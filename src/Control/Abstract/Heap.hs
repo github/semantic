@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeFamilies #-}
 module Control.Abstract.Heap
 ( Heap
 , Cell
@@ -38,3 +39,17 @@ assign :: ( Member (State (Heap location (Cell location) value)) effects
        -> value
        -> Evaluator location value effects ()
 assign address = modifyHeap . heapInsert address
+
+
+class Location location where
+  -- | The type into which stored values will be written for a given location type.
+  type family Cell location :: * -> *
+
+instance Location Precise where
+  type Cell Precise = Latest
+
+instance Location Monovariant where
+  type Cell Monovariant = All
+
+instance Location (Located location) where
+  type Cell (Located location) = Cell location
