@@ -1,5 +1,15 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Control.Abstract.Addressable where
+module Control.Abstract.Addressable
+( alloc
+, deref
+, Addressable(..)
+-- * Effects
+, Allocator
+, runAllocator
+, AddressError(..)
+, runAddressError
+, runAddressErrorWith
+) where
 
 import Control.Abstract.Context
 import Control.Abstract.Evaluator
