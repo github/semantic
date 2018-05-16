@@ -95,15 +95,15 @@ instance ( Addressable location effects
 
   allocLoc name = raiseEff (lowerEff (Located <$> allocLoc name <*> currentPackage <*> currentModule))
 
+alloc :: Addressable location effects => Name -> Evaluator location value effects (Address location value)
+alloc = fmap Address . allocLoc
+
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
 deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Address location value -> Evaluator location value effects value
 deref addr = do
   cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
   derefed <- derefCell addr cell
   maybeM (throwAddressError (UninitializedAddress addr)) derefed
-
-alloc :: Addressable location effects => Name -> Evaluator location value effects (Address location value)
-alloc = fmap Address . allocLoc
 
 data AddressError location value resume where
   UnallocatedAddress :: Address location value -> AddressError location value (Cell location value)
