@@ -37,6 +37,7 @@ evaluate
   . Value.runValueError
   . runEnvironmentError
   . runAddressError
+  . runAllocator
   . runReturn
   . runLoopControl
   . fmap fst
