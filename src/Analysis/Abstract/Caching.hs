@@ -17,7 +17,7 @@ type OutCache term location value = State  (Cache term location (Cell location) 
 -- | Look up the set of values for a given configuration in the in-cache.
 consultOracle :: (Cacheable term location (Cell location) value, Member (InCache term location value) effects)
               => Configuration term location (Cell location) value
-              -> TermEvaluator term location value effects (Set (value, Heap location (Cell location) value))
+              -> TermEvaluator term location value effects (Set (Cached location (Cell location) value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
@@ -31,13 +31,13 @@ withOracle cache = local (const cache)
 -- | Look up the set of values for a given configuration in the out-cache.
 lookupCache :: (Cacheable term location (Cell location) value, Member (OutCache term location value) effects)
             => Configuration term location (Cell location) value
-            -> TermEvaluator term location value effects (Maybe (Set (value, Heap location (Cell location) value)))
+            -> TermEvaluator term location value effects (Maybe (Set (Cached location (Cell location) value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
 cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[OutCache term location value, State (Heap location (Cell location) value)] effects)
                      => Configuration term location (Cell location) value
-                     -> Set (value, Heap location (Cell location) value)
+                     -> Set (Cached location (Cell location) value)
                      -> TermEvaluator term location value effects value
                      -> TermEvaluator term location value effects value
 cachingConfiguration configuration values action = do
@@ -125,7 +125,7 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (a, Heap location (Cell location) value) -> TermEvaluator term location value effects a
+scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (Cached location (Cell location) value) -> TermEvaluator term location value effects value
 scatter = foldMapA (\ (value, heap') -> TermEvaluator (putHeap heap') $> value)
 
 
