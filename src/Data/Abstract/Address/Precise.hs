@@ -2,8 +2,8 @@
 module Data.Abstract.Address.Precise where
 
 import Data.Abstract.Address
-import Data.Abstract.Live
 import qualified Data.IntMap.Monoidal as Monoidal
+import qualified Data.IntSet as IntSet
 import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
@@ -54,7 +54,7 @@ heapSize :: Heap value -> Int
 heapSize = Monoidal.size . unHeap
 
 -- | Restrict a 'Heap' to only those 'Address'es in the given 'Live' set (in essence garbage collecting the rest).
-heapRestrict :: Heap value -> Live Precise value -> Heap value
+heapRestrict :: Heap value -> Live value -> Heap value
 heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> Address (Precise address) `liveMember` roots) m)
 
 
@@ -65,3 +65,39 @@ instance Reducer (Precise, value) (Heap value) where
 
 instance Show value => Show (Heap value) where
   showsPrec d = showsUnaryWith showsPrec "Heap" d . map (first Precise) . Monoidal.pairs . unHeap
+
+
+-- | A set of live addresses (whether roots or reachable).
+newtype Live value = Live { unLive :: IntSet }
+  deriving (Eq, Lower, Monoid, Ord, Semigroup)
+
+fromAddresses :: Foldable t => t (Address Precise value) -> Live value
+fromAddresses = Prologue.foldr liveInsert lowerBound
+
+-- | Construct a 'Live' set containing only the given address.
+liveSingleton :: Address Precise value -> Live value
+liveSingleton = Live . IntSet.singleton . unPrecise . unAddress
+
+-- | Insert an address into a 'Live' set.
+liveInsert :: Address Precise value -> Live value -> Live value
+liveInsert (Address (Precise addr)) = Live . IntSet.insert addr . unLive
+
+-- | Delete an address from a 'Live' set, if present.
+liveDelete :: Address Precise value -> Live value -> Live value
+liveDelete (Address (Precise addr)) = Live . IntSet.delete addr . unLive
+
+-- | Compute the (asymmetric) difference of two 'Live' sets, i.e. delete every element of the second set from the first set.
+liveDifference :: Live value -> Live value -> Live value
+liveDifference = fmap Live . (IntSet.difference `on` unLive)
+
+-- | Test whether an 'Address' is in a 'Live' set.
+liveMember :: Address Precise value -> Live value -> Bool
+liveMember (Address (Precise addr)) = IntSet.member addr . unLive
+
+-- | Decompose a 'Live' set into a pair of one member address and the remaining set, or 'Nothing' if empty.
+liveSplit :: Live value -> Maybe (Address Precise value, Live value)
+liveSplit = fmap (bimap (Address . Precise) Live) . IntSet.minView . unLive
+
+
+instance Show (Live value) where
+  showsPrec d = showsUnaryWith showsPrec "Live" d . map Precise . IntSet.toList . unLive
