@@ -162,3 +162,9 @@ editDistanceUpTo m a b = diffCost m (approximateDiff a b)
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
         approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (galignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
+
+
+data Label syntax where
+  Label :: syntax a -> Label syntax
+
+instance Hashable1 syntax => Hashable (Label syntax) where hashWithSalt salt (Label syntax) = liftHashWithSalt const salt syntax
