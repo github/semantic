@@ -34,6 +34,9 @@ instance Lower b => Lower (a -> b) where lowerBound = const lowerBound
 instance Lower (Maybe a) where lowerBound = Nothing
 instance Lower [a] where lowerBound = []
 
+instance (Lower a, Lower b) => Lower (a, b) where lowerBound = (lowerBound, lowerBound)
+
+
 -- Data.Monoid
 instance Lower (Last a) where lowerBound = mempty
 
