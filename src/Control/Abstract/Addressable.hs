@@ -64,16 +64,6 @@ runAllocator = interpret (\ eff -> case eff of
   Alloc name -> Address <$> allocCell name
   Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr)))
 
-runAllocatorPrecise :: Members '[Fresh, Resumable (AddressError Precise value), State (Heap Precise Latest value)] effects => Evaluator Precise value (Allocator Precise value ': effects) a -> Evaluator Precise value effects a
-runAllocatorPrecise = interpret (\ eff -> case eff of
-  Alloc _    -> Address . Precise <$> fresh
-  Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= maybeM (throwAddressError (UninitializedAddress addr)) . getLast . unLatest)
-
-runAllocatorMonovariant :: Members '[NonDet, Resumable (AddressError Monovariant value), State (Heap Monovariant All value)] effects => Evaluator Monovariant value (Allocator Monovariant value ': effects) a -> Evaluator Monovariant value effects a
-runAllocatorMonovariant = interpret (\ eff -> case eff of
-  Alloc name -> pure (Address (Monovariant name))
-  Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= traverse (foldMapA pure) . nonEmpty . toList >>= maybeM (throwAddressError (UninitializedAddress addr)))
-
 -- | Look up the cell for the given 'Address' in the 'Heap'.
 lookupHeap :: (Member (State (Heap location (Cell location) value)) effects, Ord location) => Address location value -> Evaluator location value effects (Maybe (Cell location value))
 lookupHeap = flip fmap get . heapLookup
