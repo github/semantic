@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
