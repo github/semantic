@@ -4,7 +4,7 @@ module Control.Abstract.Addressable
 , deref
 , Addressable(..)
 -- * Effects
-, Allocator
+, Allocator(..)
 , runAllocator
 , AddressError(..)
 , runAddressError
