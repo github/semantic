@@ -3,7 +3,9 @@
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable
+import Data.Aeson (ToJSON(..), object)
 import Data.AST
+import Data.JSON.Fields
 import Data.Range
 import Data.Record
 import Data.Span
@@ -106,6 +108,9 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
+-- Propagating the identifier name into JSON is handled with the IdentifierName analysis.
+instance ToJSONFields1 Identifier
+
 instance Evaluatable Identifier where
   eval (Identifier name) = variable name
 
@@ -122,6 +127,8 @@ instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Program
+
 instance Evaluatable Program where
   eval (Program xs) = eval xs
 
@@ -133,6 +140,8 @@ instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 AccessibilityModifier
+
 -- TODO: Implement Eval instance for AccessibilityModifier
 instance Evaluatable AccessibilityModifier
 
@@ -141,6 +150,8 @@ instance Evaluatable AccessibilityModifier
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance ToJSONFields1 Empty
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
@@ -160,6 +171,13 @@ instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
 
+instance ToJSONFields1 Error where
+  toJSONFields1 f@Error{..} = withChildren f [ "stack" .= errorCallStack
+                                             , "expected" .= errorExpected
+                                             , "actual" .= errorActual
+                                             ]
+
+
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
 
@@ -168,6 +186,18 @@ unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList 
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
   deriving (Eq, Show)
+
+instance ToJSON ErrorStack where
+  toJSON (ErrorStack es) = toJSON (jSite <$> es) where
+    jSite (site, SrcLoc{..}) = object
+      [ "site" .= site
+      , "package" .= srcLocPackage
+      , "module" .= srcLocModule
+      , "file" .= srcLocFile
+      , "startLine" .= srcLocStartLine
+      , "startColumn" .= srcLocStartCol
+      , "endColumn" .= srcLocEndCol
+      ]
 
 instance Ord ErrorStack where
   compare = liftCompare (liftCompare compareSrcLoc) `on` unErrorStack
@@ -184,6 +214,8 @@ instance Ord ErrorStack where
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance ToJSONFields1 Context
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
