@@ -2,6 +2,7 @@ module Control.Abstract
 ( module X
 ) where
 
+import Control.Abstract.Addressable as X
 import Control.Abstract.Configuration as X
 import Control.Abstract.Context as X
 import Control.Abstract.Environment as X
