@@ -27,14 +27,16 @@ spec = parallel $ do
 
   describe "rws" $ do
     prop "produces correct diffs" $
-      \ (as, bs) -> let tas = defaultFeatureVectorDecorator <$> (as :: [Term ListableSyntax (Record '[])])
-                        tbs = defaultFeatureVectorDecorator <$> (bs :: [Term ListableSyntax (Record '[])])
+      \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax (Record '[])])
+                        tbs = decorate <$> (bs :: [Term ListableSyntax (Record '[])])
                         wrap = termIn Nil . injectSum
                         diff = merge (Nil, Nil) (injectSum (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
-      let (a, b) = (defaultFeatureVectorDecorator (termIn Nil (injectSum [ termIn Nil (injectSum (Syntax.Identifier "a")) ])), defaultFeatureVectorDecorator (termIn Nil (injectSum [ termIn Nil (injectSum (Syntax.Identifier "b")) ]))) in
+      let (a, b) = (decorate (termIn Nil (injectSum [ termIn Nil (injectSum (Syntax.Identifier "a")) ])), decorate (termIn Nil (injectSum [ termIn Nil (injectSum (Syntax.Identifier "b")) ]))) in
       fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
-  where diffThese = these deleting inserting replacing
+  where decorate = defaultFeatureVectorDecorator
+
+        diffThese = these deleting inserting replacing
