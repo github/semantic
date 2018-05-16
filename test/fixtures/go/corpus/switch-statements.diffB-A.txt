@@ -18,27 +18,35 @@
             (Identifier)
             ([])
             (Empty)))
-        (Pattern
-          (LessThan
-          { (Identifier)
-          ->(Identifier) }
-          { (Identifier)
-          ->(Identifier) })
+      {+(Pattern
+        {+(LessThan
+          {+(Identifier)+}
+          {+(Identifier)+})+}
         {+(Context
           {+(Comment)+}
-            (Call
-              (Identifier)
-              ([])
-              (Empty)))+})
+          {+(Call
+            {+(Identifier)+}
+            {+([])+}
+            {+(Empty)+})+})+})+}
       {+(Context
         {+(Comment)+}
           (Pattern
-            (Equal
-            { (Identifier)
-            ->(Identifier) }
-              (Integer))
+          { (LessThan
+            {-(Identifier)-}
+            {-(Identifier)-})
+          ->(Equal
+            {+(Identifier)+}
+            {+(Integer)+}) }
             (Call
             { (Identifier)
             ->(Identifier) }
               ([])
-              (Empty))))+}))))
+              (Empty))))+}
+      {-(Pattern
+        {-(Equal
+          {-(Identifier)-}
+          {-(Integer)-})-}
+        {-(Call
+          {-(Identifier)-}
+          {-([])-}
+          {-(Empty)-})-})-}))))

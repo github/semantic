@@ -55,15 +55,11 @@
       {+(BXOr
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Times
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(Modulo
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Modulo
         {+(Identifier)+}
-        {+(Integer)+}) })
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(Not
@@ -82,6 +78,11 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Times
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(Plus
