@@ -9,7 +9,7 @@ import Diffing.Algorithm
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
@@ -19,7 +19,7 @@ instance ToJSONFields1 Comment where
   toJSONFields1 f@Comment{..} = withChildren f ["contents" .= unpack commentContent ]
 
 instance Evaluatable Comment where
-  eval _ = unit
+  eval _ = Rval <$> unit
 
 -- TODO: nested comment types
 -- TODO: documentation comment types

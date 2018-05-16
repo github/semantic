@@ -9,16 +9,16 @@
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+}) }
-{ (RShift
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(LShift
+{+(LShift
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) }
+    {+(Identifier)+})+})+}
+{-(RShift
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(BXOr
   {-(Send
     {-(Identifier)-})-}
