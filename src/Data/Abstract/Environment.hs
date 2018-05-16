@@ -70,8 +70,8 @@ mergeNewer (Environment a) (Environment b) =
     Environment (NonEmpty.fromList . reverse $ alignWith (mergeThese combine) (reverse as) (reverse bs))
     where
       combine = Map.unionWith (flip const)
-      as = NonEmpty.toList a
-      bs = NonEmpty.toList b
+      as = toList a
+      bs = toList b
 
 -- | Extract an association list of bindings from an 'Environment'.
 --
@@ -106,7 +106,7 @@ trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
 bind :: Foldable t => t Name -> Environment location value -> Environment location value
-bind names env = unpairs (mapMaybe lookupName (Prologue.toList names))
+bind names env = unpairs (mapMaybe lookupName (toList names))
   where
     lookupName name = (,) name <$> lookup name env
 
