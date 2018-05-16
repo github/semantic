@@ -35,14 +35,19 @@ lookupCache :: (Cacheable term location (Cell location) value, Member (OutCache 
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[OutCache term location value, State (Heap location (Cell location) value)] effects)
+cachingConfiguration :: ( Cacheable term location (Cell location) value
+                        , Members '[ OutCache term location value
+                                   , State (Environment location value)
+                                   , State (Heap location (Cell location) value)
+                                   ] effects
+                        )
                      => Configuration term location (Cell location) value
                      -> Set (Cached location (Cell location) value)
                      -> TermEvaluator term location value effects value
                      -> TermEvaluator term location value effects value
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
-  result <- Cached <$> action <*> TermEvaluator getHeap
+  result <- Cached <$> action <*> TermEvaluator getEnv <*> TermEvaluator getHeap
   cachedValue result <$ modify' (cacheInsert configuration result)
 
 putCache :: Member (OutCache term location value) effects
@@ -125,8 +130,13 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (Cached location (Cell location) value) -> TermEvaluator term location value effects value
-scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
+scatter :: ( Foldable t
+           , Members '[ NonDet
+                      , State (Environment location value)
+                      , State (Heap location (Cell location) value)
+                      ] effects
+           ) => t (Cached location (Cell location) value) -> TermEvaluator term location value effects value
+scatter = foldMapA (\ Cached{..} -> TermEvaluator (putHeap cachedHeap) *> TermEvaluator (putEnv cachedEnvironment) $> cachedValue)
 
 
 caching :: Alternative f => TermEvaluator term location value (NonDet ': InCache term location value ': OutCache term location value ': effects) a -> TermEvaluator term location value effects (f a, Cache term location (Cell location) value)

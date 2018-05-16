@@ -2,6 +2,7 @@
 module Data.Abstract.Cache where
 
 import Data.Abstract.Configuration
+import Data.Abstract.Environment
 import Data.Abstract.Heap
 import Data.Map.Monoidal as Monoidal
 import Data.Semilattice.Lower
@@ -12,8 +13,9 @@ newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Config
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, Cached location cell value), Semigroup)
 
 data Cached location cell value = Cached
-  { cachedValue :: value
-  , cachedHeap  :: Heap location cell value
+  { cachedValue       :: value
+  , cachedEnvironment :: Environment location value
+  , cachedHeap        :: Heap location cell value
   }
   deriving (Eq, Ord, Show)
 
