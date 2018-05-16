@@ -139,10 +139,9 @@ instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
 -- | Evaluates a 'Value' returning the referenced value
-value :: ( Addressable location effects
-         , AbstractValue location value effects
-         , Members '[ Reader (Environment location value)
-                    , Resumable (AddressError location value)
+value :: ( AbstractValue location value effects
+         , Members '[ Allocator location value
+                    , Reader (Environment location value)
                     , Resumable (EnvironmentError value)
                     , Resumable (EvalError value)
                     , State (Environment location value)
@@ -156,10 +155,9 @@ value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
 value (Rval val) = pure val
 
 -- | Evaluates a 'Subterm' to its rval
-subtermValue :: ( Addressable location effects
-                , AbstractValue location value effects
-                , Members '[ Reader (Environment location value)
-                           , Resumable (AddressError location value)
+subtermValue :: ( AbstractValue location value effects
+                , Members '[ Allocator location value
+                           , Reader (Environment location value)
                            , Resumable (EnvironmentError value)
                            , Resumable (EvalError value)
                            , State (Environment location value)

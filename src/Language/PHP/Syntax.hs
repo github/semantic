@@ -52,12 +52,11 @@ resolvePHPName n = do
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( Addressable location effects
-           , AbstractValue location value effects
-           , Members '[ Modules location value
+include :: ( AbstractValue location value effects
+           , Members '[ Allocator location value
+                      , Modules location value
                       , Reader (Environment location value)
                       , Resumable ResolutionError
-                      , Resumable (AddressError location value)
                       , Resumable (EnvironmentError value)
                       , Resumable (EvalError value)
                       , State (Environment location value)
