@@ -11,7 +11,7 @@ import           Prologue
 
 -- A file directive like the Ruby constant `__FILE__`.
 data File a = File
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 File where liftEq = genericLiftEq
 instance Ord1 File where liftCompare = genericLiftCompare
@@ -25,7 +25,7 @@ instance Evaluatable File where
 
 -- A line directive like the Ruby constant `__LINE__`.
 data Line a = Line
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Line where liftEq = genericLiftEq
 instance Ord1 Line where liftCompare = genericLiftCompare
