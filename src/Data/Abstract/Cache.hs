@@ -34,4 +34,4 @@ cacheInsert = curry cons
 
 
 instance (Show term, Show location, Show (cell value), Show value) => Show (Cache term location cell value) where
-  showsPrec d = showsUnaryWith showsPrec "Cache" d . map (second toList) . Monoidal.pairs . unCache
+  showsPrec d = showsUnaryWith showsPrec "Cache" d . map (second (map ((,) <$> cachedValue <*> cachedHeap) . toList)) . Monoidal.pairs . unCache
