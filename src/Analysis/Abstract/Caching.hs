@@ -42,7 +42,7 @@ cachingConfiguration :: (Cacheable term location (Cell location) value, Members 
                      -> TermEvaluator term location value effects value
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
-  result <- (,) <$> action <*> get
+  result <- (,) <$> action <*> TermEvaluator getHeap
   fst result <$ modify' (cacheInsert configuration result)
 
 putCache :: Member (OutCache term location value) effects
