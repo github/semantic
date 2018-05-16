@@ -50,16 +50,15 @@ class Evaluatable constr where
 
 type EvaluatableConstraints location term value effects =
   ( AbstractValue location value effects
-  , Addressable location effects
   , Declarations term
   , FreeVariables term
-  , Members '[ LoopControl value
+  , Members '[ Allocator location value
+             , LoopControl value
              , Modules location value
              , Reader (Environment location value)
              , Reader ModuleInfo
              , Reader PackageInfo
              , Reader Span
-             , Resumable (AddressError location value)
              , Resumable (EnvironmentError value)
              , Resumable (EvalError value)
              , Resumable ResolutionError
@@ -70,6 +69,7 @@ type EvaluatableConstraints location term value effects =
              , State (Heap location (Cell location) value)
              , Trace
              ] effects
+  , Ord location
   , Reducer value (Cell location value)
   )
 
@@ -167,14 +167,15 @@ traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator lo
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
-builtin :: ( Addressable location effects
-           , HasCallStack
-           , Members '[ Reader (Environment location value)
+builtin :: ( HasCallStack
+           , Members '[ Allocator location value
+                      , Reader (Environment location value)
                       , Reader ModuleInfo
                       , Reader Span
                       , State (Environment location value)
                       , State (Heap location (Cell location) value)
                       ] effects
+           , Ord location
            , Reducer value (Cell location value)
            )
         => String
@@ -188,20 +189,23 @@ builtin n def = withCurrentCallStack callStack $ do
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall location term value inner inner' outer
-                    .  ( Evaluatable (Base term)
+                    .  ( Addressable location (Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+                       , Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
                                   , Fresh
                                   , Reader (Environment location value)
+                                  , Resumable (AddressError location value)
                                   , Resumable (LoadError location value)
                                   , State (Environment location value)
                                   , State (Exports location value)
+                                  , State (Heap location (Cell location) value)
                                   , State (ModuleTable (Maybe (Environment location value, value)))
                                   , Trace
                                   ] outer
                        , Recursive term
                        , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+                       , inner' ~ (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module      term (TermEvaluator term location value inner value) -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner value) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner value))
@@ -224,6 +228,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         runInModule info
           = runReader info
+          . raiseHandler runAllocator
           . raiseHandler runReturn
           . raiseHandler runLoopControl
           . raiseHandler (runGoto Gotos getGotos)
@@ -252,7 +257,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
         pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator getEnv)
 
-newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value outer) ': outer) value }
+newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value outer) ': outer) value }
   deriving (Lower)
 
 

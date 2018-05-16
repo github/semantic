@@ -118,14 +118,15 @@ javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
 evalRequire :: ( AbstractValue location value effects
-               , Addressable location effects
-               , Members '[ Modules location value
+               , Members '[ Allocator location value
+                          , Modules location value
                           , Reader (Environment location value)
                           , State (Environment location value)
                           , State (Exports location value)
                           , State (Heap location (Cell location) value)
                           , Trace
                           ] effects
+               , Ord location
                , Reducer value (Cell location value)
                )
             => M.ModulePath

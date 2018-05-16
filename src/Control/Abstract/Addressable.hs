@@ -18,15 +18,12 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Prologue
 
-alloc :: Addressable location effects => Name -> Evaluator location value effects (Address location value)
-alloc = fmap Address . allocCell
+alloc :: Member (Allocator location value) effects => Name -> Evaluator location value effects (Address location value)
+alloc = send . Alloc
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Address location value -> Evaluator location value effects value
-deref addr = do
-  cell <- heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr))
-  derefed <- derefCell addr cell
-  maybeM (throwResumable (UninitializedAddress addr)) derefed
+deref :: Member (Allocator location value) effects => Address location value -> Evaluator location value effects value
+deref = send . Deref
 
 
 -- | Defines allocation and dereferencing of 'Address'es in a 'Heap'.

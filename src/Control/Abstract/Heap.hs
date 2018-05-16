@@ -45,21 +45,21 @@ assign address = modifyHeap . heapInsert address
 
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( Addressable location effects
-                 , Members '[ Reader (Environment location value)
-                            , State (Environment location value)
-                            ] effects
-                 )
+lookupOrAlloc :: Members '[ Allocator location value
+                          , Reader (Environment location value)
+                          , State (Environment location value)
+                          ] effects
               => Name
               -> Evaluator location value effects (Address location value)
 lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
-letrec :: ( Addressable location effects
-          , Members '[ Reader (Environment location value)
+letrec :: ( Members '[ Allocator location value
+                     , Reader (Environment location value)
                      , State (Environment location value)
                      , State (Heap location (Cell location) value)
                      ] effects
+          , Ord location
           , Reducer value (Cell location value)
           )
        => Name
@@ -72,11 +72,10 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( Addressable location effects
-           , Members '[ Reader (Environment location value)
-                      , State (Environment location value)
-                      ] effects
-           )
+letrec' :: Members '[ Allocator location value
+                    , Reader (Environment location value)
+                    , State (Environment location value)
+                    ] effects
         => Name
         -> (Address location value -> Evaluator location value effects value)
         -> Evaluator location value effects value
@@ -87,14 +86,12 @@ letrec' name body = do
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Addressable location effects
-            , Members '[ Reader (Environment location value)
-                       , Resumable (AddressError location value)
-                       , Resumable (EnvironmentError value)
-                       , State (Environment location value)
-                       , State (Heap location (Cell location) value)
-                       ] effects
-            )
+variable :: Members '[ Allocator location value
+                     , Reader (Environment location value)
+                     , Resumable (EnvironmentError value)
+                     , State (Environment location value)
+                     , State (Heap location (Cell location) value)
+                     ] effects
          => Name
          -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
