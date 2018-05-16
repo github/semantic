@@ -12,7 +12,7 @@ import Data.Semigroup.Reducer
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class Ord location => Addressable location effects where
+class (Ord location, Show location) => Addressable location effects where
   derefCell :: Address location value -> Cell location value -> Evaluator location value effects (Maybe value)
 
   allocLoc :: Name -> Evaluator location value effects location
@@ -76,7 +76,7 @@ variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance Member Fresh effects => Addressable Precise effects where
-  derefCell _ = pure . unLatest
+  derefCell _ = pure . getLast . unLatest
   allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
@@ -122,8 +122,8 @@ instance Eq location => Eq1 (AddressError location value) where
 throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location value effects resume
 throwAddressError = throwResumable
 
-runAddressError :: Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (AddressError location value)) a)
+runAddressError :: Effectful (m location value) => m location value (Resumable (AddressError location value) ': effects) a -> m location value effects (Either (SomeExc (AddressError location value)) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
+runAddressErrorWith :: Effectful (m location value) => (forall resume . AddressError location value resume -> m location value effects resume) -> m location value (Resumable (AddressError location value) ': effects) a -> m location value effects a
 runAddressErrorWith = runResumableWith

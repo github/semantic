@@ -31,7 +31,7 @@ spec = parallel $ do
 evaluate
   = runM
   . fmap (first reassociate)
-  . evaluating
+  . evaluating @Precise @(Value Precise)
   . runReader (PackageInfo (name "test") Nothing)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . Value.runValueError
@@ -42,12 +42,8 @@ evaluate
   . fmap fst
   . runState (Gotos lowerBound)
   . runGoto Gotos getGotos
-  . constraining
 
 newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) (Value Precise) }
-
-constraining :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
-constraining = id
 
 reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
 reassociate (Left s) = Left (SomeExc (injectSum (Const s)))

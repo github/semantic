@@ -44,7 +44,7 @@ spec = parallel $ do
       res `shouldBe` Right [injValue (String "\"foo!\"")]
 
   where
-    ns n = Just . Latest . Just . injValue . Namespace n
+    ns n = Just . Latest . Last . Just . injValue . Namespace n
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)

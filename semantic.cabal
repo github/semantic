@@ -21,7 +21,6 @@ library
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
-                     , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -44,6 +43,7 @@ library
                      , Control.Abstract.Matching
                      , Control.Abstract.Modules
                      , Control.Abstract.Roots
+                     , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
@@ -73,11 +73,11 @@ library
                      , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
+                     , Data.Graph
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
-                     , Data.Output
                      , Data.Patch
                      , Data.Range
                      , Data.Record
@@ -131,14 +131,14 @@ library
                      , Parsing.TreeSitter
                      , Paths_semantic
                      -- Rendering formats
-                     , Rendering.DOT
+                     , Rendering.Graph
                      , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
-                     , Rendering.SExpression
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Diff
                      , Semantic.Distribute
@@ -151,7 +151,11 @@ library
                      , Semantic.Task
                      , Semantic.Telemetry
                      , Semantic.Util
-                    -- Custom Prelude
+                     -- Serialization
+                     , Serializing.DOT
+                     , Serializing.Format
+                     , Serializing.SExpression
+                     -- Custom Prelude
   other-modules:       Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
