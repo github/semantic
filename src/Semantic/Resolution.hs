@@ -15,8 +15,8 @@ import           System.FilePath.Posix
 
 
 nodeJSResolutionMap :: Member Files effs => FilePath -> Text -> [FilePath] -> Eff effs (Map FilePath FilePath)
-nodeJSResolutionMap dir prop excludeDirs = do
-  files <- findFiles dir [".json"] excludeDirs
+nodeJSResolutionMap rootDir prop excludeDirs = do
+  files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
   blobs <- readBlobs (Right packageFiles)
   pure $ fold (mapMaybe (lookup prop) blobs)
@@ -25,7 +25,9 @@ nodeJSResolutionMap dir prop excludeDirs = do
     lookup k Blob{..} = decodeStrict (sourceBytes blobSource) >>= lookupProp blobPath k
 
     lookupProp :: FilePath -> Text -> Object -> Maybe (Map FilePath FilePath)
-    lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton path <$> obj .: k
+    lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton relPkgDotJSONPath . relEntryPath <$> obj .: k
+      where relPkgDotJSONPath = makeRelative rootDir path
+            relEntryPath x = takeDirectory relPkgDotJSONPath </> x
 
 resolutionMap :: Member Resolution effs => Project -> Eff effs (Map FilePath FilePath)
 resolutionMap Project{..} = case projectLanguage of
