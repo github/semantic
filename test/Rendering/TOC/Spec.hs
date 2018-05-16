@@ -8,6 +8,7 @@ import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Diff
 import Data.Functor.Classes
+import Data.Hashable.Lifted
 import Data.Patch
 import Data.Range
 import Data.Record
@@ -241,6 +242,7 @@ diffWithParser :: ( HasField fields Data.Span.Span
                   , Diffable syntax
                   , GAlign syntax
                   , HasDeclaration syntax
+                  , Hashable1 syntax
                   , Members '[Distribute WrappedTask, Task] effs
                   )
                => Parser (Term syntax (Record fields))

@@ -105,7 +105,7 @@ decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) 
 decorate algebra = send . Decorate algebra
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
-diff :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
+diff :: (Diffable syntax, Eq1 syntax, GAlign syntax, Hashable1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
 diff terms = send (Semantic.Task.Diff terms)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
@@ -148,7 +148,7 @@ data Task output where
   Parse     :: Parser term -> Blob -> Task term
   Analyze  :: (Analysis.TermEvaluator term location value effects a -> result) -> Analysis.TermEvaluator term location value effects a -> Task result
   Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff      :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
+  Diff      :: (Diffable syntax, Eq1 syntax, GAlign syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
   Render    :: Renderer input output -> input -> Task output
   Serialize :: Format input -> input -> Task Builder
 

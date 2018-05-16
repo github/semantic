@@ -20,10 +20,10 @@ spec = parallel $ do
   let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
-      \ (term, p, q) -> pqGramDecorator constructorNameAndConstantFields (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively p) . length . stem . rhead)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively p) . length . stem . rhead)
 
     prop "produces grams with bases of the specified width" $
-      \ (term, p, q) -> pqGramDecorator constructorNameAndConstantFields (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively q) . length . base . rhead)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively q) . length . base . rhead)
 
   describe "rws" $ do
     prop "produces correct diffs" $
@@ -37,6 +37,6 @@ spec = parallel $ do
       let (a, b) = (decorate (termIn Nil (inject [ termIn Nil (inject (Syntax.Identifier "a")) ])), decorate (termIn Nil (inject [ termIn Nil (inject (Syntax.Identifier "b")) ]))) in
       fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
-  where decorate = defaultFeatureVectorDecorator constructorNameAndConstantFields
+  where decorate = defaultFeatureVectorDecorator
 
         diffThese = these deleting inserting replacing
