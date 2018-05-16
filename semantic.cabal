@@ -75,6 +75,7 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
+                     , Data.IntMap.Monoidal
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
