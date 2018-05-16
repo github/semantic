@@ -2,7 +2,6 @@
 module Data.Abstract.Address.Precise where
 
 import Data.Abstract.Address
-import Data.Abstract.Environment
 import qualified Data.IntMap.Monoidal as Monoidal
 import qualified Data.IntSet as IntSet
 import Data.Monoid (Last(..))
@@ -102,13 +101,3 @@ liveSplit = fmap (bimap (Address . Precise) Live) . IntSet.minView . unLive
 
 instance Show (Live value) where
   showsPrec d = showsUnaryWith showsPrec "Live" d . map Precise . IntSet.toList . unLive
-
-
--- | A single point in a program’s execution.
-data Configuration term value = Configuration
-  { configurationTerm        :: term                      -- ^ The “instruction,” i.e. the current term to evaluate.
-  , configurationRoots       :: Live value                -- ^ The set of rooted addresses.
-  , configurationEnvironment :: Environment Precise value -- ^ The environment binding any free variables in 'configurationTerm'.
-  , configurationHeap        :: Heap value                -- ^ The heap of values.
-  }
-  deriving (Eq, Ord, Show)
