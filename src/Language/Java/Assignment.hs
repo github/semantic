@@ -141,6 +141,7 @@ expressionChoices =
   , binary
   , boolean
   , break
+  , castExpression
   , char
   , class'
   , classInstance
@@ -539,3 +540,7 @@ formalParameters = manyTerm parameter
 
 -- constantDeclaration :: Assignment
 -- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
+
+castExpression :: Assignment
+castExpression = makeTerm <$> symbol CastExpression <*> children (flip Type.Annotation <$> type' <*> term expression)
+-- term expression, because we can deal with comments
