@@ -32,7 +32,7 @@ evaluate
   = runM
   . fmap (first reassociate)
   . evaluating @Precise @(Value Precise)
-  . runReader (PackageInfo (name "test") Nothing)
+  . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . Value.runValueError
   . runEnvironmentError
