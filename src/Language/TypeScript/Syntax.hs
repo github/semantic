@@ -2,14 +2,16 @@
 module Language.TypeScript.Syntax where
 
 import qualified Data.Abstract.Environment as Env
-import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Evaluatable
+import qualified Data.Abstract.FreeVariables as FV
 import qualified Data.Abstract.Module as M
+import           Data.Abstract.Package
 import           Data.Abstract.Path
-import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
 import qualified Data.Language as Language
+import qualified Data.Map as Map
 import           Data.Semigroup.Reducer (Reducer)
 import           Diffing.Algorithm
 import           Prelude
@@ -33,9 +35,12 @@ toName :: ImportPath -> Name
 toName = FV.name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
--- TypeScript has a couple of different strategies, but the main one mimics Node.js.
+--
+-- NB: TypeScript has a couple of different strategies, but the main one (and the
+-- only one we support) mimics Node.js.
 resolveWithNodejsStrategy :: Members '[ Modules location value
                                       , Reader M.ModuleInfo
+                                      , Reader PackageInfo
                                       , Resumable ResolutionError
                                       , Trace
                                       ] effects
@@ -54,6 +59,7 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB/index.ts
 resolveRelativePath :: Members '[ Modules location value
                                 , Reader M.ModuleInfo
+                                , Reader PackageInfo
                                 , Resumable ResolutionError
                                 , Trace
                                 ] effects
@@ -64,7 +70,8 @@ resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
   let path = joinPaths relRootDir relImportPath
-  resolveTSModule path exts >>= either notFound (\x -> x <$ traceResolve relImportPath path)
+  trace ("attempting to resolve (relative) require/import " <> show relImportPath)
+  resolveModule path exts >>= either notFound (\x -> x <$ traceResolve relImportPath path)
   where
     notFound xs = throwResumable $ NotFoundError relImportPath xs Language.TypeScript
 
@@ -80,6 +87,7 @@ resolveRelativePath relImportPath exts = do
 -- /node_modules/moduleB.ts, etc
 resolveNonRelativePath :: Members '[ Modules location value
                                    , Reader M.ModuleInfo
+                                   , Reader PackageInfo
                                    , Resumable ResolutionError
                                    , Trace
                                    ] effects
@@ -93,24 +101,31 @@ resolveNonRelativePath name exts = do
     nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
     -- Recursively search in a 'node_modules' directory, stepping up a directory each time.
     go root path searched = do
-      res <- resolveTSModule (nodeModulesPath path) exts
+      trace ("attempting to resolve (non-relative) require/import " <> show name)
+      res <- resolveModule (nodeModulesPath path) exts
       case res of
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> m <$ traceResolve name m
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
-resolveTSModule :: Member (Modules location value) effects
-                => FilePath
-                -> [String]
+-- | Resolve a module name to a ModulePath.
+resolveModule :: Members '[ Modules location value
+                          , Reader PackageInfo
+                          , Trace
+                          ] effects
+                => FilePath -- ^ Module path used as directory to search in
+                -> [String] -- ^ File extensions to look for
                 -> Evaluator location value effects (Either [FilePath] M.ModulePath)
-resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
-  where searchPaths =
-          ((path <.>) <$> exts)
-          -- TODO: Requires parsing package.json, getting the path of the
-          --       "types" property and adding that value to the search Paths.
-          -- <> [searchDir </> "package.json"]
-          <> (((path </> "index") <.>) <$> exts)
+resolveModule path' exts = do
+  let path = makeRelative "." path'
+  PackageInfo{..} <- currentPackage
+  let packageDotJSON = Map.lookup (path </> "package.json") packageResolutions
+  let searchPaths =  ((path <.>) <$> exts)
+                  <> maybe mempty (:[]) packageDotJSON
+                  <> (((path </> "index") <.>) <$> exts)
+  trace ("searching in " <> show searchPaths)
+  maybe (Left searchPaths) Right <$> resolve searchPaths
 
 typescriptExtensions :: [String]
 typescriptExtensions = ["ts", "tsx", "d.ts"]

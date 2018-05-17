@@ -28,7 +28,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
-import           Data.File
+import           Data.Project
 import           Data.Record
 import           Data.Semilattice.Lower
 import           Data.Term
@@ -39,7 +39,7 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry, Trace] effs
+graph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
       => GraphType
       -> Project
       -> Eff effs (Graph Vertex)
@@ -69,7 +69,7 @@ graph graphType project
             . runTermEvaluator @_ @_ @(Value (Located Precise))
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: Members '[Distribute WrappedTask, Files, Task, Trace] effs
+parsePackage :: Members '[Distribute WrappedTask, Files, Resolution, Task, Trace] effs
              => Parser term -- ^ A parser.
              -> Maybe File  -- ^ Prelude (optional).
              -> Project     -- ^ Project to parse into a package.
@@ -77,7 +77,8 @@ parsePackage :: Members '[Distribute WrappedTask, Files, Task, Trace] effs
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
   p <- parseModules parser project
-  let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p
+  resMap <- Task.resolutionMap project
+  let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p resMap
   pkg <$ trace ("project: " <> show pkg)
 
   where
