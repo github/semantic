@@ -275,6 +275,7 @@ test-suite test
                      , filepath
                      , free
                      , Glob
+                     , hashable
                      , haskell-tree-sitter
                      , hspec >= 2.4.1
                      , hspec-core

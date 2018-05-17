@@ -7,7 +7,7 @@ import Data.JSON.Fields
 import Diffing.Algorithm
 
 newtype Document a = Document [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Document
 
@@ -19,7 +19,7 @@ instance Show1 Document where liftShowsPrec = genericLiftShowsPrec
 -- Block elements
 
 newtype Paragraph a = Paragraph [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Paragraph
 
@@ -28,7 +28,7 @@ instance Ord1 Paragraph where liftCompare = genericLiftCompare
 instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
 
 data Heading a = Heading { headingLevel :: Int, headingContent :: [a], sectionContent :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Heading
 
@@ -37,7 +37,7 @@ instance Ord1 Heading where liftCompare = genericLiftCompare
 instance Show1 Heading where liftShowsPrec = genericLiftShowsPrec
 
 newtype UnorderedList a = UnorderedList [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 UnorderedList
 
@@ -48,7 +48,7 @@ instance Show1 UnorderedList where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 OrderedList
 
 newtype OrderedList a = OrderedList [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 OrderedList where liftEq = genericLiftEq
 instance Ord1 OrderedList where liftCompare = genericLiftCompare
@@ -57,7 +57,7 @@ instance Show1 OrderedList where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 BlockQuote
 
 newtype BlockQuote a = BlockQuote [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 BlockQuote where liftEq = genericLiftEq
 instance Ord1 BlockQuote where liftCompare = genericLiftCompare
@@ -66,7 +66,7 @@ instance Show1 BlockQuote where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 ThematicBreak
 
 data ThematicBreak a = ThematicBreak
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ThematicBreak where liftEq = genericLiftEq
 instance Ord1 ThematicBreak where liftCompare = genericLiftCompare
@@ -76,14 +76,14 @@ instance ToJSONFields1 HTMLBlock where
   toJSONFields1 (HTMLBlock b) = noChildren [ "asString" .= unpack b ]
 
 newtype HTMLBlock a = HTMLBlock ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 HTMLBlock where liftEq = genericLiftEq
 instance Ord1 HTMLBlock where liftCompare = genericLiftCompare
 instance Show1 HTMLBlock where liftShowsPrec = genericLiftShowsPrec
 
 newtype Table a = Table [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Table
 
@@ -92,7 +92,7 @@ instance Ord1 Table where liftCompare = genericLiftCompare
 instance Show1 Table where liftShowsPrec = genericLiftShowsPrec
 
 newtype TableRow a = TableRow [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 TableRow
 
@@ -101,7 +101,7 @@ instance Ord1 TableRow where liftCompare = genericLiftCompare
 instance Show1 TableRow where liftShowsPrec = genericLiftShowsPrec
 
 newtype TableCell a = TableCell [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 TableCell
 
@@ -113,7 +113,7 @@ instance Show1 TableCell where liftShowsPrec = genericLiftShowsPrec
 -- Inline elements
 
 newtype Strong a = Strong [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Strong
 
@@ -122,7 +122,7 @@ instance Ord1 Strong where liftCompare = genericLiftCompare
 instance Show1 Strong where liftShowsPrec = genericLiftShowsPrec
 
 newtype Emphasis a = Emphasis [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Emphasis
 
@@ -131,7 +131,7 @@ instance Ord1 Emphasis where liftCompare = genericLiftCompare
 instance Show1 Emphasis where liftShowsPrec = genericLiftShowsPrec
 
 newtype Text a = Text ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Text where
   toJSONFields1 (Text s) = noChildren ["asString" .= unpack s ]
@@ -141,7 +141,7 @@ instance Ord1 Text where liftCompare = genericLiftCompare
 instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
 
 data Link a = Link { linkURL :: ByteString, linkTitle :: Maybe ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 -- TODO: Better ToJSONFields1 instance
 instance ToJSONFields1 Link
@@ -151,7 +151,7 @@ instance Ord1 Link where liftCompare = genericLiftCompare
 instance Show1 Link where liftShowsPrec = genericLiftShowsPrec
 
 data Image a = Image { imageURL :: ByteString, imageTitle :: Maybe ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 -- TODO: Better ToJSONFields1 instance
 instance ToJSONFields1 Image
@@ -161,7 +161,7 @@ instance Ord1 Image where liftCompare = genericLiftCompare
 instance Show1 Image where liftShowsPrec = genericLiftShowsPrec
 
 data Code a = Code { codeLanguage :: Maybe ByteString, codeContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 -- TODO: Better ToJSONFields1 instance
 instance ToJSONFields1 Code
@@ -171,7 +171,7 @@ instance Ord1 Code where liftCompare = genericLiftCompare
 instance Show1 Code where liftShowsPrec = genericLiftShowsPrec
 
 data LineBreak a = LineBreak
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 LineBreak
 
@@ -182,7 +182,7 @@ instance Show1 LineBreak where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Strikethrough
 
 newtype Strikethrough a = Strikethrough [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Strikethrough where liftEq = genericLiftEq
 instance Ord1 Strikethrough where liftCompare = genericLiftCompare
