@@ -104,7 +104,7 @@ instance Evaluatable Import where
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval (Import (RelativeQualifiedName n Nothing) [(name, _)]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (unName name :| []))))
-    evalQualifiedImport name path
+    Rval <$> evalQualifiedImport name path
 
   -- from a import b
   -- from a import b as c
