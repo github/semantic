@@ -30,6 +30,11 @@ spec = parallel $ do
       env <- environment . snd . fst <$> evaluate "main2.py"
       Env.names env `shouldContain` [ "bar", "foo" ]
 
+    it "imports with relative syntax" $ do
+      ((_, state), _) <- evaluate "main3.py"
+      Env.names (environment state) `shouldContain` [ "utils" ]
+      (derefQName (heap state) ("utils" :| []) (environment state) >>= deNamespace) `shouldBe` Just ("utils", ["to_s"])
+
     it "subclasses" $ do
       ((res, _), _) <- evaluate "subclass.py"
       res `shouldBe` Right [injValue (String "\"bar\"")]

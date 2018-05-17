@@ -11,6 +11,7 @@ import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Semigroup.Reducer as Reducer
 import           Data.Mergeable
 import           Diffing.Algorithm
 import           GHC.Generics
@@ -98,9 +99,17 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 -- from a import b
--- from a import b as c
--- from a import *
 instance Evaluatable Import where
+  -- from . import moduleY
+  -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
+  eval (Import (RelativeQualifiedName n Nothing) [(name, _)]) = do
+    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (unName name :| []))))
+    Rval <$> evalQualifiedImport name path
+
+  -- from a import b
+  -- from a import b as c
+  -- from a import *
+  -- from .moduleY import b
   eval (Import name xs) = do
     modulePaths <- resolvePythonModules name
 
@@ -117,6 +126,24 @@ instance Evaluatable Import where
         | Prologue.null xs = importedEnv
         | otherwise = Env.overwrite xs importedEnv
 
+
+-- Evaluate a qualified import
+evalQualifiedImport :: ( AbstractValue location a effects
+                       , Addressable location effects
+                       , Reducer.Reducer a (Cell location a)
+                       , Members '[ (State (Exports location a))
+                                  , (State (Environment location a))
+                                  , (State (Heap location (Cell location) a))
+                                  , (Reader (Environment location a))
+                                  , (Modules location a)
+                                  ] effects
+                       )
+                    => Name -> ModulePath -> Evaluator location a effects a
+evalQualifiedImport name path = letrec' name $ \addr -> do
+  importedEnv <- maybe emptyEnv fst <$> isolate (require path)
+  modifyEnv (mergeEnvs importedEnv)
+  void $ makeNamespace name addr Nothing
+  unit
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -135,12 +162,8 @@ instance Evaluatable QualifiedImport where
     Rval <$> go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
-      go ((name, path) :| []) = letrec' name $ \addr -> do
-        importedEnv <- maybe emptyEnv fst <$> isolate (require path)
-        modifyEnv (mergeEnvs importedEnv)
-        void $ makeNamespace name addr Nothing
-        unit
-      -- Evaluate each parent module, creating a just namespace
+      go ((name, path) :| []) = evalQualifiedImport name path
+      -- Evaluate each parent module, just creating a namespace
       go ((name, path) :| xs) = letrec' name $ \addr -> do
         void $ isolate (require path)
         void $ go (NonEmpty.fromList xs)

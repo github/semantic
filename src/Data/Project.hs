@@ -1,9 +1,25 @@
-module Data.File where
+module Data.Project where
 
 import           Data.ByteString.Char8 as BC (pack)
 import           Data.Language
 import           Prologue
 import           System.FilePath.Posix
+
+data Project = Project
+  { projectRootDir :: FilePath
+  , projectFiles :: [File]
+  , projectLanguage :: Language
+  , projectEntryPoints :: [File]
+  , projectExcludeDirs :: [FilePath]
+  }
+  deriving (Eq, Ord, Show)
+
+projectName :: Project -> ByteString
+projectName = BC.pack . dropExtensions . takeFileName . projectRootDir
+
+projectExtensions :: Project -> [String]
+projectExtensions = extensionsForLanguage . projectLanguage
+
 
 data File = File
   { filePath :: FilePath
@@ -11,20 +27,6 @@ data File = File
   }
   deriving (Eq, Ord, Show)
 
-data Project = Project
-  { projectRootDir :: FilePath
-  , projectFiles :: [File]
-  , projectLanguage :: Language
-  , projectEntryPoints :: [File]
-  }
-  deriving (Eq, Ord, Show)
-
 file :: FilePath -> File
 file path = File path (languageForFilePath path)
   where languageForFilePath = languageForType . takeExtension
-
-projectName :: Project -> ByteString
-projectName = BC.pack . dropExtensions . takeFileName . projectRootDir
-
-projectExtensions :: Project -> [String]
-projectExtensions = extensionsForLanguage . projectLanguage
