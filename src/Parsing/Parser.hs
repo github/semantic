@@ -111,7 +111,7 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *
 --
 --   > runTask (parse (someParser @'[Show1] language) blob) >>= putStrLn . withSomeTerm show
 someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
-              , ApplyAll typeclasses (Union Java.Syntax)
+              , ApplyAll typeclasses (Sum Java.Syntax)
               , ApplyAll typeclasses (Sum JSON.Syntax)
               , ApplyAll typeclasses (Sum Markdown.Syntax)
               , ApplyAll typeclasses (Sum Python.Syntax)

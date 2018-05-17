@@ -153,7 +153,7 @@ instance Evaluatable TypeParameters
 
 -- data instead of newtype because no payload
 data Void a = Void
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Void where liftEq = genericLiftEq
 instance Ord1 Void where liftCompare = genericLiftCompare
@@ -164,7 +164,7 @@ instance Evaluatable Void
 
 -- data instead of newtype because no payload
 data Int a = Int
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Int where liftEq = genericLiftEq
 instance Ord1 Int where liftCompare = genericLiftCompare
@@ -174,7 +174,7 @@ instance Show1 Int where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Int
 
 data Float a = Float | Double
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Float where liftEq = genericLiftEq
 instance Ord1 Float where liftCompare = genericLiftCompare
@@ -184,7 +184,7 @@ instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Float
 
 data Bool a = Bool
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Bool where liftEq = genericLiftEq
 instance Ord1 Bool where liftCompare = genericLiftCompare
