@@ -218,6 +218,24 @@ builtin n def = withCurrentCallStack callStack $ do
   modifyEnv (X.insert name addr)
   def >>= assign addr
 
+defineBuiltins :: ( AbstractValue location value effects
+                  , HasCallStack
+                  , Members '[ Allocator location value
+                             , Reader (Environment location value)
+                             , Reader ModuleInfo
+                             , Reader Span
+                             , Resumable (EnvironmentError value)
+                             , State (Environment location value)
+                             , State (Heap location (Cell location) value)
+                             , Trace
+                             ] effects
+                  , Ord location
+                  , Reducer value (Cell location value)
+                  )
+               => Evaluator location value effects ()
+defineBuiltins = do
+  builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
+
 -- | Evaluate a given package.
 evaluatePackageWith :: forall location term value inner inner' outer
                     -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that? If not, can we factor this effect list out?
@@ -273,9 +291,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
           maybe v ((`call` []) <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule)) $ do
-          _ <- runInModule moduleInfoFromCallStack . TermEvaluator $ do
-            builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
-            unit
+          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> unit))
           fst <$> evalModule prelude
 
         withPrelude Nothing a = a
