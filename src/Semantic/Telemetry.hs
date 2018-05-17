@@ -4,16 +4,12 @@ module Semantic.Telemetry
 , writeStat
 , time
 , Telemetry
-, Queues(..)
 , runTelemetry
 , ignoreTelemetry
 ) where
 
-import Control.Monad.Effect.Internal hiding (run)
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Run
+import Control.Monad.Effect
 import Control.Monad.IO.Class
-import Prologue
 import Semantic.Log
 import Semantic.Queue
 import Semantic.Stat
@@ -38,32 +34,14 @@ data Telemetry output where
   WriteStat :: Stat                                  -> Telemetry ()
   WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
 
--- | Queues for logging and statting.
-data Queues = Queues { logger :: AsyncQueue Message Options, statter :: AsyncQueue Stat StatsClient }
-
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: Member IO (Reader Queues ': effs) => Eff (Telemetry ': effs) a -> Eff (Reader Queues ': effs) a
-runTelemetry = reinterpret (\ t -> case t of
-  WriteStat stat -> asks statter >>= \ statter -> liftIO (queue statter stat)
-  WriteLog level message pairs -> asks logger >>= \ logger -> queueLogMessage logger level message pairs)
+runTelemetry :: Member IO effects => AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
+runTelemetry logger statter = interpret (\ t -> case t of
+  WriteStat stat -> liftIO (queue statter stat)
+  WriteLog level message pairs -> queueLogMessage logger level message pairs)
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
 ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
   WriteLog{}  -> pure ())
-
-
--- | Interpret an effect by replacing it with another effect.
-reinterpret :: (forall x. effect x -> Eff (newEffect ': effs) x)
-            -> Eff (effect ': effs) a
-            -> Eff (newEffect ': effs) a
-reinterpret handle = loop
-  where loop (Val x)  = pure x
-        loop (E u' q) = case decompose u' of
-            Right eff -> handle eff >>=            q >>> loop
-            Left  u   -> E (weaken u) (tsingleton (q >>> loop))
-
-
-instance (Member IO (Reader Queues ': effects), Run (Reader Queues ': effects) result rest) => Run (Telemetry ': effects) result rest where
-  run = run . runTelemetry

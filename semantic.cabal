@@ -15,20 +15,12 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.BadAddresses
-                     , Analysis.Abstract.BadSyntax
-                     , Analysis.Abstract.BadModuleResolutions
-                     , Analysis.Abstract.BadVariables
-                     , Analysis.Abstract.BadValues
-                     , Analysis.Abstract.Caching
+                       Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Erroring
                      , Analysis.Abstract.Evaluating
-                     , Analysis.Abstract.ImportGraph
+                     , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
-                     , Analysis.Abstract.TypeChecking
-                     , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -39,13 +31,20 @@ library
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract
                      , Control.Abstract.Addressable
-                     , Control.Abstract.Analysis
+                     , Control.Abstract.Configuration
+                     , Control.Abstract.Context
+                     , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Exports
+                     , Control.Abstract.Goto
+                     , Control.Abstract.Heap
                      , Control.Abstract.Matching
+                     , Control.Abstract.Modules
+                     , Control.Abstract.Roots
+                     , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
-                     -- Control flow
-                     , Control.Effect
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
@@ -57,11 +56,9 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
-                     , Data.Abstract.Located
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
-                     , Data.Abstract.Origin
                      , Data.Abstract.Package
                      , Data.Abstract.Path
                      , Data.Abstract.Type
@@ -73,15 +70,15 @@ library
                      , Data.Blob
                      , Data.Diff
                      , Data.Error
-                     , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
+                     , Data.Graph
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
-                     , Data.Output
                      , Data.Patch
+                     , Data.Project
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
@@ -137,14 +134,14 @@ library
                      , Parsing.TreeSitter
                      , Paths_semantic
                      -- Rendering formats
-                     , Rendering.DOT
+                     , Rendering.Graph
                      , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
-                     , Rendering.SExpression
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Diff
                      , Semantic.Distribute
@@ -153,11 +150,16 @@ library
                      , Semantic.Log
                      , Semantic.Parse
                      , Semantic.Queue
+                     , Semantic.Resolution
                      , Semantic.Stat
                      , Semantic.Task
                      , Semantic.Telemetry
                      , Semantic.Util
-                    -- Custom Prelude
+                     -- Serialization
+                     , Serializing.DOT
+                     , Serializing.Format
+                     , Serializing.SExpression
+                     -- Custom Prelude
   other-modules:       Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
@@ -173,6 +175,7 @@ library
                      , directory
                      , directory-tree
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , freer-cofreer
@@ -182,7 +185,6 @@ library
                      , hashable
                      , kdt
                      , mersenne-random-pure64
-                     , microlens
                      , mtl
                      , network
                      , network-uri
@@ -200,6 +202,7 @@ library
                      , these
                      , time
                      , unix
+                     , unordered-containers
                      , haskell-tree-sitter
                      , tree-sitter-go
                      , tree-sitter-json
@@ -240,12 +243,13 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Assigning.Assignment.Spec
-                     , Analysis.Go.Spec
+  other-modules:       Analysis.Go.Spec
                      , Analysis.PHP.Spec
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
+                     , Assigning.Assignment.Spec
+                     , Control.Abstract.Evaluator.Spec
                      , Data.Diff.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec
@@ -273,9 +277,11 @@ test-suite test
                      , bytestring
                      , comonad
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , Glob
+                     , hashable
                      , haskell-tree-sitter
                      , hspec >= 2.4.1
                      , hspec-core

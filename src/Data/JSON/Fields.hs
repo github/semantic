@@ -1,15 +1,31 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
-module Data.JSON.Fields where
+{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+module Data.JSON.Fields
+  ( JSONFields (..)
+  , JSONFields1 (..)
+  , ToJSONFields (..)
+  , ToJSONFields1 (..)
+  , (.=)
+  , noChildren
+  , withChildren
+  ) where
 
-import Prologue
 import Data.Aeson
+import Data.Sum (Apply(..), Sum)
+import Prologue
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]
 
 class ToJSONFields1 f where
   toJSONFields1 :: (KeyValue kv, ToJSON a) => f a -> [kv]
+  default toJSONFields1 :: (KeyValue kv, ToJSON a, Foldable f) => f a -> [kv]
+  toJSONFields1 f = ["children" .= toList f]
 
+withChildren :: (KeyValue kv, ToJSON a, Foldable f) => f a -> [kv] -> [kv]
+withChildren f ks = ("children" .= toList f) : ks
+
+noChildren :: KeyValue kv => [kv] -> [kv]
+noChildren ks = ("children" .= ([] :: [Int])) : ks
 
 instance ToJSONFields a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= object (toJSONFields a), "after" .= object (toJSONFields b) ]
@@ -23,8 +39,8 @@ instance ToJSON a => ToJSONFields [a] where
 instance ToJSONFields1 [] where
   toJSONFields1 list = [ "children" .= list ]
 
-instance Apply Foldable fs => ToJSONFields1 (Union fs) where
-  toJSONFields1 = apply (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
+instance Apply ToJSONFields1 fs => ToJSONFields1 (Sum fs) where
+  toJSONFields1 = apply @ToJSONFields1 toJSONFields1
 
 instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= JSONFields a, "after" .= JSONFields b ]

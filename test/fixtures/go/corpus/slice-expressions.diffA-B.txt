@@ -6,50 +6,36 @@
     (Identifier)
     ([])
     (
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Empty)+}
-      {+(Empty)+})+}
       (Slice
-      { (Identifier)
-      ->(Identifier) }
+        (Identifier)
       { (Integer)
-      ->(Empty) }
+      ->(Integer) }
+        (Empty)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Empty)
+      { (Integer)
+      ->(Integer) }
+        (Empty))
+      (Slice
+        (Identifier)
+      { (Empty)
+      ->(Integer) }
       { (Empty)
       ->(Integer) }
         (Empty))
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Integer)+}
-      {+(Empty)+})+}
       (Slice
-      { (Identifier)
-      ->(Identifier) }
-      { (Empty)
+        (Identifier)
+      { (Integer)
       ->(Integer) }
       { (Integer)
       ->(Integer) }
-      { (Empty)
+      { (Integer)
       ->(Integer) })
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Integer)+}
-      {+(Empty)+})+}
-    {-(Slice
-      {-(Identifier)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-})-}
-    {-(Slice
-      {-(Identifier)-}
-      {-(Integer)-}
-      {-(Integer)-}
-      {-(Integer)-})-}
-    {-(Slice
-      {-(Identifier)-}
-      {-(Integer)-}
-      {-(Integer)-}
-      {-(Empty)-})-})))
+      (Slice
+      { (Identifier)
+      ->(Identifier) }
+        (Integer)
+        (Integer)
+        (Empty)))))

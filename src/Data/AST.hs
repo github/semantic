@@ -7,6 +7,11 @@ import Data.Span
 import Data.Term
 import Prologue
 
+import Data.Aeson
+import Data.ByteString.Char8 (pack)
+import Data.JSON.Fields
+import Data.Text.Encoding (decodeUtf8)
+
 -- | An AST node labelled with symbols and source location.
 type AST syntax grammar = Term syntax (Node grammar)
 
@@ -16,6 +21,12 @@ data Node grammar = Node
   , nodeSpan :: {-# UNPACK #-} !Span
   }
   deriving (Eq, Show)
+
+
+instance Show grammar => ToJSONFields (Node grammar) where
+  toJSONFields Node{..} =
+    [ "symbol" .= decodeUtf8 (pack (show nodeSymbol))
+    , "span" .= nodeSpan ]
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 type Location = '[Range, Span]

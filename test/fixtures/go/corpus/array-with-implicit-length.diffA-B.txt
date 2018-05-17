@@ -11,9 +11,9 @@
         (Array
           (Identifier))
         (
-        { (Integer)
-        ->(Integer) }
+        {+(Integer)+}
         {+(Integer)+}
         { (Integer)
         ->(Integer) }
+        {-(Integer)-}
         {-(Integer)-})))))

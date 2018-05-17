@@ -10,9 +10,6 @@ module Data.Abstract.ModuleTable
 , keys
 , fromModules
 , toPairs
-, LoadStack (..)
-, loadStackPush
-, loadStackPop
 ) where
 
 import Data.Abstract.Module
@@ -25,7 +22,7 @@ import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
-  deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Traversable)
 
 singleton :: ModulePath -> a -> ModuleTable a
 singleton name = ModuleTable . Map.singleton name
@@ -54,13 +51,5 @@ toPairs :: ModuleTable a -> [(ModulePath, a)]
 toPairs = Map.toList . unModuleTable
 
 
--- | Stack of module paths used to help break circular loads/imports.
-newtype LoadStack = LoadStack { unLoadStack :: [ModulePath] }
-  deriving (Eq, Lower, Monoid, Ord, Semigroup, Show)
-
-loadStackPush :: ModulePath -> LoadStack -> LoadStack
-loadStackPush x LoadStack{..} = LoadStack (x : unLoadStack)
-
-loadStackPop :: LoadStack -> LoadStack
-loadStackPop (LoadStack []) = LoadStack []
-loadStackPop (LoadStack (_:xs)) = LoadStack xs
+instance Show a => Show (ModuleTable a) where
+  showsPrec d = showsUnaryWith showsPrec "ModuleTable" d . toPairs

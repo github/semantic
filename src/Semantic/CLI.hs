@@ -1,41 +1,36 @@
-{-# LANGUAGE ApplicativeDo, TemplateHaskell #-}
+{-# LANGUAGE ApplicativeDo, RankNTypes, TemplateHaskell #-}
 module Semantic.CLI
 ( main
 -- Testing
-, runDiff
-, runParse
+, Diff.runDiff
+, Parse.runParse
 ) where
 
-import           Data.File
-import           Data.Language
+import           Data.Project
+import           Data.Language (Language)
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
 import           Data.Version (showVersion)
 import           Development.GitRev
-import           Options.Applicative
+import           Options.Applicative hiding (style)
 import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
-import qualified Semantic.Diff as Semantic (diffBlobPairs)
-import qualified Semantic.Graph as Semantic (graph)
-import           Semantic.IO (languageForFilePath)
+import qualified Semantic.AST as AST
+import qualified Semantic.Diff as Diff
+import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
+import           Semantic.IO as IO
 import qualified Semantic.Log as Log
-import qualified Semantic.Parse as Semantic (parseBlobs)
+import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
-import           System.IO (Handle, stdin, stdout)
+import           Serializing.Format
 import           Text.Read
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
-runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both File] -> Task.TaskEff ByteString
-runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
-
-runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
-runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
-
-runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) rootDir dir excludeDirs = Semantic.graph r <=< Task.readProject rootDir dir excludeDirs
+runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
+runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -56,43 +51,54 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       pure $ Log.Options disableColour logLevel requestId False False Log.logfmtFormatter 0 failOnWarning
 
     argumentsParser = do
-      subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
-      output <- Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (Left stdout)
-      pure $ subparser >>= Task.writeToOutput output
+      subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
+      output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
+      pure $ subparser >>= Task.write output
 
-    diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
+    diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
     diffArgumentsParser = do
-      renderer <- flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
-              <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
-              <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc" <> help "Output JSON table of contents diff summary")
-              <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot" <> help "Output the diff as a DOT graph")
+      renderer <- flag  (Diff.runDiff SExpressionDiffRenderer) (Diff.runDiff SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
+              <|> flag'                                        (Diff.runDiff JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
+              <|> flag'                                        (Diff.runDiff ToCDiffRenderer)         (long "toc"         <> help "Output JSON table of contents diff summary")
+              <|> flag'                                        (Diff.runDiff DOTDiffRenderer)         (long "dot"         <> help "Output the diff as a DOT graph")
       filesOrStdin <- Right <$> some (both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
-      pure $ runDiff renderer filesOrStdin
+      pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
-    parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for path(s)"))
+    parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
     parseArgumentsParser = do
-      renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
-              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
-              <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags")
-              <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols" <> help "Output JSON symbol list")
+      renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
+              <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
+              <|> flag'                                          (Parse.runParse TagsTermRenderer)        (long "tags"        <> help "Output JSON tags")
+              <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
                                                  <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
-              <|> flag'                                        (SomeRenderer ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
-              <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees")
+              <|> flag'                                          (Parse.runParse ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
+              <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
-      pure $ runParse renderer filesOrStdin
+      pure $ Task.readBlobs filesOrStdin >>= renderer
 
-    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute an import graph a directory or entry point"))
+    tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
+    tsParseArgumentsParser = do
+      format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
+            <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
+      filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
+      pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
+
+    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do
-      renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
-              <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
-      excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
-      File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
-      pure $ runGraph renderer rootDir filePath (fromJust fileLanguage) excludeDirs
+      graphType <- flag ImportGraph ImportGraph (long "imports" <> help "Compute an import graph (default)")
+               <|> flag'            CallGraph   (long "calls"   <> help "Compute a call graph")
+      serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
+                <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
+      rootDir <- rootDirectoryOption
+      excludeDirs <- excludeDirsOption
+      File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
+      pure $ runGraph graphType rootDir filePath (fromJust fileLanguage) excludeDirs >>= serializer
 
+    rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
+    excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | lang <- readMaybe b -> Right (File a lang)

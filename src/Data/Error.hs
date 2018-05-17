@@ -79,4 +79,4 @@ showCallStack :: Colourize -> CallStack -> ShowS
 showCallStack colourize callStack = foldr (.) id (intersperse (showChar '\n') (uncurry (showCallSite colourize) <$> getCallStack callStack))
 
 showCallSite :: Colourize -> String -> SrcLoc -> ShowS
-showCallSite colourize symbol SrcLoc{..} = showString symbol . showChar ' ' . withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showParen True (showSpan (Just srcLocFile) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))))
+showCallSite colourize symbol loc@SrcLoc{..} = showString symbol . showChar ' ' . withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showParen True (showSpan (Just srcLocFile) (spanFromSrcLoc loc)))

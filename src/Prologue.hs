@@ -21,11 +21,10 @@ import Data.Maybe as X
 import Data.Monoid (Alt (..))
 import Data.Sequence as X (Seq)
 import Data.Set as X (Set)
+import Data.Sum as X
 import Data.Text as X (Text)
 import Data.These as X
 import Data.Union as X
-
-import Debug.Trace as X
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 
@@ -47,6 +46,7 @@ import Data.Functor.Classes as X
 import Data.Functor.Classes.Generic as X
 import Data.Functor.Foldable as X (Base, Corecursive (..), Recursive (..))
 import Data.Hashable as X (Hashable, hash, hashUsing, hashWithSalt)
+import Data.Hashable.Lifted as X (Hashable1(..), hashWithSalt1)
 import Data.Mergeable as X (Mergeable)
 import Data.Monoid as X (First (..), Last (..), Monoid (..))
 import Data.Proxy as X (Proxy (..))
