@@ -1,3 +1,5 @@
+# Base image for deployment suitable containers.
+
 FROM debian:stable-slim
 
 # Install dependencies
