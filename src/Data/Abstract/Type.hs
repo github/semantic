@@ -104,8 +104,8 @@ instance AbstractHole Type where
   isHole = (== Hole)
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Addressable location effects
-         , Members '[ Fresh
+instance ( Members '[ Allocator location Type
+                    , Fresh
                     , NonDet
                     , Reader (Environment location Type)
                     , Resumable (AddressError location Type)
@@ -115,6 +115,7 @@ instance ( Addressable location effects
                     , State (Environment location Type)
                     , State (Heap location (Cell location) Type)
                     ] effects
+         , Ord location
          , Reducer Type (Cell location Type)
          )
       => AbstractValue location Type effects where
