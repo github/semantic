@@ -147,6 +147,7 @@ expressionChoices =
   , classInstance
   , continue
   , constructorDeclaration
+  , explicitConstructorInvocation
   -- , constantDeclaration
   , doWhile
   , fieldDeclaration
@@ -295,6 +296,12 @@ generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.Gener
 
 methodInvocation :: Assignment
 methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
+  where
+    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
+    callFunction a Nothing = a
+
+explicitConstructorInvocation :: Assignment
+explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
   where
     callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
     callFunction a Nothing = a
