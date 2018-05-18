@@ -10,7 +10,11 @@ module Semantic.Task
 , IO.readBlobs
 , IO.readBlobPairs
 , IO.readProject
+, IO.findFiles
 , IO.write
+-- * Module Resolution
+, resolutionMap
+, Resolution
 -- * Telemetry
 , writeLog
 , writeStat
@@ -67,6 +71,7 @@ import           Parsing.TreeSitter
 import           Prologue hiding (MonadError (..), project)
 import           Semantic.Distribute
 import qualified Semantic.IO as IO
+import           Semantic.Resolution
 import           Semantic.Log
 import           Semantic.Queue
 import           Semantic.Stat as Stat
@@ -78,6 +83,7 @@ import           System.IO (stderr)
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff = Eff '[Distribute WrappedTask
                     , Task
+                    , Resolution
                     , IO.Files
                     , Reader Options
                     , Trace
@@ -130,7 +136,14 @@ runTaskWithOptions options task = do
 
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
-        run = runM . runError . runTelemetry logger statter . runTraceInTelemetry . runReader options . IO.runFiles . runTaskF . runDistribute (run . unwrapTask)
+        run = runM . runError
+                   . runTelemetry logger statter
+                   . runTraceInTelemetry
+                   . runReader options
+                   . IO.runFiles
+                   . runResolution
+                   . runTaskF
+                   . runDistribute (run . unwrapTask)
     run task
   queue statter stat
 

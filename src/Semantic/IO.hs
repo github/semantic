@@ -5,7 +5,6 @@ module Semantic.IO
 , isDirectory
 , readBlobPairsFromHandle
 , readBlobsFromHandle
-, readBlobsFromPaths
 , readProjectFromPaths
 , readBlobsFromDir
 , findFiles
@@ -13,9 +12,10 @@ module Semantic.IO
 , NoLanguageForBlob(..)
 , noLanguageForBlob
 , readBlob
-, readProject
 , readBlobs
 , readBlobPairs
+, readProject
+, findFilesInDir
 , write
 , Handle(..)
 , getHandle
@@ -38,7 +38,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import qualified Data.Blob as Blob
 import           Data.Bool
-import           Data.File
+import           Data.Project
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
@@ -97,9 +97,6 @@ readBlobFromPath file = do
   maybeFile <- readFile file
   maybe (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) pure maybeFile
 
-readBlobsFromPaths :: MonadIO m => [File] -> m [Blob.Blob]
-readBlobsFromPaths files = catMaybes <$> traverse readFile files
-
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
   isDir <- isDirectory path
@@ -107,15 +104,15 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
       then (id, [], fromMaybe path maybeRoot)
       else (filter (/= path), [toFile path], fromMaybe (takeDirectory path) maybeRoot)
 
-  paths <- liftIO $ filterFun <$> findFiles rootDir exts excludeDirs
-  pure $ Project rootDir (toFile <$> paths) lang entryPoints
+  paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
+  pure $ Project rootDir (toFile <$> paths) lang entryPoints excludeDirs
   where
     toFile path = File path (Just lang)
     exts = extensionsForLanguage lang
 
 -- Recursively find files in a directory.
-findFiles :: forall m. MonadIO m => FilePath -> [String] -> [FilePath] -> m [FilePath]
-findFiles path exts excludeDirs = do
+findFilesInDir :: forall m. MonadIO m => FilePath -> [String] -> [FilePath] -> m [FilePath]
+findFilesInDir path exts excludeDirs = do
   _:/dir <- liftIO $ Tree.build path
   pure $ (onlyFiles . Tree.filterDir (withExtensions exts) . Tree.filterDir (notIn excludeDirs)) dir
   where
@@ -208,6 +205,9 @@ readBlobPairs (Right paths) = traverse (send . Read . FromPathPair) paths
 readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
+findFiles :: Member Files effs => FilePath -> [String] -> [FilePath] -> Eff effs [FilePath]
+findFiles dir exts = send . FindFiles dir exts
+
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.
 write :: Member Files effs => Destination -> B.Builder -> Eff effs ()
 write dest = send . Write dest
@@ -247,6 +247,7 @@ data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 data Files out where
   Read        :: Source out -> Files out
   ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
+  FindFiles   :: FilePath -> [String] -> [FilePath] -> Files [FilePath]
   Write       :: Destination -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
@@ -257,6 +258,7 @@ runFiles = interpret $ \ files -> case files of
   Read (FromPathPair paths)    -> rethrowing (runBothWith readFilePair paths)
   Read (FromPairHandle handle) -> rethrowing (readBlobPairsFromHandle handle)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
+  FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
 

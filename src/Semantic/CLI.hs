@@ -6,7 +6,7 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
-import           Data.File
+import           Data.Project
 import           Data.Language (Language)
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
