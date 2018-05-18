@@ -44,6 +44,7 @@ lambda fvs body = do
 defineBuiltins :: ( AbstractValue location value effects
                   , HasCallStack
                   , Members '[ Allocator location value
+                             , Fresh
                              , Reader (Environment location value)
                              , Reader ModuleInfo
                              , Reader Span
@@ -57,4 +58,4 @@ defineBuiltins :: ( AbstractValue location value effects
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
+  builtin "print" (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
