@@ -100,7 +100,6 @@ instance Ord location => ValueRoots location Type where
 
 instance AbstractHole Type where
   hole = Hole
-  isHole = (== Hole)
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Members '[ Allocator location Type

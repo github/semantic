@@ -203,7 +203,6 @@ instance Ord location => ValueRoots location (Value location) where
 
 instance AbstractHole (Value location) where
   hole = injValue Hole
-  isHole = (== Just Hole) . prjValue
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Members '[ Allocator location (Value location)

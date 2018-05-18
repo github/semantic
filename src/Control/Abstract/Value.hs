@@ -42,7 +42,6 @@ data Comparator
 
 class AbstractHole value where
   hole :: value
-  isHole :: value -> Bool
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
