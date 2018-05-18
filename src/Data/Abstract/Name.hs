@@ -26,7 +26,9 @@ nameI = I
 -- | Extract a human-readable 'ByteString' from a 'Name'.
 unName :: Name -> ByteString
 unName (Name name) = name
-unName (I i)       = BC.pack (show i)
+unName (I i)       = BC.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
+  where alphabet = ['a'..'z']
+        (n, a) = i `divMod` length alphabet
 
 instance IsString Name where
   fromString = Name . BC.pack
