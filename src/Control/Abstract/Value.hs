@@ -52,7 +52,7 @@ class Show value => AbstractValue location value effects where
   unit :: Evaluator location value effects value
 
   -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> Evaluator location value effects value
+  integer :: Integer -> Evaluator location value effects value
 
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
@@ -92,7 +92,7 @@ class Show value => AbstractValue location value effects where
   float :: Scientific -> Evaluator location value effects value
 
   -- | Construct a rational value.
-  rational :: Prelude.Rational -> Evaluator location value effects value
+  rational :: Rational -> Evaluator location value effects value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   multiple :: [value] -> Evaluator location value effects value
@@ -154,7 +154,7 @@ class Show value => AbstractValue location value effects where
   loop :: (Evaluator location value effects value -> Evaluator location value effects value) -> Evaluator location value effects value
 
 
--- | Attempt to extract a 'Prelude.Bool' from a given value.
+-- | C-style for loops.
 forLoop :: ( AbstractValue location value effects
            , Member (State (Environment location value)) effects
            )
@@ -166,7 +166,7 @@ forLoop :: ( AbstractValue location value effects
 forLoop initial cond step body =
   localize (initial *> while cond (body *> step))
 
--- | The fundamental looping primitive, built on top of ifthenelse.
+-- | The fundamental looping primitive, built on top of 'ifthenelse'.
 while :: AbstractValue location value effects
       => Evaluator location value effects value
       -> Evaluator location value effects value
