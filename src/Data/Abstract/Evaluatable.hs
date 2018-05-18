@@ -2,18 +2,19 @@
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
-, Unspecialized(..)
-, runUnspecialized
-, runUnspecializedWith
-, EvalError(..)
-, runEvalError
-, runEvalErrorWith
 , evaluatePackageWith
-, throwEvalError
 , traceResolve
 , builtin
 , isolate
 , Modules
+-- | Effects
+, EvalError(..)
+, throwEvalError
+, runEvalError
+, runEvalErrorWith
+, Unspecialized(..)
+, runUnspecialized
+, runUnspecializedWith
 ) where
 
 import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..), TermEvaluator(..), builtin, defineBuiltins)
@@ -72,60 +73,6 @@ type EvaluatableConstraints location term value effects =
   , Ord location
   , Reducer value (Cell location value)
   )
-
-
--- | The type of error thrown when failing to evaluate a term.
-data EvalError return where
-  FreeVariablesError :: [Name] -> EvalError Name
-  -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: ByteString -> EvalError Integer
-  FloatFormatError    :: ByteString -> EvalError Scientific
-  RationalFormatError :: ByteString -> EvalError Rational
-  DefaultExportError  :: EvalError ()
-  ExportError         :: ModulePath -> Name -> EvalError ()
-
-deriving instance Eq (EvalError return)
-deriving instance Show (EvalError return)
-
-instance Eq1 EvalError where
-  liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
-  liftEq _ DefaultExportError DefaultExportError           = True
-  liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
-  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
-  liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
-  liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
-  liftEq _ _ _                                             = False
-
-instance Show1 EvalError where
-  liftShowsPrec _ _ = showsPrec
-
-throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
-throwEvalError = throwResumable
-
-runEvalError :: Effectful m => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
-runEvalError = runResumable
-
-runEvalErrorWith :: Effectful m => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
-runEvalErrorWith = runResumableWith
-
-
-data Unspecialized a b where
-  Unspecialized :: String -> Unspecialized value (ValueRef value)
-
-deriving instance Eq (Unspecialized a b)
-deriving instance Show (Unspecialized a b)
-
-instance Eq1 (Unspecialized a) where
-  liftEq _ (Unspecialized a) (Unspecialized b) = a == b
-
-instance Show1 (Unspecialized a) where
-  liftShowsPrec _ _ = showsPrec
-
-runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
-runUnspecialized = runResumable
-
-runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
-runUnspecializedWith = runResumableWith
 
 
 -- Instances
@@ -230,3 +177,59 @@ newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl 
 -- | Isolate the given action with an empty global environment and exports.
 isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location value effects a -> Evaluator location value effects a
 isolate = withEnv lowerBound . withExports lowerBound
+
+
+-- Effects
+
+-- | The type of error thrown when failing to evaluate a term.
+data EvalError return where
+  FreeVariablesError :: [Name] -> EvalError Name
+  -- Indicates that our evaluator wasn't able to make sense of these literals.
+  IntegerFormatError  :: ByteString -> EvalError Integer
+  FloatFormatError    :: ByteString -> EvalError Scientific
+  RationalFormatError :: ByteString -> EvalError Rational
+  DefaultExportError  :: EvalError ()
+  ExportError         :: ModulePath -> Name -> EvalError ()
+
+deriving instance Eq (EvalError return)
+deriving instance Show (EvalError return)
+
+instance Eq1 EvalError where
+  liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
+  liftEq _ DefaultExportError DefaultExportError           = True
+  liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
+  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
+  liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
+  liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
+  liftEq _ _ _                                             = False
+
+instance Show1 EvalError where
+  liftShowsPrec _ _ = showsPrec
+
+throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
+throwEvalError = throwResumable
+
+runEvalError :: Effectful m => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
+runEvalError = runResumable
+
+runEvalErrorWith :: Effectful m => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
+runEvalErrorWith = runResumableWith
+
+
+data Unspecialized a b where
+  Unspecialized :: String -> Unspecialized value (ValueRef value)
+
+deriving instance Eq (Unspecialized a b)
+deriving instance Show (Unspecialized a b)
+
+instance Eq1 (Unspecialized a) where
+  liftEq _ (Unspecialized a) (Unspecialized b) = a == b
+
+instance Show1 (Unspecialized a) where
+  liftShowsPrec _ _ = showsPrec
+
+runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized = runResumable
+
+runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
+runUnspecializedWith = runResumableWith
