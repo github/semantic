@@ -110,9 +110,8 @@ resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionErr
 resumingLoadError :: Member Trace effects => Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
 
-resumingEvalError :: (AbstractHole value, Member Trace effects, Show value) => Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
+resumingEvalError :: (Member Trace effects, Show value) => Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
-  EnvironmentLookupError{} -> pure hole
   DefaultExportError{}     -> pure ()
   ExportError{}            -> pure ()
   IntegerFormatError{}     -> pure 0

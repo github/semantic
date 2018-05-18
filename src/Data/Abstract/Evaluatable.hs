@@ -85,7 +85,6 @@ data EvalError value resume where
   RationalFormatError :: ByteString -> EvalError value Rational
   DefaultExportError  :: EvalError value ()
   ExportError         :: ModulePath -> Name -> EvalError value ()
-  EnvironmentLookupError :: value -> EvalError value value
 
 runEvalError :: Effectful (m value) => m value (Resumable (EvalError value) ': effects) a -> m value effects (Either (SomeExc (EvalError value)) a)
 runEvalError = runResumable
@@ -97,14 +96,13 @@ deriving instance Eq a => Eq (EvalError a b)
 deriving instance Show a => Show (EvalError a b)
 instance Show value => Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
-instance Eq term => Eq1 (EvalError term) where
+instance Eq1 (EvalError value) where
   liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
   liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
-  liftEq _ (EnvironmentLookupError a) (EnvironmentLookupError b) = a == b
   liftEq _ _ _                                             = False
 
 
