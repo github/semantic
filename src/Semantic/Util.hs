@@ -15,11 +15,12 @@ import           Data.Blob
 import           Data.Project
 import           Data.Functor.Foldable
 import qualified Data.Language as Language
+import           Data.Sum (weaken)
 import           Data.Term
 import qualified GHC.TypeLits as TypeLevel
 import           Language.Preluded
 import           Parsing.Parser
-import           Prologue
+import           Prologue hiding (weaken)
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
@@ -98,10 +99,10 @@ blob = runTask . readBlob . file
 
 
 injectConst :: a -> SomeExc (Sum '[Const a])
-injectConst = SomeExc . injectSum . Const
+injectConst = SomeExc . inject . Const
 
 mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
-mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weakenSum sum))) (either (\ (SomeExc exc) -> Left (SomeExc (injectSum exc))) Right)
+mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)
 
 reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
 reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst

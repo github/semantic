@@ -8,6 +8,7 @@ module Language.PHP.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
+import Data.Sum
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
 import Language.PHP.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
@@ -229,34 +230,34 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.BXOr <$ symbol AnonCaretEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where
-    assign c l r = injectSum (Statement.Assignment [] l (makeTerm1 (c l r)))
+    assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 binaryExpression  :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term (expression <|> classTypeDesignator))
-  [ (injectSum .) . Expression.And              <$ symbol AnonAnd
-  , (injectSum .) . Expression.Or               <$ symbol AnonOr
-  , (injectSum .) . Expression.XOr              <$ symbol AnonXor
-  , (injectSum .) . Expression.Or               <$ symbol AnonPipePipe
-  , (injectSum .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (injectSum .) . Expression.BOr              <$ symbol AnonPipe
-  , (injectSum .) . Expression.BXOr             <$ symbol AnonCaret
-  , (injectSum .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (injectSum .) . Expression.Or               <$ symbol AnonQuestionQuestion -- Not sure if this is right.
-  , (injectSum .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
-  , (injectSum .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonLAngleRAngle <|> symbol AnonBangEqualEqual)
-  , (injectSum .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (injectSum .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (injectSum .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (injectSum .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
-  , (injectSum .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
-  , (injectSum .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (injectSum .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (injectSum .) . Expression.Plus             <$ symbol AnonPlus
-  , (injectSum .) . Expression.Minus            <$ symbol AnonMinus
-  , (injectSum .) . Expression.Times            <$ (symbol AnonStar <|> symbol AnonDot)
-  , (injectSum .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (injectSum .) . Expression.Modulo           <$ symbol AnonPercent
-  , (injectSum .) . Expression.InstanceOf       <$ symbol AnonInstanceof
+  [ (inject .) . Expression.And              <$ symbol AnonAnd
+  , (inject .) . Expression.Or               <$ symbol AnonOr
+  , (inject .) . Expression.XOr              <$ symbol AnonXor
+  , (inject .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inject .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inject .) . Expression.BOr              <$ symbol AnonPipe
+  , (inject .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inject .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inject .) . Expression.Or               <$ symbol AnonQuestionQuestion -- Not sure if this is right.
+  , (inject .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
+  , (inject .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonLAngleRAngle <|> symbol AnonBangEqualEqual)
+  , (inject .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inject .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inject .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inject .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inject .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
+  , (inject .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inject .) . Expression.Plus             <$ symbol AnonPlus
+  , (inject .) . Expression.Minus            <$ symbol AnonMinus
+  , (inject .) . Expression.Times            <$ (symbol AnonStar <|> symbol AnonDot)
+  , (inject .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inject .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inject .) . Expression.InstanceOf       <$ symbol AnonInstanceof
   ]) where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 conditionalExpression :: Assignment
