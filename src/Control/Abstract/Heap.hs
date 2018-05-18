@@ -24,8 +24,8 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Name
 import Data.Semigroup.Reducer
 import Prologue
 

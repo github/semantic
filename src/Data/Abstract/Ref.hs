@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Data.Abstract.Ref where
 
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 
 -- | 'ValueRef' is the type subterms evaluate to and can represent either values directly ('Rval'), or references to values (lvals - such as local variables or object members)
 data ValueRef value where

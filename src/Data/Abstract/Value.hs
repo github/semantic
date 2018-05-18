@@ -4,7 +4,7 @@ module Data.Abstract.Value where
 import Control.Abstract
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)

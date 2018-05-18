@@ -1,8 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address where
 
-import Data.Abstract.FreeVariables
 import Data.Abstract.Module (ModuleInfo)
+import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
 import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer

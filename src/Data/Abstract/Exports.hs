@@ -11,7 +11,7 @@ import Prelude hiding (null)
 import Prologue hiding (null)
 import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, unpairs)
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import qualified Data.Map as Map
 import Data.Semilattice.Lower
 

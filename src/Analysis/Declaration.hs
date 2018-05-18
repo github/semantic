@@ -5,7 +5,7 @@ module Analysis.Declaration
 , declarationAlgebra
 ) where
 
-import Data.Abstract.FreeVariables (Name(..))
+import Data.Abstract.Name (Name(..))
 import Data.Blob
 import Data.Error (Error(..), showExpectation)
 import Data.Language as Language

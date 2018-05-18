@@ -5,7 +5,7 @@ module Analysis.IdentifierName
 , identifierLabel
 ) where
 
-import           Data.Abstract.FreeVariables (Name (..))
+import           Data.Abstract.Name (Name (..))
 import           Data.Aeson
 import           Data.JSON.Fields
 import           Data.Sum

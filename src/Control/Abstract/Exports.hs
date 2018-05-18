@@ -10,7 +10,7 @@ module Control.Abstract.Exports
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Exports
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 
 -- | Get the global export state.
 getExports :: Member (State (Exports location value)) effects => Evaluator location value effects (Exports location value)

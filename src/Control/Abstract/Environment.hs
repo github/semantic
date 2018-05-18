@@ -20,7 +20,7 @@ module Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import Prologue
 
 -- | Retrieve the environment.

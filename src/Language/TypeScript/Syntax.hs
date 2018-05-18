@@ -3,7 +3,6 @@ module Language.TypeScript.Syntax where
 
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
-import qualified Data.Abstract.FreeVariables as FV
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
 import           Data.Abstract.Path
@@ -32,7 +31,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
                 | otherwise = NonRelative
 
 toName :: ImportPath -> Name
-toName = FV.name . BC.pack . unPath
+toName = name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 --

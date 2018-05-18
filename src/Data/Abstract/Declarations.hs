@@ -2,6 +2,7 @@
 module Data.Abstract.Declarations  where
 
 import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import Data.Sum
 import Data.Term
 import Prologue

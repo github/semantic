@@ -1,24 +1,10 @@
 {-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, UndecidableInstances #-}
 module Data.Abstract.FreeVariables where
 
-import qualified Data.ByteString.Char8 as BC
-import           Data.String
+import Data.Abstract.Name
 import           Data.Sum
 import           Data.Term
 import           Prologue
-
--- | The type of variable names.
-newtype Name = Name { unName :: ByteString }
-  deriving (Eq, Hashable, Ord)
-
-name :: ByteString -> Name
-name = Name
-
-instance IsString Name where
-  fromString = Name . BC.pack
-
-instance Show Name where showsPrec d (Name str) = showsPrec d str
-
 
 -- | Types which can contain unbound variables.
 class FreeVariables term where

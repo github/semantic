@@ -19,8 +19,8 @@ module Data.Abstract.Environment
   ) where
 
 import           Data.Abstract.Address
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Live
+import           Data.Abstract.Name
 import           Data.Align
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as Map

@@ -6,7 +6,7 @@ module Control.Abstract.Addressable
 import Control.Abstract.Context
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import Prologue
 
 -- | Defines allocation and dereferencing of 'Address'es in a 'Heap'.

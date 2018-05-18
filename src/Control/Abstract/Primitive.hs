@@ -7,7 +7,7 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import Data.Abstract.Environment
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import Data.ByteString.Char8 (pack, unpack)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower

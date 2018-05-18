@@ -20,8 +20,8 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
+import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
