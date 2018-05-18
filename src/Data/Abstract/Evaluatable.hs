@@ -8,8 +8,6 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
-, value
-, subtermValue
 , evaluatePackageWith
 , throwEvalError
 , traceResolve
@@ -120,34 +118,6 @@ deriving instance Eq (Unspecialized a b)
 deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
-
--- | Evaluates a 'Value' returning the referenced value
-value :: ( AbstractValue location value effects
-         , Members '[ Allocator location value
-                    , Reader (Environment location value)
-                    , Resumable (EnvironmentError value)
-                    , State (Environment location value)
-                    , State (Heap location (Cell location) value)
-                    ] effects
-         )
-      => ValueRef value
-      -> Evaluator location value effects value
-value (LvalLocal var) = variable var
-value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
-value (Rval val) = pure val
-
--- | Evaluates a 'Subterm' to its rval
-subtermValue :: ( AbstractValue location value effects
-                , Members '[ Allocator location value
-                           , Reader (Environment location value)
-                           , Resumable (EnvironmentError value)
-                           , State (Environment location value)
-                           , State (Heap location (Cell location) value)
-                           ] effects
-                )
-             => Subterm term (Evaluator location value effects (ValueRef value))
-             -> Evaluator location value effects value
-subtermValue = value <=< subtermRef
 
 runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable

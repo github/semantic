@@ -7,8 +7,8 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
-import Data.Abstract.Evaluatable
 import Data.Abstract.Module
+import Data.Abstract.Ref
 import Data.Semilattice.Lower
 import Prologue
 

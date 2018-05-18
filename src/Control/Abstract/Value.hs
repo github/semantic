@@ -8,6 +8,8 @@ module Control.Abstract.Value
 , forLoop
 , makeNamespace
 , evaluateInScopedEnv
+, value
+, subtermValue
 , ValueRoots(..)
 ) where
 
@@ -20,6 +22,7 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
 import Data.Abstract.Number as Number
+import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
@@ -209,6 +212,35 @@ evaluateInScopedEnv :: ( AbstractValue location value effects
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvTerm >>= scopedEnvironment
   maybe term (flip localEnv term . mergeEnvs) scopedEnv
+
+
+-- | Evaluates a 'Value' returning the referenced value
+value :: ( AbstractValue location value effects
+         , Members '[ Allocator location value
+                    , Reader (Environment location value)
+                    , Resumable (EnvironmentError value)
+                    , State (Environment location value)
+                    , State (Heap location (Cell location) value)
+                    ] effects
+         )
+      => ValueRef value
+      -> Evaluator location value effects value
+value (LvalLocal var) = variable var
+value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
+value (Rval val) = pure val
+
+-- | Evaluates a 'Subterm' to its rval
+subtermValue :: ( AbstractValue location value effects
+                , Members '[ Allocator location value
+                           , Reader (Environment location value)
+                           , Resumable (EnvironmentError value)
+                           , State (Environment location value)
+                           , State (Heap location (Cell location) value)
+                           ] effects
+                )
+             => Subterm term (Evaluator location value effects (ValueRef value))
+             -> Evaluator location value effects value
+subtermValue = value <=< subtermRef
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
