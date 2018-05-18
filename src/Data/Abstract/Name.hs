@@ -6,6 +6,8 @@ module Data.Abstract.Name
 ) where
 
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
 import           Data.String
 import           Prologue
 
@@ -26,7 +28,7 @@ nameI = I
 -- | Extract a human-readable 'ByteString' from a 'Name'.
 unName :: Name -> ByteString
 unName (Name name) = name
-unName (I i)       = BC.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
+unName (I i)       = Text.encodeUtf8 . Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
 
