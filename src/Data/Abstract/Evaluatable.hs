@@ -94,19 +94,15 @@ runEvalErrorWith :: Effectful (m value) => (forall resume . EvalError value resu
 runEvalErrorWith = runResumableWith
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
---   Throws an 'EnvironmentLookupError' if @scopedEnvTerm@ does not have an environment.
 evaluateInScopedEnv :: ( AbstractValue location value effects
-                       , Members '[ Resumable (EvalError value)
-                                  , State (Environment location value)
-                                  ] effects
+                       , Member (State (Environment location value)) effects
                        )
                     => Evaluator location value effects value
                     -> Evaluator location value effects value
                     -> Evaluator location value effects value
 evaluateInScopedEnv scopedEnvTerm term = do
-  value <- scopedEnvTerm
-  scopedEnv <- scopedEnvironment value
-  maybe (throwEvalError (EnvironmentLookupError value)) (flip localEnv term . mergeEnvs) scopedEnv
+  scopedEnv <- scopedEnvTerm >>= scopedEnvironment
+  maybe term (flip localEnv term . mergeEnvs) scopedEnv
 
 deriving instance Eq a => Eq (EvalError a b)
 deriving instance Show a => Show (EvalError a b)
@@ -143,7 +139,6 @@ value :: ( AbstractValue location value effects
          , Members '[ Allocator location value
                     , Reader (Environment location value)
                     , Resumable (EnvironmentError value)
-                    , Resumable (EvalError value)
                     , State (Environment location value)
                     , State (Heap location (Cell location) value)
                     ] effects
