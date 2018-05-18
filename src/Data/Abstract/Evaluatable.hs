@@ -3,9 +3,9 @@ module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , evaluatePackageWith
-, traceResolve
 , builtin
 , isolate
+, traceResolve
 -- | Effects
 , EvalError(..)
 , throwEvalError
@@ -75,10 +75,6 @@ type EvaluatableConstraints location term value effects =
   , Ord location
   , Reducer value (Cell location value)
   )
-
-
-traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
-traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
 -- | Evaluate a given package.
@@ -159,6 +155,9 @@ newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl 
 -- | Isolate the given action with an empty global environment and exports.
 isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location value effects a -> Evaluator location value effects a
 isolate = withEnv lowerBound . withExports lowerBound
+
+traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
+traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
 -- Effects
