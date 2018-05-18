@@ -22,17 +22,9 @@ instance Show location => Show (Address location value) where
   showsPrec d = showsPrec d . unAddress
 
 
-class Location location where
-  -- | The type into which stored values will be written for a given location type.
-  type family Cell location :: * -> *
-
-
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
 newtype Precise = Precise { unPrecise :: Int }
   deriving (Eq, Ord)
-
-instance Location Precise where
-  type Cell Precise = Latest
 
 instance Show Precise where
   showsPrec d = showsUnaryWith showsPrec "Precise" d . unPrecise
@@ -41,9 +33,6 @@ instance Show Precise where
 -- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
 newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord)
-
-instance Location Monovariant where
-  type Cell Monovariant = All
 
 instance Show Monovariant where
   showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unName . unMonovariant
@@ -55,9 +44,6 @@ data Located location = Located
   , locationModule  :: !ModuleInfo
   }
   deriving (Eq, Ord, Show)
-
-instance Location (Located location) where
-  type Cell (Located location) = Cell location
 
 
 -- | A cell holding a single value. Writes will replace any prior value.

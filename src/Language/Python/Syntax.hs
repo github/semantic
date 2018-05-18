@@ -128,17 +128,18 @@ instance Evaluatable Import where
 
 
 -- Evaluate a qualified import
-evalQualifiedImport :: ( AbstractValue location a effects
-                       , Addressable location effects
-                       , Reducer.Reducer a (Cell location a)
-                       , Members '[ (State (Exports location a))
-                                  , (State (Environment location a))
-                                  , (State (Heap location (Cell location) a))
-                                  , (Reader (Environment location a))
-                                  , (Modules location a)
+evalQualifiedImport :: ( AbstractValue location value effects
+                       , Members '[ Allocator location value
+                                  , Modules location value
+                                  , Reader (Environment location value)
+                                  , State (Environment location value)
+                                  , State (Exports location value)
+                                  , State (Heap location (Cell location) value)
                                   ] effects
+                       , Ord location
+                       , Reducer.Reducer value (Cell location value)
                        )
-                    => Name -> ModulePath -> Evaluator location a effects a
+                    => Name -> ModulePath -> Evaluator location value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require path)
   modifyEnv (mergeEnvs importedEnv)

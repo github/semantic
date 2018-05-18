@@ -12,7 +12,7 @@ import Data.Scientific.Exts
 import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Data.Sum
-import Prologue hiding (TypeError)
+import Prologue hiding (TypeError, project)
 import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
 
@@ -40,13 +40,13 @@ type ValueConstructors location
 newtype Value location = Value (Sum (ValueConstructors location) (Value location))
   deriving (Eq, Show, Ord)
 
--- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
+-- | Identical to 'inject', but wraps the resulting sub-entity in a 'Value'.
 injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
-injValue = Value . injectSum
+injValue = Value . inject
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
 prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
-prjValue (Value v) = projectSum v
+prjValue (Value v) = project v
 
 -- | Convenience function for projecting two values.
 prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)
@@ -205,18 +205,18 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Addressable location (Goto effects (Value location) ': effects)
-         , Members '[ Fail
+instance ( Members '[ Allocator location (Value location)
+                    , Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
                     , Reader PackageInfo
-                    , Resumable (AddressError location (Value location))
                     , Resumable (ValueError location)
                     , Return (Value location)
                     , State (Environment location (Value location))
                     , State (Heap location (Cell location) (Value location))
                     ] effects
+         , Ord location
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )

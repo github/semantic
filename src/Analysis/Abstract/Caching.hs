@@ -79,9 +79,9 @@ cachingTerms recur term = do
       cachingConfiguration c pairs (recur term)
 
 convergingModules :: ( AbstractValue location value effects
-                     , Addressable location effects
                      , Cacheable term location (Cell location) value
-                     , Members '[ Fresh
+                     , Members '[ Allocator location value
+                                , Fresh
                                 , NonDet
                                 , Reader (Cache term location (Cell location) value)
                                 , Reader (Environment location value)

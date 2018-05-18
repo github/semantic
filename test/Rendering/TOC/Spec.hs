@@ -44,7 +44,7 @@ spec = parallel $ do
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> do
-        let diff' = merge (True, True) (injectSum [bimap (const False) (const False) (diff :: Diff ListableSyntax Bool Bool)])
+        let diff' = merge (True, True) (inject [bimap (const False) (const False) (diff :: Diff ListableSyntax Bool Bool)])
         let toc = tableOfContentsBy (\ (n `In` _) -> if n then Just n else Nothing) diff'
         toc `shouldBe` if null (diffPatches diff') then []
                                                    else [Changed True]
@@ -173,17 +173,17 @@ numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
-programWithChange body = merge (programInfo, programInfo) (injectSum [ function' ])
+programWithChange body = merge (programInfo, programInfo) (inject [ function' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (injectSum (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (injectSum [ inserting body ]))))
-    name' = let info = Nothing :. emptyInfo in merge (info, info) (injectSum (Syntax.Identifier (name "foo")))
+    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (inject (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inject [ inserting body ]))))
+    name' = let info = Nothing :. emptyInfo in merge (info, info) (inject (Syntax.Identifier (name "foo")))
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
-programWithChangeOutsideFunction term = merge (programInfo, programInfo) (injectSum [ function', term' ])
+programWithChangeOutsideFunction term = merge (programInfo, programInfo) (inject [ function', term' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (injectSum (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (injectSum []))))
-    name' = let info = Nothing :. emptyInfo in  merge (info, info) (injectSum (Syntax.Identifier (name "foo")))
+    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (inject (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inject []))))
+    name' = let info = Nothing :. emptyInfo in  merge (info, info) (inject (Syntax.Identifier (name "foo")))
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -196,12 +196,12 @@ programWithReplace :: Text -> Term' -> Diff'
 programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Diff' -> Diff'
-programOf diff = merge (programInfo, programInfo) (injectSum [ diff ])
+programOf diff = merge (programInfo, programInfo) (inject [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf n body = termIn (Just (FunctionDeclaration n mempty Nothing) :. emptyInfo) (injectSum (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (injectSum [body]))))
+functionOf n body = termIn (Just (FunctionDeclaration n mempty Nothing) :. emptyInfo) (inject (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inject [body]))))
   where
-    name' = termIn (Nothing :. emptyInfo) (injectSum (Syntax.Identifier (name (encodeUtf8 n))))
+    name' = termIn (Nothing :. emptyInfo) (inject (Syntax.Identifier (name (encodeUtf8 n))))
 
 programInfo :: Record '[Maybe Declaration, Range, Span]
 programInfo = Nothing :. emptyInfo
@@ -212,15 +212,15 @@ emptyInfo = Range 0 0 :. Span (Pos 0 0) (Pos 0 0) :. Nil
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
 isMeaningfulTerm :: Term ListableSyntax a -> Bool
 isMeaningfulTerm a
-  | Just (_:_) <- projectSum (termOut a) = False
-  | Just []    <- projectSum (termOut a) = False
+  | Just (_:_) <- project (termOut a) = False
+  | Just []    <- project (termOut a) = False
   | otherwise                            = True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
 isMethodOrFunction :: Term' -> Bool
 isMethodOrFunction a
-  | Just Declaration.Method{}   <- projectSum (termOut a) = True
-  | Just Declaration.Function{} <- projectSum (termOut a) = True
+  | Just Declaration.Method{}   <- project (termOut a) = True
+  | Just Declaration.Function{} <- project (termOut a) = True
   | any isJust (foldMap ((:[]) . rhead) a)                = True
   | otherwise                                             = False
 
@@ -228,7 +228,7 @@ blobsForPaths :: Both FilePath -> IO BlobPair
 blobsForPaths = readFilePair . fmap ("test/fixtures" </>)
 
 blankDiff :: Diff'
-blankDiff = merge (arrayInfo, arrayInfo) (injectSum [ inserting (termIn literalInfo (injectSum (Syntax.Identifier (name "\"a\"")))) ])
+blankDiff = merge (arrayInfo, arrayInfo) (inject [ inserting (termIn literalInfo (inject (Syntax.Identifier (name "\"a\"")))) ])
   where
     arrayInfo = Nothing :. Range 0 3 :. Span (Pos 1 1) (Pos 1 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil
