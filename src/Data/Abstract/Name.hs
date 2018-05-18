@@ -19,6 +19,7 @@ data Name
 name :: ByteString -> Name
 name = Name
 
+-- | Construct a 'Name' from an 'Int'. This is suitable for automatic generation, e.g. using a Fresh effect, but should not be used for human-generated names.
 nameI :: Int -> Name
 nameI = I
 
