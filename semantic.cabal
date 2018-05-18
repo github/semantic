@@ -62,6 +62,7 @@ library
                      , Data.Abstract.Number
                      , Data.Abstract.Package
                      , Data.Abstract.Path
+                     , Data.Abstract.Ref
                      , Data.Abstract.Type
                      , Data.Abstract.Value
                      -- General datatype definitions & generic algorithms
