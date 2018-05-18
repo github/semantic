@@ -151,7 +151,6 @@ instance ( Members '[ Allocator location Type
     t1 <- fresh
     t2 <- fresh
     unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
-  asBool t   = unify t Bool *> (pure True <|> pure False)
 
   index arr sub = do
     _ <- unify sub Int

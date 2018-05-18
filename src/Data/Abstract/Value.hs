@@ -265,15 +265,9 @@ instance ( Members '[ Allocator location (Value location)
     | Just (String n) <- prjValue v = pure n
     | otherwise                     = throwValueError $ StringError v
 
-  ifthenelse cond if' else'
-    | isHole cond = pure hole
-    | otherwise   = do
-      bool <- maybe (throwValueError (BoolError cond)) (pure . getBoolean) (prjValue cond)
-      if bool then if' else else'
-
-  asBool val
-    | Just (Boolean b) <- prjValue val = pure b
-    | otherwise = throwValueError $ BoolError val
+  ifthenelse cond if' else' = do
+    bool <- maybe (throwValueError (BoolError cond)) (pure . getBoolean) (prjValue cond)
+    if bool then if' else else'
 
   index = go where
     tryIdx list ii

@@ -3,6 +3,7 @@ module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractHole(..)
 , Comparator(..)
+, asBool
 , while
 , doWhile
 , forLoop
@@ -113,10 +114,7 @@ class Show value => AbstractValue location value effects where
   asString :: value -> Evaluator location value effects ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> Evaluator location value effects value -> Evaluator location value effects value -> Evaluator location value effects value
-
-  -- | Extract a 'Bool' from a given value.
-  asBool :: value -> Evaluator location value effects Bool
+  ifthenelse :: value -> Evaluator location value effects a -> Evaluator location value effects a -> Evaluator location value effects a
 
   -- | Construct the nil/null datatype.
   null :: Evaluator location value effects value
@@ -153,6 +151,10 @@ class Show value => AbstractValue location value effects where
   --   The function argument takes an action which recurs through the loop.
   loop :: (Evaluator location value effects value -> Evaluator location value effects value) -> Evaluator location value effects value
 
+
+-- | Extract a 'Bool' from a given value.
+asBool :: AbstractValue location value effects => value -> Evaluator location value effects Bool
+asBool value = ifthenelse value (pure True) (pure False)
 
 -- | C-style for loops.
 forLoop :: ( AbstractValue location value effects
