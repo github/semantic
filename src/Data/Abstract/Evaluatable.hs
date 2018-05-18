@@ -19,10 +19,11 @@ module Data.Abstract.Evaluatable
 , Modules
 ) where
 
-import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..), TermEvaluator(..))
+import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..), TermEvaluator(..), builtin, defineBuiltins)
 import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Abstract.Goto (Goto(..))
 import Control.Abstract.Modules (Modules(..))
+import Control.Abstract.Primitive (builtin, defineBuiltins)
 import Control.Abstract.TermEvaluator (TermEvaluator(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
@@ -31,7 +32,6 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package as Package
-import Data.ByteString.Char8 (pack, unpack)
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -197,44 +197,6 @@ instance Evaluatable [] where
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
-
-builtin :: ( HasCallStack
-           , Members '[ Allocator location value
-                      , Reader (Environment location value)
-                      , Reader ModuleInfo
-                      , Reader Span
-                      , State (Environment location value)
-                      , State (Heap location (Cell location) value)
-                      ] effects
-           , Ord location
-           , Reducer value (Cell location value)
-           )
-        => String
-        -> Evaluator location value effects value
-        -> Evaluator location value effects ()
-builtin n def = withCurrentCallStack callStack $ do
-  let name = X.name ("__semantic_" <> pack n)
-  addr <- alloc name
-  modifyEnv (X.insert name addr)
-  def >>= assign addr
-
-defineBuiltins :: ( AbstractValue location value effects
-                  , HasCallStack
-                  , Members '[ Allocator location value
-                             , Reader (Environment location value)
-                             , Reader ModuleInfo
-                             , Reader Span
-                             , Resumable (EnvironmentError value)
-                             , State (Environment location value)
-                             , State (Heap location (Cell location) value)
-                             , Trace
-                             ] effects
-                  , Ord location
-                  , Reducer value (Cell location value)
-                  )
-               => Evaluator location value effects ()
-defineBuiltins = do
-  builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall location term value inner inner' outer
