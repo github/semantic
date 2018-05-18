@@ -6,11 +6,14 @@ import           Data.String
 import           Prologue
 
 -- | The type of variable names.
-newtype Name = Name { unName :: ByteString }
+newtype Name = Name ByteString
   deriving (Eq, Hashable, Ord)
 
 name :: ByteString -> Name
 name = Name
+
+unName :: Name -> ByteString
+unName (Name name) = name
 
 instance IsString Name where
   fromString = Name . BC.pack
