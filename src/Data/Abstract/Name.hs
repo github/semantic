@@ -23,6 +23,7 @@ name = Name
 nameI :: Int -> Name
 nameI = I
 
+-- | Extract a human-readable 'ByteString' from a 'Name'.
 unName :: Name -> ByteString
 unName (Name name) = name
 unName (I i)       = BC.pack (show i)
