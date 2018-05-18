@@ -19,7 +19,7 @@ module Data.Abstract.Evaluatable
 import Control.Abstract
 import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
-import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..))
+import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Exports as X
 import Control.Abstract.Heap as X hiding (AddressError(..), runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve)
