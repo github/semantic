@@ -22,4 +22,5 @@ unName (Name name) = name
 instance IsString Name where
   fromString = Name . BC.pack
 
-instance Show Name where showsPrec d (Name str) = showsPrec d str
+instance Show Name where
+  showsPrec d = showsPrec d . unName
