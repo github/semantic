@@ -28,4 +28,5 @@ instance Show Name where
   showsPrec d = showsPrec d . unName
 
 instance Hashable Name where
-  hashWithSalt = hashUsing unName
+  hashWithSalt salt (Name name) = hashWithSalt salt name
+  hashWithSalt salt (I i)       = salt `hashWithSalt` (1 :: Int) `hashWithSalt` i
