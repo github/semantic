@@ -109,7 +109,7 @@ throwEvalError = throwResumable
 
 
 data Unspecialized a b where
-  Unspecialized :: Prelude.String -> Unspecialized value (ValueRef value)
+  Unspecialized :: String -> Unspecialized value (ValueRef value)
 
 instance Eq1 (Unspecialized a) where
   liftEq _ (Unspecialized a) (Unspecialized b) = a == b
