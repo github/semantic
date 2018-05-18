@@ -10,7 +10,6 @@ module Data.Abstract.Evaluatable
 , runEvalErrorWith
 , value
 , subtermValue
-, evaluateInScopedEnv
 , evaluatePackageWith
 , throwEvalError
 , traceResolve
@@ -92,17 +91,6 @@ runEvalError = runResumable
 
 runEvalErrorWith :: Effectful (m value) => (forall resume . EvalError value resume -> m value effects resume) -> m value (Resumable (EvalError value) ': effects) a -> m value effects a
 runEvalErrorWith = runResumableWith
-
--- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
-evaluateInScopedEnv :: ( AbstractValue location value effects
-                       , Member (State (Environment location value)) effects
-                       )
-                    => Evaluator location value effects value
-                    -> Evaluator location value effects value
-                    -> Evaluator location value effects value
-evaluateInScopedEnv scopedEnvTerm term = do
-  scopedEnv <- scopedEnvTerm >>= scopedEnvironment
-  maybe term (flip localEnv term . mergeEnvs) scopedEnv
 
 deriving instance Eq a => Eq (EvalError a b)
 deriving instance Show a => Show (EvalError a b)

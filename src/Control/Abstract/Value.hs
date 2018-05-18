@@ -7,6 +7,7 @@ module Control.Abstract.Value
 , doWhile
 , forLoop
 , makeNamespace
+, evaluateInScopedEnv
 , ValueRoots(..)
 ) where
 
@@ -196,6 +197,18 @@ makeNamespace name addr super = do
   namespaceEnv <- Env.head <$> getEnv
   v <- namespace name (Env.mergeNewer env' namespaceEnv)
   v <$ assign addr v
+
+
+-- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
+evaluateInScopedEnv :: ( AbstractValue location value effects
+                       , Member (State (Environment location value)) effects
+                       )
+                    => Evaluator location value effects value
+                    -> Evaluator location value effects value
+                    -> Evaluator location value effects value
+evaluateInScopedEnv scopedEnvTerm term = do
+  scopedEnv <- scopedEnvTerm >>= scopedEnvironment
+  maybe term (flip localEnv term . mergeEnvs) scopedEnv
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
