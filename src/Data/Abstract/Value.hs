@@ -205,18 +205,18 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Addressable location (Goto effects (Value location) ': effects)
-         , Members '[ Fail
+instance ( Members '[ Allocator location (Value location)
+                    , Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
                     , Reader PackageInfo
-                    , Resumable (AddressError location (Value location))
                     , Resumable (ValueError location)
                     , Return (Value location)
                     , State (Environment location (Value location))
                     , State (Heap location (Cell location) (Value location))
                     ] effects
+         , Ord location
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
