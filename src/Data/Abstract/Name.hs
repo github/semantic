@@ -46,8 +46,9 @@ instance Show Name where
   showsPrec _ = prettyShowString . Text.unpack . Text.decodeUtf8 . unName
     where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'
           prettyChar c
-            | Char.isPrint c = showChar c
-            | otherwise      = Char.showLitChar c
+            | c `elem` ['\\', '\"'] = Char.showLitChar c
+            | Char.isPrint c        = showChar c
+            | otherwise             = Char.showLitChar c
 
 instance Hashable Name where
   hashWithSalt salt (Name name) = hashWithSalt salt name
