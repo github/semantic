@@ -6,7 +6,6 @@ module Data.Abstract.Evaluatable
 , traceResolve
 , builtin
 , isolate
-, Modules
 -- | Effects
 , EvalError(..)
 , throwEvalError
@@ -15,14 +14,17 @@ module Data.Abstract.Evaluatable
 , Unspecialized(..)
 , runUnspecialized
 , runUnspecializedWith
+, Cell
 ) where
 
-import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..), TermEvaluator(..), builtin, defineBuiltins)
-import Control.Abstract.Evaluator (LoopControl, Return(..))
-import Control.Abstract.Goto (Goto(..))
-import Control.Abstract.Modules (Modules(..))
-import Control.Abstract.Primitive (builtin, defineBuiltins)
-import Control.Abstract.TermEvaluator (TermEvaluator(..))
+import Control.Abstract
+import Control.Abstract.Context as X
+import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
+import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..))
+import Control.Abstract.Exports as X
+import Control.Abstract.Heap as X hiding (AddressError(..), runAddressError, runAddressErrorWith)
+import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve)
+import Control.Abstract.Value as X
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.Exports as Exports
