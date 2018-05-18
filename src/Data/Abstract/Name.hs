@@ -1,5 +1,6 @@
 module Data.Abstract.Name
 ( Name
+-- * Constructors
 , name
 , nameI
 , unName
@@ -36,6 +37,11 @@ unName (I i)       = Text.encodeUtf8 . Text.pack $ '_' : (alphabet !! a) : repli
 instance IsString Name where
   fromString = Name . BC.pack
 
+-- $
+-- >>> I 0
+-- "_a"
+-- >>> I 26
+-- "_aʹ"
 instance Show Name where
   showsPrec _ = prettyShowString . Text.unpack . Text.decodeUtf8 . unName
     where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'
