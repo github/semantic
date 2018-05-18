@@ -80,7 +80,7 @@ instance Ord1 Hole where liftCompare = genericLiftCompare
 instance Show1 Hole where liftShowsPrec = genericLiftShowsPrec
 
 -- | Boolean values.
-newtype Boolean value = Boolean Prelude.Bool
+newtype Boolean value = Boolean { getBoolean :: Bool }
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
@@ -265,11 +265,10 @@ instance ( Members '[ Allocator location (Value location)
     | Just (String n) <- prjValue v = pure n
     | otherwise                     = throwValueError $ StringError v
 
-  ifthenelse cond if' else' = do
-    if isHole cond then
-      pure hole
-    else do
-      bool <- asBool cond
+  ifthenelse cond if' else'
+    | isHole cond = pure hole
+    | otherwise   = do
+      bool <- maybe (throwValueError (BoolError cond)) (pure . getBoolean) (prjValue cond)
       if bool then if' else else'
 
   asBool val
