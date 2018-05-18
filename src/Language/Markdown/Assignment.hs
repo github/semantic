@@ -77,9 +77,9 @@ list :: Assignment
 list = termIn <$> symbol List <*> (makeList . termFAnnotation . termFOut <$> currentNode <*> children (many item))
   where
     makeList (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) = case listType of
-      CMarkGFM.BULLET_LIST -> injectSum . Markup.UnorderedList
-      CMarkGFM.ORDERED_LIST -> injectSum . Markup.OrderedList
-    makeList _ = injectSum . Markup.UnorderedList
+      CMarkGFM.BULLET_LIST -> inject . Markup.UnorderedList
+      CMarkGFM.ORDERED_LIST -> inject . Markup.OrderedList
+    makeList _ = inject . Markup.UnorderedList
 
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)

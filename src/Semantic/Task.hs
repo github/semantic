@@ -60,6 +60,7 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
 import           Data.Record
+import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Diffing.Algorithm (Diffable)
@@ -67,7 +68,7 @@ import           Diffing.Interpreter
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
-import           Prologue hiding (MonadError (..))
+import           Prologue hiding (MonadError (..), project)
 import           Semantic.Distribute
 import qualified Semantic.IO as IO
 import           Semantic.Resolution
@@ -217,5 +218,5 @@ runParser blob@Blob{..} parser = case parser of
         languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (In a syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- projectSum syntax -> [Syntax.unError (getField a) err]
+          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
