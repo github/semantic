@@ -205,7 +205,6 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 instance ( Members '[ Allocator location (Value location)
-                    , Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
@@ -244,7 +243,6 @@ instance ( Members '[ Allocator location (Value location)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Members '[ Allocator location (Value location)
-                    , Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
