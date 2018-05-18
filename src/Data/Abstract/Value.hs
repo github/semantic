@@ -204,6 +204,44 @@ instance Ord location => ValueRoots location (Value location) where
 instance AbstractHole (Value location) where
   hole = injValue Hole
 
+instance ( Members '[ Allocator location (Value location)
+                    , Fail
+                    , LoopControl (Value location)
+                    , Reader (Environment location (Value location))
+                    , Reader ModuleInfo
+                    , Reader PackageInfo
+                    , Resumable (ValueError location)
+                    , Return (Value location)
+                    , State (Environment location (Value location))
+                    , State (Heap location (Cell location) (Value location))
+                    ] effects
+         , Ord location
+         , Reducer (Value location) (Cell location (Value location))
+         , Show location
+         )
+      => AbstractFunction location (Value location) (Goto effects (Value location) ': effects) where
+  closure parameters freeVariables body = do
+    packageInfo <- currentPackage
+    moduleInfo <- currentModule
+    l <- label body
+    injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
+
+  call op params = do
+    case prjValue op of
+      Just (Closure packageInfo moduleInfo names label env) -> do
+        body <- goto label
+        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+        -- charge them to the closure's origin.
+        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
+          bindings <- foldr (\ (name, param) rest -> do
+            v <- param
+            a <- alloc name
+            assign a v
+            Env.insert name a <$> rest) (pure env) (zip names params)
+          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
+      Nothing -> throwValueError (CallError op)
+
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Members '[ Allocator location (Value location)
                     , Fail
@@ -337,27 +375,6 @@ instance ( Members '[ Allocator location (Value location)
     | Just (Integer (Number.Integer i), Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
-
-  closure parameters freeVariables body = do
-    packageInfo <- currentPackage
-    moduleInfo <- currentModule
-    l <- label body
-    injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
-
-  call op params = do
-    case prjValue op of
-      Just (Closure packageInfo moduleInfo names label env) -> do
-        body <- goto label
-        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
-        -- charge them to the closure's origin.
-        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, param) rest -> do
-            v <- param
-            a <- alloc name
-            assign a v
-            Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
-      Nothing -> throwValueError (CallError op)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> pure value

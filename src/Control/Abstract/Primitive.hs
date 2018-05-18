@@ -33,7 +33,7 @@ builtin n def = withCurrentCallStack callStack $ do
   modifyEnv (insert name' addr)
   def >>= assign addr
 
-lambda :: (AbstractValue location value effects, Member Fresh effects)
+lambda :: (AbstractFunction location value effects, Member Fresh effects)
        => Set Name
        -> (Name -> Evaluator location value effects value)
        -> Evaluator location value effects value

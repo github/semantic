@@ -1,6 +1,7 @@
 {-# LANGUAGE Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
+, AbstractFunction(..)
 , AbstractHole(..)
 , Comparator(..)
 , asBool
@@ -43,10 +44,20 @@ data Comparator
 class AbstractHole value where
   hole :: value
 
+class Show value => AbstractFunction location value effects where
+  -- | Build a closure (a binder like a lambda or method definition).
+  closure :: [Name]                                 -- ^ The parameter names.
+          -> Set Name                               -- ^ The set of free variables to close over.
+          -> Evaluator location value effects value -- ^ The evaluator for the body of the closure.
+          -> Evaluator location value effects value
+  -- | Evaluate an application (like a function call).
+  call :: value -> [Evaluator location value effects value] -> Evaluator location value effects value
+
+
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class Show value => AbstractValue location value effects where
+class AbstractFunction location value effects => AbstractValue location value effects where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: Evaluator location value effects value
@@ -136,14 +147,6 @@ class Show value => AbstractValue location value effects where
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
   scopedEnvironment :: value -> Evaluator location value effects (Maybe (Environment location value))
-
-  -- | Build a closure (a binder like a lambda or method definition).
-  closure :: [Name]                                 -- ^ The parameter names.
-          -> Set Name                               -- ^ The set of free variables to close over.
-          -> Evaluator location value effects value -- ^ The evaluator for the body of the closure.
-          -> Evaluator location value effects value
-  -- | Evaluate an application (like a function call).
-  call :: value -> [Evaluator location value effects value] -> Evaluator location value effects value
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --
