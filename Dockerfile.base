@@ -5,7 +5,9 @@ FROM debian:stable-slim
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     ca-certificates \
-    libgmp10
+    libgmp10 \
+    netbase \
+    libssl1.1
 
 # Cleanup
 RUN apt-get autoremove -y && \
