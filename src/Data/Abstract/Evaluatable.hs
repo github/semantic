@@ -3,7 +3,6 @@ module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , evaluatePackageWith
-, builtin
 , isolate
 , traceResolve
 -- | Effects
