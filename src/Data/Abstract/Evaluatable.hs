@@ -62,7 +62,7 @@ type EvaluatableConstraints location term value effects =
              , Reader PackageInfo
              , Reader Span
              , Resumable (EnvironmentError value)
-             , Resumable (EvalError value)
+             , Resumable EvalError
              , Resumable ResolutionError
              , Resumable (Unspecialized value)
              , Return value
@@ -77,26 +77,26 @@ type EvaluatableConstraints location term value effects =
 
 
 -- | The type of error thrown when failing to evaluate a term.
-data EvalError value resume where
-  FreeVariablesError :: [Name] -> EvalError value Name
+data EvalError return where
+  FreeVariablesError :: [Name] -> EvalError Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: ByteString -> EvalError value Integer
-  FloatFormatError    :: ByteString -> EvalError value Scientific
-  RationalFormatError :: ByteString -> EvalError value Rational
-  DefaultExportError  :: EvalError value ()
-  ExportError         :: ModulePath -> Name -> EvalError value ()
+  IntegerFormatError  :: ByteString -> EvalError Integer
+  FloatFormatError    :: ByteString -> EvalError Scientific
+  RationalFormatError :: ByteString -> EvalError Rational
+  DefaultExportError  :: EvalError ()
+  ExportError         :: ModulePath -> Name -> EvalError ()
 
-runEvalError :: Effectful (m value) => m value (Resumable (EvalError value) ': effects) a -> m value effects (Either (SomeExc (EvalError value)) a)
+runEvalError :: Effectful m => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: Effectful (m value) => (forall resume . EvalError value resume -> m value effects resume) -> m value (Resumable (EvalError value) ': effects) a -> m value effects a
+runEvalErrorWith :: Effectful m => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
 runEvalErrorWith = runResumableWith
 
-deriving instance Eq a => Eq (EvalError a b)
-deriving instance Show a => Show (EvalError a b)
-instance Show value => Show1 (EvalError value) where
+deriving instance Eq (EvalError return)
+deriving instance Show (EvalError return)
+instance Show1 EvalError where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (EvalError value) where
+instance Eq1 EvalError where
   liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
@@ -106,7 +106,7 @@ instance Eq1 (EvalError value) where
   liftEq _ _ _                                             = False
 
 
-throwEvalError :: Member (Resumable (EvalError value)) effects => EvalError value resume -> Evaluator location value effects resume
+throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
 throwEvalError = throwResumable
 
 
@@ -141,7 +141,6 @@ subtermValue :: ( AbstractValue location value effects
                 , Members '[ Allocator location value
                            , Reader (Environment location value)
                            , Resumable (EnvironmentError value)
-                           , Resumable (EvalError value)
                            , State (Environment location value)
                            , State (Heap location (Cell location) value)
                            ] effects

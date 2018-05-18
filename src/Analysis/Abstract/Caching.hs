@@ -88,7 +88,6 @@ convergingModules :: ( AbstractValue location value effects
                                 , Reader (Live location value)
                                 , Resumable (AddressError location value)
                                 , Resumable (EnvironmentError value)
-                                , Resumable (EvalError value)
                                 , State (Cache term location (Cell location) value)
                                 , State (Environment location value)
                                 , State (Heap location (Cell location) value)

@@ -9,7 +9,6 @@ module Data.Abstract.Type
 
 import Control.Abstract
 import Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
 import Data.Semigroup.Foldable (foldMap1)
 import Data.Semigroup.Reducer (Reducer)
 import Prologue hiding (TypeError)
@@ -109,7 +108,6 @@ instance ( Members '[ Allocator location Type
                     , NonDet
                     , Reader (Environment location Type)
                     , Resumable (AddressError location Type)
-                    , Resumable (EvalError Type)
                     , Resumable TypeError
                     , Return Type
                     , State (Environment location Type)

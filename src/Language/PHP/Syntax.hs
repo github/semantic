@@ -58,7 +58,6 @@ include :: ( AbstractValue location value effects
                       , Reader (Environment location value)
                       , Resumable ResolutionError
                       , Resumable (EnvironmentError value)
-                      , Resumable (EvalError value)
                       , State (Environment location value)
                       , State (Exports location value)
                       , State (Heap location (Cell location) value)
