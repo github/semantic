@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
-  , ValueRef(..)
   -- * Effects
   , Return(..)
   , earlyReturn
@@ -30,7 +29,6 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Trace
-import Data.Abstract.FreeVariables
 import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
@@ -43,16 +41,6 @@ newtype Evaluator location value effects a = Evaluator { runEvaluator :: Eff eff
 
 deriving instance Member NonDet effects => Alternative (Evaluator location value effects)
 
--- | 'ValueRef' is the type subterms evaluate to and can represent either values directly ('Rval'), or references to values (lvals - such as local variables or object members)
-data ValueRef value where
-  -- Represents a value:
-  Rval :: value -> ValueRef value
-  -- Represents a local variable. No environment is attached - it's assumed that LvalLocal will be evaluated in the same scope it was constructed:
-  LvalLocal :: Name -> ValueRef value
-  -- Represents an object member:
-  LvalMember :: value -> Name -> ValueRef value
-
-  deriving (Eq, Ord, Show)
 
 -- Effects
 

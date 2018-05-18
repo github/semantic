@@ -1,1 +1,14 @@
+{-# LANGUAGE GADTs #-}
 module Data.Abstract.Ref where
+
+import Data.Abstract.FreeVariables
+
+-- | 'ValueRef' is the type subterms evaluate to and can represent either values directly ('Rval'), or references to values (lvals - such as local variables or object members)
+data ValueRef value where
+  -- Represents a value:
+  Rval :: value -> ValueRef value
+  -- Represents a local variable. No environment is attached - it's assumed that LvalLocal will be evaluated in the same scope it was constructed:
+  LvalLocal :: Name -> ValueRef value
+  -- Represents an object member:
+  LvalMember :: value -> Name -> ValueRef value
+  deriving (Eq, Ord, Show)
