@@ -6,6 +6,7 @@ module Data.Abstract.Name
 ) where
 
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.Char as Char
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import           Data.String
@@ -36,7 +37,11 @@ instance IsString Name where
   fromString = Name . BC.pack
 
 instance Show Name where
-  showsPrec d = showsPrec d . unName
+  showsPrec _ = prettyShowString . Text.unpack . Text.decodeUtf8 . unName
+    where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'
+          prettyChar c
+            | Char.isPrint c = showChar c
+            | otherwise      = Char.showLitChar c
 
 instance Hashable Name where
   hashWithSalt salt (Name name) = hashWithSalt salt name
