@@ -1,5 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Data.Abstract.Name where
+module Data.Abstract.Name
+( Name
+, name
+, unName
+) where
 
 import qualified Data.ByteString.Char8 as BC
 import           Data.String
