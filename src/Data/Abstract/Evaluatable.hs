@@ -84,16 +84,9 @@ data EvalError return where
   DefaultExportError  :: EvalError ()
   ExportError         :: ModulePath -> Name -> EvalError ()
 
-runEvalError :: Effectful m => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
-runEvalError = runResumable
-
-runEvalErrorWith :: Effectful m => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
-runEvalErrorWith = runResumableWith
-
 deriving instance Eq (EvalError return)
 deriving instance Show (EvalError return)
-instance Show1 EvalError where
-  liftShowsPrec _ _ = showsPrec
+
 instance Eq1 EvalError where
   liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
   liftEq _ DefaultExportError DefaultExportError           = True
@@ -103,19 +96,28 @@ instance Eq1 EvalError where
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
   liftEq _ _ _                                             = False
 
+instance Show1 EvalError where
+  liftShowsPrec _ _ = showsPrec
 
 throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
 throwEvalError = throwResumable
+
+runEvalError :: Effectful m => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
+runEvalError = runResumable
+
+runEvalErrorWith :: Effectful m => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
+runEvalErrorWith = runResumableWith
 
 
 data Unspecialized a b where
   Unspecialized :: String -> Unspecialized value (ValueRef value)
 
+deriving instance Eq (Unspecialized a b)
+deriving instance Show (Unspecialized a b)
+
 instance Eq1 (Unspecialized a) where
   liftEq _ (Unspecialized a) (Unspecialized b) = a == b
 
-deriving instance Eq (Unspecialized a b)
-deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
@@ -124,6 +126,7 @@ runUnspecialized = runResumable
 
 runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 runUnspecializedWith = runResumableWith
+
 
 -- Instances
 
