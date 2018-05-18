@@ -77,26 +77,6 @@ type EvaluatableConstraints location term value effects =
   )
 
 
--- Instances
-
--- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
-instance Apply Evaluatable fs => Evaluatable (Sum fs) where
-  eval = apply @Evaluatable eval
-
--- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
-instance Evaluatable s => Evaluatable (TermF s a) where
-  eval = eval . termFOut
-
---- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
----
----   1. Each statement’s effects on the store are accumulated;
----   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
----   3. Only the last statement’s return value is returned.
-instance Evaluatable [] where
-  -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (Rval <$> unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
-
-
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
@@ -235,3 +215,23 @@ runUnspecialized = runResumable
 
 runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 runUnspecializedWith = runResumableWith
+
+
+-- Instances
+
+-- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
+instance Apply Evaluatable fs => Evaluatable (Sum fs) where
+  eval = apply @Evaluatable eval
+
+-- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
+instance Evaluatable s => Evaluatable (TermF s a) where
+  eval = eval . termFOut
+
+--- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
+---
+---   1. Each statement’s effects on the store are accumulated;
+---   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
+---   3. Only the last statement’s return value is returned.
+instance Evaluatable [] where
+  -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
+  eval = maybe (Rval <$> unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
