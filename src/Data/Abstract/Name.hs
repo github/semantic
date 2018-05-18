@@ -1,6 +1,7 @@
 module Data.Abstract.Name
 ( Name
 , name
+, nameI
 , unName
 ) where
 
@@ -16,6 +17,9 @@ data Name
 
 name :: ByteString -> Name
 name = Name
+
+nameI :: Int -> Name
+nameI = I
 
 unName :: Name -> ByteString
 unName (Name name) = name
