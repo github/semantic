@@ -15,6 +15,7 @@ data Name
   | I Int
   deriving (Eq, Ord)
 
+-- | Construct a 'Name' from a 'ByteString'.
 name :: ByteString -> Name
 name = Name
 
