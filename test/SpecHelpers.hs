@@ -23,6 +23,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
+import Data.Abstract.Name as X
 import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, prjValue, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
