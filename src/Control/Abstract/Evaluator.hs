@@ -11,24 +11,17 @@ module Control.Abstract.Evaluator
   , throwContinue
   , catchLoopControl
   , runLoopControl
-  , module Control.Monad.Effect
-  , module Control.Monad.Effect.Fail
-  , module Control.Monad.Effect.Fresh
-  , module Control.Monad.Effect.NonDet
-  , module Control.Monad.Effect.Reader
-  , module Control.Monad.Effect.Resumable
-  , module Control.Monad.Effect.State
-  , module Control.Monad.Effect.Trace
+  , module X
   ) where
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Resumable
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Trace
+import Control.Monad.Effect           as X
+import Control.Monad.Effect.Fail      as X
+import Control.Monad.Effect.Fresh     as X
+import Control.Monad.Effect.NonDet    as X
+import Control.Monad.Effect.Reader    as X
+import Control.Monad.Effect.Resumable as X
+import Control.Monad.Effect.State     as X
+import Control.Monad.Effect.Trace     as X
 import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
