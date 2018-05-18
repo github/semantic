@@ -48,5 +48,5 @@ defineBuiltins :: ( AbstractValue location value effects
                   , Reducer value (Cell location value)
                   )
                => Evaluator location value effects ()
-defineBuiltins = do
+defineBuiltins =
   builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
