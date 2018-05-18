@@ -35,7 +35,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord)
 
 instance Show Monovariant where
-  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unName . unMonovariant
+  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
 
 
 data Located location = Located

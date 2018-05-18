@@ -132,4 +132,4 @@ addresses = fromAddresses . map snd . pairs
 instance Lower (Environment location value) where lowerBound = emptyEnv
 
 instance Show location => Show (Environment location value) where
-  showsPrec d = showsUnaryWith showsPrec "Environment" d . map (first unName) . pairs
+  showsPrec d = showsUnaryWith showsPrec "Environment" d . pairs
