@@ -105,7 +105,6 @@ instance ( Members '[ Allocator location Type
                     , Fresh
                     , NonDet
                     , Reader (Environment location Type)
-                    , Resumable (AddressError location Type)
                     , Resumable TypeError
                     , Return Type
                     , State (Environment location Type)
@@ -138,7 +137,6 @@ instance ( Members '[ Allocator location Type
                     , Fresh
                     , NonDet
                     , Reader (Environment location Type)
-                    , Resumable (AddressError location Type)
                     , Resumable TypeError
                     , Return Type
                     , State (Environment location Type)
