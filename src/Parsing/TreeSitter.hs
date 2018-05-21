@@ -12,21 +12,23 @@ import Data.Source
 import Data.Span
 import Data.Term
 import Foreign
+import Foreign.C.Types
 import Foreign.Marshal.Array (allocaArray)
-import qualified TreeSitter.Document as TS
+import qualified TreeSitter.Tree as TS
+import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Language as TS
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Blob -> IO (AST [] grammar)
-parseToAST language Blob{..} = bracket TS.ts_document_new TS.ts_document_free $ \ document -> do
-  TS.ts_document_set_language document language
+parseToAST language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+  TS.ts_parser_halt_on_error parser (CBool 1)
+  TS.ts_parser_set_language parser language
   root <- unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
-    TS.ts_document_set_input_string_with_length document source len
-    TS.ts_document_parse_halt_on_error document
-    alloca (\ rootPtr -> do
-      TS.ts_document_root_node_p document rootPtr
-      peek rootPtr)
+    bracket (TS.ts_parser_parse_string parser nullPtr source len) TS.ts_tree_delete $ \ tree -> do
+      alloca (\ rootPtr -> do
+        TS.ts_tree_root_node_p tree rootPtr
+        peek rootPtr)
 
   anaM toAST root
 
@@ -34,7 +36,7 @@ toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base
 toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
-    _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
+    _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nodePtr childNodesPtr (fromIntegral count))
     peekArray count childNodesPtr
   pure $! In (Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (nodeRange node) (nodeSpan node)) children
 
