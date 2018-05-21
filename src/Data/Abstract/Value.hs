@@ -207,12 +207,12 @@ instance AbstractHole (Value location) where
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Members '[ Allocator location (Value location)
                     , Fail
-                    , LoopControl (Value location)
+                    , LoopControl location (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (ValueError location)
-                    , Return (Value location)
+                    , Return location (Value location)
                     , State (Environment location (Value location))
                     , State (Heap location (Cell location) (Value location))
                     ] effects
@@ -220,7 +220,7 @@ instance ( Members '[ Allocator location (Value location)
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
-      => AbstractValue location (Value location) (Goto effects (Value location) ': effects) where
+      => AbstractValue location (Value location) (Goto effects location (Value location) ': effects) where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -351,7 +351,7 @@ instance ( Members '[ Allocator location (Value location)
   closure parameters freeVariables body = do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
-    l <- label body
+    l <- label (body >>= box)
     injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
@@ -362,15 +362,13 @@ instance ( Members '[ Allocator location (Value location)
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
-            v <- param
-            a <- alloc name
-            assign a v
+            a <- param
             Env.insert name a <$> rest) (pure env) (zip names params)
           localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
-      Nothing -> throwValueError (CallError op)
+      Nothing -> box =<< throwValueError (CallError op)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
-    Break value -> pure value
+    Break value -> deref value
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
     Continue _  -> loop x)
 

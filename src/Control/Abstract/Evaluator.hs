@@ -58,40 +58,48 @@ data ValueRef location value where
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-data Return value resume where
-  Return :: value -> Return value value
+data Return location value resume where
+  Return :: Address location value -> Return location value (Address location value)
 
-deriving instance Eq value => Eq (Return value a)
-deriving instance Show value => Show (Return value a)
+deriving instance (Eq location, Eq value) => Eq (Return location value a)
+deriving instance (Show location, Eq value) => Show (Return location value a)
 
-earlyReturn :: Member (Return value) effects => value -> Evaluator location value effects value
+earlyReturn :: Member (Return location value) effects => Address location value -> Evaluator location value effects (Address location value)
 earlyReturn = send . Return
 
-catchReturn :: Member (Return value) effects => Evaluator location value effects a -> (forall x . Return value x -> Evaluator location value effects a) -> Evaluator location value effects a
+catchReturn :: Member (Return location value) effects => Evaluator location value effects a -> (forall x . Return location value x -> Evaluator location value effects a) -> Evaluator location value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Evaluator location value (Return value ': effects) value -> Evaluator location value effects value
+runReturn :: Evaluator location value (Return location value ': effects) (Address location value) -> Evaluator location value effects (Address location value)
 runReturn = relay pure (\ (Return value) _ -> pure value)
 
 
 -- | Effects for control flow around loops (breaking and continuing).
-data LoopControl value resume where
-  Break    :: value -> LoopControl value value
-  Continue :: value -> LoopControl value value
+data LoopControl location value resume where
+  Break    :: Address location value -> LoopControl location value (Address location value)
+  Continue :: Address location value -> LoopControl location value (Address location value)
 
-deriving instance Eq value => Eq (LoopControl value a)
-deriving instance Show value => Show (LoopControl value a)
+deriving instance (Eq location, Eq value) => Eq (LoopControl location value a)
+deriving instance (Show location, Show value) => Show (LoopControl location value a)
 
-throwBreak :: Member (LoopControl value) effects => value -> Evaluator location value effects value
+throwBreak :: Member (LoopControl location value) effects
+           => Address location value
+           -> Evaluator location value effects (Address location value)
 throwBreak = send . Break
 
-throwContinue :: Member (LoopControl value) effects => value -> Evaluator location value effects value
+throwContinue :: Member (LoopControl location value) effects
+              => Address location value
+              -> Evaluator location value effects (Address location value)
 throwContinue = send . Continue
 
-catchLoopControl :: Member (LoopControl value) effects => Evaluator location value effects a -> (forall x . LoopControl value x -> Evaluator location value effects a) -> Evaluator location value effects a
+catchLoopControl :: Member (LoopControl location value) effects
+                 => Evaluator location value effects a
+                 -> (forall x . LoopControl location value x -> Evaluator location value effects a)
+                 -> Evaluator location value effects a
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
-runLoopControl :: Evaluator location value (LoopControl value ': effects) value -> Evaluator location value effects value
+runLoopControl :: Evaluator location value (LoopControl location value ': effects) (Address location value)
+               -> Evaluator location value effects (Address location value)
 runLoopControl = relay pure (\ eff _ -> case eff of
   Break    value -> pure value
   Continue value -> pure value)

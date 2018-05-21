@@ -44,7 +44,7 @@ evaluate
   . runState (Gotos lowerBound)
   . runGoto Gotos getGotos
 
-newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) (Value Precise) }
+newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) Precise (Value Precise) }
 
 reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
 reassociate (Left s) = Left (SomeExc (inject (Const s)))

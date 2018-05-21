@@ -144,7 +144,7 @@ class Show value => AbstractValue location value effects where
           -> Evaluator location value effects value -- ^ The evaluator for the body of the closure.
           -> Evaluator location value effects value
   -- | Evaluate an application (like a function call).
-  call :: value -> [Evaluator location value effects value] -> Evaluator location value effects value
+  call :: value -> [Evaluator location value effects (Address location value)] -> Evaluator location value effects (Address location value)
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --

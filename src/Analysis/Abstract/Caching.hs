@@ -6,6 +6,7 @@ module Analysis.Abstract.Caching
 ) where
 
 import Control.Abstract
+import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
@@ -96,8 +97,8 @@ convergingModules :: ( AbstractValue location value effects
                                 ] effects
                      , Reducer value (Cell location value)
                      )
-                  => SubtermAlgebra Module term (TermEvaluator term location value effects value)
-                  -> SubtermAlgebra Module term (TermEvaluator term location value effects value)
+                  => SubtermAlgebra Module term (TermEvaluator term location value effects (Address location value))
+                  -> SubtermAlgebra Module term (TermEvaluator term location value effects (Address location value))
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -112,7 +113,7 @@ convergingModules recur m = do
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
-  TermEvaluator (value =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
+  TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
