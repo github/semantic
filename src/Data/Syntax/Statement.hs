@@ -23,7 +23,7 @@ instance ToJSONFields1 If
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
-    Rval <$> ifthenelse bool (subtermValue if') (subtermValue else')
+    rvalBox =<< ifthenelse bool (subtermValue if') (subtermValue else')
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -96,7 +96,7 @@ instance Evaluatable Let where
   eval Let{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
-    Rval <$> localEnv (Env.insert name addr) (subtermValue letBody)
+    rvalBox =<< localEnv (Env.insert name addr) (subtermValue letBody)
 
 
 -- Assignment
@@ -128,7 +128,7 @@ instance Evaluatable Assignment where
         -- the left hand side of the assignment expression is invalid:
         pure ()
 
-    pure (Rval rhs)
+    rvalBox rhs
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
@@ -170,7 +170,7 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Return
 
 instance Evaluatable Return where
-  eval (Return x) = Rval <$> (subtermValue x >>= earlyReturn)
+  eval (Return x) = rvalBox =<< (subtermValue x >>= earlyReturn)
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -195,7 +195,7 @@ instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Break
 
 instance Evaluatable Break where
-  eval (Break x) = Rval <$> (subtermValue x >>= throwBreak)
+  eval (Break x) = subtermValue x >>= throwBreak >>= rvalBox
 
 newtype Continue a = Continue a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -207,7 +207,7 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Continue
 
 instance Evaluatable Continue where
-  eval (Continue a) = Rval <$> (subtermValue a >>= throwContinue)
+  eval (Continue a) = subtermValue a >>= throwContinue >>= rvalBox
 
 newtype Retry a = Retry a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -232,7 +232,7 @@ instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 NoOp
 
 instance Evaluatable NoOp where
-  eval _ = Rval <$> unit
+  eval _ = rvalBox =<< unit
 
 -- Loops
 
@@ -246,7 +246,7 @@ instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 For
 
 instance Evaluatable For where
-  eval (fmap subtermValue -> For before cond step body) = Rval <$> forLoop before cond step body
+  eval (fmap subtermValue -> For before cond step body) = rvalBox =<< forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -272,7 +272,7 @@ instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 While
 
 instance Evaluatable While where
-  eval While{..} = Rval <$> while (subtermValue whileCondition) (subtermValue whileBody)
+  eval While{..} = rvalBox =<< while (subtermValue whileCondition) (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -284,7 +284,7 @@ instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 DoWhile
 
 instance Evaluatable DoWhile where
-  eval DoWhile{..} = Rval <$> doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
+  eval DoWhile{..} = rvalBox =<< doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
 
 -- Exception handling
 

@@ -168,7 +168,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-    modifyEnv (mergeEnvs (renamed importedEnv)) *> (Rval <$> unit)
+    modifyEnv (mergeEnvs (renamed importedEnv)) *> (rvalBox =<< unit)
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
@@ -187,7 +187,7 @@ instance Evaluatable JavaScriptRequire where
   eval (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    Rval <$> evalRequire modulePath alias
+    rvalBox =<< evalRequire modulePath alias
 
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
@@ -203,7 +203,7 @@ instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    Rval <$> evalRequire modulePath alias
+    rvalBox =<< evalRequire modulePath alias
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -218,7 +218,7 @@ instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ isolate (require modulePath)
-    Rval <$> unit
+    rvalBox =<< unit
 
 
 -- | Qualified Export declarations
@@ -236,7 +236,7 @@ instance Evaluatable QualifiedExport where
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
       addExport name alias Nothing
-    Rval <$> unit
+    rvalBox =<< unit
 
 
 -- | Qualified Export declarations that export from another module.
@@ -257,7 +257,7 @@ instance Evaluatable QualifiedExportFrom where
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
       maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
-    Rval <$> unit
+    rvalBox =<< unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -278,7 +278,7 @@ instance Evaluatable DefaultExport where
         addExport name name Nothing
         void $ modifyEnv (Env.insert name addr)
       Nothing -> throwEvalError DefaultExportError
-    Rval <$> unit
+    rvalBox =<< unit
 
 
 -- | Lookup type for a type-level key in a typescript map.
@@ -773,7 +773,7 @@ instance ToJSONFields1 Module
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> letrec' name (\addr ->
+    rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 
@@ -790,7 +790,7 @@ instance ToJSONFields1 InternalModule
 instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> letrec' name (\addr ->
+    rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 instance Declarations a => Declarations (InternalModule a) where
@@ -856,7 +856,7 @@ instance Evaluatable AbstractClass where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    Rval <$> (v <$ modifyEnv (Env.insert name addr))
+    rvalBox =<< (v <$ modifyEnv (Env.insert name addr))
 
 
 data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }

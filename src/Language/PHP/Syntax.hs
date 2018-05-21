@@ -77,7 +77,7 @@ include pathTerm f = do
   traceResolve name path
   (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> unit)
   modifyEnv (mergeEnvs importedEnv)
-  pure (Rval v)
+  rvalBox v
 
 newtype Require a = Require a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
@@ -244,7 +244,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (fmap subtermValue -> QualifiedName name iden) = Rval <$> evaluateInScopedEnv name iden
+  eval (fmap subtermValue -> QualifiedName name iden) = Rval <$> evaluateInScopedEnv name (box =<< iden)
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -257,7 +257,7 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = Rval <$> foldl1 evaluateInScopedEnv (fmap subtermValue xs)
+  eval (NamespaceName xs) = rvalBox =<< foldl1 (\ l r -> r >>= (evaluateInScopedEnv l . box) >>= deref) (fmap subtermValue xs)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
@@ -450,7 +450,7 @@ instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Namespace
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = Rval <$> go names
+  eval Namespace{..} = rvalBox =<< go names
     where
       names = freeVariables (subterm namespaceName)
       go [] = raiseEff (fail "expected at least one free variable in namespaceName, found none")

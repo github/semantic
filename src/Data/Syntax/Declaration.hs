@@ -28,7 +28,7 @@ instance Evaluatable Function where
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
     (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermValue functionBody))
     modifyEnv (Env.insert name addr)
-    pure (Rval v)
+    rvalBox v
     where paramNames = foldMap (freeVariables . subterm)
 
 instance Declarations a => Declarations (Function a) where
@@ -54,7 +54,7 @@ instance Evaluatable Method where
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
     (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermValue methodBody))
     modifyEnv (Env.insert name addr)
-    pure (Rval v)
+    rvalBox v
     where paramNames = foldMap (freeVariables . subterm)
 
 
@@ -112,8 +112,8 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
-  eval (VariableDeclaration [])   = Rval <$> unit
-  eval (VariableDeclaration decs) = Rval <$> (multiple =<< traverse subtermValue decs)
+  eval (VariableDeclaration [])   = rvalBox =<< unit
+  eval (VariableDeclaration decs) = rvalBox =<< (multiple =<< traverse subtermValue decs)
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
@@ -187,7 +187,7 @@ instance Evaluatable Class where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    Rval <$> (v <$ modifyEnv (Env.insert name addr))
+    rvalBox =<< (v <$ modifyEnv (Env.insert name addr))
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -278,7 +278,7 @@ instance Evaluatable TypeAlias where
     v <- subtermValue typeAliasKind
     addr <- lookupOrAlloc name
     assign addr v
-    Rval <$> (modifyEnv (Env.insert name addr) $> v)
+    rvalBox =<< (modifyEnv (Env.insert name addr) $> v)
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier
