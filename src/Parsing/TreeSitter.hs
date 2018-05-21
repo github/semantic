@@ -12,7 +12,7 @@ import Data.Source
 import Data.Span
 import Data.Term
 import Foreign
-import Foreign.C.Types
+import Foreign.C.Types (CBool(..))
 import Foreign.Marshal.Array (allocaArray)
 import qualified TreeSitter.Tree as TS
 import qualified TreeSitter.Parser as TS
