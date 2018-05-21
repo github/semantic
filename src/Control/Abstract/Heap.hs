@@ -107,8 +107,8 @@ letrec' :: Members '[ Allocator location value
                     , State (Environment location value)
                     ] effects
         => Name
-        -> (Address location value -> Evaluator location value effects value)
-        -> Evaluator location value effects value
+        -> (Address location value -> Evaluator location value effects a)
+        -> Evaluator location value effects a
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- localEnv id (body addr)
