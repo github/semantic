@@ -24,13 +24,13 @@ parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Blob -> IO (
 parseToAST language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   TS.ts_parser_halt_on_error parser (CBool 1)
   TS.ts_parser_set_language parser language
-  root <- unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
-    bracket (TS.ts_parser_parse_string parser nullPtr source len) TS.ts_tree_delete $ \ tree -> do
-      alloca (\ rootPtr -> do
+  unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
+    alloca (\ rootPtr -> do
+      bracket (TS.ts_parser_parse_string parser nullPtr source len) TS.ts_tree_delete $ \ tree -> do
         TS.ts_tree_root_node_p tree rootPtr
-        peek rootPtr)
+        peek rootPtr >>= anaM toAST
+      )
 
-  anaM toAST root
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do
