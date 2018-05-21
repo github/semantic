@@ -7,6 +7,7 @@ import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
 import qualified Data.Language as Language
+import           Data.Semigroup.Reducer (Reducer)
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue hiding (Text)
@@ -64,10 +65,12 @@ include :: ( AbstractValue location value effects
                       , State (Heap location (Cell location) value)
                       , Trace
                       ] effects
+           , Ord location
+           , Reducer value (Cell location value)
            )
-        => Subterm term (Evaluator location value effects (ValueRef value))
+        => Subterm term (Evaluator location value effects (ValueRef location value))
         -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, value)))
-        -> Evaluator location value effects (ValueRef value)
+        -> Evaluator location value effects (ValueRef location value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name

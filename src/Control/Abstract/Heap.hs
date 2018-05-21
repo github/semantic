@@ -4,6 +4,7 @@ module Control.Abstract.Heap
 , getHeap
 , putHeap
 , modifyHeap
+, box
 , alloc
 , deref
 , assign
@@ -41,6 +42,18 @@ putHeap = put
 modifyHeap :: Member (State (Heap location (Cell location) value)) effects => (Heap location (Cell location) value -> Heap location (Cell location) value) -> Evaluator location value effects ()
 modifyHeap = modify'
 
+box :: ( Members '[ Allocator location value
+                  , State (Heap location (Cell location) value)
+                  ] effects
+       , Ord location
+       , Reducer value (Cell location value)
+       )
+    => value
+    -> Evaluator location value effects (Address location value)
+box val = do
+  addr <- alloc "<box>"
+  assign addr val
+  pure addr
 
 alloc :: Member (Allocator location value) effects => Name -> Evaluator location value effects (Address location value)
 alloc = send . Alloc

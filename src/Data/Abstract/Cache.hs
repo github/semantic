@@ -13,7 +13,7 @@ newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Config
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, Cached location cell value), Semigroup)
 
 data Cached location cell value = Cached
-  { cachedValue :: ValueRef value
+  { cachedValue :: ValueRef location value
   , cachedHeap  :: Heap location cell value
   }
   deriving (Eq, Ord, Show)

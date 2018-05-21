@@ -110,7 +110,12 @@ resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionErr
 resumingLoadError :: Member Trace effects => Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
 
-resumingEvalError :: (AbstractHole value, Member Trace effects, Show value) => Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
+resumingEvalError :: ( AbstractHole value
+                     , Member Trace effects
+                     , Show value
+                     )
+                  => Evaluator location value (Resumable (EvalError value) ': effects) a
+                  -> Evaluator location value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
   EnvironmentLookupError{} -> pure hole
   DefaultExportError{}     -> pure ()
@@ -120,8 +125,12 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   RationalFormatError{}    -> pure 0
   FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
 
-resumingUnspecialized :: (Member Trace effects, AbstractHole value) => Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
-resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> Rval hole)
+resumingUnspecialized :: ( AbstractHole value
+                         , Member Trace effects
+                         )
+                      => Evaluator location value (Resumable (Unspecialized value) ': effects) a
+                      -> Evaluator location value effects a
+resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
 
 resumingAddressError :: (AbstractHole value, Lower (Cell location value), Member Trace effects, Show location) => Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
 resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> show err) *> case err of
