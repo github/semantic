@@ -1,9 +1,25 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
-module Semantic.Graph where
+module Semantic.Graph
+( graph
+, GraphType(..)
+, Graph
+, Vertex
+, style
+, parsePackage
+, withTermSpans
+, resumingResolutionError
+, resumingLoadError
+, resumingEvalError
+, resumingUnspecialized
+, resumingAddressError
+, resumingValueError
+, resumingEnvironmentError
+) where
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Monad.Effect.Trace
+import           Control.Abstract
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
@@ -12,34 +28,29 @@ import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
-import           Data.File
-import           Data.Output
+import           Data.Project
 import           Data.Record
 import           Data.Semilattice.Lower
 import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
-import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry, Trace] effs
+graph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
       => GraphType
-      -> GraphRenderer output
       -> Project
-      -> Eff effs ByteString
-graph graphType renderer project
+      -> Eff effs (Graph Vertex)
+graph graphType project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
     let analyzeTerm = case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph >>= case renderer of
-      JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . renderGraph
+    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
@@ -55,13 +66,10 @@ graph graphType renderer project
             . resumingResolutionError
             . resumingAddressError
             . graphing
-            . constrainingTypes
-
-          constrainingTypes :: Evaluator (Located Precise) (Value (Located Precise)) effects a -> Evaluator (Located Precise) (Value (Located Precise)) effects a
-          constrainingTypes = id
+            . runTermEvaluator @_ @_ @(Value (Located Precise))
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: Members '[Distribute WrappedTask, Files, Task, Trace] effs
+parsePackage :: Members '[Distribute WrappedTask, Files, Resolution, Task, Trace] effs
              => Parser term -- ^ A parser.
              -> Maybe File  -- ^ Prelude (optional).
              -> Project     -- ^ Project to parse into a package.
@@ -69,7 +77,8 @@ parsePackage :: Members '[Distribute WrappedTask, Files, Task, Trace] effs
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
   p <- parseModules parser project
-  let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p
+  resMap <- Task.resolutionMap project
+  let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p resMap
   pkg <$ trace ("project: " <> show pkg)
 
   where
@@ -89,8 +98,8 @@ parseModule parser rootDir file = do
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
                  )
-              => SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
-              -> SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
+              => SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
+              -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
@@ -112,7 +121,7 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
 
 resumingUnspecialized :: (Member Trace effects, AbstractHole value) => Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
-resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
+resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> Rval hole)
 
 resumingAddressError :: (AbstractHole value, Lower (Cell location value), Member Trace effects, Show location) => Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
 resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> show err) *> case err of

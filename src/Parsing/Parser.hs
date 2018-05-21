@@ -1,7 +1,8 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
-, SomeParser(..)
+, SomeTerm(..)
+, withSomeTerm
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someParser
@@ -28,7 +29,7 @@ import           Data.Record
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Data.File
+import           Data.Project
 import           Foreign.Ptr
 import qualified GHC.TypeLits as TypeLevel
 import qualified Language.Go.Assignment as Go
@@ -72,7 +73,7 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    -> Language                                         -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser Nothing
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just JavaScript))
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
 someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
@@ -83,7 +84,7 @@ someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show
 -- | A parser from 'Source' onto some term type.
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
-  ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
+  ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
                    => Parser (Term ast (Node grammar))                           -- A parser producing AST.
@@ -91,23 +92,19 @@ data Parser term where
                    -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
+  -- | An abstraction over parsers when we don’t know the details of the term type.
+  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax ann) -> Parser (SomeTerm typeclasses ann)
 
 -- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
 type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
   ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
   ApplyAll '[] syntax = ()
 
--- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
---
---   This enables us to abstract over the details of the specific syntax types in cases where we can describe all the requirements on the syntax with a list of typeclasses.
-data SomeParser typeclasses ann where
-  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax ann) -> SomeParser typeclasses ann
-
--- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
+-- | Construct a 'Parser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
 --
 --   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
 --
---   > case someParser (Proxy :: Proxy '[Show1]) <$> blobLanguage language of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
+--   > runTask (parse (someParser @'[Show1] language) blob) >>= putStrLn . withSomeTerm show
 someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum JSON.Syntax)
               , ApplyAll typeclasses (Sum Markdown.Syntax)
@@ -116,18 +113,17 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum TypeScript.Syntax)
               , ApplyAll typeclasses (Sum PHP.Syntax)
               )
-           => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-           -> Language                                 -- ^ The 'Language' to select.
-           -> SomeParser typeclasses (Record Location) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
-someParser _ Go         = SomeParser goParser
-someParser _ JavaScript = SomeParser typescriptParser
-someParser _ JSON       = SomeParser jsonParser
-someParser _ JSX        = SomeParser typescriptParser
-someParser _ Markdown   = SomeParser markdownParser
-someParser _ Python     = SomeParser pythonParser
-someParser _ Ruby       = SomeParser rubyParser
-someParser _ TypeScript = SomeParser typescriptParser
-someParser _ PHP        = SomeParser phpParser
+           => Language                                        -- ^ The 'Language' to select.
+           -> Parser (SomeTerm typeclasses (Record Location)) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
+someParser Go         = SomeParser goParser
+someParser JavaScript = SomeParser typescriptParser
+someParser JSON       = SomeParser jsonParser
+someParser JSX        = SomeParser typescriptParser
+someParser Markdown   = SomeParser markdownParser
+someParser Python     = SomeParser pythonParser
+someParser Ruby       = SomeParser rubyParser
+someParser TypeScript = SomeParser typescriptParser
+someParser PHP        = SomeParser phpParser
 
 
 goParser :: Parser Go.Term
@@ -152,9 +148,16 @@ markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
+data SomeTerm typeclasses ann where
+  SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
+
+withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
+withSomeTerm with (SomeTerm term) = with term
+
+
 -- | A parser for producing specialized (tree-sitter) ASTs.
 data SomeASTParser where
-  SomeASTParser :: forall grammar. (Bounded grammar, Enum grammar, Show grammar)
+  SomeASTParser :: (Bounded grammar, Enum grammar, Show grammar)
                 => Parser (AST [] grammar)
                 -> SomeASTParser
 

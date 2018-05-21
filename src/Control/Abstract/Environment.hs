@@ -82,8 +82,8 @@ instance Eq1 (EnvironmentError value) where liftEq _ (FreeVariable n1) (FreeVari
 freeVariableError :: Member (Resumable (EnvironmentError value)) effects => Name -> Evaluator location value effects value
 freeVariableError = throwResumable . FreeVariable
 
-runEnvironmentError :: Evaluator location value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location value effects (Either (SomeExc (EnvironmentError value)) a)
+runEnvironmentError :: Effectful (m location value) => m location value (Resumable (EnvironmentError value) ': effects) a -> m location value effects (Either (SomeExc (EnvironmentError value)) a)
 runEnvironmentError = runResumable
 
-runEnvironmentErrorWith :: (forall resume . EnvironmentError value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location value effects a
+runEnvironmentErrorWith :: Effectful (m location value) => (forall resume . EnvironmentError value resume -> m location value effects resume) -> m location value (Resumable (EnvironmentError value) ': effects) a -> m location value effects a
 runEnvironmentErrorWith = runResumableWith

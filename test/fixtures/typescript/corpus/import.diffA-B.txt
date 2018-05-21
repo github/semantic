@@ -2,10 +2,10 @@
 {+(Import)+}
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
-{+(Import)+}
-{+(Import)+}
 { (Import)
 ->(Import) }
+{+(Import)+}
+{+(Import)+}
 {+(
   {+(Import)+}
   {+(Import)+})+}

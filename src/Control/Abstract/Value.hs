@@ -10,10 +10,11 @@ module Control.Abstract.Value
 , ValueRoots(..)
 ) where
 
+import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Data.Abstract.Address (Address, Cell)
+import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
@@ -138,8 +139,8 @@ class Show value => AbstractValue location value effects where
   scopedEnvironment :: value -> Evaluator location value effects (Maybe (Environment location value))
 
   -- | Build a closure (a binder like a lambda or method definition).
-  closure :: [Name]                                      -- ^ The parameter names.
-          -> Set Name                                    -- ^ The set of free variables to close over.
+  closure :: [Name]                                 -- ^ The parameter names.
+          -> Set Name                               -- ^ The set of free variables to close over.
           -> Evaluator location value effects value -- ^ The evaluator for the body of the closure.
           -> Evaluator location value effects value
   -- | Evaluate an application (like a function call).

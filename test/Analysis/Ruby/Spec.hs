@@ -31,7 +31,7 @@ spec = parallel $ do
 
     it "evaluates load with wrapper" $ do
       ((res, state), _) <- evaluate "load-wrap.rb"
-      res `shouldBe` Left (SomeExc (injectSum @(EnvironmentError (Value Precise)) (FreeVariable "foo")))
+      res `shouldBe` Left (SomeExc (inject @(EnvironmentError (Value Precise)) (FreeVariable "foo")))
       Env.names (environment state) `shouldContain` [ "Object" ]
 
     it "evaluates subclass" $ do
@@ -76,7 +76,7 @@ spec = parallel $ do
       traces `shouldContain` [ "\"hello\"" ]
 
   where
-    ns n = Just . Latest . Just . injValue . Namespace n
+    ns n = Just . Latest . Last . Just . injValue . Namespace n
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)

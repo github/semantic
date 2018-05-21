@@ -31,24 +31,21 @@ spec = parallel $ do
 evaluate
   = runM
   . fmap (first reassociate)
-  . evaluating
-  . runReader (PackageInfo (name "test") Nothing)
+  . evaluating @Precise @(Value Precise)
+  . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . Value.runValueError
   . runEnvironmentError
   . runAddressError
+  . runAllocator
   . runReturn
   . runLoopControl
   . fmap fst
   . runState (Gotos lowerBound)
   . runGoto Gotos getGotos
-  . constraining
 
 newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) (Value Precise) }
 
-constraining :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
-constraining = id
-
 reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
-reassociate (Left s) = Left (SomeExc (injectSum (Const s)))
+reassociate (Left s) = Left (SomeExc (inject (Const s)))
 reassociate (Right (Right (Right (Right a)))) = Right a
