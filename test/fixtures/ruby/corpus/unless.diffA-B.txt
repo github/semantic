@@ -4,8 +4,7 @@
       (Send
       { (Identifier)
       ->(Identifier) }))
-    ([]
-    {-(Send
+    ({-(Send
       {-(Identifier)-})-})
   { (Send
     {-(Identifier)-})

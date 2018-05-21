@@ -3,7 +3,9 @@
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable
+import Data.Aeson (ToJSON(..), object)
 import Data.AST
+import Data.JSON.Fields
 import Data.Range
 import Data.Record
 import Data.Span
@@ -19,7 +21,7 @@ import qualified Data.Error as Error
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
 makeTerm :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
-makeTerm a = makeTerm' a . injectSum
+makeTerm a = makeTerm' a . inject
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
@@ -29,11 +31,11 @@ makeTerm' a f = termIn (sconcat (a :| (termAnnotation <$> toList f))) f
 makeTerm'' :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs, Foldable f) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
 makeTerm'' a children = case toList children of
   [x] -> x
-  _ -> makeTerm' a (injectSum children)
+  _ -> makeTerm' a (inject children)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => f (Term (Sum fs) a) -> Term (Sum fs) a
-makeTerm1 = makeTerm1' . injectSum
+makeTerm1 = makeTerm1' . inject
 
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
@@ -100,14 +102,17 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier Name
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
+-- Propagating the identifier name into JSON is handled with the IdentifierName analysis.
+instance ToJSONFields1 Identifier
+
 instance Evaluatable Identifier where
-  eval (Identifier name) = variable name
+  eval (Identifier name) = pure (LvalLocal name)
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = pure x
@@ -116,22 +121,26 @@ instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
 
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Program
 
 instance Evaluatable Program where
   eval (Program xs) = eval xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 AccessibilityModifier
 
 -- TODO: Implement Eval instance for AccessibilityModifier
 instance Evaluatable AccessibilityModifier
@@ -140,25 +149,34 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance ToJSONFields1 Empty
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = unit
+  eval _ = Rval <$> unit
 
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
+
+instance ToJSONFields1 Error where
+  toJSONFields1 f@Error{..} = withChildren f [ "stack" .= errorCallStack
+                                             , "expected" .= errorExpected
+                                             , "actual" .= errorActual
+                                             ]
+
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -168,6 +186,21 @@ unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList 
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
   deriving (Eq, Show)
+
+instance ToJSON ErrorStack where
+  toJSON (ErrorStack es) = toJSON (jSite <$> es) where
+    jSite (site, SrcLoc{..}) = object
+      [ "site" .= site
+      , "package" .= srcLocPackage
+      , "module" .= srcLocModule
+      , "file" .= srcLocFile
+      , "startLine" .= srcLocStartLine
+      , "startColumn" .= srcLocStartCol
+      , "endColumn" .= srcLocEndCol
+      ]
+
+instance Hashable ErrorStack where
+  hashWithSalt = hashUsing (map (second ((,,,,,,) <$> srcLocPackage <*> srcLocModule <*> srcLocFile <*> srcLocStartLine <*> srcLocStartCol <*> srcLocEndLine <*> srcLocEndCol)) . unErrorStack)
 
 instance Ord ErrorStack where
   compare = liftCompare (liftCompare compareSrcLoc) `on` unErrorStack
@@ -185,14 +218,18 @@ instance Ord ErrorStack where
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
+instance ToJSONFields1 Context
+
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
 
   equivalentBySubterm = Just . contextSubject
+
+instance Hashable1 Context where liftHashWithSalt = foldl
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval Context{..} = subtermValue contextSubject
+  eval Context{..} = subtermRef contextSubject

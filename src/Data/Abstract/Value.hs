@@ -12,7 +12,7 @@ import Data.Scientific.Exts
 import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Data.Sum
-import Prologue hiding (TypeError)
+import Prologue hiding (TypeError, project)
 import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
 
@@ -40,13 +40,13 @@ type ValueConstructors location
 newtype Value location = Value (Sum (ValueConstructors location) (Value location))
   deriving (Eq, Show, Ord)
 
--- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
+-- | Identical to 'inject', but wraps the resulting sub-entity in a 'Value'.
 injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
-injValue = Value . injectSum
+injValue = Value . inject
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
 prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
-prjValue (Value v) = projectSum v
+prjValue (Value v) = project v
 
 -- | Convenience function for projecting two values.
 prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)
@@ -205,18 +205,18 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Addressable location (Goto effects (Value location) ': effects)
-         , Members '[ Fail
+instance ( Members '[ Allocator location (Value location)
+                    , Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
                     , Reader PackageInfo
-                    , Resumable (AddressError location (Value location))
                     , Resumable (ValueError location)
                     , Return (Value location)
                     , State (Environment location (Value location))
                     , State (Heap location (Cell location) (Value location))
                     ] effects
+         , Ord location
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
@@ -366,7 +366,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (catchReturn body (\ (Return value) -> pure value))
+          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
       Nothing -> throwValueError (CallError op)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
@@ -412,11 +412,11 @@ deriving instance Show location => Show (ValueError location resume)
 instance Show location => Show1 (ValueError location) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location value effects resume
+throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location (Value location) effects resume
 throwValueError = throwResumable
 
-runValueError :: Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects (Either (SomeExc (ValueError location)) a)
+runValueError :: Effectful (m location (Value location)) => m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects (Either (SomeExc (ValueError location)) a)
 runValueError = runResumable
 
-runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects a
+runValueErrorWith :: Effectful (m location (Value location)) => (forall resume . ValueError location resume -> m location (Value location) effects resume) -> m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects a
 runValueErrorWith = runResumableWith
