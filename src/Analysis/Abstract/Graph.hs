@@ -94,8 +94,8 @@ graphingModules recur m = do
   recur m
 
 
-packageGraph :: PackageInfo -> Graph Vertex
-packageGraph = vertex . Package . unName . packageName
+packageVertex :: PackageInfo -> Vertex
+packageVertex = Package . unName . packageName
 
 moduleVertex :: ModuleInfo -> Vertex
 moduleVertex = Module . BC.pack . modulePath
@@ -111,7 +111,7 @@ packageInclusion :: ( Effectful m
                  -> m effects ()
 packageInclusion v = do
   p <- currentPackage
-  appendGraph (packageGraph p `connect` vertex v)
+  appendGraph (vertex (packageVertex p) `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: ( Effectful m
