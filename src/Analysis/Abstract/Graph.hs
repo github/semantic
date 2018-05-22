@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
