@@ -1,10 +1,15 @@
 module Semantic.IO.Spec (spec) where
 
 import Prelude hiding (readFile)
-import Semantic.IO
-import System.Exit (ExitCode(..))
-import System.IO (IOMode(..))
+
 import Control.Concurrent.Async
+import Foreign
+import Foreign.C.Types (CBool (..))
+import Semantic.IO
+import System.Exit (ExitCode (..))
+import System.IO (IOMode (..))
+import Parsing.TreeSitter
+import System.Timeout
 
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
@@ -74,19 +79,19 @@ spec = parallel $ do
     it "should be cancelable asynchronously" $ do
       p <- TS.ts_parser_new
 
-      churn <- async $ do
-        TS.ts_parser_loop_until_cancelled p nullptr "" 0
-        return True
+      churn <- async $
+        TS.ts_parser_loop_until_cancelled p nullPtr nullPtr 0
+        pure True
 
-      res <- timeout (Milliseconds 500) (wait churn)
+      res <- timeout 500 (wait churn)
       res `shouldBe` Nothing
 
-      TS.ts_parser_set_enabled parser (CBool 0)
-      done <- timeout (Milliseconds 500) (wait churn)
+      TS.ts_parser_set_enabled p (CBool 0)
+      done <- timeout 500 (wait churn)
 
-      res `shouldBe` (Just True)
+      done `shouldBe` (Just True)
 
-      TS.ts_parser_delete
+      TS.ts_parser_delete p
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
