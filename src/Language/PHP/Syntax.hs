@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
 module Language.PHP.Syntax where
 
+import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
@@ -69,15 +70,15 @@ include :: ( AbstractValue location value effects
            , Reducer value (Cell location value)
            )
         => Subterm term (Evaluator location value effects (ValueRef location value))
-        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, value)))
+        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, Address location value)))
         -> Evaluator location value effects (ValueRef location value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> unit)
+  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> (box =<< unit))
   modifyEnv (mergeEnvs importedEnv)
-  rvalBox v
+  pure (Rval v)
 
 newtype Require a = Require a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)

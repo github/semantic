@@ -170,7 +170,7 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Return
 
 instance Evaluatable Return where
-  eval (Return x) = rvalBox =<< (subtermValue x >>= earlyReturn)
+  eval (Return x) = Rval <$> (subtermRef x >>= address >>= earlyReturn)
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -195,7 +195,7 @@ instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Break
 
 instance Evaluatable Break where
-  eval (Break x) = subtermValue x >>= throwBreak >>= rvalBox
+  eval (Break x) = Rval <$> (subtermRef x >>= address >>= throwBreak)
 
 newtype Continue a = Continue a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -207,7 +207,7 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Continue
 
 instance Evaluatable Continue where
-  eval (Continue a) = subtermValue a >>= throwContinue >>= rvalBox
+  eval (Continue a) = Rval <$> (subtermRef a >>= address >>= throwContinue)
 
 newtype Retry a = Retry a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)

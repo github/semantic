@@ -21,7 +21,7 @@ instance ToJSONFields1 Call
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    rvalBox =<< call op (map subtermValue callParams)
+    Rval <$> call op (map (address <=< subtermRef) callParams)
 
 data Comparison a
   = LessThan !a !a

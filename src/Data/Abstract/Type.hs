@@ -110,7 +110,7 @@ instance ( Members '[ Allocator location Type
                     , Resumable (AddressError location Type)
                     , Resumable (EvalError Type)
                     , Resumable TypeError
-                    , Return Type
+                    , Return location Type
                     , State (Environment location Type)
                     , State (Heap location (Cell location) Type)
                     ] effects
@@ -124,7 +124,7 @@ instance ( Members '[ Allocator location Type
       tvar <- Var <$> fresh
       assign a tvar
       bimap (Env.insert name a) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    (zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
+    (zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> deref value)
 
   unit       = pure Unit
   integer _  = pure Int
@@ -183,11 +183,11 @@ instance ( Members '[ Allocator location Type
 
   call op params = do
     tvar <- fresh
-    paramTypes <- sequenceA params
+    paramTypes <- sequenceA $ map (>>= deref) params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
     unified <- op `unify` needed
     case unified of
-      _ :-> ret -> pure ret
-      gotten    -> throwResumable (UnificationError needed gotten)
+      _ :-> ret -> box ret
+      gotten    -> box =<< throwResumable (UnificationError needed gotten)
 
   loop f = f empty

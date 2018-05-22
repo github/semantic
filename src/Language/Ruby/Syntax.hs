@@ -57,7 +57,7 @@ instance Evaluatable Send where
           Just sel -> subtermValue sel
           Nothing  -> variable (name "call")
     func <- maybe sel (deref <=< (flip evaluateInScopedEnv (sel >>= box) . subtermValue)) sendReceiver
-    rvalBox =<< call func (map subtermValue sendArgs) -- TODO pass through sendBlock
+    Rval <$> call func (map (address <=< subtermRef) sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
