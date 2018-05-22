@@ -112,7 +112,7 @@ doLoad :: ( AbstractValue location value effects
           , Members '[ Modules location value
                      , Resumable ResolutionError
                      , State (Environment location value)
-                     , State (Exports location value)
+                     , State (Exports location)
                      , Trace
                      ] effects
           )

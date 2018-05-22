@@ -132,7 +132,7 @@ evalQualifiedImport :: ( AbstractValue location value effects
                                   , Modules location value
                                   , Reader (Environment location value)
                                   , State (Environment location value)
-                                  , State (Exports location value)
+                                  , State (Exports location)
                                   , State (Heap location (Cell location) value)
                                   ] effects
                        , Ord location

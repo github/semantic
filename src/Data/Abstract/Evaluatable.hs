@@ -68,7 +68,7 @@ type EvaluatableConstraints location term value effects =
              , Resumable (Unspecialized value)
              , Return value
              , State (Environment location value)
-             , State (Exports location value)
+             , State (Exports location)
              , State (Heap location (Cell location) value)
              , Trace
              ] effects
@@ -89,7 +89,7 @@ evaluatePackageWith :: forall location term value inner inner' outer
                                   , Resumable (AddressError location value)
                                   , Resumable (LoadError location value)
                                   , State (Environment location value)
-                                  , State (Exports location value)
+                                  , State (Exports location)
                                   , State (Heap location (Cell location) value)
                                   , State (ModuleTable (Maybe (Environment location value, value)))
                                   , Trace
@@ -153,7 +153,7 @@ newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl 
 
 
 -- | Isolate the given action with an empty global environment and exports.
-isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location value effects a -> Evaluator location value effects a
+isolate :: Members '[State (Environment location value), State (Exports location)] effects => Evaluator location value effects a -> Evaluator location value effects a
 isolate = withEnv lowerBound . withExports lowerBound
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()

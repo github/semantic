@@ -59,7 +59,7 @@ include :: ( AbstractValue location value effects
                       , Resumable ResolutionError
                       , Resumable (EnvironmentError value)
                       , State (Environment location value)
-                      , State (Exports location value)
+                      , State (Exports location)
                       , State (Heap location (Cell location) value)
                       , Trace
                       ] effects
