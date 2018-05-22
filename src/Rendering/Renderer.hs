@@ -6,6 +6,7 @@ module Rendering.Renderer
 , renderJSONTerm
 , renderJSONAST
 , renderToCDiff
+, renderRPCToCDiff
 , renderToCTerm
 , renderSymbolTerms
 , renderToSymbols
@@ -14,6 +15,7 @@ module Rendering.Renderer
 , renderToTags
 , renderTreeGraph
 , Summaries(..)
+, TOCSummary(..)
 , SymbolFields(..)
 , defaultSymbolFields
 ) where
