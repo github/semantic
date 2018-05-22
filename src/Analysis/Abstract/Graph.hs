@@ -85,6 +85,7 @@ graphingLoadErrors recur term = TermEvaluator (runTermEvaluator (recur term) `re
 graphingModules :: Members '[ Reader ModuleInfo
                             , Reader PackageInfo
                             , State (Graph Vertex)
+                            , State (Maybe ModuleInfo)
                             ] effects
                => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
@@ -92,7 +93,7 @@ graphingModules recur m = do
   let name = BC.pack (modulePath (moduleInfo m))
   packageInclusion (Module name)
   moduleInclusion (Module name)
-  recur m
+  localState (const (Just (moduleInfo m))) (recur m)
 
 
 packageGraph :: PackageInfo -> Graph Vertex
