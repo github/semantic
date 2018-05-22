@@ -209,20 +209,20 @@ class AbstractFunction location value effects => AbstractValue location value ef
   index :: value -> value -> Evaluator location value effects value
 
   -- | Build a class value from a name and environment.
-  klass :: Name                       -- ^ The new class's identifier
-        -> [value]                    -- ^ A list of superclasses
-        -> Environment location value -- ^ The environment to capture
+  klass :: Name                 -- ^ The new class's identifier
+        -> [value]              -- ^ A list of superclasses
+        -> Environment location -- ^ The environment to capture
         -> Evaluator location value effects value
 
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
-  namespace :: Name                       -- ^ The namespace's identifier
-            -> Environment location value -- ^ The environment to mappend
+  namespace :: Name                 -- ^ The namespace's identifier
+            -> Environment location -- ^ The environment to mappend
             -> Evaluator location value effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> Evaluator location value effects (Maybe (Environment location value))
+  scopedEnvironment :: value -> Evaluator location value effects (Maybe (Environment location))
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --
@@ -236,7 +236,7 @@ asBool value = ifthenelse value (pure True) (pure False)
 
 -- | C-style for loops.
 forLoop :: ( AbstractValue location value effects
-           , Member (State (Environment location value)) effects
+           , Member (State (Environment location)) effects
            )
         => Evaluator location value effects value -- ^ Initial statement
         -> Evaluator location value effects value -- ^ Condition
@@ -265,7 +265,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 makeNamespace :: ( AbstractValue location value effects
-                 , Member (State (Environment location value)) effects
+                 , Member (State (Environment location)) effects
                  , Member (State (Heap location (Cell location) value)) effects
                  , Ord location
                  , Reducer value (Cell location value)
@@ -284,7 +284,7 @@ makeNamespace name addr super = do
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 evaluateInScopedEnv :: ( AbstractValue location value effects
-                       , Member (State (Environment location value)) effects
+                       , Member (State (Environment location)) effects
                        )
                     => Evaluator location value effects value
                     -> Evaluator location value effects value
@@ -297,9 +297,9 @@ evaluateInScopedEnv scopedEnvTerm term = do
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue location value effects
          , Members '[ Allocator location value
-                    , Reader (Environment location value)
+                    , Reader (Environment location)
                     , Resumable (EnvironmentError value)
-                    , State (Environment location value)
+                    , State (Environment location)
                     , State (Heap location (Cell location) value)
                     ] effects
          )
@@ -312,9 +312,9 @@ value (Rval val) = pure val
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue location value effects
                 , Members '[ Allocator location value
-                           , Reader (Environment location value)
+                           , Reader (Environment location)
                            , Resumable (EnvironmentError value)
-                           , State (Environment location value)
+                           , State (Environment location)
                            , State (Heap location (Cell location) value)
                            ] effects
                 )

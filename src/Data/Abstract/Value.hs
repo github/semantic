@@ -57,7 +57,7 @@ prjPair = bitraverse prjValue prjValue
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a package & module info, a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure location value = Closure PackageInfo ModuleInfo [Name] Label (Environment location value)
+data Closure location value = Closure PackageInfo ModuleInfo [Name] Label (Environment location)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
@@ -151,7 +151,7 @@ instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 --   but for the time being we're pretending all languages have prototypical inheritance.
 data Class location value = Class
   { _className  :: Name
-  , _classScope :: Environment location value
+  , _classScope :: Environment location
   } deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Class location) where liftEq = genericLiftEq
@@ -160,7 +160,7 @@ instance Show location => Show1 (Class location) where liftShowsPrec = genericLi
 
 data Namespace location value = Namespace
   { namespaceName  :: Name
-  , namespaceScope :: Environment location value
+  , namespaceScope :: Environment location
   } deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Namespace location) where liftEq = genericLiftEq
@@ -205,12 +205,12 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 instance ( Members '[ Allocator location (Value location)
-                    , Reader (Environment location (Value location))
+                    , Reader (Environment location)
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (ValueError location)
                     , Return (Value location)
-                    , State (Environment location (Value location))
+                    , State (Environment location)
                     , State (Heap location (Cell location) (Value location))
                     ] effects
          , Ord location
@@ -243,12 +243,12 @@ instance ( Members '[ Allocator location (Value location)
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Members '[ Allocator location (Value location)
                     , LoopControl (Value location)
-                    , Reader (Environment location (Value location))
+                    , Reader (Environment location)
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (ValueError location)
                     , Return (Value location)
-                    , State (Environment location (Value location))
+                    , State (Environment location)
                     , State (Heap location (Cell location) (Value location))
                     ] effects
          , Ord location
@@ -384,7 +384,7 @@ data ValueError location resume where
   StringError            :: Value location                   -> ValueError location ByteString
   BoolError              :: Value location                   -> ValueError location Bool
   IndexError             :: Value location -> Value location -> ValueError location (Value location)
-  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location (Value location))
+  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location)
   CallError              :: Value location                   -> ValueError location (Value location)
   NumericError           :: Value location                   -> ValueError location (Value location)
   Numeric2Error          :: Value location -> Value location -> ValueError location (Value location)

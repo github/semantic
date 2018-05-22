@@ -22,7 +22,7 @@ newtype Exports location = Exports { unExports :: Map.Map Name (Name, Maybe loca
 null :: Exports location -> Bool
 null = Map.null . unExports
 
-toEnvironment :: Exports location -> Environment location value
+toEnvironment :: Exports location -> Environment location
 toEnvironment exports = unpairs (mapMaybe sequenceA (map (second (fmap Address)) (toList (unExports exports))))
 
 insert :: Name -> Name -> Maybe (Address location value) -> Exports location -> Exports location

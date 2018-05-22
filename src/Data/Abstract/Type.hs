@@ -104,10 +104,10 @@ instance AbstractHole Type where
 instance ( Members '[ Allocator location Type
                     , Fresh
                     , NonDet
-                    , Reader (Environment location Type)
+                    , Reader (Environment location)
                     , Resumable TypeError
                     , Return Type
-                    , State (Environment location Type)
+                    , State (Environment location)
                     , State (Heap location (Cell location) Type)
                     ] effects
          , Ord location
@@ -136,10 +136,10 @@ instance ( Members '[ Allocator location Type
 instance ( Members '[ Allocator location Type
                     , Fresh
                     , NonDet
-                    , Reader (Environment location Type)
+                    , Reader (Environment location)
                     , Resumable TypeError
                     , Return Type
-                    , State (Environment location Type)
+                    , State (Environment location)
                     , State (Heap location (Cell location) Type)
                     ] effects
          , Ord location

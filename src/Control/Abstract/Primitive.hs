@@ -15,10 +15,10 @@ import Prologue
 
 builtin :: ( HasCallStack
            , Members '[ Allocator location value
-                      , Reader (Environment location value)
+                      , Reader (Environment location)
                       , Reader ModuleInfo
                       , Reader Span
-                      , State (Environment location value)
+                      , State (Environment location)
                       , State (Heap location (Cell location) value)
                       ] effects
            , Ord location
@@ -45,11 +45,11 @@ defineBuiltins :: ( AbstractValue location value effects
                   , HasCallStack
                   , Members '[ Allocator location value
                              , Fresh
-                             , Reader (Environment location value)
+                             , Reader (Environment location)
                              , Reader ModuleInfo
                              , Reader Span
                              , Resumable (EnvironmentError value)
-                             , State (Environment location value)
+                             , State (Environment location)
                              , State (Heap location (Cell location) value)
                              , Trace
                              ] effects

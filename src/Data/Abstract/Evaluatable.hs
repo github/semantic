@@ -58,7 +58,7 @@ type EvaluatableConstraints location term value effects =
   , Members '[ Allocator location value
              , LoopControl value
              , Modules location value
-             , Reader (Environment location value)
+             , Reader (Environment location)
              , Reader ModuleInfo
              , Reader PackageInfo
              , Reader Span
@@ -67,7 +67,7 @@ type EvaluatableConstraints location term value effects =
              , Resumable ResolutionError
              , Resumable (Unspecialized value)
              , Return value
-             , State (Environment location value)
+             , State (Environment location)
              , State (Exports location)
              , State (Heap location (Cell location) value)
              , Trace
@@ -85,13 +85,13 @@ evaluatePackageWith :: forall location term value inner inner' outer
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
                                   , Fresh
-                                  , Reader (Environment location value)
+                                  , Reader (Environment location)
                                   , Resumable (AddressError location value)
                                   , Resumable (LoadError location value)
-                                  , State (Environment location value)
+                                  , State (Environment location)
                                   , State (Exports location)
                                   , State (Heap location (Cell location) value)
-                                  , State (ModuleTable (Maybe (Environment location value, value)))
+                                  , State (ModuleTable (Maybe (Environment location, value)))
                                   , Trace
                                   ] outer
                        , Recursive term
@@ -153,7 +153,7 @@ newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl 
 
 
 -- | Isolate the given action with an empty global environment and exports.
-isolate :: Members '[State (Environment location value), State (Exports location)] effects => Evaluator location value effects a -> Evaluator location value effects a
+isolate :: Members '[State (Environment location), State (Exports location)] effects => Evaluator location value effects a -> Evaluator location value effects a
 isolate = withEnv lowerBound . withExports lowerBound
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()

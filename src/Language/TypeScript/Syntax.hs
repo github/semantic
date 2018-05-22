@@ -135,8 +135,8 @@ javascriptExtensions = ["js"]
 evalRequire :: ( AbstractValue location value effects
                , Members '[ Allocator location value
                           , Modules location value
-                          , Reader (Environment location value)
-                          , State (Environment location value)
+                          , Reader (Environment location)
+                          , State (Environment location)
                           , State (Exports location)
                           , State (Heap location (Cell location) value)
                           , Trace

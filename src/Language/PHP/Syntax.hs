@@ -55,17 +55,17 @@ resolvePHPName n = do
 include :: ( AbstractValue location value effects
            , Members '[ Allocator location value
                       , Modules location value
-                      , Reader (Environment location value)
+                      , Reader (Environment location)
                       , Resumable ResolutionError
                       , Resumable (EnvironmentError value)
-                      , State (Environment location value)
+                      , State (Environment location)
                       , State (Exports location)
                       , State (Heap location (Cell location) value)
                       , Trace
                       ] effects
            )
         => Subterm term (Evaluator location value effects (ValueRef value))
-        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, value)))
+        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location, value)))
         -> Evaluator location value effects (ValueRef value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString

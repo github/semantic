@@ -81,7 +81,7 @@ doRequire :: ( AbstractValue location value effects
              , Member (Modules location value) effects
              )
           => M.ModulePath
-          -> Evaluator location value effects (Environment location value, value)
+          -> Evaluator location value effects (Environment location, value)
 doRequire path = do
   result <- join <$> lookupModule path
   case result of
@@ -111,7 +111,7 @@ instance Evaluatable Load where
 doLoad :: ( AbstractValue location value effects
           , Members '[ Modules location value
                      , Resumable ResolutionError
-                     , State (Environment location value)
+                     , State (Environment location)
                      , State (Exports location)
                      , Trace
                      ] effects
