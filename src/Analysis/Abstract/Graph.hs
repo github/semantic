@@ -9,6 +9,7 @@ module Analysis.Abstract.Graph
 , packageInclusion
 , graphingTerms
 , graphingLoadErrors
+, graphingPackages
 , graphingModules
 , graphing
 ) where
@@ -79,6 +80,14 @@ graphingLoadErrors :: Members '[ Reader ModuleInfo
                    => SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
                    -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
 graphingLoadErrors recur term = TermEvaluator (runTermEvaluator (recur term) `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name))
+
+graphingPackages :: Members '[ Reader ModuleInfo
+                             , Reader PackageInfo
+                             , State (Graph Vertex)
+                             ] effects
+                 => SubtermAlgebra Module term (TermEvaluator term location value effects a)
+                 -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
+graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingModules :: forall term location value effects a
