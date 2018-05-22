@@ -8,7 +8,6 @@ module Analysis.Abstract.Graph
 , moduleInclusion
 , packageInclusion
 , graphingTerms
-, graphingLoadErrors
 , graphingPackages
 , graphingModules
 , graphing
@@ -17,7 +16,6 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract
 import           Data.Abstract.Address
-import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
 import           Data.Abstract.Package (PackageInfo(..))
@@ -70,15 +68,6 @@ graphingTerms recur term@(In _ syntax) = do
       variableDefinition name
     _ -> pure ()
   recur term
-
--- | Add vertices to the graph for 'LoadError's.
-graphingLoadErrors :: Members '[ Reader ModuleInfo
-                               , Resumable (LoadError location value)
-                               , State (Graph Vertex)
-                               ] effects
-                   => SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
-                   -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
-graphingLoadErrors recur term = TermEvaluator (runTermEvaluator (recur term) `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name))
 
 graphingPackages :: Members '[ Reader ModuleInfo
                              , Reader PackageInfo
