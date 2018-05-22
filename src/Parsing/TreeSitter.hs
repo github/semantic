@@ -87,8 +87,8 @@ parseToAST language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ 
             | t == nullPtr = dbg "Parse failed"
             | otherwise = do
                 dbg "Parse completed"
+                withLock (setStatus Completed)
                 cancel watchdog
-                setStatus Completed
                 TS.ts_tree_delete t
 
       let go treePtr = do
