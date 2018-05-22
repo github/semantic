@@ -47,7 +47,7 @@ runGraph graphType project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let analyzeTerm = withTermSpans . graphingLoadErrors . case graphType of
+    let analyzeTerm = withTermSpans . case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
         analyzeModule = graphingPackages . graphingModules
