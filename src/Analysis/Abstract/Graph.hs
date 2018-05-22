@@ -55,10 +55,10 @@ style = (defaultStyle (byteString . vertexName))
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
                  , Members '[ Reader (Environment (Located location) value)
+                            , Reader ModuleInfo
                             , Reader PackageInfo
                             , State (Environment (Located location) value)
                             , State (Graph Vertex)
-                            , State (Maybe ModuleInfo)
                             ] effects
                  , term ~ Term (Sum syntax) ann
                  )
@@ -73,16 +73,17 @@ graphingTerms recur term@(In _ syntax) = do
   recur term
 
 -- | Add vertices to the graph for 'LoadError's.
-graphingLoadErrors :: Members '[ Resumable (LoadError location value)
+graphingLoadErrors :: Members '[ Reader ModuleInfo
+                               , Resumable (LoadError location value)
                                , State (Graph Vertex)
-                               , State (Maybe ModuleInfo)
                                ] effects
                    => SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
                    -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
 graphingLoadErrors recur term = TermEvaluator (runTermEvaluator (recur term) `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name))
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
-graphingModules :: Members '[ Reader PackageInfo
+graphingModules :: Members '[ Reader ModuleInfo
+                            , Reader PackageInfo
                             , State (Graph Vertex)
                             , State (Maybe ModuleInfo)
                             ] effects
@@ -116,16 +117,16 @@ packageInclusion v = do
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: ( Effectful m
-                   , Members '[ State (Graph Vertex)
-                              , State (Maybe ModuleInfo)
+                   , Members '[ Reader ModuleInfo
+                              , State (Graph Vertex)
                               ] effects
                    , Monad (m effects)
                    )
                 => Vertex
                 -> m effects ()
 moduleInclusion v = do
-  m <- get
-  appendGraph (maybe mempty moduleGraph m `connect` (vertex v))
+  m <- currentModule
+  appendGraph (moduleGraph m `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Member (Reader (Environment (Located location) value)) effects
