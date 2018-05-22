@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
+, renderRPCToCDiff
 , renderToCTerm
 , diffTOC
 , Summaries(..)
@@ -53,12 +54,12 @@ data TOCSummary
     , summarySpan :: Span
     , summaryChangeType :: T.Text
     }
-  | ErrorSummary { error :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
+  | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
-  toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
+  toJSON ErrorSummary{..} = object [ "error" .= errorText, "span" .= errorSpan, "language" .= errorLanguage ]
 
 isValidSummary :: TOCSummary -> Bool
 isValidSummary ErrorSummary{} = False
@@ -154,6 +155,9 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = T.pack $ pathKeyForBlobPair blobs
+
+renderRPCToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> ([TOCSummary], [TOCSummary])
+renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration
