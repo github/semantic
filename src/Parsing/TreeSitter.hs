@@ -15,7 +15,7 @@ import Data.Range
 import Data.Source
 import Data.Span
 import Data.Term
-import Foreign hiding (void)
+import Foreign
 import Foreign.C.Types (CBool (..))
 import Foreign.Marshal.Array (allocaArray)
 import System.Timeout
@@ -32,7 +32,7 @@ dbg :: String -> IO ()
 dbg = const (pure ())
 
 runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Maybe (AST [] grammar))
-runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
+runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) ->
     alloca (\ rootPtr -> do
       let acquire = do
             dbg "Starting parse"
