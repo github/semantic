@@ -79,7 +79,7 @@ spec = parallel $ do
     it "should be cancelable asynchronously" $ do
       p <- TS.ts_parser_new
 
-      churn <- async $
+      churn <- async $ do
         TS.ts_parser_loop_until_cancelled p nullPtr nullPtr 0
         pure True
 
