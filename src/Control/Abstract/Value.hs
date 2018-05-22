@@ -1,4 +1,4 @@
-{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE GADTs, Rank2Types, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractFunction(..)
@@ -16,6 +16,7 @@ module Control.Abstract.Value
 ) where
 
 import Control.Abstract.Addressable
+import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
@@ -25,9 +26,11 @@ import Data.Abstract.Live (Live)
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
+import qualified Data.Map as Map
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
+import qualified Data.Set as Set
 import Prelude
 import Prologue hiding (TypeError)
 
@@ -43,6 +46,79 @@ data Comparator
 
 class AbstractHole value where
   hole :: value
+
+
+data Function m value return where
+  Lambda :: [Name] -> Set Name -> m value -> Function m value value
+  Call   :: value -> [m value]            -> Function m value value
+
+
+data Value m location
+  = Closure [Name] (m (Value m location)) (Map Name location)
+
+runFunctionValue :: ( Effectful (m location)
+                    , Members '[ Reader (Map Name location)
+                               , Reader ModuleInfo
+                               , Reader PackageInfo
+                               ] effects
+                    , Monad (m location effects)
+                    )
+                 => (Name -> m location effects location)
+                 -> (location -> Value (m location effects) location -> m location effects ())
+                 -> m location (Function (m location effects) (Value (m location effects) location) ': effects) a
+                 -> m location effects a
+runFunctionValue alloc assign = relay pure $ \ eff yield -> case eff of
+  Lambda params fvs body -> do
+    packageInfo <- currentPackage
+    moduleInfo <- currentModule
+    env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
+    let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
+    yield (Closure params body' env)
+  Call (Closure paramNames body env) params -> do
+    bindings <- foldr (\ (name, param) rest -> do
+      v <- param
+      a <- alloc name
+      assign a v
+      Map.insert name a <$> rest) (pure env) (zip paramNames params)
+    local (Map.unionWith const bindings) body >>= yield
+
+
+data Type
+  = Type :-> Type
+  | Product [Type]
+  | Var Int
+  deriving (Eq, Ord, Show)
+
+runFunctionType :: ( Alternative (m location effects)
+                   , Effectful (m location)
+                   , Members '[ Fresh
+                              , Reader (Map Name location)
+                              , Reader ModuleInfo
+                              , Reader PackageInfo
+                              ] effects
+                   , Monad (m location effects)
+                   )
+                => (Name -> m location effects location)
+                -> (location -> Type -> m location effects ())
+                -> m location (Function (m location effects) Type ': effects) a
+                -> m location effects a
+runFunctionType alloc assign = relay pure $ \ eff yield -> case eff of
+  Lambda params _ body -> do
+    (bindings, tvars) <- foldr (\ name rest -> do
+      a <- alloc name
+      tvar <- Var <$> fresh
+      assign a tvar
+      bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
+    ret <- local (Map.unionWith const bindings) body
+    yield (Product tvars :-> ret)
+  Call fn params -> do
+    paramTypes <- sequenceA params
+    case fn of
+      Product argTypes :-> ret -> do
+        guard (and (zipWith (==) paramTypes argTypes))
+        yield ret
+      _ -> empty
+
 
 class Show value => AbstractFunction location value effects where
   -- | Build a closure (a binder like a lambda or method definition).
