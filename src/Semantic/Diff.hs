@@ -32,6 +32,9 @@ data SomeTermPair typeclasses ann where
 withSomeTermPair :: (forall syntax . ApplyAll typeclasses syntax => Join These (Term syntax ann) -> a) -> SomeTermPair typeclasses ann -> a
 withSomeTermPair with (SomeTermPair terms) = with terms
 
+diffBlobTOCPairs :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => [BlobPair] -> Eff effs ([TOCSummary], [TOCSummary])
+diffBlobTOCPairs = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderRPCToCDiff)
+
 withParsedBlobPairs :: (Members '[Distribute WrappedTask, Exc SomeException, IO, Task, Telemetry] effs, Monoid output)
                     => (forall syntax . (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
                     -> (forall syntax . (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => BlobPair -> Diff syntax (Record fields) (Record fields) -> TaskEff output)
