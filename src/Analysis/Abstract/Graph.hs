@@ -7,7 +7,6 @@ module Analysis.Abstract.Graph
 , variableDefinition
 , moduleInclusion
 , packageInclusion
-, packageGraph
 , graphingTerms
 , graphingLoadErrors
 , graphingModules
