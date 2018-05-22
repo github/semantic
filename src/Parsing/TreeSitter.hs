@@ -25,9 +25,10 @@ import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
 
-newtype Timeout = Seconds Int
+newtype Timeout = Milliseconds Int
 
 -- Change this to putStrLn if you want to debug the locking/cancellation code.
+-- TODO: Someday we should run this all in Eff so that we can 'trace'.
 dbg :: String -> IO ()
 dbg = const (pure ())
 
@@ -54,8 +55,8 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
 parseToAST :: (Bounded grammar, Enum grammar) => Timeout -> Ptr TS.Language -> Blob -> IO (Maybe (AST [] grammar))
-parseToAST (Seconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
-  let parserTimeout = s * 1000000
+parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+  let parserTimeout = s * 1000
 
   TS.ts_parser_halt_on_error parser (CBool 1)
   TS.ts_parser_set_language parser language

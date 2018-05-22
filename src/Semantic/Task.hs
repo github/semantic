@@ -185,7 +185,7 @@ data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
 instance Exception ParserCancelled
 
 defaultTimeout :: Timeout
-defaultTimeout = Seconds 5
+defaultTimeout = Milliseconds 5000
 
 -- | Parse a 'Blob' in 'IO'.
 runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
