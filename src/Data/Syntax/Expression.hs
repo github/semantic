@@ -21,7 +21,7 @@ instance ToJSONFields1 Call
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    Rval <$> call op (map (address <=< subtermRef) callParams)
+    Rval <$> call op (map subtermAddress callParams)
 
 data Comparison a
   = LessThan !a !a
@@ -217,7 +217,7 @@ instance ToJSONFields1 MemberAccess
 
 instance Evaluatable MemberAccess where
   eval (MemberAccess obj prop) = do
-    obj <- address =<< subtermRef obj
+    obj <- subtermAddress obj
     prop <- subtermRef prop
     case prop of
       LvalLocal propName -> pure (LvalMember obj propName)

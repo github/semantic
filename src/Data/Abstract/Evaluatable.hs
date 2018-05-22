@@ -12,6 +12,7 @@ module Data.Abstract.Evaluatable
 , value
 , address
 , subtermValue
+, subtermAddress
 , evaluateInScopedEnv
 , evaluatePackageWith
 , throwEvalError
@@ -214,6 +215,21 @@ subtermValue :: ( AbstractValue location value effects
              => Subterm term (Evaluator location value effects (ValueRef location value))
              -> Evaluator location value effects value
 subtermValue = value <=< subtermRef
+
+subtermAddress :: ( AbstractValue location value effects
+                , Members '[ Allocator location value
+                           , Reader (Environment location value)
+                           , Resumable (EnvironmentError value)
+                           , Resumable (EvalError value)
+                           , State (Environment location value)
+                           , State (Heap location (Cell location) value)
+                           ] effects
+                , Ord location
+                , Reducer value (Cell location value)
+                )
+             => Subterm term (Evaluator location value effects (ValueRef location value))
+             -> Evaluator location value effects (Address location value)
+subtermAddress = address <=< subtermRef
 
 runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
