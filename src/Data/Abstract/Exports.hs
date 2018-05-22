@@ -23,10 +23,7 @@ null :: Exports location value -> Bool
 null = Map.null . unExports
 
 toEnvironment :: Exports location value -> Environment location value
-toEnvironment exports = unpairs (mapMaybe collectExport (toList (unExports exports)))
-  where
-    collectExport (_, Nothing) = Nothing
-    collectExport (n, Just value)  = Just (n, value)
+toEnvironment exports = unpairs (mapMaybe sequenceA (toList (unExports exports)))
 
 insert :: Name -> Name -> Maybe (Address location value) -> Exports location value -> Exports location value
 insert name alias address = Exports . Map.insert name (alias, address) . unExports
