@@ -154,5 +154,5 @@ vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
 
 
-graphing :: (Effectful m, Functor (m effects)) => m (State (Graph Vertex) ': State (Maybe ModuleInfo) ': effects) result -> m effects (result, Graph Vertex)
-graphing = fmap fst . runState Nothing . runState mempty
+graphing :: Effectful m => m (State (Graph Vertex) ': effects) result -> m effects (result, Graph Vertex)
+graphing = runState mempty
