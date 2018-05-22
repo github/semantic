@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph
-( graph
+( runGraph
 , GraphType(..)
 , Graph
 , Vertex
@@ -39,11 +39,11 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-graph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
-      => GraphType
-      -> Project
-      -> Eff effs (Graph Vertex)
-graph graphType project
+runGraph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
+         => GraphType
+         -> Project
+         -> Eff effs (Graph Vertex)
+runGraph graphType project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
