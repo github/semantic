@@ -188,11 +188,10 @@ instance Exception ParserCancelled
 runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
-      result <- IO.rethrowing (parseToAST language blob)
-      case result of
-        Nothing -> throwError (SomeException ParserTimedOut)
-        Just p  -> pure p
+    time "parse.tree_sitter_ast_parse" languageTag $
+      IO.rethrowing (parseToAST language blob)
+        >>= maybeM (throwError (SomeException ParserTimedOut))
+
   AssignmentParser parser assignment -> do
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
