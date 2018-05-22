@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
@@ -81,7 +81,9 @@ graphingLoadErrors :: Members '[ Reader ModuleInfo
 graphingLoadErrors recur term = TermEvaluator (runTermEvaluator (recur term) `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name))
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
-graphingModules :: Members '[ Reader ModuleInfo
+graphingModules :: forall term location value effects a
+                .  Members '[ Modules location value
+                            , Reader ModuleInfo
                             , Reader PackageInfo
                             , State (Graph Vertex)
                             ] effects
@@ -90,8 +92,10 @@ graphingModules :: Members '[ Reader ModuleInfo
 graphingModules recur m = do
   let vertex = moduleVertex (moduleInfo m)
   packageInclusion vertex
-  moduleInclusion vertex
-  recur m
+  interpose @(Modules location value) pure (\ m yield -> case m of
+    Load path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
+    _ -> send m >>= yield)
+    (recur m)
 
 
 packageVertex :: PackageInfo -> Vertex
