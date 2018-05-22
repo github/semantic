@@ -180,12 +180,19 @@ runTaskF = interpret $ \ task -> case task of
 logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
 
+data ParserCancelled = ParserCancelled deriving (Show, Typeable)
+
+instance Exception ParserCancelled
+
 -- | Parse a 'Blob' in 'IO'.
 runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $
-      IO.rethrowing (parseToAST language blob)
+    time "parse.tree_sitter_ast_parse" languageTag $ do
+      result <- IO.rethrowing (parseToAST language blob)
+      case result of
+        Nothing -> throwError (SomeException ParserCancelled)
+        Just p  -> pure p
   AssignmentParser parser assignment -> do
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
