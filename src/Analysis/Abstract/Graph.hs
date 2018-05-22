@@ -86,7 +86,8 @@ graphingModules :: forall term location value effects a
                => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
 graphingModules recur m = interpose @(Modules location value) pure (\ m yield -> case m of
-  Load path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
+  Load   path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
+  Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
   _ -> send m >>= yield)
   (recur m)
 
