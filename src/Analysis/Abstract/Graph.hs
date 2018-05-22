@@ -89,9 +89,9 @@ graphingModules :: Members '[ Reader PackageInfo
                => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
 graphingModules recur m = do
-  let vertex = Module (BC.pack (modulePath (moduleInfo m)))
-  packageInclusion vertex
-  moduleInclusion vertex
+  let name = BC.pack (modulePath (moduleInfo m))
+  packageInclusion (Module name)
+  moduleInclusion (Module name)
   localState (const (Just (moduleInfo m))) (recur m)
 
 
