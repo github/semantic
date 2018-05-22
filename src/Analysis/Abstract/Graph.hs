@@ -89,17 +89,17 @@ graphingModules :: Members '[ Reader ModuleInfo
                => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
 graphingModules recur m = do
-  let name = BC.pack (modulePath (moduleInfo m))
-  packageInclusion (Module name)
-  moduleInclusion (Module name)
+  let vertex = moduleVertex (moduleInfo m)
+  packageInclusion vertex
+  moduleInclusion vertex
   recur m
 
 
 packageGraph :: PackageInfo -> Graph Vertex
 packageGraph = vertex . Package . unName . packageName
 
-moduleGraph :: ModuleInfo -> Graph Vertex
-moduleGraph = vertex . Module . BC.pack . modulePath
+moduleVertex :: ModuleInfo -> Vertex
+moduleVertex = Module . BC.pack . modulePath
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
@@ -125,7 +125,7 @@ moduleInclusion :: ( Effectful m
                 -> m effects ()
 moduleInclusion v = do
   m <- currentModule
-  appendGraph (moduleGraph m `connect` vertex v)
+  appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Member (Reader (Environment (Located location) value)) effects
@@ -135,7 +135,7 @@ variableDefinition :: ( Member (Reader (Environment (Located location) value)) e
                    => Name
                    -> TermEvaluator term (Located location) value effects ()
 variableDefinition name = do
-  graph <- maybe lowerBound (moduleGraph . locationModule . unAddress) <$> TermEvaluator (lookupEnv name)
+  graph <- maybe lowerBound (vertex . moduleVertex . locationModule . unAddress) <$> TermEvaluator (lookupEnv name)
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
