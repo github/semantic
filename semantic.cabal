@@ -11,6 +11,10 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
+flag release
+  description: Build with optimizations on (for CI or deployment builds)
+  default:     False
+
 library
   hs-source-dirs:      src
   exposed-modules:
@@ -221,13 +225,19 @@ library
                      , StandaloneDeriving
                      , StrictData
                      , TypeApplications
-  ghc-options:         -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O -j
+  if flag(release)
+    ghc-options:       -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O2 -j
+  else
+    ghc-options:       -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j
   ghc-prof-options:    -fprof-auto
 
 executable semantic
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O
+  if flag(release)
+    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O2 -j
+  else
+    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O0 -j
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
@@ -327,7 +337,7 @@ benchmark evaluation
   hs-source-dirs:      bench
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O
+  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O2
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   default-language:    Haskell2010
