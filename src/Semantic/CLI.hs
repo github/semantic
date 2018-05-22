@@ -87,6 +87,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       graphType <- flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
                <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
       let style = Graph.style
+      includePackages <- switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
       serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
                 <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
       rootDir <- rootDirectoryOption
