@@ -278,6 +278,7 @@ test-suite test
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , array
+                     , async
                      , base
                      , bifunctors
                      , bytestring
