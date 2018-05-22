@@ -93,18 +93,14 @@ graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> rec
 graphingModules :: forall term location value effects a
                 .  Members '[ Modules location value
                             , Reader ModuleInfo
-                            , Reader PackageInfo
                             , State (Graph Vertex)
                             ] effects
                => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
-graphingModules recur m = do
-  let vertex = moduleVertex (moduleInfo m)
-  packageInclusion vertex
-  interpose @(Modules location value) pure (\ m yield -> case m of
-    Load path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
-    _ -> send m >>= yield)
-    (recur m)
+graphingModules recur m = interpose @(Modules location value) pure (\ m yield -> case m of
+  Load path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
+  _ -> send m >>= yield)
+  (recur m)
 
 
 packageVertex :: PackageInfo -> Vertex

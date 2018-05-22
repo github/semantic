@@ -50,7 +50,7 @@ graph graphType project
     let analyzeTerm = case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
+    analyze runGraphAnalysis (evaluatePackageWith (graphingPackages . graphingModules) (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
