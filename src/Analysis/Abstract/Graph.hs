@@ -56,7 +56,6 @@ style = (defaultStyle (byteString . vertexName))
 graphingTerms :: ( Element Syntax.Identifier syntax
                  , Members '[ Reader (Environment (Located location) value)
                             , Reader ModuleInfo
-                            , Reader PackageInfo
                             , State (Environment (Located location) value)
                             , State (Graph Vertex)
                             ] effects
