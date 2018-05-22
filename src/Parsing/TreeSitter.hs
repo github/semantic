@@ -74,16 +74,12 @@ parseToAST language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ 
         setStatus Cancelled
         dbg "Cancelling"
         TS.ts_parser_set_enabled parser (CBool 0)
-        enabled <- TS.ts_parser_enabled parser
-        dbg ("Watchdog: parser enabled: " <> show enabled)
 
   unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
     alloca (\ rootPtr -> do
       let acquire = do
             dbg "Starting parse"
             withLock (setStatus InProgress)
-            enabled <- TS.ts_parser_enabled parser
-            dbg ("Parser enabled: " <> show enabled)
             -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
             TS.ts_parser_parse_string parser nullPtr source len
 
