@@ -40,7 +40,7 @@ import Data.Source as X
 import Data.Span as X
 import Data.Term as X
 import Parsing.Parser as X
-import Rendering.Renderer as X
+import Rendering.Renderer as X hiding (error)
 import Semantic.Diff as X
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
