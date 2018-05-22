@@ -82,10 +82,9 @@ parseToAST language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ 
       let acquire = do
             dbg "Starting parse"
             withLock (setStatus InProgress)
-            -- Uncomment this if you want to test out cancellation
-            -- threadDelay 6000000
             enabled <- TS.ts_parser_enabled parser
             dbg ("Parser enabled: " <> show enabled)
+            -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
             TS.ts_parser_parse_string parser nullPtr source len
 
       let release t
