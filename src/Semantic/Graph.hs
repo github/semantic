@@ -47,11 +47,11 @@ runGraph graphType project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let analyzeTerm = case graphType of
+    let analyzeTerm = withTermSpans . graphingLoadErrors . case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
         analyzeModule = graphingPackages . graphingModules
-    analyze runGraphAnalysis (evaluatePackageWith analyzeModule (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
+    analyze runGraphAnalysis (evaluatePackageWith analyzeModule analyzeTerm package) >>= extractGraph
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
