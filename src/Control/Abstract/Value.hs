@@ -111,6 +111,9 @@ data Unit value return where
   Unit :: Unit value value
 
 
+bool :: (Effectful m, Member (Boolean value) effects) => Bool -> m effects value
+bool = send . Bool
+
 data Boolean value return where
   Bool :: Bool -> Boolean value value
   AsBool :: value -> Boolean value Bool
