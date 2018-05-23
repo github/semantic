@@ -10,9 +10,12 @@ module Serializing.Format
 import Algebra.Graph.Class
 import Data.Aeson (ToJSON(..), fromEncoding)
 import Data.ByteString.Builder
+import Language.Haskell.HsColour
+import Language.Haskell.HsColour.Colourise
 import Prologue
 import Serializing.DOT
 import Serializing.SExpression
+import Text.Show.Pretty
 
 data Format input where
   DOT         :: (Ord vertex, ToGraph graph, ToVertex graph ~ vertex) => Style vertex Builder -> Format graph
@@ -21,12 +24,11 @@ data Format input where
   Show        :: Show input                                                                   => Format input
 
 runSerialize :: Bool -> Format input -> input -> Builder
-runSerialize _ (DOT style)        = serializeDOT style
-runSerialize _ JSON               = (<> "\n") . fromEncoding . toEncoding
-runSerialize _ (SExpression opts) = serializeSExpression opts
-runSerialize _ Show               = stringUtf8 . show
-
--- TODO: it would be kinda neat if we could use pretty-show/hscolour for Show output
+runSerialize _     (DOT style)        = serializeDOT style
+runSerialize _     JSON               = (<> "\n") . fromEncoding . toEncoding
+runSerialize _     (SExpression opts) = serializeSExpression opts
+runSerialize True  Show               = stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
+runSerialize False Show               = stringUtf8 . show
 
 
 -- | Abstract over a 'Format'’s input type.
