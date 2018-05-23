@@ -15,12 +15,14 @@ import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.FreeVariables as FV
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import qualified Language.Haskell.Syntax as Syntax
 import Prologue
 
 type Syntax = '[
     Comment.Comment
+  , Literal.Integer
   , Syntax.Context
   , Syntax.Empty
   , Syntax.Error
@@ -51,6 +53,7 @@ expression = term (handleError (choice expressionChoices))
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices = [
                       constructorIdentifier
+                    , integer
                     , moduleIdentifier
                     , comment
                     , where'
@@ -62,6 +65,8 @@ term term = contextualize comment (postContextualize comment term)
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
+variableIdentifier :: Assignment
+variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . FV.name <$> source)
 constructorIdentifier :: Assignment
 constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . FV.name <$> source)
 
@@ -70,3 +75,6 @@ moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier .
 
 where' :: Assignment
 where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (many expression)
+integer :: Assignment
+integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+
