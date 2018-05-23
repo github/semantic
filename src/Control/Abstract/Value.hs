@@ -109,6 +109,9 @@ newtype Eval location effects a = Eval { runEval :: Eff effects a }
 
 deriving instance Member NonDet effects => Alternative (Eval location effects)
 
+data Embed effect effects return where
+  Embed :: (effect \\ effects') effects => Eff effects' a -> Embed effect effects a
+
 runType :: ( effects ~ (Function (Eval Name effects) Type ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            , (Function (Eval Name effects) Type \\ effects) effects'
            , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
