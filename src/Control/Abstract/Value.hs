@@ -50,14 +50,14 @@ class AbstractHole value where
   hole :: value
 
 
-lambda :: (Effectful m, Member (Function (m effects) value) effects) => [Name] -> Set Name -> m effects value -> m effects value
-lambda paramNames fvs body = send (Lambda paramNames fvs body)
+lambda :: (Effectful m, Member (Function effects value) effects) => [Name] -> Set Name -> m effects value -> m effects value
+lambda paramNames fvs body = send (Lambda paramNames fvs (lowerEff body))
 
-call' :: (Effectful m, Member (Function (m effects) value) effects) => value -> [m effects value] -> m effects value
-call' fn params = send (Call fn params)
+call' :: (Effectful m, Member (Function effects value) effects) => value -> [m effects value] -> m effects value
+call' fn params = send (Call fn (map lowerEff params))
 
 
-lambda' :: (Effectful m, Members '[Fresh, Function (m effects) value] effects, Monad (m effects))
+lambda' :: (Effectful m, Members '[Fresh, Function effects value] effects, Monad (m effects))
         => (Name -> m effects value)
         -> m effects value
 lambda' body = do
@@ -93,7 +93,7 @@ runHeapType = runState Map.empty
 prog :: ( Effectful m
         , Members '[ Boolean value
                    , Fresh
-                   , Function (m effects) value
+                   , Function effects value
                    , Unit value
                    , Variable value
                    ] effects
@@ -112,8 +112,8 @@ deriving instance Member NonDet effects => Alternative (Eval location effects)
 data Embed effect effects return where
   Embed :: (effect \\ effects') effects => Eff effects' a -> Embed effect effects a
 
-runType :: ( effects ~ (Function (Eval Name effects) Type ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
-           , (Function (Eval Name effects) Type \\ effects) effects'
+runType :: ( effects ~ (Function effects Type ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Function effects Type \\ effects) effects'
            , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            , (Unit Type \\ effects') effects''
            , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
@@ -127,18 +127,18 @@ runType :: ( effects ~ (Function (Eval Name effects) Type ': Unit Type ': Boolea
 runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType allocType assignType
 
 
-builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
+builtinId :: (Effectful m, Members '[Fresh, Function effects value, Variable value] effects, Monad (m effects))
           => m effects value
 builtinId = lambda' variable'
 
-builtinConst :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
+builtinConst :: (Effectful m, Members '[Fresh, Function effects value, Variable value] effects, Monad (m effects))
              => m effects value
 builtinConst = lambda' (\ name -> lambda' (const (variable' name)))
 
 
-data Function m value return where
-  Lambda :: [Name] -> Set Name -> m value -> Function m value value
-  Call   :: value -> [m value]            -> Function m value value
+data Function effects value return where
+  Lambda :: [Name] -> Set Name -> Eff effects value -> Function effects value value
+  Call   :: value -> [Eff effects value]            -> Function effects value value
 
 variable' :: (Effectful m, Member (Variable value) effects) => Name -> m effects value
 variable' = send . Variable
@@ -208,7 +208,7 @@ runFunctionValue :: forall m location effects effects' a
                                ] effects'
                     , Monad (m location effects)
                     , Monad (m location effects')
-                    , (Function (m location effects) (Value (m location effects) location) \\ effects) effects'
+                    , (Function effects (Value (m location effects) location) \\ effects) effects'
                     )
                  => (Name -> m location effects location)
                  -> (location -> Value (m location effects) location -> m location effects ())
@@ -221,14 +221,14 @@ runFunctionValue alloc assign = go
             packageInfo <- currentPackage
             moduleInfo <- currentModule
             env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
-            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
+            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo (raiseEff body))
             pure (Closure params body' env)
           Call (Closure paramNames body env) params -> go $ do
             bindings <- foldr (\ (name, param) rest -> do
               v <- param
               a <- alloc name
               assign a v
-              Map.insert name a <$> rest) (pure env) (zip paramNames params)
+              Map.insert name a <$> rest) (pure env) (zip paramNames (map raiseEff params))
             local (Map.unionWith const bindings) body
 
 runUnitValue :: ( Applicative (m location effects')
@@ -268,7 +268,7 @@ runFunctionType :: forall m location effects effects' a
                               ] effects
                    , Monad (m location effects)
                    , Monad (m location effects')
-                   , (Function (m location effects) Type \\ effects) effects'
+                   , (Function effects Type \\ effects) effects'
                    )
                 => (Name -> m location effects location)
                 -> (location -> Type -> m location effects ())
@@ -283,9 +283,9 @@ runFunctionType alloc assign = go
               tvar <- TVar <$> fresh
               assign a tvar
               bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
-            (Product tvars :->) <$> local (Map.unionWith const bindings) body
+            (Product tvars :->) <$> local (Map.unionWith const bindings) (raiseEff body)
           Call fn params -> go $ do
-            paramTypes <- sequenceA params
+            paramTypes <- traverse raiseEff params
             case fn of
               Product argTypes :-> ret -> do
                 guard (and (zipWith (==) paramTypes argTypes))
