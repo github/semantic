@@ -90,14 +90,6 @@ unit' = send Unit
 data Unit value return where
   Unit :: Unit value value
 
-runUnitValue :: ( Applicative (m location effects')
-                , Effectful (m location)
-                , (Unit (Value (m location effects) location) \\ effects) effects'
-                )
-             => m location effects a
-             -> m location effects' a
-runUnitValue = relayAny pure (\ Unit yield -> yield Unit')
-
 
 data Value m location
   = Closure [Name] (m (Value m location)) (Map Name location)
@@ -140,6 +132,14 @@ runFunctionValue alloc assign = go
               assign a v
               Map.insert name a <$> rest) (pure env) (zip paramNames params)
             local (Map.unionWith const bindings) body) >>= yield
+
+runUnitValue :: ( Applicative (m location effects')
+                , Effectful (m location)
+                , (Unit (Value (m location effects) location) \\ effects) effects'
+                )
+             => m location effects a
+             -> m location effects' a
+runUnitValue = relayAny pure (\ Unit yield -> yield Unit')
 
 
 data Type
