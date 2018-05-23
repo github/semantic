@@ -7,7 +7,6 @@ module Semantic.CLI
 ) where
 
 import           Data.Project
-import           Data.Language (Language)
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
 import           Data.Version (showVersion)
@@ -18,7 +17,7 @@ import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.AST as AST
 import qualified Semantic.Diff as Diff
-import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
+import qualified Semantic.Graph as Graph
 import           Semantic.IO as IO
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Parse
@@ -28,9 +27,6 @@ import           Text.Read
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
-
-runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
-runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -91,15 +87,17 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do
-      graphType <- flag ImportGraph ImportGraph (long "imports" <> help "Compute an import graph (default)")
-               <|> flag'            CallGraph   (long "calls"   <> help "Compute a call graph")
+      graphType <- flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
+               <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
+      let style = Graph.style
+      includePackages <- switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
       serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
                 <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
                 <|> flag'                             (Task.serialize Show)        (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
-      pure $ runGraph graphType rootDir filePath (fromJust fileLanguage) excludeDirs >>= serializer
+      pure $ Task.readProject rootDir filePath (fromJust fileLanguage) excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
 
     rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
     excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))

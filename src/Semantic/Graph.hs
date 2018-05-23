@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph
-( graph
+( runGraph
 , GraphType(..)
 , Graph
 , Vertex
@@ -39,18 +39,20 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-graph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
-      => GraphType
-      -> Project
-      -> Eff effs (Graph Vertex)
-graph graphType project
+runGraph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
+         => GraphType
+         -> Bool
+         -> Project
+         -> Eff effs (Graph Vertex)
+runGraph graphType includePackages project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let analyzeTerm = case graphType of
+    let analyzeTerm = withTermSpans . case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
+        analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
+    analyze runGraphAnalysis (evaluatePackageWith analyzeModule analyzeTerm package) >>= extractGraph
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure (simplify graph)
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
