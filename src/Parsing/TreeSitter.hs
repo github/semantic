@@ -1,10 +1,14 @@
-{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeOperators #-}
 module Parsing.TreeSitter
-( parseToAST
+( Timeout (..)
+, parseToAST
 ) where
 
 import Prologue
-import Data.AST (AST, Node(Node))
+
+import Control.Concurrent.Async
+import Control.Monad
+import Data.AST (AST, Node (Node))
 import Data.Blob
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Range
@@ -12,24 +16,61 @@ import Data.Source
 import Data.Span
 import Data.Term
 import Foreign
-import Foreign.C.Types (CBool(..))
+import Foreign.C.Types (CBool (..))
 import Foreign.Marshal.Array (allocaArray)
-import qualified TreeSitter.Tree as TS
-import qualified TreeSitter.Parser as TS
-import qualified TreeSitter.Node as TS
+import System.Timeout
+
 import qualified TreeSitter.Language as TS
+import qualified TreeSitter.Node as TS
+import qualified TreeSitter.Parser as TS
+import qualified TreeSitter.Tree as TS
+
+newtype Timeout = Milliseconds Int
+
+-- Change this to putStrLn if you want to debug the locking/cancellation code.
+-- TODO: Someday we should run this all in Eff so that we can 'trace'.
+dbg :: String -> IO ()
+dbg = const (pure ())
+
+runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Maybe (AST [] grammar))
+runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) ->
+    alloca (\ rootPtr -> do
+      let acquire = do
+            dbg "Starting parse"
+            -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
+            TS.ts_parser_parse_string parser nullPtr source len
+
+      let release t
+            | t == nullPtr = dbg "Parse failed"
+            | otherwise = dbg "Parse completed" *> TS.ts_tree_delete t
+
+      let go treePtr = do
+            if treePtr == nullPtr
+              then pure Nothing
+              else do
+                TS.ts_tree_root_node_p treePtr rootPtr
+                fmap Just (peek rootPtr >>= anaM toAST)
+      bracket acquire release go)
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
-parseToAST :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Blob -> IO (AST [] grammar)
-parseToAST language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+-- Returns Nothing if the operation timed out.
+parseToAST :: (Bounded grammar, Enum grammar) => Timeout -> Ptr TS.Language -> Blob -> IO (Maybe (AST [] grammar))
+parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+  let parserTimeout = s * 1000
+
   TS.ts_parser_halt_on_error parser (CBool 1)
   TS.ts_parser_set_language parser language
-  unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
-    alloca (\ rootPtr -> do
-      bracket (TS.ts_parser_parse_string parser nullPtr source len) TS.ts_tree_delete $ \ tree -> do
-        TS.ts_tree_root_node_p tree rootPtr
-        peek rootPtr >>= anaM toAST
-      )
+
+  parsing <- async (runParser parser blobSource)
+
+  -- Kick the parser off asynchronously and wait according to the provided timeout.
+  res <- timeout parserTimeout (wait parsing)
+
+  -- If we get a Nothing back, then we failed, so we need to disable the parser, which
+  -- will let the call to runParser terminate, cleaning up appropriately
+  when (isNothing res) (TS.ts_parser_set_enabled parser (CBool 0))
+
+  pure (join res)
 
 
 toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
