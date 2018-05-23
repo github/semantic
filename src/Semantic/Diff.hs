@@ -53,8 +53,8 @@ withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> WrapTask (wi
 withParsedBlobPair :: Members '[Distribute WrappedTask, Exc SomeException, Task] effs
                    => (forall syntax . (CanDiff syntax) => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
                    -> BlobPair
-                   -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Hashable1, Show1, ToJSONFields1, Traversable] (Record fields))
+                   -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Hashable1, IdentifierName, Show1, ToJSONFields1, Traversable] (Record fields))
 withParsedBlobPair decorate blobs
-  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Hashable1, Show1, ToJSONFields1, Traversable] <$> languageForBlobPair blobs
+  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Hashable1, IdentifierName, Show1, ToJSONFields1, Traversable] <$> languageForBlobPair blobs
   = SomeTermPair <$> distributeFor blobs (\ blob -> WrapTask (parse parser blob >>= decorate blob))
   | otherwise = noLanguageForBlob (pathForBlobPair blobs)
