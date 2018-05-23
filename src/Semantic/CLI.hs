@@ -83,6 +83,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
+            <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
