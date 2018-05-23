@@ -180,12 +180,12 @@ data Boolean value return where
   AsBool :: value -> Boolean value Bool
 
 
-data Value m location
-  = Closure [Name] (m (Value m location)) (Map Name location)
+data Value effects location
+  = Closure [Name] (Eff effects (Value effects location)) (Map Name location)
   | Unit'
   | Bool' Bool
 
-liftHandler :: Functor m => (forall a . m a -> m' a) -> Value m location -> Value m' location
+liftHandler :: (forall a . Eff effects a -> Eff effects' a) -> Value effects location -> Value effects' location
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
 
 runFunctionValue :: forall m location effects effects' a
@@ -200,10 +200,10 @@ runFunctionValue :: forall m location effects effects' a
                                ] effects'
                     , Monad (m location effects)
                     , Monad (m location effects')
-                    , (Function effects (Value (m location effects) location) \\ effects) effects'
+                    , (Function effects (Value effects location) \\ effects) effects'
                     )
                  => (Name -> m location effects location)
-                 -> (location -> Value (m location effects) location -> m location effects ())
+                 -> (location -> Value effects location -> m location effects ())
                  -> m location effects a
                  -> m location effects' a
 runFunctionValue alloc assign = go
@@ -213,7 +213,7 @@ runFunctionValue alloc assign = go
             packageInfo <- currentPackage
             moduleInfo <- currentModule
             env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
-            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo (raiseEff body))
+            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
             pure (Closure params body' env)
           Call (Closure paramNames body env) params -> go $ do
             bindings <- foldr (\ (name, param) rest -> do
@@ -221,11 +221,11 @@ runFunctionValue alloc assign = go
               a <- alloc name
               assign a v
               Map.insert name a <$> rest) (pure env) (zip paramNames (map raiseEff params))
-            local (Map.unionWith const bindings) body
+            local (Map.unionWith const bindings) (raiseEff body)
 
 runUnitValue :: ( Applicative (m location effects')
                 , Effectful (m location)
-                , (Unit (Value (m location effects) location) \\ effects) effects'
+                , (Unit (Value effects location) \\ effects) effects'
                 )
              => m location effects a
              -> m location effects' a
@@ -233,7 +233,7 @@ runUnitValue = interpretAny (\ Unit -> pure Unit')
 
 runBooleanValue :: ( Applicative (m location effects')
                    , Effectful (m location)
-                   , (Boolean (Value (m location effects) location) \\ effects) effects'
+                   , (Boolean (Value effects location) \\ effects) effects'
                    )
                 => m location effects a
                 -> m location effects' a
