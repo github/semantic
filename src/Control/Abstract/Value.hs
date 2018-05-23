@@ -59,6 +59,9 @@ data Function m value return where
 data Value m location
   = Closure [Name] (m (Value m location)) (Map Name location)
 
+liftHandler :: Functor m => (forall a . m a -> m' a) -> Value m location -> Value m' location
+liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
+
 runFunctionValue :: forall m location effects a function
                  .  ( Effectful (m location)
                     , Members '[ function
