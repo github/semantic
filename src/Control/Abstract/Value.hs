@@ -111,6 +111,11 @@ data Unit value return where
   Unit :: Unit value value
 
 
+data Boolean value return where
+  Bool :: Bool -> Boolean value value
+  AsBool :: value -> Boolean value Bool
+
+
 data Value m location
   = Closure [Name] (m (Value m location)) (Map Name location)
   | Unit'
