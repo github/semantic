@@ -183,6 +183,14 @@ runFunctionType alloc assign = go
                 pure ret
               _ -> empty) >>= yield
 
+runUnitType :: ( Applicative (m location effects')
+               , Effectful (m location)
+               , (Unit Type \\ effects) effects'
+               )
+            => m location effects a
+            -> m location effects' a
+runUnitType = relayAny pure (\ Unit yield -> yield (Product []))
+
 
 class Show value => AbstractFunction location value effects where
   -- | Build a closure (a binder like a lambda or method definition).
