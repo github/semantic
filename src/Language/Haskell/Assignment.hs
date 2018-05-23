@@ -9,7 +9,7 @@ module Language.Haskell.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
 import Data.Sum
-import Data.Syntax (handleError, parseError, makeTerm, contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, contextualize, postContextualize)
 import Language.Haskell.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.FreeVariables as FV
@@ -30,14 +30,14 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment' a = HasCallStack => Assignment.Assignment [] Grammar a
 type Assignment = Assignment' Term
+type Assignment' a = HasCallStack => Assignment.Assignment [] Grammar a
 
 assignment :: Assignment
 assignment = handleError $ module' <|> parseError
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Syntax.Module <$> moduleIdentifier <*> pure [] <*> (where' <|> pure []))
+module' = makeTerm <$> symbol Module <*> children (Syntax.Module <$> moduleIdentifier <*> pure [] <*> (where' <|> emptyTerm))
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
@@ -47,6 +47,7 @@ expressionChoices = [
                       constructorIdentifier
                     , moduleIdentifier
                     , comment
+                    , where'
                     ]
 
 term :: Assignment -> Assignment
@@ -61,5 +62,5 @@ constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Id
 moduleIdentifier :: Assignment
 moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . FV.name <$> source)
 
-where' :: Assignment' [Term]
-where' = (symbol Where <|> symbol Where') *> children (many expression)
+where' :: Assignment
+where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (many expression)

@@ -9,7 +9,7 @@ import           Prologue
 
 data Module a = Module { moduleIdentifier :: !a
                        , moduleExports    :: ![a]
-                       , moduleStatements :: ![a]
+                       , moduleStatements :: !a
                        }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
