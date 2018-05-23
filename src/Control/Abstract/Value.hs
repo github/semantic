@@ -58,6 +58,9 @@ data Function m value return where
   Lambda :: [Name] -> Set Name -> m value -> Function m value value
   Call   :: value -> [m value]            -> Function m value value
 
+variable' :: (Effectful m, Member (Variable value) effects) => Name -> m effects value
+variable' = send . Variable
+
 data Variable value return where
   Variable :: Name -> Variable value value
 
