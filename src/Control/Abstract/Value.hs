@@ -63,6 +63,12 @@ lambda' fvs body = do
   var <- nameI <$> fresh
   lambda [var] fvs (body var)
 
+
+builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
+          => m effects value
+builtinId = lambda' lowerBound (\ name -> variable' name)
+
+
 data Function m value return where
   Lambda :: [Name] -> Set Name -> m value -> Function m value value
   Call   :: value -> [m value]            -> Function m value value
