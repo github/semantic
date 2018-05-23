@@ -110,14 +110,13 @@ runVariable :: forall m location effects effects' value a
                , Monad (m location effects')
                , Show location
                )
-            => (Name -> m location effects' (Maybe location))
-            -> (location -> m location effects' (Maybe value))
+            => (location -> m location effects' (Maybe value))
             -> m location effects a
             -> m location effects' a
-runVariable lookup deref = go
+runVariable deref = go
   where go :: forall a . m location effects a -> m location effects' a
         go = interpretAny (\ (Variable name) -> do
-          addr <- lookup name >>= maybeM (raiseEff (fail ("free variable: " <> show name)))
+          addr <- lookup' name >>= maybeM (raiseEff (fail ("free variable: " <> show name)))
           deref addr >>= maybeM (raiseEff (fail ("uninitialized address: " <> show addr))))
 
 
