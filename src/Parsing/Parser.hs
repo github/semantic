@@ -18,6 +18,7 @@ module Parsing.Parser
 , rubyParser
 , typescriptParser
 , phpParser
+, haskellParser
 ) where
 
 import           Assigning.Assignment
@@ -33,6 +34,7 @@ import           Data.Project
 import           Foreign.Ptr
 import qualified GHC.TypeLits as TypeLevel
 import qualified Language.Go.Assignment as Go
+import qualified Language.Haskell.Assignment as Haskell
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
@@ -48,6 +50,7 @@ import           TreeSitter.PHP
 import           TreeSitter.Python
 import           TreeSitter.Ruby
 import           TreeSitter.TypeScript
+import           TreeSitter.Haskell
 
 
 type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
@@ -68,12 +71,14 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                       , ApplyAll' typeclasses Python.Syntax
                       , ApplyAll' typeclasses Ruby.Syntax
                       , ApplyAll' typeclasses TypeScript.Syntax
+                      , ApplyAll' typeclasses Haskell.Syntax
                       )
                    => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                                         -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just JavaScript))
+someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser Nothing
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
 someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
@@ -106,6 +111,7 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *
 --
 --   > runTask (parse (someParser @'[Show1] language) blob) >>= putStrLn . withSomeTerm show
 someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
+              , ApplyAll typeclasses (Sum Haskell.Syntax)
               , ApplyAll typeclasses (Sum JSON.Syntax)
               , ApplyAll typeclasses (Sum Markdown.Syntax)
               , ApplyAll typeclasses (Sum Python.Syntax)
@@ -118,6 +124,7 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
 someParser Go         = SomeParser goParser
 someParser JavaScript = SomeParser typescriptParser
 someParser JSON       = SomeParser jsonParser
+someParser Haskell    = SomeParser haskellParser
 someParser JSX        = SomeParser typescriptParser
 someParser Markdown   = SomeParser markdownParser
 someParser Python     = SomeParser pythonParser
@@ -144,6 +151,9 @@ jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
+haskellParser :: Parser Haskell.Term
+haskellParser = AssignmentParser (ASTParser tree_sitter_haskell) Haskell.assignment
+
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
@@ -163,6 +173,7 @@ data SomeASTParser where
 
 someASTParser :: Language -> SomeASTParser
 someASTParser Go         = SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar))
+someASTParser Haskell    = SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar))
 someASTParser JavaScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
 someASTParser JSON       = SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar))
 someASTParser JSX        = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
