@@ -68,6 +68,11 @@ lookup' name = Map.lookup name <$> ask
 allocType :: Applicative (m Name effects) => Name -> m Name effects Name
 allocType = pure
 
+assignType :: (Effectful (m location), Member (State (Map location (Set Type))) effects, Monad (m location effects), Ord location, Show location) => location -> Type -> m location effects ()
+assignType addr value = do
+  cell <- gets (Map.lookup addr) >>= maybeM (pure (Set.empty))
+  modify' (Map.insert addr (Set.insert value cell))
+
 derefType :: (Alternative (m location effects), Effectful (m location), Members '[Fail, NonDet, State (Map location (Set Type))] effects, Monad (m location effects), Ord location, Show location) => location -> m location effects (Maybe Type)
 derefType loc = do
   cell <- gets (Map.lookup loc) >>= maybeM (raiseEff (fail ("unallocated address: " <> show loc)))
