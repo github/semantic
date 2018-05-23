@@ -21,7 +21,6 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.NonDet
 import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
 import Data.Abstract.Live (Live)
@@ -261,7 +260,6 @@ data Type
 
 runFunctionType :: forall m location effects effects' a
                 .  ( Alternative (m location effects)
-                   , Alternative (m location effects')
                    , Effectful (m location)
                    , Members '[ Fresh
                               , Reader (Map Name location)
@@ -269,7 +267,6 @@ runFunctionType :: forall m location effects effects' a
                               , Reader PackageInfo
                               ] effects
                    , Monad (m location effects)
-                   , Monad (m location effects')
                    , (Function effects Type \\ effects) effects'
                    )
                 => (Name -> m location effects location)
