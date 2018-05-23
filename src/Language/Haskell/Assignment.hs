@@ -15,6 +15,7 @@ import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.FreeVariables as FV
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import qualified Language.Haskell.Syntax as Syntax
@@ -22,6 +23,7 @@ import Prologue
 
 type Syntax = '[
     Comment.Comment
+  , Declaration.Function
   , Literal.Integer
   , Syntax.Context
   , Syntax.Empty
@@ -52,10 +54,12 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices = [
-                      constructorIdentifier
+                      comment
+                    , constructorIdentifier
+                    , functionDeclaration
                     , integer
                     , moduleIdentifier
-                    , comment
+                    , variableIdentifier
                     , where'
                     ]
 
@@ -67,6 +71,7 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 variableIdentifier :: Assignment
 variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . FV.name <$> source)
+
 constructorIdentifier :: Assignment
 constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . FV.name <$> source)
 
@@ -75,6 +80,22 @@ moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier .
 
 where' :: Assignment
 where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (many expression)
+
+functionBody :: Assignment
+functionBody = makeTerm <$> symbol FunctionBody <*> children (many expression)
+
+functionDeclaration :: Assignment
+functionDeclaration = makeTerm
+                   <$> symbol FunctionDeclaration
+                   <*> children (Declaration.Function
+                               <$> pure []
+                               <*> variableIdentifier
+                               <*> ((manyTermsTill expression (symbol FunctionBody)) <|> pure [])
+                               <*> functionBody)
+
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
+-- | Match a series of terms or comments until a delimiter is matched.
+manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill step end = manyTill (step <|> comment) end
