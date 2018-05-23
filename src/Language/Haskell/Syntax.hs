@@ -20,4 +20,3 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Module
 
 instance Evaluatable Module where
-  -- eval (Module identifier exports statements) = eval statements
