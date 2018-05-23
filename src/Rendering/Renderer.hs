@@ -59,6 +59,8 @@ data TermRenderer output where
   ImportsTermRenderer :: TermRenderer ImportSummary
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer (Graph (Vertex ()))
+  -- | Render to a 'ByteString' formatted using the 'Show' instance.
+  ShowTermRenderer :: TermRenderer Builder
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
