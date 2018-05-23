@@ -100,35 +100,39 @@ data Type
   | Var Int
   deriving (Eq, Ord, Show)
 
-runFunctionType :: ( Alternative (m location effects)
+runFunctionType :: forall m location effects a function
+                .  ( Alternative (m location effects)
+                   , Alternative (m location (Delete function effects))
                    , Effectful (m location)
                    , Members '[ Fresh
+                              , function
                               , Reader (Map Name location)
                               , Reader ModuleInfo
                               , Reader PackageInfo
                               ] effects
                    , Monad (m location effects)
+                   , Monad (m location (Delete function effects))
+                   , function ~ Function (m location effects) Type
                    )
                 => (Name -> m location effects location)
                 -> (location -> Type -> m location effects ())
-                -> m location (Function (m location effects) Type ': effects) a
                 -> m location effects a
-runFunctionType alloc assign = relay pure $ \ eff yield -> case eff of
-  Lambda params _ body -> do
+                -> m location (Delete function effects) a
+runFunctionType alloc assign = relayAny @function pure $ \ eff yield -> case eff of
+  Lambda params _ body -> runFunctionType alloc assign (do
     (bindings, tvars) <- foldr (\ name rest -> do
       a <- alloc name
       tvar <- Var <$> fresh
       assign a tvar
       bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
-    ret <- local (Map.unionWith const bindings) body
-    yield (Product tvars :-> ret)
-  Call fn params -> do
+    (Product tvars :->) <$> local (Map.unionWith const bindings) body) >>= yield
+  Call fn params -> runFunctionType alloc assign (do
     paramTypes <- sequenceA params
     case fn of
       Product argTypes :-> ret -> do
         guard (and (zipWith (==) paramTypes argTypes))
-        yield ret
-      _ -> empty
+        pure ret
+      _ -> empty) >>= yield
 
 
 class Show value => AbstractFunction location value effects where
