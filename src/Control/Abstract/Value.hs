@@ -129,7 +129,7 @@ runFunctionValue :: forall m location effects effects' a function
                  -> m location effects' a
 runFunctionValue alloc assign = go
   where go :: forall a . m location effects a -> m location effects' a
-        go = relayAny @function pure $ \ eff yield -> case eff of
+        go = relayAny pure $ \ eff yield -> case eff of
           Lambda params fvs body -> do
             packageInfo <- currentPackage
             moduleInfo <- currentModule
@@ -172,7 +172,7 @@ runFunctionType :: forall m location effects effects' a function
                 -> m location effects' a
 runFunctionType alloc assign = go
   where go :: forall a . m location effects a -> m location effects' a
-        go = relayAny @function pure $ \ eff yield -> case eff of
+        go = relayAny pure $ \ eff yield -> case eff of
           Lambda params _ body -> go (do
             (bindings, tvars) <- foldr (\ name rest -> do
               a <- alloc name
