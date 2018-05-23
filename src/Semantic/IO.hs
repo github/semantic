@@ -274,6 +274,31 @@ catchException :: ( Exc.Exception e
                -> Eff r a
 catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
 
+-- type Arrow m (effects :: [* -> *]) a b = a -> m effects b
+-- raiseHandler :: Effectful m => (Eff effectsA a -> Eff effectsB b) -> m effectsA a -> m effectsB b
+-- send :: (Effectful m, Member eff e) => eff b -> m e b
+-- interpose :: (Member eff e, Effectful m)
+--           => Arrow m e a b
+--           -> (forall v. eff v -> Arrow m e v b -> m e b)
+--           -> m e a -> m e b
+
+masking :: Member IO r => Eff r a -> Eff r a
+masking = interpose pure $ \m yield -> do
+  res <- send (Exc.mask_ m)
+  yield res
+
+bracket' :: (Members [Exc SomeException, IO] r)
+         => Eff r a
+         -> (a -> Eff r b)
+         -> (a -> Eff r c)
+         -> Eff r c
+bracket' before after thing = do
+  a <- before
+  r <- thing a `catchError` (\(SomeException e) -> after a *> throwError (SomeException e))
+  r <$ after a
+
+
+
 -- | Lift an 'IO' action into 'Eff', catching and rethrowing any exceptions it throws into an 'Exc' effect.
 rethrowing :: ( Member (Exc SomeException) r
               , Member IO r
