@@ -84,6 +84,9 @@ derefType addr = do
 runEnv :: Effectful (m location) => m location (Reader (Map Name location) ': effects) a -> m location effects a
 runEnv = runReader Map.empty
 
+runHeapType :: Effectful (m Name) => m Name (State (Map Name (Set Type)) ': effects) a -> m Name effects (a, Map Name (Set Type))
+runHeapType = runState Map.empty
+
 
 prog :: ( Effectful m
         , Members '[ Boolean value
