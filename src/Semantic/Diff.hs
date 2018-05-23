@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
+{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables #-}
 module Semantic.Diff where
 
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
@@ -35,9 +35,11 @@ withSomeTermPair with (SomeTermPair terms) = with terms
 diffBlobTOCPairs :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => [BlobPair] -> Eff effs ([TOCSummary], [TOCSummary])
 diffBlobTOCPairs = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderRPCToCDiff)
 
+type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax)
+
 withParsedBlobPairs :: (Members '[Distribute WrappedTask, Exc SomeException, IO, Task, Telemetry] effs, Monoid output)
-                    => (forall syntax . (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
-                    -> (forall syntax . (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => BlobPair -> Diff syntax (Record fields) (Record fields) -> TaskEff output)
+                    => (forall syntax . CanDiff syntax => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
+                    -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax (Record fields) (Record fields) -> TaskEff output)
                     -> [BlobPair]
                     -> Eff effs output
 withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> WrapTask (withParsedBlobPair decorate blobs >>= withSomeTermPair (diffTerms blobs >=> render blobs)))
@@ -48,7 +50,7 @@ withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> WrapTask (wi
           where languageTag = languageTagForBlobPair blobs
 
 withParsedBlobPair :: Members '[Distribute WrappedTask, Exc SomeException, Task] effs
-                   => (forall syntax . (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, ToJSONFields1 syntax, Traversable syntax) => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
+                   => (forall syntax . (CanDiff syntax) => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
                    -> BlobPair
                    -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Hashable1, ToJSONFields1, Traversable] (Record fields))
 withParsedBlobPair decorate blobs
