@@ -48,9 +48,6 @@ data Comparator
 class AbstractHole value where
   hole :: value
 
-shuffle :: (Effectful m, (effect \\ effects) effects') => m effects a -> m (effect ': effects') a
-shuffle = undefined
-
 
 lambda :: (Effectful m, Member (Function effects value) effects) => [Name] -> Set Name -> m effects value -> m effects value
 lambda paramNames fvs body = send (Lambda paramNames fvs (lowerEff body))
