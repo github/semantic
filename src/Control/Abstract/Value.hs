@@ -81,6 +81,9 @@ derefType addr = do
   else
     Set.foldr ((<|>) . pure . Just) empty cell
 
+runEnv :: Effectful (m location) => m location (Reader (Map Name location) ': effects) a -> m location effects a
+runEnv = runReader Map.empty
+
 
 prog :: ( Effectful m
         , Members '[ Boolean value
