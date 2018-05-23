@@ -81,20 +81,22 @@ runFunctionValue :: forall m location effects a function
                  -> (location -> Value (m location effects) location -> m location effects ())
                  -> m location effects a
                  -> m location (Delete function effects) a
-runFunctionValue alloc assign = relayAny @function pure $ \ eff yield -> case eff of
-  Lambda params fvs body -> do
-    packageInfo <- currentPackage
-    moduleInfo <- currentModule
-    env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
-    let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
-    yield (Closure params body' env)
-  Call (Closure paramNames body env) params -> runFunctionValue alloc assign (do
-    bindings <- foldr (\ (name, param) rest -> do
-      v <- param
-      a <- alloc name
-      assign a v
-      Map.insert name a <$> rest) (pure env) (zip paramNames params)
-    local (Map.unionWith const bindings) body) >>= yield
+runFunctionValue alloc assign = go
+  where go :: forall a . m location effects a -> m location (Delete function effects) a
+        go = relayAny @function pure $ \ eff yield -> case eff of
+          Lambda params fvs body -> do
+            packageInfo <- currentPackage
+            moduleInfo <- currentModule
+            env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
+            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
+            yield (Closure params body' env)
+          Call (Closure paramNames body env) params -> go (do
+            bindings <- foldr (\ (name, param) rest -> do
+              v <- param
+              a <- alloc name
+              assign a v
+              Map.insert name a <$> rest) (pure env) (zip paramNames params)
+            local (Map.unionWith const bindings) body) >>= yield
 
 
 data Type
@@ -121,21 +123,23 @@ runFunctionType :: forall m location effects a function
                 -> (location -> Type -> m location effects ())
                 -> m location effects a
                 -> m location (Delete function effects) a
-runFunctionType alloc assign = relayAny @function pure $ \ eff yield -> case eff of
-  Lambda params _ body -> runFunctionType alloc assign (do
-    (bindings, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
-      tvar <- Var <$> fresh
-      assign a tvar
-      bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
-    (Product tvars :->) <$> local (Map.unionWith const bindings) body) >>= yield
-  Call fn params -> runFunctionType alloc assign (do
-    paramTypes <- sequenceA params
-    case fn of
-      Product argTypes :-> ret -> do
-        guard (and (zipWith (==) paramTypes argTypes))
-        pure ret
-      _ -> empty) >>= yield
+runFunctionType alloc assign = go
+  where go :: forall a . m location effects a -> m location (Delete function effects) a
+        go = relayAny @function pure $ \ eff yield -> case eff of
+          Lambda params _ body -> go (do
+            (bindings, tvars) <- foldr (\ name rest -> do
+              a <- alloc name
+              tvar <- Var <$> fresh
+              assign a tvar
+              bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
+            (Product tvars :->) <$> local (Map.unionWith const bindings) body) >>= yield
+          Call fn params -> go (do
+            paramTypes <- sequenceA params
+            case fn of
+              Product argTypes :-> ret -> do
+                guard (and (zipWith (==) paramTypes argTypes))
+                pure ret
+              _ -> empty) >>= yield
 
 
 class Show value => AbstractFunction location value effects where
