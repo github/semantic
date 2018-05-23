@@ -20,6 +20,8 @@ import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.NonDet
 import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
 import Data.Abstract.Live (Live)
@@ -106,6 +108,20 @@ newtype Eval location effects a = Eval { runEval :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (Eval location effects)
+
+runType :: ( effects ~ (Function (Eval Name effects) Type ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Function (Eval Name effects) Type \\ effects) effects'
+           , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Unit Type \\ effects') effects''
+           , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Boolean Type \\ effects'') effects'''
+           , effects''' ~ (Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Variable Type \\ effects''') effects''''
+           , effects'''' ~ (State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           )
+        => Eval Name effects a
+        -> Eval Name rest [Either String (a, Map Name (Set Type))]
+runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType allocType assignType
 
 
 builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
