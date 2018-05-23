@@ -6,7 +6,7 @@ import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedF
 import Data.Fixed
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prologue hiding (index, Delete)
+import Prologue hiding (index)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
