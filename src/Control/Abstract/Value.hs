@@ -51,6 +51,9 @@ class AbstractHole value where
 lambda :: (Effectful m, Member (Function action value) effects) => [Name] -> Set Name -> action value -> m effects value
 lambda paramNames fvs body = send (Lambda paramNames fvs body)
 
+call' :: (Effectful m, Member (Function action value) effects) => value -> [action value] -> m effects value
+call' fn params = send (Call fn params)
+
 data Function m value return where
   Lambda :: [Name] -> Set Name -> m value -> Function m value value
   Call   :: value -> [m value]            -> Function m value value
