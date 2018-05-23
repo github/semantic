@@ -92,8 +92,7 @@ data Unit value return where
 
 runUnitValue :: ( Applicative (m location effects')
                 , Effectful (m location)
-                , unit ~ (Unit (Value (m location effects) location))
-                , (unit \\ effects) effects'
+                , (Unit (Value (m location effects) location) \\ effects) effects'
                 )
              => m location effects a
              -> m location effects' a
@@ -107,10 +106,9 @@ data Value m location
 liftHandler :: Functor m => (forall a . m a -> m' a) -> Value m location -> Value m' location
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
 
-runFunctionValue :: forall m location effects effects' a function
+runFunctionValue :: forall m location effects effects' a
                  .  ( Effectful (m location)
-                    , Members '[ function
-                               , Reader (Map Name location)
+                    , Members '[ Reader (Map Name location)
                                , Reader ModuleInfo
                                , Reader PackageInfo
                                ] effects
@@ -120,8 +118,7 @@ runFunctionValue :: forall m location effects effects' a function
                                ] effects'
                     , Monad (m location effects)
                     , Monad (m location effects')
-                    , function ~ Function (m location effects) (Value (m location effects) location)
-                    , (function \\ effects) effects'
+                    , (Function (m location effects) (Value (m location effects) location) \\ effects) effects'
                     )
                  => (Name -> m location effects location)
                  -> (location -> Value (m location effects) location -> m location effects ())
@@ -151,20 +148,18 @@ data Type
   | TVar Int
   deriving (Eq, Ord, Show)
 
-runFunctionType :: forall m location effects effects' a function
+runFunctionType :: forall m location effects effects' a
                 .  ( Alternative (m location effects)
                    , Alternative (m location effects')
                    , Effectful (m location)
                    , Members '[ Fresh
-                              , function
                               , Reader (Map Name location)
                               , Reader ModuleInfo
                               , Reader PackageInfo
                               ] effects
                    , Monad (m location effects)
                    , Monad (m location effects')
-                   , function ~ Function (m location effects) Type
-                   , (function \\ effects) effects'
+                   , (Function (m location effects) Type \\ effects) effects'
                    )
                 => (Name -> m location effects location)
                 -> (location -> Type -> m location effects ())
