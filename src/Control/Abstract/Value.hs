@@ -63,6 +63,21 @@ lambda' body = do
   lambda [var] lowerBound (body var)
 
 
+prog :: ( Effectful m
+        , Members '[ Boolean value
+                   , Fresh
+                   , Function (m effects) value
+                   , Unit value
+                   , Variable value
+                   ] effects
+        , Monad (m effects)
+        )
+     => value -> m effects value
+prog b = do
+  identity <- lambda' variable'
+  iff b unit' (call' identity [unit'])
+
+
 builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
           => m effects value
 builtinId = lambda' variable'
