@@ -56,17 +56,16 @@ call' fn params = send (Call fn params)
 
 
 lambda' :: (Effectful m, Members '[Fresh, Function (m effects) value] effects, Monad (m effects))
-        => Set Name
-        -> (Name -> m effects value)
+        => (Name -> m effects value)
         -> m effects value
-lambda' fvs body = do
+lambda' body = do
   var <- nameI <$> fresh
-  lambda [var] fvs (body var)
+  lambda [var] lowerBound (body var)
 
 
 builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
           => m effects value
-builtinId = lambda' lowerBound (\ name -> variable' name)
+builtinId = lambda' (\ name -> variable' name)
 
 
 data Function m value return where
