@@ -180,12 +180,12 @@ data Boolean value return where
   AsBool :: value -> Boolean value Bool
 
 
-data Value effects location
-  = Closure [Name] (Eff effects (Value effects location)) (Map Name location)
+data Value location effects
+  = Closure [Name] (Eff effects (Value location effects)) (Map Name location)
   | Unit'
   | Bool' Bool
 
-liftHandler :: (forall a . Eff effects a -> Eff effects' a) -> Value effects location -> Value effects' location
+liftHandler :: (forall a . Eff effects a -> Eff effects' a) -> Value location effects -> Value location effects'
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
 
 runFunctionValue :: forall m location effects effects' a
@@ -200,10 +200,10 @@ runFunctionValue :: forall m location effects effects' a
                                ] effects'
                     , Monad (m location effects)
                     , Monad (m location effects')
-                    , (Function effects (Value effects location) \\ effects) effects'
+                    , (Function effects (Value location effects) \\ effects) effects'
                     )
                  => (Name -> m location effects location)
-                 -> (location -> Value effects location -> m location effects ())
+                 -> (location -> Value location effects -> m location effects ())
                  -> m location effects a
                  -> m location effects' a
 runFunctionValue alloc assign = go
@@ -225,7 +225,7 @@ runFunctionValue alloc assign = go
 
 runUnitValue :: ( Applicative (m location effects')
                 , Effectful (m location)
-                , (Unit (Value effects location) \\ effects) effects'
+                , (Unit (Value location effects) \\ effects) effects'
                 )
              => m location effects a
              -> m location effects' a
@@ -233,7 +233,7 @@ runUnitValue = interpretAny (\ Unit -> pure Unit')
 
 runBooleanValue :: ( Applicative (m location effects')
                    , Effectful (m location)
-                   , (Boolean (Value effects location) \\ effects) effects'
+                   , (Boolean (Value location effects) \\ effects) effects'
                    )
                 => m location effects a
                 -> m location effects' a
