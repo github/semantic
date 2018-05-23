@@ -23,9 +23,10 @@ astParseBlob blob@Blob{..}
   | otherwise = noLanguageForBlob blobPath
 
 
-data ASTFormat = SExpression | JSON
+data ASTFormat = SExpression | JSON | Show
   deriving (Show)
 
 runASTParse :: Members '[Distribute WrappedTask, Task, Exc SomeException] effects => ASTFormat -> [Blob] -> Eff effects F.Builder
 runASTParse SExpression = distributeFoldMap (WrapTask . (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow))))
+runASTParse Show        = distributeFoldMap (WrapTask . (astParseBlob >=> withSomeAST (serialize F.Show)))
 runASTParse JSON        = distributeFoldMap (\ blob -> WrapTask (astParseBlob blob >>= withSomeAST (render (renderJSONAST blob)))) >=> serialize F.JSON
