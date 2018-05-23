@@ -128,15 +128,6 @@ runType :: ( effects ~ (Function effects Type ': Unit Type ': Boolean Type ': Va
 runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType allocType assignType
 
 
-builtinId :: (Effectful m, Members '[Fresh, Function effects value, Variable value] effects, Monad (m effects))
-          => m effects value
-builtinId = lambda' variable'
-
-builtinConst :: (Effectful m, Members '[Fresh, Function effects value, Variable value] effects, Monad (m effects))
-             => m effects value
-builtinConst = lambda' (\ name -> lambda' (const (variable' name)))
-
-
 data Function effects value return where
   Lambda :: [Name] -> Set Name -> Eff effects value -> Function effects value value
   Call   :: value -> [Eff effects value]            -> Function effects value value
