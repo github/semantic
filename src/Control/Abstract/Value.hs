@@ -112,6 +112,8 @@ deriving instance Member NonDet effects => Alternative (Eval location effects)
 data EmbedAny effect effects return where
   EmbedAny :: (effect \\ effects') effects => Eff effects' a -> EmbedAny effect effects a
 
+newtype Embed effect effects a = Embed { unEmbed :: Eff (effect effects ': effects) a }
+
 runType :: ( effects ~ (Function effects Type ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            , (Function effects Type \\ effects) effects'
            , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
