@@ -54,6 +54,15 @@ lambda paramNames fvs body = send (Lambda paramNames fvs body)
 call' :: (Effectful m, Member (Function (m effects) value) effects) => value -> [m effects value] -> m effects value
 call' fn params = send (Call fn params)
 
+
+lambda' :: (Effectful m, Members '[Fresh, Function (m effects) value] effects, Monad (m effects))
+        => Set Name
+        -> (Name -> m effects value)
+        -> m effects value
+lambda' fvs body = do
+  var <- nameI <$> fresh
+  lambda [var] fvs (body var)
+
 data Function m value return where
   Lambda :: [Name] -> Set Name -> m value -> Function m value value
   Call   :: value -> [m value]            -> Function m value value
