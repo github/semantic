@@ -92,6 +92,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
                <|> flag'            CallGraph   (long "calls"   <> help "Compute a call graph")
       serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
                 <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
+                <|> flag'                             (Task.serialize Show)        (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
