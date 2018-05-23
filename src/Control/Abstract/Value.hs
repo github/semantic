@@ -65,7 +65,7 @@ lambda' body = do
 
 builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
           => m effects value
-builtinId = lambda' (\ name -> variable' name)
+builtinId = lambda' variable'
 
 builtinConst :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
              => m effects value
