@@ -26,5 +26,5 @@ runSerialize :: Bool -> Format input -> input -> Builder
 runSerialize _     (DOT style)        = serializeDOT style
 runSerialize _     JSON               = (<> "\n") . fromEncoding . toEncoding
 runSerialize _     (SExpression opts) = serializeSExpression opts
-runSerialize True  Show               = stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
-runSerialize False Show               = stringUtf8 . show
+runSerialize True  Show               = (<> "\n") . stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
+runSerialize False Show               = (<> "\n") . stringUtf8 . show
