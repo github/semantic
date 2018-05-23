@@ -117,6 +117,9 @@ bool = send . Bool
 asBool' :: (Effectful m, Member (Boolean value) effects) => value -> m effects Bool
 asBool' = send . AsBool
 
+iff :: (Effectful m, Member (Boolean value) effects, Monad (m effects)) => value -> m effects a -> m effects a -> m effects a
+iff c t e = asBool' c >>= \ c' -> if c' then t else e
+
 data Boolean value return where
   Bool :: Bool -> Boolean value value
   AsBool :: value -> Boolean value Bool
