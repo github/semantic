@@ -62,6 +62,9 @@ lambda' body = do
   var <- nameI <$> fresh
   lambda [var] lowerBound (body var)
 
+lookup' :: (Effectful (m location), Functor (m location effects), Member (Reader (Map Name location)) effects) => Name -> m location effects (Maybe location)
+lookup' name = Map.lookup name <$> ask
+
 
 prog :: ( Effectful m
         , Members '[ Boolean value
