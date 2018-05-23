@@ -65,7 +65,7 @@ lambda' body = do
 lookup' :: (Effectful (m location), Functor (m location effects), Member (Reader (Map Name location)) effects) => Name -> m location effects (Maybe location)
 lookup' name = Map.lookup name <$> ask
 
-allocType :: Applicative (m Name effects) => Name -> m Name effects Name
+allocType :: (Applicative (m Name effects), Effectful (m Name)) => Name -> m Name effects Name
 allocType = pure
 
 assignType :: (Effectful (m location), Member (State (Map location (Set Type))) effects, Monad (m location effects), Ord location, Show location) => location -> Type -> m location effects ()
