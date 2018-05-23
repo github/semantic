@@ -90,9 +90,20 @@ unit' = send Unit
 data Unit value return where
   Unit :: Unit value value
 
+runUnitValue :: forall m location effects a unit
+             .  ( Applicative (m location (Delete unit effects))
+                , Effectful (m location)
+                , Member unit effects
+                , unit ~ (Unit (Value (m location effects) location))
+                )
+             => m location effects a
+             -> m location (Delete unit effects) a
+runUnitValue = relayAny @unit pure (\ Unit yield -> yield Unit')
+
 
 data Value m location
   = Closure [Name] (m (Value m location)) (Map Name location)
+  | Unit'
 
 liftHandler :: Functor m => (forall a . m a -> m' a) -> Value m location -> Value m' location
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
