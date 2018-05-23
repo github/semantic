@@ -74,8 +74,8 @@ assignType addr value = do
   modify' (Map.insert addr (Set.insert value cell))
 
 derefType :: (Alternative (m location effects), Effectful (m location), Members '[Fail, NonDet, State (Map location (Set Type))] effects, Monad (m location effects), Ord location, Show location) => location -> m location effects (Maybe Type)
-derefType loc = do
-  cell <- gets (Map.lookup loc) >>= maybeM (raiseEff (fail ("unallocated address: " <> show loc)))
+derefType addr = do
+  cell <- gets (Map.lookup addr) >>= maybeM (raiseEff (fail ("unallocated address: " <> show addr)))
   if Set.null cell then
     pure Nothing
   else
