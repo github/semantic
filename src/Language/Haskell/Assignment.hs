@@ -24,6 +24,7 @@ import Prologue
 type Syntax = '[
     Comment.Comment
   , Declaration.Function
+  , Literal.Float
   , Literal.Integer
   , Syntax.Context
   , Syntax.Empty
@@ -56,6 +57,7 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices = [
                       comment
                     , constructorIdentifier
+                    , float
                     , functionDeclaration
                     , integer
                     , moduleIdentifier
@@ -95,6 +97,9 @@ functionDeclaration = makeTerm
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+
+float :: Assignment
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
