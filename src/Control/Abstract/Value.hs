@@ -65,6 +65,14 @@ lambda' body = do
 lookup' :: (Effectful (m location), Functor (m location effects), Member (Reader (Map Name location)) effects) => Name -> m location effects (Maybe location)
 lookup' name = Map.lookup name <$> ask
 
+derefType :: (Alternative (m location effects), Effectful (m location), Members '[Fail, NonDet, State (Map location (Set Type))] effects, Monad (m location effects), Ord location, Show location) => location -> m location effects (Maybe Type)
+derefType loc = do
+  cell <- gets (Map.lookup loc) >>= maybeM (raiseEff (fail ("unallocated address: " <> show loc)))
+  if Set.null cell then
+    pure Nothing
+  else
+    Set.foldr ((<|>) . pure . Just) empty cell
+
 
 prog :: ( Effectful m
         , Members '[ Boolean value
