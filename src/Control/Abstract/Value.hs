@@ -63,18 +63,18 @@ lambda' body = do
   var <- nameI <$> fresh
   lambda [var] lowerBound (body var)
 
-lookup' :: (Effectful (m location), Functor (m location effects), Member (Reader (Map Name location)) effects) => Name -> m location effects (Maybe location)
+lookup' :: (Effectful (m location opaque), Functor (m location opaque effects), Member (Reader (Map Name location)) effects) => Name -> m location opaque effects (Maybe location)
 lookup' name = Map.lookup name <$> ask
 
-allocType :: (Applicative (m Name effects), Effectful (m Name)) => Name -> m Name effects Name
+allocType :: (Applicative (m Name opaque effects), Effectful (m Name opaque)) => Name -> m Name opaque effects Name
 allocType = pure
 
-assignType :: (Effectful (m location), Member (State (Map location (Set Type))) effects, Monad (m location effects), Ord location) => location -> Type -> m location effects ()
+assignType :: (Effectful (m location opaque), Member (State (Map location (Set Type))) effects, Monad (m location opaque effects), Ord location) => location -> Type -> m location opaque effects ()
 assignType addr value = do
   cell <- gets (Map.lookup addr) >>= maybeM (pure (Set.empty))
   modify' (Map.insert addr (Set.insert value cell))
 
-derefType :: (Alternative (m location effects), Effectful (m location), Members '[Fail, NonDet, State (Map location (Set Type))] effects, Monad (m location effects), Ord location, Show location) => location -> m location effects (Maybe Type)
+derefType :: (Alternative (m location opaque effects), Effectful (m location opaque), Members '[Fail, NonDet, State (Map location (Set Type))] effects, Monad (m location opaque effects), Ord location, Show location) => location -> m location opaque effects (Maybe Type)
 derefType addr = do
   cell <- gets (Map.lookup addr) >>= maybeM (raiseEff (fail ("unallocated address: " <> show addr)))
   if Set.null cell then
@@ -82,10 +82,10 @@ derefType addr = do
   else
     Set.foldr ((<|>) . pure . Just) empty cell
 
-runEnv :: Effectful (m location) => m location (Reader (Map Name location) ': effects) a -> m location effects a
+runEnv :: Effectful (m location opaque) => m location opaque (Reader (Map Name location) ': effects) a -> m location opaque effects a
 runEnv = runReader Map.empty
 
-runHeapType :: Effectful (m Name) => m Name (State (Map Name (Set Type)) ': effects) a -> m Name effects (a, Map Name (Set Type))
+runHeapType :: Effectful (m Name opaque) => m Name opaque (State (Map Name (Set Type)) ': effects) a -> m Name opaque effects (a, Map Name (Set Type))
 runHeapType = runState Map.empty
 
 
@@ -103,10 +103,10 @@ prog b = do
   identity <- lambda' variable'
   iff b unit' (call' identity [unit'])
 
-newtype Eval location effects a = Eval { runEval :: Eff effects a }
+newtype Eval location opaque effects a = Eval { runEval :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
-deriving instance Member NonDet effects => Alternative (Eval location effects)
+deriving instance Member NonDet effects => Alternative (Eval location opaque effects)
 
 data EmbedAny effect effects return where
   EmbedAny :: (effect \\ effects') effects => Eff effects' a -> EmbedAny effect effects a
@@ -123,8 +123,8 @@ runType :: ( effects ~ (Function Type effects ': Unit Type ': Boolean Type ': Va
            , (Variable Type \\ effects''') effects''''
            , effects'''' ~ (State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            )
-        => Eval Name effects a
-        -> Eval Name rest [Either String (a, Map Name (Set Type))]
+        => Eval Name opaque effects a
+        -> Eval Name opaque rest [Either String (a, Map Name (Set Type))]
 runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType allocType assignType
 
 
@@ -138,21 +138,21 @@ variable' = send . Variable
 data Variable value return where
   Variable :: Name -> Variable value value
 
-runVariable :: forall m location effects effects' value a
-            .  ( Effectful (m location)
+runVariable :: forall m location opaque effects effects' value a
+            .  ( Effectful (m location opaque)
                , (Variable value \\ effects) effects'
                , Members '[ Fail
                           , Reader (Map Name location)
                           , State (Map location value)
                           ] effects'
-               , Monad (m location effects')
+               , Monad (m location opaque effects')
                , Show location
                )
-            => (location -> m location effects' (Maybe value))
-            -> m location effects a
-            -> m location effects' a
+            => (location -> m location opaque effects' (Maybe value))
+            -> m location opaque effects a
+            -> m location opaque effects' a
 runVariable deref = go
-  where go :: forall a . m location effects a -> m location effects' a
+  where go :: forall a . m location opaque effects a -> m location opaque effects' a
         go = interpretAny (\ (Variable name) -> do
           addr <- lookup' name >>= maybeM (raiseEff (fail ("free variable: " <> show name)))
           deref addr >>= maybeM (raiseEff (fail ("uninitialized address: " <> show addr))))
@@ -188,8 +188,8 @@ data Value location effects
 liftHandler :: (forall a . Eff effects a -> Eff effects' a) -> Value location effects -> Value location effects'
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
 
-runFunctionValue :: forall m location effects effects' a
-                 .  ( Effectful (m location)
+runFunctionValue :: forall m location opaque effects effects' a
+                 .  ( Effectful (m location opaque)
                     , Members '[ Reader (Map Name location)
                                , Reader ModuleInfo
                                , Reader PackageInfo
@@ -198,16 +198,16 @@ runFunctionValue :: forall m location effects effects' a
                                , Reader ModuleInfo
                                , Reader PackageInfo
                                ] effects'
-                    , Monad (m location effects)
-                    , Monad (m location effects')
+                    , Monad (m location opaque effects)
+                    , Monad (m location opaque effects')
                     , (Function (Value location effects) effects \\ effects) effects'
                     )
-                 => (Name -> m location effects location)
-                 -> (location -> Value location effects -> m location effects ())
-                 -> m location effects a
-                 -> m location effects' a
+                 => (Name -> m location opaque effects location)
+                 -> (location -> Value location effects -> m location opaque effects ())
+                 -> m location opaque effects a
+                 -> m location opaque effects' a
 runFunctionValue alloc assign = go
-  where go :: forall a . m location effects a -> m location effects' a
+  where go :: forall a . m location opaque effects a -> m location opaque effects' a
         go = interpretAny $ \ eff -> case eff of
           Lambda params fvs body -> do
             packageInfo <- currentPackage
@@ -223,20 +223,20 @@ runFunctionValue alloc assign = go
               Map.insert name a <$> rest) (pure env) (zip paramNames (map raiseEff params))
             local (Map.unionWith const bindings) (raiseEff body)
 
-runUnitValue :: ( Applicative (m location effects')
-                , Effectful (m location)
+runUnitValue :: ( Applicative (m location opaque effects')
+                , Effectful (m location opaque)
                 , (Unit (Value location effects) \\ effects) effects'
                 )
-             => m location effects a
-             -> m location effects' a
+             => m location opaque effects a
+             -> m location opaque effects' a
 runUnitValue = interpretAny (\ Unit -> pure Unit')
 
-runBooleanValue :: ( Applicative (m location effects')
-                   , Effectful (m location)
+runBooleanValue :: ( Applicative (m location opaque effects')
+                   , Effectful (m location opaque)
                    , (Boolean (Value location effects) \\ effects) effects'
                    )
-                => m location effects a
-                -> m location effects' a
+                => m location opaque effects a
+                -> m location opaque effects' a
 runBooleanValue = interpretAny (\ eff -> case eff of
   Bool b -> pure (Bool' b)
   AsBool (Bool' b) -> pure b)
@@ -249,23 +249,23 @@ data Type
   | BoolT
   deriving (Eq, Ord, Show)
 
-runFunctionType :: forall m location effects effects' a
-                .  ( Alternative (m location effects)
-                   , Effectful (m location)
+runFunctionType :: forall m location opaque effects effects' a
+                .  ( Alternative (m location opaque effects)
+                   , Effectful (m location opaque)
                    , Members '[ Fresh
                               , Reader (Map Name location)
                               , Reader ModuleInfo
                               , Reader PackageInfo
                               ] effects
-                   , Monad (m location effects)
+                   , Monad (m location opaque effects)
                    , (Function Type effects \\ effects) effects'
                    )
-                => (Name -> m location effects location)
-                -> (location -> Type -> m location effects ())
-                -> m location effects a
-                -> m location effects' a
+                => (Name -> m location opaque effects location)
+                -> (location -> Type -> m location opaque effects ())
+                -> m location opaque effects a
+                -> m location opaque effects' a
 runFunctionType alloc assign = go
-  where go :: forall a . m location effects a -> m location effects' a
+  where go :: forall a . m location opaque effects a -> m location opaque effects' a
         go = interpretAny $ \ eff -> case eff of
           Lambda params _ body -> go $ do
             (bindings, tvars) <- foldr (\ name rest -> do
@@ -282,20 +282,20 @@ runFunctionType alloc assign = go
                 pure ret
               _ -> empty
 
-runUnitType :: ( Applicative (m location effects')
-               , Effectful (m location)
+runUnitType :: ( Applicative (m location opaque effects')
+               , Effectful (m location opaque)
                , (Unit Type \\ effects) effects'
                )
-            => m location effects a
-            -> m location effects' a
+            => m location opaque effects a
+            -> m location opaque effects' a
 runUnitType = interpretAny (\ Unit -> pure (Product []))
 
-runBooleanType :: ( Alternative (m location effects')
-                  , Effectful (m location)
+runBooleanType :: ( Alternative (m location opaque effects')
+                  , Effectful (m location opaque)
                   , (Boolean Type \\ effects) effects'
                   )
-               => m location effects a
-               -> m location effects' a
+               => m location opaque effects a
+               -> m location opaque effects' a
 runBooleanType = interpretAny (\ eff -> case eff of
   Bool _ -> pure BoolT
   AsBool BoolT -> pure True <|> pure False)
