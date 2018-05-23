@@ -99,6 +99,7 @@ prog b = do
 newtype Eval location effects a = Eval { runEval :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
+deriving instance Member NonDet effects => Alternative (Eval location effects)
 
 
 builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
