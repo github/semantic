@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types, TypeOperators #-}
+{-# LANGUAGE GADTs, Rank2Types, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractFunction(..)
@@ -59,31 +59,39 @@ data Function m value return where
 data Value m location
   = Closure [Name] (m (Value m location)) (Map Name location)
 
-runFunctionValue :: ( Effectful (m location)
-                    , Members '[ Reader (Map Name location)
+runFunctionValue :: forall m location effects a function
+                 .  ( Effectful (m location)
+                    , Members '[ function
+                               , Reader (Map Name location)
                                , Reader ModuleInfo
                                , Reader PackageInfo
                                ] effects
+                    , Members '[ Reader (Map Name location)
+                               , Reader ModuleInfo
+                               , Reader PackageInfo
+                               ] (Delete function effects)
                     , Monad (m location effects)
+                    , Monad (m location (Delete function effects))
+                    , function ~ Function (m location effects) (Value (m location effects) location)
                     )
                  => (Name -> m location effects location)
                  -> (location -> Value (m location effects) location -> m location effects ())
-                 -> m location (Function (m location effects) (Value (m location effects) location) ': effects) a
                  -> m location effects a
-runFunctionValue alloc assign = relay pure $ \ eff yield -> case eff of
+                 -> m location (Delete function effects) a
+runFunctionValue alloc assign = relayAny @function pure $ \ eff yield -> case eff of
   Lambda params fvs body -> do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
     let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
     yield (Closure params body' env)
-  Call (Closure paramNames body env) params -> do
+  Call (Closure paramNames body env) params -> runFunctionValue alloc assign (do
     bindings <- foldr (\ (name, param) rest -> do
       v <- param
       a <- alloc name
       assign a v
       Map.insert name a <$> rest) (pure env) (zip paramNames params)
-    local (Map.unionWith const bindings) body >>= yield
+    local (Map.unionWith const bindings) body) >>= yield
 
 
 data Type
