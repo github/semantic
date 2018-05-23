@@ -26,7 +26,6 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Module
-  , Syntax.Program
   , []
   ]
 
