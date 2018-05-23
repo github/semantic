@@ -105,7 +105,7 @@ runFunctionValue alloc assign = go
 data Type
   = Type :-> Type
   | Product [Type]
-  | Var Int
+  | TVar Int
   deriving (Eq, Ord, Show)
 
 runFunctionType :: forall m location effects a function
@@ -132,7 +132,7 @@ runFunctionType alloc assign = go
           Lambda params _ body -> go (do
             (bindings, tvars) <- foldr (\ name rest -> do
               a <- alloc name
-              tvar <- Var <$> fresh
+              tvar <- TVar <$> fresh
               assign a tvar
               bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
             (Product tvars :->) <$> local (Map.unionWith const bindings) body) >>= yield
