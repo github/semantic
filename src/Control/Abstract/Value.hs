@@ -125,6 +125,7 @@ data Boolean value return where
 data Value m location
   = Closure [Name] (m (Value m location)) (Map Name location)
   | Unit'
+  | Bool' Bool
 
 liftHandler :: Functor m => (forall a . m a -> m' a) -> Value m location -> Value m' location
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
@@ -171,6 +172,16 @@ runUnitValue :: ( Applicative (m location effects')
              => m location effects a
              -> m location effects' a
 runUnitValue = interpretAny (\ Unit -> pure Unit')
+
+runBooleanValue :: ( Applicative (m location effects')
+                   , Effectful (m location)
+                   , (Boolean (Value (m location effects) location) \\ effects) effects'
+                   )
+                => m location effects a
+                -> m location effects' a
+runBooleanValue = interpretAny (\ eff -> case eff of
+  Bool b -> pure (Bool' b)
+  AsBool (Bool' b) -> pure b)
 
 
 data Type
