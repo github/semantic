@@ -49,14 +49,14 @@ class AbstractHole value where
   hole :: value
 
 
-lambda :: (Effectful m, Member (Function effects value) effects) => [Name] -> Set Name -> m effects value -> m effects value
+lambda :: (Effectful m, Member (Function value effects) effects) => [Name] -> Set Name -> m effects value -> m effects value
 lambda paramNames fvs body = send (Lambda paramNames fvs (lowerEff body))
 
-call' :: (Effectful m, Member (Function effects value) effects) => value -> [m effects value] -> m effects value
+call' :: (Effectful m, Member (Function value effects) effects) => value -> [m effects value] -> m effects value
 call' fn params = send (Call fn (map lowerEff params))
 
 
-lambda' :: (Effectful m, Members '[Fresh, Function effects value] effects, Monad (m effects))
+lambda' :: (Effectful m, Members '[Fresh, Function value effects] effects, Monad (m effects))
         => (Name -> m effects value)
         -> m effects value
 lambda' body = do
@@ -92,7 +92,7 @@ runHeapType = runState Map.empty
 prog :: ( Effectful m
         , Members '[ Boolean value
                    , Fresh
-                   , Function effects value
+                   , Function value effects
                    , Unit value
                    , Variable value
                    ] effects
@@ -113,8 +113,8 @@ data EmbedAny effect effects return where
 
 type Embed effect effects = Eff (effect effects ': effects)
 
-runType :: ( effects ~ (Function effects Type ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
-           , (Function effects Type \\ effects) effects'
+runType :: ( effects ~ (Function Type effects ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Function Type effects \\ effects) effects'
            , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            , (Unit Type \\ effects') effects''
            , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
@@ -128,9 +128,9 @@ runType :: ( effects ~ (Function effects Type ': Unit Type ': Boolean Type ': Va
 runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType allocType assignType
 
 
-data Function effects value return where
-  Lambda :: [Name] -> Set Name -> Eff effects value -> Function effects value value
-  Call   :: value -> [Eff effects value]            -> Function effects value value
+data Function value effects return where
+  Lambda :: [Name] -> Set Name -> Eff effects value -> Function value effects value
+  Call   :: value -> [Eff effects value]            -> Function value effects value
 
 variable' :: (Effectful m, Member (Variable value) effects) => Name -> m effects value
 variable' = send . Variable
@@ -200,7 +200,7 @@ runFunctionValue :: forall m location effects effects' a
                                ] effects'
                     , Monad (m location effects)
                     , Monad (m location effects')
-                    , (Function effects (Value location effects) \\ effects) effects'
+                    , (Function (Value location effects) effects \\ effects) effects'
                     )
                  => (Name -> m location effects location)
                  -> (location -> Value location effects -> m location effects ())
@@ -258,7 +258,7 @@ runFunctionType :: forall m location effects effects' a
                               , Reader PackageInfo
                               ] effects
                    , Monad (m location effects)
-                   , (Function effects Type \\ effects) effects'
+                   , (Function Type effects \\ effects) effects'
                    )
                 => (Name -> m location effects location)
                 -> (location -> Type -> m location effects ())
