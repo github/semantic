@@ -59,6 +59,10 @@ data Function m value return where
   Call   :: value -> [m value]            -> Function m value value
 
 
+data Unit value return where
+  Unit :: Unit value value
+
+
 data Value m location
   = Closure [Name] (m (Value m location)) (Map Name location)
 
