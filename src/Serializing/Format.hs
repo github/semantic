@@ -20,11 +20,11 @@ data Format input where
   SExpression :: (Recursive input, ToSExpression (Base input))        => Options              -> Format input
   Show        :: Show input                                                                   => Format input
 
-runSerialize :: Format input -> input -> Builder
-runSerialize (DOT style)        = serializeDOT style
-runSerialize JSON               = (<> "\n") . fromEncoding . toEncoding
-runSerialize (SExpression opts) = serializeSExpression opts
-runSerialize Show               = stringUtf8 . show
+runSerialize :: Bool -> Format input -> input -> Builder
+runSerialize _ (DOT style)        = serializeDOT style
+runSerialize _ JSON               = (<> "\n") . fromEncoding . toEncoding
+runSerialize _ (SExpression opts) = serializeSExpression opts
+runSerialize _ Show               = stringUtf8 . show
 
 -- TODO: it would be kinda neat if we could use pretty-show/hscolour for Show output
 

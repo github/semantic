@@ -173,7 +173,9 @@ runTaskF = interpret $ \ task -> case task of
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff terms -> pure (diffTermPair terms)
   Render renderer input -> pure (renderer input)
-  Serialize format input -> pure (runSerialize format input)
+  Serialize format input -> do
+    enableColour <- asks optionsEnableColour
+    pure (runSerialize enableColour format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
