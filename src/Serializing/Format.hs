@@ -3,7 +3,6 @@ module Serializing.Format
 ( Format(..)
 , Builder
 , runSerialize
-, SomeFormat(..)
 , Options(..)
 ) where
 
@@ -29,8 +28,3 @@ runSerialize _     JSON               = (<> "\n") . fromEncoding . toEncoding
 runSerialize _     (SExpression opts) = serializeSExpression opts
 runSerialize True  Show               = stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
 runSerialize False Show               = stringUtf8 . show
-
-
--- | Abstract over a 'Format'’s input type.
-data SomeFormat where
-  SomeFormat :: Format input -> SomeFormat
