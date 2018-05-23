@@ -276,7 +276,6 @@ runUnitType = interpretAny (\ Unit -> pure (Product []))
 
 runBooleanType :: ( Alternative (m location effects')
                   , Effectful (m location)
-                  , Member NonDet effects
                   , (Boolean Type \\ effects) effects'
                   )
                => m location effects a
