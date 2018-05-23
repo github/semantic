@@ -28,9 +28,9 @@ import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
+import           Data.Graph
 import           Data.Project
 import           Data.Record
-import           Data.Semilattice.Lower
 import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
@@ -52,7 +52,7 @@ graph graphType project
           CallGraph   -> graphingTerms
     analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
     where extractGraph result = case result of
-            (Right ((_, graph), _), _) -> pure graph
+            (Right ((_, graph), _), _) -> pure (simplify graph)
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
           runGraphAnalysis
             = run
