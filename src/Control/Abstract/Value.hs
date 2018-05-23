@@ -67,6 +67,10 @@ builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable
           => m effects value
 builtinId = lambda' (\ name -> variable' name)
 
+builtinConst :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
+             => m effects value
+builtinConst = lambda' (\ name -> lambda' (const (variable' name)))
+
 
 data Function m value return where
   Lambda :: [Name] -> Set Name -> m value -> Function m value value
