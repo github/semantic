@@ -31,7 +31,7 @@ import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import qualified Data.Set as Set
-import Prelude
+import Prelude hiding (fail)
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
@@ -81,6 +81,26 @@ variable' = send . Variable
 
 data Variable value return where
   Variable :: Name -> Variable value value
+
+runVariable :: forall m location effects effects' value a
+            .  ( Effectful (m location)
+               , (Variable value \\ effects) effects'
+               , Members '[ Fail
+                          , Reader (Map Name location)
+                          , State (Map location value)
+                          ] effects'
+               , Monad (m location effects')
+               , Show location
+               )
+            => (Name -> m location effects' (Maybe location))
+            -> (location -> m location effects' (Maybe value))
+            -> m location effects a
+            -> m location effects' a
+runVariable lookup deref = go
+  where go :: forall a . m location effects a -> m location effects' a
+        go = interpretAny (\ (Variable name) -> do
+          addr <- lookup name >>= maybeM (raiseEff (fail ("free variable: " <> show name)))
+          deref addr >>= maybeM (raiseEff (fail ("uninitialized address: " <> show addr))))
 
 
 unit' :: (Effectful m, Member (Unit value) effects) => m effects value
