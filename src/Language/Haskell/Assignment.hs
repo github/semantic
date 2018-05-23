@@ -9,7 +9,7 @@ module Language.Haskell.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm'', contextualize, postContextualize)
 import Language.Haskell.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.FreeVariables as FV
@@ -37,7 +37,13 @@ assignment :: Assignment
 assignment = handleError $ module' <|> parseError
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Syntax.Module <$> moduleIdentifier <*> pure [] <*> (where' <|> emptyTerm))
+module' = makeTerm
+       <$> symbol Module
+       <*> children (Syntax.Module <$> (moduleIdentifier <|> emptyTerm) <*> pure [] <*> (where' <|> expressions <|> emptyTerm))
+
+
+expressions :: Assignment
+expressions = makeTerm'' <$> location <*> many expression
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
