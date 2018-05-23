@@ -27,5 +27,5 @@ data ASTFormat = SExpression | JSON
   deriving (Show)
 
 runASTParse :: Members '[Distribute WrappedTask, Task, Exc SomeException] effects => ASTFormat -> [Blob] -> Eff effects F.Builder
-runASTParse SExpression = distributeFoldMap (WrapTask . (withSomeAST (serialize (F.SExpression F.ByShow)) <=< astParseBlob))
-runASTParse JSON        = serialize F.JSON <=< distributeFoldMap (\ blob -> WrapTask (withSomeAST (render (renderJSONAST blob)) =<< astParseBlob blob))
+runASTParse SExpression = distributeFoldMap (WrapTask . (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow))))
+runASTParse JSON        = distributeFoldMap (\ blob -> WrapTask (astParseBlob blob >>= withSomeAST (render (renderJSONAST blob)))) >=> serialize F.JSON
