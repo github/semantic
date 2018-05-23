@@ -90,15 +90,14 @@ unit' = send Unit
 data Unit value return where
   Unit :: Unit value value
 
-runUnitValue :: forall m location effects effects' a unit
-             .  ( Applicative (m location effects')
+runUnitValue :: ( Applicative (m location effects')
                 , Effectful (m location)
                 , unit ~ (Unit (Value (m location effects) location))
                 , (unit \\ effects) effects'
                 )
              => m location effects a
              -> m location effects' a
-runUnitValue = relayAny @unit pure (\ Unit yield -> yield Unit')
+runUnitValue = relayAny pure (\ Unit yield -> yield Unit')
 
 
 data Value m location
