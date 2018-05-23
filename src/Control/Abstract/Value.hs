@@ -188,6 +188,7 @@ data Type
   = Type :-> Type
   | Product [Type]
   | TVar Int
+  | BoolT
   deriving (Eq, Ord, Show)
 
 runFunctionType :: forall m location effects effects' a
@@ -232,6 +233,17 @@ runUnitType :: ( Applicative (m location effects')
             => m location effects a
             -> m location effects' a
 runUnitType = interpretAny (\ Unit -> pure (Product []))
+
+runBooleanType :: ( Alternative (m location effects')
+                  , Effectful (m location)
+                  , Member NonDet effects
+                  , (Boolean Type \\ effects) effects'
+                  )
+               => m location effects a
+               -> m location effects' a
+runBooleanType = interpretAny (\ eff -> case eff of
+  Bool _ -> pure BoolT
+  AsBool BoolT -> pure True <|> pure False)
 
 
 class Show value => AbstractFunction location value effects where
