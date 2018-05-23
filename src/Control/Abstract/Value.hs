@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, Rank2Types, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractFunction(..)
@@ -79,6 +79,10 @@ prog :: ( Effectful m
 prog b = do
   identity <- lambda' variable'
   iff b unit' (call' identity [unit'])
+
+newtype Eval location effects a = Eval { runEval :: Eff effects a }
+  deriving (Applicative, Effectful, Functor, Monad)
+
 
 
 builtinId :: (Effectful m, Members '[Fresh, Function (m effects) value, Variable value] effects, Monad (m effects))
