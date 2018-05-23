@@ -114,6 +114,9 @@ library
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
+                     , Language.Haskell.Grammar
+                     , Language.Haskell.Assignment
+                     , Language.Haskell.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
@@ -206,6 +209,7 @@ library
                      , unordered-containers
                      , haskell-tree-sitter
                      , tree-sitter-go
+                     , tree-sitter-haskell
                      , tree-sitter-json
                      , tree-sitter-php
                      , tree-sitter-python
