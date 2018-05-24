@@ -80,8 +80,8 @@ instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
 instance (Message1 f) => Message (Term f ()) where
-  encodeMessage num (Term (In a f)) = liftEncodeMessage encodeMessage num f
-  decodeMessage num = fmap (termIn ()) $ liftDecodeMessage decodeMessage num
+  encodeMessage num (Term (In _ f)) = liftEncodeMessage encodeMessage num f
+  decodeMessage num = termIn () <$> liftDecodeMessage decodeMessage num
   dotProto _ = liftDotProto (dotProto @(Term f ())) (Proxy @f)
 
 instance Ord1 f => Ord1 (Term f) where
