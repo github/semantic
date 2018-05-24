@@ -24,9 +24,11 @@ import Prologue
 type Syntax = '[
     Comment.Comment
   , Declaration.Function
+  , Literal.Array
   , Literal.Character
   , Literal.Float
   , Literal.Integer
+  , Literal.TextElement
   , Syntax.Context
   , Syntax.Empty
   , Syntax.Error
@@ -62,7 +64,9 @@ expressionChoices = [
                     , float
                     , functionDeclaration
                     , integer
+                    , listExpression
                     , moduleIdentifier
+                    , string
                     , variableIdentifier
                     , where'
                     ]
@@ -100,11 +104,18 @@ functionDeclaration = makeTerm
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
+listExpression :: Assignment
+listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array <$> many listElement)
+  where listElement = symbol Expression *> children expression
+
 float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 character :: Assignment
 character = makeTerm <$> symbol Char <*> (Literal.Character <$> source)
+
+string :: Assignment
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
