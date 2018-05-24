@@ -16,7 +16,6 @@ module Control.Abstract.Value
 ) where
 
 import Control.Abstract.Addressable
-import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
