@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, Rank2Types, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, Rank2Types, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractFunction(..)
@@ -100,7 +100,7 @@ prog b = do
   identity <- lambda' variable'
   iff b unit' (call' identity [unit'])
 
-newtype Eval location value opaque effects a = Eval { runEval :: Eff effects a }
+newtype Eval location value (opaque :: * -> *) effects a = Eval { runEval :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (Eval location value opaque effects)
