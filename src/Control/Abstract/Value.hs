@@ -247,28 +247,26 @@ data Type
   | BoolT
   deriving (Eq, Ord, Show)
 
-runFunctionType :: forall opaque effects effects' a
-                .  ( Members '[ Fresh
-                              , NonDet
-                              , Reader (Map Name Name)
-                              , Reader ModuleInfo
-                              , Reader PackageInfo
-                              , State (Map Name (Set Type))
-                              ] effects
-                   , (Function Type opaque \\ effects) effects'
-                   )
-                => Eval Name Type opaque effects a
-                -> Eval Name Type opaque effects' a
-runFunctionType = interpretAny $ \ eff -> case eff of
+runFunctionType :: forall opaque effects a
+                .  Members '[ Fresh
+                            , NonDet
+                            , Reader (Map Name Name)
+                            , Reader ModuleInfo
+                            , Reader PackageInfo
+                            , State (Map Name (Set Type))
+                            ] effects
+                => Eval Name Type opaque (Function Type opaque ': effects) a
+                -> Eval Name Type opaque effects a
+runFunctionType = interpret $ \ eff -> case eff of
   Lambda params _ body -> runFunctionType $ do
     (bindings, tvars) <- foldr (\ name rest -> do
       a <- allocType name
       tvar <- TVar <$> fresh
       assignType a tvar
       bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
-    (Product tvars :->) <$> local (Map.unionWith const bindings) (unembedEval @_ @_ @_ @_ @effects body)
+    (Product tvars :->) <$> local (Map.unionWith const bindings) (unembedEval @_ @_ @_ @_ @(Function Type opaque ': effects) body)
   Call fn params -> runFunctionType $ do
-    paramTypes <- traverse (unembedEval @_ @_ @_ @_ @effects) params
+    paramTypes <- traverse (unembedEval @_ @_ @_ @_ @(Function Type opaque ': effects)) params
     case fn of
       Product argTypes :-> ret -> do
         guard (and (zipWith (==) paramTypes argTypes))
