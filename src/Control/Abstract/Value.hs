@@ -151,7 +151,6 @@ data Variable value return where
 runVariable :: forall location value opaque effects a
             .  ( Members '[ Fail
                           , Reader (Map Name location)
-                          , State (Map location value)
                           ] effects
                , Show location
                )
