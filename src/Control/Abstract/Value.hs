@@ -82,10 +82,10 @@ derefType addr = do
   else
     Set.foldr ((<|>) . pure . Just) empty cell
 
-runEnv :: Effectful (m location value opaque) => m location value opaque (Reader (Map Name location) ': effects) a -> m location value opaque effects a
+runEnv :: Eval location value opaque (Reader (Map Name location) ': effects) a -> Eval location value opaque effects a
 runEnv = runReader Map.empty
 
-runHeapType :: Effectful (m Name Type opaque) => m Name Type opaque (State (Map Name (Set Type)) ': effects) a -> m Name Type opaque effects (a, Map Name (Set Type))
+runHeapType :: Eval Name Type opaque (State (Map Name (Set Type)) ': effects) a -> Eval Name Type opaque effects (a, Map Name (Set Type))
 runHeapType = runState Map.empty
 
 
