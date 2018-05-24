@@ -208,6 +208,7 @@ library
                      , text >= 1.2.1.3
                      , these
                      , time
+                     , proto3-suite
                      , unix
                      , unordered-containers
                      , haskell-tree-sitter
