@@ -99,6 +99,11 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 
+instance (Apply Message1 fs) => Message1 (Sum fs) where
+  liftEncodeMessage encodeMessage num fs = apply @Message1 (liftEncodeMessage encodeMessage num) fs
+  liftDecodeMessage decodeMessage num fs = fmap inject $ apply @Message1 (liftDecodeMessage decodeMessage num)
+  liftDotProto dotProto _ fs = apply @Message1 (liftDotProto dotProto (Proxy @fs)) fs
+
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
