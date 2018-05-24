@@ -209,6 +209,7 @@ library
                      , these
                      , time
                      , proto3-suite
+                     , proto3-wire
                      , unix
                      , unordered-containers
                      , haskell-tree-sitter
