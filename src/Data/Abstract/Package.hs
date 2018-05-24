@@ -1,10 +1,10 @@
 {-# LANGUAGE TupleSections #-}
 module Data.Abstract.Package where
 
-import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Map as Map
+import Data.Abstract.Name
 
 type PackageName = Name
 

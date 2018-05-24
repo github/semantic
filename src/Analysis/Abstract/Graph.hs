@@ -16,8 +16,8 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract
 import           Data.Abstract.Address
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
+import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
@@ -52,9 +52,9 @@ style = (defaultStyle (byteString . vertexName))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Members '[ Reader (Environment (Located location) value)
+                 , Members '[ Reader (Environment (Located location))
                             , Reader ModuleInfo
-                            , State (Environment (Located location) value)
+                            , State (Environment (Located location))
                             , State (Graph Vertex)
                             ] effects
                  , term ~ Term (Sum syntax) ann
@@ -125,8 +125,8 @@ moduleInclusion v = do
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Reader (Environment (Located location) value)) effects
-                      , Member (State (Environment (Located location) value)) effects
+variableDefinition :: ( Member (Reader (Environment (Located location))) effects
+                      , Member (State (Environment (Located location))) effects
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name

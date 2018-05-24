@@ -5,7 +5,12 @@ module Main
 import System.Environment
 import Test.DocTest
 
-defaultFiles = ["src/Data/Abstract/Environment.hs", "src/Data/Range.hs", "src/Data/Semigroup/App.hs"]
+defaultFiles =
+  [ "src/Data/Abstract/Environment.hs"
+  , "src/Data/Abstract/Name.hs"
+  , "src/Data/Range.hs"
+  , "src/Data/Semigroup/App.hs"
+  ]
 
 main :: IO ()
 main = do

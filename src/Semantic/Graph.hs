@@ -112,9 +112,8 @@ resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionErr
 resumingLoadError :: Member Trace effects => Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
 
-resumingEvalError :: (AbstractHole value, Member Trace effects, Show value) => Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
+resumingEvalError :: Member Trace effects => Evaluator location value (Resumable EvalError ': effects) a -> Evaluator location value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
-  EnvironmentLookupError{} -> pure hole
   DefaultExportError{}     -> pure ()
   ExportError{}            -> pure ()
   IntegerFormatError{}     -> pure 0
@@ -130,7 +129,7 @@ resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> s
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (Members '[State (Environment location (Value location)), Trace] effects, Show location) => Evaluator location (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location (Value location) effects a
+resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => Evaluator location (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location (Value location) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))

@@ -1,8 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Go.Syntax where
 
-import           Data.Abstract.Evaluatable hiding (Label)
-import           Data.Abstract.FreeVariables (Name (..), name)
+import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path

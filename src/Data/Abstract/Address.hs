@@ -1,8 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address where
 
-import Data.Abstract.FreeVariables
 import Data.Abstract.Module (ModuleInfo)
+import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
 import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer
@@ -35,7 +35,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord)
 
 instance Show Monovariant where
-  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unName . unMonovariant
+  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
 
 
 data Located location = Located

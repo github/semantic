@@ -20,9 +20,10 @@ import Control.Monad ((>=>))
 import Data.Abstract.Address as X
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables as X hiding (dropExtension)
+import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
+import Data.Abstract.Name as X
 import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, prjValue, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
@@ -93,7 +94,7 @@ testEvaluating
 deNamespace :: Value Precise -> Maybe (Name, [Name])
 deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
 
-derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
+derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise -> Maybe (Value Precise)
 derefQName heap = go
   where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
           []        -> Just
