@@ -56,6 +56,7 @@ import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Trace
 import           Data.Blob
+import           Data.Bool
 import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
@@ -174,8 +175,8 @@ runTaskF = interpret $ \ task -> case task of
   Semantic.Task.Diff terms -> pure (diffTermPair terms)
   Render renderer input -> pure (renderer input)
   Serialize format input -> do
-    enableColour <- asks optionsEnableColour
-    pure (runSerialize enableColour format input)
+    formatStyle <- asks (bool Colourful Plain . optionsEnableColour)
+    pure (runSerialize formatStyle format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.

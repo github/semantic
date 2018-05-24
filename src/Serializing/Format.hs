@@ -25,9 +25,9 @@ data Format input where
 
 data FormatStyle = Colourful | Plain
 
-runSerialize :: Bool -> Format input -> input -> Builder
-runSerialize _     (DOT style)        = serializeDOT style
-runSerialize _     JSON               = (<> "\n") . fromEncoding . toEncoding
-runSerialize _     (SExpression opts) = serializeSExpression opts
-runSerialize True  Show               = (<> "\n") . stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
-runSerialize False Show               = (<> "\n") . stringUtf8 . show
+runSerialize :: FormatStyle -> Format input -> input -> Builder
+runSerialize _         (DOT style)        = serializeDOT style
+runSerialize _         JSON               = (<> "\n") . fromEncoding . toEncoding
+runSerialize _         (SExpression opts) = serializeSExpression opts
+runSerialize Colourful Show               = (<> "\n") . stringUtf8 . hscolour TTY defaultColourPrefs False False "" False . ppShow
+runSerialize Plain     Show               = (<> "\n") . stringUtf8 . show
