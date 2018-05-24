@@ -50,10 +50,10 @@ class AbstractHole value where
 
 
 lambda :: Member (Function value opaque) effects => [Name] -> Set Name -> Eval location value opaque effects value -> Eval location value opaque effects value
-lambda paramNames fvs body = send (Lambda paramNames fvs (embedEval body))
+lambda paramNames fvs body = embedEval body >>= send . Lambda paramNames fvs
 
 call' :: Member (Function value opaque) effects => value -> [Eval location value opaque effects value] -> Eval location value opaque effects value
-call' fn params = send (Call fn (map embedEval params))
+call' fn params = traverse embedEval params >>= send . Call fn
 
 
 lambda' :: Members '[Fresh, Function value opaque] effects
@@ -135,7 +135,7 @@ data Function value opaque return where
 unembedEval :: opaque a -> Eval location value opaque effects a
 unembedEval = undefined
 
-embedEval :: Eval location value opaque effects a -> opaque a
+embedEval :: Eval location value opaque effects a -> Eval location value opaque effects (opaque a)
 embedEval = undefined
 
 
