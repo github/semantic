@@ -216,11 +216,11 @@ runFunctionValue alloc assign = go
             let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
             pure (Closure params body' env)
           Call (Closure paramNames body env) params -> go $ do
-            bindings <- foldr (\ (name, param) rest -> do
+            bindings <- foldr (uncurry (Map.insert)) env <$> sequenceA (zipWith (\ name param -> do
               v <- param
               a <- alloc name
               assign a v
-              Map.insert name a <$> rest) (pure env) (zip paramNames (map raiseEff params))
+              pure (name, a)) paramNames (map raiseEff params))
             local (Map.unionWith const bindings) (raiseEff body)
 
 runUnitValue :: ( Applicative (m location opaque effects')
