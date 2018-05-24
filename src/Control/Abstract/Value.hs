@@ -28,6 +28,7 @@ import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import qualified Data.Map as Map
+import Data.Reflection
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
@@ -137,6 +138,13 @@ unembedEval = undefined
 
 embedEval :: Eval location value opaque effects a -> Eval location value opaque effects (opaque a)
 embedEval = undefined
+
+newtype EmbedEval opaque effects = EmbedEval { runEmbedEval :: forall a . Eff effects a -> opaque a }
+
+embedEval' :: forall location value opaque effects a . (Member (Reader (Proxy opaque)) effects, Reifies opaque (EmbedEval opaque effects)) => Eval location value opaque effects a -> Eval location value opaque effects (opaque a)
+embedEval' action = do
+  proxy <- ask @(Proxy opaque)
+  pure (runEmbedEval (reflect proxy) (lowerEff action))
 
 
 variable' :: Member (Variable value) effects => Name -> Eval location value opaque effects value
