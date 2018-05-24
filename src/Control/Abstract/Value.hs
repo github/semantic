@@ -275,10 +275,9 @@ runFunctionType = interpretAny $ \ eff -> case eff of
         pure ret
       _ -> empty
 
-runUnitType :: (Unit Type \\ effects) effects'
-            => Eval location Type opaque effects a
-            -> Eval location Type opaque effects' a
-runUnitType = interpretAny (\ Unit -> pure (Product []))
+runUnitType :: Eval location Type opaque (Unit Type ': effects) a
+            -> Eval location Type opaque effects a
+runUnitType = interpret (\ Unit -> pure (Product []))
 
 runBooleanType :: Member NonDet effects
                => Eval location Type opaque (Boolean Type ': effects) a
