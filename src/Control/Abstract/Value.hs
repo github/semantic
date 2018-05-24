@@ -28,7 +28,7 @@ import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
-import Prelude hiding (fail)
+import Prelude
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
