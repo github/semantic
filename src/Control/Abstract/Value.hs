@@ -63,7 +63,7 @@ lambda' body = do
   var <- nameI <$> fresh
   lambda [var] lowerBound (body var)
 
-lookup' :: (Effectful (m location value opaque), Functor (m location value opaque effects), Member (Reader (Map Name location)) effects) => Name -> m location value opaque effects (Maybe location)
+lookup' :: Member (Reader (Map Name location)) effects => Name -> Eval location value opaque effects (Maybe location)
 lookup' name = Map.lookup name <$> ask
 
 allocType :: (Applicative (m Name Type opaque effects), Effectful (m Name Type opaque)) => Name -> m Name Type opaque effects Name
@@ -135,21 +135,19 @@ variable' = send . Variable
 data Variable value return where
   Variable :: Name -> Variable value value
 
-runVariable :: forall m location value opaque effects effects' a
-            .  ( Effectful (m location value opaque)
-               , (Variable value \\ effects) effects'
+runVariable :: forall location value opaque effects effects' a
+            .  ( (Variable value \\ effects) effects'
                , Members '[ Fail
                           , Reader (Map Name location)
                           , State (Map location value)
                           ] effects'
-               , Monad (m location value opaque effects')
                , Show location
                )
-            => (location -> m location value opaque effects' (Maybe value))
-            -> m location value opaque effects a
-            -> m location value opaque effects' a
+            => (location -> Eval location value opaque effects' (Maybe value))
+            -> Eval location value opaque effects a
+            -> Eval location value opaque effects' a
 runVariable deref = go
-  where go :: forall a . m location value opaque effects a -> m location value opaque effects' a
+  where go :: forall a . Eval location value opaque effects a -> Eval location value opaque effects' a
         go = interpretAny (\ (Variable name) -> do
           addr <- lookup' name >>= maybeM (raiseEff (fail ("free variable: " <> show name)))
           deref addr >>= maybeM (raiseEff (fail ("uninitialized address: " <> show addr))))
