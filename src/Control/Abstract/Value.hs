@@ -250,8 +250,6 @@ runFunctionType :: forall opaque effects a
                 .  Members '[ Fresh
                             , NonDet
                             , Reader (Map Name Name)
-                            , Reader ModuleInfo
-                            , Reader PackageInfo
                             , State (Map Name (Set Type))
                             ] effects
                 => Eval Name Type opaque (Function Type opaque ': effects) a
