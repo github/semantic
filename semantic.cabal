@@ -81,6 +81,7 @@ library
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
+                     , Data.Options
                      , Data.Patch
                      , Data.Project
                      , Data.Range
