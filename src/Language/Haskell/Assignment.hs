@@ -72,7 +72,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 variableIdentifier :: Assignment
-variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . FV.name <$> source)
+variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 constructorIdentifier :: Assignment
 constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
