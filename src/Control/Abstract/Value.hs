@@ -235,23 +235,21 @@ data Type
   | BoolT
   deriving (Eq, Ord, Show)
 
-runFunctionType :: forall m location opaque effects effects' a
-                .  ( Alternative (m location Type opaque effects)
-                   , Effectful (m location Type opaque)
-                   , Members '[ Fresh
+runFunctionType :: forall location opaque effects effects' a
+                .  ( Members '[ Fresh
+                              , NonDet
                               , Reader (Map Name location)
                               , Reader ModuleInfo
                               , Reader PackageInfo
                               ] effects
-                   , Monad (m location Type opaque effects)
                    , (Function Type effects \\ effects) effects'
                    )
-                => (Name -> m location Type opaque effects location)
-                -> (location -> Type -> m location Type opaque effects ())
-                -> m location Type opaque effects a
-                -> m location Type opaque effects' a
+                => (Name -> Eval location Type opaque effects location)
+                -> (location -> Type -> Eval location Type opaque effects ())
+                -> Eval location Type opaque effects a
+                -> Eval location Type opaque effects' a
 runFunctionType alloc assign = go
-  where go :: forall a . m location Type opaque effects a -> m location Type opaque effects' a
+  where go :: forall a . Eval location Type opaque effects a -> Eval location Type opaque effects' a
         go = interpretAny $ \ eff -> case eff of
           Lambda params _ body -> go $ do
             (bindings, tvars) <- foldr (\ name rest -> do
@@ -268,20 +266,16 @@ runFunctionType alloc assign = go
                 pure ret
               _ -> empty
 
-runUnitType :: ( Applicative (m location Type opaque effects')
-               , Effectful (m location Type opaque)
-               , (Unit Type \\ effects) effects'
-               )
-            => m location Type opaque effects a
-            -> m location Type opaque effects' a
+runUnitType :: (Unit Type \\ effects) effects'
+            => Eval location Type opaque effects a
+            -> Eval location Type opaque effects' a
 runUnitType = interpretAny (\ Unit -> pure (Product []))
 
-runBooleanType :: ( Alternative (m location Type opaque effects')
-                  , Effectful (m location Type opaque)
+runBooleanType :: ( Member NonDet effects'
                   , (Boolean Type \\ effects) effects'
                   )
-               => m location Type opaque effects a
-               -> m location Type opaque effects' a
+               => Eval location Type opaque effects a
+               -> Eval location Type opaque effects' a
 runBooleanType = interpretAny (\ eff -> case eff of
   Bool _ -> pure BoolT
   AsBool BoolT -> pure True <|> pure False)
