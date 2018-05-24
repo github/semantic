@@ -46,6 +46,7 @@ library
                      , Control.Abstract.Heap
                      , Control.Abstract.Matching
                      , Control.Abstract.Modules
+                     , Control.Abstract.Primitive
                      , Control.Abstract.Roots
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
@@ -62,9 +63,11 @@ library
                      , Data.Abstract.Live
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
+                     , Data.Abstract.Name
                      , Data.Abstract.Number
                      , Data.Abstract.Package
                      , Data.Abstract.Path
+                     , Data.Abstract.Ref
                      , Data.Abstract.Type
                      , Data.Abstract.Value
                      -- General datatype definitions & generic algorithms

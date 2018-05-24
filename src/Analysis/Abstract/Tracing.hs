@@ -14,7 +14,7 @@ import Prologue
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 tracingTerms :: ( Corecursive term
                 , Members '[ Reader (Live location value)
-                           , State (Environment location value)
+                           , State (Environment location)
                            , State (Heap location (Cell location) value)
                            , Writer (trace (Configuration term location (Cell location) value))
                            ] effects
