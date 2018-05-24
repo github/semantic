@@ -111,21 +111,23 @@ data EmbedAny effect effects return where
 
 type Embed effect effects = Eff (effect effects ': effects)
 
-runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
+runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Variable Type ': rest)
            , (Function Type opaque \\ effects) effects'
-           , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
+           , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': rest)
            , (Unit Type \\ effects') effects''
-           , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
+           , effects'' ~ (Boolean Type ': Variable Type ': rest)
            , (Boolean Type \\ effects'') effects'''
-           , effects''' ~ (Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
-           , (Variable Type \\ effects''') (State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
+           , effects''' ~ (Variable Type ': rest)
+           , (Variable Type \\ effects''') (rest)
            )
         => Eval Name Type opaque effects a
-        -> Eval Name Type opaque rest [Either String (a, Map Name (Set Type))]
-runType = runFresh 0 . runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
+        -> Eval Name Type opaque rest a
+runType = runVariable derefType . runBooleanType . runUnitType . runFunctionType
+
+runRest = runFresh 0 . runNonDetA . runFail . runEnv . runHeapType
 
 resultType :: [Either String (Type, Map Name (Set Type))]
-resultType = run (runType (prog BoolT))
+resultType = run (runRest (runType (prog BoolT)))
 
 
 data Function value opaque return where
