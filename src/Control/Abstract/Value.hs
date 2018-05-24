@@ -129,6 +129,14 @@ data Function value effects return where
   Lambda :: [Name] -> Set Name -> Eff effects value -> Function value effects value
   Call   :: value -> [Eff effects value]            -> Function value effects value
 
+
+unembedEval :: opaque a -> Eval location value opaque effects a
+unembedEval = undefined
+
+embedEval :: Eval location value opaque effects a -> opaque a
+embedEval = undefined
+
+
 variable' :: Member (Variable value) effects => Name -> Eval location value opaque effects value
 variable' = send . Variable
 
