@@ -148,20 +148,19 @@ variable' = send . Variable
 data Variable value return where
   Variable :: Name -> Variable value value
 
-runVariable :: forall location value opaque effects effects' a
-            .  ( (Variable value \\ effects) effects'
-               , Members '[ Fail
+runVariable :: forall location value opaque effects a
+            .  ( Members '[ Fail
                           , Reader (Map Name location)
                           , State (Map location value)
-                          ] effects'
+                          ] effects
                , Show location
                )
-            => (location -> Eval location value opaque effects' (Maybe value))
+            => (location -> Eval location value opaque effects (Maybe value))
+            -> Eval location value opaque (Variable value ': effects) a
             -> Eval location value opaque effects a
-            -> Eval location value opaque effects' a
 runVariable deref = go
-  where go :: forall a . Eval location value opaque effects a -> Eval location value opaque effects' a
-        go = interpretAny (\ (Variable name) -> do
+  where go :: forall a . Eval location value opaque (Variable value ': effects) a -> Eval location value opaque effects a
+        go = interpret (\ (Variable name) -> do
           addr <- lookup' name >>= maybeM (raiseEff (fail ("free variable: " <> show name)))
           deref addr >>= maybeM (raiseEff (fail ("uninitialized address: " <> show addr))))
 
