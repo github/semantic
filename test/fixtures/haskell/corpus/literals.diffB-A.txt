@@ -1,11 +1,6 @@
 (Module
   (Identifier)
   (
-    (Function
-    { (Identifier)
-    ->(Identifier) }
-      (
-        (Integer)))
   {+(Function
     {+(Identifier)+}
     {+(
@@ -29,6 +24,10 @@
   {+(Function
     {+(Identifier)+}
     {+(
+      {+(Integer)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
       {+(Float)+})+})+}
   {+(Function
     {+(Identifier)+}
@@ -102,12 +101,6 @@
     {+(Identifier)+}
     {+(
       {+(Identifier)+})+})+}
-    (Function
-    { (Identifier)
-    ->(Identifier) }
-      (
-      {+(Identifier)+}
-      {-(Integer)-}))
   {+(Function
     {+(Identifier)+}
     {+(
@@ -120,6 +113,118 @@
     {+(Identifier)+}
     {+(
       {+(Identifier)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Identifier)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
   {-(Function
     {-(Identifier)-}
     {-(
@@ -139,6 +244,14 @@
   {-(Function
     {-(Identifier)-}
     {-(
+      {-(Integer)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Integer)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
       {-(Float)-})-})-}
   {-(Function
     {-(Identifier)-}
@@ -227,4 +340,112 @@
   {-(Function
     {-(Identifier)-}
     {-(
-      {-(Identifier)-})-})-}))
+      {-(Identifier)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}))
