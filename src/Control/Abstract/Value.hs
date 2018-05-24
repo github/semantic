@@ -111,21 +111,21 @@ data EmbedAny effect effects return where
 
 type Embed effect effects = Eff (effect effects ': effects)
 
-runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
            , (Function Type opaque \\ effects) effects'
-           , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
            , (Unit Type \\ effects') effects''
-           , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
            , (Boolean Type \\ effects'') effects'''
-           , effects''' ~ (Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
-           , (Variable Type \\ effects''') (State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , effects''' ~ (Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
+           , (Variable Type \\ effects''') (State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': Fresh ': rest)
            )
         => Eval Name Type opaque effects a
         -> Eval Name Type opaque rest [Either String (a, Map Name (Set Type))]
-runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
+runType = runFresh 0 . runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
 
 resultType :: [Either String (Type, Map Name (Set Type))]
-resultType = run (runFresh 0 (runType (prog BoolT)))
+resultType = run (runType (prog BoolT))
 
 
 data Function value opaque return where
