@@ -280,12 +280,10 @@ runUnitType :: (Unit Type \\ effects) effects'
             -> Eval location Type opaque effects' a
 runUnitType = interpretAny (\ Unit -> pure (Product []))
 
-runBooleanType :: ( Member NonDet effects'
-                  , (Boolean Type \\ effects) effects'
-                  )
-               => Eval location Type opaque effects a
-               -> Eval location Type opaque effects' a
-runBooleanType = interpretAny (\ eff -> case eff of
+runBooleanType :: Member NonDet effects
+               => Eval location Type opaque (Boolean Type ': effects) a
+               -> Eval location Type opaque effects a
+runBooleanType = interpret (\ eff -> case eff of
   Bool _ -> pure BoolT
   AsBool BoolT -> pure True <|> pure False)
 
