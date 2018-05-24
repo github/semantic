@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, Rank2Types, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractFunction(..)
@@ -19,19 +19,15 @@ import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Monad.Effect.Fail
 import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
 import Data.Abstract.Live (Live)
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
-import qualified Data.Map as Map
-import Data.Reflection
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
-import qualified Data.Set as Set
 import Prelude hiding (fail)
 import Prologue hiding (TypeError)
 
@@ -47,222 +43,6 @@ data Comparator
 
 class AbstractHole value where
   hole :: value
-
-
-lambda :: Member (Function opaque value) effects => [Name] -> Set Name -> Eval location value opaque effects value -> Eval location value opaque effects value
-lambda paramNames fvs body = embedEval body >>= send . Lambda paramNames fvs
-
-call' :: Member (Function opaque value) effects => value -> [Eval location value opaque effects value] -> Eval location value opaque effects value
-call' fn params = traverse embedEval params >>= send . Call fn
-
-
-lambda' :: Members '[Fresh, Function opaque value] effects
-        => (Name -> Eval location value opaque effects value)
-        -> Eval location value opaque effects value
-lambda' body = do
-  var <- nameI <$> fresh
-  lambda [var] lowerBound (body var)
-
-lookup' :: Member (Reader (Map Name location)) effects => Name -> Eval location value opaque effects (Maybe location)
-lookup' name = Map.lookup name <$> ask
-
-allocType :: Name -> Eval Name Type opaque effects Name
-allocType = pure
-
-assignType :: (Member (State (Map location (Set Type))) effects, Ord location) => location -> Type -> Eval location Type opaque effects ()
-assignType addr value = do
-  cell <- gets (Map.lookup addr) >>= maybeM (pure (Set.empty))
-  modify' (Map.insert addr (Set.insert value cell))
-
-derefType :: (Members '[Fail, NonDet, State (Map location (Set Type))] effects, Ord location, Show location) => location -> Eval location Type opaque effects (Maybe Type)
-derefType addr = do
-  cell <- gets (Map.lookup addr) >>= maybeM (raiseEff (fail ("unallocated address: " <> show addr)))
-  if Set.null cell then
-    pure Nothing
-  else
-    Set.foldr ((<|>) . pure . Just) empty cell
-
-runEnv :: Eval location value opaque (Reader (Map Name location) ': effects) a -> Eval location value opaque effects a
-runEnv = runReader Map.empty
-
-runHeapType :: Eval Name Type opaque (State (Map Name (Set Type)) ': effects) a -> Eval Name Type opaque effects (a, Map Name (Set Type))
-runHeapType = runState Map.empty
-
-
-prog :: Members '[ Boolean value
-                 , Fresh
-                 , Function opaque value
-                 , Unit value
-                 , Variable value
-                 ] effects
-     => value
-     -> Eval location value opaque effects value
-prog b = do
-  identity <- lambda' variable'
-  iff b unit' (call' identity [unit'])
-
-newtype Eval location value (opaque :: * -> *) effects a = Eval { runEval :: Eff effects a }
-  deriving (Applicative, Effectful, Functor, Monad)
-
-deriving instance Member NonDet effects => Alternative (Eval location value opaque effects)
-
-
-runType = runFresh 0 . runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
-
-resultType :: [Either String (Type, Map Name (Set Type))]
-resultType = run (runType (prog BoolT))
-
-
-data Function opaque value return where
-  Lambda :: [Name] -> Set Name -> opaque value -> Function opaque value value
-  Call   :: value -> [opaque value]            -> Function opaque value value
-
-
-unembedEval :: opaque a -> Eval location value opaque effects a
-unembedEval = undefined
-
-embedEval :: Eval location value opaque effects a -> Eval location value opaque effects (opaque a)
-embedEval = undefined
-
-newtype EmbedEval opaque effects = EmbedEval { unEmbedEval :: forall a . Eff effects a -> opaque a }
-
-embedEval' :: forall location value opaque effects a . (Member (Reader (Proxy opaque)) effects, Reifies opaque (EmbedEval opaque effects)) => Eval location value opaque effects a -> Eval location value opaque effects (opaque a)
-embedEval' action = do
-  proxy <- ask @(Proxy opaque)
-  pure (unEmbedEval (reflect proxy) (lowerEff action))
-
-
-variable' :: Member (Variable value) effects => Name -> Eval location value opaque effects value
-variable' = send . Variable
-
-data Variable value return where
-  Variable :: Name -> Variable value value
-
-runVariable :: forall location value opaque effects a
-            .  ( Members '[ Fail
-                          , Reader (Map Name location)
-                          ] effects
-               , Show location
-               )
-            => (location -> Eval location value opaque effects (Maybe value))
-            -> Eval location value opaque (Variable value ': effects) a
-            -> Eval location value opaque effects a
-runVariable deref = go
-  where go :: forall a . Eval location value opaque (Variable value ': effects) a -> Eval location value opaque effects a
-        go = interpret (\ (Variable name) -> do
-          addr <- lookup' name >>= maybeM (raiseEff (fail ("free variable: " <> show name)))
-          deref addr >>= maybeM (raiseEff (fail ("uninitialized address: " <> show addr))))
-
-
-unit' :: Member (Unit value) effects => Eval location value opaque effects value
-unit' = send Unit
-
-
-data Unit value return where
-  Unit :: Unit value value
-
-
-bool :: Member (Boolean value) effects => Bool -> Eval location value opaque effects value
-bool = send . Bool
-
-asBool' :: Member (Boolean value) effects => value -> Eval location value opaque effects Bool
-asBool' = send . AsBool
-
-iff :: Member (Boolean value) effects => value -> Eval location value opaque effects a -> Eval location value opaque effects a -> Eval location value opaque effects a
-iff c t e = asBool' c >>= \ c' -> if c' then t else e
-
-data Boolean value return where
-  Bool :: Bool -> Boolean value value
-  AsBool :: value -> Boolean value Bool
-
-
-data Value opaque location
-  = Closure [Name] (opaque (Value opaque location)) (Map Name location)
-  | Unit'
-  | Bool' Bool
-
-liftHandler :: Functor opaque => (forall a . opaque a -> opaque' a) -> Value opaque location -> Value opaque' location
-liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
-
-runFunctionValue :: forall location opaque effects effects' a
-                 .  ( Members '[ Reader (Map Name location)
-                               ] effects
-                    , Members '[ Reader (Map Name location)
-                               ] effects'
-                    , (Function opaque (Value opaque location) \\ effects) effects'
-                    )
-                 => (Name -> Eval location (Value opaque location) opaque effects location)
-                 -> (location -> Value opaque location -> Eval location (Value opaque location) opaque effects ())
-                 -> Eval location (Value opaque location) opaque effects a
-                 -> Eval location (Value opaque location) opaque effects' a
-runFunctionValue alloc assign = go
-  where go :: forall a . Eval location (Value opaque location) opaque effects a -> Eval location (Value opaque location) opaque effects' a
-        go = interpretAny $ \ eff -> case eff of
-          Lambda params fvs body -> do
-            env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
-            pure (Closure params body env)
-          Call (Closure paramNames body env) params -> go $ do
-            bindings <- foldr (uncurry (Map.insert)) env <$> sequenceA (zipWith (\ name param -> do
-              v <- param
-              a <- alloc name
-              assign a v
-              pure (name, a)) paramNames (map unembedEval params))
-            local (Map.unionWith const bindings) (unembedEval body)
-
-runUnitValue :: (Unit (Value opaque location) \\ effects) effects'
-             => Eval location (Value opaque location) opaque effects a
-             -> Eval location (Value opaque location) opaque effects' a
-runUnitValue = interpretAny (\ Unit -> pure Unit')
-
-runBooleanValue :: (Boolean (Value opaque location) \\ effects) effects'
-                => Eval location (Value opaque location) opaque effects a
-                -> Eval location (Value opaque location) opaque effects' a
-runBooleanValue = interpretAny (\ eff -> case eff of
-  Bool b -> pure (Bool' b)
-  AsBool (Bool' b) -> pure b)
-
-
-data Type
-  = Type :-> Type
-  | Product [Type]
-  | TVar Int
-  | BoolT
-  deriving (Eq, Ord, Show)
-
-runFunctionType :: forall opaque effects a
-                .  Members '[ Fresh
-                            , NonDet
-                            , Reader (Map Name Name)
-                            , State (Map Name (Set Type))
-                            ] effects
-                => Eval Name Type opaque (Function opaque Type ': effects) a
-                -> Eval Name Type opaque effects a
-runFunctionType = interpret $ \ eff -> case eff of
-  Lambda params _ body -> runFunctionType $ do
-    (bindings, tvars) <- foldr (\ name rest -> do
-      a <- allocType name
-      tvar <- TVar <$> fresh
-      assignType a tvar
-      bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
-    (Product tvars :->) <$> local (Map.unionWith const bindings) (unembedEval @_ @_ @_ @_ @(Function opaque Type ': effects) body)
-  Call fn params -> runFunctionType $ do
-    paramTypes <- traverse (unembedEval @_ @_ @_ @_ @(Function opaque Type ': effects)) params
-    case fn of
-      Product argTypes :-> ret -> do
-        guard (and (zipWith (==) paramTypes argTypes))
-        pure ret
-      _ -> empty
-
-runUnitType :: Eval location Type opaque (Unit Type ': effects) a
-            -> Eval location Type opaque effects a
-runUnitType = interpret (\ Unit -> pure (Product []))
-
-runBooleanType :: Member NonDet effects
-               => Eval location Type opaque (Boolean Type ': effects) a
-               -> Eval location Type opaque effects a
-runBooleanType = interpret (\ eff -> case eff of
-  Bool _ -> pure BoolT
-  AsBool BoolT -> pure True <|> pure False)
 
 
 class Show value => AbstractFunction location value effects where

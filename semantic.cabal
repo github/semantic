@@ -203,7 +203,6 @@ library
                      , pretty-show
                      , recursion-schemes
                      , reducers
-                     , reflection
                      , scientific
                      , semigroupoids
                      , split
