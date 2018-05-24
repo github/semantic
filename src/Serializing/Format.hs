@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Serializing.Format
 ( Format(..)
+, FormatStyle(..)
 , Builder
 , runSerialize
 , Options(..)
@@ -21,6 +22,8 @@ data Format input where
   JSON        :: ToJSON input                                                                 => Format input
   SExpression :: (Recursive input, ToSExpression (Base input))        => Options              -> Format input
   Show        :: Show input                                                                   => Format input
+
+data FormatStyle = Colourful | Plain
 
 runSerialize :: Bool -> Format input -> input -> Builder
 runSerialize _     (DOT style)        = serializeDOT style
