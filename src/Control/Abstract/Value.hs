@@ -111,17 +111,14 @@ data EmbedAny effect effects return where
 
 type Embed effect effects = Eff (effect effects ': effects)
 
-runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Variable Type ': rest)
-           , (Function Type opaque \\ effects) effects'
-           , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': rest)
-           , (Unit Type \\ effects') effects''
-           , effects'' ~ (Boolean Type ': Variable Type ': rest)
-           , (Boolean Type \\ effects'') effects'''
-           , effects''' ~ (Variable Type ': rest)
-           , (Variable Type \\ effects''') (rest)
-           )
-        => Eval Name Type opaque effects a
-        -> Eval Name Type opaque rest a
+runType :: Members '[ Fail
+                    , Fresh
+                    , NonDet
+                    , Reader (Map Name Name)
+                    , State (Map Name (Set Type))
+                    ] effects
+        => Eval Name Type opaque (Function Type opaque ': Unit Type ': Boolean Type ': Variable Type ': effects) a
+        -> Eval Name Type opaque effects a
 runType = runVariable derefType . runBooleanType . runUnitType . runFunctionType
 
 runRest = runFresh 0 . runNonDetA . runFail . runEnv . runHeapType
