@@ -81,6 +81,7 @@ library
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
+                     , Data.Options
                      , Data.Patch
                      , Data.Project
                      , Data.Range
@@ -114,6 +115,9 @@ library
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
+                     , Language.Haskell.Grammar
+                     , Language.Haskell.Assignment
+                     , Language.Haskell.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
@@ -184,6 +188,7 @@ library
                      , gitrev
                      , Glob
                      , hashable
+                     , hscolour
                      , kdt
                      , mersenne-random-pure64
                      , mtl
@@ -192,6 +197,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , pretty-show
                      , recursion-schemes
                      , reducers
                      , scientific
@@ -206,6 +212,7 @@ library
                      , unordered-containers
                      , haskell-tree-sitter
                      , tree-sitter-go
+                     , tree-sitter-haskell
                      , tree-sitter-json
                      , tree-sitter-php
                      , tree-sitter-python
