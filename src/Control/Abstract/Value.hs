@@ -49,16 +49,16 @@ class AbstractHole value where
   hole :: value
 
 
-lambda :: (Effectful m, Member (Function value effects) effects) => [Name] -> Set Name -> m effects value -> m effects value
+lambda :: Member (Function value effects) effects => [Name] -> Set Name -> Eval location value opaque effects value -> Eval location value opaque effects value
 lambda paramNames fvs body = send (Lambda paramNames fvs (lowerEff body))
 
-call' :: (Effectful m, Member (Function value effects) effects) => value -> [m effects value] -> m effects value
+call' :: Member (Function value effects) effects => value -> [Eval location value opaque effects value] -> Eval location value opaque effects value
 call' fn params = send (Call fn (map lowerEff params))
 
 
-lambda' :: (Effectful m, Members '[Fresh, Function value effects] effects, Monad (m effects))
-        => (Name -> m effects value)
-        -> m effects value
+lambda' :: Members '[Fresh, Function value effects] effects
+        => (Name -> Eval location value opaque effects value)
+        -> Eval location value opaque effects value
 lambda' body = do
   var <- nameI <$> fresh
   lambda [var] lowerBound (body var)
@@ -89,16 +89,13 @@ runHeapType :: Effectful (m Name Type opaque) => m Name Type opaque (State (Map 
 runHeapType = runState Map.empty
 
 
-prog :: ( Effectful m
-        , Members '[ Boolean value
-                   , Fresh
-                   , Function value effects
-                   , Unit value
-                   , Variable value
-                   ] effects
-        , Monad (m effects)
-        )
-     => value -> m effects value
+prog :: Members '[ Boolean value
+                 , Fresh
+                 , Function value effects
+                 , Unit value
+                 , Variable value
+                 ] effects
+     => value -> Eval location value opaque effects value
 prog b = do
   identity <- lambda' variable'
   iff b unit' (call' identity [unit'])
