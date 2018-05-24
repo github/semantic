@@ -66,15 +66,15 @@ lambda' body = do
 lookup' :: Member (Reader (Map Name location)) effects => Name -> Eval location value opaque effects (Maybe location)
 lookup' name = Map.lookup name <$> ask
 
-allocType :: (Applicative (m Name Type opaque effects), Effectful (m Name Type opaque)) => Name -> m Name Type opaque effects Name
+allocType :: Name -> Eval Name Type opaque effects Name
 allocType = pure
 
-assignType :: (Effectful (m location Type opaque), Member (State (Map location (Set Type))) effects, Monad (m location Type opaque effects), Ord location) => location -> Type -> m location Type opaque effects ()
+assignType :: (Member (State (Map location (Set Type))) effects, Ord location) => location -> Type -> Eval location Type opaque effects ()
 assignType addr value = do
   cell <- gets (Map.lookup addr) >>= maybeM (pure (Set.empty))
   modify' (Map.insert addr (Set.insert value cell))
 
-derefType :: (Alternative (m location Type opaque effects), Effectful (m location Type opaque), Members '[Fail, NonDet, State (Map location (Set Type))] effects, Monad (m location Type opaque effects), Ord location, Show location) => location -> m location Type opaque effects (Maybe Type)
+derefType :: (Members '[Fail, NonDet, State (Map location (Set Type))] effects, Ord location, Show location) => location -> Eval location Type opaque effects (Maybe Type)
 derefType addr = do
   cell <- gets (Map.lookup addr) >>= maybeM (raiseEff (fail ("unallocated address: " <> show addr)))
   if Set.null cell then
