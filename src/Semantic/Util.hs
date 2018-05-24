@@ -18,6 +18,8 @@ import qualified Data.Language as Language
 import           Data.Sum (weaken)
 import           Data.Term
 import qualified GHC.TypeLits as TypeLevel
+import           Language.Haskell.HsColour
+import           Language.Haskell.HsColour.Colourise
 import           Language.Preluded
 import           Parsing.Parser
 import           Prologue hiding (weaken)
@@ -25,6 +27,7 @@ import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
 import           Text.Show (showListWith)
+import           Text.Show.Pretty
 
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
@@ -135,3 +138,7 @@ instance Show1 syntax => Show (Quieterm syntax ann) where
 
 quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
 quieterm = cata Quieterm
+
+
+prettyShow :: Show a => a -> IO ()
+prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow

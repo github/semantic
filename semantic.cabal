@@ -84,6 +84,7 @@ library
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
+                     , Data.Options
                      , Data.Patch
                      , Data.Project
                      , Data.Range
@@ -190,6 +191,7 @@ library
                      , gitrev
                      , Glob
                      , hashable
+                     , hscolour
                      , kdt
                      , mersenne-random-pure64
                      , mtl
@@ -198,6 +200,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , pretty-show
                      , recursion-schemes
                      , reducers
                      , scientific
