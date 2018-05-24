@@ -125,6 +125,9 @@ runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Var
         -> Eval Name Type opaque rest [Either String (a, Map Name (Set Type))]
 runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
 
+resultType :: [Either String (Type, Map Name (Set Type))]
+resultType = run (runFresh 0 (runType (prog BoolT)))
+
 
 data Function value opaque return where
   Lambda :: [Name] -> Set Name -> opaque value -> Function value opaque value
