@@ -176,12 +176,12 @@ data Boolean value return where
   AsBool :: value -> Boolean value Bool
 
 
-data Value location opaque
-  = Closure [Name] (opaque (Value location opaque)) (Map Name location)
+data Value opaque location
+  = Closure [Name] (opaque (Value opaque location)) (Map Name location)
   | Unit'
   | Bool' Bool
 
-liftHandler :: Functor opaque => (forall a . opaque a -> opaque' a) -> Value location opaque -> Value location opaque'
+liftHandler :: Functor opaque => (forall a . opaque a -> opaque' a) -> Value opaque location -> Value opaque' location
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
 
 runFunctionValue :: forall location opaque effects effects' a
@@ -189,14 +189,14 @@ runFunctionValue :: forall location opaque effects effects' a
                                ] effects
                     , Members '[ Reader (Map Name location)
                                ] effects'
-                    , (Function opaque (Value location opaque) \\ effects) effects'
+                    , (Function opaque (Value opaque location) \\ effects) effects'
                     )
-                 => (Name -> Eval location (Value location opaque) opaque effects location)
-                 -> (location -> Value location opaque -> Eval location (Value location opaque) opaque effects ())
-                 -> Eval location (Value location opaque) opaque effects a
-                 -> Eval location (Value location opaque) opaque effects' a
+                 => (Name -> Eval location (Value opaque location) opaque effects location)
+                 -> (location -> Value opaque location -> Eval location (Value opaque location) opaque effects ())
+                 -> Eval location (Value opaque location) opaque effects a
+                 -> Eval location (Value opaque location) opaque effects' a
 runFunctionValue alloc assign = go
-  where go :: forall a . Eval location (Value location opaque) opaque effects a -> Eval location (Value location opaque) opaque effects' a
+  where go :: forall a . Eval location (Value opaque location) opaque effects a -> Eval location (Value opaque location) opaque effects' a
         go = interpretAny $ \ eff -> case eff of
           Lambda params fvs body -> do
             env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
@@ -209,14 +209,14 @@ runFunctionValue alloc assign = go
               pure (name, a)) paramNames (map unembedEval params))
             local (Map.unionWith const bindings) (unembedEval body)
 
-runUnitValue :: (Unit (Value location opaque) \\ effects) effects'
-             => Eval location (Value location opaque) opaque effects a
-             -> Eval location (Value location opaque) opaque effects' a
+runUnitValue :: (Unit (Value opaque location) \\ effects) effects'
+             => Eval location (Value opaque location) opaque effects a
+             -> Eval location (Value opaque location) opaque effects' a
 runUnitValue = interpretAny (\ Unit -> pure Unit')
 
-runBooleanValue :: (Boolean (Value location opaque) \\ effects) effects'
-                => Eval location (Value location opaque) opaque effects a
-                -> Eval location (Value location opaque) opaque effects' a
+runBooleanValue :: (Boolean (Value opaque location) \\ effects) effects'
+                => Eval location (Value opaque location) opaque effects a
+                -> Eval location (Value opaque location) opaque effects' a
 runBooleanValue = interpretAny (\ eff -> case eff of
   Bool b -> pure (Bool' b)
   AsBool (Bool' b) -> pure b)
