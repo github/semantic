@@ -122,7 +122,7 @@ runType :: ( effects ~ (Function Type effects ': Unit Type ': Boolean Type ': Va
            )
         => Eval Name Type opaque effects a
         -> Eval Name Type opaque rest [Either String (a, Map Name (Set Type))]
-runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType allocType assignType
+runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
 
 
 data Function value effects return where
@@ -235,36 +235,32 @@ data Type
   | BoolT
   deriving (Eq, Ord, Show)
 
-runFunctionType :: forall location opaque effects effects' a
-                .  ( Members '[ Fresh
+runFunctionType :: ( Members '[ Fresh
                               , NonDet
-                              , Reader (Map Name location)
+                              , Reader (Map Name Name)
                               , Reader ModuleInfo
                               , Reader PackageInfo
+                              , State (Map Name (Set Type))
                               ] effects
                    , (Function Type effects \\ effects) effects'
                    )
-                => (Name -> Eval location Type opaque effects location)
-                -> (location -> Type -> Eval location Type opaque effects ())
-                -> Eval location Type opaque effects a
-                -> Eval location Type opaque effects' a
-runFunctionType alloc assign = go
-  where go :: forall a . Eval location Type opaque effects a -> Eval location Type opaque effects' a
-        go = interpretAny $ \ eff -> case eff of
-          Lambda params _ body -> go $ do
-            (bindings, tvars) <- foldr (\ name rest -> do
-              a <- alloc name
-              tvar <- TVar <$> fresh
-              assign a tvar
-              bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
-            (Product tvars :->) <$> local (Map.unionWith const bindings) (raiseEff body)
-          Call fn params -> go $ do
-            paramTypes <- traverse raiseEff params
-            case fn of
-              Product argTypes :-> ret -> do
-                guard (and (zipWith (==) paramTypes argTypes))
-                pure ret
-              _ -> empty
+                => Eval Name Type opaque effects a
+                -> Eval Name Type opaque effects' a
+runFunctionType = interpretAny $ \ eff -> case eff of
+  Lambda params _ body -> runFunctionType $ do
+    (bindings, tvars) <- foldr (\ name rest -> do
+      a <- allocType name
+      tvar <- TVar <$> fresh
+      assignType a tvar
+      bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
+    (Product tvars :->) <$> local (Map.unionWith const bindings) (raiseEff body)
+  Call fn params -> runFunctionType $ do
+    paramTypes <- traverse raiseEff params
+    case fn of
+      Product argTypes :-> ret -> do
+        guard (and (zipWith (==) paramTypes argTypes))
+        pure ret
+      _ -> empty
 
 runUnitType :: (Unit Type \\ effects) effects'
             => Eval location Type opaque effects a
