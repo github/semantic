@@ -107,20 +107,10 @@ newtype Eval location value (opaque :: * -> *) effects a = Eval { runEval :: Eff
 deriving instance Member NonDet effects => Alternative (Eval location value opaque effects)
 
 
-runType :: Members '[ Fail
-                    , Fresh
-                    , NonDet
-                    , Reader (Map Name Name)
-                    , State (Map Name (Set Type))
-                    ] effects
-        => Eval Name Type opaque (Function opaque Type ': Unit Type ': Boolean Type ': Variable Type ': effects) a
-        -> Eval Name Type opaque effects a
-runType = runVariable derefType . runBooleanType . runUnitType . runFunctionType
-
-runRest = runFresh 0 . runNonDetA . runFail . runEnv . runHeapType
+runType = runFresh 0 . runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
 
 resultType :: [Either String (Type, Map Name (Set Type))]
-resultType = run (runRest (runType (prog BoolT)))
+resultType = run (runType (prog BoolT))
 
 
 data Function opaque value return where
