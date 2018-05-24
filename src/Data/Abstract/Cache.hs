@@ -1,9 +1,9 @@
 {-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Cache where
 
-import Control.Abstract.Evaluator
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
+import Data.Abstract.Ref
 import Data.Map.Monoidal as Monoidal
 import Data.Semilattice.Lower
 import Prologue

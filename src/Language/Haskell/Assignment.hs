@@ -12,7 +12,7 @@ import Data.Sum
 import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm'', contextualize, postContextualize)
 import Language.Haskell.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
-import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Abstract.Name as Name
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -72,13 +72,13 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 variableIdentifier :: Assignment
-variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . FV.name <$> source)
+variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 constructorIdentifier :: Assignment
-constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . FV.name <$> source)
+constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 moduleIdentifier :: Assignment
-moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . FV.name <$> source)
+moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 where' :: Assignment
 where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (many expression)

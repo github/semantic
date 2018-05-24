@@ -7,8 +7,8 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
-import Data.Abstract.Evaluatable
 import Data.Abstract.Module
+import Data.Abstract.Ref
 import Data.Semilattice.Lower
 import Prologue
 
@@ -63,7 +63,7 @@ cachingTerms :: ( Cacheable term location (Cell location) value
                            , Reader (Cache term location (Cell location) value)
                            , Reader (Live location value)
                            , State (Cache term location (Cell location) value)
-                           , State (Environment location value)
+                           , State (Environment location)
                            , State (Heap location (Cell location) value)
                            ] effects
                 )
@@ -84,13 +84,12 @@ convergingModules :: ( AbstractValue location value effects
                                 , Fresh
                                 , NonDet
                                 , Reader (Cache term location (Cell location) value)
-                                , Reader (Environment location value)
+                                , Reader (Environment location)
                                 , Reader (Live location value)
                                 , Resumable (AddressError location value)
                                 , Resumable (EnvironmentError value)
-                                , Resumable (EvalError value)
                                 , State (Cache term location (Cell location) value)
-                                , State (Environment location value)
+                                , State (Environment location)
                                 , State (Heap location (Cell location) value)
                                 ] effects
                      )
