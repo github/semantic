@@ -201,12 +201,8 @@ liftHandler handler = go where go (Closure names body env) = Closure names (hand
 
 runFunctionValue :: forall location opaque effects effects' a
                  .  ( Members '[ Reader (Map Name location)
-                               , Reader ModuleInfo
-                               , Reader PackageInfo
                                ] effects
                     , Members '[ Reader (Map Name location)
-                               , Reader ModuleInfo
-                               , Reader PackageInfo
                                ] effects'
                     , (Function opaque (Value location effects) \\ effects) effects'
                     )
@@ -218,11 +214,8 @@ runFunctionValue alloc assign = go
   where go :: forall a . Eval location (Value location effects) opaque effects a -> Eval location (Value location effects) opaque effects' a
         go = interpretAny $ \ eff -> case eff of
           Lambda params fvs body -> do
-            packageInfo <- currentPackage
-            moduleInfo <- currentModule
             env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
-            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo (lowerEff (unembedEval body)))
-            pure (Closure params body' env)
+            pure (Closure params (lowerEff (unembedEval body)) env)
           Call (Closure paramNames body env) params -> go $ do
             bindings <- foldr (uncurry (Map.insert)) env <$> sequenceA (zipWith (\ name param -> do
               v <- param
