@@ -92,7 +92,7 @@ functionDeclaration = makeTerm
                    <*> children (Declaration.Function
                                <$> pure []
                                <*> variableIdentifier
-                               <*> ((manyTermsTill expression (symbol FunctionBody)) <|> pure [])
+                               <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
 
 integer :: Assignment
@@ -103,4 +103,4 @@ float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
-manyTermsTill step end = manyTill (step <|> comment) end
+manyTermsTill step = manyTill (step <|> comment)
