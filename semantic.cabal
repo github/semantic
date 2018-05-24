@@ -168,7 +168,7 @@ library
                      , Serializing.Format
                      , Serializing.SExpression
                      -- Custom Prelude
-  other-modules:       Prologue
+                     , Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , algebraic-graphs
