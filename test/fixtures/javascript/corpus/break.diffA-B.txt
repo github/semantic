@@ -10,7 +10,7 @@
       (Identifier))
     (
       (If
-        (Equal
+        (StrictEqual
           (Identifier)
           (Float))
         (
