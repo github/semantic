@@ -129,7 +129,7 @@ data Function value effects return where
   Lambda :: [Name] -> Set Name -> Eff effects value -> Function value effects value
   Call   :: value -> [Eff effects value]            -> Function value effects value
 
-variable' :: (Effectful m, Member (Variable value) effects) => Name -> m effects value
+variable' :: Member (Variable value) effects => Name -> Eval location value opaque effects value
 variable' = send . Variable
 
 data Variable value return where
@@ -153,7 +153,7 @@ runVariable deref = go
           deref addr >>= maybeM (raiseEff (fail ("uninitialized address: " <> show addr))))
 
 
-unit' :: (Effectful m, Member (Unit value) effects) => m effects value
+unit' :: Member (Unit value) effects => Eval location value opaque effects value
 unit' = send Unit
 
 
@@ -161,13 +161,13 @@ data Unit value return where
   Unit :: Unit value value
 
 
-bool :: (Effectful m, Member (Boolean value) effects) => Bool -> m effects value
+bool :: Member (Boolean value) effects => Bool -> Eval location value opaque effects value
 bool = send . Bool
 
-asBool' :: (Effectful m, Member (Boolean value) effects) => value -> m effects Bool
+asBool' :: Member (Boolean value) effects => value -> Eval location value opaque effects Bool
 asBool' = send . AsBool
 
-iff :: (Effectful m, Member (Boolean value) effects, Monad (m effects)) => value -> m effects a -> m effects a -> m effects a
+iff :: Member (Boolean value) effects => value -> Eval location value opaque effects a -> Eval location value opaque effects a -> Eval location value opaque effects a
 iff c t e = asBool' c >>= \ c' -> if c' then t else e
 
 data Boolean value return where
@@ -183,9 +183,8 @@ data Value location effects
 liftHandler :: (forall a . Eff effects a -> Eff effects' a) -> Value location effects -> Value location effects'
 liftHandler handler = go where go (Closure names body env) = Closure names (handler (go <$> body)) env
 
-runFunctionValue :: forall m location opaque effects effects' a
-                 .  ( Effectful (m location (Value location effects) opaque)
-                    , Members '[ Reader (Map Name location)
+runFunctionValue :: forall location opaque effects effects' a
+                 .  ( Members '[ Reader (Map Name location)
                                , Reader ModuleInfo
                                , Reader PackageInfo
                                ] effects
@@ -193,16 +192,14 @@ runFunctionValue :: forall m location opaque effects effects' a
                                , Reader ModuleInfo
                                , Reader PackageInfo
                                ] effects'
-                    , Monad (m location (Value location effects) opaque effects)
-                    , Monad (m location (Value location effects) opaque effects')
                     , (Function (Value location effects) effects \\ effects) effects'
                     )
-                 => (Name -> m location (Value location effects) opaque effects location)
-                 -> (location -> Value location effects -> m location (Value location effects) opaque effects ())
-                 -> m location (Value location effects) opaque effects a
-                 -> m location (Value location effects) opaque effects' a
+                 => (Name -> Eval location (Value location effects) opaque effects location)
+                 -> (location -> Value location effects -> Eval location (Value location effects) opaque effects ())
+                 -> Eval location (Value location effects) opaque effects a
+                 -> Eval location (Value location effects) opaque effects' a
 runFunctionValue alloc assign = go
-  where go :: forall a . m location (Value location effects) opaque effects a -> m location (Value location effects) opaque effects' a
+  where go :: forall a . Eval location (Value location effects) opaque effects a -> Eval location (Value location effects) opaque effects' a
         go = interpretAny $ \ eff -> case eff of
           Lambda params fvs body -> do
             packageInfo <- currentPackage
@@ -218,20 +215,14 @@ runFunctionValue alloc assign = go
               pure (name, a)) paramNames (map raiseEff params))
             local (Map.unionWith const bindings) (raiseEff body)
 
-runUnitValue :: ( Applicative (m location (Value location effects) opaque effects')
-                , Effectful (m location (Value location effects) opaque)
-                , (Unit (Value location effects) \\ effects) effects'
-                )
-             => m location (Value location effects) opaque effects a
-             -> m location (Value location effects) opaque effects' a
+runUnitValue :: (Unit (Value location effects) \\ effects) effects'
+             => Eval location (Value location effects) opaque effects a
+             -> Eval location (Value location effects) opaque effects' a
 runUnitValue = interpretAny (\ Unit -> pure Unit')
 
-runBooleanValue :: ( Applicative (m location (Value location effects) opaque effects')
-                   , Effectful (m location (Value location effects) opaque)
-                   , (Boolean (Value location effects) \\ effects) effects'
-                   )
-                => m location (Value location effects) opaque effects a
-                -> m location (Value location effects) opaque effects' a
+runBooleanValue :: (Boolean (Value location effects) \\ effects) effects'
+                => Eval location (Value location effects) opaque effects a
+                -> Eval location (Value location effects) opaque effects' a
 runBooleanValue = interpretAny (\ eff -> case eff of
   Bool b -> pure (Bool' b)
   AsBool (Bool' b) -> pure b)
