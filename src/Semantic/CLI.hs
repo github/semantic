@@ -57,6 +57,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
               <|> flag'                                        (Diff.runDiff JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
               <|> flag'                                        (Diff.runDiff ToCDiffRenderer)         (long "toc"         <> help "Output JSON table of contents diff summary")
               <|> flag'                                        (Diff.runDiff DOTDiffRenderer)         (long "dot"         <> help "Output the diff as a DOT graph")
+              <|> flag'                                        (Diff.runDiff ShowDiffRenderer)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
@@ -72,6 +73,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
                   <|> pure defaultSymbolFields)
               <|> flag'                                          (Parse.runParse ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
               <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
+              <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
@@ -79,6 +81,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
+            <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
@@ -90,6 +93,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       includePackages <- switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
       serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
                 <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
+                <|> flag'                             (Task.serialize Show)        (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
