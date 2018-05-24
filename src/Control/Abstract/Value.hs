@@ -118,8 +118,7 @@ runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Var
            , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            , (Boolean Type \\ effects'') effects'''
            , effects''' ~ (Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
-           , (Variable Type \\ effects''') effects''''
-           , effects'''' ~ (State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Variable Type \\ effects''') (State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            )
         => Eval Name Type opaque effects a
         -> Eval Name Type opaque rest [Either String (a, Map Name (Set Type))]
