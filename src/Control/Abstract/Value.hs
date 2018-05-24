@@ -49,14 +49,14 @@ class AbstractHole value where
   hole :: value
 
 
-lambda :: Member (Function value effects) effects => [Name] -> Set Name -> Eval location value opaque effects value -> Eval location value opaque effects value
-lambda paramNames fvs body = send (Lambda paramNames fvs (lowerEff body))
+lambda :: Member (Function value opaque) effects => [Name] -> Set Name -> Eval location value opaque effects value -> Eval location value opaque effects value
+lambda paramNames fvs body = send (Lambda paramNames fvs (embedEval body))
 
-call' :: Member (Function value effects) effects => value -> [Eval location value opaque effects value] -> Eval location value opaque effects value
-call' fn params = send (Call fn (map lowerEff params))
+call' :: Member (Function value opaque) effects => value -> [Eval location value opaque effects value] -> Eval location value opaque effects value
+call' fn params = send (Call fn (map embedEval params))
 
 
-lambda' :: Members '[Fresh, Function value effects] effects
+lambda' :: Members '[Fresh, Function value opaque] effects
         => (Name -> Eval location value opaque effects value)
         -> Eval location value opaque effects value
 lambda' body = do
@@ -91,11 +91,12 @@ runHeapType = runState Map.empty
 
 prog :: Members '[ Boolean value
                  , Fresh
-                 , Function value effects
+                 , Function value opaque
                  , Unit value
                  , Variable value
                  ] effects
-     => value -> Eval location value opaque effects value
+     => value
+     -> Eval location value opaque effects value
 prog b = do
   identity <- lambda' variable'
   iff b unit' (call' identity [unit'])
@@ -110,8 +111,8 @@ data EmbedAny effect effects return where
 
 type Embed effect effects = Eff (effect effects ': effects)
 
-runType :: ( effects ~ (Function Type effects ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
-           , (Function Type effects \\ effects) effects'
+runType :: ( effects ~ (Function Type opaque ': Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
+           , (Function Type opaque \\ effects) effects'
            , effects' ~ (Unit Type ': Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
            , (Unit Type \\ effects') effects''
            , effects'' ~ (Boolean Type ': Variable Type ': State (Map Name (Set Type)) ': Reader (Map Name Name) ': Fail ': NonDet ': rest)
@@ -125,9 +126,9 @@ runType :: ( effects ~ (Function Type effects ': Unit Type ': Boolean Type ': Va
 runType = runNonDetA . runFail . runEnv . runHeapType . runVariable derefType . runBooleanType . runUnitType . runFunctionType
 
 
-data Function value effects return where
-  Lambda :: [Name] -> Set Name -> Eff effects value -> Function value effects value
-  Call   :: value -> [Eff effects value]            -> Function value effects value
+data Function value opaque return where
+  Lambda :: [Name] -> Set Name -> opaque value -> Function value opaque value
+  Call   :: value -> [opaque value]            -> Function value opaque value
 
 
 unembedEval :: opaque a -> Eval location value opaque effects a
@@ -200,7 +201,7 @@ runFunctionValue :: forall location opaque effects effects' a
                                , Reader ModuleInfo
                                , Reader PackageInfo
                                ] effects'
-                    , (Function (Value location effects) effects \\ effects) effects'
+                    , (Function (Value location effects) opaque \\ effects) effects'
                     )
                  => (Name -> Eval location (Value location effects) opaque effects location)
                  -> (location -> Value location effects -> Eval location (Value location effects) opaque effects ())
@@ -213,14 +214,14 @@ runFunctionValue alloc assign = go
             packageInfo <- currentPackage
             moduleInfo <- currentModule
             env <- Map.filterWithKey (fmap (`Set.member` fvs) . const) <$> ask
-            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo body)
+            let body' = withCurrentPackage packageInfo (withCurrentModule moduleInfo (lowerEff (unembedEval body)))
             pure (Closure params body' env)
           Call (Closure paramNames body env) params -> go $ do
             bindings <- foldr (uncurry (Map.insert)) env <$> sequenceA (zipWith (\ name param -> do
               v <- param
               a <- alloc name
               assign a v
-              pure (name, a)) paramNames (map raiseEff params))
+              pure (name, a)) paramNames (map unembedEval params))
             local (Map.unionWith const bindings) (raiseEff body)
 
 runUnitValue :: (Unit (Value location effects) \\ effects) effects'
@@ -243,14 +244,15 @@ data Type
   | BoolT
   deriving (Eq, Ord, Show)
 
-runFunctionType :: ( Members '[ Fresh
+runFunctionType :: forall opaque effects effects' a
+                .  ( Members '[ Fresh
                               , NonDet
                               , Reader (Map Name Name)
                               , Reader ModuleInfo
                               , Reader PackageInfo
                               , State (Map Name (Set Type))
                               ] effects
-                   , (Function Type effects \\ effects) effects'
+                   , (Function Type opaque \\ effects) effects'
                    )
                 => Eval Name Type opaque effects a
                 -> Eval Name Type opaque effects' a
@@ -261,9 +263,9 @@ runFunctionType = interpretAny $ \ eff -> case eff of
       tvar <- TVar <$> fresh
       assignType a tvar
       bimap (Map.insert name a) (tvar :) <$> rest) (pure (Map.empty, [])) params
-    (Product tvars :->) <$> local (Map.unionWith const bindings) (raiseEff body)
+    (Product tvars :->) <$> local (Map.unionWith const bindings) (unembedEval @_ @_ @_ @_ @effects body)
   Call fn params -> runFunctionType $ do
-    paramTypes <- traverse raiseEff params
+    paramTypes <- traverse (unembedEval @_ @_ @_ @_ @effects) params
     case fn of
       Product argTypes :-> ret -> do
         guard (and (zipWith (==) paramTypes argTypes))
