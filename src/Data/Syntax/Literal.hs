@@ -1,20 +1,21 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, ViewPatterns, ScopedTypeVariables #-}
 module Data.Syntax.Literal where
 
-import Data.JSON.Fields
-import Data.Abstract.Evaluatable
-import Data.ByteString.Char8 (readInteger, unpack)
+import           Data.Abstract.Evaluatable
+import           Data.ByteString.Char8 (readInteger, unpack)
 import qualified Data.ByteString.Char8 as B
-import Data.Scientific.Exts
-import Diffing.Algorithm
-import Prelude hiding (Float, null)
-import Prologue hiding (Set, hash, null)
-import Text.Read (readMaybe)
+import           Data.JSON.Fields
+import           Data.Scientific.Exts
+import           Diffing.Algorithm
+import           Prelude hiding (Float, null)
+import           Prologue hiding (Set, hash, null)
+import           Proto3.Suite.Class
+import           Text.Read (readMaybe)
 
 -- Boolean
 
 newtype Boolean a = Boolean Bool
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message)
 
 true :: Boolean a
 true = Boolean True
@@ -57,7 +58,7 @@ instance ToJSONFields1 Data.Syntax.Literal.Integer where
 
 -- | A literal float of unspecified width.
 newtype Float a = Float { floatContent  :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
@@ -133,7 +134,7 @@ instance ToJSONFields1 InterpolationElement
 
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
@@ -146,7 +147,7 @@ instance Evaluatable TextElement where
   eval (TextElement x) = Rval <$> string x
 
 data Null a = Null
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message)
 
 instance Eq1 Null where liftEq = genericLiftEq
 instance Ord1 Null where liftCompare = genericLiftCompare
@@ -189,7 +190,7 @@ instance Evaluatable Regex
 -- Collections
 
 newtype Array a = Array { arrayElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message)
 
 instance Eq1 Array where liftEq = genericLiftEq
 instance Ord1 Array where liftCompare = genericLiftCompare
@@ -201,7 +202,7 @@ instance Evaluatable Array where
   eval (Array a) = Rval <$> (array =<< traverse subtermValue a)
 
 newtype Hash a = Hash { hashElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message)
 
 instance Eq1 Hash where liftEq = genericLiftEq
 instance Ord1 Hash where liftCompare = genericLiftCompare
@@ -213,7 +214,7 @@ instance Evaluatable Hash where
   eval t = Rval <$> (traverse (subtermValue >=> asPair) (hashElements t) >>= hash)
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message)
 
 instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Ord1 KeyValue where liftCompare = genericLiftCompare
