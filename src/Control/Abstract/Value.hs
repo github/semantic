@@ -106,10 +106,6 @@ newtype Eval location value (opaque :: * -> *) effects a = Eval { runEval :: Eff
 
 deriving instance Member NonDet effects => Alternative (Eval location value opaque effects)
 
-data EmbedAny effect effects return where
-  EmbedAny :: (effect \\ effects') effects => Eff effects' a -> EmbedAny effect effects a
-
-type Embed effect effects = Eff (effect effects ': effects)
 
 runType :: Members '[ Fail
                     , Fresh
