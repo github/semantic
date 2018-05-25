@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
@@ -17,6 +17,8 @@ import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
+import Proto3.Wire.Decode
+import Proto3.Wire.Types
 
 -- Combinators
 
@@ -98,11 +100,23 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Sum fs (Term (Sum fs) a))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
-
 instance (Apply Message1 fs) => Message1 (Sum fs) where
   liftEncodeMessage encodeMessage num fs = apply @Message1 (liftEncodeMessage encodeMessage num) fs
-  liftDecodeMessage decodeMessage num fs = fmap inject $ apply @Message1 (liftDecodeMessage decodeMessage num)
+  liftDecodeMessage decodeMessage num = oneof undefined listOfParsers
+    where
+      listOfParsers =
+        zipWith (\i generator -> (FieldNumber i, generator (FieldNumber i))) [1..] (generate @fs @fs (Proxy @fs) decodeMessage)
   liftDotProto dotProto _ fs = apply @Message1 (liftDotProto dotProto (Proxy @fs)) fs
+
+class Generate (all :: [* -> *]) (fs :: [* -> *]) where
+  generate :: proxy fs -> (FieldNumber -> Parser RawMessage a) -> [FieldNumber -> Parser RawField (Sum all a)]
+
+instance Generate all '[] where
+  generate _ _ = []
+
+instance (Element f all, Generate all fs, Message1 f) => Generate all (f ': fs) where
+  generate _ decodeMessage = (\ num -> fromJust <$> embedded (inject @f @all <$> liftDecodeMessage @f decodeMessage num)) : generate (Proxy @fs) decodeMessage
+
 
 -- Common
 
