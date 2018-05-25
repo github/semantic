@@ -54,7 +54,7 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
               else do
                 TS.ts_tree_root_node_p treePtr rootPtr
                 ptr <- peek rootPtr
-                runM (fmap Succeeded (anaM toAST ptr))
+                Succeeded <$> anaM toAST ptr
       bracket acquire release go)
 
 -- | The semantics of @bracket before after handler@ are as follows:
@@ -94,8 +94,8 @@ parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_
       Nothing <$ liftIO (TS.ts_parser_set_enabled parser (CBool 0))
 
 
-toAST :: forall grammar effects . (Bounded grammar, Enum grammar, Member IO effects) => TS.Node -> Eff effects (Base (AST [] grammar) TS.Node)
-toAST node@TS.Node{..} = liftIO $ do
+toAST :: forall grammar effects . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
+toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
     _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nodePtr childNodesPtr (fromIntegral count))
