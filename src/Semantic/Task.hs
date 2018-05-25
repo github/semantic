@@ -194,7 +194,7 @@ defaultTimeout = Milliseconds 5000
 runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $ do
+    time "parse.tree_sitter_ast_parse" languageTag $
       parseToAST defaultTimeout language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
