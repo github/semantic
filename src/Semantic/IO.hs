@@ -1,36 +1,36 @@
 {-# LANGUAGE DeriveAnyClass, DeriveDataTypeable, DuplicateRecordFields, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.IO
-  ( Destination(..)
-  , Files
-  , Handle(..)
-  , IO.IOMode(..)
-  , NoLanguageForBlob(..)
-  , Source(..)
-  , catchException
-  , findFiles
-  , findFilesInDir
-  , getHandle
-  , isDirectory
-  , languageForFilePath
-  , noLanguageForBlob
-  , openFileForReading
-  , readBlob
-  , readBlobPairs
-  , readBlobPairsFromHandle
-  , readBlobs
-  , readBlobsFromDir
-  , readBlobsFromHandle
-  , readFile
-  , readFilePair
-  , readProject
-  , readProjectFromPaths
-  , rethrowing
-  , runFiles
-  , stderr
-  , stdin
-  , stdout
-  , write
-  ) where
+( Destination(..)
+, Files
+, Handle(..)
+, IO.IOMode(..)
+, NoLanguageForBlob(..)
+, Source(..)
+, catchException
+, findFiles
+, findFilesInDir
+, getHandle
+, isDirectory
+, languageForFilePath
+, noLanguageForBlob
+, openFileForReading
+, readBlob
+, readBlobPairs
+, readBlobPairsFromHandle
+, readBlobs
+, readBlobsFromDir
+, readBlobsFromHandle
+, readFile
+, readFilePair
+, readProject
+, readProjectFromPaths
+, rethrowing
+, runFiles
+, stderr
+, stdin
+, stdout
+, write
+) where
 
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect
