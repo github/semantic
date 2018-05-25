@@ -4,12 +4,14 @@ module Parsing.TreeSitter
 , parseToAST
 ) where
 
-import Prologue hiding (catchError, throwError)
+import Prologue
 
 import Control.Concurrent.Async
+import Control.Concurrent.MVar
 import Control.Exception (throwIO)
 import Control.Monad
 import Control.Monad.Effect
+import Control.Monad.Effect.Trace
 import Control.Monad.IO.Class
 import Data.AST (AST, Node (Node))
 import Data.Blob
@@ -31,34 +33,28 @@ import qualified TreeSitter.Tree as TS
 
 newtype Timeout = Milliseconds Int
 
-data ParseException = TimedOut deriving (Show, Typeable)
+data Result grammar
+  = Failed
+  | Succeeded (AST [] grammar)
 
-instance Exception ParseException
-
--- Change this to putStrLn if you want to debug the locking/cancellation code.
--- TODO: Someday we should run this all in Eff so that we can 'trace'.
-dbg :: String -> IO ()
-dbg = const (pure ())
-
-runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Maybe (AST [] grammar))
-runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) ->
+runParser :: (Enum grammar, Bounded grammar) => Ptr TS.Parser -> Source -> IO (Result grammar)
+runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ \ (source, len) -> do
     alloca (\ rootPtr -> do
       let acquire = do
-            dbg "Starting parse"
             -- Change this to TS.ts_parser_loop_until_cancelled if you want to test out cancellation
             TS.ts_parser_parse_string parser nullPtr source len
 
       let release t
-            | t == nullPtr = dbg "Parse failed"
-            | otherwise = dbg "Parse completed" *> TS.ts_tree_delete t
+            | t == nullPtr = pure ()
+            | otherwise = TS.ts_tree_delete t
 
       let go treePtr = do
             if treePtr == nullPtr
-              then pure Nothing
+              then pure Failed
               else do
                 TS.ts_tree_root_node_p treePtr rootPtr
                 ptr <- peek rootPtr
-                runM (fmap Just (anaM toAST ptr))
+                runM (fmap Succeeded (anaM toAST ptr))
       bracket acquire release go)
 
 -- | The semantics of @bracket before after handler@ are as follows:
@@ -75,24 +71,27 @@ bracket' before after action = do
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Member IO effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
-parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_parser_delete $ \ parser -> liftIO $ do
+parseToAST :: (Bounded grammar, Enum grammar, Members '[Trace, IO] effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
+parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   let parserTimeout = s * 1000
 
-  TS.ts_parser_halt_on_error parser (CBool 1)
-  TS.ts_parser_set_language parser language
+  liftIO $ do
+    TS.ts_parser_halt_on_error parser (CBool 1)
+    TS.ts_parser_set_language parser language
 
-  parsing <- async (runParser parser blobSource)
+  trace "tree-sitter: beginning parsing"
+
+  parsing <- liftIO . async $ runParser parser blobSource
 
   -- Kick the parser off asynchronously and wait according to the provided timeout.
-  res <- timeout parserTimeout (wait parsing)
+  res <- liftIO . timeout parserTimeout $ wait parsing
 
-  -- If we get a Nothing back, then we failed, so we need to disable the parser, which
-  -- will let the call to runParser terminate, cleaning up appropriately
-  when (isNothing res) $
-    TS.ts_parser_set_enabled parser (CBool 0)
-
-  pure (join res)
+  case res of
+    Just Failed          -> Nothing  <$ trace "tree-sitter: parsing failed"
+    Just (Succeeded ast) -> Just ast <$ trace "tree-sitter: parsing succeeded"
+    Nothing -> do
+      trace "tree-sitter: parsing timed out"
+      Nothing <$ liftIO (TS.ts_parser_set_enabled parser (CBool 0))
 
 
 toAST :: forall grammar effects . (Bounded grammar, Enum grammar, Member IO effects) => TS.Node -> Eff effects (Base (AST [] grammar) TS.Node)
