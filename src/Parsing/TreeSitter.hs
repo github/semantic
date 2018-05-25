@@ -7,9 +7,7 @@ module Parsing.TreeSitter
 import Prologue
 
 import Control.Concurrent.Async
-import Control.Concurrent.MVar
 import Control.Exception (throwIO)
-import Control.Monad
 import Control.Monad.Effect
 import Control.Monad.Effect.Trace
 import Control.Monad.IO.Class
@@ -94,7 +92,7 @@ parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_
       Nothing <$ liftIO (TS.ts_parser_set_enabled parser (CBool 0))
 
 
-toAST :: forall grammar effects . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
+toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base (AST [] grammar) TS.Node)
 toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
