@@ -1,0 +1,88 @@
+(Module
+  (Empty)
+  (
+    (TypeSynonym
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters))
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters)))
+    (TypeSynonym
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters))
+      (Type
+        (ListConstructor
+          (Empty))
+        (TypeParameters)))
+    (TypeSynonym
+      (Type
+        (Identifier)
+        (TypeParameters
+          (Identifier)
+        {+(Identifier)+}))
+      (Type
+        (Identifier)
+        (TypeParameters
+          (Identifier)
+        {+(Identifier)+})))
+    (TypeSynonym
+      (Type
+        (Identifier)
+        (TypeParameters
+          (Identifier)))
+      (Type
+        (Array
+          (Type
+          { (Identifier)
+          ->(Identifier) }
+            (TypeParameters
+              (Identifier))))
+        (TypeParameters)))
+    (TypeSynonym
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters))
+      (Type
+        (UnitConstructor
+          (Empty))
+        (TypeParameters)))
+  {-(TypeSynonym
+    {-(Type
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(Type
+      {-(TupleConstructor
+        {-(Empty)-})-}
+      {-(TypeParameters)-})-})-}
+    (TypeSynonym
+      (Type
+        (Identifier)
+        (TypeParameters))
+      (Type
+        (TupleConstructor
+          (Empty))
+        (TypeParameters)))
+    (TypeSynonym
+      (Type
+        (Identifier)
+        (TypeParameters))
+      (Type
+      { (FunctionConstructor
+        {-(Empty)-})
+      ->(TupleConstructor
+        {+(Empty)+}) }
+        (TypeParameters)))
+  {+(TypeSynonym
+    {+(Type
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(Type
+      {+(FunctionConstructor
+        {+(Empty)+})+}
+      {+(TypeParameters)+})+})+}))
