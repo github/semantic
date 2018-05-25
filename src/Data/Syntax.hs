@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures #-}
+{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
@@ -19,7 +19,10 @@ import qualified Data.Error as Error
 import Proto3.Suite.Class
 import Proto3.Wire.Decode
 import Proto3.Wire.Types
-
+import GHC.Types (Constraint)
+import GHC.TypeLits
+import qualified Proto3.Suite.DotProto as Proto
+import Data.Char (toLower)
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
@@ -100,23 +103,38 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Sum fs (Term (Sum fs) a))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
-instance (Apply Message1 fs) => Message1 (Sum fs) where
+instance (Apply Message1 fs, Generate Message1 fs fs, Generate NameOf1 fs fs) => Message1 (Sum fs) where
   liftEncodeMessage encodeMessage num fs = apply @Message1 (liftEncodeMessage encodeMessage num) fs
   liftDecodeMessage decodeMessage num = oneof undefined listOfParsers
     where
       listOfParsers =
-        zipWith (\i generator -> (FieldNumber i, generator (FieldNumber i))) [1..] (generate @fs @fs (Proxy @fs) decodeMessage)
-  liftDotProto dotProto _ fs = apply @Message1 (liftDotProto dotProto (Proxy @fs)) fs
+        -- zipWith (\i generator -> (FieldNumber i, generator (FieldNumber i))) [1..] (generate @fs @fs (Proxy @fs) decodeMessage)
+        generate @Message1 @fs @fs (\ (proxy :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
+  liftDotProto dotProto _ =
+    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @NameOf1 @fs @fs (\ (proxy :: proxy f) i ->
+      let
+        num = FieldNumber (fromInteger (succ i))
+        fieldType = Proto.Prim (Proto.Named . Proto.Single $ nameOf1 (Proxy @f))
+        fieldName = Proto.Single (camelCase $ nameOf1 (Proxy @f))
+        camelCase (x : xs) = toLower x : xs
+        camelCase [] = []
+      in
+        [ Proto.DotProtoField num fieldType fieldName [] Nothing ]))]
 
-class Generate (all :: [* -> *]) (fs :: [* -> *]) where
-  generate :: proxy fs -> (FieldNumber -> Parser RawMessage a) -> [FieldNumber -> Parser RawField (Sum all a)]
+class NameOf1 (f :: * -> *) where
+  nameOf1 :: proxy f -> String
 
-instance Generate all '[] where
-  generate _ _ = []
+instance (Generic1 f, Rep1 f ~ D1 c f, Datatype c) => NameOf1 f where
+  nameOf1 _ = datatypeName (undefined :: t c f a)
 
-instance (Element f all, Generate all fs, Message1 f) => Generate all (f ': fs) where
-  generate _ decodeMessage = (\ num -> fromJust <$> embedded (inject @f @all <$> liftDecodeMessage @f decodeMessage num)) : generate (Proxy @fs) decodeMessage
+class Generate (c :: (* -> *) -> Constraint) (all :: [* -> *]) (fs :: [* -> *]) where
+  generate :: Monoid b => (forall f proxy. (Element f all, c f) => proxy f -> Integer -> b) -> b
 
+instance Generate c all '[] where
+  generate _ = mempty
+
+instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) where
+  generate each = (each (Proxy @f) (natVal (Proxy @(ElemIndex f all)))) `mappend` generate @c @all @fs each
 
 -- Common
 
