@@ -103,7 +103,7 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Sum fs (Term (Sum fs) a))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
-instance (Apply Message1 fs, Generate Message1 fs fs, Generate NameOf1 fs fs) => Message1 (Sum fs) where
+instance (Apply Message1 fs, Generate Message1 fs fs, Generate GenericNamed fs fs) => Message1 (Sum fs) where
   liftEncodeMessage encodeMessage num fs = apply @Message1 (liftEncodeMessage encodeMessage num) fs
   liftDecodeMessage decodeMessage num = oneof undefined listOfParsers
     where
@@ -111,21 +111,15 @@ instance (Apply Message1 fs, Generate Message1 fs fs, Generate NameOf1 fs fs) =>
         -- zipWith (\i generator -> (FieldNumber i, generator (FieldNumber i))) [1..] (generate @fs @fs (Proxy @fs) decodeMessage)
         generate @Message1 @fs @fs (\ (proxy :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
   liftDotProto dotProto _ =
-    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @NameOf1 @fs @fs (\ (proxy :: proxy f) i ->
+    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @GenericNamed @fs @fs (\ (proxy :: proxy f) i ->
       let
         num = FieldNumber (fromInteger (succ i))
-        fieldType = Proto.Prim (Proto.Named . Proto.Single $ nameOf1 (Proxy @f))
-        fieldName = Proto.Single (camelCase $ nameOf1 (Proxy @f))
+        fieldType = Proto.Prim (Proto.Named . Proto.Single $ genericNameOf (Proxy @f))
+        fieldName = Proto.Single (camelCase $ genericNameOf (Proxy @f))
         camelCase (x : xs) = toLower x : xs
         camelCase [] = []
       in
         [ Proto.DotProtoField num fieldType fieldName [] Nothing ]))]
-
-class NameOf1 (f :: * -> *) where
-  nameOf1 :: proxy f -> String
-
-instance (Generic1 f, Rep1 f ~ D1 c f, Datatype c) => NameOf1 f where
-  nameOf1 _ = datatypeName (undefined :: t c f a)
 
 class Generate (c :: (* -> *) -> Constraint) (all :: [* -> *]) (fs :: [* -> *]) where
   generate :: Monoid b => (forall f proxy. (Element f all, c f) => proxy f -> Integer -> b) -> b
