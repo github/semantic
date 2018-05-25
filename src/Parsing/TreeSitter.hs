@@ -4,9 +4,10 @@ module Parsing.TreeSitter
 , parseToAST
 ) where
 
-import Prologue
+import Prologue hiding (catchError, throwError)
 
 import Control.Concurrent.Async
+import Control.Exception (throwIO)
 import Control.Monad
 import Control.Monad.Effect
 import Control.Monad.IO.Class
@@ -20,6 +21,7 @@ import Data.Term
 import Foreign
 import Foreign.C.Types (CBool (..))
 import Foreign.Marshal.Array (allocaArray)
+import Semantic.IO hiding (Source)
 import System.Timeout
 
 import qualified TreeSitter.Language as TS
@@ -59,10 +61,22 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
                 runM (fmap Just (anaM toAST ptr))
       bracket acquire release go)
 
+-- | The semantics of @bracket before after handler@ are as follows:
+-- * Exceptions in @before@ and @after@ are thrown in IO.
+-- * @after@ is called on IO exceptions in @handler@, and then rethrown in IO.
+-- * If @handler@ completes successfully, @after@ is called
+-- Call 'catchException' at the call site if you want to recover.
+bracket' :: (Member IO r) => IO a -> (a -> IO b) -> (a -> Eff r c) -> Eff r c
+bracket' before after action = do
+  a <- liftIO before
+  let cleanup = liftIO (after a)
+  res <- action a `catchException` (\(e :: SomeException) -> cleanup >> liftIO (throwIO e))
+  res <$ cleanup
+
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Members '[Exc SomeException, IO] effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
-parseToAST (Milliseconds s) language Blob{..} = liftIO $ bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+parseToAST :: (Bounded grammar, Enum grammar, Member IO effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
+parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_parser_delete $ \ parser -> liftIO $ do
   let parserTimeout = s * 1000
 
   TS.ts_parser_halt_on_error parser (CBool 1)
