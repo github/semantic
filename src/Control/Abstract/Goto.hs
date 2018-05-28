@@ -9,7 +9,7 @@ module Control.Abstract.Goto
 ) where
 
 import           Control.Abstract.Evaluator
-import           Control.Monad.Effect (Eff)
+import           Control.Monad.Effect.Internal
 import qualified Data.IntMap as IntMap
 import           Prelude hiding (fail)
 import           Prologue
@@ -54,24 +54,26 @@ data Goto effects value return where
 --   @
 --
 --   Callers can then evaluate the high-level 'Goto' effect by passing @Gotos@ and @getGotos@ to 'runGoto'.
-runGoto :: Members '[ Fail
-                    , Fresh
-                    , State table
-                    ] effects
+runGoto :: ( Effectful (m location value)
+           , Members '[ Fail
+                      , Fresh
+                      , State table
+                      ] effects
+           )
         => (GotoTable effects value -> table)
         -> (table -> GotoTable effects value)
-        -> Evaluator location value (Goto effects value ': effects) a
-        -> Evaluator location value effects a
-runGoto from to = interpret (\ goto -> do
+        -> m location value (Goto effects value ': effects) a
+        -> m location value effects a
+runGoto from to = raiseHandler (interpret (\ goto -> do
   table <- to <$> getTable
   case goto of
     Label action -> do
       supremum <- fresh
       supremum <$ putTable (from (IntMap.insert supremum action table))
-    Goto label   -> maybeM (raiseEff (fail ("unknown label: " <> show label))) (IntMap.lookup label table))
+    Goto label   -> maybeM (raiseEff (fail ("unknown label: " <> show label))) (IntMap.lookup label table)))
 
-getTable :: Member (State table) effects => Evaluator location value effects table
+getTable :: (Effectful m, Member (State table) effects) => m effects table
 getTable = get
 
-putTable :: Member (State table) effects => table -> Evaluator location value effects ()
+putTable :: (Effectful m, Member (State table) effects) => table -> m effects ()
 putTable = put
