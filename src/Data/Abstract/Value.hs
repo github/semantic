@@ -93,7 +93,7 @@ instance ( Members '[ Allocator location (Value location)
          , Show location
          )
       => AbstractValue location (Value location) (Goto effects (Value location) ': effects) where
-  unit     = pure $ Unit
+  unit     = pure Unit
   integer  = pure . Integer . Number.Integer
   boolean  = pure . Boolean
   string   = pure . String
@@ -106,7 +106,7 @@ instance ( Members '[ Allocator location (Value location)
 
   kvPair k = pure . KVPair k
 
-  null     = pure $ Null
+  null     = pure Null
 
   asPair val
     | KVPair k v <- val = pure (k, v)
