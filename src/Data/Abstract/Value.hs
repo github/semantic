@@ -46,7 +46,6 @@ instance AbstractHole (Value location body) where
   hole = Hole
 
 instance ( Members '[ Allocator location (Value location body)
-                    , Reader (Environment location)
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (ValueError location body)
