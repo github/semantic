@@ -9,12 +9,19 @@ import Control.Abstract.Value
 import Data.Abstract.Environment
 import Data.Abstract.Name
 import Data.ByteString.Char8 (pack, unpack)
+import Data.Char
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Prologue
 
 data Builtin = Print
   deriving (Eq, Ord, Show)
+
+builtinName :: Builtin -> Name
+builtinName = name . pack . ("__semantic_" <>) . headToLower . show
+  where headToLower (c:cs) = toLower c : cs
+        headToLower ""     = ""
+
 
 builtin :: ( HasCallStack
            , Members '[ Allocator location value
