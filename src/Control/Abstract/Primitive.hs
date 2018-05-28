@@ -72,11 +72,11 @@ defineBuiltins =
   builtin Print (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
 
 
-prim :: Member (Primitive value) effects => Builtin -> Evaluator location value effects value
-prim = send . Prim
+prim :: Member (Primitive value) effects => Builtin -> [value] -> Evaluator location value effects value
+prim builtin params = send (Prim builtin params)
 
 data Primitive value result where
-  Prim :: Builtin -> Primitive value value
+  Prim :: Builtin -> [value] -> Primitive value value
 
-runPrimitive :: (Builtin -> Evaluator location value effects value) -> Evaluator location value (Primitive value ': effects) a -> Evaluator location value effects a
-runPrimitive handler = interpret (\ (Prim builtin) -> handler builtin)
+runPrimitive :: (Builtin -> [value] -> Evaluator location value effects value) -> Evaluator location value (Primitive value ': effects) a -> Evaluator location value effects a
+runPrimitive handler = interpret (\ (Prim builtin params) -> handler builtin params)
