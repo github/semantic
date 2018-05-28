@@ -161,14 +161,14 @@ instance ( Members '[ Allocator location Type
          , Reducer Type (Cell location Type)
          )
       => AbstractValue location Type effects where
+  array fields = do
+    var <- fresh
+    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
+
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
 
   scopedEnvironment _ = pure (Just emptyEnv)
-
-  array fields = do
-    var <- fresh
-    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
 
   asString t = unify t String $> ""
   asPair t   = do
