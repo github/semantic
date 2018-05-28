@@ -13,12 +13,12 @@ spec = parallel $ do
   describe "PHP" $ do
     it "evaluates include and require" $ do
       ((res, state), _) <- evaluate "main.php"
-      res `shouldBe` Right [integer 1]
+      res `shouldBe` Right [unit]
       Env.names (environment state) `shouldBe` [ "bar", "foo" ]
 
     it "evaluates include_once and require_once" $ do
       ((res, state), _) <- evaluate "main_once.php"
-      res `shouldBe` Right [integer 1]
+      res `shouldBe` Right [unit]
       Env.names (environment state) `shouldBe` [ "bar", "foo" ]
 
     it "evaluates namespaces" $ do
