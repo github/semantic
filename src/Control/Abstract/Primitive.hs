@@ -45,12 +45,11 @@ builtin b def = withCurrentCallStack callStack $ do
   def >>= assign addr
 
 lambda :: (AbstractFunction location value effects, Member Fresh effects)
-       => Set Name
-       -> (Name -> Evaluator location value effects value)
+       => (Name -> Evaluator location value effects value)
        -> Evaluator location value effects value
-lambda fvs body = do
+lambda body = do
   var <- nameI <$> fresh
-  closure [var] fvs (body var)
+  closure [var] lowerBound (body var)
 
 defineBuiltins :: ( AbstractValue location value effects
                   , HasCallStack
@@ -69,7 +68,7 @@ defineBuiltins :: ( AbstractValue location value effects
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin Print (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
+  builtin Print (lambda (\ v -> variable v >>= asString >>= trace . unpack >> unit))
 
 
 -- | Call a 'Builtin' with parameters.
