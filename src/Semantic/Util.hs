@@ -27,7 +27,7 @@ import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
 import           Text.Show (showListWith)
-import           Text.Show.Pretty
+import           Text.Show.Pretty (ppShow)
 
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
