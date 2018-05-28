@@ -13,6 +13,9 @@ import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Prologue
 
+data Builtin = Print
+  deriving (Eq, Ord, Show)
+
 builtin :: ( HasCallStack
            , Members '[ Allocator location value
                       , Reader (Environment location)
