@@ -33,16 +33,16 @@ data Value location body
   | Hole
   deriving (Eq, Ord, Show)
 
-newtype ClosureBody location body = ClosureBody (body (Value location body))
+data ClosureBody location body = ClosureBody { closureBodyId :: Int, closureBody :: body (Value location body) }
 
 instance Eq   (ClosureBody location body) where
-  _ == _ = True
+  (==) = (==) `on` closureBodyId
 
 instance Ord  (ClosureBody location body) where
-  _ `compare` _ = EQ
+  compare = compare `on` closureBodyId
 
 instance Show (ClosureBody location body) where
-  showsPrec d (ClosureBody _) = showsUnaryWith (const showChar) "ClosureBody" d '_'
+  showsPrec d (ClosureBody i _) = showsBinaryWith showsPrec (const showChar) "ClosureBody" d i '_'
 
 
 instance Ord location => ValueRoots location (Value location body) where
@@ -56,6 +56,7 @@ instance AbstractHole (Value location body) where
 
 instance ( Coercible body (Eff effects)
          , Members '[ Allocator location (Value location body)
+                    , Fresh
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (ValueError location body)
@@ -71,11 +72,12 @@ instance ( Coercible body (Eff effects)
   closure parameters freeVariables body = do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
-    Closure packageInfo moduleInfo parameters (ClosureBody (coerce (lowerEff body))) . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
+    i <- fresh
+    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case op of
-      Closure packageInfo moduleInfo names (ClosureBody body) env -> do
+      Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
@@ -108,6 +110,7 @@ instance Show location => AbstractIntro (Value location body) where
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Members '[ Allocator location (Value location body)
+                    , Fresh
                     , LoopControl (Value location body)
                     , Reader (Environment location)
                     , Reader ModuleInfo
