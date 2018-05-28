@@ -31,7 +31,7 @@ spec = parallel $ do
 evaluate
   = runM
   . fmap (first reassociate)
-  . evaluating @Precise @(Value Precise ())
+  . evaluating @Precise @(Value Precise (Eff _))
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . runValueError
