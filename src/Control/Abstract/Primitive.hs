@@ -15,7 +15,7 @@ import Data.Semilattice.Lower
 import Prologue
 
 data Builtin = Print
-  deriving (Eq, Ord, Show)
+  deriving (Bounded, Enum, Eq, Ord, Show)
 
 builtinName :: Builtin -> Name
 builtinName = name . pack . ("__semantic_" <>) . headToLower . show
