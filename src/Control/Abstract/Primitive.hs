@@ -34,13 +34,13 @@ builtin :: ( HasCallStack
            , Ord location
            , Reducer value (Cell location value)
            )
-        => String
+        => Builtin
         -> Evaluator location value effects value
         -> Evaluator location value effects ()
-builtin n def = withCurrentCallStack callStack $ do
-  let name' = name ("__semantic_" <> pack n)
-  addr <- alloc name'
-  modifyEnv (insert name' addr)
+builtin b def = withCurrentCallStack callStack $ do
+  let name = builtinName b
+  addr <- alloc name
+  modifyEnv (insert name addr)
   def >>= assign addr
 
 lambda :: (AbstractFunction location value effects, Member Fresh effects)
@@ -68,4 +68,4 @@ defineBuiltins :: ( AbstractValue location value effects
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin "print" (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
+  builtin Print (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
