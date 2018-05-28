@@ -30,7 +30,7 @@ data Value location term
   | Hash [Value location term]
   | Null
   | Hole
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Ord, Show)
 
 data ClosureBody = Label Int
   deriving (Eq, Show, Ord)
