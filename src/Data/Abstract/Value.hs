@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
-import Control.Abstract
+import Control.Abstract hiding (Label)
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
@@ -14,7 +14,7 @@ import qualified Data.Set as Set
 import Prologue
 
 data Value location term
-  = Closure PackageInfo ModuleInfo [Name] Label (Environment location)
+  = Closure PackageInfo ModuleInfo [Name] ClosureBody (Environment location)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -32,7 +32,7 @@ data Value location term
   | Hole
   deriving (Eq, Show, Ord)
 
-data ClosureBody = Label Label
+data ClosureBody = Label Int
   deriving (Eq, Show, Ord)
 
 
@@ -63,11 +63,11 @@ instance ( Members '[ Allocator location (Value location term)
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     l <- label body
-    Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
+    Closure packageInfo moduleInfo parameters (Label l) . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case op of
-      Closure packageInfo moduleInfo names label env -> do
+      Closure packageInfo moduleInfo names (Label label) env -> do
         body <- goto label
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
