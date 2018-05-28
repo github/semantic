@@ -42,7 +42,6 @@ library
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Exports
-                     , Control.Abstract.Goto
                      , Control.Abstract.Heap
                      , Control.Abstract.Matching
                      , Control.Abstract.Modules

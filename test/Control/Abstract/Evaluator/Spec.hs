@@ -34,19 +34,12 @@ evaluate
   . evaluating @Precise @(Value Precise ())
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
-  . runTermEvaluator @() @Precise @(Value Precise ())
   . Value.runValueError
-  . TermEvaluator @() @Precise @(Value Precise ())
   . runEnvironmentError
   . runAddressError
   . runAllocator
   . runReturn
   . runLoopControl
-  . fmap fst
-  . runState (Gotos lowerBound)
-  . runGoto Gotos getGotos
-
-newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) (Value Precise ()) }
 
 reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
 reassociate (Left s) = Left (SomeExc (inject (Const s)))
