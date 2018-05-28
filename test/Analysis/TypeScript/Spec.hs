@@ -36,7 +36,7 @@ spec = parallel $ do
 
     it "evaluates early return statements" $ do
       ((res, _), _) <- evaluate "early-return.ts"
-      res `shouldBe` Right [injValue (Value.Float (Number.Decimal 123.0))]
+      res `shouldBe` Right [Value.Float (Number.Decimal 123.0)]
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
