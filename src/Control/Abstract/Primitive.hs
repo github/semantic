@@ -86,3 +86,9 @@ data Primitive result where
 runPrimitive :: (Effectful m, Member Trace effects) => m (Primitive ': effects) a -> m effects a
 runPrimitive = interpret (\ (Prim builtin params) -> case builtin of
   Print -> trace params)
+
+
+data SomeBuiltin where
+  SomeBuiltin :: Builtin arg return -> SomeBuiltin
+
+deriving instance Show SomeBuiltin
