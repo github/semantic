@@ -72,6 +72,7 @@ defineBuiltins =
   builtin Print (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
 
 
+-- | Call a 'Builtin' with parameters.
 prim :: Member (Primitive value) effects => Builtin -> [value] -> Evaluator location value effects value
 prim builtin params = send (Prim builtin params)
 
