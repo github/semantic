@@ -37,14 +37,14 @@ spec = parallel $ do
 
     it "subclasses" $ do
       ((res, _), _) <- evaluate "subclass.py"
-      res `shouldBe` Right [injValue (String "\"bar\"")]
+      res `shouldBe` Right [String "\"bar\""]
 
     it "handles multiple inheritance left-to-right" $ do
       ((res, _), _) <- evaluate "multiple_inheritance.py"
-      res `shouldBe` Right [injValue (String "\"foo!\"")]
+      res `shouldBe` Right [String "\"foo!\""]
 
   where
-    ns n = Just . Latest . Last . Just . injValue . Namespace n
+    ns n = Just . Latest . Last . Just . Namespace n
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)
