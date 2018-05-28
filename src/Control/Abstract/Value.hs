@@ -119,11 +119,11 @@ class (AbstractFunction location value effects, AbstractIntro value) => Abstract
   -- | Construct an array of zero or more values.
   array :: [value] -> Evaluator location value effects value
 
-  -- | Extract a 'ByteString' from a given value.
-  asString :: value -> Evaluator location value effects ByteString
-
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator location value effects (value, value)
+
+  -- | Extract a 'ByteString' from a given value.
+  asString :: value -> Evaluator location value effects ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> Evaluator location value effects a -> Evaluator location value effects a -> Evaluator location value effects a
