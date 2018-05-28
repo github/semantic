@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
-
 module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Environment as Env

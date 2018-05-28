@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
 module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Environment as Env

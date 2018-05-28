@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
 module Analysis.PHP.Spec (spec) where
 
 import Data.Abstract.Environment as Env
