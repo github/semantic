@@ -30,7 +30,7 @@ spec = parallel $ do
 
     it "evaluates load with wrapper" $ do
       ((res, state), _) <- evaluate "load-wrap.rb"
-      res `shouldBe` Left (SomeExc (inject @(EnvironmentError (Value Precise (Eff _))) (FreeVariable "foo")))
+      res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
       Env.names (environment state) `shouldContain` [ "Object" ]
 
     it "evaluates subclass" $ do
