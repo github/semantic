@@ -39,5 +39,5 @@ instance (Addressable location effects, Members '[Reader ModuleInfo, Reader Pack
   allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule)
   derefCell (Address (Located loc _ _)) = relocate . derefCell (Address loc)
 
-relocate :: Evaluator location value effects a -> Evaluator (Located location) value effects a
+relocate :: Evaluator location1 value effects a -> Evaluator location2 value effects a
 relocate = raiseEff . lowerEff
