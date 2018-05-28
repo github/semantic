@@ -60,20 +60,20 @@ defineBuiltins :: ( AbstractValue location value effects
                   , HasCallStack
                   , Members '[ Allocator location value
                              , Fresh
+                             , Primitive
                              , Reader (Environment location)
                              , Reader ModuleInfo
                              , Reader Span
                              , Resumable (EnvironmentError value)
                              , State (Environment location)
                              , State (Heap location (Cell location) value)
-                             , Trace
                              ] effects
                   , Ord location
                   , Reducer value (Cell location value)
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin Print (lambda (\ v -> variable v >>= asString >>= trace . unpack >> unit))
+  builtin Print (lambda (\ v -> variable v >>= asString >>= prim Print . unpack >> unit))
 
 
 -- | Call a 'Builtin' with parameters.
