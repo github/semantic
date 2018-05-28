@@ -221,7 +221,7 @@ evaluateInScopedEnv scopedEnvTerm term = do
 value :: ( AbstractValue location value effects
          , Members '[ Allocator location value
                     , Reader (Environment location)
-                    , Resumable (EnvironmentError value)
+                    , Resumable (EnvironmentError location)
                     , State (Environment location)
                     , State (Heap location (Cell location) value)
                     ] effects
@@ -236,7 +236,7 @@ value (Rval val) = pure val
 subtermValue :: ( AbstractValue location value effects
                 , Members '[ Allocator location value
                            , Reader (Environment location)
-                           , Resumable (EnvironmentError value)
+                           , Resumable (EnvironmentError location)
                            , State (Environment location)
                            , State (Heap location (Cell location) value)
                            ] effects

@@ -62,7 +62,7 @@ type EvaluatableConstraints location term value effects =
              , Reader ModuleInfo
              , Reader PackageInfo
              , Reader Span
-             , Resumable (EnvironmentError value)
+             , Resumable (EnvironmentError location)
              , Resumable EvalError
              , Resumable ResolutionError
              , Resumable (Unspecialized value)

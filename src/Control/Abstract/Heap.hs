@@ -106,13 +106,13 @@ letrec' name body = do
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: Members '[ Allocator location value
                      , Reader (Environment location)
-                     , Resumable (EnvironmentError value)
+                     , Resumable (EnvironmentError location)
                      , State (Environment location)
                      , State (Heap location (Cell location) value)
                      ] effects
          => Name
          -> Evaluator location value effects value
-variable name = lookupEnv name >>= maybe (freeVariableError name) deref
+variable name = lookupEnv name >>= maybeM (Address <$> freeVariableError name) >>= deref
 
 
 -- Effects

@@ -67,7 +67,7 @@ runGraph graphType includePackages project
             . resumingResolutionError
             . resumingAddressError
             . resumingValueError
-            . runTermEvaluator @_ @_ @(Value (Located Precise) (Eff _))
+            . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (Eff _))
             . graphing
 
 -- | Parse a list of files into a 'Package'.
@@ -145,7 +145,7 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: AbstractHole value => Evaluator location value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location value effects (a, [Name])
+resumingEnvironmentError :: AbstractHole location => Evaluator location value (Resumable (EnvironmentError location) ': effects) a -> Evaluator location value effects (a, [Name])
 resumingEnvironmentError
   = runState []
   . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)

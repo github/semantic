@@ -64,7 +64,7 @@ defineBuiltins :: ( AbstractValue location value effects
                              , Reader (Environment location)
                              , Reader ModuleInfo
                              , Reader Span
-                             , Resumable (EnvironmentError value)
+                             , Resumable (EnvironmentError location)
                              , State (Environment location)
                              , State (Heap location (Cell location) value)
                              ] effects
