@@ -78,5 +78,6 @@ prim builtin params = send (Prim builtin params)
 data Primitive value result where
   Prim :: Builtin -> [value] -> Primitive value value
 
-runPrimitive :: (Builtin -> [value] -> Evaluator location value effects value) -> Evaluator location value (Primitive value ': effects) a -> Evaluator location value effects a
-runPrimitive handler = interpret (\ (Prim builtin params) -> handler builtin params)
+runPrimitive :: (AbstractValue location value effects, Member Trace effects) => Evaluator location value (Primitive value ': effects) a -> Evaluator location value effects a
+runPrimitive = interpret (\ (Prim builtin params) -> case builtin of
+  Print -> traverse (asString >=> trace . unpack) params >> unit)
