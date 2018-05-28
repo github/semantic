@@ -59,38 +59,38 @@ class Show value => AbstractFunction location value effects where
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
-  unit :: Evaluator location value effects value
+  unit :: value
 
   -- | Construct an abstract boolean value.
-  boolean :: Bool -> Evaluator location value effects value
+  boolean :: Bool -> value
 
   -- | Construct an abstract string value.
-  string :: ByteString -> Evaluator location value effects value
+  string :: ByteString -> value
 
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: ByteString -> Evaluator location value effects value
+  symbol :: ByteString -> value
 
   -- | Construct an abstract integral value.
-  integer :: Integer -> Evaluator location value effects value
+  integer :: Integer -> value
 
   -- | Construct a floating-point value.
-  float :: Scientific -> Evaluator location value effects value
+  float :: Scientific -> value
 
   -- | Construct a rational value.
-  rational :: Rational -> Evaluator location value effects value
+  rational :: Rational -> value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> Evaluator location value effects value
+  multiple :: [value] -> value
 
   -- | Construct a key-value pair for use in a hash.
-  kvPair :: value -> value -> Evaluator location value effects value
+  kvPair :: value -> value -> value
 
   -- | Construct a hash out of pairs.
-  hash :: [(value, value)] -> Evaluator location value effects value
+  hash :: [(value, value)] -> value
 
   -- | Construct the nil/null datatype.
-  null :: Evaluator location value effects value
+  null :: value
 
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
@@ -181,7 +181,7 @@ while :: AbstractValue location value effects
       -> Evaluator location value effects value
 while cond body = loop $ \ continue -> do
   this <- cond
-  ifthenelse this (body *> continue) unit
+  ifthenelse this (body *> continue) (pure unit)
 
 -- | Do-while loop, built on top of while.
 doWhile :: AbstractValue location value effects
@@ -190,7 +190,7 @@ doWhile :: AbstractValue location value effects
         -> Evaluator location value effects value
 doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
-  ifthenelse this continue unit
+  ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue location value effects
                  , Member (State (Environment location)) effects

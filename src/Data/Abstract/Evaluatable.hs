@@ -129,11 +129,11 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) . TermEvaluator $ do
-          v <- maybe unit (pure . snd) <$> require m
-          maybe v ((`call` []) <=< variable) sym
+          v <- maybe unit snd <$> require m
+          maybe (pure v) ((`call` []) <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule)) $ do
-          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> unit))
+          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
           fst <$> evalModule prelude
 
         withPrelude Nothing a = a
@@ -234,4 +234,4 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 ---   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (Rval <$> unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
+  eval = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

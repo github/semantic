@@ -82,20 +82,20 @@ instance ( Members '[ Allocator location (Value location body)
 
 
 instance Show location => AbstractIntro (Value location body) where
-  unit     = pure Unit
-  integer  = pure . Integer . Number.Integer
-  boolean  = pure . Boolean
-  string   = pure . String
-  float    = pure . Float . Number.Decimal
-  symbol   = pure . Symbol
-  rational = pure . Rational . Number.Ratio
+  unit     = Unit
+  integer  = Integer . Number.Integer
+  boolean  = Boolean
+  string   = String
+  float    = Float . Number.Decimal
+  symbol   = Symbol
+  rational = Rational . Number.Ratio
 
-  multiple = pure . Tuple
+  multiple = Tuple
 
-  kvPair k = pure . KVPair k
-  hash = pure . Hash . map (uncurry KVPair)
+  kvPair k = KVPair k
+  hash = Hash . map (uncurry KVPair)
 
-  null     = pure Null
+  null     = Null
 
 
 
@@ -157,9 +157,9 @@ instance ( Members '[ Allocator location (Value location body)
       | otherwise = throwValueError (IndexError arr idx)
 
   liftNumeric f arg
-    | Integer (Number.Integer i) <- arg = integer $ f i
-    | Float (Number.Decimal d)   <- arg = float   $ f d
-    | Rational (Number.Ratio r)  <- arg = rational $ f r
+    | Integer (Number.Integer i) <- arg = pure . integer  $ f i
+    | Float (Number.Decimal d)   <- arg = pure . float    $ f d
+    | Rational (Number.Ratio r)  <- arg = pure . rational $ f r
     | otherwise = throwValueError (NumericError arg)
 
   liftNumeric2 f left right
@@ -179,9 +179,9 @@ instance ( Members '[ Allocator location (Value location body)
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
         specialize :: (AbstractValue location (Value location body) effects, Member (Resumable (ValueError location body)) effects) => Either ArithException Number.SomeNumber -> Evaluator location (Value location body) effects (Value location body)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
-        specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
-        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
-        specialize (Right (Number.SomeNumber (Number.Decimal d))) = float d
+        specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
+        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
+        specialize (Right (Number.SomeNumber (Number.Decimal d))) = pure $ float d
         pair = (left, right)
 
   liftComparison comparator left right
@@ -191,15 +191,15 @@ instance ( Members '[ Allocator location (Value location body)
     | (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- pair = go i j
     | (String  i,                  String  j)                  <- pair = go i j
     | (Boolean i,                  Boolean j)                  <- pair = go i j
-    | (Unit,                       Unit)                       <- pair = boolean True
+    | (Unit,                       Unit)                       <- pair = pure $ boolean True
     | otherwise = throwValueError (ComparisonError left right)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
         go :: (AbstractValue location (Value location body) effects, Ord a) => a -> a -> Evaluator location (Value location body) effects (Value location body)
         go l r = case comparator of
-          Concrete f  -> boolean (f l r)
-          Generalized -> integer (orderingToInt (compare l r))
+          Concrete f  -> pure $ boolean (f l r)
+          Generalized -> pure $ integer (orderingToInt (compare l r))
 
         -- Map from [LT, EQ, GT] to [-1, 0, 1]
         orderingToInt :: Ordering -> Prelude.Integer
@@ -209,11 +209,11 @@ instance ( Members '[ Allocator location (Value location body)
 
 
   liftBitwise operator target
-    | Integer (Number.Integer i) <- target = integer $ operator i
+    | Integer (Number.Integer i) <- target = pure . integer $ operator i
     | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
-    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = integer $ operator i j
+    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 

@@ -73,7 +73,7 @@ defineBuiltins :: ( AbstractValue location value effects
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin Print (lambda (\ v -> variable v >>= asString >>= prim Print . unpack >> unit))
+  builtin Print (lambda (\ v -> variable v >>= asString >>= prim Print . unpack >> pure unit))
 
 
 -- | Call a 'Builtin' with parameters.

@@ -102,18 +102,18 @@ instance AbstractHole Type where
   hole = Hole
 
 instance AbstractIntro Type where
-  unit       = pure Unit
-  integer _  = pure Int
-  boolean _  = pure Bool
-  string _   = pure String
-  float _    = pure Float
-  symbol _   = pure Symbol
-  rational _ = pure Rational
-  multiple   = pure . zeroOrMoreProduct
-  hash       = pure . Hash
-  kvPair k v = pure (k :* v)
+  unit       = Unit
+  integer _  = Int
+  boolean _  = Bool
+  string _   = String
+  float _    = Float
+  symbol _   = Symbol
+  rational _ = Rational
+  multiple   = zeroOrMoreProduct
+  hash       = Hash
+  kvPair k v = k :* v
 
-  null          = pure Null
+  null        = Null
 
 
 instance ( Members '[ Allocator location Type
