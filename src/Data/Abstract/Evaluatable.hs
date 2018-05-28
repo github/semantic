@@ -78,9 +78,9 @@ type EvaluatableConstraints location term value effects =
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: forall location term value inner inner' outer
+evaluatePackageWith :: forall location term value inner outer
                     -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that? If not, can we factor this effect list out?
-                    .  ( Addressable location (Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+                    .  ( Addressable location (Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        , Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
@@ -95,8 +95,7 @@ evaluatePackageWith :: forall location term value inner inner' outer
                                   , Trace
                                   ] outer
                        , Recursive term
-                       , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (Primitive ': LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+                       , inner ~ (Primitive ': LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module      term (TermEvaluator term location value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)))
@@ -105,8 +104,6 @@ evaluatePackageWith :: forall location term value inner inner' outer
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
-  . fmap fst
-  . runState (lowerBound :: Gotos location value (Reader Span ': Reader PackageInfo ': outer))
   . runReader (packageModules (packageBody package))
   . withPrelude (packagePrelude (packageBody package))
   . raiseHandler (runModules (runTermEvaluator . evalModule))
@@ -125,9 +122,8 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . raiseHandler runReturn
           . raiseHandler runLoopControl
           . runPrimitive
-          . raiseHandler (runGoto Gotos getGotos)
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': Reader Span ': Reader PackageInfo ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) . TermEvaluator $ do
           v <- maybe unit snd <$> require m
           maybe (pure v) ((`call` []) <=< variable) sym
@@ -148,9 +144,6 @@ evaluatePackageWith analyzeModule analyzeTerm package
           | Exports.null ports = env
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
         pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator getEnv)
-
-newtype Gotos location value outer = Gotos { getGotos :: GotoTable (Primitive ': LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value outer) ': outer) value }
-  deriving (Lower)
 
 
 -- | Isolate the given action with an empty global environment and exports.
