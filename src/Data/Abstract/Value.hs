@@ -14,7 +14,7 @@ import qualified Data.Set as Set
 import Prologue
 
 data Value location body
-  = Closure PackageInfo ModuleInfo [Name] ClosureBody (Environment location)
+  = Closure PackageInfo ModuleInfo [Name] (ClosureBody body) (Environment location)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -32,7 +32,7 @@ data Value location body
   | Hole
   deriving (Eq, Ord, Show)
 
-data ClosureBody = Label Int
+data ClosureBody body = Label Int
   deriving (Eq, Ord, Show)
 
 
