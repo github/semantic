@@ -3,7 +3,6 @@ module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
 , AbstractFunction(..)
-, AbstractHole(..)
 , Comparator(..)
 , asBool
 , while
@@ -41,10 +40,6 @@ import Prologue hiding (TypeError)
 data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
-
-class AbstractHole value where
-  hole :: value
-
 
 class Show value => AbstractFunction location value effects where
   -- | Build a closure (a binder like a lambda or method definition).
