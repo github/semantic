@@ -166,7 +166,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-    modifyEnv (mergeEnvs (renamed importedEnv)) *> (pure (Rval unit))
+    modifyEnv (mergeEnvs (renamed importedEnv)) $> Rval unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv

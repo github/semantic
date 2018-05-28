@@ -33,7 +33,7 @@ data Value location body
   | Hole
   deriving (Eq, Ord, Show)
 
-data ClosureBody location body = ClosureBody (body (Value location body))
+newtype ClosureBody location body = ClosureBody (body (Value location body))
 
 instance Eq   (ClosureBody location body) where
   _ == _ = True
@@ -99,7 +99,7 @@ instance Show location => AbstractIntro (Value location body) where
 
   multiple = Tuple
 
-  kvPair k = KVPair k
+  kvPair = KVPair
   hash = Hash . map (uncurry KVPair)
 
   null     = Null
