@@ -15,10 +15,15 @@ import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Prologue
 
-data Builtin = Print
-  deriving (Bounded, Enum, Eq, Ord, Show)
+data Builtin args result where
+  Print :: Builtin String ()
 
-builtinName :: Builtin -> Name
+deriving instance Eq   (Builtin args result)
+deriving instance Ord  (Builtin args result)
+deriving instance Show (Builtin args result)
+
+
+builtinName :: Builtin args result -> Name
 builtinName = name . pack . ("__semantic_" <>) . headToLower . show
   where headToLower (c:cs) = toLower c : cs
         headToLower ""     = ""
@@ -35,7 +40,7 @@ builtin :: ( HasCallStack
            , Ord location
            , Reducer value (Cell location value)
            )
-        => Builtin
+        => Builtin args result
         -> Evaluator location value effects value
         -> Evaluator location value effects ()
 builtin b def = withCurrentCallStack callStack $ do
@@ -72,12 +77,12 @@ defineBuiltins =
 
 
 -- | Call a 'Builtin' with parameters.
-prim :: Member (Primitive value) effects => Builtin -> [value] -> Evaluator location value effects value
+prim :: (Effectful m, Member Primitive effects) => Builtin args result -> args -> m effects result
 prim builtin params = send (Prim builtin params)
 
-data Primitive value result where
-  Prim :: Builtin -> [value] -> Primitive value value
+data Primitive result where
+  Prim :: Builtin args result -> args -> Primitive result
 
-runPrimitive :: (AbstractValue location value effects, Member Trace effects) => Evaluator location value (Primitive value ': effects) a -> Evaluator location value effects a
+runPrimitive :: (Effectful m, Member Trace effects) => m (Primitive ': effects) a -> m effects a
 runPrimitive = interpret (\ (Prim builtin params) -> case builtin of
-  Print -> traverse (asString >=> trace . unpack) params >> unit)
+  Print -> trace params)
