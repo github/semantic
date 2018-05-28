@@ -62,13 +62,13 @@ runGraph graphType includePackages project
             . runIgnoringTrace
             . resumingLoadError
             . resumingUnspecialized
-            . resumingValueError
             . resumingEnvironmentError
             . resumingEvalError
             . resumingResolutionError
             . resumingAddressError
+            . runTermEvaluator @_ @_ @(Value (Located Precise) _)
+            . resumingValueError
             . graphing
-            . runTermEvaluator @_ @_ @(Value (Located Precise))
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Resolution, Task, Trace] effs
@@ -129,7 +129,7 @@ resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> s
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => Evaluator location (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location (Value location) effects a
+resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => TermEvaluator term location (Value location term) (Resumable (ValueError location term) ': effects) a -> TermEvaluator term location (Value location term) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))
@@ -139,7 +139,7 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err
   NumericError{}    -> pure hole
   Numeric2Error{}   -> pure hole
   ComparisonError{} -> pure hole
-  NamespaceError{}  -> getEnv
+  NamespaceError{}  -> TermEvaluator getEnv
   BitwiseError{}    -> pure hole
   Bitwise2Error{}   -> pure hole
   KeyValueError{}   -> pure (hole, hole)

@@ -2,9 +2,9 @@ module Analysis.PHP.Spec (spec) where
 
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
-import qualified Language.PHP.Assignment as PHP
+import Data.Abstract.Value
 import qualified Data.Language as Language
-
+import qualified Language.PHP.Assignment as PHP
 import SpecHelpers
 
 
@@ -30,4 +30,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/php/analysis/"
     evaluate entry = evalPHPProject (fixtures <> entry)
-    evalPHPProject path = testEvaluating <$> evaluateProject phpParser Language.PHP Nothing path
+    evalPHPProject path = testEvaluating . runTermEvaluator @_ @_ @(Value Precise PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path

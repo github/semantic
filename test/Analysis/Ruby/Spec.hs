@@ -29,7 +29,7 @@ spec = parallel $ do
 
     it "evaluates load with wrapper" $ do
       ((res, state), _) <- evaluate "load-wrap.rb"
-      res `shouldBe` Left (SomeExc (inject @(EnvironmentError (Value Precise)) (FreeVariable "foo")))
+      res `shouldBe` Left (SomeExc (inject @(EnvironmentError (Value Precise Ruby.Term)) (FreeVariable "foo")))
       Env.names (environment state) `shouldContain` [ "Object" ]
 
     it "evaluates subclass" $ do
@@ -78,4 +78,4 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)
-    evalRubyProject path = testEvaluating <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
+    evalRubyProject path = testEvaluating . runTermEvaluator @_ @_ @(Value Precise Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path

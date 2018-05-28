@@ -39,13 +39,13 @@ justEvaluating
   . evaluating
   . runPrintingTrace
   . runLoadError
-  . runValueError
   . runUnspecialized
   . runResolutionError
   . runEnvironmentError
   . runEvalError
   . runAddressError
   . runTermEvaluator @_ @Precise
+  . runValueError
 
 evaluatingWithHoles
   = runM
@@ -53,12 +53,12 @@ evaluatingWithHoles
   . runPrintingTrace
   . resumingLoadError
   . resumingUnspecialized
-  . resumingValueError
   . resumingEnvironmentError
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError
   . runTermEvaluator @_ @Precise
+  . resumingValueError
 
 checking
   = runM @_ @IO
