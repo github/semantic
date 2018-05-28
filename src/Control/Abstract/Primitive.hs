@@ -91,4 +91,7 @@ runPrimitive = interpret (\ (Prim builtin params) -> case builtin of
 data SomeBuiltin where
   SomeBuiltin :: Builtin arg return -> SomeBuiltin
 
+instance Eq SomeBuiltin where
+  SomeBuiltin Print == SomeBuiltin Print = True
+
 deriving instance Show SomeBuiltin
