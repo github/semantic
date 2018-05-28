@@ -13,7 +13,7 @@ import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Prologue
 
-data Value location term
+data Value location body
   = Closure PackageInfo ModuleInfo [Name] ClosureBody (Environment location)
   | Unit
   | Boolean Bool
@@ -22,12 +22,12 @@ data Value location term
   | Float    (Number.Number Scientific)
   | String ByteString
   | Symbol ByteString
-  | Tuple [Value location term]
-  | Array [Value location term]
+  | Tuple [Value location body]
+  | Array [Value location body]
   | Class Name (Environment location)
   | Namespace Name (Environment location)
-  | KVPair (Value location term) (Value location term)
-  | Hash [Value location term]
+  | KVPair (Value location body) (Value location body)
+  | Hash [Value location body]
   | Null
   | Hole
   deriving (Eq, Ord, Show)
