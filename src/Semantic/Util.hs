@@ -47,19 +47,6 @@ justEvaluating
   . runTermEvaluator @_ @Precise
   . runValueError
 
-evaluatingWithHoles
-  = runM
-  . evaluating
-  . runPrintingTrace
-  . resumingLoadError
-  . resumingUnspecialized
-  . resumingEnvironmentError
-  . resumingEvalError
-  . resumingResolutionError
-  . resumingAddressError
-  . runTermEvaluator @_ @Precise
-  . resumingValueError
-
 checking
   = runM @_ @IO
   . evaluating
@@ -80,7 +67,6 @@ evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ru
 evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
 evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
 evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript javaScriptPrelude path
-evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
