@@ -22,6 +22,7 @@ module Control.Abstract.Heap
 import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
+import Control.Monad.Effect.Internal
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Heap
@@ -120,10 +121,10 @@ data Allocator location value return where
   Alloc :: Name                   -> Allocator location value (Address location value)
   Deref :: Address location value -> Allocator location value value
 
-runAllocator :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Evaluator location value (Allocator location value ': effects) a -> Evaluator location value effects a
-runAllocator = interpret (\ eff -> case eff of
-  Alloc name -> Address <$> allocCell name
-  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr)))
+runAllocator :: (Addressable location effects, Effectful (m location value), Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => m location value (Allocator location value ': effects) a -> m location value effects a
+runAllocator = raiseHandler (interpret (\ eff -> case eff of
+  Alloc name -> lowerEff $ Address <$> allocCell name
+  Deref addr -> lowerEff $ heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))))
 
 
 data AddressError location value resume where
