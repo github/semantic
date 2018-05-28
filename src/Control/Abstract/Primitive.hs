@@ -94,4 +94,7 @@ data SomeBuiltin where
 instance Eq SomeBuiltin where
   SomeBuiltin Print == SomeBuiltin Print = True
 
+instance Ord SomeBuiltin where
+  SomeBuiltin Print `compare` SomeBuiltin Print = EQ
+
 deriving instance Show SomeBuiltin
