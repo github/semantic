@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
+, AbstractIntro(..)
 , AbstractFunction(..)
 , AbstractHole(..)
 , Comparator(..)
@@ -55,17 +56,47 @@ class Show value => AbstractFunction location value effects where
   call :: value -> [Evaluator location value effects value] -> Evaluator location value effects value
 
 
--- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
---
---   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class AbstractFunction location value effects => AbstractValue location value effects where
+class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: Evaluator location value effects value
 
+  -- | Construct an abstract boolean value.
+  boolean :: Bool -> Evaluator location value effects value
+
+  -- | Construct an abstract string value.
+  string :: ByteString -> Evaluator location value effects value
+
+  -- | Construct a self-evaluating symbol value.
+  --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
+  symbol :: ByteString -> Evaluator location value effects value
+
   -- | Construct an abstract integral value.
   integer :: Integer -> Evaluator location value effects value
 
+  -- | Construct a floating-point value.
+  float :: Scientific -> Evaluator location value effects value
+
+  -- | Construct a rational value.
+  rational :: Rational -> Evaluator location value effects value
+
+  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
+  multiple :: [value] -> Evaluator location value effects value
+
+  -- | Construct a key-value pair for use in a hash.
+  kvPair :: value -> value -> Evaluator location value effects value
+
+  -- | Construct a hash out of pairs.
+  hash :: [(value, value)] -> Evaluator location value effects value
+
+  -- | Construct the nil/null datatype.
+  null :: Evaluator location value effects value
+
+
+-- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
+--
+--   This allows us to abstract the choice of whether to evaluate under binders for different value types.
+class (AbstractFunction location value effects, AbstractIntro value) => AbstractValue location value effects where
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
                -> (value -> Evaluator location value effects value)
@@ -90,45 +121,17 @@ class AbstractFunction location value effects => AbstractValue location value ef
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
                -> (value -> value -> Evaluator location value effects value)
 
-  -- | Construct an abstract boolean value.
-  boolean :: Bool -> Evaluator location value effects value
-
-  -- | Construct an abstract string value.
-  string :: ByteString -> Evaluator location value effects value
-
-  -- | Construct a self-evaluating symbol value.
-  --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: ByteString -> Evaluator location value effects value
-
-  -- | Construct a floating-point value.
-  float :: Scientific -> Evaluator location value effects value
-
-  -- | Construct a rational value.
-  rational :: Rational -> Evaluator location value effects value
-
-  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> Evaluator location value effects value
-
   -- | Construct an array of zero or more values.
   array :: [value] -> Evaluator location value effects value
-
-  -- | Construct a key-value pair for use in a hash.
-  kvPair :: value -> value -> Evaluator location value effects value
-
-  -- | Extract the contents of a key-value pair as a tuple.
-  asPair :: value -> Evaluator location value effects (value, value)
-
-  -- | Construct a hash out of pairs.
-  hash :: [(value, value)] -> Evaluator location value effects value
 
   -- | Extract a 'ByteString' from a given value.
   asString :: value -> Evaluator location value effects ByteString
 
+  -- | Extract the contents of a key-value pair as a tuple.
+  asPair :: value -> Evaluator location value effects (value, value)
+
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> Evaluator location value effects a -> Evaluator location value effects a -> Evaluator location value effects a
-
-  -- | Construct the nil/null datatype.
-  null :: Evaluator location value effects value
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
   index :: value -> value -> Evaluator location value effects value

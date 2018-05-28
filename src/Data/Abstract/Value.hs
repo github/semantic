@@ -81,6 +81,24 @@ instance ( Members '[ Allocator location (Value location body)
       _ -> throwValueError (CallError op)
 
 
+instance Show location => AbstractIntro (Value location body) where
+  unit     = pure Unit
+  integer  = pure . Integer . Number.Integer
+  boolean  = pure . Boolean
+  string   = pure . String
+  float    = pure . Float . Number.Decimal
+  symbol   = pure . Symbol
+  rational = pure . Rational . Number.Ratio
+
+  multiple = pure . Tuple
+
+  kvPair k = pure . KVPair k
+  hash = pure . Hash . map (uncurry KVPair)
+
+  null     = pure Null
+
+
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Members '[ Allocator location (Value location body)
                     , LoopControl (Value location body)
@@ -97,26 +115,11 @@ instance ( Members '[ Allocator location (Value location body)
          , Show location
          )
       => AbstractValue location (Value location body) (Goto effects (Value location body) ': effects) where
-  unit     = pure Unit
-  integer  = pure . Integer . Number.Integer
-  boolean  = pure . Boolean
-  string   = pure . String
-  float    = pure . Float . Number.Decimal
-  symbol   = pure . Symbol
-  rational = pure . Rational . Number.Ratio
-
-  multiple = pure . Tuple
-  array    = pure . Array
-
-  kvPair k = pure . KVPair k
-
-  null     = pure Null
-
   asPair val
     | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
 
-  hash = pure . Hash . map (uncurry KVPair)
+  array    = pure . Array
 
   klass n [] env = pure $ Class n env
   klass n supers env = do
