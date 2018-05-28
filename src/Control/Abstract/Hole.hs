@@ -9,3 +9,7 @@ data Hole a = Partial | Total a
 
 instance AbstractHole (Hole a) where
   hole = Partial
+
+toMaybe :: Hole a -> Maybe a
+toMaybe Partial = Nothing
+toMaybe (Total a) = Just a
