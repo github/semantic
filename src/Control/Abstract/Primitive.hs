@@ -10,19 +10,9 @@ import Control.Abstract.Value
 import Data.Abstract.Environment
 import Data.Abstract.Name
 import Data.ByteString.Char8 (pack, unpack)
-import Data.Char
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Prologue
-
-data Builtin = Print
-  deriving (Bounded, Enum, Eq, Ord, Show)
-
-builtinName :: Builtin -> Name
-builtinName = name . pack . ("__semantic_" <>) . headToLower . show
-  where headToLower (c:cs) = toLower c : cs
-        headToLower ""     = ""
-
 
 builtin :: ( HasCallStack
            , Members '[ Allocator location value
@@ -35,13 +25,13 @@ builtin :: ( HasCallStack
            , Ord location
            , Reducer value (Cell location value)
            )
-        => Builtin
+        => String
         -> Evaluator location value effects value
         -> Evaluator location value effects ()
-builtin b def = withCurrentCallStack callStack $ do
-  let name = builtinName b
-  addr <- alloc name
-  modifyEnv (insert name addr)
+builtin s def = withCurrentCallStack callStack $ do
+  let name' = name (pack ("__semantic_" <> s))
+  addr <- alloc name'
+  modifyEnv (insert name' addr)
   def >>= assign addr
 
 lambda :: (AbstractFunction location value effects, Member Fresh effects)
@@ -68,4 +58,4 @@ defineBuiltins :: ( AbstractValue location value effects
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin Print (lambda (\ v -> variable v >>= asString >>= trace . unpack >> pure unit))
+  builtin "print" (lambda (\ v -> variable v >>= asString >>= trace . unpack >> pure unit))
