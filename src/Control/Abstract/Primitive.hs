@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
 module Control.Abstract.Primitive where
 
 import Control.Abstract.Addressable
@@ -74,3 +74,6 @@ defineBuiltins =
 
 data Primitive value result where
   Prim :: Builtin -> Primitive value value
+
+runPrimitive :: (Builtin -> Evaluator location value effects value) -> Evaluator location value (Primitive value ': effects) a -> Evaluator location value effects a
+runPrimitive handler = interpret (\ (Prim builtin) -> handler builtin)
