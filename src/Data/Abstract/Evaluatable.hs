@@ -98,7 +98,7 @@ evaluatePackageWith :: forall location term value inner inner' outer
                        , inner ~ (Goto inner' value ': inner')
                        , inner' ~ (Primitive ': LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (TermEvaluator term location value inner value) -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
+                    => (SubtermAlgebra Module      term (TermEvaluator term location value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)))
                     -> Package term
                     -> TermEvaluator term location value outer [value]
