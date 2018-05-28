@@ -32,6 +32,10 @@ data Value location term
   | Hole
   deriving (Eq, Show, Ord)
 
+data ClosureBody = Label Label
+  deriving (Eq, Show, Ord)
+
+
 instance Ord location => ValueRoots location (Value location term) where
   valueRoots v
     | Closure _ _ _ _ env <- v = Env.addresses env
