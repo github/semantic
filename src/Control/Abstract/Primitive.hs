@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
 module Control.Abstract.Primitive where
 
 import Control.Abstract.Addressable
