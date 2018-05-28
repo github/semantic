@@ -6,3 +6,6 @@ class AbstractHole a where
 
 data Hole a = Partial | Total a
   deriving (Foldable, Functor, Eq, Ord, Show, Traversable)
+
+instance AbstractHole (Hole a) where
+  hole = Partial
