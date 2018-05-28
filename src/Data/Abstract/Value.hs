@@ -33,7 +33,7 @@ data Value location term
   deriving (Eq, Ord, Show)
 
 data ClosureBody = Label Int
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Ord, Show)
 
 
 instance Ord location => ValueRoots location (Value location term) where
