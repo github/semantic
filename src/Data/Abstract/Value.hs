@@ -105,7 +105,6 @@ instance Show location => AbstractIntro (Value location body) where
   null     = Null
 
 
-
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Members '[ Allocator location (Value location body)
