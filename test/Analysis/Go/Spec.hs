@@ -2,7 +2,6 @@ module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
-import Data.Abstract.Value
 import qualified Data.Language as Language
 import qualified Language.Go.Assignment as Go
 import SpecHelpers
@@ -26,4 +25,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/go/analysis/"
     evaluate entry = evalGoProject (fixtures <> entry)
-    evalGoProject path = testEvaluating . runTermEvaluator @_ @_ @(Value Precise Go.Term) <$> evaluateProject goParser Language.Go Nothing path
+    evalGoProject path = testEvaluating <$> evaluateProject goParser Language.Go Nothing path

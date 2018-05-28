@@ -84,12 +84,13 @@ testEvaluating
   . fmap (first reassociate)
   . evaluating
   . runLoadError
-  . runValueError
   . runUnspecialized
   . runResolutionError
   . runEnvironmentError
   . runEvalError
   . runAddressError
+  . runTermEvaluator @_ @_ @(Value Precise _)
+  . runValueError
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)

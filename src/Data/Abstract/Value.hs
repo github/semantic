@@ -256,7 +256,7 @@ instance Show location => Show1 (ValueError location term) where
 throwValueError :: Member (Resumable (ValueError location term)) effects => ValueError location term resume -> Evaluator location (Value location term) effects resume
 throwValueError = throwResumable
 
-runValueError :: Effectful (m location (Value location term)) => m location (Value location term) (Resumable (ValueError location term) ': effects) a -> m location (Value location term) effects (Either (SomeExc (ValueError location term)) a)
+runValueError :: TermEvaluator term location (Value location term) (Resumable (ValueError location term) ': effects) a -> TermEvaluator term location (Value location term) effects (Either (SomeExc (ValueError location term)) a)
 runValueError = runResumable
 
 runValueErrorWith :: Effectful (m location (Value location term)) => (forall resume . ValueError location term resume -> m location (Value location term) effects resume) -> m location (Value location term) (Resumable (ValueError location term) ': effects) a -> m location (Value location term) effects a

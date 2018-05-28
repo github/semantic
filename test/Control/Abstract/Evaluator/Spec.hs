@@ -34,7 +34,9 @@ evaluate
   . evaluating @Precise @(Value Precise ())
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . runTermEvaluator @() @Precise @(Value Precise ())
   . Value.runValueError
+  . TermEvaluator @() @Precise @(Value Precise ())
   . runEnvironmentError
   . runAddressError
   . runAllocator
