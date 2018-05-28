@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs #-}
 module Control.Abstract.Primitive where
 
 import Control.Abstract.Addressable
@@ -69,3 +70,7 @@ defineBuiltins :: ( AbstractValue location value effects
                => Evaluator location value effects ()
 defineBuiltins =
   builtin Print (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
+
+
+data Primitive value result where
+  Prim :: Builtin -> Primitive value value
