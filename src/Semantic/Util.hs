@@ -44,7 +44,7 @@ justEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @Precise
+  . runTermEvaluator @_ @Precise @(Value Precise (Eff _))
   . runValueError
 
 checking

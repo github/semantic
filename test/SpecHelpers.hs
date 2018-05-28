@@ -89,8 +89,8 @@ testEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @_ @(Value Precise _)
   . runValueError
+  . runTermEvaluator @_ @_ @(Value Precise (Eff _))
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)

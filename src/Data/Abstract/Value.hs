@@ -6,6 +6,7 @@ import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
+import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
@@ -32,8 +33,16 @@ data Value location body
   | Hole
   deriving (Eq, Ord, Show)
 
-data ClosureBody location body = ClosureBody Label
-  deriving (Eq, Ord, Show)
+data ClosureBody location body = ClosureBody (body (Value location body))
+
+instance Eq   (ClosureBody location body) where
+  _ == _ = True
+
+instance Ord  (ClosureBody location body) where
+  _ `compare` _ = EQ
+
+instance Show (ClosureBody location body) where
+  showsPrec d (ClosureBody _) = showsUnaryWith (const showChar) "ClosureBody" d '_'
 
 
 instance Ord location => ValueRoots location (Value location body) where
@@ -45,7 +54,8 @@ instance Ord location => ValueRoots location (Value location body) where
 instance AbstractHole (Value location body) where
   hole = Hole
 
-instance ( Members '[ Allocator location (Value location body)
+instance ( Coercible body (Eff effects)
+         , Members '[ Allocator location (Value location body)
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (ValueError location body)
@@ -57,17 +67,15 @@ instance ( Members '[ Allocator location (Value location body)
          , Reducer (Value location body) (Cell location (Value location body))
          , Show location
          )
-      => AbstractFunction location (Value location body) (Goto effects (Value location body) ': effects) where
+      => AbstractFunction location (Value location body) effects where
   closure parameters freeVariables body = do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
-    l <- label body
-    Closure packageInfo moduleInfo parameters (ClosureBody l) . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
+    Closure packageInfo moduleInfo parameters (ClosureBody (coerce (lowerEff body))) . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case op of
-      Closure packageInfo moduleInfo names (ClosureBody label) env -> do
-        body <- goto label
+      Closure packageInfo moduleInfo names (ClosureBody body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
@@ -76,7 +84,7 @@ instance ( Members '[ Allocator location (Value location body)
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
+          localEnv (mergeEnvs bindings) (raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
       _ -> throwValueError (CallError op)
 
 
@@ -99,7 +107,8 @@ instance Show location => AbstractIntro (Value location body) where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Members '[ Allocator location (Value location body)
+instance ( Coercible body (Eff effects)
+         , Members '[ Allocator location (Value location body)
                     , LoopControl (Value location body)
                     , Reader (Environment location)
                     , Reader ModuleInfo
@@ -113,7 +122,7 @@ instance ( Members '[ Allocator location (Value location body)
          , Reducer (Value location body) (Cell location (Value location body))
          , Show location
          )
-      => AbstractValue location (Value location body) (Goto effects (Value location body) ': effects) where
+      => AbstractValue location (Value location body) effects where
   asPair val
     | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
