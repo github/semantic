@@ -57,7 +57,7 @@ include :: ( AbstractValue location value effects
                       , Modules location value
                       , Reader (Environment location)
                       , Resumable ResolutionError
-                      , Resumable (EnvironmentError value)
+                      , Resumable (EnvironmentError location)
                       , State (Environment location)
                       , State (Exports location)
                       , State (Heap location (Cell location) value)
@@ -71,7 +71,7 @@ include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> unit)
+  (importedEnv, v) <- isolate (f path) >>= maybeM (pure (emptyEnv, unit))
   modifyEnv (mergeEnvs importedEnv)
   pure (Rval v)
 

@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 module Analysis.Python.Spec (spec) where
 
 import Data.Abstract.Environment as Env

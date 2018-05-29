@@ -150,8 +150,7 @@ evalRequire :: ( AbstractValue location value effects
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
   modifyEnv (mergeEnvs importedEnv)
-  void $ makeNamespace alias addr Nothing
-  unit
+  unit <$ makeNamespace alias addr Nothing
 
 data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -167,7 +166,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-    modifyEnv (mergeEnvs (renamed importedEnv)) *> (Rval <$> unit)
+    modifyEnv (mergeEnvs (renamed importedEnv)) $> Rval unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
@@ -217,7 +216,7 @@ instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ isolate (require modulePath)
-    Rval <$> unit
+    pure (Rval unit)
 
 
 -- | Qualified Export declarations
@@ -235,7 +234,7 @@ instance Evaluatable QualifiedExport where
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
       addExport name alias Nothing
-    Rval <$> unit
+    pure (Rval unit)
 
 
 -- | Qualified Export declarations that export from another module.
@@ -256,7 +255,7 @@ instance Evaluatable QualifiedExportFrom where
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
       maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
-    Rval <$> unit
+    pure (Rval unit)
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -277,7 +276,7 @@ instance Evaluatable DefaultExport where
         addExport name name Nothing
         void $ modifyEnv (Env.insert name addr)
       Nothing -> throwEvalError DefaultExportError
-    Rval <$> unit
+    pure (Rval unit)
 
 
 -- | Lookup type for a type-level key in a typescript map.

@@ -1,11 +1,9 @@
-{-# LANGUAGE OverloadedLists #-}
 module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
-import qualified Language.Go.Assignment as Go
 import qualified Data.Language as Language
-
+import qualified Language.Go.Assignment as Go
 import SpecHelpers
 
 

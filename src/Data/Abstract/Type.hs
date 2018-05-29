@@ -101,6 +101,21 @@ instance Ord location => ValueRoots location Type where
 instance AbstractHole Type where
   hole = Hole
 
+instance AbstractIntro Type where
+  unit       = Unit
+  integer _  = Int
+  boolean _  = Bool
+  string _   = String
+  float _    = Float
+  symbol _   = Symbol
+  rational _ = Rational
+  multiple   = zeroOrMoreProduct
+  hash       = Hash
+  kvPair k v = k :* v
+
+  null        = Null
+
+
 instance ( Members '[ Allocator location Type
                     , Fresh
                     , NonDet
@@ -146,21 +161,9 @@ instance ( Members '[ Allocator location Type
          , Reducer Type (Cell location Type)
          )
       => AbstractValue location Type effects where
-  unit       = pure Unit
-  integer _  = pure Int
-  boolean _  = pure Bool
-  string _   = pure String
-  float _    = pure Float
-  symbol _   = pure Symbol
-  rational _ = pure Rational
-  multiple   = pure . zeroOrMoreProduct
   array fields = do
     var <- fresh
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
-  hash       = pure . Hash
-  kvPair k v = pure (k :* v)
-
-  null          = pure Null
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit

@@ -85,8 +85,8 @@ doRequire :: ( AbstractValue location value effects
 doRequire path = do
   result <- join <$> lookupModule path
   case result of
-    Nothing       -> (,) . maybe emptyEnv fst <$> load path <*> boolean True
-    Just (env, _) -> (,) env                  <$>               boolean False
+    Nothing       -> (,) . maybe emptyEnv fst <$> load path <*> pure (boolean True)
+    Just (env, _) -> pure (env, boolean False)
 
 
 newtype Load a = Load { loadArgs :: [a] }
@@ -124,7 +124,7 @@ doLoad path shouldWrap = do
   traceResolve path path'
   importedEnv <- maybe emptyEnv fst <$> isolate (load path')
   unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
-  boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
+  pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
 

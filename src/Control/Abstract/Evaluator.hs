@@ -16,6 +16,7 @@ module Control.Abstract.Evaluator
 
 import Control.Monad.Effect           as X
 import Control.Monad.Effect.Fresh     as X
+import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
@@ -49,8 +50,8 @@ earlyReturn = send . Return
 catchReturn :: Member (Return value) effects => Evaluator location value effects a -> (forall x . Return value x -> Evaluator location value effects a) -> Evaluator location value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Evaluator location value (Return value ': effects) value -> Evaluator location value effects value
-runReturn = relay pure (\ (Return value) _ -> pure value)
+runReturn :: Effectful (m location value) => m location value (Return value ': effects) value -> m location value effects value
+runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -70,7 +71,7 @@ throwContinue = send . Continue
 catchLoopControl :: Member (LoopControl value) effects => Evaluator location value effects a -> (forall x . LoopControl value x -> Evaluator location value effects a) -> Evaluator location value effects a
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
-runLoopControl :: Evaluator location value (LoopControl value ': effects) value -> Evaluator location value effects value
-runLoopControl = relay pure (\ eff _ -> case eff of
+runLoopControl :: Effectful (m location value) => m location value (LoopControl value ': effects) value -> m location value effects value
+runLoopControl = raiseHandler (relay pure (\ eff _ -> case eff of
   Break    value -> pure value
-  Continue value -> pure value)
+  Continue value -> pure value))

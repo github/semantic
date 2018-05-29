@@ -112,8 +112,8 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
-  eval (VariableDeclaration [])   = Rval <$> unit
-  eval (VariableDeclaration decs) = Rval <$> (multiple =<< traverse subtermValue decs)
+  eval (VariableDeclaration [])   = pure (Rval unit)
+  eval (VariableDeclaration decs) = Rval . multiple <$> traverse subtermValue decs
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of

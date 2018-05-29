@@ -6,6 +6,7 @@ import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
+import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
@@ -13,8 +14,8 @@ import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Prologue
 
-data Value location
-  = Closure PackageInfo ModuleInfo [Name] Label (Environment location)
+data Value location body
+  = Closure PackageInfo ModuleInfo [Name] (ClosureBody location body) (Environment location)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -22,49 +23,61 @@ data Value location
   | Float    (Number.Number Scientific)
   | String ByteString
   | Symbol ByteString
-  | Tuple [Value location]
-  | Array [Value location]
+  | Tuple [Value location body]
+  | Array [Value location body]
   | Class Name (Environment location)
   | Namespace Name (Environment location)
-  | KVPair (Value location) (Value location)
-  | Hash [Value location]
+  | KVPair (Value location body) (Value location body)
+  | Hash [Value location body]
   | Null
   | Hole
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Ord, Show)
 
-instance Ord location => ValueRoots location (Value location) where
+data ClosureBody location body = ClosureBody { closureBodyId :: Int, closureBody :: body (Value location body) }
+
+instance Eq   (ClosureBody location body) where
+  (==) = (==) `on` closureBodyId
+
+instance Ord  (ClosureBody location body) where
+  compare = compare `on` closureBodyId
+
+instance Show (ClosureBody location body) where
+  showsPrec d (ClosureBody i _) = showsBinaryWith showsPrec (const showChar) "ClosureBody" d i '_'
+
+
+instance Ord location => ValueRoots location (Value location body) where
   valueRoots v
     | Closure _ _ _ _ env <- v = Env.addresses env
     | otherwise                = mempty
 
 
-instance AbstractHole (Value location) where
+instance AbstractHole (Value location body) where
   hole = Hole
 
-instance ( Members '[ Allocator location (Value location)
-                    , Reader (Environment location)
+instance ( Coercible body (Eff effects)
+         , Members '[ Allocator location (Value location body)
+                    , Fresh
                     , Reader ModuleInfo
                     , Reader PackageInfo
-                    , Resumable (ValueError location)
-                    , Return (Value location)
+                    , Resumable (ValueError location body)
+                    , Return (Value location body)
                     , State (Environment location)
-                    , State (Heap location (Cell location) (Value location))
+                    , State (Heap location (Cell location) (Value location body))
                     ] effects
          , Ord location
-         , Reducer (Value location) (Cell location (Value location))
+         , Reducer (Value location body) (Cell location (Value location body))
          , Show location
          )
-      => AbstractFunction location (Value location) (Goto effects (Value location) ': effects) where
+      => AbstractFunction location (Value location body) effects where
   closure parameters freeVariables body = do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
-    l <- label body
-    Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
+    i <- fresh
+    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case op of
-      Closure packageInfo moduleInfo names label env -> do
-        body <- goto label
+      Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
@@ -73,46 +86,50 @@ instance ( Members '[ Allocator location (Value location)
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
+          localEnv (mergeEnvs bindings) (raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
       _ -> throwValueError (CallError op)
 
 
+instance Show location => AbstractIntro (Value location body) where
+  unit     = Unit
+  integer  = Integer . Number.Integer
+  boolean  = Boolean
+  string   = String
+  float    = Float . Number.Decimal
+  symbol   = Symbol
+  rational = Rational . Number.Ratio
+
+  multiple = Tuple
+
+  kvPair = KVPair
+  hash = Hash . map (uncurry KVPair)
+
+  null     = Null
+
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Members '[ Allocator location (Value location)
-                    , LoopControl (Value location)
+instance ( Coercible body (Eff effects)
+         , Members '[ Allocator location (Value location body)
+                    , Fresh
+                    , LoopControl (Value location body)
                     , Reader (Environment location)
                     , Reader ModuleInfo
                     , Reader PackageInfo
-                    , Resumable (ValueError location)
-                    , Return (Value location)
+                    , Resumable (ValueError location body)
+                    , Return (Value location body)
                     , State (Environment location)
-                    , State (Heap location (Cell location) (Value location))
+                    , State (Heap location (Cell location) (Value location body))
                     ] effects
          , Ord location
-         , Reducer (Value location) (Cell location (Value location))
+         , Reducer (Value location body) (Cell location (Value location body))
          , Show location
          )
-      => AbstractValue location (Value location) (Goto effects (Value location) ': effects) where
-  unit     = pure Unit
-  integer  = pure . Integer . Number.Integer
-  boolean  = pure . Boolean
-  string   = pure . String
-  float    = pure . Float . Number.Decimal
-  symbol   = pure . Symbol
-  rational = pure . Rational . Number.Ratio
-
-  multiple = pure . Tuple
-  array    = pure . Array
-
-  kvPair k = pure . KVPair k
-
-  null     = pure Null
-
+      => AbstractValue location (Value location body) effects where
   asPair val
     | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
 
-  hash = pure . Hash . map (uncurry KVPair)
+  array    = pure . Array
 
   klass n [] env = pure $ Class n env
   klass n supers env = do
@@ -150,9 +167,9 @@ instance ( Members '[ Allocator location (Value location)
       | otherwise = throwValueError (IndexError arr idx)
 
   liftNumeric f arg
-    | Integer (Number.Integer i) <- arg = integer $ f i
-    | Float (Number.Decimal d)   <- arg = float   $ f d
-    | Rational (Number.Ratio r)  <- arg = rational $ f r
+    | Integer (Number.Integer i) <- arg = pure . integer  $ f i
+    | Float (Number.Decimal d)   <- arg = pure . float    $ f d
+    | Rational (Number.Ratio r)  <- arg = pure . rational $ f r
     | otherwise = throwValueError (NumericError arg)
 
   liftNumeric2 f left right
@@ -170,11 +187,11 @@ instance ( Members '[ Allocator location (Value location)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: (AbstractValue location (Value location) effects, Member (Resumable (ValueError location)) effects) => Either ArithException Number.SomeNumber -> Evaluator location (Value location) effects (Value location)
+        specialize :: (AbstractValue location (Value location body) effects, Member (Resumable (ValueError location body)) effects) => Either ArithException Number.SomeNumber -> Evaluator location (Value location body) effects (Value location body)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
-        specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
-        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
-        specialize (Right (Number.SomeNumber (Number.Decimal d))) = float d
+        specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
+        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
+        specialize (Right (Number.SomeNumber (Number.Decimal d))) = pure $ float d
         pair = (left, right)
 
   liftComparison comparator left right
@@ -184,15 +201,15 @@ instance ( Members '[ Allocator location (Value location)
     | (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- pair = go i j
     | (String  i,                  String  j)                  <- pair = go i j
     | (Boolean i,                  Boolean j)                  <- pair = go i j
-    | (Unit,                       Unit)                       <- pair = boolean True
+    | (Unit,                       Unit)                       <- pair = pure $ boolean True
     | otherwise = throwValueError (ComparisonError left right)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue location (Value location) effects, Ord a) => a -> a -> Evaluator location (Value location) effects (Value location)
+        go :: (AbstractValue location (Value location body) effects, Ord a) => a -> a -> Evaluator location (Value location body) effects (Value location body)
         go l r = case comparator of
-          Concrete f  -> boolean (f l r)
-          Generalized -> integer (orderingToInt (compare l r))
+          Concrete f  -> pure $ boolean (f l r)
+          Generalized -> pure $ integer (orderingToInt (compare l r))
 
         -- Map from [LT, EQ, GT] to [-1, 0, 1]
         orderingToInt :: Ordering -> Prelude.Integer
@@ -202,11 +219,11 @@ instance ( Members '[ Allocator location (Value location)
 
 
   liftBitwise operator target
-    | Integer (Number.Integer i) <- target = integer $ operator i
+    | Integer (Number.Integer i) <- target = pure . integer $ operator i
     | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
-    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = integer $ operator i j
+    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
@@ -217,25 +234,25 @@ instance ( Members '[ Allocator location (Value location)
 
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
-data ValueError location resume where
-  StringError            :: Value location                   -> ValueError location ByteString
-  BoolError              :: Value location                   -> ValueError location Bool
-  IndexError             :: Value location -> Value location -> ValueError location (Value location)
-  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location)
-  CallError              :: Value location                   -> ValueError location (Value location)
-  NumericError           :: Value location                   -> ValueError location (Value location)
-  Numeric2Error          :: Value location -> Value location -> ValueError location (Value location)
-  ComparisonError        :: Value location -> Value location -> ValueError location (Value location)
-  BitwiseError           :: Value location                   -> ValueError location (Value location)
-  Bitwise2Error          :: Value location -> Value location -> ValueError location (Value location)
-  KeyValueError          :: Value location                   -> ValueError location (Value location, Value location)
+data ValueError location body resume where
+  StringError            :: Value location body                        -> ValueError location body ByteString
+  BoolError              :: Value location body                        -> ValueError location body Bool
+  IndexError             :: Value location body -> Value location body -> ValueError location body (Value location body)
+  NamespaceError         :: Prelude.String                             -> ValueError location body (Environment location)
+  CallError              :: Value location body                        -> ValueError location body (Value location body)
+  NumericError           :: Value location body                        -> ValueError location body (Value location body)
+  Numeric2Error          :: Value location body -> Value location body -> ValueError location body (Value location body)
+  ComparisonError        :: Value location body -> Value location body -> ValueError location body (Value location body)
+  BitwiseError           :: Value location body                        -> ValueError location body (Value location body)
+  Bitwise2Error          :: Value location body -> Value location body -> ValueError location body (Value location body)
+  KeyValueError          :: Value location body                        -> ValueError location body (Value location body, Value location body)
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError        :: ArithException                   -> ValueError location (Value location)
+  ArithmeticError        :: ArithException                             -> ValueError location body (Value location body)
   -- Out-of-bounds error
-  BoundsError            :: [Value location] -> Prelude.Integer -> ValueError location (Value location)
+  BoundsError            :: [Value location body] -> Prelude.Integer   -> ValueError location body (Value location body)
 
 
-instance Eq location => Eq1 (ValueError location) where
+instance Eq location => Eq1 (ValueError location body) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
@@ -249,15 +266,15 @@ instance Eq location => Eq1 (ValueError location) where
   liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
-deriving instance Show location => Show (ValueError location resume)
-instance Show location => Show1 (ValueError location) where
+deriving instance Show location => Show (ValueError location body resume)
+instance Show location => Show1 (ValueError location body) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location (Value location) effects resume
+throwValueError :: Member (Resumable (ValueError location body)) effects => ValueError location body resume -> Evaluator location (Value location body) effects resume
 throwValueError = throwResumable
 
-runValueError :: Effectful (m location (Value location)) => m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects (Either (SomeExc (ValueError location)) a)
+runValueError :: Effectful (m location (Value location body)) => m location (Value location body) (Resumable (ValueError location body) ': effects) a -> m location (Value location body) effects (Either (SomeExc (ValueError location body)) a)
 runValueError = runResumable
 
-runValueErrorWith :: Effectful (m location (Value location)) => (forall resume . ValueError location resume -> m location (Value location) effects resume) -> m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects a
+runValueErrorWith :: Effectful (m location (Value location body)) => (forall resume . ValueError location body resume -> m location (Value location body) effects resume) -> m location (Value location body) (Resumable (ValueError location body) ': effects) a -> m location (Value location body) effects a
 runValueErrorWith = runResumableWith
