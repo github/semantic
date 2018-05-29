@@ -51,11 +51,11 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: Members '[ Modules location value
-                                 , Reader ModuleInfo
-                                 , Resumable ResolutionError
-                                 , Trace
-                                 ] effects
+resolvePythonModules :: ( Member (Modules location value) effects
+                        , Member (Reader ModuleInfo) effects
+                        , Member (Resumable ResolutionError) effects
+                        , Member Trace effects
+                        )
                      => QualifiedName
                      -> Evaluator location value effects (NonEmpty ModulePath)
 resolvePythonModules q = do
@@ -127,13 +127,12 @@ instance Evaluatable Import where
 
 -- Evaluate a qualified import
 evalQualifiedImport :: ( AbstractValue location value effects
-                       , Members '[ Allocator location value
-                                  , Modules location value
-                                  , Reader (Environment location)
-                                  , State (Environment location)
-                                  , State (Exports location)
-                                  , State (Heap location (Cell location) value)
-                                  ] effects
+                       , Member (Allocator location value) effects
+                       , Member (Modules location value) effects
+                       , Member (Reader (Environment location)) effects
+                       , Member (State (Environment location)) effects
+                       , Member (State (Exports location)) effects
+                       , Member (State (Heap location (Cell location) value)) effects
                        , Ord location
                        , Reducer.Reducer value (Cell location value)
                        )

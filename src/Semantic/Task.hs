@@ -167,7 +167,7 @@ data Task output where
   Serialize :: Format input -> input -> Task Builder
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effs => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
@@ -191,7 +191,7 @@ defaultTimeout :: Timeout
 defaultTimeout = Milliseconds 5000
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $

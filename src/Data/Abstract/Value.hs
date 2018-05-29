@@ -55,15 +55,14 @@ instance AbstractHole (Value location body) where
   hole = Hole
 
 instance ( Coercible body (Eff effects)
-         , Members '[ Allocator location (Value location body)
-                    , Fresh
-                    , Reader ModuleInfo
-                    , Reader PackageInfo
-                    , Resumable (ValueError location body)
-                    , Return (Value location body)
-                    , State (Environment location)
-                    , State (Heap location (Cell location) (Value location body))
-                    ] effects
+         , Member (Allocator location (Value location body)) effects
+         , Member Fresh effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader PackageInfo) effects
+         , Member (Resumable (ValueError location body)) effects
+         , Member (Return (Value location body)) effects
+         , Member (State (Environment location)) effects
+         , Member (State (Heap location (Cell location) (Value location body))) effects
          , Ord location
          , Reducer (Value location body) (Cell location (Value location body))
          , Show location
@@ -109,17 +108,16 @@ instance Show location => AbstractIntro (Value location body) where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
-         , Members '[ Allocator location (Value location body)
-                    , Fresh
-                    , LoopControl (Value location body)
-                    , Reader (Environment location)
-                    , Reader ModuleInfo
-                    , Reader PackageInfo
-                    , Resumable (ValueError location body)
-                    , Return (Value location body)
-                    , State (Environment location)
-                    , State (Heap location (Cell location) (Value location body))
-                    ] effects
+         , Member (Allocator location (Value location body)) effects
+         , Member Fresh effects
+         , Member (LoopControl (Value location body)) effects
+         , Member (Reader (Environment location)) effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader PackageInfo) effects
+         , Member (Resumable (ValueError location body)) effects
+         , Member (Return (Value location body)) effects
+         , Member (State (Environment location)) effects
+         , Member (State (Heap location (Cell location) (Value location body))) effects
          , Ord location
          , Reducer (Value location body) (Cell location (Value location body))
          , Show location

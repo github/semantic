@@ -12,9 +12,8 @@ import Prologue
 
 -- | An analysis performing GC after every instruction.
 collectingTerms :: ( Foldable (Cell location)
-                   , Members '[ Reader (Live location value)
-                              , State (Heap location (Cell location) value)
-                              ] effects
+                   , Member (Reader (Live location value)) effects
+                   , Member (State (Heap location (Cell location) value)) effects
                    , Ord location
                    , ValueRoots location value
                    )
