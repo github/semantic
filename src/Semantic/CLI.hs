@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fforce-recomp #-} -- So that gitHash is correct.
 {-# LANGUAGE ApplicativeDo, RankNTypes, TemplateHaskell #-}
 module Semantic.CLI
 ( main

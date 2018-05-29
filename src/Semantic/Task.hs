@@ -195,7 +195,7 @@ runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] 
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
-      IO.rethrowing (parseToAST defaultTimeout language blob)
+      parseToAST defaultTimeout language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
   AssignmentParser parser assignment -> do
