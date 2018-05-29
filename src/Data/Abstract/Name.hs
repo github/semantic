@@ -6,11 +6,13 @@ module Data.Abstract.Name
 , unName
 ) where
 
+import           Data.Aeson
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Char as Char
+import           Data.JSON.Fields ()
+import           Data.String
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
-import           Data.String
 import           Prologue
 
 -- | The type of variable names.
@@ -53,3 +55,7 @@ instance Show Name where
 instance Hashable Name where
   hashWithSalt salt (Name name) = hashWithSalt salt name
   hashWithSalt salt (I i)       = salt `hashWithSalt` (1 :: Int) `hashWithSalt` i
+
+instance ToJSON Name where
+  toJSON = toJSON . Text.decodeUtf8 . unName
+  toEncoding = toEncoding . Text.decodeUtf8 . unName
