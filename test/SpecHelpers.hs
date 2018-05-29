@@ -24,7 +24,7 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
-import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, prjValue, runValueError)
+import Data.Abstract.Value (Value(..), ValueError, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.ByteString.Builder (toLazyByteString)
@@ -92,13 +92,18 @@ testEvaluating
   . runTermEvaluator @_ @Precise
 
 deNamespace :: Value Precise -> Maybe (Name, [Name])
-deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
+deNamespace (Namespace name scope) = Just (name, Env.names scope)
+deNamespace _                      = Nothing
+
+namespaceScope :: Value Precise -> Maybe (Environment Precise)
+namespaceScope (Namespace _ scope) = Just scope
+namespaceScope _                   = Nothing
 
 derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise -> Maybe (Value Precise)
 derefQName heap = go
   where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
           []        -> Just
-          (n2 : ns) -> fmap namespaceScope . prjValue @(Namespace Precise) >=> go (n2 :| ns)
+          (n2 : ns) -> namespaceScope >=> go (n2 :| ns)
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)
