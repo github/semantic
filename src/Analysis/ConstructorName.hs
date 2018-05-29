@@ -24,7 +24,7 @@ instance Show ConstructorLabel where
   showsPrec _ (ConstructorLabel s) = showString (unpack s)
 
 instance ToJSONFields ConstructorLabel where
-  toJSONFields (ConstructorLabel s) = [ "category" .= decodeUtf8 s ]
+  toJSONFields (ConstructorLabel s) = [ "term" .= decodeUtf8 s ]
 
 
 -- | A typeclass to retrieve the name of the data constructor for a value.
