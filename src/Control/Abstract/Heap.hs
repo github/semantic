@@ -82,7 +82,7 @@ letrec :: ( Member (Allocator location value) effects
        -> Evaluator location value effects (value, Address location value)
 letrec name body = do
   addr <- lookupOrAlloc name
-  v <- localEnv (insert name addr) body
+  v <- localEnv (insert name (unAddress addr)) body
   assign addr v
   pure (v, addr)
 
@@ -96,7 +96,7 @@ letrec' :: ( Member (Allocator location value) effects
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- localEnv id (body addr)
-  v <$ modifyEnv (insert name addr)
+  v <$ modifyEnv (insert name (unAddress addr))
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
