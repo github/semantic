@@ -5,7 +5,6 @@ module Control.Abstract.Environment
 , putEnv
 , modifyEnv
 , withEnv
-, defaultEnvironment
 , withDefaultEnvironment
 , localEnv
 , localize
@@ -42,10 +41,6 @@ withEnv :: Member (State (Environment location)) effects => Environment location
 withEnv = localState . const
 
 
--- | Retrieve the default environment.
-defaultEnvironment :: Member (Reader (Environment location)) effects => Evaluator location value effects (Environment location)
-defaultEnvironment = ask
-
 -- | Set the default environment for the lifetime of an action.
 --   Usually only invoked in a top-level evaluation function.
 withDefaultEnvironment :: Member (Reader (Environment location)) effects => Environment location -> Evaluator location value effects a -> Evaluator location value effects a
@@ -76,6 +71,11 @@ runEnv = interpret (\ (Lookup name) -> (<|>) <$> (Env.lookup name <$> getEnv) <*
 
 reinterpretEnv :: Evaluator location value (Env location ': effects) a -> Evaluator location value (Reader (Environment location) ': State (Environment location) ': effects) a
 reinterpretEnv = reinterpret2 (\ (Lookup name) -> (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment))
+
+
+-- | Retrieve the default environment.
+defaultEnvironment :: Member (Reader (Environment location)) effects => Evaluator location value effects (Environment location)
+defaultEnvironment = ask
 
 
 -- | Errors involving the environment.
