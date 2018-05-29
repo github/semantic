@@ -195,7 +195,7 @@ runParser :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Op
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
-      IO.rethrowing (parseToAST defaultTimeout language blob)
+      parseToAST defaultTimeout language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
   AssignmentParser parser assignment -> do
