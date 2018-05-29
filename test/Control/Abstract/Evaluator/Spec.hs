@@ -19,33 +19,28 @@ import SpecHelpers hiding (reassociate)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (expected, _) <- evaluate (box =<< integer 123)
-    expected `shouldBe` Right (injValue (Value.Integer (Number.Integer 123)))
+    (expected, _) <- evaluate (box (integer 123))
+    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
     (expected, _) <- evaluate $ do
       identity <- closure [name "x"] lowerBound (variable (name "x"))
-      call identity [box =<< integer 123]
-    expected `shouldBe` Right (injValue (Value.Integer (Number.Integer 123)))
+      call identity [box (integer 123)]
+    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
 evaluate
   = runM
   . fmap (first reassociate)
-  . evaluating @Precise @(Value Precise)
+  . evaluating @Precise @(Value Precise (Eff _))
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
-  . Value.runValueError
+  . runValueError
   . runEnvironmentError
   . runAddressError
   . runAllocator
   . (>>= deref)
   . runReturn
   . runLoopControl
-  . fmap fst
-  . runState (Gotos lowerBound)
-  . runGoto Gotos getGotos
-
-newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) Precise (Value Precise) }
 
 reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
 reassociate (Left s) = Left (SomeExc (inject (Const s)))

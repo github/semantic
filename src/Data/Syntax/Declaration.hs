@@ -26,7 +26,7 @@ instance ToJSONFields1 Function
 instance Evaluatable Function where
   eval Function{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
-    (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermValue functionBody))
+    (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermAddress functionBody))
     modifyEnv (Env.insert name addr)
     rvalBox v
     where paramNames = foldMap (freeVariables . subterm)
@@ -52,7 +52,7 @@ instance ToJSONFields1 Method
 instance Evaluatable Method where
   eval Method{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
-    (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermValue methodBody))
+    (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermAddress methodBody))
     modifyEnv (Env.insert name addr)
     rvalBox v
     where paramNames = foldMap (freeVariables . subterm)
@@ -112,8 +112,8 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
-  eval (VariableDeclaration [])   = rvalBox =<< unit
-  eval (VariableDeclaration decs) = rvalBox =<< (multiple =<< traverse subtermValue decs)
+  eval (VariableDeclaration [])   = rvalBox unit
+  eval (VariableDeclaration decs) = rvalBox =<< (multiple <$> traverse subtermValue decs)
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of

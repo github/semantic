@@ -16,6 +16,7 @@ module Control.Abstract.Evaluator
 
 import Control.Monad.Effect           as X
 import Control.Monad.Effect.Fresh     as X
+import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
@@ -49,8 +50,10 @@ earlyReturn = send . Return
 catchReturn :: Member (Return location value) effects => Evaluator location value effects a -> (forall x . Return location value x -> Evaluator location value effects a) -> Evaluator location value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Evaluator location value (Return location value ': effects) (Address location value) -> Evaluator location value effects (Address location value)
-runReturn = relay pure (\ (Return value) _ -> pure value)
+runReturn :: Effectful (m location value)
+          => m location value (Return location value ': effects) (Address location value)
+          -> m location value effects (Address location value)
+runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -77,8 +80,9 @@ catchLoopControl :: Member (LoopControl location value) effects
                  -> Evaluator location value effects a
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
-runLoopControl :: Evaluator location value (LoopControl location value ': effects) (Address location value)
-               -> Evaluator location value effects (Address location value)
-runLoopControl = relay pure (\ eff _ -> case eff of
+runLoopControl :: Effectful (m location value)
+               => m location value (LoopControl location value ': effects) (Address location value)
+               -> m location value effects (Address location value)
+runLoopControl = raiseHandler (relay pure (\ eff _ -> case eff of
   Break    value -> pure value
-  Continue value -> pure value)
+  Continue value -> pure value))

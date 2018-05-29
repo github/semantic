@@ -62,13 +62,13 @@ runGraph graphType includePackages project
             . runIgnoringTrace
             . resumingLoadError
             . resumingUnspecialized
-            . resumingValueError
             . resumingEnvironmentError
             . resumingEvalError
             . resumingResolutionError
             . resumingAddressError
+            . resumingValueError
+            . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (Eff _))
             . graphing
-            . runTermEvaluator @_ @_ @(Value (Located Precise))
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Resolution, Task, Trace] effs
@@ -133,7 +133,7 @@ resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> s
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => Evaluator location (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location (Value location) effects a
+resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => Evaluator location (Value location body) (Resumable (ValueError location body) ': effects) a -> Evaluator location (Value location body) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))
@@ -149,7 +149,7 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: AbstractHole value => Evaluator location value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location value effects (a, [Name])
+resumingEnvironmentError :: AbstractHole location => Evaluator location value (Resumable (EnvironmentError location) ': effects) a -> Evaluator location value effects (a, [Name])
 resumingEnvironmentError
   = runState []
   . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)

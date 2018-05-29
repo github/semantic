@@ -20,7 +20,7 @@ instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 File
 
 instance Evaluatable File where
-  eval File = rvalBox =<< (currentModule >>= string . BC.pack . modulePath)
+  eval File = rvalBox =<< (string . BC.pack . modulePath <$> currentModule)
 
 
 -- A line directive like the Ruby constant `__LINE__`.
@@ -34,4 +34,4 @@ instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Line
 
 instance Evaluatable Line where
-  eval Line = rvalBox =<< (currentSpan >>= integer . fromIntegral . posLine . spanStart)
+  eval Line = rvalBox =<< (integer . fromIntegral . posLine . spanStart <$> currentSpan)

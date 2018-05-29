@@ -231,7 +231,7 @@ instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 NoOp
 
 instance Evaluatable NoOp where
-  eval _ = rvalBox =<< unit
+  eval _ = rvalBox unit
 
 -- Loops
 

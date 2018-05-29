@@ -119,7 +119,7 @@ instance Evaluatable Import where
     let path = NonEmpty.last modulePaths
     importedEnv <- maybe emptyEnv fst <$> isolate (require path)
     modifyEnv (mergeEnvs (select importedEnv))
-    rvalBox =<< unit
+    rvalBox unit
     where
       select importedEnv
         | Prologue.null xs = importedEnv
@@ -142,8 +142,7 @@ evalQualifiedImport :: ( AbstractValue location value effects
 evalQualifiedImport name path = letrec' name $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require path)
   modifyEnv (mergeEnvs importedEnv)
-  void $ makeNamespace name addr Nothing
-  unit
+  unit <$ makeNamespace name addr Nothing
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -192,8 +191,7 @@ instance Evaluatable QualifiedAliasedImport where
       let path = NonEmpty.last modulePaths
       importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
-      void $ makeNamespace alias addr Nothing
-      unit)
+      unit <$ makeNamespace alias addr Nothing)
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis

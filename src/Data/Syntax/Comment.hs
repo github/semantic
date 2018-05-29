@@ -19,7 +19,7 @@ instance ToJSONFields1 Comment where
   toJSONFields1 f@Comment{..} = withChildren f ["contents" .= unpack commentContent ]
 
 instance Evaluatable Comment where
-  eval _ = rvalBox =<< unit
+  eval _ = rvalBox unit
 
 -- TODO: nested comment types
 -- TODO: documentation comment types

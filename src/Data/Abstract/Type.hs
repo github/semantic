@@ -101,6 +101,21 @@ instance Ord location => ValueRoots location Type where
 instance AbstractHole Type where
   hole = Hole
 
+instance AbstractIntro Type where
+  unit       = Unit
+  integer _  = Int
+  boolean _  = Bool
+  string _   = String
+  float _    = Float
+  symbol _   = Symbol
+  rational _ = Rational
+  multiple   = zeroOrMoreProduct
+  hash       = Hash
+  kvPair k v = k :* v
+
+  null        = Null
+
+
 instance ( Members '[ Allocator location Type
                     , Fresh
                     , NonDet
@@ -120,16 +135,16 @@ instance ( Members '[ Allocator location Type
       tvar <- Var <$> fresh
       assign a tvar
       bimap (Env.insert name a) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    ((zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> deref value))
+    (box . (zeroOrMoreProduct tvars :->) =<< deref =<< localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value))
 
   call op params = do
     tvar <- fresh
-    paramTypes <- sequenceA params
+    paramTypes <- traverse (>>= deref) params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
     unified <- op `unify` needed
     case unified of
-      _ :-> ret -> pure ret
-      gotten    -> throwResumable (UnificationError needed gotten)
+      _ :-> ret -> box ret
+      gotten    -> box =<< throwResumable (UnificationError needed gotten)
 
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
@@ -146,21 +161,9 @@ instance ( Members '[ Allocator location Type
          , Reducer Type (Cell location Type)
          )
       => AbstractValue location Type effects where
-  unit       = pure Unit
-  integer _  = pure Int
-  boolean _  = pure Bool
-  string _   = pure String
-  float _    = pure Float
-  symbol _   = pure Symbol
-  rational _ = pure Rational
-  multiple   = pure . zeroOrMoreProduct
   array fields = do
     var <- fresh
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
-  hash       = pure . Hash
-  kvPair k v = pure (k :* v)
-
-  null          = pure Null
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit

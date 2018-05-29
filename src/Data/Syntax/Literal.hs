@@ -27,7 +27,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
-  eval (Boolean x) = rvalBox =<< boolean x
+  eval (Boolean x) = rvalBox (boolean x)
 
 instance ToJSONFields1 Boolean where
   toJSONFields1 (Boolean b) = noChildren [ "value" .= b ]
@@ -45,7 +45,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: This instance probably shouldn't have readInteger?
   eval (Data.Syntax.Literal.Integer x) =
-    rvalBox =<< (integer =<< maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x))
+    rvalBox =<< (integer <$> maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x))
 
 instance ToJSONFields1 Data.Syntax.Literal.Integer where
   toJSONFields1 (Integer i) = noChildren ["asString" .= unpack i]
@@ -65,7 +65,7 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
-    rvalBox =<< (float =<< either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
+    rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 instance ToJSONFields1 Float where
   toJSONFields1 (Float f) = noChildren ["asString" .= unpack f]
@@ -83,7 +83,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     let
       trimmed = B.takeWhile (/= 'r') r
       parsed = readMaybe @Prelude.Integer (unpack trimmed)
-    in rvalBox =<< (rational =<< maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
+    in rvalBox =<< (rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
 
 instance ToJSONFields1 Data.Syntax.Literal.Rational where
   toJSONFields1 (Rational r) = noChildren ["asString" .= unpack r]
@@ -143,7 +143,7 @@ instance ToJSONFields1 TextElement where
   toJSONFields1 (TextElement c) = noChildren ["asString" .= unpack c]
 
 instance Evaluatable TextElement where
-  eval (TextElement x) = rvalBox =<< string x
+  eval (TextElement x) = rvalBox (string x)
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -152,7 +152,7 @@ instance Eq1 Null where liftEq = genericLiftEq
 instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Null where eval _ = rvalBox =<< null
+instance Evaluatable Null where eval _ = rvalBox null
 
 instance ToJSONFields1 Null
 
@@ -166,7 +166,7 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Symbol
 
 instance Evaluatable Symbol where
-  eval (Symbol s) = rvalBox =<< symbol s
+  eval (Symbol s) = rvalBox (symbol s)
 
 newtype Regex a = Regex { regexContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -210,7 +210,7 @@ instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Hash
 
 instance Evaluatable Hash where
-  eval t = rvalBox =<< (traverse (subtermValue >=> asPair) (hashElements t) >>= hash)
+  eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -223,7 +223,7 @@ instance ToJSONFields1 KeyValue
 
 instance Evaluatable KeyValue where
   eval (fmap subtermValue -> KeyValue{..}) =
-    rvalBox =<< join (kvPair <$> key <*> value)
+    rvalBox =<< (kvPair <$> key <*> value)
 
 instance ToJSONFields1 Tuple
 
@@ -235,7 +235,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Tuple where
-  eval (Tuple cs) = rvalBox =<< (multiple =<< traverse subtermValue cs)
+  eval (Tuple cs) = rvalBox =<< (multiple <$> traverse subtermValue cs)
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)

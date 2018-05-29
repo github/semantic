@@ -1,11 +1,10 @@
-{-# LANGUAGE OverloadedLists #-}
 module Analysis.PHP.Spec (spec) where
 
+import Control.Abstract
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
-import qualified Language.PHP.Assignment as PHP
 import qualified Data.Language as Language
-
+import qualified Language.PHP.Assignment as PHP
 import SpecHelpers
 
 
@@ -13,12 +12,14 @@ spec :: Spec
 spec = parallel $ do
   describe "PHP" $ do
     it "evaluates include and require" $ do
-      env <- environment . snd . fst <$> evaluate "main.php"
-      Env.names env `shouldBe` [ "bar", "foo" ]
+      ((res, state), _) <- evaluate "main.php"
+      res `shouldBe` Right [unit]
+      Env.names (environment state) `shouldBe` [ "bar", "foo" ]
 
     it "evaluates include_once and require_once" $ do
-      env <- environment . snd . fst <$> evaluate "main_once.php"
-      Env.names env `shouldBe` [ "bar", "foo" ]
+      ((res, state), _) <- evaluate "main_once.php"
+      res `shouldBe` Right [unit]
+      Env.names (environment state) `shouldBe` [ "bar", "foo" ]
 
     it "evaluates namespaces" $ do
       ((_, state), _) <- evaluate "namespaces.php"

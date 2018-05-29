@@ -119,8 +119,8 @@ instance Evaluatable Boolean where
     go (Or a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
-    go (Not a) = a >>= asBool >>= boolean . not
-    go (XOr a b) = liftA2 (/=) (a >>= asBool) (b >>= asBool) >>= boolean
+    go (Not a) = a >>= fmap (boolean . not) . asBool
+    go (XOr a b) = boolean <$> liftA2 (/=) (a >>= asBool) (b >>= asBool)
 
 -- | Javascript delete operator
 newtype Delete a = Delete a
