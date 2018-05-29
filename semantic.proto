@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "semantic-types.proto";
 package semantic;
 
 message HealthCheckRequest {
