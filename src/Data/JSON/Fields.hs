@@ -1,4 +1,5 @@
-{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, TypeOperators, UndecidableInstances, GADTs #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Data.JSON.Fields
   ( JSONFields (..)
   , JSONFields1 (..)
@@ -9,17 +10,19 @@ module Data.JSON.Fields
   , withChildren
   ) where
 
-import Data.Aeson
-import Data.Sum (Apply(..), Sum)
-import Prologue
+import           Data.Aeson
+import           Data.Sum (Apply (..), Sum)
+import qualified Data.Text as Text
+import qualified Data.Text.Encoding as Text
+import           Prologue
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]
 
 class ToJSONFields1 f where
   toJSONFields1 :: (KeyValue kv, ToJSON a) => f a -> [kv]
-  default toJSONFields1 :: (KeyValue kv, ToJSON a, Foldable f) => f a -> [kv]
-  toJSONFields1 f = ["children" .= toList f]
+  default toJSONFields1 :: (KeyValue kv, ToJSON a, GToJSONFields1 (Rep1 f), Generic1 f) => f a -> [kv]
+  toJSONFields1 = gtoJSONFields1 . from1
 
 withChildren :: (KeyValue kv, ToJSON a, Foldable f) => f a -> [kv] -> [kv]
 withChildren f ks = ("children" .= toList f) : ks
@@ -67,3 +70,61 @@ instance (ToJSON a, ToJSONFields1 f) => ToJSONFields (JSONFields1 f a) where
 instance (ToJSON a, ToJSONFields1 f) => ToJSON (JSONFields1 f a) where
   toJSON = object . toJSONFields1 . unJSONFields1
   toEncoding = pairs . mconcat . toJSONFields1 . unJSONFields1
+
+
+class GToJSONFields1 f where
+  gtoJSONFields1 :: (KeyValue kv, ToJSON a) => f a -> [kv]
+
+instance GToJSONFields1 f => GToJSONFields1 (M1 D c f) where
+  gtoJSONFields1 = gtoJSONFields1 . unM1
+
+instance GToJSONFields1 f => GToJSONFields1 (M1 C c f) where
+  gtoJSONFields1 = gtoJSONFields1 . unM1
+
+instance GToJSONFields1 U1 where
+  gtoJSONFields1 _ = []
+
+instance (Selector c, GToJSONFields1' f) => GToJSONFields1 (M1 S c f) where
+  gtoJSONFields1 m1 = let json = gtoJSON (unM1 m1) in case selName m1 of
+    "" -> [ "children" .= json ]
+    n ->  [ Text.pack n .= json ]
+
+class GToJSONFields1' f where
+  gtoJSON :: ToJSON a => f a -> SomeJSON
+
+instance GToJSONFields1' Par1 where
+  gtoJSON = SomeJSON . unPar1
+
+instance ToJSON1 f => GToJSONFields1' (Rec1 f) where
+  gtoJSON = SomeJSON . SomeJSON1 . unRec1
+
+instance ToJSON k => GToJSONFields1' (K1 r k) where
+  gtoJSON = SomeJSON . unK1
+
+instance (GToJSONFields1 f, GToJSONFields1 g) => GToJSONFields1 (f :+: g) where
+  gtoJSONFields1 (L1 l) = gtoJSONFields1 l
+  gtoJSONFields1 (R1 r) = gtoJSONFields1 r
+
+instance (GToJSONFields1 f, GToJSONFields1 g) => GToJSONFields1 (f :*: g) where
+  gtoJSONFields1 (x :*: y) = gtoJSONFields1 x <> gtoJSONFields1 y
+
+
+-- TODO: Fix this orphan instance.
+instance ToJSON ByteString where
+  toJSON = toJSON . Text.decodeUtf8
+  toEncoding = toEncoding . Text.decodeUtf8
+
+
+data SomeJSON where
+  SomeJSON :: ToJSON a => a -> SomeJSON
+
+instance ToJSON SomeJSON where
+  toJSON (SomeJSON a) = toJSON a
+  toEncoding (SomeJSON a) = toEncoding a
+
+data SomeJSON1 where
+  SomeJSON1 :: (ToJSON1 f, ToJSON a) => f a -> SomeJSON1
+
+instance ToJSON SomeJSON1 where
+  toJSON (SomeJSON1 fa) = toJSON1 fa
+  toEncoding (SomeJSON1 fa) = toEncoding1 fa
