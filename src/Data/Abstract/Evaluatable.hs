@@ -55,23 +55,22 @@ type EvaluatableConstraints location term value effects =
   ( AbstractValue location value effects
   , Declarations term
   , FreeVariables term
-  , Members '[ Allocator location value
-             , LoopControl value
-             , Modules location value
-             , Reader (Environment location)
-             , Reader ModuleInfo
-             , Reader PackageInfo
-             , Reader Span
-             , Resumable (EnvironmentError location)
-             , Resumable EvalError
-             , Resumable ResolutionError
-             , Resumable (Unspecialized value)
-             , Return value
-             , State (Environment location)
-             , State (Exports location)
-             , State (Heap location (Cell location) value)
-             , Trace
-             ] effects
+  , Member (Allocator location value) effects
+  , Member (LoopControl value) effects
+  , Member (Modules location value) effects
+  , Member (Reader (Environment location)) effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader PackageInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (EnvironmentError location)) effects
+  , Member (Resumable EvalError) effects
+  , Member (Resumable ResolutionError) effects
+  , Member (Resumable (Unspecialized value)) effects
+  , Member (Return value) effects
+  , Member (State (Environment location)) effects
+  , Member (State (Exports location)) effects
+  , Member (State (Heap location (Cell location) value)) effects
+  , Member Trace effects
   , Ord location
   , Reducer value (Cell location value)
   )
