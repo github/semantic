@@ -7,6 +7,7 @@ module Control.Abstract.Environment
 , withEnv
 , localEnv
 , lookupEnv
+, bind
 , Env(..)
 , runEnv
 , reinterpretEnv
@@ -49,6 +50,10 @@ localEnv f a = do
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: Member (Env location) effects => Name -> Evaluator location value effects (Maybe (Address location value))
 lookupEnv name = fmap Address <$> send (Lookup name)
+
+-- | Bind a 'Name' to an 'Address' in the environment.
+bind :: Member (Env location) effects => Name -> Address location value -> Evaluator location value effects ()
+bind name addr = send (Bind name (unAddress addr))
 
 
 data Env location return where
