@@ -82,17 +82,16 @@ evaluatePackageWith :: forall location term value inner outer
                     .  ( Addressable location (Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        , Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
-                       , Members '[ Fail
-                                  , Fresh
-                                  , Reader (Environment location)
-                                  , Resumable (AddressError location value)
-                                  , Resumable (LoadError location value)
-                                  , State (Environment location)
-                                  , State (Exports location)
-                                  , State (Heap location (Cell location) value)
-                                  , State (ModuleTable (Maybe (Environment location, value)))
-                                  , Trace
-                                  ] outer
+                       , Member Fail outer
+                       , Member Fresh outer
+                       , Member (Reader (Environment location)) outer
+                       , Member (Resumable (AddressError location value)) outer
+                       , Member (Resumable (LoadError location value)) outer
+                       , Member (State (Environment location)) outer
+                       , Member (State (Exports location)) outer
+                       , Member (State (Heap location (Cell location) value)) outer
+                       , Member (State (ModuleTable (Maybe (Environment location, value)))) outer
+                       , Member Trace outer
                        , Recursive term
                        , inner ~ (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        )
@@ -145,7 +144,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
 
 -- | Isolate the given action with an empty global environment and exports.
-isolate :: Members '[State (Environment location), State (Exports location)] effects => Evaluator location value effects a -> Evaluator location value effects a
+isolate :: (Member (State (Environment location)) effects, Member (State (Exports location)) effects) => Evaluator location value effects a -> Evaluator location value effects a
 isolate = withEnv lowerBound . withExports lowerBound
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()

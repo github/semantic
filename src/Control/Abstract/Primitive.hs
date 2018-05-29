@@ -14,13 +14,11 @@ import Data.Semilattice.Lower
 import Prologue
 
 builtin :: ( HasCallStack
-           , Members '[ Allocator location value
-                      , Reader (Environment location)
-                      , Reader ModuleInfo
-                      , Reader Span
-                      , State (Environment location)
-                      , State (Heap location (Cell location) value)
-                      ] effects
+           , Member (Allocator location value) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (Reader Span) effects
+           , Member (State (Environment location)) effects
+           , Member (State (Heap location (Cell location) value)) effects
            , Ord location
            , Reducer value (Cell location value)
            )
@@ -42,16 +40,15 @@ lambda body = do
 
 defineBuiltins :: ( AbstractValue location value effects
                   , HasCallStack
-                  , Members '[ Allocator location value
-                             , Fresh
-                             , Reader (Environment location)
-                             , Reader ModuleInfo
-                             , Reader Span
-                             , Resumable (EnvironmentError location)
-                             , State (Environment location)
-                             , State (Heap location (Cell location) value)
-                             , Trace
-                             ] effects
+                  , Member (Allocator location value) effects
+                  , Member Fresh effects
+                  , Member (Reader (Environment location)) effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (EnvironmentError location)) effects
+                  , Member (State (Environment location)) effects
+                  , Member (State (Heap location (Cell location) value)) effects
+                  , Member Trace effects
                   , Ord location
                   , Reducer value (Cell location value)
                   )

@@ -41,9 +41,9 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: Members '[ Modules location value
-                           , Resumable ResolutionError
-                           ] effects
+resolvePHPName :: ( Member (Modules location value) effects
+                  , Member (Resumable ResolutionError) effects
+                  )
                => ByteString
                -> Evaluator location value effects ModulePath
 resolvePHPName n = do
@@ -53,16 +53,14 @@ resolvePHPName n = do
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue location value effects
-           , Members '[ Allocator location value
-                      , Modules location value
-                      , Reader (Environment location)
-                      , Resumable ResolutionError
-                      , Resumable (EnvironmentError location)
-                      , State (Environment location)
-                      , State (Exports location)
-                      , State (Heap location (Cell location) value)
-                      , Trace
-                      ] effects
+           , Member (Allocator location value) effects
+           , Member (Modules location value) effects
+           , Member (Reader (Environment location)) effects
+           , Member (Resumable ResolutionError) effects
+           , Member (Resumable (EnvironmentError location)) effects
+           , Member (State (Environment location)) effects
+           , Member (State (Exports location)) effects
+           , Member Trace effects
            )
         => Subterm term (Evaluator location value effects (ValueRef value))
         -> (ModulePath -> Evaluator location value effects (Maybe (Environment location, value)))

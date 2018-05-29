@@ -251,7 +251,7 @@ data Files out where
   Write       :: Destination -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
+runFiles :: (Member (Exc SomeException) effs, Member IO effs) => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   Read (FromPath path)         -> rethrowing (readBlobFromPath path)
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)
