@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
 , getEnv
@@ -52,14 +52,19 @@ lookupEnv name = fmap Address <$> send (Lookup name)
 
 
 data Env location return where
-  Lookup :: Name -> Env location (Maybe location)
+  Lookup :: Name             -> Env location (Maybe location)
+  Bind   :: Name -> location -> Env location ()
 
 
 runEnv :: Member (State (Environment location)) effects => Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value effects a
-runEnv defaultEnvironment = interpret (\ (Lookup name) -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv)
+runEnv defaultEnvironment = interpret $ \case
+  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
+  Bind name addr -> modifyEnv (Env.insert name addr)
 
 reinterpretEnv :: Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value (State (Environment location) ': effects) a
-reinterpretEnv defaultEnvironment = reinterpret (\ (Lookup name) -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv)
+reinterpretEnv defaultEnvironment = reinterpret $ \case
+  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
+  Bind name addr -> modifyEnv (Env.insert name addr)
 
 
 -- | Errors involving the environment.
