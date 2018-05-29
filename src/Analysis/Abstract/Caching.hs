@@ -58,8 +58,7 @@ isolateCache action = putCache lowerBound *> action *> get
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
 cachingTerms :: ( Cacheable term location (Cell location) value
                 , Corecursive term
-                , Member (Fresh) effects
-                , Member (NonDet) effects
+                , Member NonDet effects
                 , Member (Reader (Cache term location (Cell location) value)) effects
                 , Member (Reader (Live location value)) effects
                 , Member (State (Cache term location (Cell location) value)) effects
@@ -80,12 +79,11 @@ cachingTerms recur term = do
 convergingModules :: ( AbstractValue location value effects
                      , Cacheable term location (Cell location) value
                      , Member (Allocator location value) effects
-                     , Member (Fresh) effects
-                     , Member (NonDet) effects
+                     , Member Fresh effects
+                     , Member NonDet effects
                      , Member (Reader (Cache term location (Cell location) value)) effects
                      , Member (Reader (Environment location)) effects
                      , Member (Reader (Live location value)) effects
-                     , Member (Resumable (AddressError location value)) effects
                      , Member (Resumable (EnvironmentError location)) effects
                      , Member (State (Cache term location (Cell location) value)) effects
                      , Member (State (Environment location)) effects
