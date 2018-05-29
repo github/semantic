@@ -3,7 +3,6 @@ module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
-import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Module
 import           Data.Align.Generic
 import qualified Data.ByteString.Char8 as BC
@@ -131,9 +130,9 @@ instance Evaluatable Import where
 evalQualifiedImport :: ( AbstractValue location value effects
                        , Members '[ Allocator location value
                                   , Modules location value
-                                  , Reader (Environment location value)
-                                  , State (Environment location value)
-                                  , State (Exports location value)
+                                  , Reader (Environment location)
+                                  , State (Environment location)
+                                  , State (Exports location)
                                   , State (Heap location (Cell location) value)
                                   ] effects
                        , Ord location
@@ -158,9 +157,9 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 -- import a.b.c
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport (RelativeQualifiedName _ _))        = raiseEff (fail "technically this is not allowed in python")
-  eval (QualifiedImport name@(QualifiedName qualifiedName)) = do
-    modulePaths <- resolvePythonModules name
-    rvalBox =<< go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)
+  eval (QualifiedImport qname@(QualifiedName qualifiedName)) = do
+    modulePaths <- resolvePythonModules qname
+    rvalBox =<< go (NonEmpty.zip (name . BC.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = evalQualifiedImport name path

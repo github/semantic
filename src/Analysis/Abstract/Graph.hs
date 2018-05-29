@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
@@ -7,9 +7,8 @@ module Analysis.Abstract.Graph
 , variableDefinition
 , moduleInclusion
 , packageInclusion
-, packageGraph
 , graphingTerms
-, graphingLoadErrors
+, graphingPackages
 , graphingModules
 , graphing
 ) where
@@ -17,9 +16,8 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract
 import           Data.Abstract.Address
-import           Data.Abstract.Evaluatable (LoadError (..))
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
+import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
@@ -54,10 +52,9 @@ style = (defaultStyle (byteString . vertexName))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Members '[ Reader (Environment (Located location) value)
+                 , Members '[ Reader (Environment (Located location))
                             , Reader ModuleInfo
-                            , Reader PackageInfo
-                            , State (Environment (Located location) value)
+                            , State (Environment (Located location))
                             , State (Graph Vertex)
                             ] effects
                  , term ~ Term (Sum syntax) ann
@@ -72,34 +69,34 @@ graphingTerms recur term@(In _ syntax) = do
     _ -> pure ()
   recur term
 
--- | Add vertices to the graph for 'LoadError's.
-graphingLoadErrors :: Members '[ Reader ModuleInfo
-                               , Resumable (LoadError location value)
-                               , State (Graph Vertex)
-                               ] effects
-                   => SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
-                   -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
-graphingLoadErrors recur term = TermEvaluator (runTermEvaluator (recur term) `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name))
+graphingPackages :: Members '[ Reader ModuleInfo
+                             , Reader PackageInfo
+                             , State (Graph Vertex)
+                             ] effects
+                 => SubtermAlgebra Module term (TermEvaluator term location value effects a)
+                 -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
+graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
-graphingModules :: Members '[ Reader ModuleInfo
-                            , Reader PackageInfo
+graphingModules :: forall term location value effects a
+                .  Members '[ Modules location value
+                            , Reader ModuleInfo
                             , State (Graph Vertex)
                             ] effects
                => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
-graphingModules recur m = do
-  let name = BC.pack (modulePath (moduleInfo m))
-  packageInclusion (Module name)
-  moduleInclusion (Module name)
-  recur m
+graphingModules recur m = interpose @(Modules location value) pure (\ m yield -> case m of
+  Load   path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
+  Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
+  _ -> send m >>= yield)
+  (recur m)
 
 
-packageGraph :: PackageInfo -> Graph Vertex
-packageGraph = vertex . Package . unName . packageName
+packageVertex :: PackageInfo -> Vertex
+packageVertex = Package . unName . packageName
 
-moduleGraph :: ModuleInfo -> Graph Vertex
-moduleGraph = vertex . Module . BC.pack . modulePath
+moduleVertex :: ModuleInfo -> Vertex
+moduleVertex = Module . BC.pack . modulePath
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
@@ -112,7 +109,7 @@ packageInclusion :: ( Effectful m
                  -> m effects ()
 packageInclusion v = do
   p <- currentPackage
-  appendGraph (packageGraph p `connect` vertex v)
+  appendGraph (vertex (packageVertex p) `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: ( Effectful m
@@ -125,17 +122,17 @@ moduleInclusion :: ( Effectful m
                 -> m effects ()
 moduleInclusion v = do
   m <- currentModule
-  appendGraph (moduleGraph m `connect` vertex v)
+  appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Reader (Environment (Located location) value)) effects
-                      , Member (State (Environment (Located location) value)) effects
+variableDefinition :: ( Member (Reader (Environment (Located location))) effects
+                      , Member (State (Environment (Located location))) effects
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name
                    -> TermEvaluator term (Located location) value effects ()
 variableDefinition name = do
-  graph <- maybe lowerBound (moduleGraph . locationModule . unAddress) <$> TermEvaluator (lookupEnv name)
+  graph <- maybe lowerBound (vertex . moduleVertex . locationModule . unAddress) <$> TermEvaluator (lookupEnv name)
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()

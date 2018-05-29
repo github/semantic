@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph
-( graph
+( runGraph
 , GraphType(..)
 , Graph
 , Vertex
@@ -28,9 +28,9 @@ import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
+import           Data.Graph
 import           Data.Project
 import           Data.Record
-import           Data.Semilattice.Lower
 import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
@@ -39,20 +39,22 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-graph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
-      => GraphType
-      -> Project
-      -> Eff effs (Graph Vertex)
-graph graphType project
+runGraph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
+         => GraphType
+         -> Bool
+         -> Project
+         -> Eff effs (Graph Vertex)
+runGraph graphType includePackages project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let analyzeTerm = case graphType of
+    let analyzeTerm = withTermSpans . case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
+        analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
+    analyze runGraphAnalysis (evaluatePackageWith analyzeModule analyzeTerm package) >>= extractGraph
     where extractGraph result = case result of
-            (Right ((_, graph), _), _) -> pure graph
+            (Right ((_, graph), _), _) -> pure (simplify graph)
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
           runGraphAnalysis
             = run
@@ -110,14 +112,8 @@ resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionErr
 resumingLoadError :: Member Trace effects => Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
 
-resumingEvalError :: ( AbstractHole value
-                     , Member Trace effects
-                     , Show value
-                     )
-                  => Evaluator location value (Resumable (EvalError value) ': effects) a
-                  -> Evaluator location value effects a
+resumingEvalError :: Member Trace effects => Evaluator location value (Resumable EvalError ': effects) a -> Evaluator location value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
-  EnvironmentLookupError{} -> pure hole
   DefaultExportError{}     -> pure ()
   ExportError{}            -> pure ()
   IntegerFormatError{}     -> pure 0
@@ -137,7 +133,7 @@ resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> s
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (Members '[State (Environment location (Value location)), Trace] effects, Show location) => Evaluator location (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location (Value location) effects a
+resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => Evaluator location (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location (Value location) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))

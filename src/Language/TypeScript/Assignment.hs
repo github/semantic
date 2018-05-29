@@ -7,7 +7,7 @@ module Language.TypeScript.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.FreeVariables (name)
+import Data.Abstract.Name (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Sum
@@ -832,27 +832,29 @@ tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> term state
 
 binaryExpression  :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term expression)
-  [ (inject .) . Expression.Plus             <$ symbol AnonPlus
-  , (inject .) . Expression.Minus            <$ symbol AnonMinus
-  , (inject .) . Expression.Times            <$ symbol AnonStar
-  , (inject .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (inject .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inject .) . Expression.Member           <$ symbol AnonIn
-  , (inject .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (inject .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inject .) . Expression.Or               <$ symbol AnonPipePipe
-  , (inject .) . Expression.BOr              <$ symbol AnonPipe
-  , (inject .) . Expression.BXOr             <$ symbol AnonCaret
-  , (inject .) . Expression.InstanceOf       <$ symbol AnonInstanceof
-  , (inject .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
-  , (inject .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
-  , (inject .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (inject .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (inject .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
-  , (inject .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (inject .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (inject .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (inject .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  [ (inject .) . Expression.Plus               <$ symbol AnonPlus
+  , (inject .) . Expression.Minus              <$ symbol AnonMinus
+  , (inject .) . Expression.Times              <$ symbol AnonStar
+  , (inject .) . Expression.DividedBy          <$ symbol AnonSlash
+  , (inject .) . Expression.Modulo             <$ symbol AnonPercent
+  , (inject .) . Expression.Member             <$ symbol AnonIn
+  , (inject .) . Expression.And                <$ symbol AnonAmpersandAmpersand
+  , (inject .) . Expression.BAnd               <$ symbol AnonAmpersand
+  , (inject .) . Expression.Or                 <$ symbol AnonPipePipe
+  , (inject .) . Expression.BOr                <$ symbol AnonPipe
+  , (inject .) . Expression.BXOr               <$ symbol AnonCaret
+  , (inject .) . Expression.InstanceOf         <$ symbol AnonInstanceof
+  , (inject .) . Expression.Equal              <$ symbol AnonEqualEqual
+  , (inject .) . Expression.StrictEqual        <$ symbol AnonEqualEqualEqual
+  , (inject .) . invert Expression.Equal       <$ symbol AnonBangEqual
+  , (inject .) . invert Expression.StrictEqual <$ symbol AnonBangEqualEqual
+  , (inject .) . Expression.LShift             <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.RShift             <$ symbol AnonRAngleRAngle
+  , (inject .) . Expression.UnsignedRShift     <$ symbol AnonRAngleRAngleRAngle
+  , (inject .) . Expression.LessThan           <$ symbol AnonLAngle
+  , (inject .) . Expression.GreaterThan        <$ symbol AnonRAngle
+  , (inject .) . Expression.LessThanEqual      <$ symbol AnonLAngleEqual
+  , (inject .) . Expression.GreaterThanEqual   <$ symbol AnonRAngleEqual
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 

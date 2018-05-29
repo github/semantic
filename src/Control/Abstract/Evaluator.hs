@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
-  , ValueRef(..)
   -- * Effects
   , Return(..)
   , earlyReturn
@@ -12,26 +11,17 @@ module Control.Abstract.Evaluator
   , throwContinue
   , catchLoopControl
   , runLoopControl
-  , module Control.Monad.Effect
-  , module Control.Monad.Effect.Fail
-  , module Control.Monad.Effect.Fresh
-  , module Control.Monad.Effect.NonDet
-  , module Control.Monad.Effect.Reader
-  , module Control.Monad.Effect.Resumable
-  , module Control.Monad.Effect.State
-  , module Control.Monad.Effect.Trace
+  , module X
   ) where
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Resumable
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Trace
+import Control.Monad.Effect           as X
+import Control.Monad.Effect.Fresh     as X
+import Control.Monad.Effect.NonDet    as X
+import Control.Monad.Effect.Reader    as X
+import Control.Monad.Effect.Resumable as X
+import Control.Monad.Effect.State     as X
+import Control.Monad.Effect.Trace     as X
 import Data.Abstract.Address
-import Data.Abstract.FreeVariables
 import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
@@ -43,17 +33,6 @@ newtype Evaluator location value effects a = Evaluator { runEvaluator :: Eff eff
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluator location value effects)
-
--- | 'ValueRef' is the type subterms evaluate to and can represent either values directly ('Rval'), or references to values (lvals - such as local variables or object members)
-data ValueRef location value where
-  -- Represents a value:
-  Rval :: Address location value -> ValueRef location value
-  -- Represents a local variable. No environment is attached - it's assumed that LvalLocal will be evaluated in the same scope it was constructed:
-  LvalLocal :: Name -> ValueRef location value
-  -- Represents an object member:
-  LvalMember :: Address location value -> Name -> ValueRef location value
-
-  deriving (Eq, Ord, Show)
 
 -- Effects
 

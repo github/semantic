@@ -4,7 +4,7 @@ module Data.Abstract.Value where
 import Control.Abstract
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
@@ -57,7 +57,7 @@ prjPair = bitraverse prjValue prjValue
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a package & module info, a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure location value = Closure PackageInfo ModuleInfo [Name] Label (Environment location value)
+data Closure location value = Closure PackageInfo ModuleInfo [Name] Label (Environment location)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
@@ -80,7 +80,7 @@ instance Ord1 Hole where liftCompare = genericLiftCompare
 instance Show1 Hole where liftShowsPrec = genericLiftShowsPrec
 
 -- | Boolean values.
-newtype Boolean value = Boolean Prelude.Bool
+newtype Boolean value = Boolean { getBoolean :: Bool }
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
@@ -151,7 +151,7 @@ instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 --   but for the time being we're pretending all languages have prototypical inheritance.
 data Class location value = Class
   { _className  :: Name
-  , _classScope :: Environment location value
+  , _classScope :: Environment location
   } deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Class location) where liftEq = genericLiftEq
@@ -160,7 +160,7 @@ instance Show location => Show1 (Class location) where liftShowsPrec = genericLi
 
 data Namespace location value = Namespace
   { namespaceName  :: Name
-  , namespaceScope :: Environment location value
+  , namespaceScope :: Environment location
   } deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Namespace location) where liftEq = genericLiftEq
@@ -204,16 +204,51 @@ instance Ord location => ValueRoots location (Value location) where
 instance AbstractHole (Value location) where
   hole = injValue Hole
 
--- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Members '[ Allocator location (Value location)
-                    , Fail
-                    , LoopControl location (Value location)
-                    , Reader (Environment location (Value location))
+                    , Reader (Environment location)
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (ValueError location)
                     , Return location (Value location)
-                    , State (Environment location (Value location))
+                    , State (Environment location)
+                    , State (Heap location (Cell location) (Value location))
+                    ] effects
+         , Ord location
+         , Reducer (Value location) (Cell location (Value location))
+         , Show location
+         )
+      => AbstractFunction location (Value location) (Goto effects location (Value location) ': effects) where
+  closure parameters freeVariables body = do
+    packageInfo <- currentPackage
+    moduleInfo <- currentModule
+    l <- label body
+    env <- getEnv
+    let cls = injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) $ env
+    box cls
+
+  call op params = do
+    case prjValue op of
+      Just (Closure packageInfo moduleInfo names label env) -> do
+        body <- goto label
+        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+        -- charge them to the closure's origin.
+        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
+          bindings <- foldr (\ (name, param) rest -> do
+            a <- param
+            Env.insert name a <$> rest) (pure env) (zip names params)
+          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
+      Nothing -> box =<< throwValueError (CallError op)
+
+
+-- | Construct a 'Value' wrapping the value arguments (if any).
+instance ( Members '[ Allocator location (Value location)
+                    , LoopControl location (Value location)
+                    , Reader (Environment location)
+                    , Reader ModuleInfo
+                    , Reader PackageInfo
+                    , Resumable (ValueError location)
+                    , Return location (Value location)
+                    , State (Environment location)
                     , State (Heap location (Cell location) (Value location))
                     ] effects
          , Ord location
@@ -265,18 +300,8 @@ instance ( Members '[ Allocator location (Value location)
     | otherwise                     = throwValueError $ StringError v
 
   ifthenelse cond if' else' = do
-    isHole <- isHole cond
-    if isHole then
-      pure hole
-    else do
-      bool <- asBool cond
-      if bool then if' else else'
-
-  asBool val
-    | Just (Boolean b) <- prjValue val = pure b
-    | otherwise = throwValueError $ BoolError val
-
-  isHole val = pure (prjValue val == Just Hole)
+    bool <- maybe (throwValueError (BoolError cond)) (pure . getBoolean) (prjValue cond)
+    if bool then if' else else'
 
   index = go where
     tryIdx list ii
@@ -348,25 +373,6 @@ instance ( Members '[ Allocator location (Value location)
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
-  closure parameters freeVariables body = do
-    packageInfo <- currentPackage
-    moduleInfo <- currentModule
-    l <- label (body >>= box)
-    injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
-
-  call op params = do
-    case prjValue op of
-      Just (Closure packageInfo moduleInfo names label env) -> do
-        body <- goto label
-        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
-        -- charge them to the closure's origin.
-        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, param) rest -> do
-            a <- param
-            Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
-      Nothing -> box =<< throwValueError (CallError op)
-
   loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> deref value
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
@@ -378,7 +384,7 @@ data ValueError location resume where
   StringError            :: Value location                   -> ValueError location ByteString
   BoolError              :: Value location                   -> ValueError location Bool
   IndexError             :: Value location -> Value location -> ValueError location (Value location)
-  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location (Value location))
+  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location)
   CallError              :: Value location                   -> ValueError location (Value location)
   NumericError           :: Value location                   -> ValueError location (Value location)
   Numeric2Error          :: Value location -> Value location -> ValueError location (Value location)

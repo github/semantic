@@ -29,6 +29,7 @@ data Comparison a
   | GreaterThan !a !a
   | GreaterThanEqual !a !a
   | Equal !a !a
+  | StrictEqual !a !a
   | Comparison !a !a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
@@ -45,7 +46,10 @@ instance Evaluatable Comparison where
       (LessThanEqual a b)    -> liftComparison (Concrete (<=)) a b
       (GreaterThan a b)      -> liftComparison (Concrete (>)) a b
       (GreaterThanEqual a b) -> liftComparison (Concrete (>=)) a b
+      -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
+      -- We need some mechanism to customize this behavior per-language.
       (Equal a b)            -> liftComparison (Concrete (==)) a b
+      (StrictEqual a b)      -> liftComparison (Concrete (==)) a b
       (Comparison a b)       -> liftComparison Generalized a b
 
 -- | Binary arithmetic operators.

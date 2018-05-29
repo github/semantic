@@ -7,11 +7,11 @@ module Language.Ruby.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
+import Data.Abstract.Name (name)
 import Data.List (elem)
 import Data.Record
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Ruby.Grammar as Grammar
-import Data.Abstract.FreeVariables (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
 import qualified Data.Syntax as Syntax
@@ -455,6 +455,10 @@ binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expressi
   , (inject .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
   , (inject .) . Expression.BOr              <$ symbol AnonPipe
   , (inject .) . Expression.BXOr             <$ symbol AnonCaret
+  -- TODO: AnonEqualEqualEqual corresponds to Ruby's "case equality"
+  -- function, which (unless overridden) is true if b is an instance
+  -- of or inherits from a. We need a custom equality operator
+  -- for this situation.
   , (inject .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
   , (inject .) . invert Expression.Equal     <$ symbol AnonBangEqual
   , (inject .) . Expression.LShift           <$ symbol AnonLAngleLAngle

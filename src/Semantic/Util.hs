@@ -4,9 +4,8 @@ module Semantic.Util where
 
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Analysis.Abstract.Evaluating as X
-import           Control.Abstract.Evaluator
-import           Control.Abstract.TermEvaluator
+import           Analysis.Abstract.Evaluating
+import           Control.Abstract
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -19,6 +18,8 @@ import qualified Data.Language as Language
 import           Data.Sum (weaken)
 import           Data.Term
 import qualified GHC.TypeLits as TypeLevel
+import           Language.Haskell.HsColour
+import           Language.Haskell.HsColour.Colourise
 import           Language.Preluded
 import           Parsing.Parser
 import           Prologue hiding (weaken)
@@ -26,6 +27,7 @@ import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
 import           Text.Show (showListWith)
+import           Text.Show.Pretty
 
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
@@ -139,3 +141,7 @@ instance Show1 syntax => Show (Quieterm syntax ann) where
 
 quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
 quieterm = cata Quieterm
+
+
+prettyShow :: Show a => a -> IO ()
+prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow

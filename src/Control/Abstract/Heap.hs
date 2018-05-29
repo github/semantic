@@ -25,8 +25,8 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Name
 import Data.Semigroup.Reducer
 import Prologue
 
@@ -76,8 +76,8 @@ assign address = modifyHeap . heapInsert address
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: Members '[ Allocator location value
-                          , Reader (Environment location value)
-                          , State (Environment location value)
+                          , Reader (Environment location)
+                          , State (Environment location)
                           ] effects
               => Name
               -> Evaluator location value effects (Address location value)
@@ -85,8 +85,8 @@ lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
 letrec :: ( Members '[ Allocator location value
-                     , Reader (Environment location value)
-                     , State (Environment location value)
+                     , Reader (Environment location)
+                     , State (Environment location)
                      , State (Heap location (Cell location) value)
                      ] effects
           , Ord location
@@ -103,8 +103,8 @@ letrec name body = do
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
 letrec' :: Members '[ Allocator location value
-                    , Reader (Environment location value)
-                    , State (Environment location value)
+                    , Reader (Environment location)
+                    , State (Environment location)
                     ] effects
         => Name
         -> (Address location value -> Evaluator location value effects a)
@@ -117,9 +117,9 @@ letrec' name body = do
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: Members '[ Allocator location value
-                     , Reader (Environment location value)
+                     , Reader (Environment location)
                      , Resumable (EnvironmentError value)
-                     , State (Environment location value)
+                     , State (Environment location)
                      , State (Heap location (Cell location) value)
                      ] effects
          => Name

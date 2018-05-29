@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
-import Control.Abstract.Evaluator (ValueRef(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.ByteString.Char8 (unpack)
