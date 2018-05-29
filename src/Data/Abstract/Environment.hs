@@ -1,7 +1,6 @@
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
-  , bind
   , delete
   , head
   , emptyEnv
@@ -10,6 +9,7 @@ module Data.Abstract.Environment
   , insert
   , lookup
   , names
+  , intersect
   , overwrite
   , pairs
   , unpairs
@@ -99,8 +99,8 @@ trim :: Environment location -> Environment location
 trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
-bind :: Foldable t => t Name -> Environment location -> Environment location
-bind names env = unpairs (mapMaybe lookupName (toList names))
+intersect :: Foldable t => t Name -> Environment location -> Environment location
+intersect names env = unpairs (mapMaybe lookupName (toList names))
   where
     lookupName name = (,) name <$> lookup name env
 
