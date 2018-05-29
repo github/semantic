@@ -1,9 +1,9 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Diffing.Interpreter
 ( diffTerms
+, diffTermPair
 ) where
 
-import Analysis.Decorator
 import Control.Monad.Free.Freer
 import Data.Diff
 import Data.Record
@@ -13,13 +13,18 @@ import Diffing.Algorithm.RWS
 import Prologue
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Diffable syntax, Eq1 syntax, Show1 syntax, Traversable syntax)
+diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax)
           => Term syntax (Record fields1)
           -> Term syntax (Record fields2)
           -> Diff syntax (Record fields1) (Record fields2)
 diffTerms t1 t2 = stripDiff (fromMaybe (replacing t1' t2') (runAlgorithm (diff t1' t2')))
-  where (t1', t2') = ( defaultFeatureVectorDecorator constructorNameAndConstantFields t1
-                     , defaultFeatureVectorDecorator constructorNameAndConstantFields t2)
+  where (t1', t2') = ( defaultFeatureVectorDecorator t1
+                     , defaultFeatureVectorDecorator t2)
+
+-- | Diff a 'These' of terms.
+diffTermPair :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Diff syntax (Record fields1) (Record fields2)
+diffTermPair = these deleting inserting diffTerms
+
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
 runAlgorithm :: (Diffable syntax, Eq1 syntax, Traversable syntax, Alternative m, Monad m)

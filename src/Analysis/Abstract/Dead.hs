@@ -1,58 +1,53 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
 module Analysis.Abstract.Dead
-( DeadCode
+( Dead(..)
+, revivingTerms
+, killingModules
+, providingDeadSet
 ) where
 
-import Control.Abstract.Analysis
+import Control.Abstract
 import Data.Abstract.Module
 import Data.Semigroup.Reducer as Reducer
+import Data.Semilattice.Lower
 import Data.Set (delete)
 import Prologue
 
--- | An analysis tracking dead (unreachable) code.
-newtype DeadCode m (effects :: [* -> *]) a = DeadCode (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
-
-deriving instance MonadControl term (m effects)                    => MonadControl term (DeadCode m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (DeadCode m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (DeadCode m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (DeadCode m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (DeadCode m effects)
-
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
-  deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Show)
 
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (Effectful m, Member (State (Dead term)) effects) => Dead term -> DeadCode m effects ()
-killAll = raise . put
+killAll :: Member (State (Dead term)) effects => Dead term -> TermEvaluator term location value effects ()
+killAll = put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Effectful m, Member (State (Dead term)) effects) => Ord term => term -> DeadCode m effects ()
-revive t = raise (modify (Dead . delete t . unDead))
+revive :: (Member (State (Dead term)) effects, Ord term) => term -> TermEvaluator term location value effects ()
+revive t = modify' (Dead . delete t . unDead)
 
 -- | Compute the set of all subterms recursively.
 subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-instance ( Corecursive term
-         , Effectful m
-         , Foldable (Base term)
-         , Member (State (Dead term)) effects
-         , MonadAnalysis location term value (m effects)
-         , Ord term
-         , Recursive term
-         )
-      => MonadAnalysis location term value (DeadCode m effects) where
-  type Effects location term value (DeadCode m effects) = State (Dead term) ': Effects location term value (m effects)
+revivingTerms :: ( Corecursive term
+                 , Member (State (Dead term)) effects
+                 , Ord term
+                 )
+              => SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
+              -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
+revivingTerms recur term = revive (embedSubterm term) *> recur term
 
-  analyzeTerm recur term = do
-    revive (embedSubterm term)
-    liftAnalyze analyzeTerm recur term
+killingModules :: ( Foldable (Base term)
+                  , Member (State (Dead term)) effects
+                  , Ord term
+                  , Recursive term
+                  )
+               => SubtermAlgebra Module term (TermEvaluator term location value effects a)
+               -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
+killingModules recur m = killAll (subterms (subterm (moduleBody m))) *> recur m
 
-  analyzeModule recur m = do
-    killAll (subterms (subterm (moduleBody m)))
-    liftAnalyze analyzeModule recur m
+providingDeadSet :: TermEvaluator term location value (State (Dead term) ': effects) a -> TermEvaluator term location value effects (a, Dead term)
+providingDeadSet = runState lowerBound

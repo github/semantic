@@ -1,0 +1,20 @@
+(Program
+{+(SequenceExpression
+  {+(Assignment
+    {+(Identifier)+}
+    {+(Float)+})+}
+  {+(Assignment
+    {+(Identifier)+}
+    {+(Float)+})+})+}
+{-(Assignment
+  {-(Identifier)-}
+  {-(Hash
+    {-(KeyValue
+      {-(Identifier)-}
+      {-(SequenceExpression
+        {-(Float)-}
+        {-(SequenceExpression
+          {-(Plus
+            {-(Float)-}
+            {-(Float)-})-}
+          {-(Float)-})-})-})-})-})-})

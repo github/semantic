@@ -1,12 +1,3 @@
-[submodule "test/repos/jquery"]
-	path = test/repos/jquery
-	url = https://github.com/jquery/jquery
-[submodule "test/repos/js-test"]
-	path = test/repos/js-test
-	url = https://github.com/rewinfrey/js-test.git
-[submodule "test/repos/backbone"]
-	path = test/repos/backbone
-	url = https://github.com/jashkenas/backbone
 [submodule "vendor/hspec-expectations-pretty-diff"]
 	path = vendor/hspec-expectations-pretty-diff
 	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
@@ -19,3 +10,9 @@
 [submodule "vendor/freer-cofreer"]
 	path = vendor/freer-cofreer
 	url = https://github.com/robrix/freer-cofreer.git
+[submodule "vendor/grpc-haskell"]
+	path = vendor/grpc-haskell
+	url = https://github.com/joshvera/gRPC-haskell/
+[submodule "vendor/fastsum"]
+	path = vendor/fastsum
+	url = git@github.com:patrickt/fastsum.git

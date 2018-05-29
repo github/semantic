@@ -1,0 +1,18 @@
+(Program
+  (Match
+    (Send
+      (Identifier))
+    (
+      (Pattern
+        (
+          (Send
+            (Identifier)))
+        ([]))))
+  (Match
+    (Empty)
+    (
+      (Pattern
+        (
+          (Boolean))
+        (
+          (TextElement))))))

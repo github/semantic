@@ -1,0 +1,9 @@
+(Program
+  (Method
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+  {+(Identifier)+}
+    (
+    {+(Send
+      {+(Identifier)+})+})))

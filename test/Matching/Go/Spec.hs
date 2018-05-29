@@ -5,14 +5,14 @@ module Matching.Go.Spec (spec) where
 import           Control.Abstract.Matching
 import           Data.Abstract.Module
 import           Data.List
+import           Data.Sum
 import qualified Data.Syntax.Declaration as Decl
 import qualified Data.Syntax.Literal as Lit
 import qualified Data.Syntax.Statement as Stmt
-import           Data.Union
 import           SpecHelpers
 
 -- This gets the ByteString contents of all integers
-integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Union fs) ann) ByteString
+integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) ByteString
 integerMatcher = match Lit.integerContent target
 
 -- This matches all for-loops with its index variable new variable bound to 0,
@@ -30,11 +30,11 @@ loopMatcher = target <* go where
 spec :: Spec
 spec = describe "matching/go" $ do
   it "extracts integers" $ do
-    parsed <- moduleBody <$> parseFile goParser Nothing "test/fixtures/go/matching/integers.go"
+    parsed <- parseFile goParser "test/fixtures/go/matching/integers.go"
     let matched = runMatcher integerMatcher parsed
     sort matched `shouldBe` ["1", "2", "3"]
 
   it "counts for loops" $ do
-    parsed <- moduleBody <$> parseFile goParser Nothing "test/fixtures/go/matching/for.go"
+    parsed <- parseFile goParser "test/fixtures/go/matching/for.go"
     let matched = runMatcher @[] loopMatcher parsed
     length matched `shouldBe` 2

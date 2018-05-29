@@ -68,7 +68,7 @@ terminalFormatter :: Options -> Message -> String
 terminalFormatter Options{..} (Message level message pairs time) =
     showChar '[' . showTime time . showString "] "
   . showLevel level . showChar ' '
-  . showString (printf "%-20s" message)
+  . showString (printf "%-20s " message)
   . showPairs pairs
   . showChar '\n' $ ""
   where
@@ -83,13 +83,14 @@ terminalFormatter Options{..} (Message level message pairs time) =
 
 -- | Options controlling logging, error handling, &c.
 data Options = Options
-  { optionsEnableColour :: Bool -- ^ Whether to enable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
-  , optionsLevel        :: Maybe Level -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsRequestID    :: Maybe String -- ^ Optional request id for tracing across systems.
-  , optionsIsTerminal   :: Bool -- ^ Whether a terminal is attached (set automaticaly at runtime).
-  , optionsPrintSource  :: Bool -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
-  , optionsFormatter    :: Options -> Message -> String -- ^ Log formatter to use (set automaticaly at runtime).
-  , optionsProcessID    :: CPid -- ^ ProcessID (set automaticaly at runtime).
+  { optionsEnableColour  :: Bool                         -- ^ Whether to enable colour formatting for logging (Only works when logging to a terminal that supports ANSI colors).
+  , optionsLevel         :: Maybe Level                  -- ^ What level of messages to log. 'Nothing' disabled logging.
+  , optionsRequestID     :: Maybe String                 -- ^ Optional request id for tracing across systems.
+  , optionsIsTerminal    :: Bool                         -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , optionsPrintSource   :: Bool                         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
+  , optionsFormatter     :: Options -> Message -> String -- ^ Log formatter to use (set automaticaly at runtime).
+  , optionsProcessID     :: CPid                         -- ^ ProcessID (set automaticaly at runtime).
+  , optionsFailOnWarning :: Bool
   }
 
 defaultOptions :: Options
@@ -101,6 +102,7 @@ defaultOptions = Options
   , optionsPrintSource = False
   , optionsFormatter = logfmtFormatter
   , optionsProcessID = 0
+  , optionsFailOnWarning = False
   }
 
 configureOptionsForHandle :: MonadIO io => Handle -> Options -> io Options

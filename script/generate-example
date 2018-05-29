@@ -35,17 +35,23 @@ generate_example () {
   diffFileAB="${fileA%%.*}.diffA-B.txt"
   diffFileBA="${fileB%%.*}.diffB-A.txt"
 
-  status $parseFileA
-  "$(dirname "$0")/run" semantic parse --sexpression $fileA > $parseFileA
+  if [ -e "$fileA" ]; then
+    status $parseFileA
+    stack exec semantic -- parse --sexpression $fileA > $parseFileA
+  fi
 
-  status $parseFileB
-  "$(dirname "$0")/run" semantic parse --sexpression $fileB > $parseFileB
+  if [ -e "$fileB" ]; then
+    status $parseFileB
+    stack exec semantic -- parse --sexpression $fileB > $parseFileB
+  fi
 
-  status $diffFileAB
-  "$(dirname "$0")/run" semantic diff --sexpression $fileA $fileB > $diffFileAB
+  if [ -e "$fileA" -a -e "$fileB" ]; then
+    status $diffFileAB
+    stack exec semantic -- diff --sexpression $fileA $fileB > $diffFileAB
 
-  status $diffFileBA
-  "$(dirname "$0")/run" semantic diff --sexpression $fileB $fileA > $diffFileBA
+    status $diffFileBA
+    stack exec semantic -- diff --sexpression $fileB $fileA > $diffFileBA
+  fi
 }
 
 if [[ -d $1 ]]; then

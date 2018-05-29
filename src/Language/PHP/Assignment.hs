@@ -8,11 +8,11 @@ module Language.PHP.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
+import Data.Sum
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
 import Language.PHP.Grammar as Grammar
-import Prologue
 import qualified Assigning.Assignment as Assignment
-import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Abstract.Name as Name
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -23,6 +23,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Language.PHP.Syntax as Syntax
+import Prologue
 
 type Syntax = '[
     Comment.Comment
@@ -103,7 +104,6 @@ type Syntax = '[
   , Syntax.NamespaceUseDeclaration
   , Syntax.NamespaceUseGroupClause
   , Syntax.NewVariable
-  , Syntax.Paren
   , Syntax.PrintIntrinsic
   , Syntax.Program
   , Syntax.PropertyDeclaration
@@ -129,7 +129,7 @@ type Syntax = '[
   , Type.Annotation
   , [] ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
 append :: a -> [a] -> [a]
@@ -230,34 +230,36 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.BXOr <$ symbol AnonCaretEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where
-    assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+    assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 binaryExpression  :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term (expression <|> classTypeDesignator))
-  [ (inj .) . Expression.And              <$ symbol AnonAnd
-  , (inj .) . Expression.Or               <$ symbol AnonOr
-  , (inj .) . Expression.XOr              <$ symbol AnonXor
-  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
-  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (inj .) . Expression.BOr              <$ symbol AnonPipe
-  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
-  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inj .) . Expression.Or               <$ symbol AnonQuestionQuestion -- Not sure if this is right.
-  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
-  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonLAngleRAngle <|> symbol AnonBangEqualEqual)
-  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
-  , (inj .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
-  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (inj .) . Expression.Plus             <$ symbol AnonPlus
-  , (inj .) . Expression.Minus            <$ symbol AnonMinus
-  , (inj .) . Expression.Times            <$ (symbol AnonStar <|> symbol AnonDot)
-  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inj .) . Expression.InstanceOf       <$ symbol AnonInstanceof
+  [ (inject .) . Expression.And                <$ symbol AnonAnd
+  , (inject .) . Expression.Or                 <$ symbol AnonOr
+  , (inject .) . Expression.XOr                <$ symbol AnonXor
+  , (inject .) . Expression.Or                 <$ symbol AnonPipePipe
+  , (inject .) . Expression.And                <$ symbol AnonAmpersandAmpersand
+  , (inject .) . Expression.BOr                <$ symbol AnonPipe
+  , (inject .) . Expression.BXOr               <$ symbol AnonCaret
+  , (inject .) . Expression.BAnd               <$ symbol AnonAmpersand
+  , (inject .) . Expression.Or                 <$ symbol AnonQuestionQuestion -- Not sure if this is right.
+  , (inject .) . Expression.Equal              <$ symbol AnonEqualEqual
+  , (inject .) . Expression.StrictEqual        <$ symbol AnonEqualEqualEqual
+  , (inject .) . invert Expression.Equal       <$ (symbol AnonBangEqual <|> symbol AnonLAngleRAngle <|> symbol AnonBangEqualEqual)
+  , (inject .) . invert Expression.StrictEqual <$ symbol AnonBangEqualEqual
+  , (inject .) . Expression.LessThan           <$ symbol AnonLAngle
+  , (inject .) . Expression.GreaterThan        <$ symbol AnonRAngle
+  , (inject .) . Expression.LessThanEqual      <$ symbol AnonLAngleEqual
+  , (inject .) . Expression.GreaterThanEqual   <$ symbol AnonRAngleEqual
+  , (inject .) . Expression.Comparison         <$ symbol AnonLAngleEqualRAngle
+  , (inject .) . Expression.LShift             <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.RShift             <$ symbol AnonRAngleRAngle
+  , (inject .) . Expression.Plus               <$ symbol AnonPlus
+  , (inject .) . Expression.Minus              <$ symbol AnonMinus
+  , (inject .) . Expression.Times              <$ (symbol AnonStar <|> symbol AnonDot)
+  , (inject .) . Expression.DividedBy          <$ symbol AnonSlash
+  , (inject .) . Expression.Modulo             <$ symbol AnonPercent
+  , (inject .) . Expression.InstanceOf         <$ symbol AnonInstanceof
   ]) where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 conditionalExpression :: Assignment
@@ -288,7 +290,7 @@ primaryExpression = choice [
   ]
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children (term expression))
+parenthesizedExpression = symbol ParenthesizedExpression *> children (term expression)
 
 classConstantAccessExpression :: Assignment
 classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> term name)
@@ -443,7 +445,7 @@ classConstDeclaration :: Assignment
 classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
 
 visibilityModifier :: Assignment
-visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . FV.name <$> source)
+visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . Name.name <$> source)
 
 constElement :: Assignment
 constElement = makeTerm <$> symbol ConstElement <*> children (Statement.Assignment [] <$> term name <*> term expression)
@@ -649,7 +651,7 @@ propertyDeclaration :: Assignment
 propertyDeclaration = makeTerm <$> symbol PropertyDeclaration <*> children (Syntax.PropertyDeclaration <$> term propertyModifier <*> someTerm propertyElement)
 
 propertyModifier :: Assignment
-propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . FV.name <$> source))
+propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . Name.name <$> source))
 
 propertyElement :: Assignment
 propertyElement = makeTerm <$> symbol PropertyElement <*> children (Statement.Assignment [] <$> term variableName <*> term propertyInitializer) <|> (symbol PropertyElement *> children (term variableName))
@@ -710,7 +712,7 @@ namespaceAliasingClause = makeTerm <$> symbol NamespaceAliasingClause <*> childr
 
 -- | TODO Do something better than Identifier
 namespaceFunctionOrConst :: Assignment
-namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier . FV.name <$> source)
+namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier . Name.name <$> source)
 
 globalDeclaration :: Assignment
 globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable')
@@ -746,7 +748,7 @@ variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
 name :: Assignment
-name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . FV.name <$> source)
+name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> source)
 
 functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
@@ -763,8 +765,8 @@ string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.Te
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment
           -> Assignment
-          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment [] Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Sum Syntax Term)
 infixTerm = infixContext (comment <|> textInterpolation)
 
 {-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

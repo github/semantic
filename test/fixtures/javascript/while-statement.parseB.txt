@@ -1,9 +1,0 @@
-(Program
-  (While
-    (Paren
-      (Identifier))
-    (
-      (Call
-        (Identifier)
-        (Empty))))
-  (Empty))

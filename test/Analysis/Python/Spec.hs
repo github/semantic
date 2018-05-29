@@ -1,8 +1,12 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 module Analysis.Python.Spec (spec) where
 
+import Data.Abstract.Environment as Env
+import Data.Abstract.Evaluatable (EvalError(..))
 import Data.Abstract.Value
 import Data.Map
+import qualified Language.Python.Assignment as Python
+import qualified Data.Language as Language
 
 import SpecHelpers
 
@@ -11,40 +15,37 @@ spec :: Spec
 spec = parallel $ do
   describe "evaluates Python" $ do
     it "imports" $ do
-      res <- snd <$> evaluate "main.py"
-      environment res `shouldBe` [ ("print", addr 0)
-                                 , ("a", addr 1)
-                                 , ("b", addr 3)
-                                 ]
+      ((_, state), _) <- evaluate "main.py"
+      Env.names (environment state) `shouldContain` [ "a", "b" ]
 
-      heapLookup (Address (Precise 1)) (heap res) `shouldBe` ns "a" [ ("foo", addr 2) ]
-      heapLookup (Address (Precise 3)) (heap res) `shouldBe` ns "b" [ ("c", addr 4) ]
-      heapLookup (Address (Precise 4)) (heap res) `shouldBe` ns "c" [ ("baz", addr 5) ]
+      (derefQName (heap state) ("a" :| [])    (environment state) >>= deNamespace) `shouldBe` Just ("a", ["foo"])
+      (derefQName (heap state) ("b" :| [])    (environment state) >>= deNamespace) `shouldBe` Just ("b", ["c"])
+      (derefQName (heap state) ("b" :| ["c"]) (environment state) >>= deNamespace) `shouldBe` Just ("c", ["baz"])
 
     it "imports with aliases" $ do
-      env <- environment . snd <$> evaluate "main1.py"
-      env `shouldBe` [ ("print", addr 0)
-                     , ("b", addr 1)
-                     , ("e", addr 3)
-                     ]
+      env <- environment . snd . fst <$> evaluate "main1.py"
+      Env.names env `shouldContain` [ "b", "e" ]
 
     it "imports using 'from' syntax" $ do
-      env <- environment . snd <$> evaluate "main2.py"
-      env `shouldBe` [ ("print", addr 0)
-                     , ("foo", addr 1)
-                     , ("bar", addr 2)
-                     ]
+      env <- environment . snd . fst <$> evaluate "main2.py"
+      Env.names env `shouldContain` [ "bar", "foo" ]
+
+    it "imports with relative syntax" $ do
+      ((_, state), _) <- evaluate "main3.py"
+      Env.names (environment state) `shouldContain` [ "utils" ]
+      (derefQName (heap state) ("utils" :| []) (environment state) >>= deNamespace) `shouldBe` Just ("utils", ["to_s"])
 
     it "subclasses" $ do
-      v <- fst <$> evaluate "subclass.py"
-      v `shouldBe` Right (Right (Right (Right (Right (Right (pure (injValue (String "\"bar\""))))))))
+      ((res, _), _) <- evaluate "subclass.py"
+      res `shouldBe` Right [String "\"bar\""]
 
     it "handles multiple inheritance left-to-right" $ do
-      v <- fst <$> evaluate "multiple_inheritance.py"
-      v `shouldBe` Right (Right (Right (Right (Right (Right (pure (injValue (String "\"foo!\""))))))))
+      ((res, _), _) <- evaluate "multiple_inheritance.py"
+      res `shouldBe` Right [String "\"foo!\""]
 
   where
-    ns n = Just . Latest . Just . injValue . Namespace n
+    ns n = Just . Latest . Last . Just . Namespace n
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)
+    evalPythonProject path = testEvaluating <$> evaluateProject pythonParser Language.Python pythonPrelude path

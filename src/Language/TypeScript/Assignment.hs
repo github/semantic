@@ -7,9 +7,10 @@ module Language.TypeScript.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.FreeVariables (name)
+import Data.Abstract.Name (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
+import Data.Sum
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -66,10 +67,12 @@ type Syntax = '[
   , Statement.Break
   , Statement.Catch
   , Statement.Continue
+  , Statement.DoWhile
   , Statement.Else
   , Statement.Finally
   , Statement.For
   , Statement.ForEach
+  , Statement.HashBang
   , Statement.If
   , Statement.Match
   , Statement.Pattern
@@ -77,16 +80,14 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Throw
   , Statement.Try
   , Statement.While
   , Statement.Yield
-  , Statement.Throw
-  , Statement.DoWhile
   , Syntax.AccessibilityModifier
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Paren
   , Syntax.Program
   , Syntax.Context
   , Type.Readonly
@@ -165,10 +166,11 @@ type Syntax = '[
   , TypeScript.Syntax.DefaultExport
   , TypeScript.Syntax.QualifiedExport
   , TypeScript.Syntax.QualifiedExportFrom
+  , TypeScript.Syntax.JavaScriptRequire
   , []
   ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
@@ -232,8 +234,8 @@ assignmentExpression :: Assignment
 assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> term (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
 
 augmentedAssignmentExpression :: Assignment
-augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
-  assign Expression.Plus <$ symbol AnonPlusEqual
+augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) (term expression) [
+    assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Minus <$ symbol AnonMinusEqual
   , assign Expression.Times <$ symbol AnonStarEqual
   , assign Expression.DividedBy <$ symbol AnonSlashEqual
@@ -241,10 +243,12 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.BXOr <$ symbol AnonCaretEqual
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
   , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
+  , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
+  , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
-  where assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
-        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+  where assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
+        assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 
 awaitExpression :: Assignment
@@ -481,8 +485,9 @@ function :: Assignment
 function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.GeneratorFunction) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
   where makeFunction loc (id, (typeParams, params, annotation), statements) = makeTerm loc (Declaration.Function [typeParams, annotation] id params statements)
 
+-- TODO: FunctionSignatures can, but don't have to be ambient functions.
 ambientFunction :: Assignment
-ambientFunction = makeAmbientFunction <$> symbol Grammar.AmbientFunction <*> children ((,) <$> term identifier <*> callSignatureParts)
+ambientFunction = makeAmbientFunction <$> symbol Grammar.FunctionSignature <*> children ((,) <$> term identifier <*> callSignatureParts)
   where makeAmbientFunction loc (id, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.AmbientFunction [typeParams, annotation] id params)
 
 ty :: Assignment
@@ -598,6 +603,7 @@ statement = handleError everything
       , continueStatement
       , returnStatement
       , throwStatement
+      , hashBang
       , emptyStatement
       , labeledStatement ]
 
@@ -611,19 +617,22 @@ doStatement :: Assignment
 doStatement = makeTerm <$> symbol DoStatement <*> children (flip Statement.DoWhile <$> term statement <*> term parenthesizedExpression)
 
 continueStatement :: Assignment
-continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (statementIdentifier <|> emptyTerm))
+continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (statementIdentifier <|> term emptyTerm))
 
 breakStatement :: Assignment
-breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (statementIdentifier <|> emptyTerm))
+breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (statementIdentifier <|> term emptyTerm))
 
 withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> children (TypeScript.Syntax.With <$> term parenthesizedExpression <*> term statement)
 
 returnStatement :: Assignment
-returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (term expressions <|> emptyTerm))
+returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (term expressions <|> term emptyTerm))
 
 throwStatement :: Assignment
 throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> term expressions)
+
+hashBang :: Assignment
+hashBang = makeTerm <$> symbol HashBangLine <*> (Statement.HashBang <$> source)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (TypeScript.Syntax.LabeledStatement <$> statementIdentifier <*> term statement)
@@ -636,9 +645,9 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
     -- `import foo = require "./foo"`
-    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (TypeScript.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
+    requireImport = inject <$> (symbol Grammar.ImportRequireClause *> children (TypeScript.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
     -- `import "./foo"`
-    sideEffectImport = inj <$> (TypeScript.Syntax.SideEffectImport <$> fromClause)
+    sideEffectImport = inject <$> (TypeScript.Syntax.SideEffectImport <$> fromClause)
     -- `import { bar } from "./foo"`
     namedImport = (,) Nothing <$> (symbol Grammar.NamedImports *> children (many importSymbol))
     -- `import defaultMember from "./foo"`
@@ -780,11 +789,21 @@ variableDeclaration :: Assignment
 variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> manyTerm variableDeclarator)
 
 variableDeclarator :: Assignment
-variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> term (identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
+variableDeclarator =
+      makeTerm <$> symbol VariableDeclarator <*> children (TypeScript.Syntax.JavaScriptRequire <$> identifier <*> requireCall)
+  <|> makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> term (identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+  where
+    makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
+
+    requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier') *> do
+      s <- source
+      guard (s == "require")
+      symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source))
+      )
+
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children (term expressions))
+parenthesizedExpression = symbol ParenthesizedExpression *> children (term expressions)
 
 switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term parenthesizedExpression <*> term switchBody)
@@ -813,27 +832,29 @@ tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> term state
 
 binaryExpression  :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term expression)
-  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
-  , (inj .) . Expression.Minus            <$ symbol AnonMinus
-  , (inj .) . Expression.Times            <$ symbol AnonStar
-  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inj .) . Expression.Member           <$ symbol AnonIn
-  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
-  , (inj .) . Expression.BOr              <$ symbol AnonPipe
-  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
-  , (inj .) . Expression.InstanceOf       <$ symbol AnonInstanceof
-  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
-  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
-  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (inj .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
-  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  [ (inject .) . Expression.Plus               <$ symbol AnonPlus
+  , (inject .) . Expression.Minus              <$ symbol AnonMinus
+  , (inject .) . Expression.Times              <$ symbol AnonStar
+  , (inject .) . Expression.DividedBy          <$ symbol AnonSlash
+  , (inject .) . Expression.Modulo             <$ symbol AnonPercent
+  , (inject .) . Expression.Member             <$ symbol AnonIn
+  , (inject .) . Expression.And                <$ symbol AnonAmpersandAmpersand
+  , (inject .) . Expression.BAnd               <$ symbol AnonAmpersand
+  , (inject .) . Expression.Or                 <$ symbol AnonPipePipe
+  , (inject .) . Expression.BOr                <$ symbol AnonPipe
+  , (inject .) . Expression.BXOr               <$ symbol AnonCaret
+  , (inject .) . Expression.InstanceOf         <$ symbol AnonInstanceof
+  , (inject .) . Expression.Equal              <$ symbol AnonEqualEqual
+  , (inject .) . Expression.StrictEqual        <$ symbol AnonEqualEqualEqual
+  , (inject .) . invert Expression.Equal       <$ symbol AnonBangEqual
+  , (inject .) . invert Expression.StrictEqual <$ symbol AnonBangEqualEqual
+  , (inject .) . Expression.LShift             <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.RShift             <$ symbol AnonRAngleRAngle
+  , (inject .) . Expression.UnsignedRShift     <$ symbol AnonRAngleRAngleRAngle
+  , (inject .) . Expression.LessThan           <$ symbol AnonLAngle
+  , (inject .) . Expression.GreaterThan        <$ symbol AnonRAngle
+  , (inject .) . Expression.LessThanEqual      <$ symbol AnonLAngleEqual
+  , (inject .) . Expression.GreaterThanEqual   <$ symbol AnonRAngleEqual
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
@@ -843,6 +864,6 @@ emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment
           -> Assignment
-          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment [] Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Sum Syntax Term)
 infixTerm = infixContext comment

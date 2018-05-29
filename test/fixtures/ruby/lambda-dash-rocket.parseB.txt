@@ -1,6 +1,0 @@
-(Program
-  (Function
-    (Empty)
-    (Function
-      (Empty)
-      (Identifier))))

@@ -1,0 +1,51 @@
+(Program
+  (Send
+    (Identifier)
+    (Function
+      (Empty)
+    {+(Identifier)+}
+    { ([])
+    ->(Plus
+      {+(Identifier)+}
+      {+(Integer)+}) }))
+{-(Send
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Send
+      {-(Identifier)-})-})-})-}
+{-(Send
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Integer)-})-})-}
+{-(Function
+  {-(Empty)-}
+  {-(Function
+    {-(Empty)-}
+    {-([])-})-})-}
+{-(Function
+  {-(Empty)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Send
+      {-(Identifier)-})-})-})-}
+{-(Function
+  {-(Empty)-}
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Integer)-})-})-}
+{-(Function
+  {-(Empty)-}
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(
+    {-(Identifier)-}
+    {-(Identifier)-})-}
+  {-(Function
+    {-(Empty)-}
+    {-([])-})-})-})

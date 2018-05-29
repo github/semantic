@@ -1,0 +1,11 @@
+(Program
+  (BAnd
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
+  (LShift
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

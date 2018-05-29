@@ -1,0 +1,17 @@
+(Program
+  (If
+    (Not
+      (Send
+      { (Identifier)
+      ->(Identifier) }))
+    ({-(Send
+      {-(Identifier)-})-})
+  { (Send
+    {-(Identifier)-})
+  ->(Empty) })
+{+(If
+  {+(Not
+    {+(Send
+      {+(Identifier)+})+})+}
+  {+([])+}
+  {+(Empty)+})+})

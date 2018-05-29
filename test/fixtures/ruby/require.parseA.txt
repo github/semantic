@@ -1,6 +1,0 @@
-(Program
-  (Require
-    (TextElement))
-  (Send
-    (Identifier)
-    (Identifier)))

@@ -40,19 +40,19 @@ import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
 import Data.Record
-import Data.Semigroup
+import Data.Semigroup (Semigroup(..))
 import Data.Source
 import Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
-import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
-import Data.Union
+import Data.Sum
 import Diffing.Algorithm.RWS
 import Test.LeanCheck
 
@@ -212,13 +212,13 @@ instance (Listable a, Listable b) => Listable (Patch a b) where
   tiers = tiers2
 
 
-instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g ': fs)) where
-  liftTiers tiers = (inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Union (g ': fs) a)]) tiers))
+instance (Listable1 f, Listable1 (Sum (g ': fs))) => Listable1 (Sum (f ': g ': fs)) where
+  liftTiers tiers = (inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
 
-instance Listable1 f => Listable1 (Union '[f]) where
-  liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+instance Listable1 f => Listable1 (Sum '[f]) where
+  liftTiers tiers = inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
 
-instance (Listable1 (Union fs), Listable a) => Listable (Union fs a) where
+instance (Listable1 (Sum fs), Listable a) => Listable (Sum fs a) where
   tiers = tiers1
 
 
@@ -246,7 +246,7 @@ instance Listable1 Syntax.Empty where
 instance Listable1 Syntax.Identifier where
   liftTiers _ = cons1 Syntax.Identifier
 
-type ListableSyntax = Union
+type ListableSyntax = Sum
   '[ Comment.Comment
    , Declaration.Function
    , Declaration.Method
@@ -257,8 +257,8 @@ type ListableSyntax = Union
    , []
    ]
 
-instance Listable FV.Name where
-  tiers = cons1 FV.name
+instance Listable Name.Name where
+  tiers = cons1 Name.name
 
 instance Listable1 Gram where
   liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram

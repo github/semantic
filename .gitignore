@@ -10,13 +10,19 @@ dist-newstyle
 .ghc.environment.*
 
 tmp/
-
 bin/
+
+/test/fixtures/*/examples
 
 *.hp
 *.prof
 *.pyc
 
+/test.*
+/*.html
+
 .bundle/
 .licenses/vendor/gems
 .licenses/log/
+
+codex.tags

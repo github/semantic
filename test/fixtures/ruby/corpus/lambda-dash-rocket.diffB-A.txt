@@ -1,0 +1,13 @@
+(Program
+  (Function
+    (Empty)
+  {+(Identifier)+}
+  {+(Identifier)+}
+  {+(Identifier)+}
+    (Function
+      (Empty)
+    { (Send
+      {-(Identifier)-})
+    ->(
+      {+(Integer)+}
+      {+(Integer)+}) })))

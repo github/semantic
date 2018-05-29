@@ -1,0 +1,27 @@
+(Program
+  (Assignment
+    (Identifier)
+  { (Plus
+    {-(Identifier)-}
+    {-(Integer)-})
+  ->(RShift
+    {+(Identifier)+}
+    {+(Integer)+}) })
+{+(Assignment
+  {+(Identifier)+}
+  {+(DividedBy
+    {+(Identifier)+}
+    {+(Integer)+})+})+}
+  (Assignment
+    (Identifier)
+  { (RShift
+    {-(Identifier)-}
+    {-(Integer)-})
+  ->(Plus
+    {+(Identifier)+}
+    {+(Integer)+}) })
+{-(Assignment
+  {-(Identifier)-}
+  {-(DividedBy
+    {-(Identifier)-}
+    {-(Integer)-})-})-})

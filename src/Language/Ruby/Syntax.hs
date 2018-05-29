@@ -1,12 +1,13 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module (ModulePath)
-import           Data.Abstract.ModuleTable as ModuleTable
+import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
+import           Data.JSON.Fields
+import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue
@@ -16,95 +17,121 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyName :: Members '[ Modules location value
+                            , Resumable ResolutionError
+                            ] effects
+                => ByteString
+                -> Evaluator location value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
-  modulePath <- resolve [name' <.> "rb"]
-  maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
+  let paths = [name' <.> "rb"]
+  modulePath <- resolve paths
+  maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyPath :: Members '[ Modules location value
+                            , Resumable ResolutionError
+                            ] effects
+                => ByteString
+                -> Evaluator location value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
-
-maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
-maybeFailNotFound name = maybeFail notFound
-  where notFound = "Unable to resolve: " <> name
+  maybe (throwResumable $ NotFoundError name' [name'] Language.Ruby) pure modulePath
 
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
 
-data Send a = Send { sendReceiver :: Maybe a, sendSelector :: a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Send where liftEq = genericLiftEq
 instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Send
+
 instance Evaluatable Send where
   eval Send{..} = do
-    func <- case sendReceiver of
-      Just recv -> do
-        recvEnv <- subtermValue recv >>= scopedEnvironment
-        localEnv (mappend recvEnv) (subtermValue sendSelector)
-      Nothing -> subtermValue sendSelector -- TODO Does this require `localize` so we don't leak terms when resolving `sendSelector`?
-    call func (map subtermValue sendArgs) -- TODO pass through sendBlock
+    let sel = case sendSelector of
+          Just sel -> subtermValue sel
+          Nothing  -> variable (name "call")
+    func <- maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
+    Rval <$> call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Require where liftEq = genericLiftEq
 instance Ord1 Require where liftCompare = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Require
+
 instance Evaluatable Require where
   eval (Require _ x) = do
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
+    traceResolve name path
     (importedEnv, v) <- isolate (doRequire path)
     modifyEnv (`mergeNewer` importedEnv)
-    pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
+    pure (Rval v) -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: MonadEvaluatable location term value m
-          => ModulePath
-          -> m (Environment location value, value)
-doRequire name = do
-  moduleTable <- getModuleTable
-  case ModuleTable.lookup name moduleTable of
-    Nothing       -> (,) . fst <$> load name <*> boolean True
-    Just (env, _) -> (,) env   <$>               boolean False
+doRequire :: ( AbstractValue location value effects
+             , Member (Modules location value) effects
+             )
+          => M.ModulePath
+          -> Evaluator location value effects (Environment location, value)
+doRequire path = do
+  result <- join <$> lookupModule path
+  case result of
+    Nothing       -> (,) . maybe emptyEnv fst <$> load path <*> boolean True
+    Just (env, _) -> (,) env                  <$>               boolean False
 
 
 newtype Load a = Load { loadArgs :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Load where liftEq = genericLiftEq
 instance Ord1 Load where liftCompare = genericLiftCompare
 instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Load
+
 instance Evaluatable Load where
   eval (Load [x]) = do
     path <- subtermValue x >>= asString
-    doLoad path False
+    Rval <$> doLoad path False
   eval (Load [x, wrap]) = do
     path <- subtermValue x >>= asString
     shouldWrap <- subtermValue wrap >>= asBool
-    doLoad path shouldWrap
-  eval (Load _) = fail "invalid argument supplied to load, path is required"
+    Rval <$> doLoad path shouldWrap
+  eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
-doLoad :: MonadEvaluatable location term value m => ByteString -> Bool -> m value
+doLoad :: ( AbstractValue location value effects
+          , Members '[ Modules location value
+                     , Resumable ResolutionError
+                     , State (Environment location)
+                     , State (Exports location)
+                     , Trace
+                     ] effects
+          )
+       => ByteString
+       -> Bool
+       -> Evaluator location value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
-  (importedEnv, _) <- isolate (load path')
-  unless shouldWrap $ modifyEnv (mappend importedEnv)
+  traceResolve path path'
+  importedEnv <- maybe emptyEnv fst <$> isolate (load path')
+  unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
 
-data Class a = Class { classIdentifier :: !a, classSuperClasses :: ![a], classBody :: !a }
-  deriving (Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
+  deriving (Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance ToJSONFields1 Class
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
@@ -115,32 +142,36 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    supers <- traverse subtermValue classSuperClasses
+    super <- traverse subtermValue classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
-    letrec' name $ \addr ->
-      subtermValue classBody <* makeNamespace name addr supers
+    Rval <$> letrec' name (\addr ->
+      subtermValue classBody <* makeNamespace name addr super)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Module
+
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr []
+    Rval <$> letrec' name (\addr ->
+      value =<< (eval xs <* makeNamespace name addr Nothing))
 
 data LowPrecedenceBoolean a
   = LowAnd !a !a
   | LowOr !a !a
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance ToJSONFields1 LowPrecedenceBoolean
 
 instance Evaluatable LowPrecedenceBoolean where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval = go . fmap subtermValue where
+  eval t = Rval <$> go (fmap subtermValue t) where
     go (LowAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)

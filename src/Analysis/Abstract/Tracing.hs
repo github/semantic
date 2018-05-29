@@ -1,40 +1,32 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeOperators #-}
 module Analysis.Abstract.Tracing
-( Tracing
+( tracingTerms
+, tracing
 ) where
 
-import Control.Abstract.Analysis
+import Control.Abstract hiding (trace)
 import Control.Monad.Effect.Writer
-import Data.Abstract.Configuration
 import Data.Semigroup.Reducer as Reducer
-import Data.Union
 import Prologue
 
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+tracingTerms :: ( Corecursive term
+                , Members '[ Reader (Live location value)
+                           , State (Environment location)
+                           , State (Heap location (Cell location) value)
+                           , Writer (trace (Configuration term location (Cell location) value))
+                           ] effects
+                , Reducer (Configuration term location (Cell location) value) (trace (Configuration term location (Cell location) value))
+                )
+             => trace (Configuration term location (Cell location) value)
+             -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
+             -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
+tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (Tracing trace m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Tracing trace m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (Tracing trace m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (Tracing trace m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (Tracing trace m effects)
+trace :: Member (Writer (trace (Configuration term location (Cell location) value))) effects => trace (Configuration term location (Cell location) value) -> TermEvaluator term location value effects ()
+trace = tell
 
-instance ( Corecursive term
-         , Effectful m
-         , Member (Writer (trace (Configuration location term value))) effects
-         , MonadAnalysis location term value (m effects)
-         , Ord location
-         , Reducer (Configuration location term value) (trace (Configuration location term value))
-         )
-      => MonadAnalysis location term value (Tracing trace m effects) where
-  type Effects location term value (Tracing trace m effects) = Writer (trace (Configuration location term value)) ': Effects location term value (m effects)
-
-  analyzeTerm recur term = do
-    config <- getConfiguration (embedSubterm term)
-    raise (tell @(trace (Configuration location term value)) (Reducer.unit config))
-    liftAnalyze analyzeTerm recur term
-
-  analyzeModule = liftAnalyze analyzeModule
+tracing :: Monoid (trace (Configuration term location (Cell location) value)) => TermEvaluator term location value (Writer (trace (Configuration term location (Cell location) value)) ': effects) a -> TermEvaluator term location value effects (a, trace (Configuration term location (Cell location) value))
+tracing = runWriter

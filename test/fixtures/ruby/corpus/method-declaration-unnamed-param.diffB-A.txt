@@ -1,0 +1,7 @@
+(Program
+  (Method
+    (Empty)
+    (Identifier)
+    (Identifier)
+  {-(Empty)-}
+    ([])))

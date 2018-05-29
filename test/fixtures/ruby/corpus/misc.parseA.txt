@@ -1,0 +1,27 @@
+(Program
+  (Send
+    (Identifier)
+    (Send
+      (Identifier))
+    (Function
+      (Empty)
+      ([])))
+  (Send
+    (Send
+      (Identifier))
+    (Identifier)
+    (Function
+      (Empty)
+      (Identifier)
+      (Identifier)
+      (Identifier)
+      ([])))
+  (Send
+    (Identifier)
+    (Send
+      (Identifier))
+    (Function
+      (Empty)
+      (Identifier)
+      ([])))
+  (Identifier))

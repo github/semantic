@@ -12,13 +12,14 @@ import Data.Syntax (makeTerm)
 import Data.Term as Term (Term(..), TermF(..), termFAnnotation, termFOut, termIn)
 import Data.Text.Encoding (encodeUtf8)
 import Parsing.CMark as Grammar (Grammar(..))
-import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
 import qualified Data.ByteString as B
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Text as Text
 import qualified Language.Markdown.Syntax as Markup
+import Prologue
 
 type Syntax =
   '[ Markup.Document
@@ -47,7 +48,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment (TermF [] CMarkGFM.NodeType) Grammar Language.Markdown.Assignment.Term
 
 
@@ -76,9 +77,9 @@ list :: Assignment
 list = termIn <$> symbol List <*> (makeList . termFAnnotation . termFOut <$> currentNode <*> children (many item))
   where
     makeList (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) = case listType of
-      CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
-      CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList
-    makeList _ = inj . Markup.UnorderedList
+      CMarkGFM.BULLET_LIST -> inject . Markup.UnorderedList
+      CMarkGFM.ORDERED_LIST -> inject . Markup.OrderedList
+    makeList _ = inject . Markup.UnorderedList
 
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)

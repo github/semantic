@@ -1,118 +1,125 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, TypeOperators #-}
 module Analysis.Abstract.Caching
-( Caching
+( cachingTerms
+, convergingModules
+, caching
 ) where
 
-import Control.Abstract.Analysis
-import Data.Abstract.Address
+import Control.Abstract
 import Data.Abstract.Cache
-import Data.Abstract.Configuration
-import Data.Abstract.Heap
 import Data.Abstract.Module
+import Data.Abstract.Ref
+import Data.Semilattice.Lower
 import Prologue
 
--- | The effects necessary for caching analyses.
-type CachingEffects location term value effects
-  = NonDet                             -- For 'Alternative' and 'gather'.
- ': Reader (Cache location term value) -- The in-cache used as an oracle while converging on a result.
- ': State  (Cache location term value) -- The out-cache used to record results in each iteration of convergence.
- ': effects
+-- | Look up the set of values for a given configuration in the in-cache.
+consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects)
+              => Configuration term location (Cell location) value
+              -> TermEvaluator term location value effects (Set (Cached location (Cell location) value))
+consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
--- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
-newtype Caching m (effects :: [* -> *]) a = Caching (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+-- | Run an action with the given in-cache.
+withOracle :: Member (Reader (Cache term location (Cell location) value)) effects
+           => Cache term location (Cell location) value
+           -> TermEvaluator term location value effects a
+           -> TermEvaluator term location value effects a
+withOracle cache = local (const cache)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (Caching m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Caching m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (Caching m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (Caching m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (Caching m effects)
 
--- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
-class MonadEvaluator location term value m => MonadCaching location term value m where
-  -- | Look up the set of values for a given configuration in the in-cache.
-  consultOracle :: Configuration location term value -> m (Set (value, Heap location value))
-  -- | Run an action with the given in-cache.
-  withOracle :: Cache location term value -> m a -> m a
+-- | Look up the set of values for a given configuration in the out-cache.
+lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects)
+            => Configuration term location (Cell location) value
+            -> TermEvaluator term location value effects (Maybe (Set (Cached location (Cell location) value)))
+lookupCache configuration = cacheLookup configuration <$> get
 
-  -- | Look up the set of values for a given configuration in the out-cache.
-  lookupCache :: Configuration location term value -> m (Maybe (Set (value, Heap location value)))
-  -- | Run an action, caching its result and 'Heap' under the given configuration.
-  caching :: Configuration location term value -> Set (value, Heap location value) -> m value -> m value
+-- | Run an action, caching its result and 'Heap' under the given configuration.
+cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects)
+                     => Configuration term location (Cell location) value
+                     -> Set (Cached location (Cell location) value)
+                     -> TermEvaluator term location value effects (ValueRef value)
+                     -> TermEvaluator term location value effects (ValueRef value)
+cachingConfiguration configuration values action = do
+  modify' (cacheSet configuration values)
+  result <- Cached <$> action <*> TermEvaluator getHeap
+  cachedValue result <$ modify' (cacheInsert configuration result)
 
-  -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-  isolateCache :: m a -> m (Cache location term value)
+putCache :: Member (State (Cache term location (Cell location) value)) effects
+         => Cache term location (Cell location) value
+         -> TermEvaluator term location value effects ()
+putCache = put
 
-instance ( Effectful m
-         , Members (CachingEffects location term value '[]) effects
-         , MonadEvaluator location term value (m effects)
-         , Ord (Cell location value)
-         , Ord location
-         , Ord term
-         , Ord value
-         )
-         => MonadCaching location term value (Caching m effects) where
-  consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
-  withOracle cache = raise . local (const cache) . lower
+-- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
+isolateCache :: Member (State (Cache term location (Cell location) value)) effects
+             => TermEvaluator term location value effects a
+             -> TermEvaluator term location value effects (Cache term location (Cell location) value)
+isolateCache action = putCache lowerBound *> action *> get
 
-  lookupCache configuration = raise (cacheLookup configuration <$> get)
-  caching configuration values action = do
-    raise (modify (cacheSet configuration values))
-    result <- (,) <$> action <*> getHeap
-    raise (modify (cacheInsert configuration result))
-    pure (fst result)
 
-  isolateCache action = raise (put (mempty :: Cache location term value)) *> action *> raise get
+-- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
+cachingTerms :: ( Cacheable term location (Cell location) value
+                , Corecursive term
+                , Members '[ Fresh
+                           , NonDet
+                           , Reader (Cache term location (Cell location) value)
+                           , Reader (Live location value)
+                           , State (Cache term location (Cell location) value)
+                           , State (Environment location)
+                           , State (Heap location (Cell location) value)
+                           ] effects
+                )
+             => SubtermAlgebra (Base term) term (TermEvaluator term location value effects (ValueRef value))
+             -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects (ValueRef value))
+cachingTerms recur term = do
+  c <- getConfiguration (embedSubterm term)
+  cached <- lookupCache c
+  case cached of
+    Just pairs -> scatter pairs
+    Nothing -> do
+      pairs <- consultOracle c
+      cachingConfiguration c pairs (recur term)
 
--- | This instance coinductively iterates the analysis of a term until the results converge.
-instance ( Alternative (m effects)
-         , Corecursive term
-         , Effectful m
-         , Members (CachingEffects location term value '[]) effects
-         , MonadAnalysis location term value (m effects)
-         , MonadFresh (m effects)
-         , Ord (Cell location value)
-         , Ord location
-         , Ord term
-         , Ord value
-         )
-      => MonadAnalysis location term value (Caching m effects) where
-  -- We require the 'CachingEffects' in addition to the underlying analysis’ 'Effects'.
-  type Effects location term value (Caching m effects) = CachingEffects location term value (Effects location term value (m effects))
+convergingModules :: ( AbstractValue location value effects
+                     , Cacheable term location (Cell location) value
+                     , Members '[ Allocator location value
+                                , Fresh
+                                , NonDet
+                                , Reader (Cache term location (Cell location) value)
+                                , Reader (Environment location)
+                                , Reader (Live location value)
+                                , Resumable (AddressError location value)
+                                , Resumable (EnvironmentError value)
+                                , State (Cache term location (Cell location) value)
+                                , State (Environment location)
+                                , State (Heap location (Cell location) value)
+                                ] effects
+                     )
+                  => SubtermAlgebra Module term (TermEvaluator term location value effects value)
+                  -> SubtermAlgebra Module term (TermEvaluator term location value effects value)
+convergingModules recur m = do
+  c <- getConfiguration (subterm (moduleBody m))
+  -- Convergence here is predicated upon an Eq instance, not α-equivalence
+  cache <- converge lowerBound (\ prevCache -> isolateCache $ do
+    TermEvaluator (putEnv  (configurationEnvironment c))
+    TermEvaluator (putHeap (configurationHeap        c))
+    -- We need to reset fresh generation so that this invocation converges.
+    resetFresh 0 $
+    -- This is subtle: though the calling context supports nondeterminism, we want
+    -- to corral all the nondeterminism that happens in this @eval@ invocation, so
+    -- that it doesn't "leak" to the calling context and diverge (otherwise this
+    -- would never complete). We don’t need to use the values, so we 'gather' the
+    -- nondeterministic values into @()@.
+      withOracle prevCache (gatherM (const ()) (recur m)))
+  TermEvaluator (value =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
-  -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
-  analyzeTerm recur e = do
-    c <- getConfiguration (embedSubterm e)
-    cached <- lookupCache c
-    case cached of
-      Just pairs -> scatter pairs
-      Nothing -> do
-        pairs <- consultOracle c
-        caching c pairs (liftAnalyze analyzeTerm recur e)
-
-  analyzeModule recur m = do
-    c <- getConfiguration (subterm (moduleBody m))
-    -- Convergence here is predicated upon an Eq instance, not α-equivalence
-    cache <- converge (\ prevCache -> isolateCache $ do
-      putHeap (configurationHeap c)
-      -- We need to reset fresh generation so that this invocation converges.
-      reset 0
-      -- This is subtle: though the calling context supports nondeterminism, we want
-      -- to corral all the nondeterminism that happens in this @eval@ invocation, so
-      -- that it doesn't "leak" to the calling context and diverge (otherwise this
-      -- would never complete). We don’t need to use the values, so we 'gather' the
-      -- nondeterministic values into @()@.
-      withOracle prevCache (raise (gather (const ()) (lower (liftAnalyze analyzeModule recur m))))) mempty
-    maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
 --   This applies the Kleene fixed-point theorem to finitize a monotone action. cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
 converge :: (Eq a, Monad m)
-         => (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
-         -> a          -- ^ An initial seed value to iterate from.
+         => a          -- ^ An initial seed value to iterate from.
+         -> (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
          -> m a        -- ^ A computation producing the least fixed point (the first value at which the actions converge).
-converge f = loop
+converge seed f = loop seed
   where loop x = do
           x' <- f x
           if x' == x then
@@ -121,5 +128,12 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative m, Foldable t, MonadEvaluator location term value m) => t (a, Heap location value) -> m a
-scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
+scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (Cached location (Cell location) value) -> TermEvaluator term location value effects (ValueRef value)
+scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
+
+
+caching :: Alternative f => TermEvaluator term location value (NonDet ': Reader (Cache term location (Cell location) value) ': State (Cache term location (Cell location) value) ': effects) a -> TermEvaluator term location value effects (f a, Cache term location (Cell location) value)
+caching
+  = runState lowerBound
+  . runReader lowerBound
+  . runNonDetA

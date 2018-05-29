@@ -1,7 +1,0 @@
-(Program
-{+(Symbol)+}
-{ (Symbol)
-->(Symbol) }
-{ (Symbol)
-->(Symbol) }
-{-(Symbol)-})

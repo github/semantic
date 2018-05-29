@@ -1,147 +1,144 @@
--- MonoLocalBinds is to silence a warning about a simplifiable constraint.
-{-# LANGUAGE DataKinds, MonoLocalBinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
-import Analysis.Abstract.BadVariables
-import Analysis.Abstract.BadModuleResolutions
-import Analysis.Abstract.BadValues
-import Analysis.Abstract.Caching
-import Analysis.Abstract.Quiet
-import Analysis.Abstract.Dead
-import Analysis.Abstract.Evaluating as X
-import Analysis.Abstract.ImportGraph
-import Analysis.Abstract.Tracing
-import Analysis.Declaration
-import Control.Abstract.Analysis
-import Control.Monad.IO.Class
-import Data.Abstract.Evaluatable hiding (head)
-import Data.Abstract.Address
-import Data.Abstract.Located
-import Data.Abstract.Module
-import Data.Abstract.Package as Package
-import Data.Abstract.Type
-import Data.Abstract.Value
-import Data.Blob
-import Data.Diff
-import Data.Range
-import Data.Record
-import Data.Span
-import Data.Term
-import Diffing.Algorithm
-import Diffing.Interpreter
-import System.FilePath.Glob
+import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Collecting
+import           Analysis.Abstract.Evaluating
+import           Control.Abstract
+import           Control.Monad.Effect.Trace (runPrintingTrace)
+import           Data.Abstract.Address
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Value
+import           Data.Abstract.Type
+import           Data.Blob
+import           Data.Project
+import           Data.Functor.Foldable
+import qualified Data.Language as Language
+import           Data.Sum (weaken)
+import           Data.Term
 import qualified GHC.TypeLits as TypeLevel
-import Language.Preluded
-import Parsing.Parser
-import Prologue
-import Semantic.Diff (diffTermPair)
-import Semantic.IO as IO
-import Semantic.Task hiding (parsePackage)
-import qualified Semantic.Task as Task
-import System.FilePath.Posix
+import           Language.Haskell.HsColour
+import           Language.Haskell.HsColour.Colourise
+import           Language.Preluded
+import           Parsing.Parser
+import           Prologue hiding (weaken)
+import           Semantic.Graph
+import           Semantic.IO as IO
+import           Semantic.Task
+import           Text.Show (showListWith)
+import           Text.Show.Pretty
 
-import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
--- Ruby
-evalRubyProject = runEvaluatingWithPrelude rubyParser ["rb"]
-evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
+justEvaluating
+  = runM
+  . fmap (first reassociate)
+  . evaluating
+  . runPrintingTrace
+  . runLoadError
+  . runValueError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTermEvaluator @_ @Precise
 
-evalRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
+evaluatingWithHoles
+  = runM
+  . evaluating
+  . runPrintingTrace
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingValueError
+  . resumingEnvironmentError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . runTermEvaluator @_ @Precise
 
-evalRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+checking
+  = runM @_ @IO
+  . evaluating
+  . runPrintingTrace
+  . runTermEvaluator @_ @Monovariant @Type
+  . caching @[]
+  . providingLiveSet
+  . runLoadError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTypeError
 
-evalRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
+evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript javaScriptPrelude path
+evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 
--- Go
-evalGoProject path = runEvaluating . evaluatePackageBody <$> parseProject goParser ["go"] path
-evalGoFile path = runEvaluating . evaluateModule <$> parseFile goParser Nothing path
+typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
 
-typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
+rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
+pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
+javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just Language.JavaScript)
 
--- Python
-evalPythonProject = runEvaluatingWithPrelude pythonParser ["py"]
-evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
-
-evalPythonImportGraph name paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluatePackage <$> parsePackage name pythonParser (dropFileName (head paths)) paths
-
-typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
-tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
-evalDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
-
--- PHP
-evalPHPProject path = runEvaluating . evaluatePackageBody <$> parseProject phpParser ["php"] path
-evalPHPFile path = runEvaluating . evaluateModule <$> parseFile phpParser Nothing path
-
--- TypeScript
-evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProject typescriptParser ["ts", "tsx"] path
-evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
-typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
-
-runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
-
--- TODO: Remove this by exporting EvaluatingEffects
-runEvaluating :: forall term effects a.
-                 ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects) ~ effects
-                 , Corecursive term
-                 , Recursive term )
-              => Evaluating Precise term (Value Precise) effects a
-              -> Final effects a
-runEvaluating = runAnalysis @(Evaluating Precise term (Value Precise))
-
-parsePrelude :: forall term. TypeLevel.KnownSymbol (PreludePath term) => Parser term -> IO (Module term)
-parsePrelude parser = do
-  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
-  parseFile parser Nothing preludePath
-
-parseProject :: Parser term
-                -> [Prelude.String]
-                -> FilePath
-                -> IO (PackageBody term)
-parseProject parser exts entryPoint = do
-  let rootDir = takeDirectory entryPoint
-  paths <- getPaths exts rootDir
-  modules <- parseFiles parser rootDir paths
-  pure $ fromModulesWithEntryPoint modules (takeFileName entryPoint)
-
-withPrelude prelude a = do
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv a
-
-getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
+-- Evaluate a project, starting at a single entrypoint.
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
--- Read and parse a file.
-parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
-parseFile parser rootDir path = runTask $ do
-  blob <- file path
-  moduleForBlob rootDir blob <$> parse parser blob
+parseFile :: Parser term -> FilePath -> IO term
+parseFile parser = runTask . (parse parser <=< readBlob . file)
 
-parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
-parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
-
-parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> IO (Package term)
-parsePackage name parser rootDir = runTask . Task.parsePackage name parser rootDir
+blob :: FilePath -> IO Blob
+blob = runTask . readBlob . file
 
 
--- Read a file from the filesystem into a Blob.
-file :: MonadIO m => FilePath -> m Blob
-file path = fromJust <$> IO.readFile path (languageForFilePath path)
+injectConst :: a -> SomeExc (Sum '[Const a])
+injectConst = SomeExc . inject . Const
 
--- Diff helpers
-diffWithParser :: ( HasField fields Data.Span.Span
-                  , HasField fields Range
-                  , Eq1 syntax
-                  , Show1 syntax
-                  , Traversable syntax
-                  , Diffable syntax
-                  , HasDeclaration syntax
-                  , Members '[Distribute WrappedTask, Task] effs
-                  )
-               => Parser (Term syntax (Record fields))
-               -> BlobPair
-               -> Eff effs (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
-diffWithParser parser blobs = distributeFor blobs (\ blob -> WrapTask $ parse parser blob >>= decorate (declarationAlgebra blob)) >>= diffTermPair diffTerms . runJoin
+mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
+mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)
+
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
+reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
+
+
+newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }
+  deriving (Declarations, FreeVariables)
+
+type instance Base (Quieterm syntax ann) = TermF syntax ann
+instance Functor syntax => Recursive   (Quieterm syntax ann) where project = unQuieterm
+instance Functor syntax => Corecursive (Quieterm syntax ann) where embed   =   Quieterm
+
+instance Eq1 syntax => Eq1 (Quieterm syntax) where
+  liftEq eqA = go where go t1 t2 = liftEq2 eqA go (unQuieterm t1) (unQuieterm t2)
+
+instance (Eq1 syntax, Eq ann) => Eq (Quieterm syntax ann) where
+  (==) = eq1
+
+instance Ord1 syntax => Ord1 (Quieterm syntax) where
+  liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unQuieterm t1) (unQuieterm t2)
+
+instance (Ord1 syntax, Ord ann) => Ord (Quieterm syntax ann) where
+  compare = compare1
+
+instance Show1 syntax => Show1 (Quieterm syntax) where
+  liftShowsPrec _ _ = go where go d = liftShowsPrec go (showListWith (go 0)) d . termFOut . unQuieterm
+
+instance Show1 syntax => Show (Quieterm syntax ann) where
+  showsPrec = liftShowsPrec (const (const id)) (const id)
+
+quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
+quieterm = cata Quieterm
+
+
+prettyShow :: Show a => a -> IO ()
+prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow

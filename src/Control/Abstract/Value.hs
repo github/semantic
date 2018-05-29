@@ -1,210 +1,254 @@
-{-# LANGUAGE FunctionalDependencies, GADTs, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, Rank2Types #-}
 module Control.Abstract.Value
-( MonadValue(..)
+( AbstractValue(..)
+, AbstractFunction(..)
+, AbstractHole(..)
 , Comparator(..)
+, asBool
 , while
 , doWhile
 , forLoop
 , makeNamespace
+, evaluateInScopedEnv
+, value
+, subtermValue
 , ValueRoots(..)
-, ValueError(..)
 ) where
 
+import Control.Abstract.Addressable
+import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Data.Abstract.Address (Address, Cell)
+import Control.Abstract.Heap
+import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
+import Data.Abstract.Name
 import Data.Abstract.Number as Number
+import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
+import Data.Semilattice.Lower
 import Prelude
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
 --   encapsulate a traditional, boolean-returning operator, wrap it in 'Concrete';
---   if you want the generalized comparator, pass in 'Generalized'. In MonadValue
+--   if you want the generalized comparator, pass in 'Generalized'. In 'AbstractValue'
 --   instances, you can then then handle the different cases to return different
 --   types, if that's what you need.
 data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
+class AbstractHole value where
+  hole :: value
+
+
+class Show value => AbstractFunction location value effects where
+  -- | Build a closure (a binder like a lambda or method definition).
+  closure :: [Name]                                 -- ^ The parameter names.
+          -> Set Name                               -- ^ The set of free variables to close over.
+          -> Evaluator location value effects value -- ^ The evaluator for the body of the closure.
+          -> Evaluator location value effects value
+  -- | Evaluate an application (like a function call).
+  call :: value -> [Evaluator location value effects value] -> Evaluator location value effects value
+
+
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (Monad m, Show value) => MonadValue location value m | m value -> location where
+class AbstractFunction location value effects => AbstractValue location value effects where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
-  unit :: m value
+  unit :: Evaluator location value effects value
 
   -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> m value
+  integer :: Integer -> Evaluator location value effects value
 
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
-               -> (value -> m value)
+               -> (value -> Evaluator location value effects value)
 
   -- | Lift a pair of binary operators to a function on 'value's.
   --   You usually pass the same operator as both arguments, except in the cases where
   --   Haskell provides different functions for integral and fractional operations, such
   --   as division, exponentiation, and modulus.
   liftNumeric2 :: (forall a b. Number a -> Number b -> SomeNumber)
-               -> (value -> value -> m value)
+               -> (value -> value -> Evaluator location value effects value)
 
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
-  liftComparison :: Comparator -> (value -> value -> m value)
+  liftComparison :: Comparator -> (value -> value -> Evaluator location value effects value)
 
   -- | Lift a unary bitwise operator to values. This is usually 'complement'.
   liftBitwise :: (forall a . Bits a => a -> a)
-              -> (value -> m value)
+              -> (value -> Evaluator location value effects value)
 
   -- | Lift a binary bitwise operator to values. The Integral constraint is
   --   necessary to satisfy implementation details of Haskell left/right shift,
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> m value)
+               -> (value -> value -> Evaluator location value effects value)
 
   -- | Construct an abstract boolean value.
-  boolean :: Bool -> m value
+  boolean :: Bool -> Evaluator location value effects value
 
   -- | Construct an abstract string value.
-  string :: ByteString -> m value
+  string :: ByteString -> Evaluator location value effects value
 
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: ByteString -> m value
+  symbol :: ByteString -> Evaluator location value effects value
 
   -- | Construct a floating-point value.
-  float :: Scientific -> m value
+  float :: Scientific -> Evaluator location value effects value
 
   -- | Construct a rational value.
-  rational :: Prelude.Rational -> m value
+  rational :: Rational -> Evaluator location value effects value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> m value
+  multiple :: [value] -> Evaluator location value effects value
 
   -- | Construct an array of zero or more values.
-  array :: [value] -> m value
+  array :: [value] -> Evaluator location value effects value
 
   -- | Construct a key-value pair for use in a hash.
-  kvPair :: value -> value -> m value
+  kvPair :: value -> value -> Evaluator location value effects value
 
   -- | Extract the contents of a key-value pair as a tuple.
-  asPair :: value -> m (value, value)
+  asPair :: value -> Evaluator location value effects (value, value)
 
   -- | Construct a hash out of pairs.
-  hash :: [(value, value)] -> m value
+  hash :: [(value, value)] -> Evaluator location value effects value
 
   -- | Extract a 'ByteString' from a given value.
-  asString :: value -> m ByteString
+  asString :: value -> Evaluator location value effects ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> m value -> m value -> m value
-
-  -- | Extract a 'Bool' from a given value.
-  asBool :: value -> m Bool
+  ifthenelse :: value -> Evaluator location value effects a -> Evaluator location value effects a -> Evaluator location value effects a
 
   -- | Construct the nil/null datatype.
-  null :: m value
+  null :: Evaluator location value effects value
+
+  -- | @index x i@ computes @x[i]@, with zero-indexing.
+  index :: value -> value -> Evaluator location value effects value
 
   -- | Build a class value from a name and environment.
-  klass :: Name                       -- ^ The new class's identifier
-        -> [value]                    -- ^ A list of superclasses
-        -> Environment location value -- ^ The environment to capture
-        -> m value
+  klass :: Name                 -- ^ The new class's identifier
+        -> [value]              -- ^ A list of superclasses
+        -> Environment location -- ^ The environment to capture
+        -> Evaluator location value effects value
 
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
-  namespace :: Name                       -- ^ The namespace's identifier
-            -> Environment location value -- ^ The environment to mappend
-            -> m value
+  namespace :: Name                 -- ^ The namespace's identifier
+            -> Environment location -- ^ The environment to mappend
+            -> Evaluator location value effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> m (Environment location value)
-
-  -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  lambda :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
-  -- | Evaluate an application (like a function call).
-  call :: value -> [m value] -> m value
+  scopedEnvironment :: value -> Evaluator location value effects (Maybe (Environment location))
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --
   --   The function argument takes an action which recurs through the loop.
-  loop :: (m value -> m value) -> m value
+  loop :: (Evaluator location value effects value -> Evaluator location value effects value) -> Evaluator location value effects value
 
 
--- | Attempt to extract a 'Prelude.Bool' from a given value.
-forLoop :: (MonadEnvironment location value m, MonadValue location value m)
-        => m value -- ^ Initial statement
-        -> m value -- ^ Condition
-        -> m value -- ^ Increment/stepper
-        -> m value -- ^ Body
-        -> m value
+-- | Extract a 'Bool' from a given value.
+asBool :: AbstractValue location value effects => value -> Evaluator location value effects Bool
+asBool value = ifthenelse value (pure True) (pure False)
+
+-- | C-style for loops.
+forLoop :: ( AbstractValue location value effects
+           , Member (State (Environment location)) effects
+           )
+        => Evaluator location value effects value -- ^ Initial statement
+        -> Evaluator location value effects value -- ^ Condition
+        -> Evaluator location value effects value -- ^ Increment/stepper
+        -> Evaluator location value effects value -- ^ Body
+        -> Evaluator location value effects value
 forLoop initial cond step body =
   localize (initial *> while cond (body *> step))
 
--- | The fundamental looping primitive, built on top of ifthenelse.
-while :: MonadValue location value m
-      => m value
-      -> m value
-      -> m value
+-- | The fundamental looping primitive, built on top of 'ifthenelse'.
+while :: AbstractValue location value effects
+      => Evaluator location value effects value
+      -> Evaluator location value effects value
+      -> Evaluator location value effects value
 while cond body = loop $ \ continue -> do
   this <- cond
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: MonadValue location value m
-        => m value
-        -> m value
-        -> m value
+doWhile :: AbstractValue location value effects
+        => Evaluator location value effects value
+        -> Evaluator location value effects value
+        -> Evaluator location value effects value
 doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
 
-makeNamespace :: ( MonadValue location value m
-                 , MonadEnvironment location value m
-                 , MonadHeap location value m
+makeNamespace :: ( AbstractValue location value effects
+                 , Member (State (Environment location)) effects
+                 , Member (State (Heap location (Cell location) value)) effects
                  , Ord location
                  , Reducer value (Cell location value)
                  )
               => Name
               -> Address location value
-              -> [value]
-              -> m value
-makeNamespace name addr supers = do
-  superEnv <- mconcat <$> traverse scopedEnvironment supers
+              -> Maybe value
+              -> Evaluator location value effects value
+makeNamespace name addr super = do
+  superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
+  let env' = fromMaybe lowerBound superEnv
   namespaceEnv <- Env.head <$> getEnv
-  v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
+  v <- namespace name (Env.mergeNewer env' namespaceEnv)
   v <$ assign addr v
+
+
+-- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
+evaluateInScopedEnv :: ( AbstractValue location value effects
+                       , Member (State (Environment location)) effects
+                       )
+                    => Evaluator location value effects value
+                    -> Evaluator location value effects value
+                    -> Evaluator location value effects value
+evaluateInScopedEnv scopedEnvTerm term = do
+  scopedEnv <- scopedEnvTerm >>= scopedEnvironment
+  maybe term (flip localEnv term . mergeEnvs) scopedEnv
+
+
+-- | Evaluates a 'Value' returning the referenced value
+value :: ( AbstractValue location value effects
+         , Members '[ Allocator location value
+                    , Reader (Environment location)
+                    , Resumable (EnvironmentError value)
+                    , State (Environment location)
+                    , State (Heap location (Cell location) value)
+                    ] effects
+         )
+      => ValueRef value
+      -> Evaluator location value effects value
+value (LvalLocal var) = variable var
+value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
+value (Rval val) = pure val
+
+-- | Evaluates a 'Subterm' to its rval
+subtermValue :: ( AbstractValue location value effects
+                , Members '[ Allocator location value
+                           , Reader (Environment location)
+                           , Resumable (EnvironmentError value)
+                           , State (Environment location)
+                           , State (Heap location (Cell location) value)
+                           ] effects
+                )
+             => Subterm term (Evaluator location value effects (ValueRef value))
+             -> Evaluator location value effects value
+subtermValue = value <=< subtermRef
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots location value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> Live location value
-
-
--- The type of exceptions that can be thrown when constructing values in `MonadValue`.
-data ValueError location value resume where
-  StringError            :: value          -> ValueError location value ByteString
-  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
-  CallError              :: value          -> ValueError location value value
-  BoolError              :: value          -> ValueError location value Bool
-  Numeric2Error          :: value          -> value -> ValueError location value value
-
-instance Eq value => Eq1 (ValueError location value) where
-  liftEq _ (StringError a) (StringError b)                       = a == b
-  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
-  liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
-  liftEq _ (CallError a) (CallError b)                           = a == b
-  liftEq _ (BoolError a) (BoolError c)                           = a == c
-  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
-  liftEq _ _             _                                       = False
-
-deriving instance (Show value) => Show (ValueError location value resume)
-instance (Show value) => Show1 (ValueError location value) where
-  liftShowsPrec _ _ = showsPrec

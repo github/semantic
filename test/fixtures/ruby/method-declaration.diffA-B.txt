@@ -1,8 +1,0 @@
-(Program
-  (Method
-    (Empty)
-  { (Identifier)
-  ->(Identifier) }
-  {+(Identifier)+}
-    (
-    {+(Identifier)+})))

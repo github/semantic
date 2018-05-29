@@ -1,0 +1,65 @@
+(Program
+{+(Try
+  {+(
+    {+(Send
+      {+(Identifier)+})+}
+    {+(Catch
+      {+(
+        {+(
+          {+(Send
+            {+(Identifier)+})+})+})+}
+      {+(Send
+        {+(Identifier)+})+})+})+})+}
+{-(Try
+  {-(
+    {-(Send
+      {-(Identifier)-})-}
+    {-(Catch
+      {-(
+        {-(
+          {-(Identifier)-})-})-}
+      {-(Catch
+        {-(
+          {-(
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(
+            {-(Send
+              {-(Identifier)-})-})-})-}
+        {-(Send
+          {-(Identifier)-})-})-})-}
+    {-(Else
+      {-(Empty)-}
+      {-(Send
+        {-(Identifier)-})-})-}
+    {-(Finally
+      {-(Send
+        {-(Identifier)-})-})-})-})-}
+{-(Method
+  {-(Empty)-}
+  {-(Identifier)-}
+  {-(
+    {-(Catch
+      {-(
+        {-(
+          {-(Identifier)-})-})-}
+      {-(Catch
+        {-(
+          {-(
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(
+            {-(Send
+              {-(Identifier)-})-})-})-}
+        {-([])-})-})-}
+    {-(Else
+      {-(Empty)-}
+      {-([])-})-}
+    {-(Finally
+      {-([])-})-})-})-}
+{-(Try
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Catch
+    {-(Null)-}
+    {-(Empty)-})-})-})

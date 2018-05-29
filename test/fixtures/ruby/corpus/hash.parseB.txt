@@ -1,0 +1,11 @@
+(Program
+  (Hash
+    (KeyValue
+      (Symbol)
+      (TextElement))
+    (KeyValue
+      (Symbol)
+      (Integer))
+    (KeyValue
+      (Symbol)
+      (Boolean))))

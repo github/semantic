@@ -1,0 +1,10 @@
+(Program
+  (While
+    (Send
+      (Identifier))
+    ([]))
+  (While
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

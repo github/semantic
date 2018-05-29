@@ -1,7 +1,0 @@
-(Program
-  (Subscript
-    (Identifier)
-    (TextElement))
-  (Subscript
-    (Identifier)
-    (Symbol)))

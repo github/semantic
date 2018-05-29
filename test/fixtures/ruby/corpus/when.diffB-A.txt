@@ -1,0 +1,28 @@
+(Program
+  (Match
+    (Send
+      (Identifier))
+    (
+      (Pattern
+        (
+          (Send
+            (Identifier)))
+        ({-(Send
+          {-(Identifier)-})-}
+        {-(Pattern
+          {-(
+            {-(Send
+              {-(Identifier)-})-}
+            {-(Send
+              {-(Identifier)-})-})-}
+          {-(
+            {-(Send
+              {-(Identifier)-})-})-})-}))))
+{+(Match
+  {+(Empty)+}
+  {+(
+    {+(Pattern
+      {+(
+        {+(Boolean)+})+}
+      {+(
+        {+(TextElement)+})+})+})+})+})

@@ -1,0 +1,21 @@
+(Program
+  (Package
+    (Identifier))
+  (
+  {+(QualifiedImport
+    {+(Identifier)+})+}
+  {+(Import
+    {+(TextElement)+})+}
+  {+(QualifiedImport
+    {+(Identifier)+})+}
+  {-(QualifiedImport
+    {-(Identifier)-})-}
+  {-(Import
+    {-(TextElement)-})-}
+  {-(QualifiedImport
+    {-(Identifier)-})-})
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    ([])))

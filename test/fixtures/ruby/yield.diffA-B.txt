@@ -1,4 +1,0 @@
-(Program
-  (Yield
-  { (Identifier)
-  ->(Empty) }))

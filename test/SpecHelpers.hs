@@ -1,32 +1,46 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-module SpecHelpers (
-  module X
+module SpecHelpers
+( module X
+, runBuilder
 , diffFilePaths
 , parseFilePath
 , readFilePair
-, readFileVerbatim
-, addr
-, ns
+, testEvaluating
+, deNamespace
+, derefQName
 , verbatim
 , Verbatim(..)
-, ) where
+) where
 
+import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
+import Control.Abstract
+import Control.Arrow ((&&&))
+import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
+import Control.Monad ((>=>))
 import Data.Abstract.Address as X
-import Data.Abstract.FreeVariables as X hiding (dropExtension)
+import Data.Abstract.Environment as Env
+import Data.Abstract.Evaluatable
+import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
+import Data.Abstract.Name as X
+import Data.Abstract.Value (Value(..), ValueError, runValueError)
+import Data.Bifunctor (first)
 import Data.Blob as X
+import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Lazy (toStrict)
+import Data.Project as X
 import Data.Functor.Listable as X
 import Data.Language as X
-import Data.Output as X
+import Data.List.NonEmpty as X (NonEmpty(..))
+import Data.Monoid as X (Last(..))
 import Data.Range as X
 import Data.Record as X
 import Data.Source as X
 import Data.Span as X
 import Data.Term as X
 import Parsing.Parser as X
-import Rendering.Renderer as X
+import Rendering.Renderer as X hiding (error)
 import Semantic.Diff as X
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
@@ -47,26 +61,49 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
-import Data.Abstract.Value
+
+runBuilder = toStrict . toLazyByteString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
-diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionDiffRenderer
+diffFilePaths paths = readFilePair paths >>= fmap runBuilder . runTask . runDiff SExpressionDiffRenderer . pure
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile path (IO.languageForFilePath path)) >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap runBuilder . runTask . runParse SExpressionTermRenderer . pure
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
-readFilePair paths = let paths' = fmap (\p -> (p, IO.languageForFilePath p)) paths in
+readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-readFileVerbatim :: FilePath -> IO Verbatim
-readFileVerbatim = fmap verbatim . B.readFile
+testEvaluating
+  = run
+  . runReturningTrace
+  . fmap (first reassociate)
+  . evaluating
+  . runLoadError
+  . runValueError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTermEvaluator @_ @Precise
 
-ns n = Just . Latest . Just . injValue . Namespace n
-addr = Address . Precise
+deNamespace :: Value Precise -> Maybe (Name, [Name])
+deNamespace (Namespace name scope) = Just (name, Env.names scope)
+deNamespace _                      = Nothing
+
+namespaceScope :: Value Precise -> Maybe (Environment Precise)
+namespaceScope (Namespace _ scope) = Just scope
+namespaceScope _                   = Nothing
+
+derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise -> Maybe (Value Precise)
+derefQName heap = go
+  where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
+          []        -> Just
+          (n2 : ns) -> namespaceScope >=> go (n2 :| ns)
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

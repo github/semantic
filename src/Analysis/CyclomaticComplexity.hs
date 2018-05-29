@@ -5,11 +5,12 @@ module Analysis.CyclomaticComplexity
 , cyclomaticComplexityAlgebra
 ) where
 
-import Prologue
 import Data.Aeson
+import Data.Sum
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Term
+import Prologue
 
 -- | The cyclomatic complexity of a (sub)term.
 newtype CyclomaticComplexity = CyclomaticComplexity Int
@@ -71,9 +72,9 @@ instance CustomHasCyclomaticComplexity Statement.If
 instance CustomHasCyclomaticComplexity Statement.Pattern
 instance CustomHasCyclomaticComplexity Statement.While
 
--- | Produce a 'CyclomaticComplexity' for 'Union's using the 'HasCyclomaticComplexity' instance & therefore using a 'CustomHasCyclomaticComplexity' instance when one exists & the type is listed in 'CyclomaticComplexityStrategy'.
-instance Apply HasCyclomaticComplexity fs => CustomHasCyclomaticComplexity (Union fs) where
-  customToCyclomaticComplexity = apply (Proxy :: Proxy HasCyclomaticComplexity) toCyclomaticComplexity
+-- | Produce a 'CyclomaticComplexity' for 'Sum's using the 'HasCyclomaticComplexity' instance & therefore using a 'CustomHasCyclomaticComplexity' instance when one exists & the type is listed in 'CyclomaticComplexityStrategy'.
+instance Apply HasCyclomaticComplexity fs => CustomHasCyclomaticComplexity (Sum fs) where
+  customToCyclomaticComplexity = apply @HasCyclomaticComplexity toCyclomaticComplexity
 
 
 -- | A strategy for defining a 'HasCyclomaticComplexity' instance. Intended to be promoted to the kind level using @-XDataKinds@.
@@ -102,7 +103,7 @@ type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy Statement.If = 'Custom
   CyclomaticComplexityStrategy Statement.Pattern = 'Custom
   CyclomaticComplexityStrategy Statement.While = 'Custom
-  CyclomaticComplexityStrategy (Union fs) = 'Custom
+  CyclomaticComplexityStrategy (Sum fs) = 'Custom
   CyclomaticComplexityStrategy a = 'Default
 
 

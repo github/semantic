@@ -1,0 +1,12 @@
+(Program
+  (If
+    (MemberAccess
+      (Identifier)
+      (Identifier))
+    (
+      (Call
+        (Identifier)
+        (Identifier)
+        (Empty))
+      (Identifier))
+    (Empty)))

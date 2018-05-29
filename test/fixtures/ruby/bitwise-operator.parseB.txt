@@ -1,7 +1,0 @@
-(Program
-  (BAnd
-    (Identifier)
-    (Identifier))
-  (LShift
-    (Identifier)
-    (Identifier)))

@@ -1,5 +1,0 @@
-(Program
-  (While
-    (Not
-      (Identifier))
-    (Identifier)))

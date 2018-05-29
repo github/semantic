@@ -1,9 +1,0 @@
-(Program
-  (While
-    (Not
-      (Identifier))
-    ([]))
-  (While
-    (Not
-      (Identifier))
-    (Identifier)))

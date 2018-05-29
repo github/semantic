@@ -1,0 +1,12 @@
+(Program
+  (Try
+    (
+      (Send
+        (Identifier))
+      (Catch
+        (
+          (
+            (Send
+              (Identifier))))
+        (Send
+          (Identifier))))))

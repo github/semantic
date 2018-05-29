@@ -5,12 +5,13 @@ module Analysis.ConstructorName
 , constructorLabel
 ) where
 
-import Prologue
 import Data.Aeson
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.JSON.Fields
+import Data.Sum
 import Data.Term
 import Data.Text.Encoding (decodeUtf8)
+import Prologue
 
 -- | Compute a 'ConstructorLabel' label for a 'Term'.
 constructorLabel :: ConstructorName syntax => TermF syntax a b -> ConstructorLabel
@@ -35,31 +36,25 @@ class ConstructorName syntax where
 instance (ConstructorNameStrategy syntax ~ strategy, ConstructorNameWithStrategy strategy syntax) => ConstructorName syntax where
   constructorName = constructorNameWithStrategy (Proxy :: Proxy strategy)
 
-class CustomConstructorName syntax where
-  customConstructorName :: syntax a -> String
+instance Apply ConstructorName fs => ConstructorNameWithStrategy 'Custom (Sum fs) where
+  constructorNameWithStrategy _ = apply @ConstructorName constructorName
 
-instance Apply ConstructorName fs => CustomConstructorName (Union fs) where
-  customConstructorName = apply (Proxy :: Proxy ConstructorName) constructorName
-
-instance CustomConstructorName [] where
-  customConstructorName [] = "[]"
-  customConstructorName _  = ""
+instance ConstructorNameWithStrategy 'Custom [] where
+  constructorNameWithStrategy _ [] = "[]"
+  constructorNameWithStrategy _ _  = ""
 
 data Strategy = Default | Custom
 
 type family ConstructorNameStrategy syntax where
-  ConstructorNameStrategy (Union _) = 'Custom
-  ConstructorNameStrategy []        = 'Custom
-  ConstructorNameStrategy syntax    = 'Default
+  ConstructorNameStrategy (Sum _) = 'Custom
+  ConstructorNameStrategy []      = 'Custom
+  ConstructorNameStrategy syntax  = 'Default
 
 class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
   constructorNameWithStrategy :: proxy strategy -> syntax a -> String
 
 instance (Generic1 syntax, GConstructorName (Rep1 syntax)) => ConstructorNameWithStrategy 'Default syntax where
   constructorNameWithStrategy _ = gconstructorName . from1
-
-instance CustomConstructorName syntax => ConstructorNameWithStrategy 'Custom syntax where
-  constructorNameWithStrategy _ = customConstructorName
 
 
 class GConstructorName f where

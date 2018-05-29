@@ -8,13 +8,14 @@ module Language.Python.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.FreeVariables (name)
+import Data.Abstract.Name (name)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
 import qualified Assigning.Assignment as Assignment
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -79,13 +80,12 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
-   , Syntax.Paren
    , Syntax.Program
    , Type.Annotation
    , []
    ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
@@ -191,7 +191,7 @@ keywordArgument :: Assignment
 keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment [] <$> term expression <*> term expression)
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children expressions)
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 parameter :: Assignment
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment [] <$> term expression <*> term expression)
@@ -243,16 +243,11 @@ exceptClause = makeTerm <$> symbol ExceptClause <*> children
                    <*> expressions)
 
 functionDefinition :: Assignment
-functionDefinition
-  =   makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions)
-  <|> makeAsyncFunctionDeclaration <$> symbol AsyncFunctionDefinition <*> children ((,,,,) <$> term async' <*> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions)
+functionDefinition =
+      makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
-    makeAsyncFunctionDeclaration loc (async', functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)) async'
-
-async' :: Assignment
-async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier . name <$> source)
 
 classDefinition :: Assignment
 classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> pure [] <*> term expression <*> argumentList <*> expressions)
@@ -297,32 +292,34 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
 
 binaryOperator :: Assignment
 binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression (term expression)
-  [ (inj .) . Expression.Plus      <$ symbol AnonPlus
-  , (inj .) . Expression.Minus     <$ symbol AnonMinus
-  , (inj .) . Expression.Times     <$ symbol AnonStar
-  , (inj .) . Expression.DividedBy <$ symbol AnonSlash
-  , (inj .) . Expression.DividedBy <$ symbol AnonSlashSlash
-  , (inj .) . Expression.Modulo    <$ symbol AnonPercent
-  , (inj .) . Expression.Power     <$ symbol AnonStarStar
-  , (inj .) . Expression.BOr       <$ symbol AnonPipe
-  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersand
-  , (inj .) . Expression.BXOr      <$ symbol AnonCaret
-  , (inj .) . Expression.LShift    <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift    <$ symbol AnonRAngleRAngle
+  [ (inject .) . Expression.Plus      <$ symbol AnonPlus
+  , (inject .) . Expression.Minus     <$ symbol AnonMinus
+  , (inject .) . Expression.Times     <$ symbol AnonStar
+  , (inject .) . Expression.Times     <$ symbol AnonAt -- Matrix multiplication, TODO: May not want to assign to Expression.Times.
+  , (inject .) . Expression.DividedBy <$ symbol AnonSlash
+  , (inject .) . Expression.FloorDivision <$ symbol AnonSlashSlash
+  , (inject .) . Expression.Modulo    <$ symbol AnonPercent
+  , (inject .) . Expression.Power     <$ symbol AnonStarStar
+  , (inject .) . Expression.BOr       <$ symbol AnonPipe
+  , (inject .) . Expression.BAnd      <$ symbol AnonAmpersand
+  , (inject .) . Expression.BXOr      <$ symbol AnonCaret
+  , (inject .) . Expression.LShift    <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.RShift    <$ symbol AnonRAngleRAngle
   ])
 
 booleanOperator :: Assignment
 booleanOperator = makeTerm' <$> symbol BooleanOperator <*> children (infixTerm expression (term expression)
-  [ (inj .) . Expression.And <$ symbol AnonAnd
-  , (inj .) . Expression.Or  <$ symbol AnonOr
+  [ (inject .) . Expression.And <$ symbol AnonAnd
+  , (inject .) . Expression.Or  <$ symbol AnonOr
   ])
 
 assignment' :: Assignment
-assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignment [] <$> term expressionList <*> term rvalue)
+assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term expressionList <*> optional (symbol Type *> children (term expression)) <*> term rvalue)
            <|> makeTerm' <$> symbol AugmentedAssignment <*> children (infixTerm expressionList (term rvalue)
                   [ assign Expression.Plus      <$ symbol AnonPlusEqual
                   , assign Expression.Minus     <$ symbol AnonMinusEqual
                   , assign Expression.Times     <$ symbol AnonStarEqual
+                  , assign Expression.Times     <$ symbol AnonAtEqual -- Matrix multiplication assignment. TODO: May not want to assign to Expression.Times.
                   , assign Expression.Power     <$ symbol AnonStarStarEqual
                   , assign Expression.DividedBy <$ symbol AnonSlashEqual
                   , assign Expression.DividedBy <$ symbol AnonSlashSlashEqual
@@ -334,8 +331,9 @@ assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignmen
                   , assign Expression.BXOr      <$ symbol AnonCaretEqual
                   ])
   where rvalue = expressionList <|> assignment' <|> yield
-        assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
-        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+        makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
+        assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
+        assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expression <|> emptyTerm )))
@@ -350,7 +348,7 @@ dictionary :: Assignment
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> manyTerm expression)
 
 pair :: Assignment
-pair = makeTerm' <$> symbol Pair <*> children (infixTerm expression (term expression) [ (inj .) . Literal.KeyValue <$ symbol AnonColon ])
+pair = makeTerm' <$> symbol Pair <*> children (infixTerm expression (term expression) [ (inject .) . Literal.KeyValue <$ symbol AnonColon ])
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> manyTerm expression)
@@ -497,8 +495,8 @@ manyTermsTill step end = manyTill (step <|> comment) end
 infixTerm :: HasCallStack
           => Assignment
           -> Assignment
-          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment [] Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Sum Syntax Term)
 infixTerm = infixContext comment
 
 {-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

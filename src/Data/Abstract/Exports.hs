@@ -10,30 +10,28 @@ module Data.Abstract.Exports
 import Prelude hiding (null)
 import Prologue hiding (null)
 import Data.Abstract.Address
-import Data.Abstract.Environment (Environment)
-import Data.Abstract.FreeVariables
+import Data.Abstract.Environment (Environment, unpairs)
+import Data.Abstract.Name
 import qualified Data.Map as Map
-import Data.Semigroup.Reducer
+import Data.Semilattice.Lower
 
 -- | A map of export names to an alias & address tuple.
-newtype Exports l a = Exports { unExports :: Map.Map Name (Name, Maybe (Address l a)) }
-  deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
+newtype Exports location = Exports { unExports :: Map.Map Name (Name, Maybe location) }
+  deriving (Eq, Lower, Monoid, Ord, Semigroup)
 
-null :: Exports l a -> Bool
+null :: Exports location -> Bool
 null = Map.null . unExports
 
-toEnvironment :: Exports l a -> Environment l a
-toEnvironment = Map.foldMapWithKey buildEnv . unExports where
-  buildEnv _ (_, Nothing) = mempty
-  buildEnv _ (n, Just a)  = unit (n, a)
+toEnvironment :: Exports location -> Environment location
+toEnvironment exports = unpairs (mapMaybe (traverse (fmap Address)) (toList (unExports exports)))
 
-insert :: Name -> Name -> Maybe (Address l a) -> Exports l a -> Exports l a
-insert name alias address = Exports . Map.insert name (alias, address) . unExports
+insert :: Name -> Name -> Maybe (Address location value) -> Exports location -> Exports location
+insert name alias address = Exports . Map.insert name (alias, unAddress <$> address) . unExports
 
 -- TODO: Should we filter for duplicates here?
-aliases :: Exports l a -> [(Name, Name)]
+aliases :: Exports location -> [(Name, Name)]
 aliases = Map.toList . fmap fst . unExports
 
-instance Eq l => Eq1 (Exports l) where liftEq = genericLiftEq
-instance Ord l => Ord1 (Exports l) where liftCompare = genericLiftCompare
-instance Show l => Show1 (Exports l) where liftShowsPrec = genericLiftShowsPrec
+
+instance Show location => Show (Exports location) where
+  showsPrec d = showsUnaryWith showsPrec "Exports" d . Map.toList . unExports

@@ -1,19 +1,21 @@
 module Data.Scientific.Exts
     ( module Data.Scientific
+    , attemptUnsafeArithmetic
     , parseScientific
     ) where
 
-import Prelude hiding (filter, null, takeWhile)
-
 import Control.Applicative
-import Control.Monad
+import Control.Exception as Exc (evaluate, try)
+import Control.Monad hiding (fail)
 import Data.Attoparsec.ByteString.Char8
 import Data.ByteString.Char8 hiding (readInt, takeWhile)
 import Data.Char (isOctDigit)
 import Data.Scientific
-import Data.Semigroup
 import Numeric
+import Prelude hiding (fail, filter, null, takeWhile)
+import Prologue hiding (null)
 import Text.Read (readMaybe)
+import System.IO.Unsafe
 
 parseScientific :: ByteString -> Either String Scientific
 parseScientific = parseOnly parser
@@ -38,9 +40,9 @@ parser = signed (choice [hex, oct, bin, dec]) where
   -- The ending stanza. Note the explicit endOfInput call to ensure we haven't left any dangling input.
   done = skipWhile (inClass "iIjJlL") *> endOfInput
 
-  -- Wrapper around readMaybe. Analogous to maybeFail in the Prologue, but no need to pull that in.
+  -- Wrapper around readMaybe.
   attempt :: Read a => String -> Parser a
-  attempt str = maybe (fail ("No parse: " <> str)) pure (readMaybe str)
+  attempt str = maybeM (fail ("No parse: " <> str)) (readMaybe str)
 
   -- Parse a hex value, leaning on the parser provided by Attoparsec.
   hex = fromIntegral <$> (string "0x" *> hexadecimal @Integer)
@@ -97,3 +99,10 @@ parser = signed (choice [hex, oct, bin, dec]) where
     let trail = if null trailings then "0" else trailings
 
     attempt (unpack (leads <> "." <> trail <> exponent))
+
+-- | Attempt to evaluate the given term into WHNF. If doing so raises an 'ArithException', such as
+-- 'ZeroDivisionError' or 'RatioZeroDenominator', 'Left' will be returned.
+-- Hooray for uncatchable exceptions that bubble up from third-party code.
+attemptUnsafeArithmetic :: a -> Either ArithException a
+attemptUnsafeArithmetic = unsafePerformIO . Exc.try . evaluate
+{-# NOINLINE attemptUnsafeArithmetic #-}

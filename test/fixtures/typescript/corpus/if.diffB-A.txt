@@ -1,0 +1,14 @@
+(Program
+  (If
+  { (MemberAccess
+    {-(Identifier)-}
+    {-(Identifier)-})
+  ->(Identifier) }
+    (
+      (Call
+        (Identifier)
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+    {-(Identifier)-})
+    (Empty)))
