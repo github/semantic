@@ -89,13 +89,13 @@ diffPatches = para $ \ diff -> case diff of
 
 
 -- | Recover the before state of a diff.
-beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
+beforeTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
 beforeTerm = cata $ \ diff -> case diff of
   Patch patch -> (before patch >>= \ (In  a     l) -> termIn a <$> sequenceAlt l) <|> (after patch >>= asum)
   Merge                              (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
-afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
+afterTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
 afterTerm = cata $ \ diff -> case diff of
   Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
   Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
