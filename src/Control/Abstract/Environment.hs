@@ -11,6 +11,7 @@ module Control.Abstract.Environment
 , localEnv
 , localize
 , lookupEnv
+, Env(..)
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -68,6 +69,10 @@ localize = localEnv id
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
+
+
+data Env location return where
+  Lookup :: Name -> Env location (Maybe location)
 
 
 -- | Errors involving the environment.
