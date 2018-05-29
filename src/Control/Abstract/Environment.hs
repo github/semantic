@@ -12,6 +12,7 @@ module Control.Abstract.Environment
 , localize
 , lookupEnv
 , Env(..)
+, runEnv
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -73,6 +74,10 @@ lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$>
 
 data Env location return where
   Lookup :: Name -> Env location (Maybe location)
+
+
+runEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Evaluator location value (Env location ': effects) a -> Evaluator location value effects a
+runEnv = interpret (\ (Lookup name) -> (<|>) <$> (fmap unAddress . Env.lookup name <$> getEnv) <*> (fmap unAddress . Env.lookup name <$> defaultEnvironment))
 
 
 -- | Errors involving the environment.
