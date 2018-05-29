@@ -15,9 +15,9 @@ import Prologue
 
 builtin :: ( HasCallStack
            , Member (Allocator location value) effects
+           , Member (Env location) effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
-           , Member (State (Environment location)) effects
            , Member (State (Heap location (Cell location) value)) effects
            , Ord location
            , Reducer value (Cell location value)
@@ -28,7 +28,7 @@ builtin :: ( HasCallStack
 builtin s def = withCurrentCallStack callStack $ do
   let name' = name (pack ("__semantic_" <> s))
   addr <- alloc name'
-  modifyEnv (insert name' addr)
+  bind name' addr
   def >>= assign addr
 
 lambda :: (AbstractFunction location value effects, Member Fresh effects)
@@ -41,12 +41,11 @@ lambda body = do
 defineBuiltins :: ( AbstractValue location value effects
                   , HasCallStack
                   , Member (Allocator location value) effects
+                  , Member (Env location) effects
                   , Member Fresh effects
-                  , Member (Reader (Environment location)) effects
                   , Member (Reader ModuleInfo) effects
                   , Member (Reader Span) effects
                   , Member (Resumable (EnvironmentError location)) effects
-                  , Member (State (Environment location)) effects
                   , Member (State (Heap location (Cell location) value)) effects
                   , Member Trace effects
                   , Ord location

@@ -96,7 +96,7 @@ letrec' :: ( Member (Allocator location value) effects
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- localEnv id (body addr)
-  v <$ modifyEnv (insert name (unAddress addr))
+  v <$ bind name addr
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.

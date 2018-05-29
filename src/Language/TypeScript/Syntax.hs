@@ -272,7 +272,7 @@ instance Evaluatable DefaultExport where
         addr <- lookupOrAlloc name
         assign addr v
         addExport name name Nothing
-        void $ modifyEnv (Env.insert name addr)
+        bind name addr
       Nothing -> throwEvalError DefaultExportError
     pure (Rval unit)
 
@@ -852,7 +852,7 @@ instance Evaluatable AbstractClass where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    Rval <$> (v <$ modifyEnv (Env.insert name addr))
+    Rval v <$ bind name addr
 
 
 data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }
