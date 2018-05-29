@@ -14,7 +14,7 @@ import           Text.Read (readMaybe)
 
 -- Boolean
 
-newtype Boolean a = Boolean Bool
+newtype Boolean a = Boolean { booleanContent :: Bool }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Generic, Named, Message1)
 
 true :: Boolean a
