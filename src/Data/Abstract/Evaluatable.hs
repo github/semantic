@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -62,7 +62,7 @@ type EvaluatableConstraints location term value effects =
              , Reader ModuleInfo
              , Reader PackageInfo
              , Reader Span
-             , Resumable (EnvironmentError value)
+             , Resumable (EnvironmentError location)
              , Resumable EvalError
              , Resumable ResolutionError
              , Resumable (Unspecialized value)
@@ -78,9 +78,9 @@ type EvaluatableConstraints location term value effects =
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: forall location term value inner inner' outer
+evaluatePackageWith :: forall location term value inner outer
                     -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that? If not, can we factor this effect list out?
-                    .  ( Addressable location (Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+                    .  ( Addressable location (Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        , Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
@@ -95,18 +95,15 @@ evaluatePackageWith :: forall location term value inner inner' outer
                                   , Trace
                                   ] outer
                        , Recursive term
-                       , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+                       , inner ~ (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (TermEvaluator term location value inner value) -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
+                    => (SubtermAlgebra Module      term (TermEvaluator term location value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)))
                     -> Package term
                     -> TermEvaluator term location value outer [value]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
-  . fmap fst
-  . runState (lowerBound :: Gotos location value (Reader Span ': Reader PackageInfo ': outer))
   . runReader (packageModules (packageBody package))
   . withPrelude (packagePrelude (packageBody package))
   . raiseHandler (runModules (runTermEvaluator . evalModule))
@@ -124,15 +121,14 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . raiseHandler runAllocator
           . raiseHandler runReturn
           . raiseHandler runLoopControl
-          . raiseHandler (runGoto Gotos getGotos)
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': Reader Span ': Reader PackageInfo ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) . TermEvaluator $ do
-          v <- maybe unit (pure . snd) <$> require m
-          maybe v ((`call` []) <=< variable) sym
+          v <- maybe unit snd <$> require m
+          maybe (pure v) ((`call` []) <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule)) $ do
-          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> unit))
+          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
           fst <$> evalModule prelude
 
         withPrelude Nothing a = a
@@ -147,9 +143,6 @@ evaluatePackageWith analyzeModule analyzeTerm package
           | Exports.null ports = env
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
         pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator getEnv)
-
-newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value outer) ': outer) value }
-  deriving (Lower)
 
 
 -- | Isolate the given action with an empty global environment and exports.
@@ -233,4 +226,4 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 ---   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (Rval <$> unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
+  eval = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

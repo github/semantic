@@ -5,6 +5,7 @@ module Control.Abstract.Addressable
 
 import Control.Abstract.Context
 import Control.Abstract.Evaluator
+import Control.Abstract.Hole
 import Data.Abstract.Address
 import Data.Abstract.Name
 import Prologue
@@ -39,5 +40,12 @@ instance (Addressable location effects, Members '[Reader ModuleInfo, Reader Pack
   allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule)
   derefCell (Address (Located loc _ _)) = relocate . derefCell (Address loc)
 
-relocate :: Evaluator location value effects a -> Evaluator (Located location) value effects a
+instance Addressable location effects => Addressable (Hole location) effects where
+  type Cell (Hole location) = Cell location
+
+  allocCell name = relocate (Total <$> allocCell name)
+  derefCell (Address (Total loc)) = relocate . derefCell (Address loc)
+  derefCell (Address Partial)     = const (pure Nothing)
+
+relocate :: Evaluator location1 value effects a -> Evaluator location2 value effects a
 relocate = raiseEff . lowerEff

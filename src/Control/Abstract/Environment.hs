@@ -71,19 +71,19 @@ lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$>
 
 
 -- | Errors involving the environment.
-data EnvironmentError value return where
-  FreeVariable :: Name -> EnvironmentError value value
+data EnvironmentError location return where
+  FreeVariable :: Name -> EnvironmentError location location
 
-deriving instance Eq (EnvironmentError value return)
-deriving instance Show (EnvironmentError value return)
-instance Show1 (EnvironmentError value) where liftShowsPrec _ _ = showsPrec
-instance Eq1 (EnvironmentError value) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
+deriving instance Eq (EnvironmentError location return)
+deriving instance Show (EnvironmentError location return)
+instance Show1 (EnvironmentError location) where liftShowsPrec _ _ = showsPrec
+instance Eq1 (EnvironmentError location) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
 
-freeVariableError :: Member (Resumable (EnvironmentError value)) effects => Name -> Evaluator location value effects value
+freeVariableError :: Member (Resumable (EnvironmentError location)) effects => Name -> Evaluator location value effects location
 freeVariableError = throwResumable . FreeVariable
 
-runEnvironmentError :: Effectful (m location value) => m location value (Resumable (EnvironmentError value) ': effects) a -> m location value effects (Either (SomeExc (EnvironmentError value)) a)
+runEnvironmentError :: Effectful (m location value) => m location value (Resumable (EnvironmentError location) ': effects) a -> m location value effects (Either (SomeExc (EnvironmentError location)) a)
 runEnvironmentError = runResumable
 
-runEnvironmentErrorWith :: Effectful (m location value) => (forall resume . EnvironmentError value resume -> m location value effects resume) -> m location value (Resumable (EnvironmentError value) ': effects) a -> m location value effects a
+runEnvironmentErrorWith :: Effectful (m location value) => (forall resume . EnvironmentError location resume -> m location value effects resume) -> m location value (Resumable (EnvironmentError location) ': effects) a -> m location value effects a
 runEnvironmentErrorWith = runResumableWith

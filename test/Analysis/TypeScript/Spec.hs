@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
 import Control.Arrow ((&&&))
