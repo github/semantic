@@ -19,7 +19,7 @@ import Semantic.Task
 import Serializing.Format
 
 runParse :: (Member (Distribute WrappedTask) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
-runParse JSONTermRenderer             = withParsedBlobs (\ blob -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)) >=> serialize JSON
+runParse JSONTermRenderer             = withParsedBlobs (\ blob -> decorate constructorLabel >=> render (renderJSONTerm blob)) >=> serialize JSON
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
 runParse TagsTermRenderer             = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderToTags blob)) >=> serialize JSON
