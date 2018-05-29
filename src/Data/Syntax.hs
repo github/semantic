@@ -109,7 +109,8 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 -- Propagating the identifier name into JSON is handled with the IdentifierName analysis.
-instance ToJSONFields1 Identifier
+instance ToJSONFields1 Identifier where
+  toJSONFields1 (Identifier name) = [ "name" .= name ]
 
 instance Evaluatable Identifier where
   eval (Identifier name) = pure (LvalLocal name)
