@@ -20,7 +20,7 @@ import Semantic.Stat as Stat
 import Semantic.Task as Task
 import Serializing.Format
 
-runDiff :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => DiffRenderer output -> [BlobPair] -> Eff effs Builder
+runDiff :: (Member (Distribute WrappedTask) effs, Member Task effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
 runDiff JSONDiffRenderer        = withParsedBlobPairs (const (decorate constructorLabel >=> decorate identifierLabel)) (render . renderJSONDiff) >=> serialize JSON
 runDiff SExpressionDiffRenderer = withParsedBlobPairs (const pure) (const (serialize (SExpression ByConstructorName)))
@@ -33,24 +33,24 @@ data SomeTermPair typeclasses ann where
 withSomeTermPair :: (forall syntax . ApplyAll typeclasses syntax => Join These (Term syntax ann) -> a) -> SomeTermPair typeclasses ann -> a
 withSomeTermPair with (SomeTermPair terms) = with terms
 
-diffBlobTOCPairs :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => [BlobPair] -> Eff effs ([TOCSummary], [TOCSummary])
+diffBlobTOCPairs :: Member (Distribute WrappedTask) effs => [BlobPair] -> Eff effs ([TOCSummary], [TOCSummary])
 diffBlobTOCPairs = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderRPCToCDiff)
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 
-withParsedBlobPairs :: (Members '[Distribute WrappedTask, Exc SomeException, IO, Task, Telemetry] effs, Monoid output)
+withParsedBlobPairs :: (Member (Distribute WrappedTask) effs, Monoid output)
                     => (forall syntax . CanDiff syntax => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
                     -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax (Record fields) (Record fields) -> TaskEff output)
                     -> [BlobPair]
                     -> Eff effs output
 withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> WrapTask (withParsedBlobPair decorate blobs >>= withSomeTermPair (diffTerms blobs >=> render blobs)))
-  where diffTerms :: (Diffable syntax, Eq1 syntax, GAlign syntax, Hashable1 syntax, Traversable syntax, Members '[IO, Task, Telemetry] effs) => BlobPair -> Join These (Term syntax (Record fields)) -> Eff effs (Diff syntax (Record fields) (Record fields))
+  where diffTerms :: (Diffable syntax, Eq1 syntax, GAlign syntax, Hashable1 syntax, Traversable syntax, Member IO effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax (Record fields)) -> Eff effs (Diff syntax (Record fields) (Record fields))
         diffTerms blobs terms = time "diff" languageTag $ do
           diff <- diff (runJoin terms)
           diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
           where languageTag = languageTagForBlobPair blobs
 
-withParsedBlobPair :: Members '[Distribute WrappedTask, Exc SomeException, Task] effs
+withParsedBlobPair :: (Member (Distribute WrappedTask) effs, Member (Exc SomeException) effs)
                    => (forall syntax . (CanDiff syntax) => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
                    -> BlobPair
                    -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Hashable1, IdentifierName, Show1, ToJSONFields1, Traversable] (Record fields))

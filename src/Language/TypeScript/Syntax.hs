@@ -37,12 +37,12 @@ toName = name . BC.pack . unPath
 --
 -- NB: TypeScript has a couple of different strategies, but the main one (and the
 -- only one we support) mimics Node.js.
-resolveWithNodejsStrategy :: Members '[ Modules location value
-                                      , Reader M.ModuleInfo
-                                      , Reader PackageInfo
-                                      , Resumable ResolutionError
-                                      , Trace
-                                      ] effects
+resolveWithNodejsStrategy :: ( Member (Modules location value) effects
+                             , Member (Reader M.ModuleInfo) effects
+                             , Member (Reader PackageInfo) effects
+                             , Member (Resumable ResolutionError) effects
+                             , Member Trace effects
+                             )
                           => ImportPath
                           -> [String]
                           -> Evaluator location value effects M.ModulePath
@@ -56,12 +56,12 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: Members '[ Modules location value
-                                , Reader M.ModuleInfo
-                                , Reader PackageInfo
-                                , Resumable ResolutionError
-                                , Trace
-                                ] effects
+resolveRelativePath :: ( Member (Modules location value) effects
+                       , Member (Reader M.ModuleInfo) effects
+                       , Member (Reader PackageInfo) effects
+                       , Member (Resumable ResolutionError) effects
+                       , Member Trace effects
+                       )
                     => FilePath
                     -> [String]
                     -> Evaluator location value effects M.ModulePath
@@ -84,12 +84,12 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: Members '[ Modules location value
-                                   , Reader M.ModuleInfo
-                                   , Reader PackageInfo
-                                   , Resumable ResolutionError
-                                   , Trace
-                                   ] effects
+resolveNonRelativePath :: ( Member (Modules location value) effects
+                          , Member (Reader M.ModuleInfo) effects
+                          , Member (Reader PackageInfo) effects
+                          , Member (Resumable ResolutionError) effects
+                          , Member Trace effects
+                          )
                        => FilePath
                        -> [String]
                        -> Evaluator location value effects M.ModulePath
@@ -109,13 +109,13 @@ resolveNonRelativePath name exts = do
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
 -- | Resolve a module name to a ModulePath.
-resolveModule :: Members '[ Modules location value
-                          , Reader PackageInfo
-                          , Trace
-                          ] effects
-                => FilePath -- ^ Module path used as directory to search in
-                -> [String] -- ^ File extensions to look for
-                -> Evaluator location value effects (Either [FilePath] M.ModulePath)
+resolveModule :: ( Member (Modules location value) effects
+                 , Member (Reader PackageInfo) effects
+                 , Member Trace effects
+                 )
+              => FilePath -- ^ Module path used as directory to search in
+              -> [String] -- ^ File extensions to look for
+              -> Evaluator location value effects (Either [FilePath] M.ModulePath)
 resolveModule path' exts = do
   let path = makeRelative "." path'
   PackageInfo{..} <- currentPackage
@@ -133,14 +133,12 @@ javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
 evalRequire :: ( AbstractValue location value effects
-               , Members '[ Allocator location value
-                          , Modules location value
-                          , Reader (Environment location)
-                          , State (Environment location)
-                          , State (Exports location)
-                          , State (Heap location (Cell location) value)
-                          , Trace
-                          ] effects
+               , Member (Allocator location value) effects
+               , Member (Modules location value) effects
+               , Member (Reader (Environment location)) effects
+               , Member (State (Environment location)) effects
+               , Member (State (Exports location)) effects
+               , Member (State (Heap location (Cell location) value)) effects
                , Ord location
                , Reducer value (Cell location value)
                )

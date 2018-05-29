@@ -60,10 +60,10 @@ sendModules :: Member (Modules location value) effects => Modules location value
 sendModules = send
 
 runModules :: forall term location value effects a
-           .  Members '[ Resumable (LoadError location value)
-                       , State (ModuleTable (Maybe (Environment location, value)))
-                       , Trace
-                       ] effects
+           .  ( Member (Resumable (LoadError location value)) effects
+              , Member (State (ModuleTable (Maybe (Environment location, value)))) effects
+              , Member Trace effects
+              )
            => (Module term -> Evaluator location value (Modules location value ': effects) (Environment location, value))
            -> Evaluator location value (Modules location value ': effects) a
            -> Evaluator location value (Reader (ModuleTable [Module term]) ': effects) a

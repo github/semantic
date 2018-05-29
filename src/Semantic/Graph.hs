@@ -39,7 +39,7 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-runGraph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
+runGraph :: ( Member (Distribute WrappedTask) effs, Member (Exc SomeException) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -71,7 +71,7 @@ runGraph graphType includePackages project
             . graphing
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: Members '[Distribute WrappedTask, Files, Resolution, Task, Trace] effs
+parsePackage :: (Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Maybe File  -- ^ Prelude (optional).
              -> Project     -- ^ Project to parse into a package.
@@ -87,11 +87,11 @@ parsePackage parser preludeFile project@Project{..} = do
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
-    parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
+    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
     parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
 -- | Parse a file into a 'Module'.
-parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
+parseModule :: (Member Files effs, Member Task effs) => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
 parseModule parser rootDir file = do
   blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
@@ -129,7 +129,7 @@ resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> s
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => Evaluator location (Value location body) (Resumable (ValueError location body) ': effects) a -> Evaluator location (Value location body) effects a
+resumingValueError :: (Member (State (Environment location)) effects, Member Trace effects, Show location) => Evaluator location (Value location body) (Resumable (ValueError location body) ': effects) a -> Evaluator location (Value location body) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))

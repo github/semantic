@@ -51,7 +51,7 @@ withDefaultEnvironment e = local (const e)
 
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
-fullEnvironment :: Members '[Reader (Environment location), State (Environment location)] effects => Evaluator location value effects (Environment location)
+fullEnvironment :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Evaluator location value effects (Environment location)
 fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
 
 -- | Run an action with a locally-modified environment.
@@ -66,7 +66,7 @@ localize :: Member (State (Environment location)) effects => Evaluator location 
 localize = localEnv id
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: Members '[Reader (Environment location), State (Environment location)] effects => Name -> Evaluator location value effects (Maybe (Address location value))
+lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
 

@@ -116,15 +116,12 @@ instance AbstractIntro Type where
   null        = Null
 
 
-instance ( Members '[ Allocator location Type
-                    , Fresh
-                    , NonDet
-                    , Reader (Environment location)
-                    , Resumable TypeError
-                    , Return Type
-                    , State (Environment location)
-                    , State (Heap location (Cell location) Type)
-                    ] effects
+instance ( Member (Allocator location Type) effects
+         , Member Fresh effects
+         , Member (Resumable TypeError) effects
+         , Member (Return Type) effects
+         , Member (State (Environment location)) effects
+         , Member (State (Heap location (Cell location) Type)) effects
          , Ord location
          , Reducer Type (Cell location Type)
          )
@@ -148,15 +145,13 @@ instance ( Members '[ Allocator location Type
 
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Members '[ Allocator location Type
-                    , Fresh
-                    , NonDet
-                    , Reader (Environment location)
-                    , Resumable TypeError
-                    , Return Type
-                    , State (Environment location)
-                    , State (Heap location (Cell location) Type)
-                    ] effects
+instance ( Member (Allocator location Type) effects
+         , Member Fresh effects
+         , Member NonDet effects
+         , Member (Resumable TypeError) effects
+         , Member (Return Type) effects
+         , Member (State (Environment location)) effects
+         , Member (State (Heap location (Cell location) Type)) effects
          , Ord location
          , Reducer Type (Cell location Type)
          )

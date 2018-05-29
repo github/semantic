@@ -52,11 +52,10 @@ style = (defaultStyle (byteString . vertexName))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Members '[ Reader (Environment (Hole (Located location)))
-                            , Reader ModuleInfo
-                            , State (Environment (Hole (Located location)))
-                            , State (Graph Vertex)
-                            ] effects
+                 , Member (Reader (Environment (Hole (Located location)))) effects
+                 , Member (Reader ModuleInfo) effects
+                 , Member (State (Environment (Hole (Located location)))) effects
+                 , Member (State (Graph Vertex)) effects
                  , term ~ Term (Sum syntax) ann
                  )
               => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located location)) value effects a)
@@ -69,20 +68,19 @@ graphingTerms recur term@(In _ syntax) = do
     _ -> pure ()
   recur term
 
-graphingPackages :: Members '[ Reader ModuleInfo
-                             , Reader PackageInfo
-                             , State (Graph Vertex)
-                             ] effects
+graphingPackages :: ( Member (Reader PackageInfo) effects
+                    , Member (State (Graph Vertex)) effects
+                    )
                  => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                  -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
 graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingModules :: forall term location value effects a
-                .  Members '[ Modules location value
-                            , Reader ModuleInfo
-                            , State (Graph Vertex)
-                            ] effects
+                .  ( Member (Modules location value) effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (State (Graph Vertex)) effects
+                   )
                => SubtermAlgebra Module term (TermEvaluator term location value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
 graphingModules recur m = interpose @(Modules location value) pure (\ m yield -> case m of
@@ -100,9 +98,8 @@ moduleVertex = Module . BC.pack . modulePath
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
-                    , Members '[ Reader PackageInfo
-                               , State (Graph Vertex)
-                               ] effects
+                    , Member (Reader PackageInfo) effects
+                    , Member (State (Graph Vertex)) effects
                     , Monad (m effects)
                     )
                  => Vertex
@@ -113,9 +110,8 @@ packageInclusion v = do
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: ( Effectful m
-                   , Members '[ Reader ModuleInfo
-                              , State (Graph Vertex)
-                              ] effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (State (Graph Vertex)) effects
                    , Monad (m effects)
                    )
                 => Vertex

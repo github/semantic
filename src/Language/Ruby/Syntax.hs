@@ -17,9 +17,9 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: Members '[ Modules location value
-                            , Resumable ResolutionError
-                            ] effects
+resolveRubyName :: ( Member (Modules location value) effects
+                   , Member (Resumable ResolutionError) effects
+                   )
                 => ByteString
                 -> Evaluator location value effects M.ModulePath
 resolveRubyName name = do
@@ -29,9 +29,9 @@ resolveRubyName name = do
   maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: Members '[ Modules location value
-                            , Resumable ResolutionError
-                            ] effects
+resolveRubyPath :: ( Member (Modules location value) effects
+                   , Member (Resumable ResolutionError) effects
+                   )
                 => ByteString
                 -> Evaluator location value effects M.ModulePath
 resolveRubyPath path = do
@@ -109,12 +109,11 @@ instance Evaluatable Load where
   eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
 doLoad :: ( AbstractValue location value effects
-          , Members '[ Modules location value
-                     , Resumable ResolutionError
-                     , State (Environment location)
-                     , State (Exports location)
-                     , Trace
-                     ] effects
+          , Member (Modules location value) effects
+          , Member (Resumable ResolutionError) effects
+          , Member (State (Environment location)) effects
+          , Member (State (Exports location)) effects
+          , Member Trace effects
           )
        => ByteString
        -> Bool
