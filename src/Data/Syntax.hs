@@ -192,12 +192,6 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 instance Evaluatable Empty where
   eval _ = Rval <$> unit
 
-data Identity a = Identity a
-  deriving (Generic1, Message1)
-data Product a = Product a a
-  deriving (Generic1, Message1)
-
-
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
