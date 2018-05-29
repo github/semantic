@@ -3,7 +3,7 @@
     (Not
       (Send
         (Identifier)))
-  { ([])
+  { (Statements)
   ->(Send
     {+(Identifier)+}) })
 {-(While

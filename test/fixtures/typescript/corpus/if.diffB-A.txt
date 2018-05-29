@@ -4,7 +4,7 @@
     {-(Identifier)-}
     {-(Identifier)-})
   ->(Identifier) }
-    (
+    (Statements
       (Call
         (Identifier)
       { (Identifier)

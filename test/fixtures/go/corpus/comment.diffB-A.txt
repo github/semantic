@@ -4,7 +4,7 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Context
     { (Comment)
     ->(Comment) }

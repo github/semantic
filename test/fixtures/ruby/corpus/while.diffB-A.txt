@@ -4,7 +4,7 @@
       (Identifier))
   { (Send
     {-(Identifier)-})
-  ->([]) })
+  ->(Statements) })
 {+(While
   {+(Send
     {+(Identifier)+})+}

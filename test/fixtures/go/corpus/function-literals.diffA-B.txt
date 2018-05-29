@@ -4,25 +4,25 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
       (Identifier)
       (Function
         (Empty)
         (Empty)
-        (
+        (Statements
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) })
-        (
-          (
+        (Statements
+          (Statements
           { (Identifier)
           ->(Identifier) })
-          (
+          (Statements
           { (Identifier)
           ->(Identifier) }))
         (Return
-          (
+          (Statements
             (Integer)
             (Integer)))))))

@@ -4,8 +4,8 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Defer
         (Call
           (MemberAccess
@@ -13,7 +13,7 @@
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
-          ([])
+          (Statements)
           (Empty)))
       (Go
         (Call
@@ -22,5 +22,5 @@
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
-          ([])
+          (Statements)
           (Empty))))))

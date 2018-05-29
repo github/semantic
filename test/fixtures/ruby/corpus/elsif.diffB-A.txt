@@ -2,12 +2,13 @@
   (If
     (Send
       (Identifier))
-    (
+    (Statements
       (Send
         (Identifier)))
     (If
       (Send
         (Identifier))
-      ({-(Send
+      (Statements
+      {-(Send
         {-(Identifier)-})-})
       (Empty))))

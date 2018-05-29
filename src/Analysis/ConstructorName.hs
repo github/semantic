@@ -40,7 +40,7 @@ instance Apply ConstructorName fs => ConstructorNameWithStrategy 'Custom (Sum fs
   constructorNameWithStrategy _ = apply @ConstructorName constructorName
 
 instance ConstructorNameWithStrategy 'Custom [] where
-  constructorNameWithStrategy _ _ = "ExpressionList"
+  constructorNameWithStrategy _ _ = "Statements"
 
 data Strategy = Default | Custom
 
