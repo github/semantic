@@ -5,7 +5,6 @@ import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Aeson
-import           Data.Align.Generic
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import           Data.Mergeable
