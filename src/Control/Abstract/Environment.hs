@@ -66,16 +66,11 @@ data Env location return where
   Lookup :: Name -> Env location (Maybe location)
 
 
-runEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Evaluator location value (Env location ': effects) a -> Evaluator location value effects a
-runEnv = interpret (\ (Lookup name) -> (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment))
+runEnv :: Member (State (Environment location)) effects => Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value effects a
+runEnv defaultEnvironment = interpret (\ (Lookup name) -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv)
 
-reinterpretEnv :: Evaluator location value (Env location ': effects) a -> Evaluator location value (Reader (Environment location) ': State (Environment location) ': effects) a
-reinterpretEnv = reinterpret2 (\ (Lookup name) -> (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment))
-
-
--- | Retrieve the default environment.
-defaultEnvironment :: Member (Reader (Environment location)) effects => Evaluator location value effects (Environment location)
-defaultEnvironment = ask
+reinterpretEnv :: Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value (State (Environment location) ': effects) a
+reinterpretEnv defaultEnvironment = reinterpret (\ (Lookup name) -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv)
 
 
 -- | Errors involving the environment.
