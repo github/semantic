@@ -7,8 +7,8 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
-import Data.Abstract.Evaluatable
 import Data.Abstract.Module
+import Data.Abstract.Ref
 import Data.Semilattice.Lower
 import Prologue
 
@@ -33,7 +33,7 @@ lookupCache :: (Cacheable term location (Cell location) value, Member (State (Ca
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects)
+cachingConfiguration :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects, Member (State (Heap location (Cell location) value)) effects)
                      => Configuration term location (Cell location) value
                      -> Set (Cached location (Cell location) value)
                      -> TermEvaluator term location value effects (ValueRef value)
@@ -58,14 +58,12 @@ isolateCache action = putCache lowerBound *> action *> get
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
 cachingTerms :: ( Cacheable term location (Cell location) value
                 , Corecursive term
-                , Members '[ Fresh
-                           , NonDet
-                           , Reader (Cache term location (Cell location) value)
-                           , Reader (Live location value)
-                           , State (Cache term location (Cell location) value)
-                           , State (Environment location value)
-                           , State (Heap location (Cell location) value)
-                           ] effects
+                , Member NonDet effects
+                , Member (Reader (Cache term location (Cell location) value)) effects
+                , Member (Reader (Live location value)) effects
+                , Member (State (Cache term location (Cell location) value)) effects
+                , Member (State (Environment location)) effects
+                , Member (State (Heap location (Cell location) value)) effects
                 )
              => SubtermAlgebra (Base term) term (TermEvaluator term location value effects (ValueRef value))
              -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects (ValueRef value))
@@ -80,19 +78,16 @@ cachingTerms recur term = do
 
 convergingModules :: ( AbstractValue location value effects
                      , Cacheable term location (Cell location) value
-                     , Members '[ Allocator location value
-                                , Fresh
-                                , NonDet
-                                , Reader (Cache term location (Cell location) value)
-                                , Reader (Environment location value)
-                                , Reader (Live location value)
-                                , Resumable (AddressError location value)
-                                , Resumable (EnvironmentError value)
-                                , Resumable (EvalError value)
-                                , State (Cache term location (Cell location) value)
-                                , State (Environment location value)
-                                , State (Heap location (Cell location) value)
-                                ] effects
+                     , Member (Allocator location value) effects
+                     , Member Fresh effects
+                     , Member NonDet effects
+                     , Member (Reader (Cache term location (Cell location) value)) effects
+                     , Member (Reader (Environment location)) effects
+                     , Member (Reader (Live location value)) effects
+                     , Member (Resumable (EnvironmentError location)) effects
+                     , Member (State (Cache term location (Cell location) value)) effects
+                     , Member (State (Environment location)) effects
+                     , Member (State (Heap location (Cell location) value)) effects
                      )
                   => SubtermAlgebra Module term (TermEvaluator term location value effects value)
                   -> SubtermAlgebra Module term (TermEvaluator term location value effects value)
@@ -129,7 +124,7 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (Cached location (Cell location) value) -> TermEvaluator term location value effects (ValueRef value)
+scatter :: (Foldable t, Member NonDet effects, Member (State (Heap location (Cell location) value)) effects) => t (Cached location (Cell location) value) -> TermEvaluator term location value effects (ValueRef value)
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 

@@ -39,6 +39,6 @@ data Distribute task output where
 
 
 -- | Evaluate a 'Distribute' effect concurrently.
-runDistribute :: Members '[Exc SomeException, IO] effs => (forall output . task output -> IO (Either SomeException output)) -> Eff (Distribute task ': effs) a -> Eff effs a
+runDistribute :: (Member (Exc SomeException) effs, Member IO effs) => (forall output . task output -> IO (Either SomeException output)) -> Eff (Distribute task ': effs) a -> Eff effs a
 runDistribute action = interpret (\ (Distribute tasks) ->
   liftIO (Async.mapConcurrently action tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq)))

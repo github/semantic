@@ -39,7 +39,7 @@ data Resolution output where
   NodeJSResolution :: FilePath -> Text -> [FilePath] -> Resolution (Map FilePath FilePath)
   NoResolution :: Resolution (Map FilePath FilePath)
 
-runResolution :: Members '[Files] effs => Eff (Resolution ': effs) a -> Eff effs a
+runResolution :: Member Files effs => Eff (Resolution ': effs) a -> Eff effs a
 runResolution = interpret $ \ res -> case res of
   NodeJSResolution dir prop excludeDirs -> nodeJSResolutionMap dir prop excludeDirs
   NoResolution -> pure Map.empty

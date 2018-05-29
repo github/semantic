@@ -16,16 +16,17 @@ data SomeAST where
 withSomeAST :: (forall grammar . Show grammar => AST [] grammar -> a) -> SomeAST -> a
 withSomeAST f (SomeAST ast) = f ast
 
-astParseBlob :: Members '[Task, Exc SomeException] effs => Blob -> Eff effs SomeAST
+astParseBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs SomeAST
 astParseBlob blob@Blob{..}
   | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
   = SomeAST <$> parse parser blob
   | otherwise = noLanguageForBlob blobPath
 
 
-data ASTFormat = SExpression | JSON
+data ASTFormat = SExpression | JSON | Show
   deriving (Show)
 
-runASTParse :: Members '[Distribute WrappedTask, Task, Exc SomeException] effects => ASTFormat -> [Blob] -> Eff effects F.Builder
-runASTParse SExpression = distributeFoldMap (WrapTask . (withSomeAST (serialize (F.SExpression F.ByShow)) <=< astParseBlob))
-runASTParse JSON        = serialize F.JSON <=< distributeFoldMap (\ blob -> WrapTask (withSomeAST (render (renderJSONAST blob)) =<< astParseBlob blob))
+runASTParse :: (Member (Distribute WrappedTask) effects, Member Task effects) => ASTFormat -> [Blob] -> Eff effects F.Builder
+runASTParse SExpression = distributeFoldMap (WrapTask . (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow))))
+runASTParse Show        = distributeFoldMap (WrapTask . (astParseBlob >=> withSomeAST (serialize F.Show)))
+runASTParse JSON        = distributeFoldMap (\ blob -> WrapTask (astParseBlob blob >>= withSomeAST (render (renderJSONAST blob)))) >=> serialize F.JSON

@@ -56,6 +56,7 @@ import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Trace
 import           Data.Blob
+import           Data.Bool
 import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
@@ -111,7 +112,7 @@ decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) 
 decorate algebra = send . Decorate algebra
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
-diff :: (Diffable syntax, Eq1 syntax, GAlign syntax, Hashable1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
+diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
 diff terms = send (Semantic.Task.Diff terms)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
@@ -161,19 +162,21 @@ data Task output where
   Parse     :: Parser term -> Blob -> Task term
   Analyze  :: (Analysis.TermEvaluator term location value effects a -> result) -> Analysis.TermEvaluator term location value effects a -> Task result
   Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff      :: (Diffable syntax, Eq1 syntax, GAlign syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
+  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
   Render    :: Renderer input output -> input -> Task output
   Serialize :: Format input -> input -> Task Builder
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effs => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff terms -> pure (diffTermPair terms)
   Render renderer input -> pure (renderer input)
-  Serialize format input -> pure (runSerialize format input)
+  Serialize format input -> do
+    formatStyle <- asks (bool Colourful Plain . optionsEnableColour)
+    pure (runSerialize formatStyle format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
@@ -188,11 +191,11 @@ defaultTimeout :: Timeout
 defaultTimeout = Milliseconds 5000
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
-      IO.rethrowing (parseToAST defaultTimeout language blob)
+      parseToAST defaultTimeout language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
   AssignmentParser parser assignment -> do

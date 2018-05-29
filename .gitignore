@@ -24,3 +24,5 @@ bin/
 .bundle/
 .licenses/vendor/gems
 .licenses/log/
+
+codex.tags

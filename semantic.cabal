@@ -42,10 +42,11 @@ library
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Exports
-                     , Control.Abstract.Goto
                      , Control.Abstract.Heap
+                     , Control.Abstract.Hole
                      , Control.Abstract.Matching
                      , Control.Abstract.Modules
+                     , Control.Abstract.Primitive
                      , Control.Abstract.Roots
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
@@ -62,14 +63,15 @@ library
                      , Data.Abstract.Live
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
+                     , Data.Abstract.Name
                      , Data.Abstract.Number
                      , Data.Abstract.Package
                      , Data.Abstract.Path
+                     , Data.Abstract.Ref
                      , Data.Abstract.Type
                      , Data.Abstract.Value
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
-                     , Data.Align.Generic
                      , Data.AST
                      , Data.Blob
                      , Data.Diff
@@ -81,6 +83,7 @@ library
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
+                     , Data.Options
                      , Data.Patch
                      , Data.Project
                      , Data.Range
@@ -114,6 +117,9 @@ library
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
+                     , Language.Haskell.Grammar
+                     , Language.Haskell.Assignment
+                     , Language.Haskell.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
@@ -161,7 +167,7 @@ library
                      , Serializing.Format
                      , Serializing.SExpression
                      -- Custom Prelude
-  other-modules:       Prologue
+                     , Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , algebraic-graphs
@@ -184,6 +190,7 @@ library
                      , gitrev
                      , Glob
                      , hashable
+                     , hscolour
                      , kdt
                      , mersenne-random-pure64
                      , mtl
@@ -192,6 +199,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , pretty-show
                      , recursion-schemes
                      , reducers
                      , scientific
@@ -206,6 +214,7 @@ library
                      , unordered-containers
                      , haskell-tree-sitter
                      , tree-sitter-go
+                     , tree-sitter-haskell
                      , tree-sitter-json
                      , tree-sitter-php
                      , tree-sitter-python
@@ -260,7 +269,6 @@ test-suite test
                      , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
-                     , Data.Mergeable.Spec
                      , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec

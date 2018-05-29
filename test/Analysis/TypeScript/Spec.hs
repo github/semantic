@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
 import Control.Arrow ((&&&))
@@ -32,11 +31,11 @@ spec = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       ((res, _), _) <- evaluate "bad-export.ts"
-      res `shouldBe` Left (SomeExc (inject @(EvalError (Value Precise)) (ExportError "foo.ts" (Name "pip"))))
+      res `shouldBe` Left (SomeExc (inject @EvalError (ExportError "foo.ts" (name "pip"))))
 
     it "evaluates early return statements" $ do
       ((res, _), _) <- evaluate "early-return.ts"
-      res `shouldBe` Right [injValue (Value.Float (Number.Decimal 123.0))]
+      res `shouldBe` Right [Value.Float (Number.Decimal 123.0)]
 
   where
     fixtures = "test/fixtures/typescript/analysis/"

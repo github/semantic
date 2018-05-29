@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: heap
-version: 1.0.3
+version: 1.0.4
 summary: Heaps in Haskell
 homepage: 
 license: bsd-2-clause

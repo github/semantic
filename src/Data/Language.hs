@@ -7,6 +7,7 @@ import Data.Aeson
 -- | A programming language.
 data Language
     = Go
+    | Haskell
     | JavaScript
     | JSON
     | JSX
@@ -21,6 +22,7 @@ data Language
 languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
     ".json" -> Just JSON
+    ".hs" -> Just Haskell
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
     ".go" -> Just Go
@@ -36,6 +38,7 @@ languageForType mediaType = case mediaType of
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
   Go -> [".go"]
+  Haskell -> [".hs"]
   JavaScript -> [".js"]
   PHP -> [".php"]
   Python -> [".py"]

@@ -39,6 +39,8 @@ data DiffRenderer output where
   SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
   DOTDiffRenderer :: DiffRenderer (Graph (Vertex DiffTag))
+  -- | Render to a 'ByteString' formatted using the 'Show' instance.
+  ShowDiffRenderer :: DiffRenderer Builder
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
@@ -57,6 +59,8 @@ data TermRenderer output where
   ImportsTermRenderer :: TermRenderer ImportSummary
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer (Graph (Vertex ()))
+  -- | Render to a 'ByteString' formatted using the 'Show' instance.
+  ShowTermRenderer :: TermRenderer Builder
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
