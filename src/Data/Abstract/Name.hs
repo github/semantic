@@ -9,7 +9,6 @@ module Data.Abstract.Name
 import           Data.Aeson
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Char as Char
-import           Data.JSON.Fields ()
 import           Data.String
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
