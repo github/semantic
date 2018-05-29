@@ -36,7 +36,7 @@ withSomeTermPair with (SomeTermPair terms) = with terms
 diffBlobTOCPairs :: Member (Distribute WrappedTask) effs => [BlobPair] -> Eff effs ([TOCSummary], [TOCSummary])
 diffBlobTOCPairs = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderRPCToCDiff)
 
-type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, GAlign syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
+type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, IdentifierName syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
 
 withParsedBlobPairs :: (Member (Distribute WrappedTask) effs, Monoid output)
                     => (forall syntax . CanDiff syntax => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
@@ -44,7 +44,7 @@ withParsedBlobPairs :: (Member (Distribute WrappedTask) effs, Monoid output)
                     -> [BlobPair]
                     -> Eff effs output
 withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> WrapTask (withParsedBlobPair decorate blobs >>= withSomeTermPair (diffTerms blobs >=> render blobs)))
-  where diffTerms :: (Diffable syntax, Eq1 syntax, GAlign syntax, Hashable1 syntax, Traversable syntax, Member IO effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax (Record fields)) -> Eff effs (Diff syntax (Record fields) (Record fields))
+  where diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member IO effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax (Record fields)) -> Eff effs (Diff syntax (Record fields) (Record fields))
         diffTerms blobs terms = time "diff" languageTag $ do
           diff <- diff (runJoin terms)
           diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
@@ -53,8 +53,8 @@ withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> WrapTask (wi
 withParsedBlobPair :: (Member (Distribute WrappedTask) effs, Member (Exc SomeException) effs)
                    => (forall syntax . (CanDiff syntax) => Blob -> Term syntax (Record Location) -> TaskEff (Term syntax (Record fields)))
                    -> BlobPair
-                   -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Hashable1, IdentifierName, Show1, ToJSONFields1, Traversable] (Record fields))
+                   -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, IdentifierName, Show1, ToJSONFields1, Traversable] (Record fields))
 withParsedBlobPair decorate blobs
-  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Hashable1, IdentifierName, Show1, ToJSONFields1, Traversable] <$> languageForBlobPair blobs
+  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, IdentifierName, Show1, ToJSONFields1, Traversable] <$> languageForBlobPair blobs
   = SomeTermPair <$> distributeFor blobs (\ blob -> WrapTask (parse parser blob >>= decorate blob))
   | otherwise = noLanguageForBlob (pathForBlobPair blobs)
