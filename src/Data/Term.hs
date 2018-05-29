@@ -82,7 +82,7 @@ instance (Show1 f, Show a) => Show (Term f a) where
 instance (Message1 f) => Message (Term f ()) where
   encodeMessage num (Term (In _ f)) = liftEncodeMessage encodeMessage num f
   decodeMessage num = termIn () <$> liftDecodeMessage decodeMessage num
-  dotProto _ = liftDotProto (dotProto @(Term f ())) (Proxy @f)
+  dotProto _ = liftDotProto (dotProto @(Term f ())) (Proxy @(f (Term f ())))
 
 instance Ord1 f => Ord1 (Term f) where
   liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unTerm t1) (unTerm t2)
