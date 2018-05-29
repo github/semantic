@@ -9,7 +9,6 @@ module Data.Abstract.Exports
 
 import Prelude hiding (null)
 import Prologue hiding (null)
-import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, unpairs)
 import Data.Abstract.Name
 import qualified Data.Map as Map
@@ -23,10 +22,10 @@ null :: Exports location -> Bool
 null = Map.null . unExports
 
 toEnvironment :: Exports location -> Environment location
-toEnvironment exports = unpairs (mapMaybe (traverse (fmap Address)) (toList (unExports exports)))
+toEnvironment exports = unpairs (mapMaybe sequenceA (toList (unExports exports)))
 
-insert :: Name -> Name -> Maybe (Address location value) -> Exports location -> Exports location
-insert name alias address = Exports . Map.insert name (alias, unAddress <$> address) . unExports
+insert :: Name -> Name -> Maybe location -> Exports location -> Exports location
+insert name alias address = Exports . Map.insert name (alias, address) . unExports
 
 -- TODO: Should we filter for duplicates here?
 aliases :: Exports location -> [(Name, Name)]

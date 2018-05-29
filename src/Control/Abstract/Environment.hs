@@ -78,10 +78,10 @@ data Env location return where
 
 
 runEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Evaluator location value (Env location ': effects) a -> Evaluator location value effects a
-runEnv = interpret (\ (Lookup name) -> (<|>) <$> (fmap unAddress . Env.lookup name <$> getEnv) <*> (fmap unAddress . Env.lookup name <$> defaultEnvironment))
+runEnv = interpret (\ (Lookup name) -> (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment))
 
 reinterpretEnv :: Evaluator location value (Env location ': effects) a -> Evaluator location value (Reader (Environment location) ': State (Environment location) ': effects) a
-reinterpretEnv = reinterpret2 (\ (Lookup name) -> (<|>) <$> (fmap unAddress . Env.lookup name <$> getEnv) <*> (fmap unAddress . Env.lookup name <$> defaultEnvironment))
+reinterpretEnv = reinterpret2 (\ (Lookup name) -> (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment))
 
 
 -- | Errors involving the environment.
