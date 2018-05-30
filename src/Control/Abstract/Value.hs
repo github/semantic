@@ -19,7 +19,7 @@ import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Data.Abstract.Address (Address)
+import Data.Abstract.Address (Address(..))
 import Data.Abstract.Environment as Env
 import Data.Abstract.Live (Live)
 import Data.Abstract.Name
@@ -207,14 +207,14 @@ makeNamespace name addr super = do
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 evaluateInScopedEnv :: ( AbstractValue location value effects
-                       , Member (State (Environment location)) effects
+                       , Member (Env location) effects
                        )
                     => Evaluator location value effects value
                     -> Evaluator location value effects value
                     -> Evaluator location value effects value
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvTerm >>= scopedEnvironment
-  maybe term (flip localEnv term . mergeEnvs) scopedEnv
+  maybe term (\ env -> locally $ bindAll env >> term) scopedEnv
 
 
 -- | Evaluates a 'Value' returning the referenced value
@@ -222,7 +222,6 @@ value :: ( AbstractValue location value effects
          , Member (Allocator location value) effects
          , Member (Env location) effects
          , Member (Resumable (EnvironmentError location)) effects
-         , Member (State (Environment location)) effects
          )
       => ValueRef value
       -> Evaluator location value effects value
@@ -235,7 +234,6 @@ subtermValue :: ( AbstractValue location value effects
                 , Member (Allocator location value) effects
                 , Member (Env location) effects
                 , Member (Resumable (EnvironmentError location)) effects
-                , Member (State (Environment location)) effects
                 )
              => Subterm term (Evaluator location value effects (ValueRef value))
              -> Evaluator location value effects value
