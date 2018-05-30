@@ -81,7 +81,7 @@ resolvePythonModules q = do
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybe (throwResumable $ NotFoundError path searchPaths Language.Python) pure modulePath
+      maybeM (throwResumable $ NotFoundError path searchPaths Language.Python) modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).

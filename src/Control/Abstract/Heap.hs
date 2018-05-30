@@ -66,7 +66,7 @@ lookupOrAlloc :: ( Member (Allocator address value) effects
                  )
               => Name
               -> Evaluator address value effects address
-lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
+lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
 letrec :: ( Member (Allocator address value) effects

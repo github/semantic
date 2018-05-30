@@ -26,7 +26,7 @@ resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
   modulePath <- resolve paths
-  maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
+  maybeM (throwResumable $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
 resolveRubyPath :: ( Member (Modules address value) effects
@@ -37,7 +37,7 @@ resolveRubyPath :: ( Member (Modules address value) effects
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybe (throwResumable $ NotFoundError name' [name'] Language.Ruby) pure modulePath
+  maybeM (throwResumable $ NotFoundError name' [name'] Language.Ruby) modulePath
 
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
