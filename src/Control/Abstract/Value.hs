@@ -187,7 +187,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue address value effects
-                 , Member (State (Environment address)) effects
+                 , Member (Env address) effects
                  , Member (State (Heap address (Cell address) value)) effects
                  , Ord address
                  , Reducer value (Cell address value)
