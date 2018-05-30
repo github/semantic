@@ -48,7 +48,7 @@ resolvePHPName :: ( Member (Modules address value) effects
                -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
+  maybeM (throwResumable $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
