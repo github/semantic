@@ -159,7 +159,7 @@ asBool value = ifthenelse value (pure True) (pure False)
 
 -- | C-style for loops.
 forLoop :: ( AbstractValue location value effects
-           , Member (State (Environment location)) effects
+           , Member (Env location) effects
            )
         => Evaluator location value effects value -- ^ Initial statement
         -> Evaluator location value effects value -- ^ Condition
@@ -167,7 +167,7 @@ forLoop :: ( AbstractValue location value effects
         -> Evaluator location value effects value -- ^ Body
         -> Evaluator location value effects value
 forLoop initial cond step body =
-  localEnv id (initial *> while cond (body *> step))
+  locally (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
 while :: AbstractValue location value effects
