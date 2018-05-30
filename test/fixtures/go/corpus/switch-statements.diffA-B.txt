@@ -18,39 +18,27 @@
             (Identifier)
             ([])
             (Empty)))
-      {+(Pattern
-        {+(LessThan
-          {+(Identifier)+}
-          {+(Identifier)+})+}
-        {+(Call
-          {+(Identifier)+}
-          {+([])+}
-          {+(Empty)+})+})+}
-      {+(Pattern
-        {+(Equal
-          {+(Identifier)+}
-          {+(Integer)+})+}
-        {+(Call
-          {+(Identifier)+}
-          {+([])+}
-          {+(Empty)+})+})+}
-      {-(Pattern
-        {-(LessThan
-          {-(Identifier)-}
-          {-(Identifier)-})-}
+        (Pattern
+          (LessThan
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
         {-(Context
           {-(Comment)-}
-          {-(Call
-            {-(Identifier)-}
-            {-([])-}
-            {-(Empty)-})-})-})-}
+            (Call
+              (Identifier)
+              ([])
+              (Empty)))-})
       {-(Context
         {-(Comment)-}
-        {-(Pattern
-          {-(Equal
-            {-(Identifier)-}
-            {-(Integer)-})-}
-          {-(Call
-            {-(Identifier)-}
-            {-([])-}
-            {-(Empty)-})-})-})-}))))
+          (Pattern
+            (Equal
+            { (Identifier)
+            ->(Identifier) }
+              (Integer))
+            (Call
+            { (Identifier)
+            ->(Identifier) }
+              ([])
+              (Empty))))-}))))

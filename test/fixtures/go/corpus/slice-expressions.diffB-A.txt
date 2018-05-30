@@ -25,17 +25,22 @@
       { (Integer)
       ->(Empty) }
         (Empty))
-      (Slice
-        (Identifier)
-      { (Integer)
-      ->(Integer) }
-      { (Integer)
-      ->(Integer) }
-      { (Integer)
-      ->(Integer) })
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Integer)+})+}
       (Slice
       { (Identifier)
       ->(Identifier) }
-        (Integer)
-        (Integer)
-        (Empty)))))
+      { (Integer)
+      ->(Integer) }
+      { (Integer)
+      ->(Integer) }
+      { (Integer)
+      ->(Empty) })
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Empty)-})-})))

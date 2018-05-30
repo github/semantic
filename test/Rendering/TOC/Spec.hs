@@ -201,7 +201,7 @@ programOf diff = merge (programInfo, programInfo) (inject [ diff ])
 functionOf :: Text -> Term' -> Term'
 functionOf n body = termIn (Just (FunctionDeclaration n mempty Nothing) :. emptyInfo) (inject (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inject [body]))))
   where
-    name' = termIn (Nothing :. emptyInfo) (inject (Syntax.Identifier (name (encodeUtf8 n))))
+    name' = termIn (Nothing :. emptyInfo) (inject (Syntax.Identifier (name n)))
 
 programInfo :: Record '[Maybe Declaration, Range, Span]
 programInfo = Nothing :. emptyInfo

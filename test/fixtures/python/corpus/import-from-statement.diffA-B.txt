@@ -1,12 +1,12 @@
 (Program
-{+(Import)+}
 { (Import)
 ->(Import) }
 {+(Import)+}
 {+(Import)+}
 {+(Import)+}
-{ (Import)
-->(Import) }
+{+(Import)+}
+{+(Import)+}
+{-(Import)-}
 {-(Import)-}
 {-(Import)-}
 {-(Import)-})

@@ -11,7 +11,8 @@
         (Composite
           (Slice
             (Identifier))
-          ({-(TextElement)-})))
+          (
+          {-(TextElement)-})))
       (Assignment
         (Identifier)
         (Composite

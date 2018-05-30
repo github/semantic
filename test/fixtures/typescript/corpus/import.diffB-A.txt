@@ -1,8 +1,12 @@
 (Program
-{+(Import)+}
-{+(QualifiedAliasedImport
-  {+(Identifier)+})+}
-{+(Import)+}
+{ (Import)
+->(Import) }
+{ (QualifiedAliasedImport
+  {-(Identifier)-})
+->(QualifiedAliasedImport
+  {+(Identifier)+}) }
+{ (Import)
+->(Import) }
 {+(Import)+}
 {+(Import)+}
 {+(
@@ -15,10 +19,6 @@
 {+(SideEffectImport)+}
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
-{-(Import)-}
-{-(QualifiedAliasedImport
-  {-(Identifier)-})-}
-{-(Import)-}
 {-(Import)-}
 {-(Import)-}
 {-(
