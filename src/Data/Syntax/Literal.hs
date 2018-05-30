@@ -119,7 +119,7 @@ instance Evaluatable Data.Syntax.Literal.String
 instance ToJSONFields1 Data.Syntax.Literal.String
 
 newtype Character a = Character { characterContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Data.Syntax.Literal.Character where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Character where liftCompare = genericLiftCompare
