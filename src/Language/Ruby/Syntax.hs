@@ -109,9 +109,9 @@ instance Evaluatable Load where
   eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
 doLoad :: ( AbstractValue location value effects
+          , Member (Env location) effects
           , Member (Modules location value) effects
           , Member (Resumable ResolutionError) effects
-          , Member (State (Environment location)) effects
           , Member (State (Exports location)) effects
           , Member Trace effects
           )
@@ -122,7 +122,7 @@ doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
   importedEnv <- maybe emptyEnv fst <$> isolate (load path')
-  unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
+  unless shouldWrap $ bindAll importedEnv
   pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload

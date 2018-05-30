@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
+import           Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
@@ -134,9 +135,8 @@ javascriptExtensions = ["js"]
 
 evalRequire :: ( AbstractValue location value effects
                , Member (Allocator location value) effects
+               , Member (Env location) effects
                , Member (Modules location value) effects
-               , Member (Reader (Environment location)) effects
-               , Member (State (Environment location)) effects
                , Member (State (Exports location)) effects
                , Member (State (Heap location (Cell location) value)) effects
                , Ord location
@@ -147,7 +147,7 @@ evalRequire :: ( AbstractValue location value effects
             -> Evaluator location value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-  modifyEnv (mergeEnvs importedEnv)
+  bindAll importedEnv
   unit <$ makeNamespace alias addr Nothing
 
 data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
@@ -164,7 +164,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-    modifyEnv (mergeEnvs (renamed importedEnv)) $> Rval unit
+    bindAll (renamed importedEnv) $> Rval unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
@@ -252,7 +252,7 @@ instance Evaluatable QualifiedExportFrom where
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
-      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
+      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just . Address) address
     pure (Rval unit)
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }

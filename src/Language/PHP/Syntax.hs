@@ -54,11 +54,10 @@ resolvePHPName n = do
 
 include :: ( AbstractValue location value effects
            , Member (Allocator location value) effects
+           , Member (Env location) effects
            , Member (Modules location value) effects
-           , Member (Reader (Environment location)) effects
            , Member (Resumable ResolutionError) effects
            , Member (Resumable (EnvironmentError location)) effects
-           , Member (State (Environment location)) effects
            , Member (State (Exports location)) effects
            , Member Trace effects
            )
@@ -70,7 +69,7 @@ include pathTerm f = do
   path <- resolvePHPName name
   traceResolve name path
   (importedEnv, v) <- isolate (f path) >>= maybeM (pure (emptyEnv, unit))
-  modifyEnv (mergeEnvs importedEnv)
+  bindAll importedEnv
   pure (Rval v)
 
 newtype Require a = Require a

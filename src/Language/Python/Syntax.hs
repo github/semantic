@@ -117,7 +117,7 @@ instance Evaluatable Import where
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
     importedEnv <- maybe emptyEnv fst <$> isolate (require path)
-    modifyEnv (mergeEnvs (select importedEnv))
+    bindAll (select importedEnv)
     pure (Rval unit)
     where
       select importedEnv
@@ -128,9 +128,8 @@ instance Evaluatable Import where
 -- Evaluate a qualified import
 evalQualifiedImport :: ( AbstractValue location value effects
                        , Member (Allocator location value) effects
+                       , Member (Env location) effects
                        , Member (Modules location value) effects
-                       , Member (Reader (Environment location)) effects
-                       , Member (State (Environment location)) effects
                        , Member (State (Exports location)) effects
                        , Member (State (Heap location (Cell location) value)) effects
                        , Ord location
@@ -139,7 +138,7 @@ evalQualifiedImport :: ( AbstractValue location value effects
                     => Name -> ModulePath -> Evaluator location value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require path)
-  modifyEnv (mergeEnvs importedEnv)
+  bindAll importedEnv
   unit <$ makeNamespace name addr Nothing
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
@@ -188,7 +187,7 @@ instance Evaluatable QualifiedAliasedImport where
     Rval <$> letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
       importedEnv <- maybe emptyEnv fst <$> isolate (require path)
-      modifyEnv (mergeEnvs importedEnv)
+      bindAll importedEnv
       unit <$ makeNamespace alias addr Nothing)
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
