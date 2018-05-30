@@ -52,7 +52,6 @@ style = (defaultStyle (byteString . vertexName))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Member (Reader (Environment (Hole (Located address)))) effects
                  , Member (Reader ModuleInfo) effects
                  , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
@@ -121,8 +120,7 @@ moduleInclusion v = do
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Reader (Environment (Hole (Located address)))) effects
-                      , Member (Env (Hole (Located address))) effects
+variableDefinition :: ( Member (Env (Hole (Located address))) effects
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name
