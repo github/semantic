@@ -10,6 +10,7 @@ module Control.Abstract.Environment
 , lookupEnv
 , bind
 , bindAll
+, locally
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -69,6 +70,12 @@ bind name = modifyEnv . Env.insert name . unAddress
 
 bindAll :: Member (State (Environment location)) effects => Environment location -> Evaluator location value effects ()
 bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . pairs
+
+locally :: Member (State (Environment location)) effects => Evaluator location value effects a -> Evaluator location value effects a
+locally a = do
+  modifyEnv Env.push
+  a' <- a
+  a' <$ modifyEnv Env.pop
 
 
 -- | Errors involving the environment.
