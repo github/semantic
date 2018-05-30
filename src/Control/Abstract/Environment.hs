@@ -79,22 +79,19 @@ data Env location return where
   Push   ::                     Env location ()
   Pop    ::                     Env location ()
 
+handleEnv :: Member (State (Environment location)) effects => Environment location -> Env location result -> Evaluator location value effects result
+handleEnv defaultEnvironment = \case
+  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
+  Bind name addr -> modifyEnv (Env.insert name addr)
+  Close names -> Env.intersect names <$> getEnv
+  Push -> modifyEnv Env.push
+  Pop -> modifyEnv Env.pop
 
 runEnv :: Member (State (Environment location)) effects => Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value effects a
-runEnv defaultEnvironment = interpret $ \case
-  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
-  Bind name addr -> modifyEnv (Env.insert name addr)
-  Close names -> Env.intersect names <$> getEnv
-  Push -> modifyEnv Env.push
-  Pop -> modifyEnv Env.pop
+runEnv defaultEnvironment = interpret (handleEnv defaultEnvironment)
 
 reinterpretEnv :: Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value (State (Environment location) ': effects) a
-reinterpretEnv defaultEnvironment = reinterpret $ \case
-  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
-  Bind name addr -> modifyEnv (Env.insert name addr)
-  Close names -> Env.intersect names <$> getEnv
-  Push -> modifyEnv Env.push
-  Pop -> modifyEnv Env.pop
+reinterpretEnv defaultEnvironment = reinterpret (handleEnv defaultEnvironment)
 
 
 -- | Errors involving the environment.
