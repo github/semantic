@@ -103,18 +103,18 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Sum fs (Term (Sum fs) a))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
-instance (Apply Message1 fs, Generate Message1 fs fs, Generate GenericNamed fs fs) => Message1 (Sum fs) where
+instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
   liftEncodeMessage encodeMessage num fs = apply @Message1 (liftEncodeMessage encodeMessage num) fs
   liftDecodeMessage decodeMessage num = oneof undefined listOfParsers
     where
       listOfParsers =
         generate @Message1 @fs @fs (\ (proxy :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
   liftDotProto _ =
-    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @GenericNamed @fs @fs (\ (proxy :: proxy f) i ->
+    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (proxy :: proxy f) i ->
       let
         num = FieldNumber (fromInteger (succ i))
-        fieldType = Proto.Prim (Proto.Named . Proto.Single $ genericNameOf (Proxy @f))
-        fieldName = Proto.Single (camelCase $ genericNameOf (Proxy @f))
+        fieldType = Proto.Prim (Proto.Named . Proto.Single $ nameOf1 (Proxy @f))
+        fieldName = Proto.Single (camelCase $ nameOf1 (Proxy @f))
         camelCase (x : xs) = toLower x : xs
         camelCase [] = []
       in
@@ -133,7 +133,7 @@ instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) whe
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier Name
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, Named)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, Named1)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
@@ -180,7 +180,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Named, Message1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Named1, Message1)
 
 instance ToJSONFields1 Empty
 

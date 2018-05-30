@@ -79,12 +79,12 @@ instance Show1 f => Show1 (Term f) where
 instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
-instance (Message1 f) => Message (Term f ()) where
+instance Message1 f => Message (Term f ()) where
   encodeMessage num (Term (In _ f)) = liftEncodeMessage encodeMessage num f
   decodeMessage num = termIn () <$> liftDecodeMessage decodeMessage num
   dotProto _ = liftDotProto (Proxy @(f (Term f ())))
 
-instance Named (Term f ()) where
+instance Named (Term f a) where
   nameOf _ = "Term"
 
 instance Ord1 f => Ord1 (Term f) where
