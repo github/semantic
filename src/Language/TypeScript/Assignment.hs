@@ -186,6 +186,9 @@ manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Conte
 manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
 manyStatements expr = fromList <$> (manyTerm expr)
 
+emptyStatements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
+emptyStatements = pure (fromList [])
+
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
 
@@ -768,7 +771,7 @@ internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (TypeScript.Syntax.InternalModule <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure (fromList [])))
+module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> emptyStatements))
 
 
 statements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)

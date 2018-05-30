@@ -422,7 +422,7 @@ methodSpecList :: Assignment
 methodSpecList = symbol MethodSpecList *> children expressions
 
 packageClause :: Assignment
-packageClause = makeTerm <$> symbol PackageClause <*> children (Go.Syntax.Package <$> expression <*> pure [])
+packageClause = makeTerm <$> symbol PackageClause <*> children (Go.Syntax.Package <$> expression <*> emptyStatements)
 
 parameters :: Assignment
 parameters = symbol ParameterList *> children expressions
@@ -609,5 +609,8 @@ manyTerm = many . term
 -- | Match a term and contextualize any comments preceeding or proceeding the term.
 term :: Assignment -> Assignment
 term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+
+emptyStatements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
+emptyStatements = pure (fromList [])
 
 {-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

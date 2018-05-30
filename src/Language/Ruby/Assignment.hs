@@ -94,7 +94,7 @@ type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . fromList <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyStatements expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
