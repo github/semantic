@@ -59,17 +59,23 @@ bind name addr = send (Bind name (unAddress addr))
 data Env location return where
   Lookup :: Name             -> Env location (Maybe location)
   Bind   :: Name -> location -> Env location ()
+  Push   ::                     Env location ()
+  Pop    ::                     Env location ()
 
 
 runEnv :: Member (State (Environment location)) effects => Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value effects a
 runEnv defaultEnvironment = interpret $ \case
   Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
   Bind name addr -> modifyEnv (Env.insert name addr)
+  Push -> modifyEnv Env.push
+  Pop -> modifyEnv Env.pop
 
 reinterpretEnv :: Environment location -> Evaluator location value (Env location ': effects) a -> Evaluator location value (State (Environment location) ': effects) a
 reinterpretEnv defaultEnvironment = reinterpret $ \case
   Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
   Bind name addr -> modifyEnv (Env.insert name addr)
+  Push -> modifyEnv Env.push
+  Pop -> modifyEnv Env.pop
 
 
 -- | Errors involving the environment.
