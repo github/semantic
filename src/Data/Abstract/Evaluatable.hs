@@ -64,7 +64,6 @@ type EvaluatableConstraints address term value effects =
   , Member (Resumable ResolutionError) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Return value) effects
-  , Member (State (Exports address)) effects
   , Member (State (Heap address (Cell address) value)) effects
   , Member Trace effects
   , Ord address
