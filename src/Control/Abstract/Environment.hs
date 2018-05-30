@@ -3,7 +3,6 @@ module Control.Abstract.Environment
 ( Environment
 , getEnv
 , putEnv
-, modifyEnv
 , withEnv
 , defaultEnvironment
 , withDefaultEnvironment
