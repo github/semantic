@@ -12,6 +12,7 @@ module Control.Abstract.Environment
 , localize
 , lookupEnv
 , bind
+, bindAll
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -72,6 +73,9 @@ lookupEnv name = (<|>) <$> (fmap Address . Env.lookup name <$> getEnv) <*> (fmap
 
 bind :: Member (State (Environment location)) effects => Name -> Address location value -> Evaluator location value effects ()
 bind name = modifyEnv . Env.insert name . unAddress
+
+bindAll :: Member (State (Environment location)) effects => Environment location -> Evaluator location value effects ()
+bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . pairs
 
 
 -- | Errors involving the environment.
