@@ -101,7 +101,13 @@ reinterpretEnv = reinterpret2 handleEnv
 runEnvState :: Environment address
             -> Evaluator address value (Env address ': effects) a
             -> Evaluator address value effects (a, Environment address)
-runEnvState initial = fmap fst . runState lowerBound . runState initial . reinterpretEnv
+runEnvState initial = fmap (uncurry filterEnv) . runState lowerBound . runState initial . reinterpretEnv
+  where -- TODO: If the set of exports is empty because no exports have been
+        -- defined, do we export all terms, or no terms? This behavior varies across
+        -- languages. We need better semantics rather than doing it ad-hoc.
+        filterEnv (a, env) ports
+          | Exports.null ports = (a, env)
+          | otherwise          = (a, Exports.toEnvironment ports `Env.mergeEnvs` Env.overwrite (Exports.aliases ports) env)
 
 
 -- | Errors involving the environment.

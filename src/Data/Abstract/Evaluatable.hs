@@ -24,7 +24,6 @@ import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookup
 import Control.Abstract.Value as X
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
-import Data.Abstract.Exports as Exports
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
@@ -83,7 +82,6 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (LoadError address value)) outer
-                       , Member (State (Exports address)) outer
                        , Member (State (Heap address (Cell address) value)) outer
                        , Member (State (ModuleTable (Maybe (Environment address, value)))) outer
                        , Member Trace outer
@@ -107,8 +105,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
     $ ModuleTable.toPairs (packageEntryPoints (packageBody package))
   where
         evalModule preludeEnv m
-          = pairValueWithEnv
-          . runInModule preludeEnv (moduleInfo m)
+          = runInModule preludeEnv (moduleInfo m)
           . analyzeModule (subtermRef . moduleBody)
           $ evalTerm <$> m
         evalTerm term = Subterm term (TermEvaluator (value =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
@@ -133,17 +130,6 @@ evaluatePackageWith analyzeModule analyzeTerm package
         withPrelude (Just prelude) f = do
           (_, preludeEnv) <- evalPrelude prelude
           f preludeEnv
-
-        -- TODO: If the set of exports is empty because no exports have been
-        -- defined, do we export all terms, or no terms? This behavior varies across
-        -- languages. We need better semantics rather than doing it ad-hoc.
-        filterEnv ports env
-          | Exports.null ports = env
-          | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-        pairValueWithEnv action = do
-          (a, env) <- action
-          filtered <- filterEnv <$> TermEvaluator getExports <*> pure env
-          pure (a, filtered)
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
