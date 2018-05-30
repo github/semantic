@@ -112,7 +112,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
         runInModule preludeEnv info
           = runReader info
           . raiseHandler runAllocator
-          . raiseHandler (runEnvState preludeEnv)
+          . raiseHandler (runEnv preludeEnv)
           . raiseHandler runReturn
           . raiseHandler runLoopControl
 
