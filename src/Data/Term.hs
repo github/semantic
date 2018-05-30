@@ -82,7 +82,7 @@ instance (Show1 f, Show a) => Show (Term f a) where
 instance (Message1 f) => Message (Term f ()) where
   encodeMessage num (Term (In _ f)) = liftEncodeMessage encodeMessage num f
   decodeMessage num = termIn () <$> liftDecodeMessage decodeMessage num
-  dotProto _ = liftDotProto (dotProto @(Term f ())) (Proxy @(f (Term f ())))
+  dotProto _ = liftDotProto (Proxy @(f (Term f ())))
 
 instance Named (Term f ()) where
   nameOf _ = "Term"

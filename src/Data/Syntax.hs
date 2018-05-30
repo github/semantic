@@ -109,7 +109,7 @@ instance (Apply Message1 fs, Generate Message1 fs fs, Generate GenericNamed fs f
     where
       listOfParsers =
         generate @Message1 @fs @fs (\ (proxy :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
-  liftDotProto dotProto _ =
+  liftDotProto _ =
     [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @GenericNamed @fs @fs (\ (proxy :: proxy f) i ->
       let
         num = FieldNumber (fromInteger (succ i))
