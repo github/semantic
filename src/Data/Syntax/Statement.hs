@@ -120,7 +120,7 @@ instance Evaluatable Assignment where
       LvalLocal nam -> do
         addr <- lookupOrAlloc nam
         assign addr rhs
-        modifyEnv (Env.insert nam (unAddress addr))
+        bind nam addr
       LvalMember _ _ ->
         -- we don't yet support mutable object properties:
         pure ()
