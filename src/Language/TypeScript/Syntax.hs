@@ -37,7 +37,7 @@ toName = name . BC.pack . unPath
 --
 -- NB: TypeScript has a couple of different strategies, but the main one (and the
 -- only one we support) mimics Node.js.
-resolveWithNodejsStrategy :: ( Member (Modules location value) effects
+resolveWithNodejsStrategy :: ( Member (Modules address value) effects
                              , Member (Reader M.ModuleInfo) effects
                              , Member (Reader PackageInfo) effects
                              , Member (Resumable ResolutionError) effects
@@ -45,7 +45,7 @@ resolveWithNodejsStrategy :: ( Member (Modules location value) effects
                              )
                           => ImportPath
                           -> [String]
-                          -> Evaluator location value effects M.ModulePath
+                          -> Evaluator address value effects M.ModulePath
 resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
@@ -56,7 +56,7 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: ( Member (Modules location value) effects
+resolveRelativePath :: ( Member (Modules address value) effects
                        , Member (Reader M.ModuleInfo) effects
                        , Member (Reader PackageInfo) effects
                        , Member (Resumable ResolutionError) effects
@@ -64,7 +64,7 @@ resolveRelativePath :: ( Member (Modules location value) effects
                        )
                     => FilePath
                     -> [String]
-                    -> Evaluator location value effects M.ModulePath
+                    -> Evaluator address value effects M.ModulePath
 resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
@@ -84,7 +84,7 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: ( Member (Modules location value) effects
+resolveNonRelativePath :: ( Member (Modules address value) effects
                           , Member (Reader M.ModuleInfo) effects
                           , Member (Reader PackageInfo) effects
                           , Member (Resumable ResolutionError) effects
@@ -92,7 +92,7 @@ resolveNonRelativePath :: ( Member (Modules location value) effects
                           )
                        => FilePath
                        -> [String]
-                       -> Evaluator location value effects M.ModulePath
+                       -> Evaluator address value effects M.ModulePath
 resolveNonRelativePath name exts = do
   M.ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -109,13 +109,13 @@ resolveNonRelativePath name exts = do
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
 -- | Resolve a module name to a ModulePath.
-resolveModule :: ( Member (Modules location value) effects
+resolveModule :: ( Member (Modules address value) effects
                  , Member (Reader PackageInfo) effects
                  , Member Trace effects
                  )
               => FilePath -- ^ Module path used as directory to search in
               -> [String] -- ^ File extensions to look for
-              -> Evaluator location value effects (Either [FilePath] M.ModulePath)
+              -> Evaluator address value effects (Either [FilePath] M.ModulePath)
 resolveModule path' exts = do
   let path = makeRelative "." path'
   PackageInfo{..} <- currentPackage
@@ -132,19 +132,19 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: ( AbstractValue location value effects
-               , Member (Allocator location value) effects
-               , Member (Modules location value) effects
-               , Member (Reader (Environment location)) effects
-               , Member (State (Environment location)) effects
-               , Member (State (Exports location)) effects
-               , Member (State (Heap location (Cell location) value)) effects
-               , Ord location
-               , Reducer value (Cell location value)
+evalRequire :: ( AbstractValue address value effects
+               , Member (Allocator address value) effects
+               , Member (Modules address value) effects
+               , Member (Reader (Environment address)) effects
+               , Member (State (Environment address)) effects
+               , Member (State (Exports address)) effects
+               , Member (State (Heap address (Cell address) value)) effects
+               , Ord address
+               , Reducer value (Cell address value)
                )
             => M.ModulePath
             -> Name
-            -> Evaluator location value effects value
+            -> Evaluator address value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
   bindAll importedEnv

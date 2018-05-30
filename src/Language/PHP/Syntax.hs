@@ -41,30 +41,30 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: ( Member (Modules location value) effects
+resolvePHPName :: ( Member (Modules address value) effects
                   , Member (Resumable ResolutionError) effects
                   )
                => ByteString
-               -> Evaluator location value effects ModulePath
+               -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( AbstractValue location value effects
-           , Member (Allocator location value) effects
-           , Member (Modules location value) effects
-           , Member (Reader (Environment location)) effects
+include :: ( AbstractValue address value effects
+           , Member (Allocator address value) effects
+           , Member (Modules address value) effects
+           , Member (Reader (Environment address)) effects
            , Member (Resumable ResolutionError) effects
-           , Member (Resumable (EnvironmentError location)) effects
-           , Member (State (Environment location)) effects
-           , Member (State (Exports location)) effects
+           , Member (Resumable (EnvironmentError address)) effects
+           , Member (State (Environment address)) effects
+           , Member (State (Exports address)) effects
            , Member Trace effects
            )
-        => Subterm term (Evaluator location value effects (ValueRef value))
-        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location, value)))
-        -> Evaluator location value effects (ValueRef value)
+        => Subterm term (Evaluator address value effects (ValueRef value))
+        -> (ModulePath -> Evaluator address value effects (Maybe (Environment address, value)))
+        -> Evaluator address value effects (ValueRef value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name

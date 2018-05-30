@@ -52,14 +52,14 @@ style = (defaultStyle (byteString . vertexName))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Member (Reader (Environment (Hole (Located location)))) effects
+                 , Member (Reader (Environment (Hole (Located address)))) effects
                  , Member (Reader ModuleInfo) effects
-                 , Member (State (Environment (Hole (Located location)))) effects
+                 , Member (State (Environment (Hole (Located address)))) effects
                  , Member (State (Graph Vertex)) effects
                  , term ~ Term (Sum syntax) ann
                  )
-              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located location)) value effects a)
-              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located location)) value effects a)
+              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
+              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
 graphingTerms recur term@(In _ syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
@@ -71,19 +71,19 @@ graphingTerms recur term@(In _ syntax) = do
 graphingPackages :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph Vertex)) effects
                     )
-                 => SubtermAlgebra Module term (TermEvaluator term location value effects a)
-                 -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
+                 => SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                 -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
-graphingModules :: forall term location value effects a
-                .  ( Member (Modules location value) effects
+graphingModules :: forall term address value effects a
+                .  ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph Vertex)) effects
                    )
-               => SubtermAlgebra Module term (TermEvaluator term location value effects a)
-               -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
-graphingModules recur m = interpose @(Modules location value) pure (\ m yield -> case m of
+               => SubtermAlgebra Module term (TermEvaluator term address value effects a)
+               -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+graphingModules recur m = interpose @(Modules address value) pure (\ m yield -> case m of
   Load   path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
   Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
   _ -> send m >>= yield)
@@ -121,14 +121,14 @@ moduleInclusion v = do
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Reader (Environment (Hole (Located location)))) effects
-                      , Member (State (Environment (Hole (Located location)))) effects
+variableDefinition :: ( Member (Reader (Environment (Hole (Located address)))) effects
+                      , Member (State (Environment (Hole (Located address)))) effects
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name
-                   -> TermEvaluator term (Hole (Located location)) value effects ()
+                   -> TermEvaluator term (Hole (Located address)) value effects ()
 variableDefinition name = do
-  graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . locationModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
+  graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
