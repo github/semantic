@@ -26,8 +26,8 @@ instance Show Monovariant where
   showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
 
 
-data Located location = Located
-  { location        :: location
+data Located address = Located
+  { location        :: address
   , locationPackage :: {-# UNPACK #-} !PackageInfo
   , locationModule  :: !ModuleInfo
   }
