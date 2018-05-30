@@ -122,8 +122,8 @@ evaluatePackageWith analyzeModule analyzeTerm package
           maybe (pure v) ((`call` []) <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          _ <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
-          evalModule emptyEnv prelude
+          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
+          second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
 
         withPrelude Nothing f = f emptyEnv
         withPrelude (Just prelude) f = do
