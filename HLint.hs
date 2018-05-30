@@ -31,3 +31,5 @@ error "avoid init" = init
 
 error "avoid last" = last
   where note = "last is partial; consider pattern-matching"
+
+error "use maybeM" = maybe a pure ==> maybeM a
