@@ -32,8 +32,8 @@ getEnv :: Member (Env address) effects => Evaluator address value effects (Envir
 getEnv = send GetEnv
 
 -- | Add an export to the global export state.
-export :: Member (State (Exports address)) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
-export name alias = modify' . insert name alias
+export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
+export name alias addr = send (Export name alias addr)
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
