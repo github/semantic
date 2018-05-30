@@ -220,7 +220,7 @@ evaluateInScopedEnv scopedEnvTerm term = do
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue location value effects
          , Member (Allocator location value) effects
-         , Member (Reader (Environment location)) effects
+         , Member (Env location) effects
          , Member (Resumable (EnvironmentError location)) effects
          , Member (State (Environment location)) effects
          )
@@ -233,7 +233,7 @@ value (Rval val) = pure val
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue location value effects
                 , Member (Allocator location value) effects
-                , Member (Reader (Environment location)) effects
+                , Member (Env location) effects
                 , Member (Resumable (EnvironmentError location)) effects
                 , Member (State (Environment location)) effects
                 )
