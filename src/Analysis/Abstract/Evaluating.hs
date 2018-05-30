@@ -23,7 +23,6 @@ deriving instance (Show (Cell location value), Show location, Show value) => Sho
 evaluating :: Evaluator location value
                 (  Fail
                 ': Fresh
-                ': Reader (Environment location)
                 ': State (Environment location)
                 ': State (Heap location (Cell location) value)
                 ': State (ModuleTable (Maybe (Environment location, value)))
@@ -36,6 +35,5 @@ evaluating
   . runState lowerBound -- State (ModuleTable (Maybe (Environment location, value)))
   . runState lowerBound -- State (Heap location (Cell location) value)
   . runState lowerBound -- State (Environment location)
-  . runReader lowerBound -- Reader (Environment location)
   . runFresh 0
   . runFail
