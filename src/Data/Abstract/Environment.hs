@@ -1,7 +1,7 @@
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
-  , bind
+  , intersect
   , delete
   , head
   , emptyEnv
@@ -18,9 +18,8 @@ module Data.Abstract.Environment
   , roots
   ) where
 
-import           Data.Abstract.Address
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Live
+import           Data.Abstract.Name
 import           Data.Align
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as Map
@@ -29,42 +28,39 @@ import           Prelude hiding (head, lookup)
 import           Prologue
 
 -- $setup
--- >>> let bright = push (insert (name "foo") (Address (Precise 0)) emptyEnv)
--- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
+-- >>> import Data.Abstract.Address
+-- >>> let bright = push (insert (name "foo") (Precise 0) emptyEnv)
+-- >>> let shadowed = insert (name "foo") (Precise 1) bright
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
-newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address location value)) }
+newtype Environment address = Environment { unEnvironment :: NonEmpty (Map.Map Name address) }
   deriving (Eq, Ord)
 
-instance Eq location   => Eq1   (Environment location) where liftEq      eq      (Environment a) (Environment b) = liftEq      (liftEq      (liftEq      eq))      a b
-instance Ord location  => Ord1  (Environment location) where liftCompare compare (Environment a) (Environment b) = liftCompare (liftCompare (liftCompare compare)) a b
-instance Show location => Show1 (Environment location) where liftShowsPrec _ _ = showsPrec
-
-mergeEnvs :: Environment location value -> Environment location value -> Environment location value
+mergeEnvs :: Environment address -> Environment address -> Environment address
 mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
   Environment ((<>) a b :| alignWith (mergeThese (<>)) as bs)
 
-emptyEnv :: Environment location value
+emptyEnv :: Environment address
 emptyEnv = Environment (lowerBound :| [])
 
 -- | Make and enter a new empty scope in the given environment.
-push :: Environment location value -> Environment location value
+push :: Environment address -> Environment address
 push (Environment (a :| as)) = Environment (mempty :| a : as)
 
 -- | Remove the frontmost scope.
-pop :: Environment location value -> Environment location value
+pop :: Environment address -> Environment address
 pop (Environment (_ :| []))     = emptyEnv
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
 -- | Drop all scopes save for the frontmost one.
-head :: Environment location value -> Environment location value
+head :: Environment address -> Environment address
 head (Environment (a :| _)) = Environment (a :| [])
 
 -- | Take the union of two environments. When duplicate keys are found in the
 --   name to address map, the second definition wins.
-mergeNewer :: Environment location value -> Environment location value -> Environment location value
+mergeNewer :: Environment address -> Environment address -> Environment address
 mergeNewer (Environment a) (Environment b) =
     Environment (NonEmpty.fromList . reverse $ alignWith (mergeThese combine) (reverse as) (reverse bs))
     where
@@ -76,45 +72,45 @@ mergeNewer (Environment a) (Environment b) =
 --
 -- >>> pairs shadowed
 -- [("foo",Precise 1)]
-pairs :: Environment location value -> [(Name, Address location value)]
+pairs :: Environment address -> [(Name, address)]
 pairs = Map.toList . fold . unEnvironment
 
-unpairs :: [(Name, Address location value)] -> Environment location value
+unpairs :: [(Name, address)] -> Environment address
 unpairs = Environment . pure . Map.fromList
 
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
 -- Just (Precise 1)
-lookup :: Name -> Environment location value -> Maybe (Address location value)
-lookup k = foldMapA (Map.lookup k) . unEnvironment
+lookup :: Name -> Environment address -> Maybe address
+lookup name = foldMapA (Map.lookup name) . unEnvironment
 
 -- | Insert a 'Name' in the environment.
-insert :: Name -> Address location value -> Environment location value -> Environment location value
-insert name address (Environment (a :| as)) = Environment (Map.insert name address a :| as)
+insert :: Name -> address -> Environment address -> Environment address
+insert name addr (Environment (a :| as)) = Environment (Map.insert name addr a :| as)
 
 -- | Remove a 'Name' from the environment.
 --
 -- >>> delete (name "foo") shadowed
 -- Environment []
-delete :: Name -> Environment location value -> Environment location value
+delete :: Name -> Environment address -> Environment address
 delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
 
-trim :: Environment location value -> Environment location value
+trim :: Environment address -> Environment address
 trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
-bind :: Foldable t => t Name -> Environment location value -> Environment location value
-bind names env = unpairs (mapMaybe lookupName (toList names))
+intersect :: Foldable t => t Name -> Environment address -> Environment address
+intersect names env = unpairs (mapMaybe lookupName (toList names))
   where
     lookupName name = (,) name <$> lookup name env
 
 -- | Get all bound 'Name's in an environment.
-names :: Environment location value -> [Name]
+names :: Environment address -> [Name]
 names = fmap fst . pairs
 
 -- | Lookup and alias name-value bindings from an environment.
-overwrite :: [(Name, Name)] -> Environment location value -> Environment location value
+overwrite :: [(Name, Name)] -> Environment address -> Environment address
 overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
   where
     lookupAndAlias (oldName, newName) = (,) newName <$> lookup oldName env
@@ -122,14 +118,14 @@ overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
 --   Unbound names are silently dropped.
-roots :: (Ord location, Foldable t) => Environment location value -> t Name -> Live location value
-roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
+roots :: (Ord address, Foldable t) => Environment address -> t Name -> Live address
+roots env names = addresses (names `intersect` env)
 
-addresses :: Ord location => Environment location value -> Live location value
+addresses :: Ord address => Environment address -> Live address
 addresses = fromAddresses . map snd . pairs
 
 
-instance Lower (Environment location value) where lowerBound = emptyEnv
+instance Lower (Environment address) where lowerBound = emptyEnv
 
-instance Show location => Show (Environment location value) where
-  showsPrec d = showsUnaryWith showsPrec "Environment" d . map (first unName) . pairs
+instance Show address => Show (Environment address) where
+  showsPrec d = showsUnaryWith showsPrec "Environment" d . pairs

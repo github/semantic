@@ -7,11 +7,11 @@ module Language.Ruby.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
+import Data.Abstract.Name (name)
 import Data.List (elem)
 import Data.Record
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Ruby.Grammar as Grammar
-import Data.Abstract.FreeVariables (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
 import qualified Data.Syntax as Syntax

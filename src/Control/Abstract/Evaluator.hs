@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
-  , ValueRef(..)
   -- * Effects
   , Return(..)
   , earlyReturn
@@ -12,47 +11,29 @@ module Control.Abstract.Evaluator
   , throwContinue
   , catchLoopControl
   , runLoopControl
-  , module Control.Monad.Effect
-  , module Control.Monad.Effect.Fail
-  , module Control.Monad.Effect.Fresh
-  , module Control.Monad.Effect.NonDet
-  , module Control.Monad.Effect.Reader
-  , module Control.Monad.Effect.Resumable
-  , module Control.Monad.Effect.State
-  , module Control.Monad.Effect.Trace
+  , module X
   ) where
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Resumable
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Trace
-import Data.Abstract.FreeVariables
+import Control.Monad.Effect           as X
+import Control.Monad.Effect.Fresh     as X
+import Control.Monad.Effect.Internal
+import Control.Monad.Effect.NonDet    as X
+import Control.Monad.Effect.Reader    as X
+import Control.Monad.Effect.Resumable as X
+import Control.Monad.Effect.State     as X
+import Control.Monad.Effect.Trace     as X
 import Prologue
 
--- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
+-- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
 --
 --   These parameters enable us to constrain the types of effects using them s.t. we can avoid both ambiguous types when they aren’t mentioned outside of the context, and lengthy, redundant annotations on the use sites of functions employing these effects.
 --
 --   These effects will typically include the environment, heap, module table, etc. effects necessary for evaluation of modules and terms, but may also include any other effects so long as they’re eventually handled.
-newtype Evaluator location value effects a = Evaluator { runEvaluator :: Eff effects a }
+newtype Evaluator address value effects a = Evaluator { runEvaluator :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
-deriving instance Member NonDet effects => Alternative (Evaluator location value effects)
+deriving instance Member NonDet effects => Alternative (Evaluator address value effects)
 
--- | 'ValueRef' is the type subterms evaluate to and can represent either values directly ('Rval'), or references to values (lvals - such as local variables or object members)
-data ValueRef value where
-  -- Represents a value:
-  Rval :: value -> ValueRef value
-  -- Represents a local variable. No environment is attached - it's assumed that LvalLocal will be evaluated in the same scope it was constructed:
-  LvalLocal :: Name -> ValueRef value
-  -- Represents an object member:
-  LvalMember :: value -> Name -> ValueRef value
-
-  deriving (Eq, Ord, Show)
 
 -- Effects
 
@@ -63,14 +44,14 @@ data Return value resume where
 deriving instance Eq value => Eq (Return value a)
 deriving instance Show value => Show (Return value a)
 
-earlyReturn :: Member (Return value) effects => value -> Evaluator location value effects value
+earlyReturn :: Member (Return value) effects => value -> Evaluator address value effects value
 earlyReturn = send . Return
 
-catchReturn :: Member (Return value) effects => Evaluator location value effects a -> (forall x . Return value x -> Evaluator location value effects a) -> Evaluator location value effects a
+catchReturn :: Member (Return value) effects => Evaluator address value effects a -> (forall x . Return value x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Evaluator location value (Return value ': effects) value -> Evaluator location value effects value
-runReturn = relay pure (\ (Return value) _ -> pure value)
+runReturn :: Effectful (m address value) => m address value (Return value ': effects) value -> m address value effects value
+runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -81,16 +62,16 @@ data LoopControl value resume where
 deriving instance Eq value => Eq (LoopControl value a)
 deriving instance Show value => Show (LoopControl value a)
 
-throwBreak :: Member (LoopControl value) effects => value -> Evaluator location value effects value
+throwBreak :: Member (LoopControl value) effects => value -> Evaluator address value effects value
 throwBreak = send . Break
 
-throwContinue :: Member (LoopControl value) effects => value -> Evaluator location value effects value
+throwContinue :: Member (LoopControl value) effects => value -> Evaluator address value effects value
 throwContinue = send . Continue
 
-catchLoopControl :: Member (LoopControl value) effects => Evaluator location value effects a -> (forall x . LoopControl value x -> Evaluator location value effects a) -> Evaluator location value effects a
+catchLoopControl :: Member (LoopControl value) effects => Evaluator address value effects a -> (forall x . LoopControl value x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
-runLoopControl :: Evaluator location value (LoopControl value ': effects) value -> Evaluator location value effects value
-runLoopControl = relay pure (\ eff _ -> case eff of
+runLoopControl :: Effectful (m address value) => m address value (LoopControl value ': effects) value -> m address value effects value
+runLoopControl = raiseHandler (relay pure (\ eff _ -> case eff of
   Break    value -> pure value
-  Continue value -> pure value)
+  Continue value -> pure value))

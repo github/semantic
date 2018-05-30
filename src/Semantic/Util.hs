@@ -4,9 +4,8 @@ module Semantic.Util where
 
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Analysis.Abstract.Evaluating as X
-import           Control.Abstract.Evaluator
-import           Control.Abstract.TermEvaluator
+import           Analysis.Abstract.Evaluating
+import           Control.Abstract
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -28,7 +27,7 @@ import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
 import           Text.Show (showListWith)
-import           Text.Show.Pretty
+import           Text.Show.Pretty (ppShow)
 
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
@@ -40,26 +39,13 @@ justEvaluating
   . evaluating
   . runPrintingTrace
   . runLoadError
-  . runValueError
   . runUnspecialized
   . runResolutionError
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @Precise
-
-evaluatingWithHoles
-  = runM
-  . evaluating
-  . runPrintingTrace
-  . resumingLoadError
-  . resumingUnspecialized
-  . resumingValueError
-  . resumingEnvironmentError
-  . resumingEvalError
-  . resumingResolutionError
-  . resumingAddressError
-  . runTermEvaluator @_ @Precise
+  . runTermEvaluator @_ @Precise @(Value Precise (Eff _))
+  . runValueError
 
 checking
   = runM @_ @IO
@@ -81,7 +67,6 @@ evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ru
 evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
 evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
 evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript javaScriptPrelude path
-evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path

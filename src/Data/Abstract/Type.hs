@@ -9,7 +9,6 @@ module Data.Abstract.Type
 
 import Control.Abstract
 import Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
 import Data.Semigroup.Foldable (foldMap1)
 import Data.Semigroup.Reducer (Reducer)
 import Prologue hiding (TypeError)
@@ -95,52 +94,71 @@ unify t1 t2
   | t1 == t2  = pure t2
   | otherwise = throwResumable (UnificationError t1 t2)
 
-instance Ord location => ValueRoots location Type where
+instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
 instance AbstractHole Type where
   hole = Hole
 
--- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Members '[ Allocator location Type
-                    , Fresh
-                    , NonDet
-                    , Reader (Environment location Type)
-                    , Resumable (AddressError location Type)
-                    , Resumable (EvalError Type)
-                    , Resumable TypeError
-                    , Return Type
-                    , State (Environment location Type)
-                    , State (Heap location (Cell location) Type)
-                    ] effects
-         , Ord location
-         , Reducer Type (Cell location Type)
+instance AbstractIntro Type where
+  unit       = Unit
+  integer _  = Int
+  boolean _  = Bool
+  string _   = String
+  float _    = Float
+  symbol _   = Symbol
+  rational _ = Rational
+  multiple   = zeroOrMoreProduct
+  hash       = Hash
+  kvPair k v = k :* v
+
+  null        = Null
+
+
+instance ( Member (Allocator address Type) effects
+         , Member Fresh effects
+         , Member (Resumable TypeError) effects
+         , Member (Return Type) effects
+         , Member (State (Environment address)) effects
+         , Member (State (Heap address (Cell address) Type)) effects
+         , Ord address
+         , Reducer Type (Cell address Type)
          )
-      => AbstractValue location Type effects where
+      => AbstractFunction address Type effects where
   closure names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
       tvar <- Var <$> fresh
       assign a tvar
       bimap (Env.insert name a) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    (zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
+    (zeroOrMoreProduct tvars :->) <$> locally (bindAll env *> body `catchReturn` \ (Return value) -> pure value)
 
-  unit       = pure Unit
-  integer _  = pure Int
-  boolean _  = pure Bool
-  string _   = pure String
-  float _    = pure Float
-  symbol _   = pure Symbol
-  rational _ = pure Rational
-  multiple   = pure . zeroOrMoreProduct
+  call op params = do
+    tvar <- fresh
+    paramTypes <- sequenceA params
+    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
+    unified <- op `unify` needed
+    case unified of
+      _ :-> ret -> pure ret
+      gotten    -> throwResumable (UnificationError needed gotten)
+
+
+-- | Discard the value arguments (if any), constructing a 'Type' instead.
+instance ( Member (Allocator address Type) effects
+         , Member Fresh effects
+         , Member NonDet effects
+         , Member (Resumable TypeError) effects
+         , Member (Return Type) effects
+         , Member (State (Environment address)) effects
+         , Member (State (Heap address (Cell address) Type)) effects
+         , Ord address
+         , Reducer Type (Cell address Type)
+         )
+      => AbstractValue address Type effects where
   array fields = do
     var <- fresh
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
-  hash       = pure . Hash
-  kvPair k v = pure (k :* v)
-
-  null          = pure Null
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
@@ -152,9 +170,6 @@ instance ( Members '[ Allocator location Type
     t1 <- fresh
     t2 <- fresh
     unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
-  asBool t   = unify t Bool *> (pure True <|> pure False)
-
-  isHole ty = pure (ty == Hole)
 
   index arr sub = do
     _ <- unify sub Int
@@ -180,14 +195,5 @@ instance ( Members '[ Allocator location Type
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
-
-  call op params = do
-    tvar <- fresh
-    paramTypes <- sequenceA params
-    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
-    unified <- op `unify` needed
-    case unified of
-      _ :-> ret -> pure ret
-      gotten    -> throwResumable (UnificationError needed gotten)
 
   loop f = f empty

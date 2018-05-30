@@ -8,7 +8,7 @@ module Language.Python.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.FreeVariables (name)
+import Data.Abstract.Name (name)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import GHC.Stack
