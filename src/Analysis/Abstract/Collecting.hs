@@ -5,7 +5,6 @@ module Analysis.Abstract.Collecting
 ) where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Semilattice.Lower
@@ -46,7 +45,7 @@ reachable :: ( Ord location
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
-          Just (a, as) -> go (liveInsert a seen) (case heapLookupAll (Address a) heap of
+          Just (a, as) -> go (liveInsert a seen) (case heapLookupAll a heap of
             Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
             _           -> seen)
 

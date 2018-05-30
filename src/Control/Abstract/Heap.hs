@@ -59,7 +59,7 @@ assign :: ( Member (State (Heap location (Cell location) value)) effects
        => Address location value
        -> value
        -> Evaluator location value effects ()
-assign address = modifyHeap . heapInsert address
+assign address = modifyHeap . heapInsert (unAddress address)
 
 
 -- | Look up or allocate an address for a 'Name'.
@@ -122,7 +122,7 @@ data Allocator location value return where
 runAllocator :: (Addressable location effects, Effectful (m location value), Member (Resumable (AddressError location value)) effects, Member (State (Heap location (Cell location) value)) effects) => m location value (Allocator location value ': effects) a -> m location value effects a
 runAllocator = raiseHandler (interpret (\ eff -> case eff of
   Alloc name -> lowerEff $ Address <$> allocCell name
-  Deref addr -> lowerEff $ heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))))
+  Deref addr -> lowerEff $ heapLookup (unAddress addr) <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))))
 
 
 data AddressError location value resume where
