@@ -3,11 +3,11 @@
     (Not
       (Send
         (Identifier)))
-    ([])
+    (Statements)
     (Empty))
   (If
     (Not
       (Send
         (Identifier)))
-    ([])
+    (Statements)
     (Empty)))

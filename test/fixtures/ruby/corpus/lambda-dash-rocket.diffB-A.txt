@@ -8,6 +8,6 @@
       (Empty)
     { (Send
       {-(Identifier)-})
-    ->(
+    ->(Statements
       {+(Integer)+}
       {+(Integer)+}) })))

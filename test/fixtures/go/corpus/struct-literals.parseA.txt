@@ -4,13 +4,13 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Composite
           (Identifier)
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (TextElement))
@@ -24,9 +24,9 @@
             (Empty)
             (Field
               (Identifier)
-              (
+              (Statements
                 (Identifier))))
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (Integer)))))
@@ -36,4 +36,4 @@
           (MemberAccess
             (Identifier)
             (Identifier))
-          ([]))))))
+          (Statements))))))

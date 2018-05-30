@@ -15,7 +15,7 @@
         (Assignment
           (Identifier)
           (Empty)))
-      (
+      (Statements
         (Return
           (MemberAccess
           { (Identifier)

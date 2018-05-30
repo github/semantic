@@ -1,9 +1,9 @@
 (Program
-  (
+  (Statements
     (QualifiedImport)
     (QualifiedAliasedImport
       (Identifier)))
-  (
+  (Statements
     (QualifiedAliasedImport
       (Identifier))
     (QualifiedImport))

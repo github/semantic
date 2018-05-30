@@ -2,17 +2,17 @@
   (Match
     (Send
       (Identifier))
-    (
+    (Statements
       (Pattern
-        (
+        (Statements
           (Send
             (Identifier)))
-        ([]))))
+        (Statements))))
   (Match
     (Empty)
-    (
+    (Statements
       (Pattern
-        (
+        (Statements
           (Boolean))
-        (
+        (Statements
           (TextElement))))))

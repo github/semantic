@@ -21,7 +21,7 @@
         (Assignment
           (Identifier)
           (Empty)))
-      (
+      (Statements
         (Call
           (MemberAccess
             (Identifier)

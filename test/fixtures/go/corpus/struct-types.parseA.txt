@@ -4,45 +4,45 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
-      (
+    (Statements)
+    (Statements
+      (Statements
         (Type
           (Identifier)
           (Constructor
             (Empty)
-            ([]))))
-      (
-        (Type
-          (Identifier)
-          (Constructor
-            (Empty)
-            (Field
-              (Identifier)
-              ([])))))
-      (
+            (Statements))))
+      (Statements
         (Type
           (Identifier)
           (Constructor
             (Empty)
             (Field
               (Identifier)
-              (
+              (Statements)))))
+      (Statements
+        (Type
+          (Identifier)
+          (Constructor
+            (Empty)
+            (Field
+              (Identifier)
+              (Statements
                 (Identifier)
                 (Identifier))))))
-      (
+      (Statements
         (Type
           (Identifier)
           (Constructor
             (Empty)
-            (
+            (Statements
               (Field
-                (
+                (Statements
                   (MemberAccess
                     (Identifier)
                     (Identifier))))
               (Field
                 (Identifier)
                 (TextElement)
-                (
+                (Statements
                   (Identifier))))))))))

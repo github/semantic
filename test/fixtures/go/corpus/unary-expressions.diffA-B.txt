@@ -4,8 +4,8 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
     { (Identifier)
     ->(Identifier) }
       (Negate
@@ -19,7 +19,7 @@
         (Call
         { (Identifier)
         ->(Identifier) }
-          ([])
+          (Statements)
           (Empty)))
       (Complement
       { (Identifier)

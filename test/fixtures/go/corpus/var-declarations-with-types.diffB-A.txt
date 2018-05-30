@@ -4,23 +4,23 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Annotation
-          (
+          (Statements
           { (Identifier)
           ->(Identifier) })
           (Identifier))
         (Integer))
       (Assignment
         (Annotation
-          (
+          (Statements
           { (Identifier)
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
           (Identifier))
-        (
+        (Statements
           (Integer)
           (Integer))))))

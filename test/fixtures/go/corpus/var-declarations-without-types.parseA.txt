@@ -4,7 +4,7 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
       (Identifier)
       (Integer))))

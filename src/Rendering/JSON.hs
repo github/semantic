@@ -52,8 +52,8 @@ data JSONTerm a = JSONTerm { jsonTermBlob :: Blob, jsonTerm :: a }
   deriving (Eq, Show)
 
 instance ToJSON a => ToJSON (JSONTerm a) where
-  toJSON JSONTerm{..} = object ("programNode" .= jsonTerm : toJSONFields jsonTermBlob)
-  toEncoding JSONTerm{..} = pairs (fold ("programNode" .= jsonTerm : toJSONFields jsonTermBlob))
+  toJSON JSONTerm{..} = object ("tree" .= jsonTerm : toJSONFields jsonTermBlob)
+  toEncoding JSONTerm{..} = pairs (fold ("tree" .= jsonTerm : toJSONFields jsonTermBlob))
 
 
 renderJSONAST :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON

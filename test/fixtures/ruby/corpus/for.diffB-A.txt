@@ -1,6 +1,6 @@
 (Program
 {+(ForEach
-  {+(
+  {+(Statements
     {+(Send
       {+(Identifier)+})+})+}
   {+(Send
@@ -8,7 +8,7 @@
   {+(Send
     {+(Identifier)+})+})+}
   (ForEach
-    (
+    (Statements
       (Send
       { (Identifier)
       ->(Identifier) })
@@ -26,7 +26,7 @@
     {-(Send
       {-(Identifier)-})-}))
 {+(ForEach
-  {+(
+  {+(Statements
     {+(Send
       {+(Identifier)+})+})+}
   {+(Enumeration
@@ -35,7 +35,7 @@
     {+(Empty)+})+}
   {+(Boolean)+})+}
 {+(ForEach
-  {+(
+  {+(Statements
     {+(Send
       {+(Identifier)+})+}
     {+(Send

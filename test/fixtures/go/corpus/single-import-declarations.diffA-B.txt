@@ -16,5 +16,5 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([])))
+    (Statements)
+    (Statements)))

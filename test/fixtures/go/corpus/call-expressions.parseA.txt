@@ -4,29 +4,29 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Call
         (Identifier)
-        (
+        (Statements
           (Identifier)
           (Variadic
             (Identifier)))
         (Empty))
       (Call
         (Identifier)
-        (
+        (Statements
           (Identifier)
           (Identifier))
         (Empty))
       (Call
         (Identifier)
-        (
+        (Statements
           (Identifier)
           (Variadic
             (Identifier)))
         (Empty))
       (Call
         (Identifier)
-        ([])
+        (Statements)
         (Empty)))))
