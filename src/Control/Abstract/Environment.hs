@@ -10,6 +10,7 @@ module Control.Abstract.Environment
 , lookupEnv
 , bind
 , bindAll
+, close
 , Env(..)
 , runEnv
 , reinterpretEnv
@@ -67,10 +68,14 @@ bind name addr = send (Bind name (unAddress addr))
 bindAll :: Member (Env location) effects => Environment location -> Evaluator location value effects ()
 bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . Env.pairs
 
+close :: Member (Env location) effects => Set Name -> Evaluator location value effects (Environment location)
+close = send . Close
+
 
 data Env location return where
   Lookup :: Name             -> Env location (Maybe location)
   Bind   :: Name -> location -> Env location ()
+  Close  :: Set Name         -> Env location (Environment location)
   Push   ::                     Env location ()
   Pop    ::                     Env location ()
 
@@ -79,6 +84,7 @@ runEnv :: Member (State (Environment location)) effects => Environment location 
 runEnv defaultEnvironment = interpret $ \case
   Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
   Bind name addr -> modifyEnv (Env.insert name addr)
+  Close names -> Env.intersect names <$> getEnv
   Push -> modifyEnv Env.push
   Pop -> modifyEnv Env.pop
 
@@ -86,6 +92,7 @@ reinterpretEnv :: Environment location -> Evaluator location value (Env location
 reinterpretEnv defaultEnvironment = reinterpret $ \case
   Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
   Bind name addr -> modifyEnv (Env.insert name addr)
+  Close names -> Env.intersect names <$> getEnv
   Push -> modifyEnv Env.push
   Pop -> modifyEnv Env.pop
 
