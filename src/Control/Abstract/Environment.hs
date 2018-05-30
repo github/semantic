@@ -1,7 +1,10 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
+, Exports
 , getEnv
+, getExports
+, addExport
 , lookupEnv
 , bind
 , bindAll
@@ -19,6 +22,7 @@ module Control.Abstract.Environment
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment (Environment)
+import Data.Abstract.Exports
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import Prologue
@@ -26,6 +30,14 @@ import Prologue
 -- | Retrieve the environment.
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
+
+-- | Get the global export state.
+getExports :: Member (State (Exports address)) effects => Evaluator address value effects (Exports address)
+getExports = get
+
+-- | Add an export to the global export state.
+addExport :: Member (State (Exports address)) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
+addExport name alias = modify' . insert name alias
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
