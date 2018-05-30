@@ -27,9 +27,9 @@ instance Show Monovariant where
 
 
 data Located address = Located
-  { location        :: address
-  , locationPackage :: {-# UNPACK #-} !PackageInfo
-  , locationModule  :: !ModuleInfo
+  { address        :: address
+  , addressPackage :: {-# UNPACK #-} !PackageInfo
+  , addressModule  :: !ModuleInfo
   }
   deriving (Eq, Ord, Show)
 
