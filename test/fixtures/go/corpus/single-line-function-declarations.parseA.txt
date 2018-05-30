@@ -4,39 +4,39 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([]))
+    (Statements)
+    (Statements))
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Call
       (Identifier)
-      ([])
+      (Statements)
       (Empty)))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Call
         (Identifier)
-        ([])
+        (Statements)
         (Empty))
       (Call
         (Identifier)
-        ([])
+        (Statements)
         (Empty))))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Call
         (Identifier)
-        ([])
+        (Statements)
         (Empty))
       (Call
         (Identifier)
-        ([])
+        (Statements)
         (Empty)))))

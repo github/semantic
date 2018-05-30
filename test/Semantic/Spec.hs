@@ -18,6 +18,6 @@ spec = parallel $ do
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTask $ runParse SExpressionTermRenderer [methodsBlob]
-      output `shouldBe` "(Program\n  (Method\n    (Empty)\n    (Identifier)\n    ([])))\n"
+      output `shouldBe` "(Program\n  (Method\n    (Empty)\n    (Identifier)\n    (Statements)))\n"
   where
     methodsBlob = Blob "def foo\nend\n" "methods.rb" (Just Ruby)

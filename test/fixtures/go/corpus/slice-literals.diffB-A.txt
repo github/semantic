@@ -4,20 +4,21 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Composite
           (Slice
             (Identifier))
-          ({-(TextElement)-})))
+          (Statements
+          {-(TextElement)-})))
       (Assignment
         (Identifier)
         (Composite
           (Slice
             (Identifier))
-          (
+          (Statements
           { (TextElement)
           ->(TextElement) })))
       (Assignment
@@ -25,7 +26,7 @@
         (Composite
           (Slice
             (Identifier))
-          (
+          (Statements
           { (TextElement)
           ->(TextElement) }
           { (TextElement)

@@ -13,7 +13,7 @@
         {-(TypeIdentifier)-})-}
       {-(Identifier)-}
       {-(Empty)-})
-    ->([]) }))
+    ->(Statements) }))
   (AmbientDeclaration
   { (VariableDeclaration
     {-(Assignment
@@ -99,7 +99,7 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (
+      (Statements
         (MethodSignature
           (Empty)
           (Empty)

@@ -6,6 +6,7 @@ import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
 import           Data.Abstract.Path
+import           Data.Aeson
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
@@ -18,10 +19,10 @@ import           Prologue
 import           System.FilePath.Posix
 
 data Relative = Relative | NonRelative
-  deriving (Eq, Generic, Hashable, Ord, Show)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
-  deriving (Eq, Generic, Hashable, Ord, Show)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 importPath :: ByteString -> ImportPath
 importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)

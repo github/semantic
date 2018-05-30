@@ -1,7 +1,7 @@
 (Program
   (Package
     (Identifier))
-  (
+  (Statements
     (Assignment
       (Identifier)
     { (Rune)

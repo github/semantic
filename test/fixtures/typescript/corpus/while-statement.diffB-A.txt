@@ -2,7 +2,7 @@
   (While
   { (Identifier)
   ->(Identifier) }
-    (
+    (Statements
       (Call
       { (Identifier)
       ->(Identifier) }
