@@ -6,7 +6,6 @@ module Control.Abstract.Environment
 , withEnv
 , withDefaultEnvironment
 , fullEnvironment
-, localEnv
 , lookupEnv
 , bind
 , bindAll
@@ -54,13 +53,6 @@ withDefaultEnvironment e = local (const e)
 fullEnvironment :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Evaluator location value effects (Environment location)
 fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
 
--- | Run an action with a locally-modified environment.
-localEnv :: Member (State (Environment location)) effects => (Environment location -> Environment location) -> Evaluator location value effects a -> Evaluator location value effects a
-localEnv f a = do
-  modifyEnv (f . Env.push)
-  result <- a
-  result <$ modifyEnv Env.pop
-
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (fmap Address . Env.lookup name <$> getEnv) <*> (fmap Address . Env.lookup name <$> defaultEnvironment)
@@ -71,6 +63,7 @@ bind name = modifyEnv . Env.insert name . unAddress
 bindAll :: Member (State (Environment location)) effects => Environment location -> Evaluator location value effects ()
 bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . pairs
 
+-- | Run an action in a new local environment.
 locally :: Member (State (Environment location)) effects => Evaluator location value effects a -> Evaluator location value effects a
 locally a = do
   modifyEnv Env.push
