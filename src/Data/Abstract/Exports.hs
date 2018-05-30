@@ -23,7 +23,7 @@ null :: Exports location -> Bool
 null = Map.null . unExports
 
 toEnvironment :: Exports location -> Environment location
-toEnvironment exports = unpairs (mapMaybe (traverse (fmap Address)) (toList (unExports exports)))
+toEnvironment exports = unpairs (mapMaybe sequenceA (toList (unExports exports)))
 
 insert :: Name -> Name -> Maybe (Address location value) -> Exports location -> Exports location
 insert name alias address = Exports . Map.insert name (alias, unAddress <$> address) . unExports

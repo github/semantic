@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
+import Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.ByteString.Char8 (unpack)
@@ -95,7 +96,7 @@ instance Evaluatable Let where
   eval Let{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
-    Rval <$> localEnv (Env.insert name addr) (subtermValue letBody)
+    Rval <$> localEnv (Env.insert name (unAddress addr)) (subtermValue letBody)
 
 
 -- Assignment
@@ -119,7 +120,7 @@ instance Evaluatable Assignment where
       LvalLocal nam -> do
         addr <- lookupOrAlloc nam
         assign addr rhs
-        modifyEnv (Env.insert nam addr)
+        modifyEnv (Env.insert nam (unAddress addr))
       LvalMember _ _ ->
         -- we don't yet support mutable object properties:
         pure ()

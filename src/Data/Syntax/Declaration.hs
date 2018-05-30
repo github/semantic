@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
+import Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.JSON.Fields
@@ -27,7 +28,7 @@ instance Evaluatable Function where
   eval Function{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
     (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermValue functionBody))
-    modifyEnv (Env.insert name addr)
+    modifyEnv (Env.insert name (unAddress addr))
     pure (Rval v)
     where paramNames = foldMap (freeVariables . subterm)
 
@@ -53,7 +54,7 @@ instance Evaluatable Method where
   eval Method{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
     (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermValue methodBody))
-    modifyEnv (Env.insert name addr)
+    modifyEnv (Env.insert name (unAddress addr))
     pure (Rval v)
     where paramNames = foldMap (freeVariables . subterm)
 
@@ -187,7 +188,7 @@ instance Evaluatable Class where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    Rval <$> (v <$ modifyEnv (Env.insert name addr))
+    Rval <$> (v <$ modifyEnv (Env.insert name (unAddress addr)))
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -278,7 +279,7 @@ instance Evaluatable TypeAlias where
     v <- subtermValue typeAliasKind
     addr <- lookupOrAlloc name
     assign addr v
-    Rval <$> (modifyEnv (Env.insert name addr) $> v)
+    Rval <$> (modifyEnv (Env.insert name (unAddress addr)) $> v)
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier

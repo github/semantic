@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
+import           Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
@@ -252,7 +253,7 @@ instance Evaluatable QualifiedExportFrom where
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
-      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
+      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just . Address) address
     pure (Rval unit)
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
@@ -272,7 +273,7 @@ instance Evaluatable DefaultExport where
         addr <- lookupOrAlloc name
         assign addr v
         addExport name name Nothing
-        void $ modifyEnv (Env.insert name addr)
+        void $ modifyEnv (Env.insert name (unAddress addr))
       Nothing -> throwEvalError DefaultExportError
     pure (Rval unit)
 
@@ -852,7 +853,7 @@ instance Evaluatable AbstractClass where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    Rval <$> (v <$ modifyEnv (Env.insert name addr))
+    Rval <$> (v <$ modifyEnv (Env.insert name (unAddress addr)))
 
 
 data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }

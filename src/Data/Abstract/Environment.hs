@@ -18,7 +18,6 @@ module Data.Abstract.Environment
   , roots
   ) where
 
-import           Data.Abstract.Address
 import           Data.Abstract.Live
 import           Data.Abstract.Name
 import           Data.Align
@@ -72,22 +71,22 @@ mergeNewer (Environment a) (Environment b) =
 --
 -- >>> pairs shadowed
 -- [("foo",Precise 1)]
-pairs :: Environment location -> [(Name, Address location value)]
-pairs = map (second Address) . Map.toList . fold . unEnvironment
+pairs :: Environment location -> [(Name, location)]
+pairs = Map.toList . fold . unEnvironment
 
-unpairs :: [(Name, Address location value)] -> Environment location
-unpairs = Environment . pure . Map.fromList . map (second unAddress)
+unpairs :: [(Name, location)] -> Environment location
+unpairs = Environment . pure . Map.fromList
 
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
 -- Just (Precise 1)
-lookup :: Name -> Environment location -> Maybe (Address location value)
-lookup k = fmap Address . foldMapA (Map.lookup k) . unEnvironment
+lookup :: Name -> Environment location -> Maybe location
+lookup name = foldMapA (Map.lookup name) . unEnvironment
 
 -- | Insert a 'Name' in the environment.
-insert :: Name -> Address location value -> Environment location -> Environment location
-insert name (Address value) (Environment (a :| as)) = Environment (Map.insert name value a :| as)
+insert :: Name -> location -> Environment location -> Environment location
+insert name addr (Environment (a :| as)) = Environment (Map.insert name addr a :| as)
 
 -- | Remove a 'Name' from the environment.
 --
@@ -122,7 +121,7 @@ roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live lo
 roots env names = addresses (bind names env)
 
 addresses :: Ord location => Environment location -> Live location
-addresses = fromAddresses . map (unAddress . snd) . pairs
+addresses = fromAddresses . map snd . pairs
 
 
 instance Lower (Environment location) where lowerBound = emptyEnv

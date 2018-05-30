@@ -67,7 +67,7 @@ localize = localEnv id
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
-lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
+lookupEnv name = (<|>) <$> (fmap Address . Env.lookup name <$> getEnv) <*> (fmap Address . Env.lookup name <$> defaultEnvironment)
 
 
 -- | Errors involving the environment.
