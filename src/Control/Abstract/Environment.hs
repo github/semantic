@@ -3,7 +3,6 @@ module Control.Abstract.Environment
 ( Environment
 , Exports
 , getEnv
-, getExports
 , export
 , lookupEnv
 , bind
@@ -31,10 +30,6 @@ import Prologue
 -- | Retrieve the environment.
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
-
--- | Get the global export state.
-getExports :: Member (State (Exports address)) effects => Evaluator address value effects (Exports address)
-getExports = get
 
 -- | Add an export to the global export state.
 export :: Member (State (Exports address)) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
