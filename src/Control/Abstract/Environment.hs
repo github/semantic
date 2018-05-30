@@ -12,6 +12,7 @@ module Control.Abstract.Environment
 , Env(..)
 , runEnv
 , reinterpretEnv
+, runEnvState
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -75,11 +76,10 @@ data Env address return where
 
 handleEnv :: forall address effects value result
            . Member (State (Environment address)) effects
-          => Environment address
-          -> Env address result
+          => Env address result
           -> Evaluator address value effects result
-handleEnv defaultEnvironment = \case
-  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> get
+handleEnv = \case
+  Lookup name -> Env.lookup name <$> get
   Bind name addr -> modify (Env.insert name addr)
   Close names -> Env.intersect names <$> get
   Push -> modify (Env.push @address)
@@ -88,15 +88,26 @@ handleEnv defaultEnvironment = \case
   PutEnv e -> put e
 
 runEnv :: Member (State (Environment address)) effects
-       => Environment address
-       -> Evaluator address value (Env address ': effects) a
+       => Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects a
-runEnv defaultEnvironment = interpret (handleEnv defaultEnvironment)
+runEnv = interpret handleEnv
 
-reinterpretEnv :: Environment address
-               -> Evaluator address value (Env address ': effects) a
+reinterpretEnv :: Evaluator address value (Env address ': effects) a
                -> Evaluator address value (State (Environment address) ': effects) a
-reinterpretEnv defaultEnvironment = reinterpret (handleEnv defaultEnvironment)
+reinterpretEnv = reinterpret handleEnv
+
+runEnvState :: forall address value effects a
+            .  Environment address
+            -> Evaluator address value (Env address ': effects) a
+            -> Evaluator address value effects (a, Environment address)
+runEnvState initial = relayState initial (\ s a -> pure (a, s)) $ \ s eff yield -> case eff of
+  Lookup name -> yield s (Env.lookup name s)
+  Bind name addr -> yield (Env.insert name addr s) ()
+  Close names -> yield s (Env.intersect names s)
+  Push -> yield (Env.push @address s) ()
+  Pop -> yield (Env.pop @address s) ()
+  GetEnv -> yield s s
+  PutEnv e -> yield e ()
 
 
 -- | Errors involving the environment.
