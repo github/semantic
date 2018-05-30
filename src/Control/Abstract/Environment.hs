@@ -22,9 +22,10 @@ module Control.Abstract.Environment
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment (Environment)
-import Data.Abstract.Exports
 import qualified Data.Abstract.Environment as Env
+import Data.Abstract.Exports as Exports
 import Data.Abstract.Name
+import Data.Semilattice.Lower
 import Prologue
 
 -- | Retrieve the environment.
@@ -69,9 +70,12 @@ data Env address return where
   Push   ::                    Env address ()
   Pop    ::                    Env address ()
   GetEnv ::                    Env address (Environment address)
+  Export :: Name -> Name -> Maybe address -> Env address ()
 
 handleEnv :: forall address effects value result
-           . Member (State (Environment address)) effects
+          .  ( Member (State (Environment address)) effects
+             , Member (State (Exports address)) effects
+             )
           => Env address result
           -> Evaluator address value effects result
 handleEnv = \case
@@ -81,20 +85,23 @@ handleEnv = \case
   Push -> modify (Env.push @address)
   Pop -> modify (Env.pop @address)
   GetEnv -> get
+  Export name alias addr -> modify (Exports.insert name alias addr)
 
-runEnv :: Member (State (Environment address)) effects
+runEnv :: ( Member (State (Environment address)) effects
+          , Member (State (Exports address)) effects
+          )
        => Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects a
 runEnv = interpret handleEnv
 
 reinterpretEnv :: Evaluator address value (Env address ': effects) a
-               -> Evaluator address value (State (Environment address) ': effects) a
-reinterpretEnv = reinterpret handleEnv
+               -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
+reinterpretEnv = reinterpret2 handleEnv
 
 runEnvState :: Environment address
             -> Evaluator address value (Env address ': effects) a
             -> Evaluator address value effects (a, Environment address)
-runEnvState initial = runState initial . reinterpretEnv
+runEnvState initial = fmap fst . runState lowerBound . runState initial . reinterpretEnv
 
 
 -- | Errors involving the environment.
