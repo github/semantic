@@ -17,11 +17,11 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: ( Member (Modules location value) effects
+resolveRubyName :: ( Member (Modules address value) effects
                    , Member (Resumable ResolutionError) effects
                    )
                 => ByteString
-                -> Evaluator location value effects M.ModulePath
+                -> Evaluator address value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
@@ -29,11 +29,11 @@ resolveRubyName name = do
   maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: ( Member (Modules location value) effects
+resolveRubyPath :: ( Member (Modules address value) effects
                    , Member (Resumable ResolutionError) effects
                    )
                 => ByteString
-                -> Evaluator location value effects M.ModulePath
+                -> Evaluator address value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
@@ -77,11 +77,11 @@ instance Evaluatable Require where
     bindAll importedEnv
     pure (Rval v) -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: ( AbstractValue location value effects
-             , Member (Modules location value) effects
+doRequire :: ( AbstractValue address value effects
+             , Member (Modules address value) effects
              )
           => M.ModulePath
-          -> Evaluator location value effects (Environment location, value)
+          -> Evaluator address value effects (Environment address, value)
 doRequire path = do
   result <- join <$> lookupModule path
   case result of
@@ -108,16 +108,16 @@ instance Evaluatable Load where
     Rval <$> doLoad path shouldWrap
   eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
-doLoad :: ( AbstractValue location value effects
-          , Member (Modules location value) effects
+doLoad :: ( AbstractValue address value effects
+          , Member (Modules address value) effects
           , Member (Resumable ResolutionError) effects
-          , Member (State (Environment location)) effects
-          , Member (State (Exports location)) effects
+          , Member (State (Environment address)) effects
+          , Member (State (Exports address)) effects
           , Member Trace effects
           )
        => ByteString
        -> Bool
-       -> Evaluator location value effects value
+       -> Evaluator address value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'

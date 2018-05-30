@@ -29,14 +29,14 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . BC.pack . takeFileName . unPath
 
-resolveGoImport :: ( Member (Modules location value) effects
+resolveGoImport :: ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Package.PackageInfo) effects
                    , Member (Resumable ResolutionError) effects
                    , Member Trace effects
                    )
                 => ImportPath
-                -> Evaluator location value effects [ModulePath]
+                -> Evaluator address value effects [ModulePath]
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)

@@ -52,13 +52,13 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: ( Member (Modules location value) effects
+resolvePythonModules :: ( Member (Modules address value) effects
                         , Member (Reader ModuleInfo) effects
                         , Member (Resumable ResolutionError) effects
                         , Member Trace effects
                         )
                      => QualifiedName
-                     -> Evaluator location value effects (NonEmpty ModulePath)
+                     -> Evaluator address value effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -127,17 +127,17 @@ instance Evaluatable Import where
 
 
 -- Evaluate a qualified import
-evalQualifiedImport :: ( AbstractValue location value effects
-                       , Member (Allocator location value) effects
-                       , Member (Modules location value) effects
-                       , Member (Reader (Environment location)) effects
-                       , Member (State (Environment location)) effects
-                       , Member (State (Exports location)) effects
-                       , Member (State (Heap location (Cell location) value)) effects
-                       , Ord location
-                       , Reducer.Reducer value (Cell location value)
+evalQualifiedImport :: ( AbstractValue address value effects
+                       , Member (Allocator address value) effects
+                       , Member (Modules address value) effects
+                       , Member (Reader (Environment address)) effects
+                       , Member (State (Environment address)) effects
+                       , Member (State (Exports address)) effects
+                       , Member (State (Heap address (Cell address) value)) effects
+                       , Ord address
+                       , Reducer.Reducer value (Cell address value)
                        )
-                    => Name -> ModulePath -> Evaluator location value effects value
+                    => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require path)
   bindAll importedEnv
