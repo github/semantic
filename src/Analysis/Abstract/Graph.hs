@@ -54,7 +54,7 @@ style = (defaultStyle (byteString . vertexName))
 graphingTerms :: ( Element Syntax.Identifier syntax
                  , Member (Reader (Environment (Hole (Located address)))) effects
                  , Member (Reader ModuleInfo) effects
-                 , Member (State (Environment (Hole (Located address)))) effects
+                 , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
                  , term ~ Term (Sum syntax) ann
                  )
@@ -122,7 +122,7 @@ moduleInclusion v = do
 
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Member (Reader (Environment (Hole (Located address)))) effects
-                      , Member (State (Environment (Hole (Located address)))) effects
+                      , Member (Env (Hole (Located address))) effects
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name

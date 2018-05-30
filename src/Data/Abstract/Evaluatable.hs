@@ -147,7 +147,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
 
 -- | Isolate the given action with an empty global environment and exports.
-isolate :: (Member (State (Environment address)) effects, Member (State (Exports address)) effects) => Evaluator address value effects a -> Evaluator address value effects a
+isolate :: (Member (Env address) effects, Member (State (Exports address)) effects) => Evaluator address value effects a -> Evaluator address value effects a
 isolate = withEnv lowerBound . withExports lowerBound
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()

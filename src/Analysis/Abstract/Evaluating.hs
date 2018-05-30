@@ -34,6 +34,6 @@ evaluating
   . runState lowerBound -- State (Exports address)
   . runState lowerBound -- State (ModuleTable (Maybe (Environment address, value)))
   . runState lowerBound -- State (Heap address (Cell address) value)
-  . runState lowerBound -- State (Environment address)
+  . runState lowerBound -- Env address
   . runFresh 0
   . runFail

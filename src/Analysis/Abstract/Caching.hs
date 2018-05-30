@@ -62,7 +62,7 @@ cachingTerms :: ( Cacheable term address (Cell address) value
                 , Member (Reader (Cache term address (Cell address) value)) effects
                 , Member (Reader (Live address)) effects
                 , Member (State (Cache term address (Cell address) value)) effects
-                , Member (State (Environment address)) effects
+                , Member (Env address) effects
                 , Member (State (Heap address (Cell address) value)) effects
                 )
              => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef value))
@@ -86,7 +86,7 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (Reader (Live address)) effects
                      , Member (Resumable (EnvironmentError address)) effects
                      , Member (State (Cache term address (Cell address) value)) effects
-                     , Member (State (Environment address)) effects
+                     , Member (Env address) effects
                      , Member (State (Heap address (Cell address) value)) effects
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects value)
