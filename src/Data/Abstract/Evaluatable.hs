@@ -118,8 +118,9 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (value, Environment address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
-          v <- maybe unit snd <$> require m
-          maybe (pure v) ((`call` []) <=< variable) sym
+          (env, value) <- fromMaybe (emptyEnv, unit) <$> require m
+          bindAll env
+          maybe (pure value) ((`call` []) <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
           (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
