@@ -60,7 +60,7 @@ cachingTerms :: ( Cacheable term location (Cell location) value
                 , Corecursive term
                 , Member NonDet effects
                 , Member (Reader (Cache term location (Cell location) value)) effects
-                , Member (Reader (Live location value)) effects
+                , Member (Reader (Live location)) effects
                 , Member (State (Cache term location (Cell location) value)) effects
                 , Member (State (Environment location)) effects
                 , Member (State (Heap location (Cell location) value)) effects
@@ -83,7 +83,7 @@ convergingModules :: ( AbstractValue location value effects
                      , Member NonDet effects
                      , Member (Reader (Cache term location (Cell location) value)) effects
                      , Member (Reader (Environment location)) effects
-                     , Member (Reader (Live location value)) effects
+                     , Member (Reader (Live location)) effects
                      , Member (Resumable (EnvironmentError location)) effects
                      , Member (State (Cache term location (Cell location) value)) effects
                      , Member (State (Environment location)) effects

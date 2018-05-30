@@ -19,7 +19,6 @@ import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
 import Data.Abstract.Live (Live)
 import Data.Abstract.Name
@@ -167,7 +166,7 @@ forLoop :: ( AbstractValue location value effects
         -> Evaluator location value effects value -- ^ Body
         -> Evaluator location value effects value
 forLoop initial cond step body =
-  localize (initial *> while cond (body *> step))
+  locally (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
 while :: AbstractValue location value effects
@@ -194,7 +193,7 @@ makeNamespace :: ( AbstractValue location value effects
                  , Reducer value (Cell location value)
                  )
               => Name
-              -> Address location value
+              -> location
               -> Maybe value
               -> Evaluator location value effects value
 makeNamespace name addr super = do
@@ -214,7 +213,7 @@ evaluateInScopedEnv :: ( AbstractValue location value effects
                     -> Evaluator location value effects value
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvTerm >>= scopedEnvironment
-  maybe term (flip localEnv term . mergeEnvs) scopedEnv
+  maybe term (\ env -> locally (bindAll env *> term)) scopedEnv
 
 
 -- | Evaluates a 'Value' returning the referenced value
@@ -245,4 +244,4 @@ subtermValue = value <=< subtermRef
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots location value where
   -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: value -> Live location value
+  valueRoots :: value -> Live location

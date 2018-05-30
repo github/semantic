@@ -71,7 +71,7 @@ instance Evaluatable Import where
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
       importedEnv <- maybe emptyEnv fst <$> isolate (require path)
-      modifyEnv (mergeEnvs importedEnv)
+      bindAll importedEnv
     pure (Rval unit)
 
 
@@ -95,7 +95,7 @@ instance Evaluatable QualifiedImport where
       for_ paths $ \p -> do
         traceResolve (unPath importPath) p
         importedEnv <- maybe emptyEnv fst <$> isolate (require p)
-        modifyEnv (mergeEnvs importedEnv)
+        bindAll importedEnv
       makeNamespace alias addr Nothing
     pure (Rval unit)
 

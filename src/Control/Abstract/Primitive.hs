@@ -6,7 +6,6 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Value
-import Data.Abstract.Environment
 import Data.Abstract.Name
 import Data.ByteString.Char8 (pack, unpack)
 import Data.Semigroup.Reducer hiding (unit)
@@ -28,7 +27,7 @@ builtin :: ( HasCallStack
 builtin s def = withCurrentCallStack callStack $ do
   let name' = name (pack ("__semantic_" <> s))
   addr <- alloc name'
-  modifyEnv (insert name' addr)
+  bind name' addr
   def >>= assign addr
 
 lambda :: (AbstractFunction location value effects, Member Fresh effects)

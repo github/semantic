@@ -1,7 +1,7 @@
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
-  , bind
+  , intersect
   , delete
   , head
   , emptyEnv
@@ -18,7 +18,6 @@ module Data.Abstract.Environment
   , roots
   ) where
 
-import           Data.Abstract.Address
 import           Data.Abstract.Live
 import           Data.Abstract.Name
 import           Data.Align
@@ -29,8 +28,9 @@ import           Prelude hiding (head, lookup)
 import           Prologue
 
 -- $setup
--- >>> let bright = push (insert (name "foo") (Address (Precise 0)) emptyEnv)
--- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
+-- >>> import Data.Abstract.Address
+-- >>> let bright = push (insert (name "foo") (Precise 0) emptyEnv)
+-- >>> let shadowed = insert (name "foo") (Precise 1) bright
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
@@ -72,22 +72,22 @@ mergeNewer (Environment a) (Environment b) =
 --
 -- >>> pairs shadowed
 -- [("foo",Precise 1)]
-pairs :: Environment location -> [(Name, Address location value)]
-pairs = map (second Address) . Map.toList . fold . unEnvironment
+pairs :: Environment location -> [(Name, location)]
+pairs = Map.toList . fold . unEnvironment
 
-unpairs :: [(Name, Address location value)] -> Environment location
-unpairs = Environment . pure . Map.fromList . map (second unAddress)
+unpairs :: [(Name, location)] -> Environment location
+unpairs = Environment . pure . Map.fromList
 
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
 -- Just (Precise 1)
-lookup :: Name -> Environment location -> Maybe (Address location value)
-lookup k = fmap Address . foldMapA (Map.lookup k) . unEnvironment
+lookup :: Name -> Environment location -> Maybe location
+lookup name = foldMapA (Map.lookup name) . unEnvironment
 
 -- | Insert a 'Name' in the environment.
-insert :: Name -> Address location value -> Environment location -> Environment location
-insert name (Address value) (Environment (a :| as)) = Environment (Map.insert name value a :| as)
+insert :: Name -> location -> Environment location -> Environment location
+insert name addr (Environment (a :| as)) = Environment (Map.insert name addr a :| as)
 
 -- | Remove a 'Name' from the environment.
 --
@@ -100,8 +100,8 @@ trim :: Environment location -> Environment location
 trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
-bind :: Foldable t => t Name -> Environment location -> Environment location
-bind names env = unpairs (mapMaybe lookupName (toList names))
+intersect :: Foldable t => t Name -> Environment location -> Environment location
+intersect names env = unpairs (mapMaybe lookupName (toList names))
   where
     lookupName name = (,) name <$> lookup name env
 
@@ -118,10 +118,10 @@ overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
 --   Unbound names are silently dropped.
-roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live location value
-roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
+roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live location
+roots env names = addresses (names `intersect` env)
 
-addresses :: Ord location => Environment location -> Live location value
+addresses :: Ord location => Environment location -> Live location
 addresses = fromAddresses . map snd . pairs
 
 
