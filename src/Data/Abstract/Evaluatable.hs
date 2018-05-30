@@ -85,7 +85,6 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (LoadError address value)) outer
-                       , Member (State (Environment address)) outer
                        , Member (State (Exports address)) outer
                        , Member (State (Heap address (Cell address) value)) outer
                        , Member (State (ModuleTable (Maybe (Environment address, value)))) outer
@@ -98,7 +97,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                     => (SubtermAlgebra Module      term (TermEvaluator term address value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner value))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)))
                     -> Package term
-                    -> TermEvaluator term address value outer [value]
+                    -> TermEvaluator term address value outer [(value, Environment address)]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
@@ -119,22 +118,22 @@ evaluatePackageWith analyzeModule analyzeTerm package
         runInModule preludeEnv info
           = runReader info
           . raiseHandler runAllocator
-          . raiseHandler (runEnv preludeEnv)
+          . raiseHandler (runEnvState preludeEnv)
           . raiseHandler runReturn
           . raiseHandler runLoopControl
 
-        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' value
+        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (value, Environment address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
           v <- maybe unit snd <$> require m
           maybe (pure v) ((`call` []) <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
           _ <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
-          fst <$> evalModule emptyEnv prelude
+          evalModule emptyEnv prelude
 
         withPrelude Nothing f = f emptyEnv
         withPrelude (Just prelude) f = do
-          preludeEnv <- evalPrelude prelude
+          (_, preludeEnv) <- evalPrelude prelude
           f preludeEnv
 
         -- TODO: If the set of exports is empty because no exports have been
@@ -143,7 +142,10 @@ evaluatePackageWith analyzeModule analyzeTerm package
         filterEnv ports env
           | Exports.null ports = env
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-        pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator (get @(Environment address)))
+        pairValueWithEnv action = do
+          (a, env) <- action
+          filtered <- filterEnv <$> TermEvaluator getExports <*> pure env
+          pure (a, filtered)
 
 
 -- | Isolate the given action with an empty global environment and exports.
