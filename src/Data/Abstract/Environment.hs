@@ -119,7 +119,7 @@ overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
 --
 --   Unbound names are silently dropped.
 roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live location value
-roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
+roots env names = addresses (bind names env)
 
 addresses :: Ord location => Environment location -> Live location value
 addresses = fromAddresses . map snd . pairs
