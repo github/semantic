@@ -2,6 +2,7 @@
 module Data.Abstract.Value where
 
 import Control.Abstract
+import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
@@ -56,12 +57,12 @@ instance AbstractHole (Value location body) where
 
 instance ( Coercible body (Eff effects)
          , Member (Allocator location (Value location body)) effects
+         , Member (Env location) effects
          , Member Fresh effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError location body)) effects
          , Member (Return (Value location body)) effects
-         , Member (State (Environment location)) effects
          , Member (State (Heap location (Cell location) (Value location body))) effects
          , Ord location
          , Reducer (Value location body) (Cell location (Value location body))
@@ -72,7 +73,7 @@ instance ( Coercible body (Eff effects)
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) . Env.intersect (foldr Set.delete freeVariables parameters) <$> getEnv
+    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) <$> close (foldr Set.delete freeVariables parameters)
 
   call op params = do
     case op of
@@ -81,11 +82,11 @@ instance ( Coercible body (Eff effects)
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
-            v <- param
-            a <- alloc name
-            assign a v
-            Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
+            value <- param
+            addr <- alloc name
+            assign addr value
+            Env.insert name (unAddress addr) <$> rest) (pure env) (zip names params)
+          locally (bindAll bindings >> raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
       _ -> throwValueError (CallError op)
 
 
@@ -109,14 +110,13 @@ instance Show location => AbstractIntro (Value location body) where
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Member (Allocator location (Value location body)) effects
+         , Member (Env location) effects
          , Member Fresh effects
          , Member (LoopControl (Value location body)) effects
-         , Member (Reader (Environment location)) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError location body)) effects
          , Member (Return (Value location body)) effects
-         , Member (State (Environment location)) effects
          , Member (State (Heap location (Cell location) (Value location body))) effects
          , Ord location
          , Reducer (Value location body) (Cell location (Value location body))
