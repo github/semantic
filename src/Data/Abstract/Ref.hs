@@ -14,4 +14,4 @@ data ValueRef value where
   deriving (Eq, Ord, Show)
 
 
-data Ref address value = Ref address
+newtype Ref address value = Ref address
