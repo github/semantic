@@ -167,7 +167,7 @@ forLoop :: ( AbstractValue location value effects
         -> Evaluator location value effects value -- ^ Body
         -> Evaluator location value effects value
 forLoop initial cond step body =
-  localize (initial *> while cond (body *> step))
+  localEnv id (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
 while :: AbstractValue location value effects

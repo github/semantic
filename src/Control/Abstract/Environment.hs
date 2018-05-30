@@ -7,7 +7,6 @@ module Control.Abstract.Environment
 , withDefaultEnvironment
 , fullEnvironment
 , localEnv
-, localize
 , lookupEnv
 , bind
 , bindAll
@@ -60,10 +59,6 @@ localEnv f a = do
   modifyEnv (f . Env.push)
   result <- a
   result <$ modifyEnv Env.pop
-
--- | Run a computation in a new local environment.
-localize :: Member (State (Environment location)) effects => Evaluator location value effects a -> Evaluator location value effects a
-localize = localEnv id
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
