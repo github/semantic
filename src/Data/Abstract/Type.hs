@@ -121,7 +121,7 @@ instance ( Member (Allocator address Type) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Heap location (Cell address) Type)) effects
+         , Member (State (Heap address (Cell address) Type)) effects
          , Ord address
          , Reducer Type (Cell address Type)
          )
@@ -151,7 +151,7 @@ instance ( Member (Allocator address Type) effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Heap location (Cell address) Type)) effects
+         , Member (State (Heap address (Cell address) Type)) effects
          , Ord address
          , Reducer Type (Cell address Type)
          )

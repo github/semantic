@@ -71,7 +71,11 @@ data Env address return where
   Push   ::                     Env address ()
   Pop    ::                     Env address ()
 
-handleEnv :: Member (Env address) effects => Environment address -> Env address result -> Evaluator address value effects result
+handleEnv :: forall address effects value result
+           . Member (State (Environment address)) effects
+          => Environment address
+          -> Env address result
+          -> Evaluator address value effects result
 handleEnv defaultEnvironment = \case
   Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
   Bind name addr -> modifyEnv (Env.insert name addr)
@@ -79,10 +83,15 @@ handleEnv defaultEnvironment = \case
   Push -> modifyEnv Env.push
   Pop -> modifyEnv Env.pop
 
-runEnv :: Member (Env address) effects => Environment address -> Evaluator address value (Env address ': effects) a -> Evaluator address value effects a
+runEnv :: Member (State (Environment address)) effects
+       => Environment address
+       -> Evaluator address value (Env address ': effects) a
+       -> Evaluator address value effects a
 runEnv defaultEnvironment = interpret (handleEnv defaultEnvironment)
 
-reinterpretEnv :: Environment address -> Evaluator address value (Env address ': effects) a -> Evaluator address value (Env address ': effects) a
+reinterpretEnv :: Environment address
+               -> Evaluator address value (Env address ': effects) a
+               -> Evaluator address value (State (Environment address) ': effects) a
 reinterpretEnv defaultEnvironment = reinterpret (handleEnv defaultEnvironment)
 
 
