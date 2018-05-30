@@ -85,7 +85,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (LoadError address value)) outer
-                       , Member (Env address) outer
+                       , Member (State (Environment address)) outer
                        , Member (State (Exports address)) outer
                        , Member (State (Heap address (Cell address) value)) outer
                        , Member (State (ModuleTable (Maybe (Environment address, value)))) outer
@@ -143,7 +143,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
         filterEnv ports env
           | Exports.null ports = env
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-        pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator getEnv)
+        pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator (get @(Environment address)))
 
 
 -- | Isolate the given action with an empty global environment and exports.
