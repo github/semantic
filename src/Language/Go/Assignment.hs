@@ -113,7 +113,7 @@ assignment :: Assignment
 assignment = handleError program <|> parseError
 
 program :: Assignment
-program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program . fromList <$> manyTerm expression)
+program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> manyStatements expression)
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
@@ -360,7 +360,7 @@ defaultExpressionCase :: Assignment
 defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> (Go.Syntax.DefaultPattern <$ source <*> (expressions <|> emptyTerm))
 
 callExpression :: Assignment
-callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> expression <*> manyTerm expression <*> emptyTerm)
+callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call [] <$> expression <*> manyTerm expression <*> emptyTerm)
 
 expressionCase :: Assignment
 expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children expressions <*> expressions)
@@ -606,11 +606,14 @@ manyTermsTill step end = manyTill (step <|> comment) end
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm = many . term
 
--- | Match a term and contextualize any comments preceeding or proceeding the term.
-term :: Assignment -> Assignment
-term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
+manyStatements expr = fromList <$> (manyTerm expr)
 
 emptyStatements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
 emptyStatements = pure (fromList [])
+
+-- | Match a term and contextualize any comments preceeding or proceeding the term.
+term :: Assignment -> Assignment
+term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 {-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

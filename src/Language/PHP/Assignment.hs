@@ -128,36 +128,15 @@ type Syntax = '[
   , Syntax.UseClause
   , Syntax.VariableName
   , Type.Annotation
-  , [] ]
+  , []
+  ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
-append :: a -> [a] -> [a]
-append x xs = xs ++ [x]
-
-bookend :: a -> [a] -> a -> [a]
-bookend head list last = head : append last list
-
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . fromList <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
-
-term :: Assignment -> Assignment
-term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
-
-commentedTerm :: Assignment -> Assignment
-commentedTerm term = contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm)
-
--- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
-manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm = many . commentedTerm
-
-someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm = fmap NonEmpty.toList . someTerm'
-
-someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
-someTerm' = NonEmpty.some1 . commentedTerm
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
@@ -762,6 +741,31 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 string :: Assignment
 string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.TextElement <$> source)
+
+
+-- Helpers
+
+append :: a -> [a] -> [a]
+append x xs = xs ++ [x]
+
+bookend :: a -> [a] -> a -> [a]
+bookend head list last = head : append last list
+
+term :: Assignment -> Assignment
+term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
+
+commentedTerm :: Assignment -> Assignment
+commentedTerm term = contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm)
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+manyTerm = many . commentedTerm
+
+someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+someTerm = fmap NonEmpty.toList . someTerm'
+
+someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
+someTerm' = NonEmpty.some1 . commentedTerm
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment

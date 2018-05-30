@@ -177,20 +177,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . fromList <$> manyTerm statement) <|> parseError
-
--- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
-manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
-
-manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
-manyStatements expr = fromList <$> (manyTerm expr)
-
-emptyStatements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
-emptyStatements = pure (fromList [])
-
-term :: Assignment -> Assignment
-term term = contextualize comment (postContextualize comment term)
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyStatements statement) <|> parseError
 
 expression :: Assignment
 expression = handleError everything
@@ -865,6 +852,22 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inject .) . Expression.GreaterThanEqual   <$ symbol AnonRAngleEqual
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
+
+
+-- Helpers
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
+manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
+manyStatements expr = fromList <$> (manyTerm expr)
+
+emptyStatements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
+emptyStatements = pure (fromList [])
+
+term :: Assignment -> Assignment
+term term = contextualize comment (postContextualize comment term)
 
 emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
