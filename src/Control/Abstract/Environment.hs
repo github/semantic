@@ -51,12 +51,12 @@ close :: Member (Env address) effects => Set Name -> Evaluator address value eff
 close = send . Close
 
 data Env address return where
-  Lookup :: Name                -> Env address (Maybe address)
-  Bind   :: Name -> address     -> Env address ()
-  Close  :: Set Name            -> Env address (Environment address)
-  Push   ::                        Env address ()
-  Pop    ::                        Env address ()
-  GetEnv ::                        Env address (Environment address)
+  Lookup :: Name            -> Env address (Maybe address)
+  Bind   :: Name -> address -> Env address ()
+  Close  :: Set Name        -> Env address (Environment address)
+  Push   ::                    Env address ()
+  Pop    ::                    Env address ()
+  GetEnv ::                    Env address (Environment address)
 
 handleEnv :: forall address effects value result
            . Member (State (Environment address)) effects
