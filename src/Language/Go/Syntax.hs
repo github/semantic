@@ -69,7 +69,7 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      importedEnv <- maybe emptyEnv fst <$> isolate (require path)
+      importedEnv <- maybe emptyEnv fst <$> require path
       bindAll importedEnv
     pure (Rval unit)
 
@@ -93,7 +93,7 @@ instance Evaluatable QualifiedImport where
     void $ letrec' alias $ \addr -> do
       for_ paths $ \p -> do
         traceResolve (unPath importPath) p
-        importedEnv <- maybe emptyEnv fst <$> isolate (require p)
+        importedEnv <- maybe emptyEnv fst <$> require p
         bindAll importedEnv
       makeNamespace alias addr Nothing
     pure (Rval unit)
@@ -112,7 +112,7 @@ instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
-    for_ paths $ \path -> isolate (require path)
+    for_ paths require
     pure (Rval unit)
 
 -- A composite literal in Go

@@ -58,7 +58,6 @@ include :: ( AbstractValue address value effects
            , Member (Modules address value) effects
            , Member (Resumable ResolutionError) effects
            , Member (Resumable (EnvironmentError address)) effects
-           , Member (State (Exports address)) effects
            , Member Trace effects
            )
         => Subterm term (Evaluator address value effects (ValueRef value))
@@ -68,7 +67,7 @@ include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (importedEnv, v) <- fromMaybe (emptyEnv, unit) <$> isolate (f path)
+  (importedEnv, v) <- fromMaybe (emptyEnv, unit) <$> f path
   bindAll importedEnv
   pure (Rval v)
 
