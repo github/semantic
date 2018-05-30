@@ -8,6 +8,7 @@ module Data.Abstract.Type
   ) where
 
 import Control.Abstract
+import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
 import Data.Semigroup.Reducer (Reducer)
@@ -117,10 +118,10 @@ instance AbstractIntro Type where
 
 
 instance ( Member (Allocator location Type) effects
+         , Member (Env location) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Environment location)) effects
          , Member (State (Heap location (Cell location) Type)) effects
          , Ord location
          , Reducer Type (Cell location Type)
@@ -128,11 +129,11 @@ instance ( Member (Allocator location Type) effects
       => AbstractFunction location Type effects where
   closure names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
+      addr <- alloc name
       tvar <- Var <$> fresh
-      assign a tvar
-      bimap (Env.insert name a) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    (zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
+      assign addr tvar
+      bimap (Env.insert name (unAddress addr)) (tvar :) <$> rest) (pure (emptyEnv, [])) names
+    (zeroOrMoreProduct tvars :->) <$> locally (bindAll env >> body `catchReturn` \ (Return value) -> pure value)
 
   call op params = do
     tvar <- fresh
@@ -146,11 +147,11 @@ instance ( Member (Allocator location Type) effects
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator location Type) effects
+         , Member (Env location) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Environment location)) effects
          , Member (State (Heap location (Cell location) Type)) effects
          , Ord location
          , Reducer Type (Cell location Type)
