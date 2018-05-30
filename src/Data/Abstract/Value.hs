@@ -42,7 +42,7 @@ instance Ord  (ClosureBody address body) where
   compare = compare `on` closureBodyId
 
 instance Show (ClosureBody address body) where
-  showsPrec d (ClosureBody i _) = showsBinaryWith showsPrec (const showChar) "ClosureBody" d i '_'
+  showsPrec d (ClosureBody i _) = showsUnaryWith showsPrec "ClosureBody" d i
 
 
 instance Ord address => ValueRoots address (Value address body) where
