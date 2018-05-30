@@ -23,7 +23,7 @@ deriving instance (Show (Cell address value), Show address, Show value) => Show 
 evaluating :: Evaluator address value
                 (  Fail
                 ': Fresh
-                ': Env address
+                ': State (Environment address)
                 ': State (Heap address (Cell address) value)
                 ': State (ModuleTable (Maybe (Environment address, value)))
                 ': State (Exports address)
@@ -34,6 +34,6 @@ evaluating
   . runState lowerBound -- State (Exports address)
   . runState lowerBound -- State (ModuleTable (Maybe (Environment address, value)))
   . runState lowerBound -- State (Heap address (Cell address) value)
-  . runState lowerBound -- Env address
+  . runState lowerBound -- State (Environment address)
   . runFresh 0
   . runFail
