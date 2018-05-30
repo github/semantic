@@ -1,5 +1,7 @@
 module Control.Abstract.Primitive where
 
+import Prologue
+
 import Control.Abstract.Addressable
 import Control.Abstract.Context
 import Control.Abstract.Environment
@@ -8,10 +10,10 @@ import Control.Abstract.Heap
 import Control.Abstract.Value
 import Data.Abstract.Environment
 import Data.Abstract.Name
-import Data.ByteString.Char8 (pack, unpack)
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
-import Prologue
+import qualified Data.ByteString.Char8 as B
+import qualified Data.Text as T
 
 builtin :: ( HasCallStack
            , Members '[ Allocator location value
@@ -28,7 +30,7 @@ builtin :: ( HasCallStack
         -> Evaluator location value effects value
         -> Evaluator location value effects ()
 builtin n def = withCurrentCallStack callStack $ do
-  let name' = name ("__semantic_" <> pack n)
+  let name' = name ("__semantic_" <> T.pack n)
   addr <- alloc name'
   modifyEnv (insert name' addr)
   def >>= assign addr
@@ -58,4 +60,4 @@ defineBuiltins :: ( AbstractValue location value effects
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin "print" (lambda lowerBound (\ v -> variable v >>= asString >>= trace . unpack >> unit))
+  builtin "print" (lambda lowerBound (\ v -> variable v >>= asString >>= trace . B.unpack >> unit))

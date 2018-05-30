@@ -6,8 +6,7 @@ import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
 import           Data.Abstract.Path
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as BC
+import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
@@ -23,15 +22,16 @@ data Relative = Relative | NonRelative
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
   deriving (Eq, Generic, Hashable, Ord, Show)
 
-importPath :: ByteString -> ImportPath
-importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)
+-- TODO: fix the duplication present in this and Python
+importPath :: Text -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    stripQuotes = B.filter (`B.notElem` "\'\"")
-    pathType xs | not (B.null xs), BC.head xs == '.' = Relative
+    stripQuotes = T.dropAround (`elem` ("\'\"" :: String))
+    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- TODO: fix partiality
                 | otherwise = NonRelative
 
 toName :: ImportPath -> Name
-toName = name . BC.pack . unPath
+toName = name . T.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 --

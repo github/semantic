@@ -19,7 +19,6 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import Data.Term
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import Prologue hiding (project)
@@ -130,7 +129,7 @@ getSource blobSource = toText . flip Source.slice blobSource . getField
 instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Sum fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
     | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- project fromF = Just $ CallReference (getSource idenAnn) mempty blobLanguage (memberAccess leftAnn leftF)
-    | Just (Syntax.Identifier name) <- project fromF = Just $ CallReference (T.decodeUtf8 (unName name)) mempty blobLanguage []
+    | Just (Syntax.Identifier name) <- project fromF = Just $ CallReference (unName name) mempty blobLanguage []
     | otherwise = Just $ CallReference (getSource fromAnn) mempty blobLanguage []
     where
       memberAccess modAnn termFOut

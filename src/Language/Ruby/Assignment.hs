@@ -178,7 +178,7 @@ identifier =
   <|> mk BlockArgument
   <|> mk Uninterpreted
   where
-    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> tsource)
     vcallOrLocal = do
       (loc, ident, locals) <- identWithLocals
       case ident of
@@ -286,11 +286,11 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
 alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
-  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> tsource)
 
 undef :: Assignment
 undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
-  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> tsource)
 
 if' :: Assignment
 if' =   ifElsif If
@@ -361,7 +361,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 methodSelector :: Assignment
-methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
+methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> tsource))
   where
     symbols = symbol Identifier
           <|> symbol Constant
@@ -411,17 +411,17 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> source)
+    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> tsource)
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment' (Record Location, ByteString, [ByteString])
+identWithLocals :: Assignment' (Record Location, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getRubyLocals first
   locals <- getRubyLocals
-  ident <- source
+  ident <- tsource
   pure (loc, ident, locals)
 
 lhsIdent :: Assignment
@@ -435,7 +435,7 @@ unary = symbol Unary >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
-  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> source)) <*> some expression <*> emptyTerm)
+  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> tsource)) <*> some expression <*> emptyTerm)
   <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
 

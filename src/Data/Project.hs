@@ -1,28 +1,28 @@
 module Data.Project where
 
-import           Data.ByteString.Char8 as BC (pack)
-import           Data.Language
-import           Prologue
-import           System.FilePath.Posix
+import Data.Text as T (pack)
+import Data.Language
+import Prologue
+import System.FilePath.Posix
 
 data Project = Project
-  { projectRootDir :: FilePath
-  , projectFiles :: [File]
-  , projectLanguage :: Language
+  { projectRootDir     :: FilePath
+  , projectFiles       :: [File]
+  , projectLanguage    :: Language
   , projectEntryPoints :: [File]
   , projectExcludeDirs :: [FilePath]
   }
   deriving (Eq, Ord, Show)
 
-projectName :: Project -> ByteString
-projectName = BC.pack . dropExtensions . takeFileName . projectRootDir
+projectName :: Project -> Text
+projectName = T.pack . dropExtensions . takeFileName . projectRootDir
 
 projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
 
 
 data File = File
-  { filePath :: FilePath
+  { filePath     :: FilePath
   , fileLanguage :: Maybe Language
   }
   deriving (Eq, Ord, Show)

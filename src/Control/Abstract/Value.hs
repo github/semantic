@@ -121,7 +121,7 @@ class AbstractFunction location value effects => AbstractValue location value ef
   -- | Construct a hash out of pairs.
   hash :: [(value, value)] -> Evaluator location value effects value
 
-  -- | Extract a 'ByteString' from a given value.
+  -- | Extract a 'Text' from a given value.
   asString :: value -> Evaluator location value effects ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy

@@ -5,9 +5,8 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
+import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue
 import           System.FilePath.Posix
@@ -18,15 +17,15 @@ data Relative = Relative | NonRelative
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
   deriving (Eq, Generic, Hashable, Ord, Show)
 
-importPath :: ByteString -> ImportPath
-importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)
+importPath :: Text -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    stripQuotes = B.filter (`B.notElem` "\'\"")
-    pathType xs | not (B.null xs), BC.head xs == '.' = Relative
+    stripQuotes = T.dropAround (`elem` ("\'\"" :: String))
+    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- TODO: head is partial
                 | otherwise = NonRelative
 
 defaultAlias :: ImportPath -> Name
-defaultAlias = name . BC.pack . takeFileName . unPath
+defaultAlias = name . T.pack . takeFileName . unPath
 
 resolveGoImport :: Members '[ Modules location value
                             , Reader ModuleInfo
@@ -41,16 +40,16 @@ resolveGoImport (ImportPath path Relative) = do
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
   case paths of
     [] -> throwResumable $ GoImportError path
-    _ -> pure paths
+    _  -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
-  package <- BC.unpack . unName . Package.packageName <$> currentPackage
+  package <- T.unpack . unName . Package.packageName <$> currentPackage
   trace ("attempting to resolve " <> show path <> " for package " <> package)
   case splitDirectories path of
     -- Import an absolute path that's defined in this package being analyzed.
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
-    _ -> throwResumable $ GoImportError path
+    _                -> throwResumable $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --

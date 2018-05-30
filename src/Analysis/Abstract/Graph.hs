@@ -21,23 +21,23 @@ import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
-import qualified Data.ByteString.Char8 as BC
 import           Data.Graph
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Data.Text.Encoding as T
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import           Prologue hiding (packageName, project)
 
 -- | A vertex of some specific type.
 data Vertex
-  = Package  { vertexName :: ByteString }
-  | Module   { vertexName :: ByteString }
-  | Variable { vertexName :: ByteString }
+  = Package  { vertexName :: Text }
+  | Module   { vertexName :: Text }
+  | Variable { vertexName :: Text }
   deriving (Eq, Ord, Show)
 
 style :: Style Vertex Builder
-style = (defaultStyle (byteString . vertexName))
+style = (defaultStyle (T.encodeUtf8Builder . vertexName))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
@@ -96,7 +96,7 @@ packageVertex :: PackageInfo -> Vertex
 packageVertex = Package . unName . packageName
 
 moduleVertex :: ModuleInfo -> Vertex
-moduleVertex = Module . BC.pack . modulePath
+moduleVertex = Module . T.pack . modulePath
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
@@ -143,7 +143,7 @@ instance ToJSON Vertex where
   toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
 
 vertexToText :: Vertex -> Text
-vertexToText = decodeUtf8 . vertexName
+vertexToText = vertexName
 
 vertexToType :: Vertex -> Text
 vertexToType Package{}  = "package"
