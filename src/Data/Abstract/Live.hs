@@ -28,7 +28,7 @@ liveDelete addr = Live . Set.delete addr . unLive
 liveDifference :: Ord location => Live location -> Live location -> Live location
 liveDifference = fmap Live . (Set.difference `on` unLive)
 
--- | Test whether an 'Address' is in a 'Live' set.
+-- | Test whether an address is in a 'Live' set.
 liveMember :: Ord location => location -> Live location -> Bool
 liveMember addr = Set.member addr . unLive
 
