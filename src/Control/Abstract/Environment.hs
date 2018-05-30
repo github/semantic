@@ -3,7 +3,6 @@ module Control.Abstract.Environment
 ( Environment
 , getEnv
 , putEnv
-, withEnv
 , lookupEnv
 , bind
 , bindAll
@@ -32,15 +31,6 @@ getEnv = send GetEnv
 -- | Set the environment.
 putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
 putEnv = send . PutEnv
-
--- | Sets the environment for the lifetime of the given action.
-withEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects a -> Evaluator address value effects a
-withEnv env m = do
-  oldEnv <- getEnv
-  putEnv env
-  result <- m
-  putEnv oldEnv
-  pure result
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
