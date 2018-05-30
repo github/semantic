@@ -9,30 +9,30 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
-newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Configuration term location cell value) (Set (Cached location cell value)) }
-  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, Cached location cell value), Semigroup)
+newtype Cache term address cell value = Cache { unCache :: Monoidal.Map (Configuration term address cell value) (Set (Cached address cell value)) }
+  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term address cell value, Cached address cell value), Semigroup)
 
-data Cached location cell value = Cached
+data Cached address cell value = Cached
   { cachedValue :: ValueRef value
-  , cachedHeap  :: Heap location cell value
+  , cachedHeap  :: Heap address cell value
   }
   deriving (Eq, Ord, Show)
 
 
-type Cacheable term location cell value = (Ord (cell value), Ord location, Ord term, Ord value)
+type Cacheable term address cell value = (Ord (cell value), Ord address, Ord term, Ord value)
 
 -- | Look up the resulting value & 'Heap' for a given 'Configuration'.
-cacheLookup :: Cacheable term location cell value => Configuration term location cell value -> Cache term location cell value -> Maybe (Set (Cached location cell value))
+cacheLookup :: Cacheable term address cell value => Configuration term address cell value -> Cache term address cell value -> Maybe (Set (Cached address cell value))
 cacheLookup key = Monoidal.lookup key . unCache
 
 -- | Set the resulting value & 'Heap' for a given 'Configuration', overwriting any previous entry.
-cacheSet :: Cacheable term location cell value => Configuration term location cell value -> Set (Cached location cell value) -> Cache term location cell value -> Cache term location cell value
+cacheSet :: Cacheable term address cell value => Configuration term address cell value -> Set (Cached address cell value) -> Cache term address cell value -> Cache term address cell value
 cacheSet key value = Cache . Monoidal.insert key value . unCache
 
 -- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
-cacheInsert :: Cacheable term location cell value => Configuration term location cell value -> Cached location cell value -> Cache term location cell value -> Cache term location cell value
+cacheInsert :: Cacheable term address cell value => Configuration term address cell value -> Cached address cell value -> Cache term address cell value -> Cache term address cell value
 cacheInsert = curry cons
 
 
-instance (Show term, Show location, Show (cell value), Show value) => Show (Cache term location cell value) where
+instance (Show term, Show address, Show (cell value), Show value) => Show (Cache term address cell value) where
   showsPrec d = showsUnaryWith showsPrec "Cache" d . map (second toList) . Monoidal.pairs . unCache

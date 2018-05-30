@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -44,69 +44,64 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( EvaluatableConstraints location term value effects
+  eval :: ( EvaluatableConstraints address term value effects
           , Member Fail effects
           )
-       => SubtermAlgebra constr term (Evaluator location value effects (ValueRef value))
-  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location value effects (ValueRef value))
+       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
+  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
-type EvaluatableConstraints location term value effects =
-  ( AbstractValue location value effects
+type EvaluatableConstraints address term value effects =
+  ( AbstractValue address value effects
   , Declarations term
   , FreeVariables term
-  , Members '[ Allocator location value
-             , LoopControl value
-             , Modules location value
-             , Reader (Environment location)
-             , Reader ModuleInfo
-             , Reader PackageInfo
-             , Reader Span
-             , Resumable (EnvironmentError value)
-             , Resumable EvalError
-             , Resumable ResolutionError
-             , Resumable (Unspecialized value)
-             , Return value
-             , State (Environment location)
-             , State (Exports location)
-             , State (Heap location (Cell location) value)
-             , Trace
-             ] effects
-  , Ord location
-  , Reducer value (Cell location value)
+  , Member (Allocator address value) effects
+  , Member (LoopControl value) effects
+  , Member (Modules address value) effects
+  , Member (Reader (Environment address)) effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader PackageInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (EnvironmentError address)) effects
+  , Member (Resumable EvalError) effects
+  , Member (Resumable ResolutionError) effects
+  , Member (Resumable (Unspecialized value)) effects
+  , Member (Return value) effects
+  , Member (State (Environment address)) effects
+  , Member (State (Exports address)) effects
+  , Member (State (Heap address (Cell address) value)) effects
+  , Member Trace effects
+  , Ord address
+  , Reducer value (Cell address value)
   )
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: forall location term value inner inner' outer
-                    -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that? If not, can we factor this effect list out?
-                    .  ( Addressable location (Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+evaluatePackageWith :: forall address term value inner outer
+                    -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' addresses require knowledge of 'currentModule' to run. Can we fix that? If not, can we factor this effect list out?
+                    .  ( Addressable address (Reader ModuleInfo ': Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        , Evaluatable (Base term)
-                       , EvaluatableConstraints location term value inner
-                       , Members '[ Fail
-                                  , Fresh
-                                  , Reader (Environment location)
-                                  , Resumable (AddressError location value)
-                                  , Resumable (LoadError location value)
-                                  , State (Environment location)
-                                  , State (Exports location)
-                                  , State (Heap location (Cell location) value)
-                                  , State (ModuleTable (Maybe (Environment location, value)))
-                                  , Trace
-                                  ] outer
+                       , EvaluatableConstraints address term value inner
+                       , Member Fail outer
+                       , Member Fresh outer
+                       , Member (Reader (Environment address)) outer
+                       , Member (Resumable (AddressError address value)) outer
+                       , Member (Resumable (LoadError address value)) outer
+                       , Member (State (Environment address)) outer
+                       , Member (State (Exports address)) outer
+                       , Member (State (Heap address (Cell address) value)) outer
+                       , Member (State (ModuleTable (Maybe (Environment address, value)))) outer
+                       , Member Trace outer
                        , Recursive term
-                       , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
+                       , inner ~ (LoopControl value ': Return value ': Allocator address value ': Reader ModuleInfo ': Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (TermEvaluator term location value inner value) -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
-                    -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)))
+                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner value))
+                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)))
                     -> Package term
-                    -> TermEvaluator term location value outer [value]
+                    -> TermEvaluator term address value outer [value]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
-  . fmap fst
-  . runState (lowerBound :: Gotos location value (Reader Span ': Reader PackageInfo ': outer))
   . runReader (packageModules (packageBody package))
   . withPrelude (packagePrelude (packageBody package))
   . raiseHandler (runModules (runTermEvaluator . evalModule))
@@ -124,15 +119,14 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . raiseHandler runAllocator
           . raiseHandler runReturn
           . raiseHandler runLoopControl
-          . raiseHandler (runGoto Gotos getGotos)
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term address value (Modules address value ': Reader Span ': Reader PackageInfo ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) . TermEvaluator $ do
-          v <- maybe unit (pure . snd) <$> require m
-          maybe v ((`call` []) <=< variable) sym
+          v <- maybe unit snd <$> require m
+          maybe (pure v) ((`call` []) <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule)) $ do
-          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> unit))
+          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
           fst <$> evalModule prelude
 
         withPrelude Nothing a = a
@@ -148,15 +142,12 @@ evaluatePackageWith analyzeModule analyzeTerm package
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
         pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator getEnv)
 
-newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value outer) ': outer) value }
-  deriving (Lower)
-
 
 -- | Isolate the given action with an empty global environment and exports.
-isolate :: Members '[State (Environment location), State (Exports location)] effects => Evaluator location value effects a -> Evaluator location value effects a
+isolate :: (Member (State (Environment address)) effects, Member (State (Exports address)) effects) => Evaluator address value effects a -> Evaluator address value effects a
 isolate = withEnv lowerBound . withExports lowerBound
 
-traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
+traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
@@ -233,4 +224,4 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 ---   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (Rval <$> unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
+  eval = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

@@ -1,11 +1,10 @@
-{-# LANGUAGE OverloadedLists #-}
-
 module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value as Value
 import Data.Abstract.Number as Number
+import Data.AST
 import Control.Monad.Effect (SomeExc(..))
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Map
@@ -31,7 +30,7 @@ spec = parallel $ do
 
     it "evaluates load with wrapper" $ do
       ((res, state), _) <- evaluate "load-wrap.rb"
-      res `shouldBe` Left (SomeExc (inject @(EnvironmentError (Value Precise)) (FreeVariable "foo")))
+      res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
       Env.names (environment state) `shouldContain` [ "Object" ]
 
     it "evaluates subclass" $ do
@@ -77,7 +76,6 @@ spec = parallel $ do
 
   where
     ns n = Just . Latest . Last . Just . Namespace n
-    addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)
     evalRubyProject path = testEvaluating <$> evaluateProject rubyParser Language.Ruby rubyPrelude path

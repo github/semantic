@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 module Analysis.Python.Spec (spec) where
 
 import Data.Abstract.Environment as Env
@@ -45,7 +44,6 @@ spec = parallel $ do
 
   where
     ns n = Just . Latest . Last . Just . Namespace n
-    addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)
     evalPythonProject path = testEvaluating <$> evaluateProject pythonParser Language.Python pythonPrelude path

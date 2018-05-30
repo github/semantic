@@ -42,8 +42,8 @@ library
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Exports
-                     , Control.Abstract.Goto
                      , Control.Abstract.Heap
+                     , Control.Abstract.Hole
                      , Control.Abstract.Matching
                      , Control.Abstract.Modules
                      , Control.Abstract.Primitive
@@ -72,7 +72,6 @@ library
                      , Data.Abstract.Value
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
-                     , Data.Align.Generic
                      , Data.AST
                      , Data.Blob
                      , Data.Diff
@@ -270,7 +269,6 @@ test-suite test
                      , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
-                     , Data.Mergeable.Spec
                      , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec

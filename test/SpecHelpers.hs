@@ -8,6 +8,7 @@ module SpecHelpers
 , deNamespace
 , derefQName
 , verbatim
+, TermEvaluator(..)
 , Verbatim(..)
 ) where
 
@@ -83,23 +84,23 @@ testEvaluating
   . fmap (first reassociate)
   . evaluating
   . runLoadError
-  . runValueError
   . runUnspecialized
   . runResolutionError
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @Precise
+  . runValueError
+  . runTermEvaluator @_ @_ @(Value Precise (Eff _))
 
-deNamespace :: Value Precise -> Maybe (Name, [Name])
+deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)
 deNamespace _                      = Nothing
 
-namespaceScope :: Value Precise -> Maybe (Environment Precise)
+namespaceScope :: Value Precise term -> Maybe (Environment Precise)
 namespaceScope (Namespace _ scope) = Just scope
 namespaceScope _                   = Nothing
 
-derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise -> Maybe (Value Precise)
+derefQName :: Heap Precise (Cell Precise) (Value Precise term) -> NonEmpty Name -> Environment Precise -> Maybe (Value Precise term)
 derefQName heap = go
   where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
           []        -> Just

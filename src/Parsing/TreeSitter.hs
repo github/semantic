@@ -69,7 +69,7 @@ bracket' before after action = do
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Members '[Trace, IO] effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
+parseToAST :: (Bounded grammar, Enum grammar, Member IO effects, Member Trace effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
 parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   let parserTimeout = s * 1000
 

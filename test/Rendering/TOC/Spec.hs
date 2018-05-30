@@ -3,7 +3,6 @@ module Rendering.TOC.Spec (spec) where
 
 import Analysis.Declaration
 import Data.Aeson
-import Data.Align.Generic
 import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Diff
@@ -240,10 +239,10 @@ diffWithParser :: ( HasField fields Data.Span.Span
                   , Show1 syntax
                   , Traversable syntax
                   , Diffable syntax
-                  , GAlign syntax
                   , HasDeclaration syntax
                   , Hashable1 syntax
-                  , Members '[Distribute WrappedTask, Task] effs
+                  , Member (Distribute WrappedTask) effs
+                  , Member Task effs
                   )
                => Parser (Term syntax (Record fields))
                -> BlobPair
