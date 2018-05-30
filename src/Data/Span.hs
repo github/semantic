@@ -11,6 +11,9 @@ module Data.Span
 ) where
 
 import Data.Aeson ((.=), (.:))
+import Proto3.Suite
+import Proto3.Wire.Decode as Decode
+import Proto3.Wire.Encode as Encode
 import qualified Data.Aeson as A
 import Data.JSON.Fields
 import Data.Semilattice.Lower
@@ -22,7 +25,15 @@ data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named, Message)
+
+instance MessageField Pos where
+  encodeMessageField num = (Encode.embedded num . encodeMessage (fieldNumber 1))
+  decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
+  protoType pr = messageField (Prim $ Named (Single (nameOf pr))) Nothing
+
+instance HasDefault Pos where
+  def = Pos 1 1
 
 instance A.ToJSON Pos where
   toJSON Pos{..} =
@@ -37,7 +48,7 @@ data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named, Message)
 
 spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc = Span . (Pos . srcLocStartLine <*> srcLocStartCol) <*> (Pos . srcLocEndLine <*> srcLocEndCol)

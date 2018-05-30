@@ -14,6 +14,12 @@ message Blob { bytes blobSource = 1;
                string blobPath = 2;
                Language blobLanguage = 3;
              }
+message Pos { int64 posLine = 1;
+              int64 posColumn = 2;
+            }
+message Span { Pos spanStart = 1;
+               Pos spanEnd = 2;
+             }
 message Array { repeated Term arrayElements = 1;
               }
 message Boolean { bool booleanContent = 1;

@@ -34,12 +34,6 @@ message BlobPair {
   Blob after = 2;
 }
 
-message Blob {
-  string source = 1;
-  string path = 2;
-  string language = 3;
-}
-
 message SummariesResponse {
   repeated Summary changes = 1;
   repeated Error errors = 2;
