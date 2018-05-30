@@ -3,7 +3,6 @@ module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , evaluatePackageWith
-, isolate
 , traceResolve
 -- | Effects
 , EvalError(..)
@@ -147,10 +146,6 @@ evaluatePackageWith analyzeModule analyzeTerm package
           filtered <- filterEnv <$> TermEvaluator getExports <*> pure env
           pure (a, filtered)
 
-
--- | Isolate the given action with an empty global environment and exports.
-isolate :: (Member (Env address) effects, Member (State (Exports address)) effects) => Evaluator address value effects a -> Evaluator address value effects a
-isolate = withEnv lowerBound . withExports lowerBound
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
