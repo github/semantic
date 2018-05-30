@@ -229,7 +229,7 @@ instance Evaluatable QualifiedExport where
   eval (QualifiedExport exportSymbols) = do
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
-      addExport name alias Nothing
+      export name alias Nothing
     pure (Rval unit)
 
 
@@ -250,7 +250,7 @@ instance Evaluatable QualifiedExportFrom where
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
-      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
+      maybe (throwEvalError $ ExportError modulePath name) (export name alias . Just) address
     pure (Rval unit)
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
@@ -269,7 +269,7 @@ instance Evaluatable DefaultExport where
       Just name -> do
         addr <- lookupOrAlloc name
         assign addr v
-        addExport name name Nothing
+        export name name Nothing
         bind name addr
       Nothing -> throwEvalError DefaultExportError
     pure (Rval unit)

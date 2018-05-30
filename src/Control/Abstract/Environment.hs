@@ -4,7 +4,7 @@ module Control.Abstract.Environment
 , Exports
 , getEnv
 , getExports
-, addExport
+, export
 , lookupEnv
 , bind
 , bindAll
@@ -36,8 +36,8 @@ getExports :: Member (State (Exports address)) effects => Evaluator address valu
 getExports = get
 
 -- | Add an export to the global export state.
-addExport :: Member (State (Exports address)) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
-addExport name alias = modify' . insert name alias
+export :: Member (State (Exports address)) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
+export name alias = modify' . insert name alias
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
