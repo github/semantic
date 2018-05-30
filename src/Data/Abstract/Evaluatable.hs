@@ -56,9 +56,9 @@ type EvaluatableConstraints location term value effects =
   , Declarations term
   , FreeVariables term
   , Member (Allocator location value) effects
+  , Member (Env location) effects
   , Member (LoopControl value) effects
   , Member (Modules location value) effects
-  , Member (Reader (Environment location)) effects
   , Member (Reader ModuleInfo) effects
   , Member (Reader PackageInfo) effects
   , Member (Reader Span) effects
@@ -67,7 +67,6 @@ type EvaluatableConstraints location term value effects =
   , Member (Resumable ResolutionError) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Return value) effects
-  , Member (State (Environment location)) effects
   , Member (State (Exports location)) effects
   , Member (State (Heap location (Cell location) value)) effects
   , Member Trace effects
@@ -77,14 +76,13 @@ type EvaluatableConstraints location term value effects =
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: forall location term value inner outer
-                    -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that? If not, can we factor this effect list out?
-                    .  ( Addressable location (Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
+evaluatePackageWith :: forall location term value inner inner' inner'' outer
+                    -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
+                    .  ( Addressable location inner'
                        , Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Member Fail outer
                        , Member Fresh outer
-                       , Member (Reader (Environment location)) outer
                        , Member (Resumable (AddressError location value)) outer
                        , Member (Resumable (LoadError location value)) outer
                        , Member (State (Environment location)) outer
@@ -93,7 +91,9 @@ evaluatePackageWith :: forall location term value inner outer
                        , Member (State (ModuleTable (Maybe (Environment location, value)))) outer
                        , Member Trace outer
                        , Recursive term
-                       , inner ~ (LoopControl value ': Return value ': Allocator location value ': Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
+                       , inner ~ (LoopControl value ': Return value ': Env location ': Allocator location value ': inner')
+                       , inner' ~ (Reader ModuleInfo ': inner'')
+                       , inner'' ~ (Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module      term (TermEvaluator term location value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)))
@@ -104,35 +104,38 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . runReader lowerBound
   . runReader (packageModules (packageBody package))
   . withPrelude (packagePrelude (packageBody package))
-  . raiseHandler (runModules (runTermEvaluator . evalModule))
-  $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
+  $ \ preludeEnv
+  ->  raiseHandler (runModules (runTermEvaluator . evalModule preludeEnv))
+    . traverse (uncurry (evaluateEntryPoint preludeEnv))
+    $ ModuleTable.toPairs (packageEntryPoints (packageBody package))
   where
-        evalModule m
+        evalModule preludeEnv m
           = pairValueWithEnv
-          . runInModule (moduleInfo m)
+          . runInModule preludeEnv (moduleInfo m)
           . analyzeModule (subtermRef . moduleBody)
           $ evalTerm <$> m
         evalTerm term = Subterm term (TermEvaluator (value =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
 
-        runInModule info
+        runInModule preludeEnv info
           = runReader info
           . raiseHandler runAllocator
+          . raiseHandler (runEnv preludeEnv)
           . raiseHandler runReturn
           . raiseHandler runLoopControl
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': Reader Span ': Reader PackageInfo ': outer) value
-        evaluateEntryPoint m sym = runInModule (ModuleInfo m) . TermEvaluator $ do
+        evaluateEntryPoint :: Environment location -> ModulePath -> Maybe Name -> TermEvaluator term location value inner'' value
+        evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
           v <- maybe unit snd <$> require m
           maybe (pure v) ((`call` []) <=< variable) sym
 
-        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule)) $ do
-          _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
-          fst <$> evalModule prelude
+        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
+          _ <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
+          fst <$> evalModule emptyEnv prelude
 
-        withPrelude Nothing a = a
-        withPrelude (Just prelude) a = do
+        withPrelude Nothing f = f emptyEnv
+        withPrelude (Just prelude) f = do
           preludeEnv <- evalPrelude prelude
-          raiseHandler (withDefaultEnvironment preludeEnv) a
+          f preludeEnv
 
         -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
