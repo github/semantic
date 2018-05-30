@@ -9,6 +9,7 @@ module Control.Abstract.Environment
 , locally
 , lookupEnv
 , bind
+, bindAll
 , Env(..)
 , runEnv
 , reinterpretEnv
@@ -62,6 +63,9 @@ lookupEnv name = fmap Address <$> send (Lookup name)
 -- | Bind a 'Name' to an 'Address' in the environment.
 bind :: Member (Env location) effects => Name -> Address location value -> Evaluator location value effects ()
 bind name addr = send (Bind name (unAddress addr))
+
+bindAll :: Member (Env location) effects => Environment location -> Evaluator location value effects ()
+bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . Env.pairs
 
 
 data Env location return where
