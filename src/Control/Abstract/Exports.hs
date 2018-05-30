@@ -26,7 +26,7 @@ modifyExports = modify'
 
 -- | Add an export to the global export state.
 addExport :: Member (State (Exports location)) effects => Name -> Name -> Maybe (Address location value) -> Evaluator location value effects ()
-addExport name alias = modifyExports . insert name alias
+addExport name alias = modifyExports . insert name alias . fmap unAddress
 
 -- | Sets the global export state for the lifetime of the given action.
 withExports :: Member (State (Exports location)) effects => Exports location -> Evaluator location value effects a -> Evaluator location value effects a
