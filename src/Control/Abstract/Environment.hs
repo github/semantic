@@ -4,7 +4,6 @@ module Control.Abstract.Environment
 , getEnv
 , putEnv
 , withEnv
-, defaultEnvironment
 , withDefaultEnvironment
 , fullEnvironment
 , localEnv
