@@ -2,7 +2,6 @@ module Control.Abstract.Exports
 ( Exports
 , getExports
 , putExports
-, modifyExports
 , addExport
 , withExports
 ) where
