@@ -1,7 +1,6 @@
 module Control.Abstract.Exports
 ( Exports
 , getExports
-, putExports
 , addExport
 , withExports
 ) where
@@ -13,10 +12,6 @@ import Data.Abstract.Name
 -- | Get the global export state.
 getExports :: Member (State (Exports address)) effects => Evaluator address value effects (Exports address)
 getExports = get
-
--- | Set the global export state.
-putExports :: Member (State (Exports address)) effects => Exports address -> Evaluator address value effects ()
-putExports = put
 
 -- | Update the global export state.
 modifyExports :: Member (State (Exports address)) effects => (Exports address -> Exports address) -> Evaluator address value effects ()
