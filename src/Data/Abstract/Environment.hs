@@ -119,7 +119,7 @@ overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
 --
 --   Unbound names are silently dropped.
 roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live location
-roots env names = addresses (intersect names env)
+roots env names = addresses (names `intersect` env)
 
 addresses :: Ord location => Environment location -> Live location
 addresses = fromAddresses . map snd . pairs
