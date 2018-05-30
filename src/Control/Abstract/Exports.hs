@@ -2,7 +2,6 @@ module Control.Abstract.Exports
 ( Exports
 , getExports
 , addExport
-, withExports
 ) where
 
 import Control.Abstract.Evaluator
@@ -20,7 +19,3 @@ modifyExports = modify'
 -- | Add an export to the global export state.
 addExport :: Member (State (Exports address)) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
 addExport name alias = modifyExports . insert name alias
-
--- | Sets the global export state for the lifetime of the given action.
-withExports :: Member (State (Exports address)) effects => Exports address -> Evaluator address value effects a -> Evaluator address value effects a
-withExports = localState . const
