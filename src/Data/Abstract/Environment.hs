@@ -122,7 +122,7 @@ roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live lo
 roots env names = addresses (bind names env)
 
 addresses :: Ord location => Environment location -> Live location
-addresses = fromAddresses . map snd . pairs
+addresses = fromAddresses . map (unAddress . snd) . pairs
 
 
 instance Lower (Environment location) where lowerBound = emptyEnv

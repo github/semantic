@@ -32,9 +32,9 @@ heapInit (Address address) cell (Heap h) = Heap (Monoidal.insert address cell h)
 heapSize :: Heap location cell value -> Int
 heapSize = Monoidal.size . unHeap
 
--- | Restrict a 'Heap' to only those 'Address'es in the given 'Live' set (in essence garbage collecting the rest).
+-- | Restrict a 'Heap' to only those addresses in the given 'Live' set (in essence garbage collecting the rest).
 heapRestrict :: Ord location => Heap location cell value -> Live location -> Heap location cell value
-heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> Address address `liveMember` roots) m)
+heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
 
 instance (Ord location, Reducer value (cell value)) => Reducer (Address location value, value) (Heap location cell value) where
