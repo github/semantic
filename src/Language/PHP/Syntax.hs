@@ -70,7 +70,7 @@ include pathTerm f = do
   path <- resolvePHPName name
   traceResolve name path
   (importedEnv, v) <- isolate (f path) >>= maybeM (pure (emptyEnv, unit))
-  modifyEnv (mergeEnvs importedEnv)
+  bindAll importedEnv
   pure (Rval v)
 
 newtype Require a = Require a

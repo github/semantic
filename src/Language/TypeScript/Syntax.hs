@@ -148,7 +148,7 @@ evalRequire :: ( AbstractValue location value effects
             -> Evaluator location value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-  modifyEnv (mergeEnvs importedEnv)
+  bindAll importedEnv
   unit <$ makeNamespace alias addr Nothing
 
 data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
@@ -165,7 +165,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-    modifyEnv (mergeEnvs (renamed importedEnv)) $> Rval unit
+    bindAll (renamed importedEnv) $> Rval unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
