@@ -26,19 +26,20 @@ import Prologue
 
 -- | Retrieve the environment.
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
-getEnv = get
+getEnv = send GetEnv
 
 -- | Set the environment.
 putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
-putEnv = put
-
--- | Update the global environment.
-modifyEnv :: Member (Env address) effects => (Environment address -> Environment address) -> Evaluator address value effects ()
-modifyEnv = modify'
+putEnv = send . PutEnv
 
 -- | Sets the environment for the lifetime of the given action.
 withEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects a -> Evaluator address value effects a
-withEnv = localState . const
+withEnv env m = do
+  oldEnv <- getEnv
+  putEnv env
+  result <- m
+  putEnv oldEnv
+  pure result
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
@@ -63,13 +64,14 @@ locally a = do
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close
 
-
 data Env address return where
-  Lookup :: Name             -> Env address (Maybe address)
-  Bind   :: Name -> address  -> Env address ()
-  Close  :: Set Name         -> Env address (Environment address)
-  Push   ::                     Env address ()
-  Pop    ::                     Env address ()
+  Lookup :: Name                -> Env address (Maybe address)
+  Bind   :: Name -> address     -> Env address ()
+  Close  :: Set Name            -> Env address (Environment address)
+  Push   ::                        Env address ()
+  Pop    ::                        Env address ()
+  GetEnv ::                        Env address (Environment address)
+  PutEnv :: Environment address -> Env address ()
 
 handleEnv :: forall address effects value result
            . Member (State (Environment address)) effects
@@ -77,11 +79,13 @@ handleEnv :: forall address effects value result
           -> Env address result
           -> Evaluator address value effects result
 handleEnv defaultEnvironment = \case
-  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> getEnv
-  Bind name addr -> modifyEnv (Env.insert name addr)
-  Close names -> Env.intersect names <$> getEnv
-  Push -> modifyEnv Env.push
-  Pop -> modifyEnv Env.pop
+  Lookup name -> maybe (Env.lookup name defaultEnvironment) Just . Env.lookup name <$> get
+  Bind name addr -> modify (Env.insert name addr)
+  Close names -> Env.intersect names <$> get
+  Push -> modify (Env.push @address)
+  Pop -> modify (Env.pop @address)
+  GetEnv -> get
+  PutEnv e -> put e
 
 runEnv :: Member (State (Environment address)) effects
        => Environment address
