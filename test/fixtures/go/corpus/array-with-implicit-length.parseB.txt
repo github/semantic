@@ -4,13 +4,13 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
       (Identifier)
       (Composite
         (Array
           (Identifier))
-        (
+        (Statements
           (Integer)
           (Integer)
           (Integer))))))

@@ -29,7 +29,6 @@ library
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
                      , Analysis.Declaration
-                     , Analysis.IdentifierName
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment

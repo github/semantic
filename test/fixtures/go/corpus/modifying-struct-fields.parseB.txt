@@ -4,13 +4,13 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
       (Identifier)
       (Reference
         (Composite
           (Identifier)
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (Call

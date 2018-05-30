@@ -10,18 +10,18 @@
     {+(Identifier)+}
     {+(TextElement)+}
     {+(Empty)+}) }
-    (
+    (Statements
       (Assignment
         (Identifier)
         (Boolean))
     {+(ForEach
       {+(Identifier)+}
       {+(Identifier)+}
-      {+(
+      {+(Statements
         {+(Assignment
           {+(Identifier)+}
           {+(Boolean)+})+})+})+}))
-{-(
+{-(Statements
   {-(Let
     {-(Empty)-}
     {-(Call
@@ -32,7 +32,7 @@
       {-(TextElement)-}
       {-(Identifier)-}
       {-(Empty)-})-}
-    {-([])-})-}
+    {-(Statements)-})-}
   {-(Let
     {-(Empty)-}
     {-(Call
@@ -43,5 +43,5 @@
       {-(TextElement)-}
       {-(Identifier)-}
       {-(Empty)-})-}
-    {-(
+    {-(Statements
       {-(Identifier)-})-})-})-})

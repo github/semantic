@@ -4,23 +4,24 @@ module Language.Python.Syntax where
 import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
-import qualified Data.ByteString.Char8 as BC
+import           Data.Aeson
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
-import qualified Data.Language as Language
-import qualified Data.List.NonEmpty as NonEmpty
-import qualified Data.Semigroup.Reducer as Reducer
 import           Data.Mergeable
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.Language as Language
+import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Semigroup.Reducer as Reducer
 
 data QualifiedName
   = QualifiedName (NonEmpty FilePath)
   | RelativeQualifiedName FilePath (Maybe QualifiedName)
-  deriving (Eq, Generic, Hashable, Ord, Show)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 qualifiedName :: NonEmpty ByteString -> QualifiedName
 qualifiedName xs = QualifiedName (BC.unpack <$> xs)

@@ -2,7 +2,7 @@
   (DefaultExport
   { (Class
     {-(Identifier)-}
-    {-([])-})
+    {-(Statements)-})
   ->(Function
     {+(Empty)+}
     {+(Empty)+}
@@ -23,7 +23,7 @@
       {+(Assignment
         {+(Identifier)+}
         {+(Empty)+})+})+}
-    {+(
+    {+(Statements
       {+(Return
         {+(Hash
           {+(ShorthandPropertyIdentifier)+}

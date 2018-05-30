@@ -20,11 +20,11 @@
       {-(Assignment
         {-(Identifier)-}
         {-(Empty)-})-})-}
-    {-(
+    {-(Statements
       {-(Return
         {-(Hash
           {-(ShorthandPropertyIdentifier)-}
           {-(ShorthandPropertyIdentifier)-})-})-})-})
   ->(Class
     {+(Identifier)+}
-    {+([])+}) }))
+    {+(Statements)+}) }))

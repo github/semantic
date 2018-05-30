@@ -4,8 +4,8 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Complex))
