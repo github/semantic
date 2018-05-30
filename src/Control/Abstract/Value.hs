@@ -19,7 +19,6 @@ import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Data.Abstract.Address (Address)
 import Data.Abstract.Environment as Env
 import Data.Abstract.Live (Live)
 import Data.Abstract.Name
@@ -194,7 +193,7 @@ makeNamespace :: ( AbstractValue location value effects
                  , Reducer value (Cell location value)
                  )
               => Name
-              -> Address location value
+              -> location
               -> Maybe value
               -> Evaluator location value effects value
 makeNamespace name addr super = do

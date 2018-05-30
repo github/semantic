@@ -16,7 +16,6 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import Prologue
@@ -48,16 +47,16 @@ withDefaultEnvironment :: Member (Reader (Environment location)) effects => Envi
 withDefaultEnvironment e = local (const e)
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
-lookupEnv name = (<|>) <$> (fmap Address . Env.lookup name <$> getEnv) <*> (fmap Address . Env.lookup name <$> defaultEnvironment)
+lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe location)
+lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
 -- | Bind a 'Name' to an 'Address' in the current scope.
-bind :: Member (State (Environment location)) effects => Name -> Address location value -> Evaluator location value effects ()
-bind name = modifyEnv . Env.insert name . unAddress
+bind :: Member (State (Environment location)) effects => Name -> location -> Evaluator location value effects ()
+bind name = modifyEnv . Env.insert name
 
 -- | Bind all of the names from an 'Environment' in the current scope.
 bindAll :: Member (State (Environment location)) effects => Environment location -> Evaluator location value effects ()
-bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . pairs
+bindAll = foldr ((>>) . uncurry bind) (pure ()) . pairs
 
 -- | Run an action in a new local environment.
 locally :: Member (State (Environment location)) effects => Evaluator location value effects a -> Evaluator location value effects a
