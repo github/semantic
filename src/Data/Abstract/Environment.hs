@@ -28,8 +28,9 @@ import           Prelude hiding (head, lookup)
 import           Prologue
 
 -- $setup
--- >>> let bright = push (insert (name "foo") (Address (Precise 0)) emptyEnv)
--- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
+-- >>> import Data.Abstract.Address
+-- >>> let bright = push (insert (name "foo") (Precise 0) emptyEnv)
+-- >>> let shadowed = insert (name "foo") (Precise 1) bright
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
