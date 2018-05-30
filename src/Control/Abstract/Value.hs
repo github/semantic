@@ -245,4 +245,4 @@ subtermValue = value <=< subtermRef
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots location value where
   -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: value -> Live location value
+  valueRoots :: value -> Live location

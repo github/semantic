@@ -118,10 +118,10 @@ overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
 --   Unbound names are silently dropped.
-roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live location value
+roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live location
 roots env names = addresses (bind names env)
 
-addresses :: Ord location => Environment location -> Live location value
+addresses :: Ord location => Environment location -> Live location
 addresses = fromAddresses . map snd . pairs
 
 
