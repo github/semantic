@@ -7,12 +7,12 @@ module Data.Abstract.Exports
     , toEnvironment
     ) where
 
-import Prelude hiding (null)
-import Prologue hiding (null)
 import Data.Abstract.Environment (Environment, unpairs)
 import Data.Abstract.Name
 import qualified Data.Map as Map
 import Data.Semilattice.Lower
+import Prelude hiding (null)
+import Prologue hiding (null)
 
 -- | A map of export names to an alias & address tuple.
 newtype Exports location = Exports { unExports :: Map.Map Name (Name, Maybe location) }

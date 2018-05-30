@@ -3,13 +3,11 @@ module Control.Abstract.Environment
 ( Environment
 , getEnv
 , putEnv
-, modifyEnv
 , withEnv
-, localEnv
-, locally
 , lookupEnv
 , bind
 , bindAll
+, locally
 , close
 , Env(..)
 , runEnv
@@ -21,7 +19,6 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
 import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
@@ -44,29 +41,24 @@ withEnv :: Member (State (Environment location)) effects => Environment location
 withEnv = localState . const
 
 
--- | Run an action with a locally-modified environment.
-localEnv :: Member (State (Environment location)) effects => (Environment location -> Environment location) -> Evaluator location value effects a -> Evaluator location value effects a
-localEnv f a = do
-  modifyEnv (f . Env.push)
-  result <- a
-  result <$ modifyEnv Env.pop
+-- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
+lookupEnv :: Member (Env location) effects => Name -> Evaluator location value effects (Maybe location)
+lookupEnv name = send (Lookup name)
 
+-- | Bind a 'Name' to an address in the current scope.
+bind :: Member (Env location) effects => Name -> location -> Evaluator location value effects ()
+bind name addr = send (Bind name addr)
+
+-- | Bind all of the names from an 'Environment' in the current scope.
+bindAll :: Member (Env location) effects => Environment location -> Evaluator location value effects ()
+bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.pairs
+
+-- | Run an action in a new local scope.
 locally :: forall location value effects a . Member (Env location) effects => Evaluator location value effects a -> Evaluator location value effects a
 locally a = do
   send (Push @location)
   a' <- a
   a' <$ send (Pop @location)
-
--- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: Member (Env location) effects => Name -> Evaluator location value effects (Maybe (Address location value))
-lookupEnv name = fmap Address <$> send (Lookup name)
-
--- | Bind a 'Name' to an 'Address' in the environment.
-bind :: Member (Env location) effects => Name -> Address location value -> Evaluator location value effects ()
-bind name addr = send (Bind name (unAddress addr))
-
-bindAll :: Member (Env location) effects => Environment location -> Evaluator location value effects ()
-bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . Env.pairs
 
 close :: Member (Env location) effects => Set Name -> Evaluator location value effects (Environment location)
 close = send . Close

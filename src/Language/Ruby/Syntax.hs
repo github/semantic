@@ -74,7 +74,7 @@ instance Evaluatable Require where
     path <- resolveRubyName name
     traceResolve name path
     (importedEnv, v) <- isolate (doRequire path)
-    modifyEnv (`mergeNewer` importedEnv)
+    bindAll importedEnv
     pure (Rval v) -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( AbstractValue location value effects

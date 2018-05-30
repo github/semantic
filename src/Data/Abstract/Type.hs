@@ -8,7 +8,6 @@ module Data.Abstract.Type
   ) where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
 import Data.Semigroup.Reducer (Reducer)
@@ -132,8 +131,8 @@ instance ( Member (Allocator location Type) effects
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
-      bimap (Env.insert name (unAddress addr)) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    (zeroOrMoreProduct tvars :->) <$> locally (bindAll env >> body `catchReturn` \ (Return value) -> pure value)
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (emptyEnv, [])) names
+    (zeroOrMoreProduct tvars :->) <$> locally (bindAll env *> body `catchReturn` \ (Return value) -> pure value)
 
   call op params = do
     tvar <- fresh

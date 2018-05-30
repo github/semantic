@@ -8,7 +8,6 @@ module Control.Abstract.Exports
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
 import Data.Abstract.Exports
 import Data.Abstract.Name
 
@@ -25,8 +24,8 @@ modifyExports :: Member (State (Exports location)) effects => (Exports location 
 modifyExports = modify'
 
 -- | Add an export to the global export state.
-addExport :: Member (State (Exports location)) effects => Name -> Name -> Maybe (Address location value) -> Evaluator location value effects ()
-addExport name alias = modifyExports . insert name alias . fmap unAddress
+addExport :: Member (State (Exports location)) effects => Name -> Name -> Maybe location -> Evaluator location value effects ()
+addExport name alias = modifyExports . insert name alias
 
 -- | Sets the global export state for the lifetime of the given action.
 withExports :: Member (State (Exports location)) effects => Exports location -> Evaluator location value effects a -> Evaluator location value effects a

@@ -28,8 +28,9 @@ import           Prelude hiding (head, lookup)
 import           Prologue
 
 -- $setup
--- >>> let bright = push (insert (name "foo") (Address (Precise 0)) emptyEnv)
--- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
+-- >>> import Data.Abstract.Address
+-- >>> let bright = push (insert (name "foo") (Precise 0) emptyEnv)
+-- >>> let shadowed = insert (name "foo") (Precise 1) bright
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
@@ -82,11 +83,11 @@ unpairs = Environment . pure . Map.fromList
 -- >>> lookup (name "foo") shadowed
 -- Just (Precise 1)
 lookup :: Name -> Environment location -> Maybe location
-lookup k = foldMapA (Map.lookup k) . unEnvironment
+lookup name = foldMapA (Map.lookup name) . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 insert :: Name -> location -> Environment location -> Environment location
-insert name address (Environment (a :| as)) = Environment (Map.insert name address a :| as)
+insert name addr (Environment (a :| as)) = Environment (Map.insert name addr a :| as)
 
 -- | Remove a 'Name' from the environment.
 --
@@ -118,7 +119,7 @@ overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
 --
 --   Unbound names are silently dropped.
 roots :: (Ord location, Foldable t) => Environment location -> t Name -> Live location
-roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
+roots env names = addresses (names `intersect` env)
 
 addresses :: Ord location => Environment location -> Live location
 addresses = fromAddresses . map snd . pairs

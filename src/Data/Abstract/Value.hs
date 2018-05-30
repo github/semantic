@@ -2,7 +2,6 @@
 module Data.Abstract.Value where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
@@ -85,8 +84,8 @@ instance ( Coercible body (Eff effects)
             value <- param
             addr <- alloc name
             assign addr value
-            Env.insert name (unAddress addr) <$> rest) (pure env) (zip names params)
-          locally (bindAll bindings >> raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
+            Env.insert name addr <$> rest) (pure env) (zip names params)
+          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
       _ -> throwValueError (CallError op)
 
 
