@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
-import           Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
@@ -253,7 +252,7 @@ instance Evaluatable QualifiedExportFrom where
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
-      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just . Address) address
+      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
     pure (Rval unit)
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
