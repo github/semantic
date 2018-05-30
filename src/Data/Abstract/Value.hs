@@ -72,7 +72,7 @@ instance ( Coercible body (Eff effects)
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
+    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) . Env.intersect (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case op of
@@ -85,7 +85,7 @@ instance ( Coercible body (Eff effects)
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
+          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
       _ -> throwValueError (CallError op)
 
 

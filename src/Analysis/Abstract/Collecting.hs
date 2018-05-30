@@ -12,7 +12,7 @@ import Prologue
 
 -- | An analysis performing GC after every instruction.
 collectingTerms :: ( Foldable (Cell location)
-                   , Member (Reader (Live location value)) effects
+                   , Member (Reader (Live location)) effects
                    , Member (State (Heap location (Cell location) value)) effects
                    , Ord location
                    , ValueRoots location value
@@ -29,7 +29,7 @@ gc :: ( Ord location
       , Foldable (Cell location)
       , ValueRoots location value
       )
-   => Live location value                 -- ^ The set of addresses to consider rooted.
+   => Live location                       -- ^ The set of addresses to consider rooted.
    -> Heap location (Cell location) value -- ^ A heap to collect unreachable addresses within.
    -> Heap location (Cell location) value -- ^ A garbage-collected heap.
 gc roots heap = heapRestrict heap (reachable roots heap)
@@ -39,9 +39,9 @@ reachable :: ( Ord location
              , Foldable (Cell location)
              , ValueRoots location value
              )
-          => Live location value                 -- ^ The set of root addresses.
+          => Live location                       -- ^ The set of root addresses.
           -> Heap location (Cell location) value -- ^ The heap to trace addresses through.
-          -> Live location value                 -- ^ The set of addresses reachable from the root set.
+          -> Live location                       -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
@@ -50,5 +50,5 @@ reachable roots heap = go mempty roots
             _           -> seen)
 
 
-providingLiveSet :: Effectful (m location value) => m location value (Reader (Live location value) ': effects) a -> m location value effects a
+providingLiveSet :: Effectful (m location value) => m location value (Reader (Live location) ': effects) a -> m location value effects a
 providingLiveSet = runReader lowerBound

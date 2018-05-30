@@ -3,14 +3,12 @@ module Control.Abstract.Environment
 ( Environment
 , getEnv
 , putEnv
-, modifyEnv
 , withEnv
-, defaultEnvironment
 , withDefaultEnvironment
-, fullEnvironment
-, localEnv
-, localize
 , lookupEnv
+, bind
+, bindAll
+, locally
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -18,7 +16,6 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import Prologue
@@ -49,25 +46,24 @@ defaultEnvironment = ask
 withDefaultEnvironment :: Member (Reader (Environment location)) effects => Environment location -> Evaluator location value effects a -> Evaluator location value effects a
 withDefaultEnvironment e = local (const e)
 
--- | Obtain an environment that is the composition of the current and default environments.
---   Useful for debugging.
-fullEnvironment :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Evaluator location value effects (Environment location)
-fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
-
--- | Run an action with a locally-modified environment.
-localEnv :: Member (State (Environment location)) effects => (Environment location -> Environment location) -> Evaluator location value effects a -> Evaluator location value effects a
-localEnv f a = do
-  modifyEnv (f . Env.push)
-  result <- a
-  result <$ modifyEnv Env.pop
-
--- | Run a computation in a new local environment.
-localize :: Member (State (Environment location)) effects => Evaluator location value effects a -> Evaluator location value effects a
-localize = localEnv id
-
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
+lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe location)
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
+
+-- | Bind a 'Name' to an 'Address' in the current scope.
+bind :: Member (State (Environment location)) effects => Name -> location -> Evaluator location value effects ()
+bind name = modifyEnv . Env.insert name
+
+-- | Bind all of the names from an 'Environment' in the current scope.
+bindAll :: Member (State (Environment location)) effects => Environment location -> Evaluator location value effects ()
+bindAll = foldr ((>>) . uncurry bind) (pure ()) . pairs
+
+-- | Run an action in a new local environment.
+locally :: Member (State (Environment location)) effects => Evaluator location value effects a -> Evaluator location value effects a
+locally a = do
+  modifyEnv Env.push
+  a' <- a
+  a' <$ modifyEnv Env.pop
 
 
 -- | Errors involving the environment.
