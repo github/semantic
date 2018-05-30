@@ -96,18 +96,10 @@ reinterpretEnv :: Evaluator address value (Env address ': effects) a
                -> Evaluator address value (State (Environment address) ': effects) a
 reinterpretEnv = reinterpret handleEnv
 
-runEnvState :: forall address value effects a
-            .  Environment address
+runEnvState :: Environment address
             -> Evaluator address value (Env address ': effects) a
             -> Evaluator address value effects (a, Environment address)
-runEnvState initial = relayState initial (\ s a -> pure (a, s)) $ \ s eff yield -> case eff of
-  Lookup name -> yield s (Env.lookup name s)
-  Bind name addr -> yield (Env.insert name addr s) ()
-  Close names -> yield s (Env.intersect names s)
-  Push -> yield (Env.push @address s) ()
-  Pop -> yield (Env.pop @address s) ()
-  GetEnv -> yield s s
-  PutEnv e -> yield e ()
+runEnvState initial = runState initial . reinterpretEnv
 
 
 -- | Errors involving the environment.
