@@ -1,5 +1,5 @@
 {-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
+{-# OPTIONS_GHC -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable
@@ -105,12 +105,12 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 
 instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
   liftEncodeMessage encodeMessage num fs = apply @Message1 (liftEncodeMessage encodeMessage num) fs
-  liftDecodeMessage decodeMessage num = oneof undefined listOfParsers
+  liftDecodeMessage decodeMessage _ = oneof undefined listOfParsers
     where
       listOfParsers =
-        generate @Message1 @fs @fs (\ (proxy :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
+        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
   liftDotProto _ =
-    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (proxy :: proxy f) i ->
+    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (_ :: proxy f) i ->
       let
         num = FieldNumber (fromInteger (succ i))
         fieldType = Proto.Prim (Proto.Named . Proto.Single $ nameOf1 (Proxy @f))
