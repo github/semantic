@@ -51,9 +51,11 @@ withDefaultEnvironment e = local (const e)
 lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (fmap Address . Env.lookup name <$> getEnv) <*> (fmap Address . Env.lookup name <$> defaultEnvironment)
 
+-- | Bind a 'Name' to an 'Address' in the current scope.
 bind :: Member (State (Environment location)) effects => Name -> Address location value -> Evaluator location value effects ()
 bind name = modifyEnv . Env.insert name . unAddress
 
+-- | Bind all of the names from an 'Environment' in the current scope.
 bindAll :: Member (State (Environment location)) effects => Environment location -> Evaluator location value effects ()
 bindAll = foldr ((>>) . uncurry bind . second Address) (pure ()) . pairs
 
