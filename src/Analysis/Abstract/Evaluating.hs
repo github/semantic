@@ -12,7 +12,6 @@ data EvaluatingState address value = EvaluatingState
   { environment :: Environment address
   , heap        :: Heap address (Cell address) value
   , modules     :: ModuleTable (Maybe (Environment address, value))
-  , exports     :: Exports address
   }
 
 deriving instance (Eq (Cell address value), Eq address, Eq value) => Eq (EvaluatingState address value)
@@ -26,12 +25,10 @@ evaluating :: Evaluator address value
                 ': State (Environment address)
                 ': State (Heap address (Cell address) value)
                 ': State (ModuleTable (Maybe (Environment address, value)))
-                ': State (Exports address)
                 ': effects) result
            -> Evaluator address value effects (Either String result, EvaluatingState address value)
 evaluating
-  = fmap (\ ((((result, env), heap), modules), exports) -> (result, EvaluatingState env heap modules exports))
-  . runState lowerBound -- State (Exports address)
+  = fmap (\ (((result, env), heap), modules) -> (result, EvaluatingState env heap modules))
   . runState lowerBound -- State (ModuleTable (Maybe (Environment address, value)))
   . runState lowerBound -- State (Heap address (Cell address) value)
   . runState lowerBound -- State (Environment address)
