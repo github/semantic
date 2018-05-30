@@ -276,7 +276,7 @@ instance Evaluatable TypeAlias where
     v <- subtermValue typeAliasKind
     addr <- lookupOrAlloc name
     assign addr v
-    Rval v <$> bind name addr
+    Rval v <$ bind name addr
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier
