@@ -21,8 +21,9 @@ class ToJSONFields a where
 
 class ToJSONFields1 f where
   toJSONFields1 :: (KeyValue kv, ToJSON a) => f a -> [kv]
-  default toJSONFields1 :: (KeyValue kv, ToJSON a, GToJSONFields1 (Rep1 f), Generic1 f) => f a -> [kv]
-  toJSONFields1 = gtoJSONFields1 . from1
+  default toJSONFields1 :: (KeyValue kv, ToJSON a, GToJSONFields1 (Rep1 f), GConstructorName1 (Rep1 f), Generic1 f) => f a -> [kv]
+  toJSONFields1 s = let r = from1 s in
+    "term" .= gconstructorName1 r : gtoJSONFields1 r
 
 withChildren :: (KeyValue kv, ToJSON a, Foldable f) => f a -> [kv] -> [kv]
 withChildren f ks = ("children" .= toList f) : ks
@@ -72,6 +73,25 @@ instance (ToJSON a, ToJSONFields1 f) => ToJSON (JSONFields1 f a) where
   toEncoding = pairs . mconcat . toJSONFields1 . unJSONFields1
 
 
+-- | A typeclass to retrieve the name of a data constructor.
+class GConstructorName1 f where
+  gconstructorName1 :: f a -> String
+
+instance Apply GConstructorName1 fs => GConstructorName1 (Sum fs) where
+  gconstructorName1 = apply @GConstructorName1 gconstructorName1
+
+instance GConstructorName1 f => GConstructorName1 (M1 D c f) where
+  gconstructorName1 = gconstructorName1 . unM1
+
+instance Constructor c => GConstructorName1 (M1 C c f) where
+  gconstructorName1 = conName
+
+instance (GConstructorName1 f, GConstructorName1 g) => GConstructorName1 (f :+: g) where
+  gconstructorName1 (L1 l) = gconstructorName1 l
+  gconstructorName1 (R1 r) = gconstructorName1 r
+
+
+-- | A typeclass to calculate a list of 'KeyValue's describing the record selector names and associated values on a datatype.
 class GToJSONFields1 f where
   gtoJSONFields1 :: (KeyValue kv, ToJSON a) => f a -> [kv]
 
@@ -84,22 +104,11 @@ instance GToJSONFields1 f => GToJSONFields1 (M1 C c f) where
 instance GToJSONFields1 U1 where
   gtoJSONFields1 _ = []
 
-instance (Selector c, GToJSONFields1' f) => GToJSONFields1 (M1 S c f) where
-  gtoJSONFields1 m1 = let json = gtoJSON (unM1 m1) in case selName m1 of
+instance (Selector c, GSelectorJSONValue1 f) => GToJSONFields1 (M1 S c f) where
+  gtoJSONFields1 m1 = case selName m1 of
     "" -> [ "children" .= json ]
     n ->  [ Text.pack n .= json ]
-
-class GToJSONFields1' f where
-  gtoJSON :: ToJSON a => f a -> SomeJSON
-
-instance GToJSONFields1' Par1 where
-  gtoJSON = SomeJSON . unPar1
-
-instance ToJSON1 f => GToJSONFields1' (Rec1 f) where
-  gtoJSON = SomeJSON . SomeJSON1 . unRec1
-
-instance ToJSON k => GToJSONFields1' (K1 r k) where
-  gtoJSON = SomeJSON . unK1
+    where json = gselectorJSONValue1 (unM1 m1)
 
 instance (GToJSONFields1 f, GToJSONFields1 g) => GToJSONFields1 (f :+: g) where
   gtoJSONFields1 (L1 l) = gtoJSONFields1 l
@@ -107,6 +116,19 @@ instance (GToJSONFields1 f, GToJSONFields1 g) => GToJSONFields1 (f :+: g) where
 
 instance (GToJSONFields1 f, GToJSONFields1 g) => GToJSONFields1 (f :*: g) where
   gtoJSONFields1 (x :*: y) = gtoJSONFields1 x <> gtoJSONFields1 y
+
+-- | A typeclass to retrieve the JSON 'Value' of a record selector.
+class GSelectorJSONValue1 f where
+  gselectorJSONValue1 :: ToJSON a => f a -> SomeJSON
+
+instance GSelectorJSONValue1 Par1 where
+  gselectorJSONValue1 = SomeJSON . unPar1
+
+instance ToJSON1 f => GSelectorJSONValue1 (Rec1 f) where
+  gselectorJSONValue1 = SomeJSON . SomeJSON1 . unRec1
+
+instance ToJSON k => GSelectorJSONValue1 (K1 r k) where
+  gselectorJSONValue1 = SomeJSON . unK1
 
 
 -- TODO: Fix this orphan instance.

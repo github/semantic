@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
 module Semantic.Parse where
 
-import Analysis.ConstructorName (ConstructorName, constructorLabel)
+import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
 import Data.AST
@@ -18,7 +18,7 @@ import Semantic.Task
 import Serializing.Format
 
 runParse :: (Member (Distribute WrappedTask) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
-runParse JSONTermRenderer             = withParsedBlobs (\ blob -> decorate constructorLabel >=> render (renderJSONTerm blob)) >=> serialize JSON
+runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm) >=> serialize JSON
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
 runParse TagsTermRenderer             = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderToTags blob)) >=> serialize JSON

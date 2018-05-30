@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables #-}
 module Semantic.Diff where
 
-import Analysis.ConstructorName (ConstructorName, constructorLabel)
+import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Data.AST
 import Data.Blob
@@ -21,7 +21,7 @@ import Serializing.Format
 
 runDiff :: (Member (Distribute WrappedTask) effs, Member Task effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
-runDiff JSONDiffRenderer        = withParsedBlobPairs (const (decorate constructorLabel)) (render . renderJSONDiff) >=> serialize JSON
+runDiff JSONDiffRenderer        = withParsedBlobPairs (const pure) (render . renderJSONDiff) >=> serialize JSON
 runDiff SExpressionDiffRenderer = withParsedBlobPairs (const pure) (const (serialize (SExpression ByConstructorName)))
 runDiff ShowDiffRenderer        = withParsedBlobPairs (const pure) (const (serialize Show))
 runDiff DOTDiffRenderer         = withParsedBlobPairs (const pure) (const (render renderTreeGraph)) >=> serialize (DOT (diffStyle "diffs"))
