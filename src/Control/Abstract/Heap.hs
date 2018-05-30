@@ -24,7 +24,6 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Monad.Effect.Internal
 import Data.Abstract.Address
-import Data.Abstract.Environment
 import Data.Abstract.Heap
 import Data.Abstract.Name
 import Data.Semigroup.Reducer
@@ -84,7 +83,7 @@ letrec :: ( Member (Allocator location value) effects
        -> Evaluator location value effects (value, Address location value)
 letrec name body = do
   addr <- lookupOrAlloc name
-  v <- localEnv (insert name (unAddress addr)) body
+  v <- locally (bind name addr *> body)
   assign addr v
   pure (v, addr)
 

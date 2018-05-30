@@ -86,7 +86,7 @@ instance ( Coercible body (Eff effects)
             a <- alloc name
             assign a v
             Env.insert name (unAddress a) <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
+          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
       _ -> throwValueError (CallError op)
 
 

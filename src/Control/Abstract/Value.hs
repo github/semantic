@@ -214,7 +214,7 @@ evaluateInScopedEnv :: ( AbstractValue location value effects
                     -> Evaluator location value effects value
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvTerm >>= scopedEnvironment
-  maybe term (flip localEnv term . mergeEnvs) scopedEnv
+  maybe term (\ env -> locally (bindAll env *> term)) scopedEnv
 
 
 -- | Evaluates a 'Value' returning the referenced value

@@ -133,7 +133,7 @@ instance ( Member (Allocator location Type) effects
       tvar <- Var <$> fresh
       assign a tvar
       bimap (Env.insert name (unAddress a)) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    (zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
+    (zeroOrMoreProduct tvars :->) <$> locally (bindAll env *> body `catchReturn` \ (Return value) -> pure value)
 
   call op params = do
     tvar <- fresh
