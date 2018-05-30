@@ -5,7 +5,6 @@ module Control.Abstract.Environment
 , putEnv
 , withEnv
 , withDefaultEnvironment
-, fullEnvironment
 , lookupEnv
 , bind
 , bindAll
@@ -47,11 +46,6 @@ defaultEnvironment = ask
 --   Usually only invoked in a top-level evaluation function.
 withDefaultEnvironment :: Member (Reader (Environment location)) effects => Environment location -> Evaluator location value effects a -> Evaluator location value effects a
 withDefaultEnvironment e = local (const e)
-
--- | Obtain an environment that is the composition of the current and default environments.
---   Useful for debugging.
-fullEnvironment :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Evaluator location value effects (Environment location)
-fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: (Member (Reader (Environment location)) effects, Member (State (Environment location)) effects) => Name -> Evaluator location value effects (Maybe (Address location value))
