@@ -104,7 +104,7 @@ instance Ord1 Rational where liftCompare = genericLiftCompare
 instance Show1 Rational where liftShowsPrec = genericLiftShowsPrec
 
 -- | String values.
-newtype String value = String ByteString
+newtype String value = String Text
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 String where liftEq = genericLiftEq
@@ -112,8 +112,7 @@ instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
 -- | Possibly-interned Symbol values.
---   TODO: Should this store a 'Text'?
-newtype Symbol value = Symbol ByteString
+newtype Symbol value = Symbol Text
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
@@ -381,7 +380,7 @@ instance ( Members '[ Allocator location (Value location)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError location resume where
-  StringError            :: Value location                   -> ValueError location ByteString
+  StringError            :: Value location                   -> ValueError location Text
   BoolError              :: Value location                   -> ValueError location Bool
   IndexError             :: Value location -> Value location -> ValueError location (Value location)
   NamespaceError         :: Prelude.String                   -> ValueError location (Environment location)

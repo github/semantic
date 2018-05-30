@@ -3,7 +3,7 @@ module Data.Syntax.Directive where
 
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module (ModuleInfo(..))
-import qualified Data.ByteString.Char8 as BC
+import qualified Data.Text as T
 import           Data.JSON.Fields
 import           Data.Span
 import           Diffing.Algorithm
@@ -20,7 +20,7 @@ instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 File
 
 instance Evaluatable File where
-  eval File = Rval <$> (currentModule >>= string . BC.pack . modulePath)
+  eval File = Rval <$> (currentModule >>= string . T.pack . modulePath)
 
 
 -- A line directive like the Ruby constant `__LINE__`.

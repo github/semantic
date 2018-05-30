@@ -20,7 +20,7 @@ import           System.FilePath.Posix
 resolveRubyName :: Members '[ Modules location value
                             , Resumable ResolutionError
                             ] effects
-                => ByteString
+                => Text
                 -> Evaluator location value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name

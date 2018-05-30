@@ -94,11 +94,11 @@ class AbstractFunction location value effects => AbstractValue location value ef
   boolean :: Bool -> Evaluator location value effects value
 
   -- | Construct an abstract string value.
-  string :: ByteString -> Evaluator location value effects value
+  string :: Text -> Evaluator location value effects value
 
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: ByteString -> Evaluator location value effects value
+  symbol :: Text -> Evaluator location value effects value
 
   -- | Construct a floating-point value.
   float :: Scientific -> Evaluator location value effects value
@@ -122,7 +122,7 @@ class AbstractFunction location value effects => AbstractValue location value ef
   hash :: [(value, value)] -> Evaluator location value effects value
 
   -- | Extract a 'Text' from a given value.
-  asString :: value -> Evaluator location value effects ByteString
+  asString :: value -> Evaluator location value effects Text
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> Evaluator location value effects a -> Evaluator location value effects a -> Evaluator location value effects a

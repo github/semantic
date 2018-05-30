@@ -49,10 +49,10 @@ array :: Assignment
 array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
 
 number :: Assignment
-number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
+number = makeTerm <$> symbol Number <*> (Literal.Float <$> tsource)
 
 string :: Assignment
-string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)
 
 boolean :: Assignment
 boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)

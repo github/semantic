@@ -354,13 +354,13 @@ list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> manyTerm expression)
 
 string :: Assignment
-string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)
 
 concatenatedString :: Assignment
 concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (manyTerm string)
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> tsource)
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> tsource)

@@ -12,7 +12,6 @@ import Data.Abstract.Environment
 import Data.Abstract.Name
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
-import qualified Data.ByteString.Char8 as B
 import qualified Data.Text as T
 
 builtin :: ( HasCallStack
@@ -60,4 +59,4 @@ defineBuiltins :: ( AbstractValue location value effects
                   )
                => Evaluator location value effects ()
 defineBuiltins =
-  builtin "print" (lambda lowerBound (\ v -> variable v >>= asString >>= trace . B.unpack >> unit))
+  builtin "print" (lambda lowerBound (\ v -> variable v >>= asString >>= trace . T.unpack >> unit))

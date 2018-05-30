@@ -281,7 +281,7 @@ this :: Assignment
 this = makeTerm <$> symbol Grammar.This <*> (TypeScript.Syntax.This <$ source)
 
 regex :: Assignment
-regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)
+regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> tsource)
 
 null' :: Assignment
 null' = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
@@ -330,10 +330,10 @@ importAlias' :: Assignment
 importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> children (TypeScript.Syntax.ImportAlias <$> term identifier <*> term (identifier <|> nestedIdentifier))
 
 number :: Assignment
-number = makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
+number = makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> tsource)
 
 string :: Assignment
-string = makeTerm <$> symbol Grammar.String <*> (Literal.TextElement <$> source)
+string = makeTerm <$> symbol Grammar.String <*> (Literal.TextElement <$> tsource)
 
 true :: Assignment
 true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)

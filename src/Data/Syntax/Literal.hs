@@ -2,10 +2,9 @@
 module Data.Syntax.Literal where
 
 import           Data.Abstract.Evaluatable
-import           Data.ByteString.Char8 (unpack)
-import qualified Data.ByteString.Char8 as B
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
+import           Data.Text (unpack)
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prelude hiding (Float, null)
@@ -57,7 +56,7 @@ instance ToJSONFields1 Data.Syntax.Literal.Integer where
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 -- | A literal float of unspecified width.
-newtype Float a = Float { floatContent  :: ByteString }
+newtype Float a = Float { floatContent  :: Text }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
@@ -69,10 +68,10 @@ instance Evaluatable Data.Syntax.Literal.Float where
     Rval <$> (float =<< either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 instance ToJSONFields1 Float where
-  toJSONFields1 (Float f) = noChildren ["asString" .= unpack f]
+  toJSONFields1 (Float f) = noChildren ["asString" .= f]
 
 -- Rational literals e.g. `2/3r`
-newtype Rational a = Rational ByteString
+newtype Rational a = Rational Text
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Data.Syntax.Literal.Rational where liftEq = genericLiftEq
@@ -82,15 +81,15 @@ instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftSho
 instance Evaluatable Data.Syntax.Literal.Rational where
   eval (Rational r) =
     let
-      trimmed = B.takeWhile (/= 'r') r
+      trimmed = T.takeWhile (/= 'r') r
       parsed = readMaybe @Prelude.Integer (unpack trimmed)
     in Rval <$> (rational =<< maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
 
 instance ToJSONFields1 Data.Syntax.Literal.Rational where
-  toJSONFields1 (Rational r) = noChildren ["asString" .= unpack r]
+  toJSONFields1 (Rational r) = noChildren ["asString" .= r]
 
 -- Complex literals e.g. `3 + 2i`
-newtype Complex a = Complex ByteString
+newtype Complex a = Complex Text
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Data.Syntax.Literal.Complex where liftEq = genericLiftEq
@@ -101,7 +100,7 @@ instance Show1 Data.Syntax.Literal.Complex where liftShowsPrec = genericLiftShow
 instance Evaluatable Complex
 
 instance ToJSONFields1 Complex where
-  toJSONFields1 (Complex c) = noChildren ["asString" .= unpack c]
+  toJSONFields1 (Complex c) = noChildren ["asString" .= c]
 
 -- Strings, symbols
 
@@ -133,7 +132,7 @@ instance Evaluatable InterpolationElement
 instance ToJSONFields1 InterpolationElement
 
 -- | A sequence of textual contents within a string literal.
-newtype TextElement a = TextElement { textElementContent :: ByteString }
+newtype TextElement a = TextElement { textElementContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
@@ -141,7 +140,7 @@ instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 instance ToJSONFields1 TextElement where
-  toJSONFields1 (TextElement c) = noChildren ["asString" .= unpack c]
+  toJSONFields1 (TextElement c) = noChildren ["asString" .= c]
 
 instance Evaluatable TextElement where
   eval (TextElement x) = Rval <$> string x
@@ -157,7 +156,7 @@ instance Evaluatable Null where eval _ = Rval <$> null
 
 instance ToJSONFields1 Null
 
-newtype Symbol a = Symbol { symbolContent :: ByteString }
+newtype Symbol a = Symbol { symbolContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
@@ -169,7 +168,7 @@ instance ToJSONFields1 Symbol
 instance Evaluatable Symbol where
   eval (Symbol s) = Rval <$> symbol s
 
-newtype Regex a = Regex { regexContent :: ByteString }
+newtype Regex a = Regex { regexContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Regex where liftEq = genericLiftEq
@@ -180,7 +179,7 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Character literals.
 
 instance ToJSONFields1 Regex where
-  toJSONFields1 (Regex r) = noChildren ["asString" .= unpack r]
+  toJSONFields1 (Regex r) = noChildren ["asString" .= r]
 
 
 -- TODO: Implement Eval instance for Regex
