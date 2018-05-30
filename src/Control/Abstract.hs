@@ -5,7 +5,7 @@ module Control.Abstract
 import Control.Abstract.Addressable as X
 import Control.Abstract.Configuration as X
 import Control.Abstract.Context as X
-import Control.Abstract.Environment as X
+import Control.Abstract.Environment as X hiding (Lookup)
 import Control.Abstract.Evaluator as X
 import Control.Abstract.Exports as X
 import Control.Abstract.Heap as X
