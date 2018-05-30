@@ -22,6 +22,7 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
+import GHC.Exts (fromList)
 import Prologue
 
 -- | The type of TypeScript syntax.
@@ -89,6 +90,7 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
+  , Syntax.Statements
   , Syntax.Context
   , Type.Readonly
   , Type.TypeParameters
@@ -175,11 +177,14 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyTerm statement) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . fromList <$> manyTerm statement) <|> parseError
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
+manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
+manyStatements expr = fromList <$> (manyTerm expr)
 
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
@@ -763,11 +768,11 @@ internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (TypeScript.Syntax.InternalModule <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
+module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure (fromList [])))
 
 
-statements :: Assignment.Assignment [] Grammar [Term]
-statements = symbol StatementBlock *> children (manyTerm statement)
+statements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
+statements = symbol StatementBlock *> children (manyStatements statement)
 
 arrowFunction :: Assignment
 arrowFunction = makeArrowFun <$> symbol ArrowFunction <*> children ((,,) <$> emptyTerm <*> (((\a b c -> (a, [b], c)) <$> emptyTerm <*> term identifier <*> emptyTerm) <|> callSignatureParts) <*> term (expression <|> statementBlock))

@@ -22,6 +22,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import Data.Sum
+import GHC.Exts (fromList)
 import qualified Data.Term as Term
 import Prologue
 
@@ -91,6 +92,7 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Identifier
    , Syntax.Program
+   , Syntax.Statements
    , Type.Annotation
    , Type.Array
    , Type.Function
@@ -111,7 +113,7 @@ assignment :: Assignment
 assignment = handleError program <|> parseError
 
 program :: Assignment
-program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> manyTerm expression)
+program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program . fromList <$> manyTerm expression)
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))

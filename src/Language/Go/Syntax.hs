@@ -9,6 +9,7 @@ import           Data.Aeson
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
+import           Data.Syntax (Statements)
 import           Diffing.Algorithm
 import           Prologue
 import           System.FilePath.Posix
@@ -299,7 +300,7 @@ instance ToJSONFields1 Field
 instance Evaluatable Field
 
 
-data Package a = Package { packageName :: !a, packageContents :: ![a] }
+data Package a = Package { packageName :: !a, packageContents :: Statements a }
   deriving (Diffable, Eq, FreeVariables1, Declarations1, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Package where liftEq = genericLiftEq
