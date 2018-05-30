@@ -2,7 +2,6 @@
 module Control.Abstract.Environment
 ( Environment
 , getEnv
-, putEnv
 , lookupEnv
 , bind
 , bindAll
@@ -27,10 +26,6 @@ import Prologue
 -- | Retrieve the environment.
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
-
--- | Set the environment.
-putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
-putEnv = send . PutEnv
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
@@ -62,7 +57,6 @@ data Env address return where
   Push   ::                        Env address ()
   Pop    ::                        Env address ()
   GetEnv ::                        Env address (Environment address)
-  PutEnv :: Environment address -> Env address ()
 
 handleEnv :: forall address effects value result
            . Member (State (Environment address)) effects
@@ -75,7 +69,6 @@ handleEnv = \case
   Push -> modify (Env.push @address)
   Pop -> modify (Env.pop @address)
   GetEnv -> get
-  PutEnv e -> put e
 
 runEnv :: Member (State (Environment address)) effects
        => Evaluator address value (Env address ': effects) a
