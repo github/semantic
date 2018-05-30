@@ -144,7 +144,7 @@ evalRequire :: ( AbstractValue address value effects
             -> Name
             -> Evaluator address value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
-  importedEnv <- maybe emptyEnv fst <$> require modulePath
+  importedEnv <- maybe emptyEnv snd <$> require modulePath
   bindAll importedEnv
   unit <$ makeNamespace alias addr Nothing
 
@@ -161,7 +161,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- maybe emptyEnv fst <$> require modulePath
+    importedEnv <- maybe emptyEnv snd <$> require modulePath
     bindAll (renamed importedEnv) $> Rval unit
     where
       renamed importedEnv
@@ -246,7 +246,7 @@ instance ToJSONFields1 QualifiedExportFrom
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- maybe emptyEnv fst <$> require modulePath
+    importedEnv <- maybe emptyEnv snd <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv

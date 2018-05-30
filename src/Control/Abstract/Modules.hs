@@ -23,11 +23,10 @@ import Data.Abstract.Environment
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
-import Data.Tuple (swap)
 import Prologue
 
 -- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
-lookupModule :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Maybe (Environment address, value)))
+lookupModule :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Maybe (value, Environment address)))
 lookupModule = send . Lookup
 
 -- | Resolve a list of module paths to a possible module table entry.
@@ -41,19 +40,19 @@ listModulesInDir = sendModules . List
 -- | Require/import another module by name and return its environment and value.
 --
 -- Looks up the module's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Environment address, value))
+require :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (value, Environment address))
 require path = lookupModule path >>= maybeM (load path)
 
 -- | Load another module by name and return its environment and value.
 --
 -- Always loads/evaluates.
-load :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Environment address, value))
-load path = fmap swap <$> send (Load path)
+load :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (value, Environment address))
+load path = send (Load path)
 
 
 data Modules address value return where
   Load    :: ModulePath -> Modules address value (Maybe (value, Environment address))
-  Lookup  :: ModulePath -> Modules address value (Maybe (Maybe (Environment address, value)))
+  Lookup  :: ModulePath -> Modules address value (Maybe (Maybe (value, Environment address)))
   Resolve :: [FilePath] -> Modules address value (Maybe ModulePath)
   List    :: FilePath   -> Modules address value [ModulePath]
 
@@ -62,7 +61,7 @@ sendModules = send
 
 runModules :: forall term address value effects a
            .  ( Member (Resumable (LoadError address value)) effects
-              , Member (State (ModuleTable (Maybe (Environment address, value)))) effects
+              , Member (State (ModuleTable (Maybe (value, Environment address)))) effects
               , Member Trace effects
               )
            => (Module term -> Evaluator address value (Modules address value ': effects) (value, Environment address))
@@ -90,11 +89,11 @@ runModules evaluateModule = go
             pure (find isMember names)
           List dir -> modulePathsInDir dir <$> askModuleTable @term)
 
-getModuleTable :: Member (State (ModuleTable (Maybe (Environment address, value)))) effects => Evaluator address value effects (ModuleTable (Maybe (Environment address, value)))
+getModuleTable :: Member (State (ModuleTable (Maybe (value, Environment address)))) effects => Evaluator address value effects (ModuleTable (Maybe (value, Environment address)))
 getModuleTable = get
 
-cacheModule :: Member (State (ModuleTable (Maybe (Environment address, value)))) effects => ModulePath -> Maybe (value, Environment address) -> Evaluator address value effects (Maybe (value, Environment address))
-cacheModule path result = modify' (ModuleTable.insert path (swap <$> result)) $> result
+cacheModule :: Member (State (ModuleTable (Maybe (value, Environment address)))) effects => ModulePath -> Maybe (value, Environment address) -> Evaluator address value effects (Maybe (value, Environment address))
+cacheModule path result = modify' (ModuleTable.insert path result) $> result
 
 askModuleTable :: Member (Reader (ModuleTable [Module term])) effects => Evaluator address value effects (ModuleTable [Module term])
 askModuleTable = ask

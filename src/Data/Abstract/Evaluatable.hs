@@ -82,7 +82,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (LoadError address value)) outer
                        , Member (State (Heap address (Cell address) value)) outer
-                       , Member (State (ModuleTable (Maybe (Environment address, value)))) outer
+                       , Member (State (ModuleTable (Maybe (value, Environment address)))) outer
                        , Member Trace outer
                        , Recursive term
                        , inner ~ (LoopControl value ': Return value ': Env address ': Allocator address value ': inner')
@@ -118,7 +118,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (value, Environment address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
-          (env, value) <- fromMaybe (emptyEnv, unit) <$> require m
+          (value, env) <- fromMaybe (unit, emptyEnv) <$> require m
           bindAll env
           maybe (pure value) ((`call` []) <=< variable) sym
 
