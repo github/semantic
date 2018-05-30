@@ -98,7 +98,7 @@ letrec' :: ( Member (Allocator location value) effects
         -> Evaluator location value effects value
 letrec' name body = do
   addr <- lookupOrAlloc name
-  v <- localEnv id (body addr)
+  v <- locally (body addr)
   v <$ bind name addr
 
 
