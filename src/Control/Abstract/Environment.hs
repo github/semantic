@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
 , getEnv
@@ -6,6 +6,7 @@ module Control.Abstract.Environment
 , modifyEnv
 , withEnv
 , localEnv
+, locally
 , lookupEnv
 , bind
 , Env(..)
@@ -19,7 +20,8 @@ module Control.Abstract.Environment
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
-import Data.Abstract.Environment as Env
+import Data.Abstract.Environment (Environment)
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import Prologue
 
@@ -46,6 +48,12 @@ localEnv f a = do
   modifyEnv (f . Env.push)
   result <- a
   result <$ modifyEnv Env.pop
+
+locally :: forall location value effects a . Member (Env location) effects => Evaluator location value effects a -> Evaluator location value effects a
+locally a = do
+  send (Push @location)
+  a' <- a
+  a' <$ send (Pop @location)
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: Member (Env location) effects => Name -> Evaluator location value effects (Maybe (Address location value))
