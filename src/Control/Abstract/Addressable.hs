@@ -10,7 +10,7 @@ import Data.Abstract.Address
 import Data.Abstract.Name
 import Prologue
 
--- | Defines allocation and dereferencing of 'Address'es in a 'Heap'.
+-- | Defines allocation and dereferencing of addresses.
 class (Ord location, Show location) => Addressable location effects where
   -- | The type into which stored values will be written for a given location type.
   type family Cell location :: * -> *
@@ -19,14 +19,14 @@ class (Ord location, Show location) => Addressable location effects where
   derefCell :: location -> Cell location value -> Evaluator location value effects (Maybe value)
 
 
--- | 'Precise' locations are always allocated a fresh 'Address', and dereference to the 'Latest' value written.
+-- | 'Precise' locations are always allocated a fresh address, and dereference to the 'Latest' value written.
 instance Member Fresh effects => Addressable Precise effects where
   type Cell Precise = Latest
 
   allocCell _ = Precise <$> fresh
   derefCell _ = pure . getLast . unLatest
 
--- | 'Monovariant' locations allocate one 'Address' per unique variable name, and dereference once per stored value, nondeterministically.
+-- | 'Monovariant' locations allocate one address per unique variable name, and dereference once per stored value, nondeterministically.
 instance Member NonDet effects => Addressable Monovariant effects where
   type Cell Monovariant = All
 
