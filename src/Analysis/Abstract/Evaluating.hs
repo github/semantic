@@ -10,8 +10,7 @@ import Data.Semilattice.Lower
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 data EvaluatingState address value = EvaluatingState
-  { environment :: Environment address
-  , heap        :: Heap address (Cell address) value
+  { heap        :: Heap address (Cell address) value
   , modules     :: ModuleTable (Maybe (Environment address, value))
   }
 
@@ -23,15 +22,13 @@ deriving instance (Show (Cell address value), Show address, Show value) => Show 
 evaluating :: Evaluator address value
                 (  Fail
                 ': Fresh
-                ': State (Environment address)
                 ': State (Heap address (Cell address) value)
                 ': State (ModuleTable (Maybe (Environment address, value)))
                 ': effects) result
            -> Evaluator address value effects (Either String result, EvaluatingState address value)
 evaluating
-  = fmap (\ (((result, env), heap), modules) -> (result, EvaluatingState env heap modules))
+  = fmap (\ ((result, heap), modules) -> (result, EvaluatingState heap modules))
   . runState lowerBound -- State (ModuleTable (Maybe (Environment address, value)))
   . runState lowerBound -- State (Heap address (Cell address) value)
-  . runState lowerBound -- State (Environment address)
   . runFresh 0
   . runFail
