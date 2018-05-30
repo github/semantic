@@ -101,16 +101,12 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
-newtype Identifier a = Identifier Name
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+newtype Identifier a = Identifier { name :: Name }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, ToJSONFields1)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
-
--- Propagating the identifier name into JSON is handled with the IdentifierName analysis.
-instance ToJSONFields1 Identifier where
-  toJSONFields1 (Identifier name) = [ "name" .= name ]
 
 instance Evaluatable Identifier where
   eval (Identifier name) = pure (LvalLocal name)
