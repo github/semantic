@@ -1,15 +1,16 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, ViewPatterns #-}
 module Data.Syntax.Literal where
 
-import Data.JSON.Fields
-import Data.Abstract.Evaluatable
-import Data.ByteString.Char8 (readInteger, unpack)
+import           Data.Abstract.Evaluatable
+import           Data.ByteString.Char8 (unpack)
 import qualified Data.ByteString.Char8 as B
-import Data.Scientific.Exts
-import Diffing.Algorithm
-import Prelude hiding (Float, null)
-import Prologue hiding (Set, hash, null)
-import Text.Read (readMaybe)
+import           Data.JSON.Fields
+import           Data.Scientific.Exts
+import qualified Data.Text as T
+import           Diffing.Algorithm
+import           Prelude hiding (Float, null)
+import           Prologue hiding (Set, hash, null)
+import           Text.Read (readMaybe)
 
 -- Boolean
 
@@ -35,7 +36,7 @@ instance ToJSONFields1 Boolean where
 -- Numeric
 
 -- | A literal integer of unspecified width. No particular base is implied.
-newtype Integer a = Integer { integerContent :: ByteString }
+newtype Integer a = Integer { integerContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
@@ -43,12 +44,12 @@ instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Data.Syntax.Literal.Integer where
-  -- TODO: This instance probably shouldn't have readInteger?
+  -- TODO: We should use something more robust than shelling out to readMaybe.
   eval (Data.Syntax.Literal.Integer x) =
-    Rval <$> (integer =<< maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x))
+    Rval <$> (integer =<< maybeM (throwEvalError (IntegerFormatError x)) (readMaybe (T.unpack x)))
 
 instance ToJSONFields1 Data.Syntax.Literal.Integer where
-  toJSONFields1 (Integer i) = noChildren ["asString" .= unpack i]
+  toJSONFields1 (Integer i) = noChildren ["asString" .= i]
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?

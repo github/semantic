@@ -240,7 +240,7 @@ interpretedStringLiteral :: Assignment
 interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
 
 intLiteral :: Assignment
-intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
+intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> tsource)
 
 literalValue :: Assignment
 literalValue = makeTerm <$> symbol LiteralValue <*> children (manyTerm expression)

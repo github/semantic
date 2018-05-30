@@ -96,7 +96,7 @@ functionDeclaration = makeTerm
                                <*> functionBody)
 
 integer :: Assignment
-integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> tsource)
 
 float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)

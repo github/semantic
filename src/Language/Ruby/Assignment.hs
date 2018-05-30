@@ -196,7 +196,7 @@ literal =
       makeTerm <$> token  Grammar.True     <*> pure Literal.true
   <|> makeTerm <$> token  Grammar.False    <*> pure Literal.false
   <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
-  <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
+  <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> tsource)
   <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
   <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> source)
   <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> source)

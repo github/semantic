@@ -166,7 +166,7 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 data EvalError return where
   FreeVariablesError :: [Name] -> EvalError Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: ByteString -> EvalError Integer
+  IntegerFormatError  :: Text -> EvalError Integer
   FloatFormatError    :: ByteString -> EvalError Scientific
   RationalFormatError :: ByteString -> EvalError Rational
   DefaultExportError  :: EvalError ()
