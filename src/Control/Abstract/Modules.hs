@@ -19,7 +19,6 @@ module Control.Abstract.Modules
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable

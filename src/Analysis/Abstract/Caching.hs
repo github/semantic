@@ -10,7 +10,6 @@ import Data.Abstract.Cache
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Data.Semilattice.Lower
-import Data.Semigroup.Reducer (Reducer)
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
@@ -85,11 +84,9 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (Reader (Cache term address (Cell address) value)) effects
                      , Member (Reader (Environment address)) effects
                      , Member (Reader (Live address)) effects
-                     , Member (Resumable (EnvironmentError address)) effects
                      , Member (State (Cache term address (Cell address) value)) effects
                      , Member (State (Environment address)) effects
                      , Member (State (Heap address (Cell address) value)) effects
-                     , Reducer value (Cell address value)
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects address)
                   -> SubtermAlgebra Module term (TermEvaluator term address value effects address)

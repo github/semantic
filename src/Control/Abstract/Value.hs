@@ -47,10 +47,10 @@ class Show value => AbstractFunction address value effects where
   -- | Build a closure (a binder like a lambda or method definition).
   closure :: [Name]                                 -- ^ The parameter names.
           -> Set Name                               -- ^ The set of free variables to close over.
-          -> Evaluator address value effects (address) -- ^ The evaluator for the body of the closure.
+          -> Evaluator address value effects address -- ^ The evaluator for the body of the closure.
           -> Evaluator address value effects value
   -- | Evaluate an application (like a function call).
-  call :: value -> [Evaluator address value effects (address)] -> Evaluator address value effects (address)
+  call :: value -> [Evaluator address value effects address] -> Evaluator address value effects address
 
 
 class Show value => AbstractIntro value where
@@ -233,7 +233,6 @@ value = deref <=< address
 subtermValue :: ( AbstractValue address value effects
                 , Member (Allocator address value) effects
                 , Member (Reader (Environment address)) effects
-                , Member (Resumable (EnvironmentError address)) effects
                 , Member (State (Environment address)) effects
                 )
              => Subterm term (Evaluator address value effects (ValueRef address value))

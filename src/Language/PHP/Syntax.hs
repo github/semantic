@@ -58,7 +58,6 @@ include :: ( AbstractValue address value effects
            , Member (Modules address value) effects
            , Member (Reader (Environment address)) effects
            , Member (Resumable ResolutionError) effects
-           , Member (Resumable (EnvironmentError address)) effects
            , Member (State (Environment address)) effects
            , Member (State (Exports address)) effects
            , Member (State (Heap address (Cell address) value)) effects
