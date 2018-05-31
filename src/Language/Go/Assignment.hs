@@ -216,7 +216,7 @@ expressions = makeTerm'' <$> location <*> manyTerm expression
 -- Literals
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
 
 compositeLiteral :: Assignment
 compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Go.Syntax.Composite <$> expression <*> expression)
@@ -225,40 +225,40 @@ element :: Assignment
 element = symbol Element *> children expression
 
 fieldIdentifier :: Assignment
-fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> tsource)
+fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> source)
 
 floatLiteral :: Assignment
-floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> tsource)
+floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
 identifier :: Assignment
-identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> tsource)
+identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
 
 imaginaryLiteral :: Assignment
-imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> tsource)
+imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
 interpretedStringLiteral :: Assignment
-interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> tsource)
+interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
 
 intLiteral :: Assignment
-intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> tsource)
+intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
 
 literalValue :: Assignment
 literalValue = makeTerm <$> symbol LiteralValue <*> children (manyTerm expression)
 
 packageIdentifier :: Assignment
-packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier . name <$> tsource)
+packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier . name <$> source)
 
 parenthesizedType :: Assignment
 parenthesizedType = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Type.Parenthesized <$> expression)
 
 rawStringLiteral :: Assignment
-rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> tsource)
+rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> source)
 
 runeLiteral :: Assignment
-runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> source)
+runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> rawSource)
 
 typeIdentifier :: Assignment
-typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> tsource)
+typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
 
 
 -- Primitive Types
@@ -355,7 +355,7 @@ defaultCase :: Assignment
 defaultCase = makeTerm <$> symbol DefaultCase <*> children (Go.Syntax.DefaultPattern <$> (expressions <|> emptyTerm))
 
 defaultExpressionCase :: Assignment
-defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> (Go.Syntax.DefaultPattern <$ source <*> (expressions <|> emptyTerm))
+defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> (Go.Syntax.DefaultPattern <$ rawSource <*> (expressions <|> emptyTerm))
 
 callExpression :: Assignment
 callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> expression <*> manyTerm expression <*> emptyTerm)
@@ -373,7 +373,7 @@ expressionSwitchStatement :: Assignment
 expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCaseClause)) <|> emptyTerm) <*> expressions)
 
 fallThroughStatement :: Assignment
-fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> tsource)) <*> emptyTerm)
+fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment
 functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> manyTerm parameters <*> (term types <|> term identifier <|> term returnParameters <|> emptyTerm) <*> (term block <|> emptyTerm))
@@ -392,15 +392,15 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     namedImport = inject <$> (flip Go.Syntax.QualifiedImport <$> packageIdentifier <*> importFromPath)
     -- `import "lib/Math"`
     plainImport = inject <$> (symbol InterpretedStringLiteral >>= \loc -> do
-      from <- importPath <$> tsource
+      from <- importPath <$> source
       let alias = makeTerm loc (Syntax.Identifier (defaultAlias from)) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
       Go.Syntax.QualifiedImport <$> pure from <*> pure alias)
 
-    dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> tsource)
-    underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> tsource)
+    dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
+    underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
     importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
-    importFromPath = symbol InterpretedStringLiteral *> (importPath <$> tsource)
+    importFromPath = symbol InterpretedStringLiteral *> (importPath <$> source)
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
@@ -564,7 +564,7 @@ keyedElement :: Assignment
 keyedElement = makeTerm <$> symbol KeyedElement <*> children (Literal.KeyValue <$> expression <*> expression)
 
 labelName :: Assignment
-labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier . name <$> tsource)
+labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier . name <$> source)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> (symbol LabeledStatement <|> symbol LabeledStatement') <*> children (Go.Syntax.Label <$> expression <*> (expression <|> emptyTerm))

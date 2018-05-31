@@ -69,16 +69,16 @@ term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
 
 variableIdentifier :: Assignment
-variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> tsource)
+variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 constructorIdentifier :: Assignment
-constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> tsource)
+constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 moduleIdentifier :: Assignment
-moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> tsource)
+moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 where' :: Assignment
 where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (many expression)
@@ -96,10 +96,10 @@ functionDeclaration = makeTerm
                                <*> functionBody)
 
 integer :: Assignment
-integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> tsource)
+integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (Literal.Float <$> tsource)
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]

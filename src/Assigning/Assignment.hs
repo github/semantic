@@ -69,8 +69,8 @@ module Assigning.Assignment
 , location
 , currentNode
 , symbol
+, rawSource
 , source
-, tsource
 , children
 , advance
 , choice
@@ -163,12 +163,12 @@ symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast 
 symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` return
 
 -- | A rule to produce a node’s source as a ByteString.
--- Deprecated: please use source'.
-source :: HasCallStack => Assignment ast grammar ByteString
-source = tracing Source `Then` return
+-- You probably want to use 'source', unless you're throwing away the result.
+rawSource :: HasCallStack => Assignment ast grammar ByteString
+rawSource = tracing Source `Then` return
 
-tsource :: HasCallStack => Assignment ast grammar Text
-tsource = source >>= \b -> case decodeUtf8' b of
+source :: HasCallStack => Assignment ast grammar Text
+source = rawSource >>= \b -> case decodeUtf8' b of
   Right t -> pure t
   Left  e -> fail ("UTF-8 decoding failed: " <> show e)
 

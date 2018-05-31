@@ -159,10 +159,10 @@ someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
 someTerm' = NonEmpty.some1 . commentedTerm
 
 text :: Assignment
-text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
+text = makeTerm <$> symbol Text <*> (Syntax.Text <$> rawSource)
 
 textInterpolation :: Assignment
-textInterpolation = makeTerm <$> symbol TextInterpolation <*> (Syntax.Text <$> source)
+textInterpolation = makeTerm <$> symbol TextInterpolation <*> (Syntax.Text <$> rawSource)
 
 statement :: Assignment
 statement = handleError everything
@@ -407,7 +407,7 @@ baseTypeDeclaration :: Assignment
 baseTypeDeclaration = makeTerm <$> symbol BaseTypeDeclaration <*> children (Syntax.BaseTypeDeclaration <$> term (scalarType <|> qualifiedName <|> emptyTerm))
 
 scalarType :: Assignment
-scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> source)
+scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> rawSource)
 
 compoundStatement :: Assignment
 compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
@@ -445,7 +445,7 @@ classConstDeclaration :: Assignment
 classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
 
 visibilityModifier :: Assignment
-visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . Name.name <$> tsource)
+visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . Name.name <$> source)
 
 constElement :: Assignment
 constElement = makeTerm <$> symbol ConstElement <*> children (Statement.Assignment [] <$> term name <*> term expression)
@@ -466,7 +466,7 @@ memberName :: Assignment
 memberName = name <|> simpleVariable' <|> expression
 
 relativeScope :: Assignment
-relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
+relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> rawSource)
 
 qualifiedName :: Assignment
 qualifiedName = makeTerm <$> symbol QualifiedName <*> children (Syntax.QualifiedName <$> (term namespaceNameAsPrefix <|> emptyTerm) <*> term name)
@@ -481,16 +481,16 @@ updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
 
 shellCommandExpression :: Assignment
-shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> (Syntax.ShellCommand <$> source)
+shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> (Syntax.ShellCommand <$> rawSource)
 
 literal :: Assignment
 literal = integer <|> float <|> string
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (Literal.Float <$> tsource)
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 integer :: Assignment
-integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> tsource)
+integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
 unaryOpExpression :: Assignment
 unaryOpExpression = symbol UnaryOpExpression >>= \ loc ->
@@ -502,7 +502,7 @@ castExpression :: Assignment
 castExpression = makeTerm <$> (symbol CastExpression <|> symbol CastExpression') <*> children (flip Expression.Cast <$> term castType <*> term unaryExpression)
 
 castType :: Assignment
-castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> rawSource)
 
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children (term expression)
@@ -651,7 +651,7 @@ propertyDeclaration :: Assignment
 propertyDeclaration = makeTerm <$> symbol PropertyDeclaration <*> children (Syntax.PropertyDeclaration <$> term propertyModifier <*> someTerm propertyElement)
 
 propertyModifier :: Assignment
-propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . Name.name <$> tsource))
+propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . Name.name <$> source))
 
 propertyElement :: Assignment
 propertyElement = makeTerm <$> symbol PropertyElement <*> children (Statement.Assignment [] <$> term variableName <*> term propertyInitializer) <|> (symbol PropertyElement *> children (term variableName))
@@ -671,10 +671,10 @@ methodModifier = choice [
   ]
 
 staticModifier :: Assignment
-staticModifier = makeTerm <$> symbol StaticModifier <*> (Syntax.Static <$> source)
+staticModifier = makeTerm <$> symbol StaticModifier <*> (Syntax.Static <$> rawSource)
 
 classModifier :: Assignment
-classModifier = makeTerm <$> symbol ClassModifier <*> (Syntax.ClassModifier <$> source)
+classModifier = makeTerm <$> symbol ClassModifier <*> (Syntax.ClassModifier <$> rawSource)
 
 traitUseClause :: Assignment
 traitUseClause = makeTerm <$> symbol TraitUseClause <*> children (Syntax.TraitUseClause <$> someTerm qualifiedName <*> (term traitUseSpecification <|> emptyTerm))
@@ -712,7 +712,7 @@ namespaceAliasingClause = makeTerm <$> symbol NamespaceAliasingClause <*> childr
 
 -- | TODO Do something better than Identifier
 namespaceFunctionOrConst :: Assignment
-namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier . Name.name <$> tsource)
+namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier . Name.name <$> source)
 
 globalDeclaration :: Assignment
 globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable')
@@ -748,7 +748,7 @@ variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
 name :: Assignment
-name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> tsource)
+name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> source)
 
 functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
@@ -757,10 +757,10 @@ staticVariableDeclaration :: Assignment
 staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment <$> pure [] <*> term variableName <*> (term expression <|> emptyTerm))
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
 
 string :: Assignment
-string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.TextElement <$> tsource)
+string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.TextElement <$> source)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment

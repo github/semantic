@@ -94,7 +94,7 @@ blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> (makeCode . termFAnnotation . termFOut <$> currentNode <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> (makeCode . termFAnnotation . termFOut <$> currentNode <*> rawSource)
   where
     makeCode (CMarkGFM.CODE_BLOCK language _) = Markup.Code (nullText language)
     makeCode _ = Markup.Code Nothing
@@ -103,7 +103,7 @@ thematicBreak :: Assignment
 thematicBreak = makeTerm <$> token ThematicBreak <*> pure Markup.ThematicBreak
 
 htmlBlock :: Assignment
-htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> source)
+htmlBlock = makeTerm <$> symbol HTMLBlock <*> (Markup.HTMLBlock <$> rawSource)
 
 table :: Assignment
 table = makeTerm <$> symbol Table <*> children (Markup.Table <$> many tableRow)
@@ -140,10 +140,10 @@ strikethrough :: Assignment
 strikethrough = makeTerm <$> symbol Strikethrough <*> children (Markup.Strikethrough <$> many inlineElement)
 
 text :: Assignment
-text = makeTerm <$> symbol Text <*> (Markup.Text <$> source)
+text = makeTerm <$> symbol Text <*> (Markup.Text <$> rawSource)
 
 htmlInline :: Assignment
-htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
+htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> rawSource)
 
 link :: Assignment
 link = makeTerm <$> symbol Link <*> (makeLink . termFAnnotation . termFOut <$> currentNode) <* advance
@@ -158,7 +158,7 @@ image = makeTerm <$> symbol Image <*> (makeImage . termFAnnotation . termFOut <$
     makeImage _ = Markup.Image B.empty Nothing
 
 code :: Assignment
-code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
+code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> rawSource)
 
 lineBreak :: Assignment
 lineBreak = makeTerm <$> token LineBreak <*> pure Markup.LineBreak

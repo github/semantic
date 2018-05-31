@@ -182,10 +182,10 @@ expressionList :: Assignment
 expressionList = makeTerm'' <$> symbol ExpressionList <*> children (someTerm expression)
 
 listSplat :: Assignment
-listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier . name <$> tsource)
+listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier . name <$> source)
 
 dictionarySplat :: Assignment
-dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier . name <$> tsource)
+dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier . name <$> source)
 
 keywordArgument :: Assignment
 keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment [] <$> term expression <*> term expression)
@@ -339,7 +339,7 @@ yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expression <|> emptyTerm )))
 
 identifier :: Assignment
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> tsource)
+identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
@@ -354,19 +354,19 @@ list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> manyTerm expression)
 
 string :: Assignment
-string = makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 concatenatedString :: Assignment
 concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (manyTerm string)
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (Literal.Float <$> tsource)
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 integer :: Assignment
-integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> tsource)
+integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
 
 import' :: Assignment
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
@@ -381,20 +381,20 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `from a import foo as bar`
     aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> aliasIdentifier <*> (Just <$> aliasIdentifier))
     -- `from a import *`
-    wildcard = symbol WildcardImport *> (name <$> tsource) $> []
+    wildcard = symbol WildcardImport *> (name <$> source) $> []
 
     importPath = importDottedName <|> importRelative
     importDottedName = symbol DottedName *> children (qualifiedName <$> NonEmpty.some1 identifierSource)
     importRelative = symbol RelativeImport *> children (relativeQualifiedName <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
-    importPrefix = symbol ImportPrefix *> tsource
-    identifierSource = (symbol Identifier <|> symbol Identifier') *> tsource
+    importPrefix = symbol ImportPrefix *> source
+    identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
-    aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> tsource) <|> symbol DottedName *> (name <$> tsource)
+    aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source) <|> symbol DottedName *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
 
 assertStatement :: Assignment
-assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> tsource)) <*> manyTerm expression <*> emptyTerm)
+assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 printStatement :: Assignment
 printStatement = do
@@ -403,25 +403,25 @@ printStatement = do
     print <- term printKeyword
     term (redirectCallTerm location print <|> printCallTerm location print)
   where
-    printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier . name <$> tsource)
+    printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier . name <$> source)
     redirectCallTerm location identifier = makeTerm location <$ symbol Chevron <*> (flip Python.Syntax.Redirect <$> children (term expression) <*> term (printCallTerm location identifier))
     printCallTerm location identifier = makeTerm location <$> (Expression.Call [] identifier <$> manyTerm expression <*> emptyTerm)
 
 nonlocalStatement :: Assignment
-nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier . name <$> tsource)) <*> manyTerm expression <*> emptyTerm)
+nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 globalStatement :: Assignment
-globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier . name <$> tsource)) <*> manyTerm expression <*> emptyTerm)
+globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 await :: Assignment
-await = makeTerm <$> symbol Await <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier . name <$> tsource)) <*> manyTerm expression <*> emptyTerm)
+await = makeTerm <$> symbol Await <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> term (expressionList <|> emptyTerm))
 
 deleteStatement :: Assignment
 deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> pure [] <*> term deleteIdentifier <* symbol ExpressionList <*> children (manyTerm expression) <*> emptyTerm)
-  where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier . name <$> tsource)
+  where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier . name <$> source)
 
 raiseStatement :: Assignment
 raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> expressions)
@@ -432,7 +432,7 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> ter
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 execStatement :: Assignment
-execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> location <*> (Syntax.Identifier . name <$> tsource)) <*> manyTerm (string <|> expression) <*> emptyTerm)
+execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> manyTerm (string <|> expression) <*> emptyTerm)
 
 passStatement :: Assignment
 passStatement = makeTerm <$> symbol PassStatement <*> (Statement.NoOp <$> emptyTerm <* advance)
@@ -463,7 +463,7 @@ boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
        <|> makeTerm <$> token Grammar.False <*> pure Literal.false
 
 none :: Assignment
-none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
+none = makeTerm <$> symbol None <*> (Literal.Null <$ rawSource)
 
 comprehension :: Assignment
 comprehension =  makeTerm <$> symbol ListComprehension       <*> children (Declaration.Comprehension <$> term expression <*> expressions)

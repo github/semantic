@@ -178,7 +178,7 @@ identifier =
   <|> mk BlockArgument
   <|> mk Uninterpreted
   where
-    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> tsource)
+    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
     vcallOrLocal = do
       (loc, ident, locals) <- identWithLocals
       case ident of
@@ -196,23 +196,23 @@ literal =
       makeTerm <$> token  Grammar.True     <*> pure Literal.true
   <|> makeTerm <$> token  Grammar.False    <*> pure Literal.false
   <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
-  <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> tsource)
-  <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> tsource)
-  <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> tsource)
-  <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> tsource)
+  <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
+  <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
+  <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> source)
+  <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> source)
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
   <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many expression)
-  <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> tsource)
-  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)
-  <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)))
-  <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> tsource)
-  <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.Symbol <$> tsource)
+  <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
+  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+  <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
+  <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
+  <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.Symbol <$> source)
 
 heredoc :: Assignment
-heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> tsource)
-       <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> tsource)
+heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
+       <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 beginBlock :: Assignment
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many expression)
@@ -282,15 +282,15 @@ block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
         params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
 
 alias :: Assignment
 alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
-  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> tsource)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
 
 undef :: Assignment
 undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
-  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> tsource)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
 
 if' :: Assignment
 if' =   ifElsif If
@@ -350,18 +350,18 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
 
     selector = Just <$> term methodSelector
     require = inject <$> (symbol Identifier *> do
-      s <- source
+      s <- rawSource
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
     load = inject <$> (symbol Identifier *> do
-      s <- source
+      s <- rawSource
       guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
     loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 methodSelector :: Assignment
-methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> tsource))
+methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
   where
     symbols = symbol Identifier
           <|> symbol Constant
@@ -411,7 +411,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> tsource)
+    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> source)
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
        <|> lhsIdent
        <|> expression
@@ -421,7 +421,7 @@ identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getRubyLocals first
   locals <- getRubyLocals
-  ident <- tsource
+  ident <- source
   pure (loc, ident, locals)
 
 lhsIdent :: Assignment
@@ -435,7 +435,7 @@ unary = symbol Unary >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
-  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> tsource)) <*> some expression <*> emptyTerm)
+  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> source)) <*> some expression <*> emptyTerm)
   <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
 
@@ -477,7 +477,7 @@ conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> expression <*> expression <*> expression)
 
 emptyStatement :: Assignment
-emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
+emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ rawSource <|> pure Syntax.Empty)
 
 
 -- Helper functions
@@ -488,7 +488,7 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
 term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> heredocEnd) <*> emptyTerm)
-  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> tsource)
+  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]

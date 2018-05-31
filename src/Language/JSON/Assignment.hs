@@ -49,14 +49,14 @@ array :: Assignment
 array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
 
 number :: Assignment
-number = makeTerm <$> symbol Number <*> (Literal.Float <$> tsource)
+number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
 
 string :: Assignment
-string = makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 boolean :: Assignment
-boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
-       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ rawSource)
+       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
 
 none :: Assignment
-none = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
+none = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
