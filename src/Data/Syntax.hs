@@ -104,7 +104,7 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
-  liftEncodeMessage encodeMessage num fs = apply @Message1 (liftEncodeMessage encodeMessage num) fs
+  liftEncodeMessage encodeMessage num = apply @Message1 (liftEncodeMessage encodeMessage num)
   liftDecodeMessage decodeMessage _ = oneof undefined listOfParsers
     where
       listOfParsers =
@@ -127,7 +127,7 @@ instance Generate c all '[] where
   generate _ = mempty
 
 instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) where
-  generate each = (each (Proxy @f) (natVal (Proxy @(ElemIndex f all)))) `mappend` generate @c @all @fs each
+  generate each = each (Proxy @f) (natVal (Proxy @(ElemIndex f all))) `mappend` generate @c @all @fs each
 
 -- Common
 

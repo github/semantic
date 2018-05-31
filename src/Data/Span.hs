@@ -28,7 +28,7 @@ data Pos = Pos
   deriving (Show, Read, Eq, Ord, Generic, Hashable, Named, Message)
 
 instance MessageField Pos where
-  encodeMessageField num = (Encode.embedded num . encodeMessage (fieldNumber 1))
+  encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
   decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
   protoType pr = messageField (Prim $ Named (Single (nameOf pr))) Nothing
 
