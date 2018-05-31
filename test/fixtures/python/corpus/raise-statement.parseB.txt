@@ -5,11 +5,11 @@
       (TextElement)
       (Empty)))
   (Throw
-    (
+    (Statements
       (Call
         (Identifier)
         (TextElement)
         (Empty))
       (Identifier)))
   (Throw
-    ([])))
+    (Statements)))

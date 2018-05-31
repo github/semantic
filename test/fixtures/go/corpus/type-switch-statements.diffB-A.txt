@@ -4,10 +4,10 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (TypeSwitch
-        (
+        (Statements
           (Assignment
           { (Identifier)
           ->(Identifier) }
@@ -16,15 +16,15 @@
           (TypeSwitchGuard
           { (Identifier)
           ->(Identifier) }))
-        (
+        (Statements
           (Pattern
-            (
+            (Statements
               (Identifier)
               (Pointer
                 (MemberAccess
                   (Identifier)
                   (Identifier))))
-            ([]))
+            (Statements))
           (Context
             (Comment)
             (Pattern
@@ -32,7 +32,7 @@
                 (Identifier))
               (Call
                 (Identifier)
-                ([])
+                (Statements)
                 (Empty))))
           (Pattern
             (Pointer
@@ -41,18 +41,18 @@
               (Empty)))
         {-(Pattern
           {-(DefaultPattern
-            {-([])-})-}
+            {-(Statements)-})-}
           {-(Break
             {-(Empty)-})-})-}))
       (TypeSwitch
-        (
+        (Statements
           (TypeSwitchGuard
-            (
+            (Statements
             { (Identifier)
             ->(Identifier) }
             { (Identifier)
             ->(Identifier) })))
-        (
+        (Statements
           (Pattern
           { (Identifier)
           ->(Identifier) }
@@ -60,7 +60,7 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-              (
+              (Statements
               { (TextElement)
               ->(TextElement) }
               { (DividedBy
@@ -77,7 +77,7 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-              (
+              (Statements
               { (TextElement)
               ->(TextElement) }
               { (Times
@@ -89,7 +89,7 @@
               (Empty)))
           (Pattern
             (Identifier)
-            (
+            (Statements
               (Assignment
               { (Identifier)
               ->(Identifier) }
@@ -104,7 +104,7 @@
                 (MemberAccess
                   (Identifier)
                   (Identifier))
-                (
+                (Statements
                   (TextElement)
                   (Plus
                     (Slice
@@ -124,13 +124,13 @@
                 (Empty))))
           (Pattern
             (DefaultPattern
-              ([]))
-            ([]))))
+              (Statements))
+            (Statements))))
       (TypeSwitch
         (Empty)
-        (
+        (Statements
           (TypeSwitchGuard
-            (
+            (Statements
               (Identifier)
             { (Identifier)
             ->(Identifier) }))

@@ -4,13 +4,13 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Type
         (Identifier)
         (Constructor
           (Empty)
           (Field
             (Identifier)
-            (
+            (Statements
               (Identifier))))))))

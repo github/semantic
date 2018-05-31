@@ -21,7 +21,7 @@ import Data.Maybe as X
 import Data.Monoid (Alt (..))
 import Data.Sequence as X (Seq)
 import Data.Set as X (Set)
-import Data.Sum as X
+import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
 import Data.These as X
 import Data.Union as X
@@ -35,7 +35,6 @@ import Control.Monad as X hiding (fail, return, unless, when)
 import Control.Monad.Except as X (MonadError (..))
 import Control.Monad.Fail as X (MonadFail (..))
 import Data.Algebra as X
-import Data.Align.Generic as X (GAlign)
 import Data.Bifoldable as X
 import Data.Bifunctor as X (Bifunctor (..))
 import Data.Bitraversable as X

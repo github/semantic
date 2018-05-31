@@ -1,5 +1,6 @@
 module Control.Abstract.Roots
-( Live
+( ValueRoots(..)
+, Live
 , askRoots
 , extraRoots
 ) where
@@ -8,10 +9,17 @@ import Control.Abstract.Evaluator
 import Data.Abstract.Live
 import Prologue
 
+
+-- | Value types, e.g. closures, which can root a set of addresses.
+class ValueRoots address value where
+  -- | Compute the set of addresses rooted by a given value.
+  valueRoots :: value -> Live address
+
+
 -- | Retrieve the local 'Live' set.
-askRoots :: Member (Reader (Live location value)) effects => Evaluator location value effects (Live location value)
+askRoots :: Member (Reader (Live address)) effects => Evaluator address value effects (Live address)
 askRoots = ask
 
 -- | Run a computation with the given 'Live' set added to the local root set.
-extraRoots :: (Member (Reader (Live location value)) effects, Ord location) => Live location value -> Evaluator location value effects a -> Evaluator location value effects a
+extraRoots :: (Member (Reader (Live address)) effects, Ord address) => Live address -> Evaluator address value effects a -> Evaluator address value effects a
 extraRoots roots = local (<> roots)

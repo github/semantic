@@ -8,6 +8,7 @@ module SpecHelpers
 , deNamespace
 , derefQName
 , verbatim
+, TermEvaluator(..)
 , Verbatim(..)
 ) where
 
@@ -20,10 +21,11 @@ import Control.Monad ((>=>))
 import Data.Abstract.Address as X
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables as X hiding (dropExtension)
+import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
-import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, prjValue, runValueError)
+import Data.Abstract.Name as X
+import Data.Abstract.Value (Value(..), ValueError, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.ByteString.Builder (toLazyByteString)
@@ -32,14 +34,13 @@ import Data.Project as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
-import Data.Monoid as X (Last(..))
 import Data.Range as X
 import Data.Record as X
 import Data.Source as X
 import Data.Span as X
 import Data.Term as X
 import Parsing.Parser as X
-import Rendering.Renderer as X
+import Rendering.Renderer as X hiding (error)
 import Semantic.Diff as X
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
@@ -82,22 +83,27 @@ testEvaluating
   . fmap (first reassociate)
   . evaluating
   . runLoadError
-  . runValueError
   . runUnspecialized
   . runResolutionError
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @Precise
+  . runValueError
+  . runTermEvaluator @_ @_ @(Value Precise (Eff _))
 
-deNamespace :: Value Precise -> Maybe (Name, [Name])
-deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
+deNamespace :: Value Precise term -> Maybe (Name, [Name])
+deNamespace (Namespace name scope) = Just (name, Env.names scope)
+deNamespace _                      = Nothing
 
-derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
+namespaceScope :: Value Precise term -> Maybe (Environment Precise)
+namespaceScope (Namespace _ scope) = Just scope
+namespaceScope _                   = Nothing
+
+derefQName :: Heap Precise (Cell Precise) (Value Precise term) -> NonEmpty Name -> Environment Precise -> Maybe (Value Precise term)
 derefQName heap = go
   where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
           []        -> Just
-          (n2 : ns) -> fmap namespaceScope . prjValue @(Namespace Precise) >=> go (n2 :| ns)
+          (n2 : ns) -> namespaceScope >=> go (n2 :| ns)
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

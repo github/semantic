@@ -47,7 +47,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
-import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
@@ -213,10 +213,10 @@ instance (Listable a, Listable b) => Listable (Patch a b) where
 
 
 instance (Listable1 f, Listable1 (Sum (g ': fs))) => Listable1 (Sum (f ': g ': fs)) where
-  liftTiers tiers = (injectSum `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weakenSum `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
+  liftTiers tiers = (inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
 
 instance Listable1 f => Listable1 (Sum '[f]) where
-  liftTiers tiers = injectSum `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+  liftTiers tiers = inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
 
 instance (Listable1 (Sum fs), Listable a) => Listable (Sum fs a) where
   tiers = tiers1
@@ -257,8 +257,8 @@ type ListableSyntax = Sum
    , []
    ]
 
-instance Listable FV.Name where
-  tiers = cons1 FV.name
+instance Listable Name.Name where
+  tiers = cons1 Name.name
 
 instance Listable1 Gram where
   liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram

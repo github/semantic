@@ -1,7 +1,7 @@
 (Program
   (While
     (Identifier)
-    (
+    (Statements
       (Call
         (Identifier)
         (Empty))))

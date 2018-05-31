@@ -1,34 +1,35 @@
 {-# LANGUAGE DeriveAnyClass, DeriveDataTypeable, DuplicateRecordFields, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.IO
-( readFile
-, readFilePair
-, isDirectory
-, readBlobPairsFromHandle
-, readBlobsFromHandle
-, readProjectFromPaths
-, readBlobsFromDir
-, findFiles
-, languageForFilePath
-, NoLanguageForBlob(..)
-, noLanguageForBlob
-, readBlob
-, readBlobs
-, readBlobPairs
-, readProject
-, findFilesInDir
-, write
+( Destination(..)
+, Files
 , Handle(..)
-, getHandle
 , IO.IOMode(..)
+, NoLanguageForBlob(..)
+, Source(..)
+, catchException
+, findFiles
+, findFilesInDir
+, getHandle
+, isDirectory
+, languageForFilePath
+, noLanguageForBlob
+, openFileForReading
+, readBlob
+, readBlobPairs
+, readBlobPairsFromHandle
+, readBlobs
+, readBlobsFromDir
+, readBlobsFromHandle
+, readFile
+, readFilePair
+, readProject
+, readProjectFromPaths
+, rethrowing
+, runFiles
+, stderr
 , stdin
 , stdout
-, stderr
-, openFileForReading
-, Source(..)
-, Destination(..)
-, Files
-, runFiles
-, rethrowing
+, write
 ) where
 
 import qualified Control.Exception as Exc
@@ -95,7 +96,7 @@ readBlobsFromHandle = fmap toBlobs . readFromHandle
 readBlobFromPath :: MonadIO m => File -> m Blob.Blob
 readBlobFromPath file = do
   maybeFile <- readFile file
-  maybe (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) pure maybeFile
+  maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
@@ -251,7 +252,7 @@ data Files out where
   Write       :: Destination -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
+runFiles :: (Member (Exc SomeException) effs, Member IO effs) => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   Read (FromPath path)         -> rethrowing (readBlobFromPath path)
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)

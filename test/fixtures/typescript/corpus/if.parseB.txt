@@ -3,7 +3,7 @@
     (MemberAccess
       (Identifier)
       (Identifier))
-    (
+    (Statements
       (Call
         (Identifier)
         (Identifier)

@@ -5,7 +5,7 @@ module Analysis.Declaration
 , declarationAlgebra
 ) where
 
-import Data.Abstract.FreeVariables (Name(..))
+import Data.Abstract.Name (unName)
 import Data.Blob
 import Data.Error (Error(..), showExpectation)
 import Data.Language as Language
@@ -22,7 +22,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Ruby.Syntax as Ruby.Syntax
-import Prologue
+import Prologue hiding (project)
 
 -- | A declaration’s identifier and type.
 data Declaration
@@ -129,12 +129,12 @@ getSource blobSource = toText . flip Source.slice blobSource . getField
 
 instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Sum fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
-    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- projectSum fromF = Just $ CallReference (getSource idenAnn) mempty blobLanguage (memberAccess leftAnn leftF)
-    | Just (Syntax.Identifier (Name name)) <- projectSum fromF = Just $ CallReference (T.decodeUtf8 name) mempty blobLanguage []
+    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- project fromF = Just $ CallReference (getSource idenAnn) mempty blobLanguage (memberAccess leftAnn leftF)
+    | Just (Syntax.Identifier name) <- project fromF = Just $ CallReference (T.decodeUtf8 (unName name)) mempty blobLanguage []
     | otherwise = Just $ CallReference (getSource fromAnn) mempty blobLanguage []
     where
       memberAccess modAnn termFOut
-        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In rightAnn rightF))) <- projectSum termFOut
+        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In rightAnn rightF))) <- project termFOut
         = memberAccess leftAnn leftF <> memberAccess rightAnn rightF
         | otherwise = [getSource modAnn]
       getSource = toText . flip Source.slice blobSource . getField

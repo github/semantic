@@ -7,34 +7,30 @@ module Data.Abstract.Exports
     , toEnvironment
     ) where
 
-import Prelude hiding (null)
-import Prologue hiding (null)
-import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, unpairs)
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import qualified Data.Map as Map
 import Data.Semilattice.Lower
+import Prelude hiding (null)
+import Prologue hiding (null)
 
 -- | A map of export names to an alias & address tuple.
-newtype Exports location value = Exports { unExports :: Map.Map Name (Name, Maybe (Address location value)) }
+newtype Exports address = Exports { unExports :: Map.Map Name (Name, Maybe address) }
   deriving (Eq, Lower, Monoid, Ord, Semigroup)
 
-null :: Exports location value -> Bool
+null :: Exports address -> Bool
 null = Map.null . unExports
 
-toEnvironment :: Exports location value -> Environment location value
-toEnvironment exports = unpairs (mapMaybe collectExport (toList (unExports exports)))
-  where
-    collectExport (_, Nothing) = Nothing
-    collectExport (n, Just value)  = Just (n, value)
+toEnvironment :: Exports address -> Environment address
+toEnvironment exports = unpairs (mapMaybe sequenceA (toList (unExports exports)))
 
-insert :: Name -> Name -> Maybe (Address location value) -> Exports location value -> Exports location value
+insert :: Name -> Name -> Maybe address -> Exports address -> Exports address
 insert name alias address = Exports . Map.insert name (alias, address) . unExports
 
 -- TODO: Should we filter for duplicates here?
-aliases :: Exports location value -> [(Name, Name)]
+aliases :: Exports address -> [(Name, Name)]
 aliases = Map.toList . fmap fst . unExports
 
 
-instance Show location => Show (Exports location value) where
+instance Show address => Show (Exports address) where
   showsPrec d = showsUnaryWith showsPrec "Exports" d . Map.toList . unExports

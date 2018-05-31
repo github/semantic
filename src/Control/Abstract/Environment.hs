@@ -1,16 +1,17 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
+, Exports
 , getEnv
-, putEnv
-, modifyEnv
-, withEnv
-, defaultEnvironment
-, withDefaultEnvironment
-, fullEnvironment
-, localEnv
-, localize
+, export
 , lookupEnv
+, bind
+, bindAll
+, locally
+, close
+-- * Effects
+, Env(..)
+, runEnv
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -18,72 +19,97 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
-import Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
+import Data.Abstract.Environment (Environment)
+import qualified Data.Abstract.Environment as Env
+import Data.Abstract.Exports as Exports
+import Data.Abstract.Name
+import Data.Semilattice.Lower
 import Prologue
 
 -- | Retrieve the environment.
-getEnv :: Member (State (Environment location value)) effects => Evaluator location value effects (Environment location value)
-getEnv = get
+getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
+getEnv = send GetEnv
 
--- | Set the environment.
-putEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location value effects ()
-putEnv = put
+-- | Add an export to the global export state.
+export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
+export name alias addr = send (Export name alias addr)
 
--- | Update the global environment.
-modifyEnv :: Member (State (Environment location value)) effects => (Environment location value -> Environment location value) -> Evaluator location value effects ()
-modifyEnv = modify'
-
--- | Sets the environment for the lifetime of the given action.
-withEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location value effects a -> Evaluator location value effects a
-withEnv = localState . const
-
-
--- | Retrieve the default environment.
-defaultEnvironment :: Member (Reader (Environment location value)) effects => Evaluator location value effects (Environment location value)
-defaultEnvironment = ask
-
--- | Set the default environment for the lifetime of an action.
---   Usually only invoked in a top-level evaluation function.
-withDefaultEnvironment :: Member (Reader (Environment location value)) effects => Environment location value -> Evaluator location value effects a -> Evaluator location value effects a
-withDefaultEnvironment e = local (const e)
-
--- | Obtain an environment that is the composition of the current and default environments.
---   Useful for debugging.
-fullEnvironment :: Members '[Reader (Environment location value), State (Environment location value)] effects => Evaluator location value effects (Environment location value)
-fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
-
--- | Run an action with a locally-modified environment.
-localEnv :: Member (State (Environment location value)) effects => (Environment location value -> Environment location value) -> Evaluator location value effects a -> Evaluator location value effects a
-localEnv f a = do
-  modifyEnv (f . Env.push)
-  result <- a
-  result <$ modifyEnv Env.pop
-
--- | Run a computation in a new local environment.
-localize :: Member (State (Environment location value)) effects => Evaluator location value effects a -> Evaluator location value effects a
-localize = localEnv id
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: Members '[Reader (Environment location value), State (Environment location value)] effects => Name -> Evaluator location value effects (Maybe (Address location value))
-lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
+lookupEnv :: Member (Env address) effects => Name -> Evaluator address value effects (Maybe address)
+lookupEnv name = send (Lookup name)
+
+-- | Bind a 'Name' to an address in the current scope.
+bind :: Member (Env address) effects => Name -> address -> Evaluator address value effects ()
+bind name addr = send (Bind name addr)
+
+-- | Bind all of the names from an 'Environment' in the current scope.
+bindAll :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
+bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.pairs
+
+-- | Run an action in a new local scope.
+locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
+locally a = do
+  send (Push @address)
+  a' <- a
+  a' <$ send (Pop @address)
+
+close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
+close = send . Close
+
+
+-- Effects
+
+data Env address return where
+  Lookup :: Name            -> Env address (Maybe address)
+  Bind   :: Name -> address -> Env address ()
+  Close  :: Set Name        -> Env address (Environment address)
+  Push   ::                    Env address ()
+  Pop    ::                    Env address ()
+  GetEnv ::                    Env address (Environment address)
+  Export :: Name -> Name -> Maybe address -> Env address ()
+
+handleEnv :: forall address effects value result
+          .  ( Member (State (Environment address)) effects
+             , Member (State (Exports address)) effects
+             )
+          => Env address result
+          -> Evaluator address value effects result
+handleEnv = \case
+  Lookup name -> Env.lookup name <$> get
+  Bind name addr -> modify (Env.insert name addr)
+  Close names -> Env.intersect names <$> get
+  Push -> modify (Env.push @address)
+  Pop -> modify (Env.pop @address)
+  GetEnv -> get
+  Export name alias addr -> modify (Exports.insert name alias addr)
+
+runEnv :: Environment address
+       -> Evaluator address value (Env address ': effects) a
+       -> Evaluator address value effects (a, Environment address)
+runEnv initial = fmap (uncurry filterEnv . first (fmap Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 handleEnv
+  where -- TODO: If the set of exports is empty because no exports have been
+        -- defined, do we export all terms, or no terms? This behavior varies across
+        -- languages. We need better semantics rather than doing it ad-hoc.
+        filterEnv (a, env) ports
+          | Exports.null ports = (a, env)
+          | otherwise          = (a, Exports.toEnvironment ports `Env.mergeEnvs` Env.overwrite (Exports.aliases ports) env)
 
 
 -- | Errors involving the environment.
-data EnvironmentError value return where
-  FreeVariable :: Name -> EnvironmentError value value
+data EnvironmentError address return where
+  FreeVariable :: Name -> EnvironmentError address address
 
-deriving instance Eq (EnvironmentError value return)
-deriving instance Show (EnvironmentError value return)
-instance Show1 (EnvironmentError value) where liftShowsPrec _ _ = showsPrec
-instance Eq1 (EnvironmentError value) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
+deriving instance Eq (EnvironmentError address return)
+deriving instance Show (EnvironmentError address return)
+instance Show1 (EnvironmentError address) where liftShowsPrec _ _ = showsPrec
+instance Eq1 (EnvironmentError address) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
 
-freeVariableError :: Member (Resumable (EnvironmentError value)) effects => Name -> Evaluator location value effects value
+freeVariableError :: Member (Resumable (EnvironmentError address)) effects => Name -> Evaluator address value effects address
 freeVariableError = throwResumable . FreeVariable
 
-runEnvironmentError :: Effectful (m location value) => m location value (Resumable (EnvironmentError value) ': effects) a -> m location value effects (Either (SomeExc (EnvironmentError value)) a)
+runEnvironmentError :: Effectful (m address value) => m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects (Either (SomeExc (EnvironmentError address)) a)
 runEnvironmentError = runResumable
 
-runEnvironmentErrorWith :: Effectful (m location value) => (forall resume . EnvironmentError value resume -> m location value effects resume) -> m location value (Resumable (EnvironmentError value) ': effects) a -> m location value effects a
+runEnvironmentErrorWith :: Effectful (m address value) => (forall resume . EnvironmentError address resume -> m address value effects resume) -> m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects a
 runEnvironmentErrorWith = runResumableWith

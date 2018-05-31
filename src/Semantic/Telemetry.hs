@@ -23,7 +23,7 @@ writeStat :: Member Telemetry effs => Stat -> Eff effs ()
 writeStat stat = send (WriteStat stat)
 
 -- | A task which measures and stats the timing of another task.
-time :: Members '[Telemetry, IO] effs => String -> [(String, String)] -> Eff effs output -> Eff effs output
+time :: (Member IO effs, Member Telemetry effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
 time statName tags task = do
   (a, stat) <- withTiming statName tags task
   a <$ writeStat stat

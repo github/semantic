@@ -3,7 +3,7 @@
 
 -- See docs/💡ProTip!.md
 :undef pretty
-:def pretty \ _ -> return (unlines ["let colour = putStrLn . Language.Haskell.HsColour.hscolour Language.Haskell.HsColour.TTY Language.Haskell.HsColour.Colourise.defaultColourPrefs Prelude.False Prelude.False \"\" Prelude.False . Text.Show.Pretty.ppShow", ":set -interactive-print colour"])
+:def pretty \ _ -> return (unlines [":set -interactive-print Semantic.Util.prettyShow"])
 
 -- See docs/💡ProTip!.md
 :undef no-pretty

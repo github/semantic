@@ -4,333 +4,202 @@ module Data.Abstract.Value where
 import Control.Abstract
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
+import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
-import Data.Semigroup.Reducer
 import qualified Data.Set as Set
-import Data.Sum
-import Prologue hiding (TypeError)
-import Prelude hiding (Float, Integer, String, Rational)
-import qualified Prelude
+import Prologue
 
-type ValueConstructors location
-  = '[Array
-    , Boolean
-    , Class location
-    , Closure location
-    , Float
-    , Hash
-    , Integer
-    , KVPair
-    , Namespace location
-    , Null
-    , Rational
-    , String
-    , Symbol
-    , Tuple
-    , Unit
-    , Hole
-    ]
+data Value address body
+  = Closure PackageInfo ModuleInfo [Name] (ClosureBody address body) (Environment address)
+  | Unit
+  | Boolean Bool
+  | Integer  (Number.Number Integer)
+  | Rational (Number.Number Rational)
+  | Float    (Number.Number Scientific)
+  | String ByteString
+  | Symbol ByteString
+  | Tuple [Value address body]
+  | Array [Value address body]
+  | Class Name (Environment address)
+  | Namespace Name (Environment address)
+  | KVPair (Value address body) (Value address body)
+  | Hash [Value address body]
+  | Null
+  | Hole
+  deriving (Eq, Ord, Show)
 
--- | Open union of primitive values that terms can be evaluated to.
---   Fix by another name.
-newtype Value location = Value (Sum (ValueConstructors location) (Value location))
-  deriving (Eq, Show, Ord)
+data ClosureBody address body = ClosureBody { closureBodyId :: Int, closureBody :: body (Value address body) }
 
--- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
-injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
-injValue = Value . injectSum
+instance Eq   (ClosureBody address body) where
+  (==) = (==) `on` closureBodyId
 
--- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
-prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
-prjValue (Value v) = projectSum v
+instance Ord  (ClosureBody address body) where
+  compare = compare `on` closureBodyId
 
--- | Convenience function for projecting two values.
-prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)
-        => (Value location, Value location)
-        -> Maybe (f (Value location), g (Value location))
-prjPair = bitraverse prjValue prjValue
-
--- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
-
--- | A function value consisting of a package & module info, a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure location value = Closure PackageInfo ModuleInfo [Name] Label (Environment location value)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Closure location) where liftCompare = genericLiftCompare
-instance Show location => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
-
--- | The unit value. Typically used to represent the result of imperative statements.
-data Unit value = Unit
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Unit where liftEq = genericLiftEq
-instance Ord1 Unit where liftCompare = genericLiftCompare
-instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
-
-data Hole value = Hole
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Hole where liftEq = genericLiftEq
-instance Ord1 Hole where liftCompare = genericLiftCompare
-instance Show1 Hole where liftShowsPrec = genericLiftShowsPrec
-
--- | Boolean values.
-newtype Boolean value = Boolean Prelude.Bool
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Boolean where liftEq = genericLiftEq
-instance Ord1 Boolean where liftCompare = genericLiftCompare
-instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
-
--- | Arbitrary-width integral values.
-newtype Integer value = Integer (Number.Number Prelude.Integer)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Integer where liftEq = genericLiftEq
-instance Ord1 Integer where liftCompare = genericLiftCompare
-instance Show1 Integer where liftShowsPrec = genericLiftShowsPrec
-
--- | Arbitrary-width rational values values.
-newtype Rational value = Rational (Number.Number Prelude.Rational)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Rational where liftEq = genericLiftEq
-instance Ord1 Rational where liftCompare = genericLiftCompare
-instance Show1 Rational where liftShowsPrec = genericLiftShowsPrec
-
--- | String values.
-newtype String value = String ByteString
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 String where liftEq = genericLiftEq
-instance Ord1 String where liftCompare = genericLiftCompare
-instance Show1 String where liftShowsPrec = genericLiftShowsPrec
-
--- | Possibly-interned Symbol values.
---   TODO: Should this store a 'Text'?
-newtype Symbol value = Symbol ByteString
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Symbol where liftEq = genericLiftEq
-instance Ord1 Symbol where liftCompare = genericLiftCompare
-instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
-
--- | Float values.
-newtype Float value = Float (Number.Number Scientific)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Float where liftEq = genericLiftEq
-instance Ord1 Float where liftCompare = genericLiftCompare
-instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
-
--- | Zero or more values. Fixed-size at interpretation time.
---   TODO: Investigate whether we should use Vector for this.
---   TODO: Should we have a Some type over a nonemmpty list? Or does this merit one?
-newtype Tuple value = Tuple [value]
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Tuple where liftEq = genericLiftEq
-instance Ord1 Tuple where liftCompare = genericLiftCompare
-instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
-
--- | Zero or more values. Dynamically resized as needed at interpretation time.
---   TODO: Vector? Seq?
-newtype Array value = Array [value]
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Array where liftEq = genericLiftEq
-instance Ord1 Array where liftCompare = genericLiftCompare
-instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
-
--- | Class values. There will someday be a difference between classes and objects,
---   but for the time being we're pretending all languages have prototypical inheritance.
-data Class location value = Class
-  { _className  :: Name
-  , _classScope :: Environment location value
-  } deriving (Eq, Generic1, Ord, Show)
-
-instance Eq location => Eq1 (Class location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Class location) where liftCompare = genericLiftCompare
-instance Show location => Show1 (Class location) where liftShowsPrec = genericLiftShowsPrec
-
-data Namespace location value = Namespace
-  { namespaceName  :: Name
-  , namespaceScope :: Environment location value
-  } deriving (Eq, Generic1, Ord, Show)
-
-instance Eq location => Eq1 (Namespace location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Namespace location) where liftCompare = genericLiftCompare
-instance Show location => Show1 (Namespace location) where liftShowsPrec = genericLiftShowsPrec
-
-data KVPair value = KVPair value value
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 KVPair where liftEq = genericLiftEq
-instance Ord1 KVPair where liftCompare = genericLiftCompare
-instance Show1 KVPair where liftShowsPrec = genericLiftShowsPrec
-
--- You would think this would be a @Map value value@ or a @[(value, value)].
--- You would be incorrect, as we can't derive a Generic1 instance for the above,
--- and in addition a 'Map' representation would lose information given hash literals
--- that assigned multiple values to one given key. Instead, this holds KVPair
--- values. The smart constructor for hashes in 'AbstractValue' ensures that these are
--- only populated with pairs.
-newtype Hash value = Hash [value]
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Hash where liftEq = genericLiftEq
-instance Ord1 Hash where liftCompare = genericLiftCompare
-instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
-
-data Null value = Null
-  deriving (Eq, Generic1, Ord, Show)
-
-instance Eq1 Null where liftEq = genericLiftEq
-instance Ord1 Null where liftCompare = genericLiftCompare
-instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
+instance Show (ClosureBody address body) where
+  showsPrec d (ClosureBody i _) = showsUnaryWith showsPrec "ClosureBody" d i
 
 
-instance Ord location => ValueRoots location (Value location) where
+instance Ord address => ValueRoots address (Value address body) where
   valueRoots v
-    | Just (Closure _ _ _ _ env) <- prjValue v = Env.addresses env
-    | otherwise                                = mempty
+    | Closure _ _ _ _ env <- v = Env.addresses env
+    | otherwise                = mempty
 
 
-instance AbstractHole (Value location) where
-  hole = injValue Hole
+instance AbstractHole (Value address body) where
+  hole = Hole
+
+instance ( Coercible body (Eff effects)
+         , Member (Allocator address (Value address body)) effects
+         , Member (Env address) effects
+         , Member Fresh effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader PackageInfo) effects
+         , Member (Resumable (ValueError address body)) effects
+         , Member (Return (Value address body)) effects
+         , Show address
+         )
+      => AbstractFunction address (Value address body) effects where
+  closure parameters freeVariables body = do
+    packageInfo <- currentPackage
+    moduleInfo <- currentModule
+    i <- fresh
+    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) <$> close (foldr Set.delete freeVariables parameters)
+
+  call op params = do
+    case op of
+      Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
+        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+        -- charge them to the closure's origin.
+        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
+          bindings <- foldr (\ (name, param) rest -> do
+            value <- param
+            addr <- alloc name
+            assign addr value
+            Env.insert name addr <$> rest) (pure env) (zip names params)
+          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
+      _ -> throwValueError (CallError op)
+
+
+instance Show address => AbstractIntro (Value address body) where
+  unit     = Unit
+  integer  = Integer . Number.Integer
+  boolean  = Boolean
+  string   = String
+  float    = Float . Number.Decimal
+  symbol   = Symbol
+  rational = Rational . Number.Ratio
+
+  multiple = Tuple
+
+  kvPair = KVPair
+  hash = Hash . map (uncurry KVPair)
+
+  null     = Null
+
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Addressable location (Goto effects (Value location) ': effects)
-         , Members '[ Fail
-                    , LoopControl (Value location)
-                    , Reader (Environment location (Value location))
-                    , Reader ModuleInfo
-                    , Reader PackageInfo
-                    , Resumable (AddressError location (Value location))
-                    , Resumable (ValueError location)
-                    , Return (Value location)
-                    , State (Environment location (Value location))
-                    , State (Heap location (Cell location) (Value location))
-                    ] effects
-         , Reducer (Value location) (Cell location (Value location))
-         , Show location
+instance ( Coercible body (Eff effects)
+         , Member (Allocator address (Value address body)) effects
+         , Member (Env address) effects
+         , Member Fresh effects
+         , Member (LoopControl (Value address body)) effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader PackageInfo) effects
+         , Member (Resumable (ValueError address body)) effects
+         , Member (Return (Value address body)) effects
+         , Show address
          )
-      => AbstractValue location (Value location) (Goto effects (Value location) ': effects) where
-  unit     = pure . injValue $ Unit
-  integer  = pure . injValue . Integer . Number.Integer
-  boolean  = pure . injValue . Boolean
-  string   = pure . injValue . String
-  float    = pure . injValue . Float . Number.Decimal
-  symbol   = pure . injValue . Symbol
-  rational = pure . injValue . Rational . Number.Ratio
-
-  multiple = pure . injValue . Tuple
-  array    = pure . injValue . Array
-
-  kvPair k = pure . injValue . KVPair k
-
-  null     = pure . injValue $ Null
-
+      => AbstractValue address (Value address body) effects where
   asPair val
-    | Just (KVPair k v) <- prjValue val = pure (k, v)
+    | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
 
-  hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
+  array    = pure . Array
 
-  klass n [] env = pure . injValue $ Class n env
+  klass n [] env = pure $ Class n env
   klass n supers env = do
     product <- foldl mergeEnvs emptyEnv . catMaybes <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (mergeEnvs product env)
+    pure $ Class n (mergeEnvs product env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
     env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
-    pure (injValue (Namespace n (Env.mergeNewer env' env)))
+    pure (Namespace n (Env.mergeNewer env' env))
     where asNamespaceEnv v
-            | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
+            | Namespace _ env' <- v = pure env'
+            | otherwise             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
-    | Just (Class _ env) <- prjValue o = pure (Just env)
-    | Just (Namespace _ env) <- prjValue o = pure (Just env)
+    | Class _ env <- o = pure (Just env)
+    | Namespace _ env <- o = pure (Just env)
     | otherwise = pure Nothing
 
   asString v
-    | Just (String n) <- prjValue v = pure n
-    | otherwise                     = throwValueError $ StringError v
+    | String n <- v = pure n
+    | otherwise     = throwValueError $ StringError v
 
   ifthenelse cond if' else' = do
-    isHole <- isHole cond
-    if isHole then
-      pure hole
-    else do
-      bool <- asBool cond
-      if bool then if' else else'
-
-  asBool val
-    | Just (Boolean b) <- prjValue val = pure b
-    | otherwise = throwValueError $ BoolError val
-
-  isHole val = pure (prjValue val == Just Hole)
+    bool <- case cond of { Boolean b -> pure b ; _ -> throwValueError (BoolError cond) }
+    if bool then if' else else'
 
   index = go where
     tryIdx list ii
       | ii > genericLength list = throwValueError (BoundsError list ii)
       | otherwise               = pure (genericIndex list ii)
     go arr idx
-      | (Just (Array arr, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx arr i
-      | (Just (Tuple tup, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx tup i
+      | (Array arr, Integer (Number.Integer i)) <- (arr, idx) = tryIdx arr i
+      | (Tuple tup, Integer (Number.Integer i)) <- (arr, idx) = tryIdx tup i
       | otherwise = throwValueError (IndexError arr idx)
 
   liftNumeric f arg
-    | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
-    | Just (Float (Number.Decimal d))   <- prjValue arg = float   $ f d
-    | Just (Rational (Number.Ratio r))  <- prjValue arg = rational $ f r
+    | Integer (Number.Integer i) <- arg = pure . integer  $ f i
+    | Float (Number.Decimal d)   <- arg = pure . float    $ f d
+    | Rational (Number.Ratio r)  <- arg = pure . rational $ f r
     | otherwise = throwValueError (NumericError arg)
 
   liftNumeric2 f left right
-    | Just (Integer  i, Integer j)  <- prjPair pair = tentative f i j & specialize
-    | Just (Integer  i, Rational j) <- prjPair pair = tentative f i j & specialize
-    | Just (Integer  i, Float j)    <- prjPair pair = tentative f i j & specialize
-    | Just (Rational i, Integer j)  <- prjPair pair = tentative f i j & specialize
-    | Just (Rational i, Rational j) <- prjPair pair = tentative f i j & specialize
-    | Just (Rational i, Float j)    <- prjPair pair = tentative f i j & specialize
-    | Just (Float    i, Integer j)  <- prjPair pair = tentative f i j & specialize
-    | Just (Float    i, Rational j) <- prjPair pair = tentative f i j & specialize
-    | Just (Float    i, Float j)    <- prjPair pair = tentative f i j & specialize
+    | (Integer  i, Integer j)  <- pair = tentative f i j & specialize
+    | (Integer  i, Rational j) <- pair = tentative f i j & specialize
+    | (Integer  i, Float j)    <- pair = tentative f i j & specialize
+    | (Rational i, Integer j)  <- pair = tentative f i j & specialize
+    | (Rational i, Rational j) <- pair = tentative f i j & specialize
+    | (Rational i, Float j)    <- pair = tentative f i j & specialize
+    | (Float    i, Integer j)  <- pair = tentative f i j & specialize
+    | (Float    i, Rational j) <- pair = tentative f i j & specialize
+    | (Float    i, Float j)    <- pair = tentative f i j & specialize
     | otherwise = throwValueError (Numeric2Error left right)
       where
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: (AbstractValue location (Value location) effects, Member (Resumable (ValueError location)) effects) => Either ArithException Number.SomeNumber -> Evaluator location (Value location) effects (Value location)
+        specialize :: (AbstractValue address (Value address body) effects, Member (Resumable (ValueError address body)) effects) => Either ArithException Number.SomeNumber -> Evaluator address (Value address body) effects (Value address body)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
-        specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
-        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
-        specialize (Right (Number.SomeNumber (Number.Decimal d))) = float d
+        specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
+        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
+        specialize (Right (Number.SomeNumber (Number.Decimal d))) = pure $ float d
         pair = (left, right)
 
   liftComparison comparator left right
-    | Just (Integer (Number.Integer i), Integer (Number.Integer j)) <- prjPair pair = go i j
-    | Just (Integer (Number.Integer i), Float   (Number.Decimal j)) <- prjPair pair = go (fromIntegral i) j
-    | Just (Float   (Number.Decimal i), Integer (Number.Integer j)) <- prjPair pair = go i                (fromIntegral j)
-    | Just (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- prjPair pair = go i j
-    | Just (String  i,                  String  j)                  <- prjPair pair = go i j
-    | Just (Boolean i,                  Boolean j)                  <- prjPair pair = go i j
-    | Just (Unit,                       Unit)                       <- prjPair pair = boolean True
+    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = go i j
+    | (Integer (Number.Integer i), Float   (Number.Decimal j)) <- pair = go (fromIntegral i) j
+    | (Float   (Number.Decimal i), Integer (Number.Integer j)) <- pair = go i                (fromIntegral j)
+    | (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- pair = go i j
+    | (String  i,                  String  j)                  <- pair = go i j
+    | (Boolean i,                  Boolean j)                  <- pair = go i j
+    | (Unit,                       Unit)                       <- pair = pure $ boolean True
     | otherwise = throwValueError (ComparisonError left right)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue location (Value location) effects, Ord a) => a -> a -> Evaluator location (Value location) effects (Value location)
+        go :: (AbstractValue address (Value address body) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
         go l r = case comparator of
-          Concrete f  -> boolean (f l r)
-          Generalized -> integer (orderingToInt (compare l r))
+          Concrete f  -> pure $ boolean (f l r)
+          Generalized -> pure $ integer (orderingToInt (compare l r))
 
         -- Map from [LT, EQ, GT] to [-1, 0, 1]
         orderingToInt :: Ordering -> Prelude.Integer
@@ -340,34 +209,13 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
 
 
   liftBitwise operator target
-    | Just (Integer (Number.Integer i)) <- prjValue target = integer $ operator i
+    | Integer (Number.Integer i) <- target = pure . integer $ operator i
     | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
-    | Just (Integer (Number.Integer i), Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
+    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
-
-  closure parameters freeVariables body = do
-    packageInfo <- currentPackage
-    moduleInfo <- currentModule
-    l <- label body
-    injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
-
-  call op params = do
-    case prjValue op of
-      Just (Closure packageInfo moduleInfo names label env) -> do
-        body <- goto label
-        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
-        -- charge them to the closure's origin.
-        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, param) rest -> do
-            v <- param
-            a <- alloc name
-            assign a v
-            Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
-      Nothing -> throwValueError (CallError op)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> pure value
@@ -376,25 +224,25 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
 
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
-data ValueError location resume where
-  StringError            :: Value location                   -> ValueError location ByteString
-  BoolError              :: Value location                   -> ValueError location Bool
-  IndexError             :: Value location -> Value location -> ValueError location (Value location)
-  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location (Value location))
-  CallError              :: Value location                   -> ValueError location (Value location)
-  NumericError           :: Value location                   -> ValueError location (Value location)
-  Numeric2Error          :: Value location -> Value location -> ValueError location (Value location)
-  ComparisonError        :: Value location -> Value location -> ValueError location (Value location)
-  BitwiseError           :: Value location                   -> ValueError location (Value location)
-  Bitwise2Error          :: Value location -> Value location -> ValueError location (Value location)
-  KeyValueError          :: Value location                   -> ValueError location (Value location, Value location)
+data ValueError address body resume where
+  StringError            :: Value address body                       -> ValueError address body ByteString
+  BoolError              :: Value address body                       -> ValueError address body Bool
+  IndexError             :: Value address body -> Value address body -> ValueError address body (Value address body)
+  NamespaceError         :: Prelude.String                           -> ValueError address body (Environment address)
+  CallError              :: Value address body                       -> ValueError address body (Value address body)
+  NumericError           :: Value address body                       -> ValueError address body (Value address body)
+  Numeric2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
+  ComparisonError        :: Value address body -> Value address body -> ValueError address body (Value address body)
+  BitwiseError           :: Value address body                       -> ValueError address body (Value address body)
+  Bitwise2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
+  KeyValueError          :: Value address body                       -> ValueError address body (Value address body, Value address body)
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError        :: ArithException                   -> ValueError location (Value location)
+  ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
   -- Out-of-bounds error
-  BoundsError            :: [Value location] -> Prelude.Integer -> ValueError location (Value location)
+  BoundsError            :: [Value address body] -> Prelude.Integer  -> ValueError address body (Value address body)
 
 
-instance Eq location => Eq1 (ValueError location) where
+instance Eq address => Eq1 (ValueError address body) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
@@ -408,15 +256,15 @@ instance Eq location => Eq1 (ValueError location) where
   liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
-deriving instance Show location => Show (ValueError location resume)
-instance Show location => Show1 (ValueError location) where
+deriving instance Show address => Show (ValueError address body resume)
+instance Show address => Show1 (ValueError address body) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location (Value location) effects resume
+throwValueError :: Member (Resumable (ValueError address body)) effects => ValueError address body resume -> Evaluator address (Value address body) effects resume
 throwValueError = throwResumable
 
-runValueError :: Effectful (m location (Value location)) => m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects (Either (SomeExc (ValueError location)) a)
+runValueError :: Effectful (m address (Value address body)) => m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects (Either (SomeExc (ValueError address body)) a)
 runValueError = runResumable
 
-runValueErrorWith :: Effectful (m location (Value location)) => (forall resume . ValueError location resume -> m location (Value location) effects resume) -> m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects a
+runValueErrorWith :: Effectful (m address (Value address body)) => (forall resume . ValueError address body resume -> m address (Value address body) effects resume) -> m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects a
 runValueErrorWith = runResumableWith

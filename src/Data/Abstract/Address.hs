@@ -1,8 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address where
 
-import Data.Abstract.FreeVariables
 import Data.Abstract.Module (ModuleInfo)
+import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
 import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer
@@ -10,29 +10,9 @@ import Data.Semilattice.Lower
 import Data.Set as Set
 import Prologue
 
--- | An abstract address with a @location@ pointing to a variable of type @value@.
-newtype Address location value = Address { unAddress :: location }
-  deriving (Eq, Ord)
-
-instance Eq   location => Eq1   (Address location) where liftEq          _ a b = unAddress a    ==     unAddress b
-instance Ord  location => Ord1  (Address location) where liftCompare     _ a b = unAddress a `compare` unAddress b
-instance Show location => Show1 (Address location) where liftShowsPrec _ _     = showsPrec
-
-instance Show location => Show (Address location value) where
-  showsPrec d = showsPrec d . unAddress
-
-
-class Location location where
-  -- | The type into which stored values will be written for a given location type.
-  type family Cell location :: * -> *
-
-
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
 newtype Precise = Precise { unPrecise :: Int }
   deriving (Eq, Ord)
-
-instance Location Precise where
-  type Cell Precise = Latest
 
 instance Show Precise where
   showsPrec d = showsUnaryWith showsPrec "Precise" d . unPrecise
@@ -42,22 +22,16 @@ instance Show Precise where
 newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord)
 
-instance Location Monovariant where
-  type Cell Monovariant = All
-
 instance Show Monovariant where
-  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unName . unMonovariant
+  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
 
 
-data Located location = Located
-  { location        :: location
-  , locationPackage :: {-# UNPACK #-} !PackageInfo
-  , locationModule  :: !ModuleInfo
+data Located address = Located
+  { address        :: address
+  , addressPackage :: {-# UNPACK #-} !PackageInfo
+  , addressModule  :: !ModuleInfo
   }
   deriving (Eq, Ord, Show)
-
-instance Location (Located location) where
-  type Cell (Located location) = Cell location
 
 
 -- | A cell holding a single value. Writes will replace any prior value.

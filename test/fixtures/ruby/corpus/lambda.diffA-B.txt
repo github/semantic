@@ -4,7 +4,7 @@
     (Function
       (Empty)
     {+(Identifier)+}
-    { ([])
+    { (Statements)
     ->(Plus
       {+(Identifier)+}
       {+(Integer)+}) }))
@@ -26,7 +26,7 @@
   {-(Empty)-}
   {-(Function
     {-(Empty)-}
-    {-([])-})-})-}
+    {-(Statements)-})-})-}
 {-(Function
   {-(Empty)-}
   {-(Function
@@ -43,9 +43,9 @@
   {-(Empty)-}
   {-(Identifier)-}
   {-(Identifier)-}
-  {-(
+  {-(Statements
     {-(Identifier)-}
     {-(Identifier)-})-}
   {-(Function
     {-(Empty)-}
-    {-([])-})-})-})
+    {-(Statements)-})-})-})

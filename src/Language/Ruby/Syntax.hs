@@ -17,33 +17,33 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: Members '[ Modules location value
-                            , Resumable ResolutionError
-                            ] effects
+resolveRubyName :: ( Member (Modules address value) effects
+                   , Member (Resumable ResolutionError) effects
+                   )
                 => ByteString
-                -> Evaluator location value effects M.ModulePath
+                -> Evaluator address value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
   modulePath <- resolve paths
-  maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
+  maybeM (throwResumable $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: Members '[ Modules location value
-                            , Resumable ResolutionError
-                            ] effects
+resolveRubyPath :: ( Member (Modules address value) effects
+                   , Member (Resumable ResolutionError) effects
+                   )
                 => ByteString
-                -> Evaluator location value effects M.ModulePath
+                -> Evaluator address value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybe (throwResumable $ NotFoundError name' [name'] Language.Ruby) pure modulePath
+  maybeM (throwResumable $ NotFoundError name' [name'] Language.Ruby) modulePath
 
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Send where liftEq = genericLiftEq
 instance Ord1 Send where liftCompare = genericLiftCompare
@@ -60,7 +60,7 @@ instance Evaluatable Send where
     Rval <$> call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Require where liftEq = genericLiftEq
 instance Ord1 Require where liftCompare = genericLiftCompare
@@ -73,24 +73,24 @@ instance Evaluatable Require where
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
     traceResolve name path
-    (importedEnv, v) <- isolate (doRequire path)
-    modifyEnv (`mergeNewer` importedEnv)
+    (v, importedEnv) <- doRequire path
+    bindAll importedEnv
     pure (Rval v) -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: ( AbstractValue location value effects
-             , Member (Modules location value) effects
+doRequire :: ( AbstractValue address value effects
+             , Member (Modules address value) effects
              )
           => M.ModulePath
-          -> Evaluator location value effects (Environment location value, value)
+          -> Evaluator address value effects (value, Environment address)
 doRequire path = do
   result <- join <$> lookupModule path
   case result of
-    Nothing       -> (,) . maybe emptyEnv fst <$> load path <*> boolean True
-    Just (env, _) -> (,) env                  <$>               boolean False
+    Nothing       -> (,) (boolean True) . maybe emptyEnv snd <$> load path
+    Just (_, env) -> pure (boolean False, env)
 
 
 newtype Load a = Load { loadArgs :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Load where liftEq = genericLiftEq
 instance Ord1 Load where liftCompare = genericLiftCompare
@@ -108,28 +108,26 @@ instance Evaluatable Load where
     Rval <$> doLoad path shouldWrap
   eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
-doLoad :: ( AbstractValue location value effects
-          , Members '[ Modules location value
-                     , Resumable ResolutionError
-                     , State (Environment location value)
-                     , State (Exports location value)
-                     , Trace
-                     ] effects
+doLoad :: ( AbstractValue address value effects
+          , Member (Env address) effects
+          , Member (Modules address value) effects
+          , Member (Resumable ResolutionError) effects
+          , Member Trace effects
           )
        => ByteString
        -> Bool
-       -> Evaluator location value effects value
+       -> Evaluator address value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- maybe emptyEnv fst <$> isolate (load path')
-  unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
-  boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
+  importedEnv <- maybe emptyEnv snd <$> load path'
+  unless shouldWrap $ bindAll importedEnv
+  pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
 
 data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 Class
 
@@ -148,7 +146,7 @@ instance Evaluatable Class where
       subtermValue classBody <* makeNamespace name addr super)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
@@ -165,7 +163,7 @@ instance Evaluatable Module where
 data LowPrecedenceBoolean a
   = LowAnd !a !a
   | LowOr !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 LowPrecedenceBoolean
 

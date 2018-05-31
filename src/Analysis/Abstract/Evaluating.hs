@@ -5,37 +5,30 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract
+import Control.Monad.Effect.Fail
 import Data.Semilattice.Lower
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
-data EvaluatingState location value = EvaluatingState
-  { environment :: Environment location value
-  , heap        :: Heap location (Cell location) value
-  , modules     :: ModuleTable (Maybe (Environment location value, value))
-  , exports     :: Exports location value
+data EvaluatingState address value = EvaluatingState
+  { heap        :: Heap address (Cell address) value
+  , modules     :: ModuleTable (Maybe (value, Environment address))
   }
 
-deriving instance (Eq (Cell location value), Eq location, Eq value) => Eq (EvaluatingState location value)
-deriving instance (Ord (Cell location value), Ord location, Ord value) => Ord (EvaluatingState location value)
-deriving instance (Show (Cell location value), Show location, Show value) => Show (EvaluatingState location value)
+deriving instance (Eq (Cell address value), Eq address, Eq value) => Eq (EvaluatingState address value)
+deriving instance (Ord (Cell address value), Ord address, Ord value) => Ord (EvaluatingState address value)
+deriving instance (Show (Cell address value), Show address, Show value) => Show (EvaluatingState address value)
 
 
-evaluating :: Evaluator location value
+evaluating :: Evaluator address value
                 (  Fail
                 ': Fresh
-                ': Reader (Environment location value)
-                ': State (Environment location value)
-                ': State (Heap location (Cell location) value)
-                ': State (ModuleTable (Maybe (Environment location value, value)))
-                ': State (Exports location value)
+                ': State (Heap address (Cell address) value)
+                ': State (ModuleTable (Maybe (value, Environment address)))
                 ': effects) result
-           -> Evaluator location value effects (Either String result, EvaluatingState location value)
+           -> Evaluator address value effects (Either String result, EvaluatingState address value)
 evaluating
-  = fmap (\ ((((result, env), heap), modules), exports) -> (result, EvaluatingState env heap modules exports))
-  . runState lowerBound -- State (Exports location value)
-  . runState lowerBound -- State (ModuleTable (Maybe (Environment location value, value)))
-  . runState lowerBound -- State (Heap location (Cell location) value)
-  . runState lowerBound -- State (Environment location value)
-  . runReader lowerBound -- Reader (Environment location value)
+  = fmap (\ ((result, heap), modules) -> (result, EvaluatingState heap modules))
+  . runState lowerBound -- State (ModuleTable (Maybe (value, Environment address)))
+  . runState lowerBound -- State (Heap address (Cell address) value)
   . runFresh 0
   . runFail

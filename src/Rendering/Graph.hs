@@ -28,7 +28,7 @@ runGraph :: Eff '[Fresh, Reader (Graph vertex)] (Graph vertex) -> Graph vertex
 runGraph = run . runReader mempty . runFresh 0
 
 
-termAlgebra :: (ConstructorName syntax, Foldable syntax, Members '[Fresh, Reader (Graph (Vertex tag))] effs)
+termAlgebra :: (ConstructorName syntax, Foldable syntax, Member Fresh effs, Member (Reader (Graph (Vertex tag))) effs)
             => tag
             -> TermF syntax ann (Eff effs (Graph (Vertex tag)))
             -> Eff effs (Graph (Vertex tag))
@@ -63,7 +63,7 @@ data DiffTag = Deleted | Inserted | Merged
 
 
 class ToTreeGraph vertex t | t -> vertex where
-  toTreeGraph :: Members '[Fresh, Reader (Graph vertex)] effs => t (Eff effs (Graph vertex)) -> Eff effs (Graph vertex)
+  toTreeGraph :: (Member Fresh effs, Member (Reader (Graph vertex)) effs) => t (Eff effs (Graph vertex)) -> Eff effs (Graph vertex)
 
 instance (ConstructorName syntax, Foldable syntax) => ToTreeGraph (Vertex ()) (TermF syntax ann) where
   toTreeGraph = termAlgebra ()

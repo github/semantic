@@ -4,27 +4,27 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Composite
           (Slice
             (Identifier))
-          (
+          (Statements
             (TextElement))))
       (Assignment
         (Identifier)
         (Composite
           (Slice
             (Identifier))
-          (
+          (Statements
             (TextElement))))
       (Assignment
         (Identifier)
         (Composite
           (Slice
             (Identifier))
-          (
+          (Statements
             (TextElement)
             (TextElement)))))))

@@ -1,0 +1,58 @@
+syntax = "proto3";
+import "types.proto";
+package semantic;
+
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+  }
+  ServingStatus status = 1;
+}
+
+service SemanticAPI {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+  rpc FetchSummaries (SummariesRequest) returns (SummariesResponse) {}
+  rpc ParseBlobs (ParseRequest) returns (ParseResponse) {}
+}
+
+message SummariesRequest  {
+  repeated BlobPair blobPairs = 1;
+}
+
+message ParseRequest {
+  repeated Blob source = 1;
+}
+
+message BlobPair {
+  Blob before = 1;
+  Blob after = 2;
+}
+
+message SummariesResponse {
+  repeated Summary changes = 1;
+  repeated Error errors = 2;
+}
+
+message ParseResponse {
+  bytes json_tree = 1;
+  repeated Error errors = 2;
+}
+
+message Summary {
+  string categoryName = 1;
+  string termName = 2;
+  Span span = 3;
+  string changeType = 4;
+}
+
+message Error {
+  string error = 1;
+  Span span = 2;
+  string language = 3;
+}

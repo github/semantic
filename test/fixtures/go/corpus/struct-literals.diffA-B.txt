@@ -4,14 +4,14 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Composite
         { (Identifier)
         ->(Identifier) }
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (TextElement))
@@ -26,9 +26,9 @@
             (Field
             { (Identifier)
             ->(Identifier) }
-              (
+              (Statements
                 (Identifier))))
-          (
+          (Statements
             (KeyValue
             { (Identifier)
             ->(Identifier) }
@@ -41,4 +41,4 @@
             (Identifier)
           { (Identifier)
           ->(Identifier) })
-          ([]))))))
+          (Statements))))))

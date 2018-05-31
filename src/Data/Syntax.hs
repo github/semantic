@@ -1,5 +1,5 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
+{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable
@@ -16,12 +16,18 @@ import Prelude
 import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
-
+import Proto3.Suite.Class
+import Proto3.Wire.Decode
+import Proto3.Wire.Types
+import GHC.Types (Constraint)
+import GHC.TypeLits
+import qualified Proto3.Suite.DotProto as Proto
+import Data.Char (toLower)
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
 makeTerm :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
-makeTerm a = makeTerm' a . injectSum
+makeTerm a = makeTerm' a . inject
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
@@ -31,11 +37,11 @@ makeTerm' a f = termIn (sconcat (a :| (termAnnotation <$> toList f))) f
 makeTerm'' :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs, Foldable f) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
 makeTerm'' a children = case toList children of
   [x] -> x
-  _ -> makeTerm' a (injectSum children)
+  _ -> makeTerm' a (inject children)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => f (Term (Sum fs) a) -> Term (Sum fs) a
-makeTerm1 = makeTerm1' . injectSum
+makeTerm1 = makeTerm1' . inject
 
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
@@ -97,19 +103,41 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
              -> m (Sum fs (Term (Sum fs) a))
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
+instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
+  liftEncodeMessage encodeMessage num = apply @Message1 (liftEncodeMessage encodeMessage num)
+  liftDecodeMessage decodeMessage _ = oneof undefined listOfParsers
+    where
+      listOfParsers =
+        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
+  liftDotProto _ =
+    [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (_ :: proxy f) i ->
+      let
+        num = FieldNumber (fromInteger (succ i))
+        fieldType = Proto.Prim (Proto.Named . Proto.Single $ nameOf1 (Proxy @f))
+        fieldName = Proto.Single (camelCase $ nameOf1 (Proxy @f))
+        camelCase (x : xs) = toLower x : xs
+        camelCase [] = []
+      in
+        [ Proto.DotProtoField num fieldType fieldName [] Nothing ]))]
+
+class Generate (c :: (* -> *) -> Constraint) (all :: [* -> *]) (fs :: [* -> *]) where
+  generate :: Monoid b => (forall f proxy. (Element f all, c f) => proxy f -> Integer -> b) -> b
+
+instance Generate c all '[] where
+  generate _ = mempty
+
+instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) where
+  generate each = each (Proxy @f) (natVal (Proxy @(ElemIndex f all))) `mappend` generate @c @all @fs each
 
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
-newtype Identifier a = Identifier Name
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+newtype Identifier a = Identifier { name :: Name }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, Named1, ToJSONFields1)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
-
--- Propagating the identifier name into JSON is handled with the IdentifierName analysis.
-instance ToJSONFields1 Identifier
 
 instance Evaluatable Identifier where
   eval (Identifier name) = pure (LvalLocal name)
@@ -120,27 +148,25 @@ instance FreeVariables1 Identifier where
 instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
 
+
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
-instance ToJSONFields1 Program
-
 instance Evaluatable Program where
   eval (Program xs) = eval xs
 
+
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
-
-instance ToJSONFields1 AccessibilityModifier
 
 -- TODO: Implement Eval instance for AccessibilityModifier
 instance Evaluatable AccessibilityModifier
@@ -149,7 +175,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Named1, Message1)
 
 instance ToJSONFields1 Empty
 
@@ -158,12 +184,11 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = Rval <$> unit
-
+  eval _ = pure (Rval unit)
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -216,7 +241,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 Context
 
