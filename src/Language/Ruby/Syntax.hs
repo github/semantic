@@ -26,7 +26,7 @@ resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
   modulePath <- resolve paths
-  maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
+  maybeM (throwResumable $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
 resolveRubyPath :: ( Member (Modules address value) effects
@@ -37,7 +37,7 @@ resolveRubyPath :: ( Member (Modules address value) effects
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybe (throwResumable $ NotFoundError name' [name'] Language.Ruby) pure modulePath
+  maybeM (throwResumable $ NotFoundError name' [name'] Language.Ruby) modulePath
 
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
@@ -73,7 +73,7 @@ instance Evaluatable Require where
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
     traceResolve name path
-    (importedEnv, v) <- isolate (doRequire path)
+    (importedEnv, v) <- doRequire path
     bindAll importedEnv
     pure (Rval v) -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
@@ -109,10 +109,9 @@ instance Evaluatable Load where
   eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
 doLoad :: ( AbstractValue address value effects
+          , Member (Env address) effects
           , Member (Modules address value) effects
           , Member (Resumable ResolutionError) effects
-          , Member (State (Environment address)) effects
-          , Member (State (Exports address)) effects
           , Member Trace effects
           )
        => ByteString
@@ -121,7 +120,7 @@ doLoad :: ( AbstractValue address value effects
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- maybe emptyEnv fst <$> isolate (load path')
+  importedEnv <- maybe emptyEnv fst <$> load path'
   unless shouldWrap $ bindAll importedEnv
   pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 

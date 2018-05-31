@@ -48,18 +48,16 @@ resolvePHPName :: ( Member (Modules address value) effects
                -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
+  maybeM (throwResumable $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
+           , Member (Env address) effects
            , Member (Modules address value) effects
-           , Member (Reader (Environment address)) effects
            , Member (Resumable ResolutionError) effects
            , Member (Resumable (EnvironmentError address)) effects
-           , Member (State (Environment address)) effects
-           , Member (State (Exports address)) effects
            , Member Trace effects
            )
         => Subterm term (Evaluator address value effects (ValueRef value))
@@ -69,7 +67,7 @@ include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (importedEnv, v) <- isolate (f path) >>= maybeM (pure (emptyEnv, unit))
+  (importedEnv, v) <- fromMaybe (emptyEnv, unit) <$> f path
   bindAll importedEnv
   pure (Rval v)
 
