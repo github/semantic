@@ -110,7 +110,7 @@ variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
 -- Effects
 
 data Allocator address value return where
-  Alloc :: Name     -> Allocator address value address
+  Alloc :: Name    -> Allocator address value address
   Deref :: address -> Allocator address value value
 
 runAllocator :: (Addressable address effects, Effectful (m address value), Member (Resumable (AddressError address value)) effects, Member (State (Heap address (Cell address) value)) effects) => m address value (Allocator address value ': effects) a -> m address value effects a
