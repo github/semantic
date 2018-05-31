@@ -25,7 +25,7 @@ builtin :: ( HasCallStack
         -> Evaluator address value effects value
         -> Evaluator address value effects ()
 builtin s def = withCurrentCallStack callStack $ do
-  let name' = name ("__semantic_" <> T.pack s)
+  let name' = name ("__semantic_" <> pack s)
   addr <- alloc name'
   bind name' addr
   def >>= assign addr
@@ -53,4 +53,4 @@ defineBuiltins :: ( AbstractValue address value effects
                   )
                => Evaluator address value effects ()
 defineBuiltins =
-  builtin "print" (lambda (\ v -> variable v >>= asString >>= trace . T.unpack >> pure unit))
+  builtin "print" (lambda (\ v -> variable v >>= asString >>= trace . unpack >> pure unit))
