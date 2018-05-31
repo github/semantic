@@ -15,7 +15,6 @@ module Control.Abstract.Value
 , ValueRoots(..)
 ) where
 
-import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
@@ -25,7 +24,6 @@ import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
-import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Prelude
 import Prologue hiding (TypeError)
@@ -188,9 +186,7 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Env address) effects
-                 , Member (State (Heap address (Cell address) value)) effects
-                 , Ord address
-                 , Reducer value (Cell address value)
+                 , Member (Store address value) effects
                  )
               => Name
               -> address

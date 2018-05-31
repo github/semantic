@@ -49,14 +49,11 @@ deref = send . Deref
 
 
 -- | Write a value to the given address in the 'Store'.
-assign :: ( Member (State (Heap address (Cell address) value)) effects
-          , Ord address
-          , Reducer value (Cell address value)
-          )
+assign :: Member (Store address value) effects
        => address
        -> value
        -> Evaluator address value effects ()
-assign address = modifyHeap . heapInsert address
+assign address = send . Assign address
 
 
 -- | Look up or allocate an address for a 'Name'.
@@ -70,9 +67,6 @@ lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 letrec :: ( Member (Store address value) effects
           , Member (Env address) effects
-          , Member (State (Heap address (Cell address) value)) effects
-          , Ord address
-          , Reducer value (Cell address value)
           )
        => Name
        -> Evaluator address value effects value
@@ -109,18 +103,21 @@ variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
 -- Effects
 
 data Store address value return where
-  Alloc :: Name    -> Store address value address
-  Deref :: address -> Store address value value
+  Alloc  :: Name             -> Store address value address
+  Deref  :: address          -> Store address value value
+  Assign :: address -> value -> Store address value ()
 
 runStore :: ( Addressable address effects
             , Member (Resumable (AddressError address value)) effects
             , Member (State (Heap address (Cell address) value)) effects
+            , Reducer value (Cell address value)
             )
          => Evaluator address value (Store address value ': effects) a
          -> Evaluator address value effects a
 runStore = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
   Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
+  Assign addr value -> modifyHeap (heapInsert addr value)
 
 
 data AddressError address value resume where
