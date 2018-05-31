@@ -6,8 +6,6 @@ module Data.JSON.Fields
   , ToJSONFields (..)
   , ToJSONFields1 (..)
   , (.=)
-  , noChildren
-  , withChildren
   ) where
 
 import           Data.Aeson
@@ -24,12 +22,6 @@ class ToJSONFields1 f where
   default toJSONFields1 :: (KeyValue kv, ToJSON a, GToJSONFields1 (Rep1 f), GConstructorName1 (Rep1 f), Generic1 f) => f a -> [kv]
   toJSONFields1 s = let r = from1 s in
     "term" .= gconstructorName1 r : gtoJSONFields1 r
-
-withChildren :: (KeyValue kv, ToJSON a, Foldable f) => f a -> [kv] -> [kv]
-withChildren f ks = ("children" .= toList f) : ks
-
-noChildren :: KeyValue kv => [kv] -> [kv]
-noChildren ks = ("children" .= ([] :: [Int])) : ks
 
 instance ToJSONFields a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= object (toJSONFields a), "after" .= object (toJSONFields b) ]
@@ -105,10 +97,10 @@ instance GToJSONFields1 U1 where
   gtoJSONFields1 _ = []
 
 instance (Selector c, GSelectorJSONValue1 f) => GToJSONFields1 (M1 S c f) where
-  gtoJSONFields1 m1 = case selName m1 of
-    "" -> [ "children" .= json ]
-    n ->  [ Text.pack n .= json ]
-    where json = gselectorJSONValue1 (unM1 m1)
+  gtoJSONFields1 m1 = gselectorJSONValue1 keyName (unM1 m1)
+    where keyName = case selName m1 of
+            "" -> Nothing
+            n  -> Just (Text.pack n)
 
 instance (GToJSONFields1 f, GToJSONFields1 g) => GToJSONFields1 (f :+: g) where
   gtoJSONFields1 (L1 l) = gtoJSONFields1 l
@@ -119,34 +111,19 @@ instance (GToJSONFields1 f, GToJSONFields1 g) => GToJSONFields1 (f :*: g) where
 
 -- | A typeclass to retrieve the JSON 'Value' of a record selector.
 class GSelectorJSONValue1 f where
-  gselectorJSONValue1 :: ToJSON a => f a -> SomeJSON
+  gselectorJSONValue1 :: (KeyValue kv, ToJSON a) => Maybe Text -> f a -> [kv]
 
 instance GSelectorJSONValue1 Par1 where
-  gselectorJSONValue1 = SomeJSON . unPar1
+  gselectorJSONValue1 k x = [ fromMaybe "children" k .= unPar1 x]
 
 instance ToJSON1 f => GSelectorJSONValue1 (Rec1 f) where
-  gselectorJSONValue1 = SomeJSON . SomeJSON1 . unRec1
+  gselectorJSONValue1 k x = [ fromMaybe "children" k .= toJSON1 (unRec1 x)]
 
 instance ToJSON k => GSelectorJSONValue1 (K1 r k) where
-  gselectorJSONValue1 = SomeJSON . unK1
+  gselectorJSONValue1 k x = [ fromMaybe "value" k .= unK1 x ]
 
 
 -- TODO: Fix this orphan instance.
 instance ToJSON ByteString where
   toJSON = toJSON . Text.decodeUtf8
   toEncoding = toEncoding . Text.decodeUtf8
-
-
-data SomeJSON where
-  SomeJSON :: ToJSON a => a -> SomeJSON
-
-instance ToJSON SomeJSON where
-  toJSON (SomeJSON a) = toJSON a
-  toEncoding (SomeJSON a) = toEncoding a
-
-data SomeJSON1 where
-  SomeJSON1 :: (ToJSON1 f, ToJSON a) => f a -> SomeJSON1
-
-instance ToJSON SomeJSON1 where
-  toJSON (SomeJSON1 fa) = toJSON1 fa
-  toEncoding (SomeJSON1 fa) = toEncoding1 fa

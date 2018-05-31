@@ -11,12 +11,10 @@ data Module a = Module { moduleIdentifier :: !a
                        , moduleExports    :: ![a]
                        , moduleStatements :: !a
                        }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
-
-instance ToJSONFields1 Module
 
 instance Evaluatable Module where
