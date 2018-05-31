@@ -45,9 +45,9 @@ reachable :: ( Ord address
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
-          Just (a, as) -> go (liveInsert a seen) (case heapLookupAll a heap of
+          Just (a, as) -> go (liveInsert a seen) $ case heapLookupAll a heap of
             Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
-            _           -> seen)
+            _           -> seen
 
 
 providingLiveSet :: Effectful (m address value) => m address value (Reader (Live address) ': effects) a -> m address value effects a
