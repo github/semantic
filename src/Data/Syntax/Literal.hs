@@ -119,6 +119,17 @@ instance Evaluatable Data.Syntax.Literal.String
 
 instance ToJSONFields1 Data.Syntax.Literal.String
 
+newtype Character a = Character { characterContent :: ByteString }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 Data.Syntax.Literal.Character where liftEq = genericLiftEq
+instance Ord1 Data.Syntax.Literal.Character where liftCompare = genericLiftCompare
+instance Show1 Data.Syntax.Literal.Character where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Data.Syntax.Literal.Character
+
+instance ToJSONFields1 Data.Syntax.Literal.Character
+
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -177,7 +188,6 @@ instance Ord1 Regex where liftCompare = genericLiftCompare
 instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Heredoc-style string literals?
--- TODO: Character literals.
 
 instance ToJSONFields1 Regex where
   toJSONFields1 (Regex r) = noChildren ["asString" .= unpack r]
