@@ -12,7 +12,6 @@ import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
-import           Data.Semigroup.Reducer (Reducer)
 import           Diffing.Algorithm
 import           Prelude
 import           Prologue
@@ -137,9 +136,6 @@ evalRequire :: ( AbstractValue address value effects
                , Member (Allocator address value) effects
                , Member (Env address) effects
                , Member (Modules address value) effects
-               , Member (State (Heap address (Cell address) value)) effects
-               , Ord address
-               , Reducer value (Cell address value)
                )
             => M.ModulePath
             -> Name
