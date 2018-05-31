@@ -228,16 +228,16 @@ fieldIdentifier :: Assignment
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> tsource)
 
 floatLiteral :: Assignment
-floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
+floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> tsource)
 
 identifier :: Assignment
 identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> tsource)
 
 imaginaryLiteral :: Assignment
-imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
+imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> tsource)
 
 interpretedStringLiteral :: Assignment
-interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
+interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> tsource)
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> tsource)
@@ -252,7 +252,7 @@ parenthesizedType :: Assignment
 parenthesizedType = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Type.Parenthesized <$> expression)
 
 rawStringLiteral :: Assignment
-rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> source)
+rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> tsource)
 
 runeLiteral :: Assignment
 runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> source)
@@ -396,8 +396,8 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
       let alias = makeTerm loc (Syntax.Identifier (defaultAlias from)) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
       Go.Syntax.QualifiedImport <$> pure from <*> pure alias)
 
-    dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
-    underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
+    dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> tsource)
+    underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> tsource)
     importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
     importFromPath = symbol InterpretedStringLiteral *> (importPath <$> tsource)

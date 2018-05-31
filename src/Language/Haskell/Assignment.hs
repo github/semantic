@@ -99,7 +99,7 @@ integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> tsource)
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> tsource)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]

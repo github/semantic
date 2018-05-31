@@ -197,22 +197,22 @@ literal =
   <|> makeTerm <$> token  Grammar.False    <*> pure Literal.false
   <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
   <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> tsource)
-  <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
-  <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> source)
-  <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> source)
+  <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> tsource)
+  <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> tsource)
+  <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> tsource)
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
   <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many expression)
-  <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
-  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
-  <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
-  <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
-  <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.Symbol <$> source)
+  <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> tsource)
+  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)
+  <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> tsource)))
+  <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> tsource)
+  <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.Symbol <$> tsource)
 
 heredoc :: Assignment
-heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
-       <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
+heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> tsource)
+       <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> tsource)
 
 beginBlock :: Assignment
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many expression)
@@ -488,7 +488,7 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
 term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> heredocEnd) <*> emptyTerm)
-  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
+  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> tsource)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]

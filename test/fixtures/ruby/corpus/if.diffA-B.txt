@@ -3,7 +3,8 @@
     (Send
     { (Identifier)
     ->(Identifier) })
-    ({-(Send
+    (
+    {-(Send
       {-(Identifier)-})-})
   { (If
     {-(Send

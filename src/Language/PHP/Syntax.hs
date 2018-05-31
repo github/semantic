@@ -5,6 +5,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
@@ -44,13 +45,13 @@ instance Evaluatable VariableName
 resolvePHPName :: Members '[ Modules location value
                            , Resumable ResolutionError
                            ] effects
-               => ByteString
+               => T.Text
                -> Evaluator location value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
-        toName = BC.unpack . dropRelativePrefix . stripQuotes
+        toName = T.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue location value effects
            , Members '[ Allocator location value
