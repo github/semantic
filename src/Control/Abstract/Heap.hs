@@ -62,17 +62,15 @@ assign address = modifyHeap . heapInsert address
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( Member (Allocator address value) effects
-                 , Member (Reader (Environment address)) effects
-                 , Member (State (Environment address)) effects
+                 , Member (Env address) effects
                  )
               => Name
               -> Evaluator address value effects address
-lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
+lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
 letrec :: ( Member (Allocator address value) effects
-          , Member (Reader (Environment address)) effects
-          , Member (State (Environment address)) effects
+          , Member (Env address) effects
           , Member (State (Heap address (Cell address) value)) effects
           , Ord address
           , Reducer value (Cell address value)
@@ -88,8 +86,7 @@ letrec name body = do
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
 letrec' :: ( Member (Allocator address value) effects
-           , Member (Reader (Environment address)) effects
-           , Member (State (Environment address)) effects
+           , Member (Env address) effects
            )
         => Name
         -> (address -> Evaluator address value effects value)
@@ -102,9 +99,8 @@ letrec' name body = do
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: ( Member (Allocator address value) effects
-            , Member (Reader (Environment address)) effects
+            , Member (Env address) effects
             , Member (Resumable (EnvironmentError address)) effects
-            , Member (State (Environment address)) effects
             )
          => Name
          -> Evaluator address value effects value
