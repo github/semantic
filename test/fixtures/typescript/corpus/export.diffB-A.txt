@@ -47,9 +47,10 @@
       {-(Empty)-}
       {-(Identifier)-}
       {-(Empty)-})-}))
-  (DefaultExport
-  { (Identifier)
-  ->(Identifier) })
+{+(DefaultExport
+  {+(Identifier)+})+}
+{-(DefaultExport
+  {-(Identifier)-})-}
 {-(DefaultExport
   {-(Function
     {-(Empty)-}

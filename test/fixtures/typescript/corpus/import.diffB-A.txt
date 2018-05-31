@@ -2,7 +2,8 @@
 {+(Import)+}
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
-{+(Import)+}
+{ (Import)
+->(Import) }
 {+(Import)+}
 {+(Import)+}
 {+(Statements
@@ -15,7 +16,6 @@
 {+(SideEffectImport)+}
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
-{-(Import)-}
 {-(QualifiedAliasedImport
   {-(Identifier)-})-}
 {-(Import)-}

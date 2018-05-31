@@ -44,15 +44,15 @@
       { (Identifier)
       ->(Identifier) }
         (Empty))))
+{+(DefaultExport
+  {+(Identifier)+})+}
   (DefaultExport
   { (Identifier)
-  ->(Identifier) })
-{+(DefaultExport
-  {+(Function
+  ->(Function
     {+(Empty)+}
     {+(Empty)+}
     {+(Identifier)+}
-    {+(Statements)+})+})+}
+    {+(Statements)+}) })
   (DefaultExport
     (Function
       (Empty)
