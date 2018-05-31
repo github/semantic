@@ -174,7 +174,6 @@ expressionChoices =
   , yield
   ]
 
-
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> manyTerm expression
 

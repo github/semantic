@@ -138,8 +138,7 @@ type Syntax = '[
   , Syntax.UseClause
   , Syntax.VariableName
   , Type.Annotation
-  , []
-  ]
+  , [] ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term

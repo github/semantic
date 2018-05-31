@@ -130,7 +130,7 @@ instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Program where
   eval (Program statements) = eval statements
 
--- | Imperative sequence of statements/declarations
+-- | Imperative sequence of statements/declarations s.t.:
 --
 --   1. Each statement’s effects on the store are accumulated;
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
