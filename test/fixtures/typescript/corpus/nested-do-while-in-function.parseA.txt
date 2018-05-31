@@ -17,10 +17,10 @@
       (Assignment
         (Identifier)
         (Empty)))
-    (
+    (Statements
       (DoWhile
         (Identifier)
-        (
+        (Statements
           (Call
             (Identifier)
             (Identifier)

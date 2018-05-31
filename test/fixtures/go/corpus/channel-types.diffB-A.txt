@@ -4,8 +4,8 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
     {+(Type
       {+(Identifier)+}
       {+(BidirectionalChannel
@@ -17,7 +17,7 @@
         {+(SendChannel
           {+(Constructor
             {+(Empty)+}
-            {+([])+})+})+})+})+}
+            {+(Statements)+})+})+})+})+}
     {+(Type
       {+(Identifier)+}
       {+(SendChannel
@@ -45,7 +45,7 @@
         {-(SendChannel
           {-(Constructor
             {-(Empty)-}
-            {-([])-})-})-})-})-}
+            {-(Statements)-})-})-})-})-}
     {-(Type
       {-(Identifier)-}
       {-(SendChannel

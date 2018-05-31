@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
 module Language.PHP.Syntax where
 
-import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
@@ -14,7 +13,7 @@ import           Prelude hiding (fail)
 import           Prologue hiding (Text)
 
 newtype Text a = Text ByteString
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Text where
   toJSONFields1 (Text t) = noChildren ["asString" .= BC.unpack t]
@@ -26,7 +25,7 @@ instance Evaluatable Text
 
 
 newtype VariableName a = VariableName a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 VariableName
 
@@ -43,44 +42,43 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: Members '[ Modules location value
-                           , Resumable ResolutionError
-                           ] effects
+resolvePHPName :: ( Member (Modules address value) effects
+                  , Member (Resumable ResolutionError) effects
+                  )
                => ByteString
-               -> Evaluator location value effects ModulePath
+               -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( AbstractValue location value effects
-           , Members '[ Allocator location value
-                      , Modules location value
-                      , Reader (Environment location)
-                      , Resumable ResolutionError
-                      , Resumable (EnvironmentError location)
-                      , State (Environment location)
-                      , State (Exports location)
-                      , State (Heap location (Cell location) value)
-                      , Trace
-                      ] effects
-           , Ord location
-           , Reducer value (Cell location value)
+include :: ( AbstractValue address value effects
+           , Member (Allocator address value) effects
+           , Member (Modules address value) effects
+           , Member (Reader (Environment address)) effects
+           , Member (Resumable ResolutionError) effects
+           , Member (Resumable (EnvironmentError address)) effects
+           , Member (State (Environment address)) effects
+           , Member (State (Exports address)) effects
+           , Member (State (Heap address (Cell address) value)) effects
+           , Member Trace effects
+           , Ord address
+           , Reducer value (Cell address value)
            )
-        => Subterm term (Evaluator location value effects (ValueRef location value))
-        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location, Address location value)))
-        -> Evaluator location value effects (ValueRef location value)
+        => Subterm term (Evaluator address value effects (ValueRef address value))
+        -> (ModulePath -> Evaluator address value effects (Maybe (Environment address, address)))
+        -> Evaluator address value effects (ValueRef address value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> (box unit))
-  modifyEnv (mergeEnvs importedEnv)
+  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> box unit)
+  bindAll importedEnv
   pure (Rval v)
 
 newtype Require a = Require a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Require where liftEq          = genericLiftEq
 instance Ord1 Require where liftCompare    = genericLiftCompare
@@ -93,7 +91,7 @@ instance Evaluatable Require where
 
 
 newtype RequireOnce a = RequireOnce a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 RequireOnce where liftEq = genericLiftEq
 instance Ord1 RequireOnce where liftCompare = genericLiftCompare
@@ -106,7 +104,7 @@ instance Evaluatable RequireOnce where
 
 
 newtype Include a = Include a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Include where liftEq          = genericLiftEq
 instance Ord1 Include where liftCompare    = genericLiftCompare
@@ -119,7 +117,7 @@ instance Evaluatable Include where
 
 
 newtype IncludeOnce a = IncludeOnce a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 IncludeOnce where liftEq          = genericLiftEq
 instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
@@ -132,7 +130,7 @@ instance Evaluatable IncludeOnce where
 
 
 newtype ArrayElement a = ArrayElement a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ArrayElement
 
@@ -142,7 +140,7 @@ instance Show1 ArrayElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ArrayElement
 
 newtype GlobalDeclaration a = GlobalDeclaration [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 GlobalDeclaration
 
@@ -152,7 +150,7 @@ instance Show1 GlobalDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable GlobalDeclaration
 
 newtype SimpleVariable a = SimpleVariable a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 SimpleVariable
 
@@ -164,7 +162,7 @@ instance Evaluatable SimpleVariable
 
 -- | TODO: Unify with TypeScript's PredefinedType
 newtype CastType a = CastType { _castType :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 CastType
 
@@ -174,7 +172,7 @@ instance Show1 CastType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable CastType
 
 newtype ErrorControl a = ErrorControl a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ErrorControl
 
@@ -184,7 +182,7 @@ instance Show1 ErrorControl where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ErrorControl
 
 newtype Clone a = Clone a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Clone
 
@@ -194,7 +192,7 @@ instance Show1 Clone where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Clone
 
 newtype ShellCommand a = ShellCommand ByteString
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ShellCommand
 
@@ -205,7 +203,7 @@ instance Evaluatable ShellCommand
 
 -- | TODO: Combine with TypeScript update expression.
 newtype Update a = Update { _updateSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Update
 
@@ -215,7 +213,7 @@ instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Update
 
 newtype NewVariable a = NewVariable [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 NewVariable
 
@@ -225,7 +223,7 @@ instance Show1 NewVariable where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NewVariable
 
 newtype RelativeScope a = RelativeScope ByteString
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 RelativeScope
 
@@ -235,7 +233,7 @@ instance Show1 RelativeScope where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable RelativeScope
 
 data QualifiedName a = QualifiedName !a !a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 QualifiedName
 
@@ -247,7 +245,7 @@ instance Evaluatable QualifiedName where
   eval (fmap subtermValue -> QualifiedName name iden) = Rval <$> evaluateInScopedEnv name (box =<< iden)
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 NamespaceName
 
@@ -260,7 +258,7 @@ instance Evaluatable NamespaceName where
   eval (NamespaceName xs) = rvalBox =<< foldl1 (\ l r -> r >>= (evaluateInScopedEnv l . box) >>= deref) (fmap subtermValue xs)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ConstDeclaration
 
@@ -270,7 +268,7 @@ instance Show1 ConstDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ConstDeclaration
 
 data ClassConstDeclaration a = ClassConstDeclaration a [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ClassConstDeclaration
 
@@ -280,7 +278,7 @@ instance Show1 ClassConstDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ClassConstDeclaration
 
 newtype ClassInterfaceClause a = ClassInterfaceClause [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ClassInterfaceClause
 
@@ -290,7 +288,7 @@ instance Show1 ClassInterfaceClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ClassInterfaceClause
 
 newtype ClassBaseClause a = ClassBaseClause a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ClassBaseClause
 
@@ -301,7 +299,7 @@ instance Evaluatable ClassBaseClause
 
 
 newtype UseClause a = UseClause [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 UseClause
 
@@ -311,7 +309,7 @@ instance Show1 UseClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable UseClause
 
 newtype ReturnType a = ReturnType a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ReturnType
 
@@ -321,7 +319,7 @@ instance Show1 ReturnType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ReturnType
 
 newtype TypeDeclaration a = TypeDeclaration a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 TypeDeclaration
 
@@ -331,7 +329,7 @@ instance Show1 TypeDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeDeclaration
 
 newtype BaseTypeDeclaration a = BaseTypeDeclaration a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 BaseTypeDeclaration
 
@@ -341,7 +339,7 @@ instance Show1 BaseTypeDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BaseTypeDeclaration
 
 newtype ScalarType a = ScalarType ByteString
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ScalarType
 
@@ -351,7 +349,7 @@ instance Show1 ScalarType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ScalarType
 
 newtype EmptyIntrinsic a = EmptyIntrinsic a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 EmptyIntrinsic
 
@@ -361,7 +359,7 @@ instance Show1 EmptyIntrinsic where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable EmptyIntrinsic
 
 newtype ExitIntrinsic a = ExitIntrinsic a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ExitIntrinsic
 
@@ -371,7 +369,7 @@ instance Show1 ExitIntrinsic where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ExitIntrinsic
 
 newtype IssetIntrinsic a = IssetIntrinsic a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 IssetIntrinsic
 
@@ -381,7 +379,7 @@ instance Show1 IssetIntrinsic where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable IssetIntrinsic
 
 newtype EvalIntrinsic a = EvalIntrinsic a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 EvalIntrinsic
 
@@ -391,7 +389,7 @@ instance Show1 EvalIntrinsic where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable EvalIntrinsic
 
 newtype PrintIntrinsic a = PrintIntrinsic a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 PrintIntrinsic
 
@@ -401,7 +399,7 @@ instance Show1 PrintIntrinsic where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PrintIntrinsic
 
 newtype NamespaceAliasingClause a = NamespaceAliasingClause a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 NamespaceAliasingClause
 
@@ -411,7 +409,7 @@ instance Show1 NamespaceAliasingClause where liftShowsPrec = genericLiftShowsPre
 instance Evaluatable NamespaceAliasingClause
 
 newtype NamespaceUseDeclaration a = NamespaceUseDeclaration [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 NamespaceUseDeclaration
 
@@ -421,7 +419,7 @@ instance Show1 NamespaceUseDeclaration where liftShowsPrec = genericLiftShowsPre
 instance Evaluatable NamespaceUseDeclaration
 
 newtype NamespaceUseClause a = NamespaceUseClause [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 NamespaceUseClause
 
@@ -431,7 +429,7 @@ instance Show1 NamespaceUseClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NamespaceUseClause
 
 newtype NamespaceUseGroupClause a = NamespaceUseGroupClause [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 NamespaceUseGroupClause
 
@@ -441,7 +439,7 @@ instance Show1 NamespaceUseGroupClause where liftShowsPrec = genericLiftShowsPre
 instance Evaluatable NamespaceUseGroupClause
 
 data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Namespace where liftEq = genericLiftEq
 instance Ord1 Namespace where liftCompare = genericLiftCompare
@@ -462,7 +460,7 @@ instance Evaluatable Namespace where
         go xs <* makeNamespace name addr Nothing
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 TraitDeclaration
 
@@ -472,7 +470,7 @@ instance Show1 TraitDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TraitDeclaration
 
 data AliasAs a = AliasAs { aliasAsName  :: a, aliasAsModifier :: a, aliasAsClause :: a }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 AliasAs
 
@@ -482,7 +480,7 @@ instance Show1 AliasAs where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable AliasAs
 
 data InsteadOf a = InsteadOf a a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 InsteadOf
 
@@ -492,7 +490,7 @@ instance Show1 InsteadOf where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable InsteadOf
 
 newtype TraitUseSpecification a = TraitUseSpecification [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 TraitUseSpecification
 
@@ -502,7 +500,7 @@ instance Show1 TraitUseSpecification where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TraitUseSpecification
 
 data TraitUseClause a = TraitUseClause [a] a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 TraitUseClause
 
@@ -512,7 +510,7 @@ instance Show1 TraitUseClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TraitUseClause
 
 data DestructorDeclaration a = DestructorDeclaration [a] a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 DestructorDeclaration
 
@@ -522,7 +520,7 @@ instance Show1 DestructorDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable DestructorDeclaration
 
 newtype Static a = Static ByteString
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Static
 
@@ -532,7 +530,7 @@ instance Show1 Static where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Static
 
 newtype ClassModifier a = ClassModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ClassModifier
 
@@ -542,7 +540,7 @@ instance Show1 ClassModifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ClassModifier
 
 data ConstructorDeclaration a = ConstructorDeclaration [a] [a] a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ConstructorDeclaration
 
@@ -552,7 +550,7 @@ instance Show1 ConstructorDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ConstructorDeclaration
 
 data PropertyDeclaration a = PropertyDeclaration a [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 PropertyDeclaration
 
@@ -562,7 +560,7 @@ instance Show1 PropertyDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PropertyDeclaration
 
 data PropertyModifier a = PropertyModifier a a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 PropertyModifier
 
@@ -572,7 +570,7 @@ instance Show1 PropertyModifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PropertyModifier
 
 data InterfaceDeclaration a = InterfaceDeclaration a a [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 InterfaceDeclaration
 
@@ -582,7 +580,7 @@ instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable InterfaceDeclaration
 
 newtype InterfaceBaseClause a = InterfaceBaseClause [a]
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 InterfaceBaseClause
 
@@ -592,7 +590,7 @@ instance Show1 InterfaceBaseClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable InterfaceBaseClause
 
 newtype Echo a = Echo a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Echo
 
@@ -602,7 +600,7 @@ instance Show1 Echo where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Echo
 
 newtype Unset a = Unset a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Unset
 
@@ -612,7 +610,7 @@ instance Show1 Unset where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Unset
 
 data Declare a = Declare a a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Declare
 
@@ -622,7 +620,7 @@ instance Show1 Declare where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Declare
 
 newtype DeclareDirective a = DeclareDirective a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 DeclareDirective
 
@@ -632,7 +630,7 @@ instance Show1 DeclareDirective where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable DeclareDirective
 
 newtype LabeledStatement a = LabeledStatement { _labeledStatementIdentifier :: a }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 LabeledStatement
 

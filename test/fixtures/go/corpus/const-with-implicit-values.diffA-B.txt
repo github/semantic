@@ -4,8 +4,8 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
     {+(Assignment
       {+(Identifier)+}
       {+(Identifier)+})+}
@@ -13,13 +13,13 @@
       { (Identifier)
       ->(Identifier) }
       { (Identifier)
-      ->([]) })
+      ->(Statements) })
     {+(Assignment
       {+(Identifier)+}
-      {+([])+})+}
+      {+(Statements)+})+}
     {-(Assignment
       {-(Identifier)-}
-      {-([])-})-}
+      {-(Statements)-})-}
     {-(Assignment
       {-(Identifier)-}
-      {-([])-})-})))
+      {-(Statements)-})-})))

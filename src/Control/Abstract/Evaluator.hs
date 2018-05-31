@@ -22,67 +22,64 @@ import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
 import Control.Monad.Effect.State     as X
 import Control.Monad.Effect.Trace     as X
-import Data.Abstract.Address
 import Prologue
 
--- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
+-- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
 --
 --   These parameters enable us to constrain the types of effects using them s.t. we can avoid both ambiguous types when they aren’t mentioned outside of the context, and lengthy, redundant annotations on the use sites of functions employing these effects.
 --
 --   These effects will typically include the environment, heap, module table, etc. effects necessary for evaluation of modules and terms, but may also include any other effects so long as they’re eventually handled.
-newtype Evaluator location value effects a = Evaluator { runEvaluator :: Eff effects a }
+newtype Evaluator address value effects a = Evaluator { runEvaluator :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
-deriving instance Member NonDet effects => Alternative (Evaluator location value effects)
+deriving instance Member NonDet effects => Alternative (Evaluator address value effects)
 
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-data Return location value resume where
-  Return :: Address location value -> Return location value (Address location value)
+data Return address value resume where
+  Return :: address -> Return address value address
 
-deriving instance (Eq location, Eq value) => Eq (Return location value a)
-deriving instance (Show location, Eq value) => Show (Return location value a)
+deriving instance (Eq address, Eq value) => Eq (Return address value a)
+deriving instance (Show address, Eq value) => Show (Return address value a)
 
-earlyReturn :: Member (Return location value) effects => Address location value -> Evaluator location value effects (Address location value)
-earlyReturn = send . Return
+earlyReturn :: forall address value effects
+            .  Member (Return address value) effects
+            => address
+            -> Evaluator address value effects address
+earlyReturn = send . Return @address @value
 
-catchReturn :: Member (Return location value) effects => Evaluator location value effects a -> (forall x . Return location value x -> Evaluator location value effects a) -> Evaluator location value effects a
+catchReturn :: Member (Return address value) effects => Evaluator address value effects a -> (forall x . Return address value x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Effectful (m location value)
-          => m location value (Return location value ': effects) (Address location value)
-          -> m location value effects (Address location value)
+runReturn :: Effectful (m address value) => m address value (Return address value ': effects) (address) -> m address value effects (address)
 runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
-data LoopControl location value resume where
-  Break    :: Address location value -> LoopControl location value (Address location value)
-  Continue :: Address location value -> LoopControl location value (Address location value)
+data LoopControl address value resume where
+  Break    :: address -> LoopControl address value address
+  Continue :: address -> LoopControl address value address
 
-deriving instance (Eq location, Eq value) => Eq (LoopControl location value a)
-deriving instance (Show location, Show value) => Show (LoopControl location value a)
+deriving instance (Eq address, Eq value) => Eq (LoopControl address value a)
+deriving instance (Show address, Show value) => Show (LoopControl address value a)
 
-throwBreak :: Member (LoopControl location value) effects
-           => Address location value
-           -> Evaluator location value effects (Address location value)
-throwBreak = send . Break
+throwBreak :: forall address value effects
+           .  Member (LoopControl address value) effects
+           => address
+           -> Evaluator address value effects address
+throwBreak = send . Break @address @value
 
-throwContinue :: Member (LoopControl location value) effects
-              => Address location value
-              -> Evaluator location value effects (Address location value)
-throwContinue = send . Continue
+throwContinue :: forall address value effects
+              .  Member (LoopControl address value) effects
+              => address
+              -> Evaluator address value effects address
+throwContinue = send . Continue @address @value
 
-catchLoopControl :: Member (LoopControl location value) effects
-                 => Evaluator location value effects a
-                 -> (forall x . LoopControl location value x -> Evaluator location value effects a)
-                 -> Evaluator location value effects a
+catchLoopControl :: Member (LoopControl address value) effects => Evaluator address value effects a -> (forall x . LoopControl address value x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
-runLoopControl :: Effectful (m location value)
-               => m location value (LoopControl location value ': effects) (Address location value)
-               -> m location value effects (Address location value)
+runLoopControl :: Effectful (m address value) => m address value (LoopControl address value ': effects) address -> m address value effects address
 runLoopControl = raiseHandler (relay pure (\ eff _ -> case eff of
   Break    value -> pure value
   Continue value -> pure value))

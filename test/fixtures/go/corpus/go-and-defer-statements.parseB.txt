@@ -4,19 +4,19 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Defer
         (Call
           (MemberAccess
             (Identifier)
             (Identifier))
-          ([])
+          (Statements)
           (Empty)))
       (Go
         (Call
           (MemberAccess
             (Identifier)
             (Identifier))
-          ([])
+          (Statements)
           (Empty))))))

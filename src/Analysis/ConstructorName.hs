@@ -1,31 +1,10 @@
 {-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.ConstructorName
 ( ConstructorName(..)
-, ConstructorLabel(..)
-, constructorLabel
 ) where
 
-import Data.Aeson
-import Data.ByteString.Char8 (ByteString, pack, unpack)
-import Data.JSON.Fields
 import Data.Sum
-import Data.Term
-import Data.Text.Encoding (decodeUtf8)
 import Prologue
-
--- | Compute a 'ConstructorLabel' label for a 'Term'.
-constructorLabel :: ConstructorName syntax => TermF syntax a b -> ConstructorLabel
-constructorLabel (In _ s) = ConstructorLabel $ pack (constructorName s)
-
-
-newtype ConstructorLabel = ConstructorLabel { unConstructorLabel :: ByteString }
-
-instance Show ConstructorLabel where
-  showsPrec _ (ConstructorLabel s) = showString (unpack s)
-
-instance ToJSONFields ConstructorLabel where
-  toJSONFields (ConstructorLabel s) = [ "category" .= decodeUtf8 s ]
-
 
 -- | A typeclass to retrieve the name of the data constructor for a value.
 --
@@ -40,8 +19,7 @@ instance Apply ConstructorName fs => ConstructorNameWithStrategy 'Custom (Sum fs
   constructorNameWithStrategy _ = apply @ConstructorName constructorName
 
 instance ConstructorNameWithStrategy 'Custom [] where
-  constructorNameWithStrategy _ [] = "[]"
-  constructorNameWithStrategy _ _  = ""
+  constructorNameWithStrategy _ _ = "Statements"
 
 data Strategy = Default | Custom
 

@@ -1,11 +1,11 @@
 (Program
   (Try
-    (
+    (Statements
       (Send
         (Identifier))
       (Catch
-        (
-          (
+        (Statements
+          (Statements
             (Send
               (Identifier))))
         (Send

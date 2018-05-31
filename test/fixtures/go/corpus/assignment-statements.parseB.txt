@@ -4,20 +4,20 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Integer))
       (Assignment
-        (
+        (Statements
           (Identifier)
           (Identifier))
         (Plus
-          (
+          (Statements
             (Identifier)
             (Identifier))
-          (
+          (Statements
             (Integer)
             (Integer))))
       (Assignment
@@ -63,13 +63,13 @@
             (Integer))))
       (Assignment
         (Identifier)
-        (
+        (Statements
           (Pointer
             (Identifier))
           (Reference
             (Composite
               (Identifier)
-              (
+              (Statements
                 (KeyValue
                   (Identifier)
                   (Integer))))))))))

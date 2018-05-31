@@ -4,10 +4,10 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Match
-      ([])
-      (
+      (Statements)
+      (Statements
         (Pattern
           (LessThan
           { (Identifier)
@@ -16,7 +16,7 @@
           ->(Identifier) })
           (Call
             (Identifier)
-            ([])
+            (Statements)
             (Empty)))
       {+(Pattern
         {+(LessThan
@@ -24,7 +24,7 @@
           {+(Identifier)+})+}
         {+(Call
           {+(Identifier)+}
-          {+([])+}
+          {+(Statements)+}
           {+(Empty)+})+})+}
       {+(Pattern
         {+(Equal
@@ -32,7 +32,7 @@
           {+(Integer)+})+}
         {+(Call
           {+(Identifier)+}
-          {+([])+}
+          {+(Statements)+}
           {+(Empty)+})+})+}
       {-(Pattern
         {-(LessThan
@@ -42,7 +42,7 @@
           {-(Comment)-}
           {-(Call
             {-(Identifier)-}
-            {-([])-}
+            {-(Statements)-}
             {-(Empty)-})-})-})-}
       {-(Context
         {-(Comment)-}
@@ -52,5 +52,5 @@
             {-(Integer)-})-}
           {-(Call
             {-(Identifier)-}
-            {-([])-}
+            {-(Statements)-}
             {-(Empty)-})-})-})-}))))

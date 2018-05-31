@@ -4,12 +4,12 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Call
       { (Identifier)
       ->(Identifier) }
-        (
+        (Statements
           (Identifier)
           (Variadic
             (Identifier)))
@@ -17,13 +17,13 @@
       (Call
       { (Identifier)
       ->(Identifier) }
-        (
+        (Statements
           (Identifier)
           (Identifier))
         (Empty))
     {+(Call
       {+(Identifier)+}
-      {+(
+      {+(Statements
         {+(Identifier)+}
         {+(Variadic
           {+(Identifier)+})+})+}
@@ -31,8 +31,8 @@
       (Call
       { (Identifier)
       ->(Identifier) }
-      {+([])+}
-      {-(
+      {+(Statements)+}
+      {-(Statements
         {-(Identifier)-}
         {-(Variadic
           {-(Identifier)-})-})-}

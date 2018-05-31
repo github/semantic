@@ -4,12 +4,12 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Call
       (MemberAccess
         (MemberAccess
           (Identifier)
           (Identifier))
         (Identifier))
-      ([])
+      (Statements)
       (Empty))))

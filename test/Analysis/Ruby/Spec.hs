@@ -76,7 +76,6 @@ spec = parallel $ do
 
   where
     ns n = Just . Latest . Last . Just . Namespace n
-    addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)
     evalRubyProject path = testEvaluating <$> evaluateProject rubyParser Language.Ruby rubyPrelude path

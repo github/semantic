@@ -39,7 +39,7 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-runGraph :: Members '[Distribute WrappedTask, Files, Resolution, Task, Exc SomeException, Telemetry, Trace] effs
+runGraph :: ( Member (Distribute WrappedTask) effs, Member (Exc SomeException) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -71,7 +71,7 @@ runGraph graphType includePackages project
             . graphing
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: Members '[Distribute WrappedTask, Files, Resolution, Task, Trace] effs
+parsePackage :: (Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Maybe File  -- ^ Prelude (optional).
              -> Project     -- ^ Project to parse into a package.
@@ -87,11 +87,11 @@ parsePackage parser preludeFile project@Project{..} = do
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
-    parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
+    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
     parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
 -- | Parse a file into a 'Module'.
-parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
+parseModule :: (Member Files effs, Member Task effs) => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
 parseModule parser rootDir file = do
   blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
@@ -100,8 +100,8 @@ parseModule parser rootDir file = do
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
                  )
-              => SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
-              -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
+              => SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
+              -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
@@ -109,10 +109,10 @@ resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionErr
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: Member Trace effects => Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
+resumingLoadError :: Member Trace effects => Evaluator address value (Resumable (LoadError address value) ': effects) a -> Evaluator address value effects a
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
 
-resumingEvalError :: Member Trace effects => Evaluator location value (Resumable EvalError ': effects) a -> Evaluator location value effects a
+resumingEvalError :: Member Trace effects => Evaluator address value (Resumable EvalError ': effects) a -> Evaluator address value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
   DefaultExportError{}     -> pure ()
   ExportError{}            -> pure ()
@@ -121,19 +121,15 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   RationalFormatError{}    -> pure 0
   FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
 
-resumingUnspecialized :: ( AbstractHole value
-                         , Member Trace effects
-                         )
-                      => Evaluator location value (Resumable (Unspecialized value) ': effects) a
-                      -> Evaluator location value effects a
+resumingUnspecialized :: (Member Trace effects, AbstractHole value) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
 
-resumingAddressError :: (AbstractHole value, Lower (Cell location value), Member Trace effects, Show location) => Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
+resumingAddressError :: (AbstractHole value, Lower (Cell address value), Member Trace effects, Show address) => Evaluator address value (Resumable (AddressError address value) ': effects) a -> Evaluator address value effects a
 resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> show err) *> case err of
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (Members '[State (Environment location), Trace] effects, Show location) => Evaluator location (Value location body) (Resumable (ValueError location body) ': effects) a -> Evaluator location (Value location body) effects a
+resumingValueError :: (Member (State (Environment address)) effects, Member Trace effects, Show address) => Evaluator address (Value address body) (Resumable (ValueError address body) ': effects) a -> Evaluator address (Value address body) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))
@@ -149,7 +145,7 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: AbstractHole location => Evaluator location value (Resumable (EnvironmentError location) ': effects) a -> Evaluator location value effects (a, [Name])
+resumingEnvironmentError :: AbstractHole address => Evaluator address value (Resumable (EnvironmentError address) ': effects) a -> Evaluator address value effects (a, [Name])
 resumingEnvironmentError
   = runState []
   . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)

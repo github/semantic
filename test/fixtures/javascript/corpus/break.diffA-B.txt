@@ -8,12 +8,12 @@
       (Float))
     (Update
       (Identifier))
-    (
+    (Statements
       (If
         (StrictEqual
           (Identifier)
           (Float))
-        (
+        (Statements
         {+(Continue
           {+(Empty)+})+}
         {-(Break
