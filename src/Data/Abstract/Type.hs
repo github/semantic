@@ -116,7 +116,7 @@ instance AbstractIntro Type where
   null        = Null
 
 
-instance ( Member (Allocator address Type) effects
+instance ( Member (Store address Type) effects
          , Member (Env address) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
@@ -145,7 +145,7 @@ instance ( Member (Allocator address Type) effects
 
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address Type) effects
+instance ( Member (Store address Type) effects
          , Member (Env address) effects
          , Member Fresh effects
          , Member NonDet effects

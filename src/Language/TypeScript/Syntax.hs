@@ -134,7 +134,7 @@ javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
 evalRequire :: ( AbstractValue address value effects
-               , Member (Allocator address value) effects
+               , Member (Store address value) effects
                , Member (Env address) effects
                , Member (Modules address value) effects
                , Member (State (Heap address (Cell address) value)) effects

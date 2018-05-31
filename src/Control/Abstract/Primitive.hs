@@ -13,7 +13,7 @@ import Data.Semilattice.Lower
 import Prologue
 
 builtin :: ( HasCallStack
-           , Member (Allocator address value) effects
+           , Member (Store address value) effects
            , Member (Env address) effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
@@ -39,7 +39,7 @@ lambda body = do
 
 defineBuiltins :: ( AbstractValue address value effects
                   , HasCallStack
-                  , Member (Allocator address value) effects
+                  , Member (Store address value) effects
                   , Member (Env address) effects
                   , Member Fresh effects
                   , Member (Reader ModuleInfo) effects

@@ -52,7 +52,7 @@ type EvaluatableConstraints address term value effects =
   ( AbstractValue address value effects
   , Declarations term
   , FreeVariables term
-  , Member (Allocator address value) effects
+  , Member (Store address value) effects
   , Member (Env address) effects
   , Member (LoopControl value) effects
   , Member (Modules address value) effects
@@ -85,7 +85,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member (State (ModuleTable (Maybe (value, Environment address)))) outer
                        , Member Trace outer
                        , Recursive term
-                       , inner ~ (LoopControl value ': Return value ': Env address ': Allocator address value ': inner')
+                       , inner ~ (LoopControl value ': Return value ': Env address ': Store address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
@@ -111,7 +111,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         runInModule preludeEnv info
           = runReader info
-          . raiseHandler runAllocator
+          . raiseHandler runStore
           . raiseHandler (runEnv preludeEnv)
           . raiseHandler runReturn
           . raiseHandler runLoopControl
