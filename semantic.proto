@@ -56,13 +56,3 @@ message Error {
   Span span = 2;
   string language = 3;
 }
-
-message Span {
-  Pos start = 1;
-  Pos end = 2;
-}
-
-message Pos {
-  int32 line = 1;
-  int32 column = 2;
-}
