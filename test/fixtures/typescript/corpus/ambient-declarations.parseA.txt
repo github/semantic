@@ -89,7 +89,7 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (
+      (Statements
         (MethodSignature
           (Empty)
           (Empty)

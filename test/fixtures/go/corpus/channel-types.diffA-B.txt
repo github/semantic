@@ -18,20 +18,20 @@
           {+(Constructor
             {+(Empty)+}
             {+([])+})+})+})+})+}
-    {+(Type
-      {+(Identifier)+}
-      {+(SendChannel
-        {+(ReceiveChannel
-          {+(Identifier)+})+})+})+}
       (Type
       { (Identifier)
       ->(Identifier) }
       { (BidirectionalChannel
         {-(ReceiveChannel
           {-(Identifier)-})-})
-      ->(ReceiveChannel
+      ->(SendChannel
         {+(ReceiveChannel
           {+(Identifier)+})+}) })
+    {+(Type
+      {+(Identifier)+}
+      {+(ReceiveChannel
+        {+(ReceiveChannel
+          {+(Identifier)+})+})+})+}
     {+(Type
       {+(Identifier)+}
       {+(BidirectionalChannel

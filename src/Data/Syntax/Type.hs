@@ -7,7 +7,7 @@ import Diffing.Algorithm
 import Prologue hiding (Map)
 
 data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Array where liftEq = genericLiftEq
 instance Ord1 Array where liftCompare = genericLiftCompare
@@ -21,7 +21,7 @@ instance Evaluatable Array
 
 -- TODO: What about type variables? re: FreeVariables1
 data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
@@ -35,7 +35,7 @@ instance Evaluatable Annotation where
 
 
 data Function a = Function { functionParameters :: [a], functionReturn :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
@@ -48,7 +48,7 @@ instance Evaluatable Function
 
 
 newtype Interface a = Interface [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Interface where liftEq = genericLiftEq
 instance Ord1 Interface where liftCompare = genericLiftCompare
@@ -61,7 +61,7 @@ instance Evaluatable Interface
 
 
 data Map a = Map { mapKeyType :: a, mapElementType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Map where liftEq = genericLiftEq
 instance Ord1 Map where liftCompare = genericLiftCompare
@@ -74,7 +74,7 @@ instance Evaluatable Map
 
 
 newtype Parenthesized a = Parenthesized a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Parenthesized where liftEq = genericLiftEq
 instance Ord1 Parenthesized where liftCompare = genericLiftCompare
@@ -87,7 +87,7 @@ instance Evaluatable Parenthesized
 
 
 newtype Pointer a = Pointer a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Pointer where liftEq = genericLiftEq
 instance Ord1 Pointer where liftCompare = genericLiftCompare
@@ -100,7 +100,7 @@ instance Evaluatable Pointer
 
 
 newtype Product a = Product [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Product where liftEq = genericLiftEq
 instance Ord1 Product where liftCompare = genericLiftCompare
@@ -113,7 +113,7 @@ instance Evaluatable Product
 
 
 data Readonly a = Readonly
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Readonly where liftEq = genericLiftEq
 instance Ord1 Readonly where liftCompare = genericLiftCompare
@@ -126,7 +126,7 @@ instance Evaluatable Readonly
 
 
 newtype Slice a = Slice a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Slice where liftEq = genericLiftEq
 instance Ord1 Slice where liftCompare = genericLiftCompare
@@ -139,7 +139,7 @@ instance Evaluatable Slice
 
 
 newtype TypeParameters a = TypeParameters [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 TypeParameters where liftEq = genericLiftEq
 instance Ord1 TypeParameters where liftCompare = genericLiftCompare

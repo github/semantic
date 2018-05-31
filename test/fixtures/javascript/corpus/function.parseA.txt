@@ -17,6 +17,6 @@
       (Assignment
         (Identifier)
         (Empty)))
-    (
+    (Statements
       (Identifier)))
   (Empty))

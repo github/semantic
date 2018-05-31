@@ -6,6 +6,7 @@ module Data.Abstract.Name
 , unName
 ) where
 
+import           Data.Aeson
 import qualified Data.Char as Char
 import           Data.Text (Text)
 import qualified Data.Text as Text
@@ -52,3 +53,7 @@ instance Show Name where
 instance Hashable Name where
   hashWithSalt salt (Name name) = hashWithSalt salt name
   hashWithSalt salt (I i)       = salt `hashWithSalt` (1 :: Int) `hashWithSalt` i
+
+instance ToJSON Name where
+  toJSON = toJSON . unName
+  toEncoding = toEncoding . unName

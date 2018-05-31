@@ -3,7 +3,7 @@
     (Empty)
     (Empty)
     (Identifier)
-    (
+    (Statements
       (VariableDeclaration
         (Assignment
           (Empty)

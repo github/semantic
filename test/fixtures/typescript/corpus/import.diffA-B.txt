@@ -9,20 +9,20 @@
 ->(Import) }
 {+(Import)+}
 {+(Import)+}
-{+(
+{+(Statements
   {+(Import)+}
   {+(Import)+})+}
-{+(
+{+(Statements
   {+(Import)+}
   {+(QualifiedAliasedImport
     {+(Identifier)+})+})+}
 {+(SideEffectImport)+}
 {-(Import)-}
 {-(Import)-}
-{-(
+{-(Statements
   {-(Import)-}
   {-(Import)-})-}
-{-(
+{-(Statements
   {-(Import)-}
   {-(QualifiedAliasedImport
     {-(Identifier)-})-})-}

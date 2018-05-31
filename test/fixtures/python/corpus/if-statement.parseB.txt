@@ -1,7 +1,7 @@
 (Program
   (If
     (Identifier)
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (Empty)))
