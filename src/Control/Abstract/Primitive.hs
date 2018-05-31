@@ -53,4 +53,4 @@ defineBuiltins :: ( AbstractValue address value effects
                   )
                => Evaluator address value effects ()
 defineBuiltins =
-  builtin "print" (lambda (\ v -> variable v >>= asString >>= trace . unpack >> box unit))
+  builtin "print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))

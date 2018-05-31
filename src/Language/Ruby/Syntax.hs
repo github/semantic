@@ -54,9 +54,9 @@ instance ToJSONFields1 Send
 instance Evaluatable Send where
   eval Send{..} = do
     let sel = case sendSelector of
-          Just sel -> subtermValue sel
+          Just sel -> subtermAddress sel
           Nothing  -> variable (name "call")
-    func <- maybe sel (deref <=< (flip evaluateInScopedEnv (sel >>= box) . subtermValue)) sendReceiver
+    func <- deref =<< maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
     Rval <$> call func (map subtermAddress sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }

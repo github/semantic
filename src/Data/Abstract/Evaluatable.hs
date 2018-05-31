@@ -131,7 +131,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) . TermEvaluator $ do
           reqResult <- require m
           v <- maybe (box unit) (pure . snd) reqResult
-          maybe (pure v) ((`call` []) <=< variable) sym
+          maybe (pure v) ((`call` []) <=< deref <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule)) $ do
           _ <- runInModule moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> (box unit)))
