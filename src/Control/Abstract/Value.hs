@@ -12,14 +12,12 @@ module Control.Abstract.Value
 , evaluateInScopedEnv
 , value
 , subtermValue
-, ValueRoots(..)
 ) where
 
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Environment as Env
-import Data.Abstract.Live (Live)
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
@@ -233,9 +231,3 @@ subtermValue :: ( AbstractValue address value effects
              => Subterm term (Evaluator address value effects (ValueRef value))
              -> Evaluator address value effects value
 subtermValue = value <=< subtermRef
-
-
--- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots address value where
-  -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: value -> Live address
