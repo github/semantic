@@ -145,11 +145,9 @@ listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> many type')
 
 tuplingConstructor :: Assignment
-tuplingConstructor = makeTerm
-                  <$> symbol TuplingConstructor
-                  <*> (source >>= tupleWithArity)
+tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> source)
         -- a tuple (,) has arity two, but only one comma, so apply the successor to the count of commas for the correct arity.
-  where tupleWithArity = pure . Syntax.TupleConstructor . succ . count ','
+  where tupleWithArity = Syntax.TupleConstructor . succ . count ','
 
 type' :: Assignment
 type' = (makeTerm <$> symbol Type <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))
