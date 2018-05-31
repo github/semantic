@@ -113,9 +113,9 @@ data Store address value return where
   Deref :: address -> Store address value value
 
 runStore :: (Addressable address effects, Member (Resumable (AddressError address value)) effects, Member (State (Heap address (Cell address) value)) effects) => Evaluator address value (Store address value ': effects) a -> Evaluator address value effects a
-runStore = interpret (\ eff -> case eff of
+runStore = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
-  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr)))
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
 
 
 data AddressError address value resume where
