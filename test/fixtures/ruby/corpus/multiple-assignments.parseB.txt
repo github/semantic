@@ -1,6 +1,6 @@
 (Program
   (Assignment
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (Array

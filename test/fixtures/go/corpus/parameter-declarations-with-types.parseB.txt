@@ -4,16 +4,16 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([]))
+    (Statements)
+    (Statements))
   (Function
     (Empty)
     (Identifier)
-    (
-      (
+    (Statements
+      (Statements
         (Identifier)
         (Identifier))
-      (
+      (Statements
         (Identifier)
         (Identifier)))
-    ([])))
+    (Statements)))

@@ -4,4 +4,4 @@
     (Method
       (Empty)
       (Identifier)
-      ([]))))
+      (Statements))))

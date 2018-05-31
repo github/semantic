@@ -1,6 +1,6 @@
 (Program
   (Return
-    (
+    (Statements
       (Plus
         (Identifier)
         (Identifier))

@@ -4,34 +4,34 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([]))
+    (Statements)
+    (Statements))
   (Method
     (Empty)
     (Identifier)
     (Identifier)
-    ([])
+    (Statements)
     (Empty))
   (Method
-    (
+    (Statements
       (Identifier))
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (Identifier)
-    (
+    (Statements
       (Identifier)
       (Identifier))
-    ([]))
+    (Statements))
   (Method
-    (
+    (Statements
       (Identifier))
-    (
+    (Statements
       (Identifier)
       (Pointer
         (Identifier)))
     (Identifier)
-    ([])
+    (Statements)
     (Return
       (Call
         (MemberAccess
@@ -54,16 +54,16 @@
               (Identifier))))
         (Empty))))
   (Method
-    ([])
-    (
+    (Statements)
+    (Statements
       (Identifier)
       (Pointer
         (Identifier)))
     (Identifier)
-    (
+    (Statements
       (Identifier)
       (Identifier))
-    (
+    (Statements
       (Assignment
         (MemberAccess
           (Identifier)
@@ -83,15 +83,15 @@
             (Identifier))
           (Identifier)))))
   (Method
-    (
+    (Statements
       (Identifier))
-    (
+    (Statements
       (Identifier)
       (Pointer
         (Identifier)))
     (Identifier)
-    (
+    (Statements
       (Identifier)
       (Identifier)
       (Identifier))
-    ([])))
+    (Statements)))

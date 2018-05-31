@@ -4,15 +4,15 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
-      (
+    (Statements)
+    (Statements
+      (Statements
         (Type
           (Identifier)
           (Slice
             (Slice
               (Identifier)))))
-      (
+      (Statements
         (Type
           (Identifier)
           (Slice

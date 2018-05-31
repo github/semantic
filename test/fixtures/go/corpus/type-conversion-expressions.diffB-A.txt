@@ -4,8 +4,8 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Pointer
         (Call
           (Identifier)
@@ -31,27 +31,27 @@
       ->(Identifier) })
       (TypeConversion
         (Function
-          ([])
+          (Statements)
           (Empty))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
         (Parenthesized
           (Function
-            ([])
+            (Statements)
             (Empty)))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
         (Parenthesized
           (Function
-            ([])
+            (Statements)
             (Identifier)))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
         (Function
-          ([])
+          (Statements)
           (Identifier))
       { (Identifier)
       ->(Identifier) })

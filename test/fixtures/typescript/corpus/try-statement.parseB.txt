@@ -1,12 +1,12 @@
 (Program
   (Try
-    (
+    (Statements
       (Identifier))
     (Catch
       (Empty)
-      (
+      (Statements
         (Identifier)))
     (Finally
-      (
+      (Statements
         (Identifier))))
   (Empty))

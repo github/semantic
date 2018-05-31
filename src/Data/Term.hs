@@ -130,7 +130,7 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
   toJSONFields = toJSONFields . unTerm
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
-  toJSONFields (In a f) = toJSONFields a <> toJSONFields1 f
+  toJSONFields (In a f) = toJSONFields1 f <> toJSONFields a
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
   toJSON = object . toJSONFields

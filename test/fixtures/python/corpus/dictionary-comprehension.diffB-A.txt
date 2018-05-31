@@ -5,10 +5,10 @@
     ->(Identifier) }
     { (Identifier)
     ->(Identifier) })
-    (
+    (Statements
     {+(Identifier)+}
     {+(Identifier)+}
-    {-(
+    {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-}
     {-(Identifier)-}))
@@ -18,8 +18,8 @@
     ->(Identifier) }
     { (Integer)
     ->(Identifier) })
-    (
-    {+(
+    (Statements
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+})+}
     { (Identifier)
