@@ -1,11 +1,6 @@
 (Module
   (Identifier)
   (
-    (Function
-    { (Identifier)
-    ->(Identifier) }
-      (
-        (Integer)))
   {+(Function
     {+(Identifier)+}
     {+(
@@ -29,6 +24,10 @@
   {+(Function
     {+(Identifier)+}
     {+(
+      {+(Integer)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
       {+(Float)+})+})+}
   {+(Function
     {+(Identifier)+}
@@ -118,6 +117,152 @@
     {+(Identifier)+}
     {+(
       {+(Identifier)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Character)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(
+      {+(Array
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+}
+        {+(TextElement)+})+})+})+}
   {-(Function
     {-(Identifier)-}
     {-(
@@ -141,6 +286,10 @@
   {-(Function
     {-(Identifier)-}
     {-(
+      {-(Integer)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
       {-(Float)-})-})-}
   {-(Function
     {-(Identifier)-}
@@ -229,4 +378,150 @@
   {-(Function
     {-(Identifier)-}
     {-(
-      {-(Identifier)-})-})-}))
+      {-(Identifier)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Character)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(
+      {-(Array
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-}
+        {-(TextElement)-})-})-})-}))
