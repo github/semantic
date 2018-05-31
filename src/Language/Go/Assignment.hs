@@ -9,7 +9,7 @@ module Language.Go.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (name)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import Data.Syntax (contextualize, emptyStatements, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeStatementTerm, makeTerm1, parseError)
 import Language.Go.Grammar as Grammar
 import Language.Go.Syntax as Go.Syntax
 import Language.Go.Type as Go.Type
@@ -209,10 +209,10 @@ types =
          ]
 
 identifiers :: Assignment
-identifiers = makeTerm'' <$> location <*> manyTerm identifier
+identifiers = makeStatementTerm <$> location <*> manyTerm identifier
 
 expressions :: Assignment
-expressions = makeTerm'' <$> location <*> manyTerm expression
+expressions = makeStatementTerm <$> location <*> manyTerm expression
 
 
 -- Literals
@@ -384,7 +384,7 @@ functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncL
     returnParameters = makeTerm <$> symbol ParameterList <*> children (manyTerm expression)
 
 importDeclaration :: Assignment
-importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
+importDeclaration = makeStatementTerm <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
     -- `import . "lib/Math"`
     dotImport = inject <$> (flip Go.Syntax.Import <$> dot <*> importFromPath)
@@ -401,7 +401,7 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
     underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
     importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
-    importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
+    importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyStatements (importSpec <|> comment))
     importFromPath = symbol InterpretedStringLiteral *> (importPath <$> source)
 
 indexExpression :: Assignment
@@ -608,9 +608,6 @@ manyTerm = many . term
 
 manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
 manyStatements expr = fromList <$> (manyTerm expr)
-
-emptyStatements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
-emptyStatements = pure (fromList [])
 
 -- | Match a term and contextualize any comments preceeding or proceeding the term.
 term :: Assignment -> Assignment

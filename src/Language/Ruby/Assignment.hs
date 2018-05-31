@@ -10,7 +10,19 @@ import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (name)
 import Data.List (elem)
 import Data.Record
-import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm1
+    , makeStatementTerm
+    , manyStatements
+    , parseError
+    , postContextualize
+    )
 import Language.Ruby.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
@@ -146,10 +158,10 @@ expressionChoices =
     mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
-expressions = makeTerm'' <$> location <*> many expression
+expressions = makeStatementTerm <$> location <*> many expression
 
 parenthesizedExpressions :: Assignment
-parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
+parenthesizedExpressions = makeTerm <$> symbol ParenthesizedStatements <*> children (manyStatements expression)
 
 withExtendedScope :: Assignment' a -> Assignment' a
 withExtendedScope inner = do
@@ -262,9 +274,8 @@ parameter = postContextualize comment (term uncontextualizedParameter)
     optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> methodSelector <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
-        expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
 singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> expression <*> methodSelector <*> params <*> expressions)
@@ -493,11 +504,8 @@ term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> som
   where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
-manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
-manyTermsTill step end = manyTill (step <|> comment) end
-
-manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
-manyStatements expr = fromList <$> (many expr)
+manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
+manyTermsTill step end = fromList <$> manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack

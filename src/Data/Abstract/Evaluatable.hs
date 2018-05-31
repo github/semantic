@@ -34,8 +34,6 @@ import Data.Abstract.Name as X
 import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
 import Data.Scientific (Scientific)
-import Data.Semigroup.App
-import Data.Semigroup.Foldable
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Data.Sum
@@ -217,11 +215,6 @@ instance Apply Evaluatable fs => Evaluatable (Sum fs) where
 instance Evaluatable s => Evaluatable (TermF s a) where
   eval = eval . termFOut
 
--- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
---
---   1. Each statement’s effects on the store are accumulated;
---   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
---   3. Only the last statement’s return value is returned.
+-- | '[]' uses the default eval. Use Data.Syntax.Statements if you need an imperative sequence.
 instance Evaluatable [] where
-  -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
+  eval _ = throwResumable (Unspecialized ("Eval unspecialized for []"))

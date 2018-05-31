@@ -9,7 +9,7 @@ module Language.Haskell.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm'', contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, contextualize, postContextualize)
 import Language.Haskell.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
@@ -48,7 +48,7 @@ module' = makeTerm
 
 
 expressions :: Assignment
-expressions = makeTerm'' <$> location <*> many expression
+expressions = makeTerm <$> location <*> many expression
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))

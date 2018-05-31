@@ -11,7 +11,7 @@ import Data.Abstract.Name (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
+import Data.Syntax (emptyTerm, emptyStatements, handleError, parseError, infixContext, makeTerm, makeTerm', makeStatementTerm, makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -558,10 +558,10 @@ constructorTy :: Assignment
 constructorTy = makeTerm <$> symbol ConstructorType <*> children (TypeScript.Syntax.Constructor <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> term ty)
 
 statementBlock :: Assignment
-statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
+statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyStatements statement)
 
 classBodyStatements :: Assignment
-classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
+classBodyStatements = makeStatementTerm <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
   where
     contextualize' (cs, formalParams) = case nonEmpty cs of
       Just cs -> toList cs ++ formalParams
@@ -862,9 +862,6 @@ manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Conte
 
 manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
 manyStatements expr = fromList <$> (manyTerm expr)
-
-emptyStatements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
-emptyStatements = pure (fromList [])
 
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)

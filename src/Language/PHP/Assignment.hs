@@ -117,6 +117,7 @@ type Syntax = '[
   , Syntax.ScalarType
   , Syntax.ShellCommand
   , Syntax.SimpleVariable
+  , Syntax.Statements
   , Syntax.Static
   , Syntax.Text
   , Syntax.TraitDeclaration
@@ -390,12 +391,12 @@ scalarType :: Assignment
 scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> source)
 
 compoundStatement :: Assignment
-compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
+compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyStatements statement)
 
 objectCreationExpression :: Assignment
 objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (Expression.New <$> ((:) <$> term classTypeDesignator <*> (arguments <|> pure []))))
 
-  <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration)))
+  <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyStatements classMemberDeclaration)))
   where makeAnonClass identifier args baseClause interfaceClause declarations = Declaration.Class [] identifier (args <> [baseClause, interfaceClause]) declarations
 
 classMemberDeclaration :: Assignment
@@ -602,7 +603,7 @@ functionDefinition = makeTerm <$> symbol FunctionDefinition <*> children (makeFu
     makeFunction identifier parameters returnType statement = Declaration.Function [returnType] identifier parameters statement
 
 classDeclaration :: Assignment
-classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> (term classModifier <|> emptyTerm) <*> term name <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration))
+classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> (term classModifier <|> emptyTerm) <*> term name <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyStatements classMemberDeclaration))
   where
     makeClass modifier name baseClause interfaceClause declarations = Declaration.Class [modifier] name [baseClause, interfaceClause] declarations
 
@@ -734,7 +735,7 @@ functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
 
 staticVariableDeclaration :: Assignment
-staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment <$> pure [] <*> term variableName <*> (term expression <|> emptyTerm))
+staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment [] <$> term variableName <*> (term expression <|> emptyTerm))
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -766,6 +767,9 @@ someTerm = fmap NonEmpty.toList . someTerm'
 
 someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
 someTerm' = NonEmpty.some1 . commentedTerm
+
+manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
+manyStatements expr = fromList <$> (manyTerm expr)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment
