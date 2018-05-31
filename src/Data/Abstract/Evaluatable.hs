@@ -74,6 +74,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                     .  ( Addressable address inner'
                        , Evaluatable (Base term)
                        , EvaluatableConstraints term address value inner
+                       , Foldable (Cell address)
                        , Member Fail outer
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
@@ -83,6 +84,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member Trace outer
                        , Recursive term
                        , Reducer value (Cell address value)
+                       , ValueRoots address value
                        , inner ~ (LoopControl value ': Return value ': Env address ': Store address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)

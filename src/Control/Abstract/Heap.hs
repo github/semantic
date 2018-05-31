@@ -107,14 +107,10 @@ variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: ( Ord address
-      , Foldable (Cell address)
-      , ValueRoots address value
-      )
-   => Live address                      -- ^ The set of addresses to consider rooted.
-   -> Heap address (Cell address) value -- ^ A heap to collect unreachable addresses within.
-   -> Heap address (Cell address) value -- ^ A garbage-collected heap.
-gc roots heap = heapRestrict heap (reachable roots heap)
+gc :: Member (Store address value) effects
+   => Live address                       -- ^ The set of addresses to consider rooted.
+   -> Evaluator address value effects ()
+gc roots = sendStore (GC roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: ( Ord address
@@ -134,15 +130,21 @@ reachable roots heap = go mempty roots
 
 -- Effects
 
+sendStore :: Member (Store address value) effects => Store address value return -> Evaluator address value effects return
+sendStore = send
+
 data Store address value return where
   Alloc  :: Name             -> Store address value address
   Deref  :: address          -> Store address value value
   Assign :: address -> value -> Store address value ()
+  GC     :: Live address     -> Store address value ()
 
 runStore :: ( Addressable address effects
+            , Foldable (Cell address)
             , Member (Resumable (AddressError address value)) effects
             , Member (State (Heap address (Cell address) value)) effects
             , Reducer value (Cell address value)
+            , ValueRoots address value
             )
          => Evaluator address value (Store address value ': effects) a
          -> Evaluator address value effects a
@@ -150,6 +152,7 @@ runStore = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
   Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
   Assign addr value -> modifyHeap (heapInsert addr value)
+  GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
 
 data AddressError address value resume where

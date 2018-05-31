@@ -9,9 +9,8 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | An analysis performing GC after every instruction.
-collectingTerms :: ( Foldable (Cell address)
-                   , Member (Reader (Live address)) effects
-                   , Member (State (Heap address (Cell address) value)) effects
+collectingTerms :: ( Member (Reader (Live address)) effects
+                   , Member (Store address value) effects
                    , Ord address
                    , ValueRoots address value
                    )
@@ -20,7 +19,7 @@ collectingTerms :: ( Foldable (Cell address)
 collectingTerms recur term = do
   roots <- TermEvaluator askRoots
   v <- recur term
-  v <$ TermEvaluator (modifyHeap (gc (roots <> valueRoots v)))
+  v <$ TermEvaluator (gc (roots <> valueRoots v))
 
 
 providingLiveSet :: Effectful (m address value) => m address value (Reader (Live address) ': effects) a -> m address value effects a
