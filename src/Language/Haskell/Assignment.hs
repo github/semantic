@@ -6,7 +6,8 @@ module Language.Haskell.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
+import Assigning.Assignment hiding (Assignment, Error, count)
+import Data.ByteString.Char8 (count)
 import Data.Record
 import Data.Sum
 import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm'', contextualize, postContextualize)
@@ -116,7 +117,7 @@ functionBody :: Assignment
 functionBody = makeTerm <$> symbol FunctionBody <*> children (many expression)
 
 functionConstructor :: Assignment
-functionConstructor = makeTerm <$> token FunctionConstructor  <*> (Syntax.FunctionConstructor <$> emptyTerm)
+functionConstructor = makeTerm <$> token FunctionConstructor  <*> pure Syntax.FunctionConstructor
 
 functionDeclaration :: Assignment
 functionDeclaration = makeTerm
@@ -131,10 +132,10 @@ integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
 listConstructor :: Assignment
-listConstructor = makeTerm <$> token ListConstructor <*> (Syntax.ListConstructor <$> emptyTerm)
+listConstructor = makeTerm <$> token ListConstructor <*> pure Syntax.ListConstructor
 
 unitConstructor :: Assignment
-unitConstructor = makeTerm <$> token UnitConstructor <*> (Syntax.UnitConstructor <$> emptyTerm)
+unitConstructor = makeTerm <$> token UnitConstructor <*> pure Syntax.UnitConstructor
 
 listExpression :: Assignment
 listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array <$> many listElement)
@@ -144,7 +145,11 @@ listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> many type')
 
 tuplingConstructor :: Assignment
-tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> children (Syntax.TupleConstructor <$> emptyTerm)
+tuplingConstructor = makeTerm
+                  <$> symbol TuplingConstructor
+                  <*> (source >>= tupleWithArity)
+        -- a tuple (,) has arity two, but only one comma, so apply the successor to the count of commas for the correct arity.
+  where tupleWithArity = pure . Syntax.TupleConstructor . succ . count ','
 
 type' :: Assignment
 type' = (makeTerm <$> symbol Type <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))

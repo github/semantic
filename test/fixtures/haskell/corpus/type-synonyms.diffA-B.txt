@@ -16,8 +16,7 @@
       ->(Identifier) }
         (TypeParameters))
       (Type
-        (ListConstructor
-          (Empty))
+        (ListConstructor)
         (TypeParameters)))
     (TypeSynonym
       (Type
@@ -49,40 +48,34 @@
       ->(Identifier) }
         (TypeParameters))
       (Type
-        (UnitConstructor
-          (Empty))
+        (UnitConstructor)
         (TypeParameters)))
   {-(TypeSynonym
     {-(Type
       {-(Identifier)-}
       {-(TypeParameters)-})-}
     {-(Type
-      {-(TupleConstructor
-        {-(Empty)-})-}
+      {-(TupleConstructor)-}
       {-(TypeParameters)-})-})-}
     (TypeSynonym
       (Type
         (Identifier)
         (TypeParameters))
       (Type
-        (TupleConstructor
-          (Empty))
+        (TupleConstructor)
         (TypeParameters)))
     (TypeSynonym
       (Type
         (Identifier)
         (TypeParameters))
       (Type
-      { (FunctionConstructor
-        {-(Empty)-})
-      ->(TupleConstructor
-        {+(Empty)+}) }
+      { (FunctionConstructor)
+      ->(TupleConstructor) }
         (TypeParameters)))
   {+(TypeSynonym
     {+(Type
       {+(Identifier)+}
       {+(TypeParameters)+})+}
     {+(Type
-      {+(FunctionConstructor
-        {+(Empty)+})+}
+      {+(FunctionConstructor)+}
       {+(TypeParameters)+})+})+}))

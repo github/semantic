@@ -43,7 +43,7 @@ instance ToJSONFields1 TypeSynonym
 
 instance Evaluatable TypeSynonym
 
-newtype UnitConstructor a = UnitConstructor a deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+data UnitConstructor a = UnitConstructor deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 UnitConstructor where liftEq = genericLiftEq
 instance Ord1 UnitConstructor where liftCompare = genericLiftCompare
@@ -53,7 +53,7 @@ instance ToJSONFields1 UnitConstructor
 
 instance Evaluatable UnitConstructor
 
-newtype TupleConstructor a = TupleConstructor a deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+newtype TupleConstructor a = TupleConstructor { tupleConstructorArity :: Int } deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 TupleConstructor where liftEq = genericLiftEq
 instance Ord1 TupleConstructor where liftCompare = genericLiftCompare
@@ -63,7 +63,7 @@ instance ToJSONFields1 TupleConstructor
 
 instance Evaluatable TupleConstructor
 
-newtype ListConstructor a = ListConstructor a deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+data ListConstructor a = ListConstructor deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 ListConstructor where liftEq = genericLiftEq
 instance Ord1 ListConstructor where liftCompare = genericLiftCompare
@@ -73,7 +73,7 @@ instance ToJSONFields1 ListConstructor
 
 instance Evaluatable ListConstructor
 
-newtype FunctionConstructor a = FunctionConstructor a deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+data FunctionConstructor a = FunctionConstructor deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 FunctionConstructor where liftEq = genericLiftEq
 instance Ord1 FunctionConstructor where liftCompare = genericLiftCompare
