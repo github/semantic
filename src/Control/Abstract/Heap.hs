@@ -22,7 +22,6 @@ module Control.Abstract.Heap
 import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Control.Monad.Effect.Internal
 import Data.Abstract.Heap
 import Data.Abstract.Name
 import Data.Semigroup.Reducer
@@ -113,10 +112,10 @@ data Store address value return where
   Alloc :: Name    -> Store address value address
   Deref :: address -> Store address value value
 
-runStore :: (Addressable address effects, Effectful (m address value), Member (Resumable (AddressError address value)) effects, Member (State (Heap address (Cell address) value)) effects) => m address value (Store address value ': effects) a -> m address value effects a
-runStore = raiseHandler (interpret (\ eff -> case eff of
-  Alloc name -> lowerEff $ allocCell name
-  Deref addr -> lowerEff $ heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))))
+runStore :: (Addressable address effects, Member (Resumable (AddressError address value)) effects, Member (State (Heap address (Cell address) value)) effects) => Evaluator address value (Store address value ': effects) a -> Evaluator address value effects a
+runStore = interpret (\ eff -> case eff of
+  Alloc name -> allocCell name
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr)))
 
 
 data AddressError address value resume where
