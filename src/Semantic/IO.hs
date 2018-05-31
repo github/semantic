@@ -96,7 +96,7 @@ readBlobsFromHandle = fmap toBlobs . readFromHandle
 readBlobFromPath :: MonadIO m => File -> m Blob.Blob
 readBlobFromPath file = do
   maybeFile <- readFile file
-  maybe (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) pure maybeFile
+  maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do

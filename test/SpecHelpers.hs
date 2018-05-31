@@ -34,7 +34,6 @@ import Data.Project as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
-import Data.Monoid as X (Last(..))
 import Data.Range as X
 import Data.Record as X
 import Data.Source as X

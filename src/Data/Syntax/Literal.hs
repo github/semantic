@@ -100,6 +100,15 @@ instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShows
 -- TODO: Implement Eval instance for String
 instance Evaluatable Data.Syntax.Literal.String
 
+newtype Character a = Character { characterContent :: ByteString }
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+
+instance Eq1 Data.Syntax.Literal.Character where liftEq = genericLiftEq
+instance Ord1 Data.Syntax.Literal.Character where liftCompare = genericLiftCompare
+instance Show1 Data.Syntax.Literal.Character where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Data.Syntax.Literal.Character
+
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
@@ -149,7 +158,6 @@ instance Ord1 Regex where liftCompare = genericLiftCompare
 instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Heredoc-style string literals?
--- TODO: Character literals.
 
 -- TODO: Implement Eval instance for Regex
 instance Evaluatable Regex

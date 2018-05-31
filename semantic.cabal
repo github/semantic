@@ -40,7 +40,6 @@ library
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
-                     , Control.Abstract.Exports
                      , Control.Abstract.Heap
                      , Control.Abstract.Hole
                      , Control.Abstract.Matching
