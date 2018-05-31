@@ -184,7 +184,7 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Env address) effects
-                 , Member (Store address value) effects
+                 , Member (Allocator address value) effects
                  )
               => Name
               -> address
@@ -212,7 +212,7 @@ evaluateInScopedEnv scopedEnvTerm term = do
 
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
-         , Member (Store address value) effects
+         , Member (Allocator address value) effects
          , Member (Env address) effects
          , Member (Resumable (EnvironmentError address)) effects
          )
@@ -224,7 +224,7 @@ value (Rval val) = pure val
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
-                , Member (Store address value) effects
+                , Member (Allocator address value) effects
                 , Member (Env address) effects
                 , Member (Resumable (EnvironmentError address)) effects
                 )

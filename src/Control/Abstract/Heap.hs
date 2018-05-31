@@ -13,8 +13,8 @@ module Control.Abstract.Heap
 -- * Garbage collection
 , gc
 -- * Effects
-, Store(..)
-, runStore
+, Allocator(..)
+, runAllocator
 , AddressError(..)
 , runAddressError
 , runAddressErrorWith
@@ -43,16 +43,16 @@ modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Hea
 modifyHeap = modify'
 
 
-alloc :: Member (Store address value) effects => Name -> Evaluator address value effects address
-alloc = sendStore . Alloc
+alloc :: Member (Allocator address value) effects => Name -> Evaluator address value effects address
+alloc = sendAllocator . Alloc
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
-deref :: Member (Store address value) effects => address -> Evaluator address value effects value
+deref :: Member (Allocator address value) effects => address -> Evaluator address value effects value
 deref = send . Deref
 
 
--- | Write a value to the given address in the 'Store'.
-assign :: Member (Store address value) effects
+-- | Write a value to the given address in the 'Allocator'.
+assign :: Member (Allocator address value) effects
        => address
        -> value
        -> Evaluator address value effects ()
@@ -60,7 +60,7 @@ assign address = send . Assign address
 
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( Member (Store address value) effects
+lookupOrAlloc :: ( Member (Allocator address value) effects
                  , Member (Env address) effects
                  )
               => Name
@@ -68,7 +68,7 @@ lookupOrAlloc :: ( Member (Store address value) effects
 lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
-letrec :: ( Member (Store address value) effects
+letrec :: ( Member (Allocator address value) effects
           , Member (Env address) effects
           )
        => Name
@@ -81,7 +81,7 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( Member (Store address value) effects
+letrec' :: ( Member (Allocator address value) effects
            , Member (Env address) effects
            )
         => Name
@@ -94,7 +94,7 @@ letrec' name body = do
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Store address value) effects
+variable :: ( Member (Allocator address value) effects
             , Member (Env address) effects
             , Member (Resumable (EnvironmentError address)) effects
             )
@@ -106,10 +106,10 @@ variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: Member (Store address value) effects
+gc :: Member (Allocator address value) effects
    => Live address                       -- ^ The set of addresses to consider rooted.
    -> Evaluator address value effects ()
-gc roots = sendStore (GC roots)
+gc roots = sendAllocator (GC roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: ( Ord address
@@ -129,25 +129,25 @@ reachable roots heap = go mempty roots
 
 -- Effects
 
-sendStore :: Member (Store address value) effects => Store address value return -> Evaluator address value effects return
-sendStore = send
+sendAllocator :: Member (Allocator address value) effects => Allocator address value return -> Evaluator address value effects return
+sendAllocator = send
 
-data Store address value return where
-  Alloc  :: Name             -> Store address value address
-  Deref  :: address          -> Store address value value
-  Assign :: address -> value -> Store address value ()
-  GC     :: Live address     -> Store address value ()
+data Allocator address value return where
+  Alloc  :: Name             -> Allocator address value address
+  Deref  :: address          -> Allocator address value value
+  Assign :: address -> value -> Allocator address value ()
+  GC     :: Live address     -> Allocator address value ()
 
-runStore :: ( Addressable address effects
-            , Foldable (Cell address)
-            , Member (Resumable (AddressError address value)) effects
-            , Member (State (Heap address (Cell address) value)) effects
-            , Reducer value (Cell address value)
-            , ValueRoots address value
-            )
-         => Evaluator address value (Store address value ': effects) a
-         -> Evaluator address value effects a
-runStore = interpret $ \ eff -> case eff of
+runAllocator :: ( Addressable address effects
+                , Foldable (Cell address)
+                , Member (Resumable (AddressError address value)) effects
+                , Member (State (Heap address (Cell address) value)) effects
+                , Reducer value (Cell address value)
+                , ValueRoots address value
+                )
+             => Evaluator address value (Allocator address value ': effects) a
+             -> Evaluator address value effects a
+runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
   Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
   Assign addr value -> modifyHeap (heapInsert addr value)

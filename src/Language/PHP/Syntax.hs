@@ -53,7 +53,7 @@ resolvePHPName n = do
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue address value effects
-           , Member (Store address value) effects
+           , Member (Allocator address value) effects
            , Member (Env address) effects
            , Member (Modules address value) effects
            , Member (Resumable ResolutionError) effects

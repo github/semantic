@@ -54,7 +54,7 @@ instance AbstractHole (Value address body) where
   hole = Hole
 
 instance ( Coercible body (Eff effects)
-         , Member (Store address (Value address body)) effects
+         , Member (Allocator address (Value address body)) effects
          , Member (Env address) effects
          , Member Fresh effects
          , Member (Reader ModuleInfo) effects
@@ -104,7 +104,7 @@ instance Show address => AbstractIntro (Value address body) where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
-         , Member (Store address (Value address body)) effects
+         , Member (Allocator address (Value address body)) effects
          , Member (Env address) effects
          , Member Fresh effects
          , Member (LoopControl (Value address body)) effects

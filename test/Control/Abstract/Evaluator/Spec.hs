@@ -37,7 +37,7 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . runStore
+  . runAllocator
   . runEnv lowerBound
   . runReturn
   . runLoopControl
