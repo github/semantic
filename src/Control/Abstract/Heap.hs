@@ -13,7 +13,6 @@ module Control.Abstract.Heap
 , variable
 -- * Garbage collection
 , gc
-, reachable
 -- * Effects
 , Store(..)
 , runStore
