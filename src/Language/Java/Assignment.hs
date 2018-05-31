@@ -295,7 +295,7 @@ generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.Gener
 -- Q to help decide: do we lose anything by omitting the term?
 
 methodInvocation :: Assignment
-methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> expression <*> optional (token AnonDot *> expression)) <*> (argumentList <|> pure []) <*> emptyTerm)
   where
     callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
     callFunction a Nothing = a
@@ -325,7 +325,15 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     -- we won't make a term because we have a choice of a bunch of things
 
 package :: Assignment
-package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
+-- package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
+package = do
+  loc <- symbol PackageDeclaration -- location which is calling the symbol API
+  c <- children $ do
+                  expressions <- someTerm expression
+                  pure (Java.Syntax.Package expressions)
+  pure (makeTerm loc c) -- pure is re-wrapping it back into the outer context, which in this case is Assignment (ie., the return type of the function)
+
+
 
 enum :: Assignment
 enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
