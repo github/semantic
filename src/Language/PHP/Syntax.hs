@@ -57,6 +57,7 @@ include :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
            , Member (Modules address value) effects
            , Member (Reader (Environment address)) effects
+           , Member (Resumable (EnvironmentError address)) effects
            , Member (Resumable ResolutionError) effects
            , Member (State (Environment address)) effects
            , Member (State (Exports address)) effects

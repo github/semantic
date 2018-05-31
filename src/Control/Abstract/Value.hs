@@ -223,6 +223,7 @@ evaluateInScopedEnv scopedEnvTerm term = do
 value :: ( AbstractValue address value effects
          , Member (Allocator address value) effects
          , Member (Reader (Environment address)) effects
+         , Member (Resumable (EnvironmentError address)) effects
          , Member (State (Environment address)) effects
          )
       => ValueRef address value
@@ -233,6 +234,7 @@ value = deref <=< address
 subtermValue :: ( AbstractValue address value effects
                 , Member (Allocator address value) effects
                 , Member (Reader (Environment address)) effects
+                , Member (Resumable (EnvironmentError address)) effects
                 , Member (State (Environment address)) effects
                 )
              => Subterm term (Evaluator address value effects (ValueRef address value))
@@ -242,17 +244,19 @@ subtermValue = value <=< subtermRef
 address :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
            , Member (Reader (Environment address)) effects
+           , Member (Resumable (EnvironmentError address)) effects
            , Member (State (Environment address)) effects
            )
         => ValueRef address value
         -> Evaluator address value effects address
-address (LvalLocal var) = fromJust <$> lookupEnv var
+address (LvalLocal var) = variable var
 address (LvalMember obj prop) = evaluateInScopedEnv (deref obj) (fromJust <$> lookupEnv prop)
 address (Rval addr) = pure addr
 
 subtermAddress :: ( AbstractValue address value effects
                   , Member (Allocator address value) effects
                   , Member (Reader (Environment address)) effects
+                  , Member (Resumable (EnvironmentError address)) effects
                   , Member (State (Environment address)) effects
                   )
                => Subterm term (Evaluator address value effects (ValueRef address value))
