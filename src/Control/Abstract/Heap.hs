@@ -3,7 +3,6 @@ module Control.Abstract.Heap
 ( Heap
 , getHeap
 , putHeap
-, modifyHeap
 , alloc
 , deref
 , assign
