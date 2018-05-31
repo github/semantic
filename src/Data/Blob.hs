@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Data.Blob
 ( Blob(..)
 , nullBlob
@@ -14,6 +15,7 @@ module Data.Blob
 ) where
 
 import Prologue
+import Proto3.Suite
 import Data.Aeson
 import Data.JSON.Fields
 import Data.Language
@@ -26,7 +28,7 @@ data Blob = Blob
   , blobPath :: FilePath -- ^ The file path to the blob.
   , blobLanguage :: Maybe Language -- ^ The language of this blob. Nothing denotes a langauge we don't support yet.
   }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic, Message, Named)
 
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = nullSource blobSource
