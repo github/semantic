@@ -25,6 +25,8 @@ import Prologue
 
 type Syntax = '[
     Comment.Comment
+  , Declaration.Constructor
+  , Declaration.Datatype
   , Declaration.Function
   , Literal.Array
   , Literal.Character
@@ -67,7 +69,8 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices = [
-                      character
+                      algebraicDatatypeDeclaration
+                    , character
                     , comment
                     , constructorIdentifier
                     , float
@@ -92,8 +95,19 @@ expressionChoices = [
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
 
+algebraicDatatypeDeclaration :: Assignment
+algebraicDatatypeDeclaration = makeTerm
+                            <$> symbol AlgebraicDatatypeDeclaration
+                            <*> children (Declaration.Datatype
+                                        <$> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters))
+                                        <*> ((symbol Constructors *> children (many constructor))
+                                            <|> pure []))
+
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+
+constructor :: Assignment
+constructor = makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> typeConstructor <*> typeParameters)
 
 variableIdentifier :: Assignment
 variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
@@ -172,6 +186,7 @@ typeConstructor = typeConstructorIdentifier
                <|> listType
                <|> tuplingConstructor
                <|> unitConstructor
+               <|> constructorIdentifier
 
 typeSynonymDeclaration :: Assignment
 typeSynonymDeclaration = makeTerm
