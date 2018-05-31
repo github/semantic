@@ -241,7 +241,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Named1, Message1)
 
 instance ToJSONFields1 Context
 
