@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , getHeap
@@ -43,8 +43,8 @@ modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Hea
 modifyHeap = modify'
 
 
-alloc :: forall address value effects . Member (Store address value) effects => Name -> Evaluator address value effects address
-alloc = send . Alloc @address @value
+alloc :: Member (Store address value) effects => Name -> Evaluator address value effects address
+alloc = sendStore . Alloc
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: Member (Store address value) effects => address -> Evaluator address value effects value
