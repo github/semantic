@@ -17,8 +17,8 @@ error "Avoid return" =
     return ==> pure
     where note = "return is obsolete as of GHC 7.10"
 
-error "use extract" = termAnnotation . unTerm ==> extract
-error "use unwrap" = termOut . unTerm ==> unwrap
+error "use termAnnotation" = termFAnnotation . unTerm ==> termAnnotation
+error "use termOut" = termFOut . unTerm ==> termOut
 
 error "avoid head" = head
   where note = "head is partial; consider using Data.Maybe.listToMaybe"
@@ -31,3 +31,5 @@ error "avoid init" = init
 
 error "avoid last" = last
   where note = "last is partial; consider pattern-matching"
+
+error "use maybeM" = maybe a pure ==> maybeM a
