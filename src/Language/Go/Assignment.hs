@@ -9,7 +9,7 @@ module Language.Go.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (name)
 import Data.Record
-import Data.Syntax (contextualize, emptyStatements, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeStatementTerm, makeTerm1, parseError)
+import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Go.Grammar as Grammar
 import Language.Go.Syntax as Go.Syntax
 import Language.Go.Type as Go.Type
@@ -22,7 +22,6 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import Data.Sum
-import GHC.Exts (fromList)
 import qualified Data.Term as Term
 import Prologue
 
@@ -113,7 +112,7 @@ assignment :: Assignment
 assignment = handleError program <|> parseError
 
 program :: Assignment
-program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> manyStatements expression)
+program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program. Syntax.Statements <$> manyTerm expression)
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
@@ -209,10 +208,10 @@ types =
          ]
 
 identifiers :: Assignment
-identifiers = makeStatementTerm <$> location <*> manyTerm identifier
+identifiers = makeTerm'' <$> location <*> manyTerm identifier
 
 expressions :: Assignment
-expressions = makeStatementTerm <$> location <*> manyTerm expression
+expressions = makeTerm'' <$> location <*> manyTerm expression
 
 
 -- Literals
@@ -360,7 +359,7 @@ defaultExpressionCase :: Assignment
 defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> (Go.Syntax.DefaultPattern <$ source <*> (expressions <|> emptyTerm))
 
 callExpression :: Assignment
-callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call [] <$> expression <*> manyTerm expression <*> emptyTerm)
+callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> expression <*> manyTerm expression <*> emptyTerm)
 
 expressionCase :: Assignment
 expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children expressions <*> expressions)
@@ -384,7 +383,7 @@ functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncL
     returnParameters = makeTerm <$> symbol ParameterList <*> children (manyTerm expression)
 
 importDeclaration :: Assignment
-importDeclaration = makeStatementTerm <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
+importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
     -- `import . "lib/Math"`
     dotImport = inject <$> (flip Go.Syntax.Import <$> dot <*> importFromPath)
@@ -401,7 +400,7 @@ importDeclaration = makeStatementTerm <$> symbol ImportDeclaration <*> children 
     dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
     underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
     importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
-    importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyStatements (importSpec <|> comment))
+    importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
     importFromPath = symbol InterpretedStringLiteral *> (importPath <$> source)
 
 indexExpression :: Assignment
@@ -422,7 +421,7 @@ methodSpecList :: Assignment
 methodSpecList = symbol MethodSpecList *> children expressions
 
 packageClause :: Assignment
-packageClause = makeTerm <$> symbol PackageClause <*> children (Go.Syntax.Package <$> expression <*> emptyStatements)
+packageClause = makeTerm <$> symbol PackageClause <*> children (Go.Syntax.Package <$> expression <*> pure [])
 
 parameters :: Assignment
 parameters = symbol ParameterList *> children expressions
@@ -605,9 +604,6 @@ manyTermsTill step end = manyTill (step <|> comment) end
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm = many . term
-
-manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
-manyStatements expr = fromList <$> (manyTerm expr)
 
 -- | Match a term and contextualize any comments preceeding or proceeding the term.
 term :: Assignment -> Assignment

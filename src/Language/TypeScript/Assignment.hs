@@ -11,7 +11,18 @@ import Data.Abstract.Name (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, emptyStatements, handleError, parseError, infixContext, makeTerm, makeTerm', makeStatementTerm, makeTerm1, contextualize, postContextualize)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm''
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -22,7 +33,6 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
-import GHC.Exts (fromList)
 import Prologue
 
 -- | The type of TypeScript syntax.
@@ -177,7 +187,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyStatements statement) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . Syntax.Statements <$> manyTerm statement) <|> parseError
 
 expression :: Assignment
 expression = handleError everything
@@ -558,10 +568,10 @@ constructorTy :: Assignment
 constructorTy = makeTerm <$> symbol ConstructorType <*> children (TypeScript.Syntax.Constructor <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> term ty)
 
 statementBlock :: Assignment
-statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyStatements statement)
+statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
 classBodyStatements :: Assignment
-classBodyStatements = makeStatementTerm <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
+classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
   where
     contextualize' (cs, formalParams) = case nonEmpty cs of
       Just cs -> toList cs ++ formalParams
@@ -758,11 +768,11 @@ internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (TypeScript.Syntax.InternalModule <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> emptyStatements))
+module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
 
 
-statements :: Assignment.Assignment [] Grammar (Syntax.Statements Term)
-statements = symbol StatementBlock *> children (manyStatements statement)
+statements :: Assignment.Assignment [] Grammar [Term]
+statements = symbol StatementBlock *> children (manyTerm statement)
 
 arrowFunction :: Assignment
 arrowFunction = makeArrowFun <$> symbol ArrowFunction <*> children ((,,) <$> emptyTerm <*> (((\a b c -> (a, [b], c)) <$> emptyTerm <*> term identifier <*> emptyTerm) <|> callSignatureParts) <*> term (expression <|> statementBlock))
@@ -859,9 +869,6 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
-
-manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
-manyStatements expr = fromList <$> (manyTerm expr)
 
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)

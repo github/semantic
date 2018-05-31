@@ -10,7 +10,18 @@ module Language.Python.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (name)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeStatementTerm, makeTerm1, parseError, postContextualize)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm''
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
@@ -25,7 +36,6 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Data.List.NonEmpty as NonEmpty
-import GHC.Exts (fromList)
 import Prologue
 
 
@@ -92,7 +102,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program . fromList <$> manyTerm expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program . Syntax.Statements <$> manyTerm expression) <|> parseError
 
 expression :: Assignment
 expression = handleError (choice expressionChoices)
@@ -166,13 +176,13 @@ expressionChoices =
 
 
 expressions :: Assignment
-expressions = makeStatementTerm <$> location <*> manyTerm expression
+expressions = makeTerm'' <$> location <*> manyTerm expression
 
 expressionStatement :: Assignment
-expressionStatement = makeStatementTerm <$> symbol ExpressionStatement <*> children (someTerm expression)
+expressionStatement = makeTerm'' <$> symbol ExpressionStatement <*> children (someTerm expression)
 
 expressionList :: Assignment
-expressionList = makeStatementTerm <$> symbol ExpressionList <*> children (someTerm expression)
+expressionList = makeTerm'' <$> symbol ExpressionList <*> children (someTerm expression)
 
 listSplat :: Assignment
 listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier . name <$> source)
@@ -362,7 +372,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
-import' =   makeStatementTerm <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
+import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
         <|> makeTerm <$> symbol ImportFromStatement <*> children (Python.Syntax.Import <$> importPath <*> (wildcard <|> some (aliasImportSymbol <|> importSymbol)))
   where
     -- `import a as b`

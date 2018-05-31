@@ -13,7 +13,6 @@ import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
 import           Data.Semigroup.Reducer (Reducer)
-import           Data.Syntax (Statements)
 import           Diffing.Algorithm
 import           Prelude
 import           Prologue
@@ -759,7 +758,7 @@ instance Ord1 Update where liftCompare = genericLiftCompare
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Update
 
-data Module a = Module { moduleIdentifier :: !a, moduleStatements :: Statements a }
+data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Module where liftEq = genericLiftEq
@@ -776,7 +775,7 @@ instance Evaluatable Module where
 
 
 
-data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: Statements a }
+data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 InternalModule where liftEq = genericLiftEq

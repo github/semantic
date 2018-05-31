@@ -16,7 +16,6 @@ import Data.Term
 import Diffing.Algorithm hiding (Empty)
 import Prelude
 import Prologue
-import qualified GHC.Exts as Exts
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 
@@ -30,6 +29,12 @@ makeTerm a = makeTerm' a . inject
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
 makeTerm' a f = termIn (sconcat (a :| (termAnnotation <$> toList f))) f
 
+-- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children. Removes extra structure if term is a list of a single item.
+makeTerm'' :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs, Foldable f) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
+makeTerm'' a children = case toList children of
+  [x] -> x
+  _ -> makeTerm' a (inject children)
+
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => f (Term (Sum fs) a) -> Term (Sum fs) a
 makeTerm1 = makeTerm1' . inject
@@ -40,25 +45,10 @@ makeTerm1' f = case toList f of
   a : _ -> makeTerm' (termAnnotation a) f
   _ -> error "makeTerm1': empty structure"
 
--- FIXME: I think this might be an anti-pattern.
--- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children. Removes extra structure if term is a list of a single item.
-makeStatementTerm :: (HasCallStack, f :< fs, Statements :< fs, Semigroup a, Apply Foldable fs, Foldable f) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
-makeStatementTerm a children = case toList children of
-  [x] -> x
-  xs -> makeTerm' a (inject (Statements xs))
-
 -- | Construct an empty term at the current position.
 emptyTerm :: (HasCallStack, Empty :< fs, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Sum fs) (Record Location))
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation ann = Range (start (getField ann)) (start (getField ann)) :. Span (spanStart (getField ann)) (spanStart (getField ann)) :. Nil
-
--- | Construct zero or more Statements.
-manyStatements :: (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => Assignment.Assignment ast grammar (Term f a) -> Assignment.Assignment ast grammar (Statements (Term f a))
-manyStatements expr = Exts.fromList <$> (many expr)
-
--- | Construct an empty list of Statements.
-emptyStatements :: Assignment.Assignment ast grammar (Statements (Term f a))
-emptyStatements = pure (Exts.fromList [])
 
 -- | Catch assignment errors into an error term.
 handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Sum fs) (Record Location)) -> Assignment.Assignment ast grammar (Term (Sum fs) (Record Location))
@@ -153,18 +143,8 @@ instance Ord1 Statements where liftCompare = genericLiftCompare
 instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
 instance ToJSON1 Statements
 
--- | Imperative sequence of statements is evaluated s.t:
---
---   1. Each statement’s effects on the store are accumulated;
---   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
---   3. Only the last statement’s return value is returned.
 instance Evaluatable Statements where
   eval (Statements xs) = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
-
-instance Exts.IsList (Statements a) where
-  type Item (Statements a) = a
-  fromList = Statements
-  toList (Statements xs) = xs
 
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
@@ -182,9 +162,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 Empty
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
@@ -249,9 +227,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 Context
+  deriving (Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s

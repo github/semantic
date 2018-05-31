@@ -9,7 +9,17 @@ module Language.PHP.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import Language.PHP.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
@@ -23,7 +33,6 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Language.PHP.Syntax as Syntax
-import GHC.Exts (fromList)
 import Prologue
 
 type Syntax = '[
@@ -137,7 +146,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . fromList <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . Syntax.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
@@ -391,12 +400,12 @@ scalarType :: Assignment
 scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> source)
 
 compoundStatement :: Assignment
-compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyStatements statement)
+compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
 
 objectCreationExpression :: Assignment
 objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (Expression.New <$> ((:) <$> term classTypeDesignator <*> (arguments <|> pure []))))
 
-  <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyStatements classMemberDeclaration)))
+  <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration)))
   where makeAnonClass identifier args baseClause interfaceClause declarations = Declaration.Class [] identifier (args <> [baseClause, interfaceClause]) declarations
 
 classMemberDeclaration :: Assignment
@@ -603,7 +612,7 @@ functionDefinition = makeTerm <$> symbol FunctionDefinition <*> children (makeFu
     makeFunction identifier parameters returnType statement = Declaration.Function [returnType] identifier parameters statement
 
 classDeclaration :: Assignment
-classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> (term classModifier <|> emptyTerm) <*> term name <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyStatements classMemberDeclaration))
+classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> (term classModifier <|> emptyTerm) <*> term name <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration))
   where
     makeClass modifier name baseClause interfaceClause declarations = Declaration.Class [modifier] name [baseClause, interfaceClause] declarations
 
@@ -767,9 +776,6 @@ someTerm = fmap NonEmpty.toList . someTerm'
 
 someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
 someTerm' = NonEmpty.some1 . commentedTerm
-
-manyStatements :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar (Syntax.Statements Term)
-manyStatements expr = fromList <$> (manyTerm expr)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment

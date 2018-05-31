@@ -8,7 +8,6 @@ import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import           Data.Syntax (Statements)
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue
@@ -147,7 +146,7 @@ instance Evaluatable Class where
     Rval <$> letrec' name (\addr ->
       subtermValue classBody <* makeNamespace name addr super)
 
-data Module a = Module { moduleIdentifier :: !a, moduleStatements :: Statements a }
+data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Module where liftEq = genericLiftEq
