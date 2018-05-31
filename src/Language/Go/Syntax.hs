@@ -41,7 +41,7 @@ resolveGoImport (ImportPath path Relative) = do
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
   case paths of
     [] -> throwResumable $ GoImportError path
-    _  -> pure paths
+    _ -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
   package <- T.unpack . unName . Package.packageName <$> currentPackage
   trace ("attempting to resolve " <> show path <> " for package " <> package)
@@ -50,7 +50,7 @@ resolveGoImport (ImportPath path NonRelative) = do
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
-    _                -> throwResumable $ GoImportError path
+    _  -> throwResumable $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --

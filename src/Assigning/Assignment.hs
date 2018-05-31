@@ -167,6 +167,8 @@ symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` 
 rawSource :: HasCallStack => Assignment ast grammar ByteString
 rawSource = tracing Source `Then` return
 
+-- | A rule to produce a node's source as Text. Fails if the node's source
+-- can't be parsed as UTF-8.
 source :: HasCallStack => Assignment ast grammar Text
 source = rawSource >>= \b -> case decodeUtf8' b of
   Right t -> pure t

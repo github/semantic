@@ -1,7 +1,5 @@
 module Control.Abstract.Primitive where
 
-import Prologue
-
 import Control.Abstract.Addressable
 import Control.Abstract.Context
 import Control.Abstract.Environment
@@ -11,7 +9,8 @@ import Control.Abstract.Value
 import Data.Abstract.Name
 import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
-import qualified Data.Text as T
+import Data.Text (pack, unpack)
+import Prologue
 
 builtin :: ( HasCallStack
            , Member (Allocator address value) effects
