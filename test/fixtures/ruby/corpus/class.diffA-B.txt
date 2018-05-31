@@ -5,9 +5,9 @@
     (Method
       (Empty)
       (Identifier)
-      ([])))
+      (Statements)))
 {-(Class
   {-(ScopeResolution
     {-(Identifier)-}
     {-(Identifier)-})-}
-  {-([])-})-})
+  {-(Statements)-})-})

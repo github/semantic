@@ -20,7 +20,7 @@ instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 File
 
 instance Evaluatable File where
-  eval File = Rval <$> (currentModule >>= string . T.pack . modulePath)
+  eval File = Rval . string . T.pack . modulePath <$> currentModule
 
 
 -- A line directive like the Ruby constant `__LINE__`.

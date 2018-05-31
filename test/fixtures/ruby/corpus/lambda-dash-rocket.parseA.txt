@@ -6,6 +6,6 @@
     (Identifier)
     (Function
       (Empty)
-      (
+      (Statements
         (Integer)
         (Integer)))))

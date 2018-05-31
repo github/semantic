@@ -45,7 +45,7 @@ instance Evaluatable VariableName
 resolvePHPName :: ( Member (Modules address value) effects
                   , Member (Resumable ResolutionError) effects
                   )
-               => Text
+               => T.Text
                -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]

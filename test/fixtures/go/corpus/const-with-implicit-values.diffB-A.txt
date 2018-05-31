@@ -4,22 +4,17 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
-    {+(Assignment
-      {+(Identifier)+}
-      {+(Identifier)+})+}
+    (Statements)
+    (Statements
       (Assignment
       { (Identifier)
       ->(Identifier) }
+        (Identifier))
+      (Assignment
       { (Identifier)
-      ->([]) })
-    {+(Assignment
-      {+(Identifier)+}
-      {+([])+})+}
-    {-(Assignment
-      {-(Identifier)-}
-      {-([])-})-}
-    {-(Assignment
-      {-(Identifier)-}
-      {-([])-})-})))
+      ->(Identifier) }
+        (Statements))
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+        (Statements)))))

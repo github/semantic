@@ -4,16 +4,16 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
       (Identifier)
       (Composite
         (Array
           (Identifier))
-        (
-        {+(Integer)+}
-        {+(Integer)+}
+        (Statements
         { (Integer)
         ->(Integer) }
-        {-(Integer)-}
-        {-(Integer)-})))))
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) })))))

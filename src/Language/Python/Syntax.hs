@@ -12,7 +12,6 @@ import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
 import qualified Data.Semigroup.Reducer as Reducer
-import qualified Data.Semigroup.Reducer as Reducer
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics

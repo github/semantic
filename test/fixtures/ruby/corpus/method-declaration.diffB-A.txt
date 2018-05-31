@@ -4,6 +4,6 @@
   { (Identifier)
   ->(Identifier) }
   {-(Identifier)-}
-    (
+    (Statements
     {-(Send
       {-(Identifier)-})-})))

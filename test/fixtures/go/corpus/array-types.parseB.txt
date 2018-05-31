@@ -4,9 +4,9 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
-      (
+    (Statements)
+    (Statements
+      (Statements
         (Type
           (Identifier)
           (Array
@@ -14,7 +14,7 @@
               (Integer)
               (Integer))
             (Identifier))))
-      (
+      (Statements
         (Type
           (Identifier)
           (Array
@@ -22,7 +22,7 @@
             (Array
               (Integer)
               (Identifier)))))
-      (
+      (Statements
         (Type
           (Identifier)
           (Array

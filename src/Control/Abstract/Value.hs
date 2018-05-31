@@ -113,26 +113,7 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   --   necessary to satisfy implementation details of Haskell left/right shift,
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> Evaluator location value effects value)
-
-  -- | Construct an abstract boolean value.
-  boolean :: Bool -> Evaluator location value effects value
-
-  -- | Construct an abstract string value.
-  string :: Text -> Evaluator location value effects value
-
-  -- | Construct a self-evaluating symbol value.
-  --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: Text -> Evaluator location value effects value
-
-  -- | Construct a floating-point value.
-  float :: Scientific -> Evaluator location value effects value
-
-  -- | Construct a rational value.
-  rational :: Rational -> Evaluator location value effects value
-
-  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> Evaluator location value effects value
+               -> (value -> value -> Evaluator address value effects value)
 
   -- | Construct an array of zero or more values.
   array :: [value] -> Evaluator address value effects value
