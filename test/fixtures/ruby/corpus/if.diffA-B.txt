@@ -3,12 +3,13 @@
     (Send
     { (Identifier)
     ->(Identifier) })
-    ({-(Send
+    (Statements
+    {-(Send
       {-(Identifier)-})-})
   { (If
     {-(Send
       {-(Identifier)-})-}
-    {-(
+    {-(Statements
       {-(Send
         {-(Identifier)-})-})-}
     {-(Send
@@ -17,5 +18,5 @@
 {+(If
   {+(Send
     {+(Identifier)+})+}
-  {+([])+}
+  {+(Statements)+}
   {+(Empty)+})+})

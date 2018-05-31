@@ -4,10 +4,10 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
       (Annotation
-        (
+        (Statements
           (Identifier))
         (Identifier))
       (Integer))))

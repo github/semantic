@@ -1,6 +1,6 @@
 (Program
 {+(Return
-  {+(
+  {+(Statements
     {+(Plus
       {+(Identifier)+}
       {+(Identifier)+})+}
@@ -8,7 +8,7 @@
   (Return
     (Empty))
   (Return
-  { (
+  { (Statements
     {-(Plus
       {-(Identifier)-}
       {-(Identifier)-})-}

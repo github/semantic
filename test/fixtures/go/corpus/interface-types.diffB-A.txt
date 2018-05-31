@@ -4,15 +4,15 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
-      (
+    (Statements)
+    (Statements
+      (Statements
         (Type
         { (Identifier)
         ->(Identifier) }
           (Interface
-            ([]))))
-      (
+            (Statements))))
+      (Statements
         (Type
         { (Identifier)
         ->(Identifier) }
@@ -20,12 +20,12 @@
             (MemberAccess
               (Identifier)
               (Identifier)))))
-      (
+      (Statements
         (Type
         { (Identifier)
         ->(Identifier) }
           (Interface
-            (
+            (Statements
               (Identifier)
               (MemberAccess
                 (Identifier)
@@ -33,12 +33,12 @@
               (MethodSignature
                 (Identifier)
                 (Identifier)
-                (
+                (Statements
                   (Identifier)
                   (Identifier)))))))
       (Context
         (Comment)
-        (
+        (Statements
           (Type
           { (Identifier)
           ->(Identifier) }
@@ -47,4 +47,4 @@
                 (Empty)
               { (Identifier)
               ->(Identifier) }
-                ([])))))))))
+                (Statements)))))))))

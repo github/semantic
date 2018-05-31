@@ -2,4 +2,4 @@
   (DefaultExport
     (Class
       (Identifier)
-      ([]))))
+      (Statements))))

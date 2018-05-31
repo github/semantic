@@ -4,24 +4,24 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (TypeSwitch
-        (
+        (Statements
           (Assignment
             (Identifier)
             (Identifier))
           (TypeSwitchGuard
             (Identifier)))
-        (
+        (Statements
           (Pattern
-            (
+            (Statements
               (Identifier)
               (Pointer
                 (MemberAccess
                   (Identifier)
                   (Identifier))))
-            ([]))
+            (Statements))
           (Context
             (Comment)
             (Pattern
@@ -29,7 +29,7 @@
                 (Identifier))
               (Call
                 (Identifier)
-                ([])
+                (Statements)
                 (Empty))))
           (Pattern
             (Pointer
@@ -37,19 +37,19 @@
             (Break
               (Empty)))))
       (TypeSwitch
-        (
+        (Statements
           (TypeSwitchGuard
-            (
+            (Statements
               (Identifier)
               (Identifier))))
-        (
+        (Statements
           (Pattern
             (Identifier)
             (Call
               (MemberAccess
                 (Identifier)
                 (Identifier))
-              (
+              (Statements
                 (TextElement)
                 (Times
                   (Identifier)
@@ -61,7 +61,7 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-              (
+              (Statements
                 (TextElement)
                 (DividedBy
                   (Integer)
@@ -69,7 +69,7 @@
               (Empty)))
           (Pattern
             (Identifier)
-            (
+            (Statements
               (Assignment
                 (Identifier)
                 (DividedBy
@@ -82,7 +82,7 @@
                 (MemberAccess
                   (Identifier)
                   (Identifier))
-                (
+                (Statements
                   (TextElement)
                   (Plus
                     (Slice
@@ -98,13 +98,13 @@
                 (Empty))))
           (Pattern
             (DefaultPattern
-              ([]))
-            ([]))))
+              (Statements))
+            (Statements))))
       (TypeSwitch
         (Empty)
-        (
+        (Statements
           (TypeSwitchGuard
-            (
+            (Statements
               (Identifier)
               (Identifier)))
           (Context

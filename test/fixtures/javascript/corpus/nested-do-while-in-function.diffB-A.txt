@@ -17,11 +17,11 @@
       (Assignment
         (Identifier)
         (Empty)))
-    (
+    (Statements
       (DoWhile
       { (Identifier)
       ->(Identifier) }
-        (
+        (Statements
           (Call
             (Identifier)
           { (Identifier)

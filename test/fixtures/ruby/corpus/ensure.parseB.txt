@@ -1,6 +1,6 @@
 (Program
   (Try
-    (
+    (Statements
       (Send
         (Identifier))
       (Finally
