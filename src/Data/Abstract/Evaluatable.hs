@@ -64,10 +64,7 @@ type EvaluatableConstraints address term value effects =
   , Member (Resumable ResolutionError) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Return value) effects
-  , Member (State (Heap address (Cell address) value)) effects
   , Member Trace effects
-  , Ord address
-  , Reducer value (Cell address value)
   )
 
 
@@ -85,6 +82,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member (State (ModuleTable (Maybe (value, Environment address)))) outer
                        , Member Trace outer
                        , Recursive term
+                       , Reducer value (Cell address value)
                        , inner ~ (LoopControl value ': Return value ': Env address ': Store address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
