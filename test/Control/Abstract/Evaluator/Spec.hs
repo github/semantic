@@ -38,7 +38,7 @@ evaluate
   . runEnvironmentError
   . runAddressError
   . runAllocator
-  . (>>= deref)
+  . (>>= deref . fst)
   . runEnv lowerBound
   . runReturn
   . runLoopControl
