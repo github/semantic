@@ -113,7 +113,7 @@ manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Conte
 manyTermsTill :: Assignment.Assignment [] Grammar Term
               -> Assignment.Assignment [] Grammar b
               -> Assignment.Assignment [] Grammar [Term]
-manyTermsTill step end = manyTill (step <|> comment) end
+manyTermsTill step = manyTill (step <|> comment)
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
@@ -254,7 +254,7 @@ superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *
 class' :: Assignment
 class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> (superInterfaces <|> pure []) <*> classBody)
   where
-    makeClass modifiers identifier typeParams superClass superInterfaces classBody = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass ++ superInterfaces) classBody -- not doing an assignment, just straight up function
+    makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass ++ superInterfaces) -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
     superClass = symbol Superclass *> children type'
     -- matching term expression won't work since there is no node for that; it's AnonExtends
@@ -272,7 +272,6 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many m
 -- it correctly; fieldDeclaration is standalone (compared to a type, which doesn't say anything by itself)
 fieldDeclaration :: Assignment
 fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
-
 
 method :: Assignment
 method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
