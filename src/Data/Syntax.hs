@@ -17,11 +17,12 @@ import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
-import Proto3.Wire.Decode
 import Proto3.Wire.Types
 import GHC.Types (Constraint)
 import GHC.TypeLits
 import qualified Proto3.Suite.DotProto as Proto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 import Data.Char (toLower)
 -- Combinators
 
@@ -105,10 +106,10 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 
 instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
   liftEncodeMessage encodeMessage num = apply @Message1 (liftEncodeMessage encodeMessage num)
-  liftDecodeMessage decodeMessage _ = oneof undefined listOfParsers
+  liftDecodeMessage decodeMessage _ = Decode.oneof undefined listOfParsers
     where
       listOfParsers =
-        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
+        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
   liftDotProto _ =
     [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (_ :: proxy f) i ->
       let
@@ -207,7 +208,7 @@ instance Named String where
 
 instance Message String where
   encodeMessage = encodeMessageField
-  decodeMessage num = (at decodeMessageField num)
+  decodeMessage num = (Decode.at decodeMessageField num)
   dotProto _ = [Proto.DotProtoMessageField $ protoType (Proxy @String)]
 
 
@@ -229,8 +230,15 @@ instance HasDefault ErrorStack where
   def = ErrorStack mempty
 
 deriving instance Generic SrcLoc
+deriving instance Message SrcLoc
 deriving instance Named SrcLoc
-deriving instance MessageField SrcLoc
+instance MessageField SrcLoc where
+  encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
+  decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
+  protoType _ = messageField (Proto.Prim (Proto.Named (Proto.Single (nameOf (Proxy @SrcLoc))))) Nothing
+
+instance HasDefault SrcLoc where
+  def = SrcLoc mempty mempty mempty 1 1 1 1
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
