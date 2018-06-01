@@ -296,10 +296,6 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
 
 package :: Assignment
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
-package = do
-  loc <- symbol PackageDeclaration
-  c <- children $ do Java.Syntax.Package <$> someTerm expression
-  pure (makeTerm loc c)
 
 enum :: Assignment
 enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
