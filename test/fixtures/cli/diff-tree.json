@@ -5,7 +5,7 @@
     {
       "merge":
       {
-        "term": "Program",
+        "term": "Statements",
         "children": [
         {
           "merge":

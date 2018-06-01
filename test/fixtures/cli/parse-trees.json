@@ -3,7 +3,7 @@
   {
     "tree":
     {
-      "term": "Program",
+      "term": "Statements",
       "children": [
       {
         "term": "LowAnd",
@@ -74,7 +74,7 @@
   {
     "tree":
     {
-      "term": "Program",
+      "term": "Statements",
       "children": [
       {
         "term": "LowOr",

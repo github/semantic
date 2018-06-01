@@ -3,7 +3,7 @@
   {
     "tree":
     {
-      "term": "Program",
+      "term": "Statements",
       "children": [
       {
         "term": "LowAnd",

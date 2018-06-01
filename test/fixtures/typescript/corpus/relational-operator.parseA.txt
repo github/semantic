@@ -1,4 +1,4 @@
-(Program
+(Statements
   (LessThan
     (Identifier)
     (Identifier)))

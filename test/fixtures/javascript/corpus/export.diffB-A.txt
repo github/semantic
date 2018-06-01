@@ -1,4 +1,4 @@
-(Program
+(Statements
 { (QualifiedExport)
 ->(QualifiedExport) }
 { (QualifiedExport)
@@ -35,22 +35,18 @@
         (Identifier)
       { (Identifier)
       ->(Empty) })
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {-(Assignment
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(Empty)-})-}
+      (Assignment
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
     {-(Assignment
       {-(Empty)-}
       {-(Identifier)-}
       {-(Empty)-})-}))
-{+(DefaultExport
-  {+(Identifier)+})+}
-{-(DefaultExport
-  {-(Identifier)-})-}
+  (DefaultExport
+  { (Identifier)
+  ->(Identifier) })
 {-(DefaultExport
   {-(Function
     {-(Empty)-}
