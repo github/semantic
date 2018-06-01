@@ -19,6 +19,7 @@ service SemanticAPI {
   rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
   rpc FetchSummaries (SummariesRequest) returns (SummariesResponse) {}
   rpc ParseBlobs (ParseRequest) returns (ParseResponse) {}
+  rpc ParseRawBlobs (ParseRequest) returns (RawParseResponse) {}
 }
 
 message SummariesRequest  {
@@ -41,6 +42,11 @@ message SummariesResponse {
 
 message ParseResponse {
   bytes json_tree = 1;
+  repeated Error errors = 2;
+}
+
+message RawParseResponse {
+  repeated Term terms = 1;
   repeated Error errors = 2;
 }
 
