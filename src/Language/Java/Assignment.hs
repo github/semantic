@@ -8,6 +8,7 @@ module Language.Java.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error, while, try)
 import Data.Abstract.FreeVariables
+import Data.Abstract.Name
 import Data.Functor (($>))
 import Data.List.NonEmpty (some1)
 import Data.Record
@@ -418,26 +419,26 @@ enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.F
 -- TODO: instanceOf
 binary :: Assignment
 binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
-  [ (injectSum .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (injectSum .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (injectSum .) . Expression.Equal            <$ symbol AnonEqualEqual
-  , (injectSum .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
-  , (injectSum .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (injectSum .) . invert Expression.Equal     <$ symbol AnonBangEqual
-  , (injectSum .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (injectSum .) . Expression.Or               <$ symbol AnonPipePipe
-  , (injectSum .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (injectSum .) . Expression.BOr              <$ symbol AnonPipe
-  , (injectSum .) . Expression.BXOr             <$ symbol AnonCaret
-  , (injectSum .) . Expression.Modulo           <$ symbol AnonPercent
-  , (injectSum .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (injectSum .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (injectSum .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
-  , (injectSum .) . Expression.Plus             <$ symbol AnonPlus
-  , (injectSum .) . Expression.Minus            <$ symbol AnonMinus
-  , (injectSum .) . Expression.Times            <$ symbol AnonStar
-  , (injectSum .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (injectSum .) . Expression.InstanceOf       <$ symbol AnonInstanceof
+  [ (inject .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inject .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inject .) . Expression.Equal            <$ symbol AnonEqualEqual
+  , (inject .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inject .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inject .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  , (inject .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inject .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inject .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inject .) . Expression.BOr              <$ symbol AnonPipe
+  , (inject .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inject .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inject .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inject .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
+  , (inject .) . Expression.Plus             <$ symbol AnonPlus
+  , (inject .) . Expression.Minus            <$ symbol AnonMinus
+  , (inject .) . Expression.Times            <$ symbol AnonStar
+  , (inject .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inject .) . Expression.InstanceOf       <$ symbol AnonInstanceof
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
@@ -451,7 +452,7 @@ infixTerm = infixContext comment
 
 assignment' :: Assignment
 assignment' = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm lhs expression
-                [ (injectSum .) . Statement.Assignment [] <$ symbol AnonEqual
+                [ (inject .) . Statement.Assignment [] <$ symbol AnonEqual
                 , assign Expression.Plus            <$ symbol AnonPlusEqual
                 , assign Expression.Minus           <$ symbol AnonMinusEqual
                 , assign Expression.Times           <$ symbol AnonStarEqual
@@ -466,7 +467,7 @@ assignment' = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm 
                 ])
   where
     assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
-    assign c l r = injectSum (Statement.Assignment [] l (makeTerm1 (c l r)))
+    assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
     lhs = symbol Lhs *> children (term expression)
 
 data UnaryType
@@ -489,10 +490,10 @@ unary = make <$> symbol UnaryExpression <*> children ((,) <$> operator <*> term 
 
 update :: Assignment
 update = makeTerm' <$> symbol UpdateExpression <*> children (
-      injectSum . Statement.PreIncrement  <$ token AnonPlusPlus <*> term expression
-  <|> injectSum . Statement.PreDecrement  <$ token AnonMinusMinus <*> term expression
-  <|> injectSum . Statement.PostIncrement <$> term expression <* token AnonPlusPlus
-  <|> injectSum . Statement.PostDecrement <$> term expression <* token AnonMinusMinus)
+      inject . Statement.PreIncrement  <$ token AnonPlusPlus <*> term expression
+  <|> inject . Statement.PreDecrement  <$ token AnonMinusMinus <*> term expression
+  <|> inject . Statement.PostIncrement <$> term expression <* token AnonPlusPlus
+  <|> inject . Statement.PostDecrement <$> term expression <* token AnonMinusMinus)
 
 ternary :: Assignment
 ternary = makeTerm <$> symbol TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
