@@ -9,6 +9,7 @@ module Control.Abstract.Environment
 , bindAll
 , locally
 , close
+-- * Effects
 , Env(..)
 , runEnv
 , EnvironmentError(..)
@@ -55,6 +56,9 @@ locally a = do
 
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close
+
+
+-- Effects
 
 data Env address return where
   Lookup :: Name            -> Env address (Maybe address)

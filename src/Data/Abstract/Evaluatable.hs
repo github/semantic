@@ -41,14 +41,14 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( EvaluatableConstraints address term value effects
+  eval :: ( EvaluatableConstraints term address value effects
           , Member Fail effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
   default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
-type EvaluatableConstraints address term value effects =
+type EvaluatableConstraints term address value effects =
   ( AbstractValue address value effects
   , Declarations term
   , FreeVariables term
@@ -64,10 +64,7 @@ type EvaluatableConstraints address term value effects =
   , Member (Resumable ResolutionError) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Return value) effects
-  , Member (State (Heap address (Cell address) value)) effects
   , Member Trace effects
-  , Ord address
-  , Reducer value (Cell address value)
   )
 
 
@@ -76,7 +73,8 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                     -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
                     .  ( Addressable address inner'
                        , Evaluatable (Base term)
-                       , EvaluatableConstraints address term value inner
+                       , EvaluatableConstraints term address value inner
+                       , Foldable (Cell address)
                        , Member Fail outer
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
@@ -85,6 +83,8 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member (State (ModuleTable (Maybe (value, Environment address)))) outer
                        , Member Trace outer
                        , Recursive term
+                       , Reducer value (Cell address value)
+                       , ValueRoots address value
                        , inner ~ (LoopControl value ': Return value ': Env address ': Allocator address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
