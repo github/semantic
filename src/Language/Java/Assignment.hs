@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators, KindSignatures #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Java.Assignment
 ( assignment
 , Syntax
