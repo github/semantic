@@ -127,3 +127,13 @@ instance Show1 Pragma where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Pragma
 
 instance Evaluatable Pragma
+
+newtype Deriving a = Deriving [a] deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 Deriving where liftEq = genericLiftEq
+instance Ord1 Deriving where liftCompare = genericLiftCompare
+instance Show1 Deriving where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Deriving
+
+instance Evaluatable Deriving
