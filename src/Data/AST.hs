@@ -5,7 +5,6 @@ import Data.Range
 import Data.Record
 import Data.Span
 import Data.Term
-import Prologue
 
 import Data.Aeson
 import Data.ByteString.Char8 (pack)
@@ -33,11 +32,3 @@ type Location = '[Range, Span]
 
 nodeLocation :: Node grammar -> Record Location
 nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
-
-newtype Tree (syntax) = Tree (syntax (Tree syntax))
-
-instance (Show1 syntax) => Show (Tree syntax) where
-  showsPrec precedence (Tree syntax) = showsPrec1 precedence syntax
-
-termToTree :: Functor syntax => Term syntax annotation -> Tree syntax
-termToTree = cata (\ (In _ syntax) -> Tree syntax)
