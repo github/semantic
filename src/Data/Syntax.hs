@@ -24,6 +24,7 @@ import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import Data.Char (toLower)
+import qualified Data.ByteString.Char8 as BC
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
@@ -61,7 +62,7 @@ handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pur
 
 -- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Sum fs) (Record Location))
-parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
+parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -213,13 +214,19 @@ instance Message String where
 
 
 errorSyntax :: Error.Error String -> [a] -> Error a
-errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
+errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
+unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList $ unErrorSite <$> (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
 
 data ErrorSite = ErrorSite { errorMessage :: ByteString, errorLocation :: SrcLoc }
   deriving (Eq, Show, Generic, Named, Message)
+
+errorSite :: (String, SrcLoc) -> ErrorSite
+errorSite = uncurry ErrorSite . (BC.pack *** id)
+
+unErrorSite :: ErrorSite -> (String, SrcLoc)
+unErrorSite ErrorSite{..} = (BC.unpack errorMessage, errorLocation)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
   deriving stock (Eq, Show, Generic)
@@ -242,7 +249,7 @@ instance HasDefault SrcLoc where
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
-    jSite (site, SrcLoc{..}) = object
+    jSite (ErrorSite site SrcLoc{..}) = object
       [ "site" .= site
       , "package" .= srcLocPackage
       , "module" .= srcLocModule
@@ -253,10 +260,10 @@ instance ToJSON ErrorStack where
       ]
 
 instance Hashable ErrorStack where
-  hashWithSalt = hashUsing (map (second ((,,,,,,) <$> srcLocPackage <*> srcLocModule <*> srcLocFile <*> srcLocStartLine <*> srcLocStartCol <*> srcLocEndLine <*> srcLocEndCol)) . unErrorStack)
+  hashWithSalt = hashUsing (map (second ((,,,,,,) <$> srcLocPackage <*> srcLocModule <*> srcLocFile <*> srcLocStartLine <*> srcLocStartCol <*> srcLocEndLine <*> srcLocEndCol) . unErrorSite) . unErrorStack)
 
 instance Ord ErrorStack where
-  compare = liftCompare (liftCompare compareSrcLoc) `on` unErrorStack
+  compare = liftCompare (liftCompare compareSrcLoc) `on` (fmap unErrorSite . unErrorStack)
     where compareSrcLoc s1 s2 = mconcat
             [ (compare `on` srcLocPackage) s1 s2
             , (compare `on` srcLocModule) s1 s2
