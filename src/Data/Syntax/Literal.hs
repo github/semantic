@@ -51,9 +51,7 @@ instance Evaluatable Data.Syntax.Literal.Integer where
 instance ToJSONFields1 Data.Syntax.Literal.Integer where
   toJSONFields1 (Integer i) = noChildren ["asString" .= unpack i]
 
-
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
--- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 -- | A literal float of unspecified width.
