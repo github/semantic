@@ -137,3 +137,23 @@ instance Show1 Deriving where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Deriving
 
 instance Evaluatable Deriving
+
+newtype Context' a = Context' [a] deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 Context' where liftEq = genericLiftEq
+instance Ord1 Context' where liftCompare = genericLiftCompare
+instance Show1 Context' where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Context'
+
+instance Evaluatable Context'
+
+data Class a = Class { classType :: a, classTypeParameters :: a } deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 Class where liftEq = genericLiftEq
+instance Ord1 Class where liftCompare = genericLiftCompare
+instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Class
+
+instance Evaluatable Class
