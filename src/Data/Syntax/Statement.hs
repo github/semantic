@@ -157,7 +157,7 @@ instance Evaluatable PostDecrement
 
 -- | Pre increment operator (e.g. ++1 in C or Java).
 newtype PreIncrement a = PreIncrement a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 PreIncrement where liftEq = genericLiftEq
 instance Ord1 PreIncrement where liftCompare = genericLiftCompare
@@ -169,7 +169,7 @@ instance Evaluatable PreIncrement
 
 -- | Pre decrement operator (e.g. --1 in C or Java).
 newtype PreDecrement a = PreDecrement a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 PreDecrement where liftEq = genericLiftEq
 instance Ord1 PreDecrement where liftCompare = genericLiftCompare
