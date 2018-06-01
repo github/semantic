@@ -79,6 +79,7 @@ type Syntax =
    , Statement.Let
    , Statement.NoOp
    , Statement.Return
+   , Statement.Statements
    , Statement.Throw
    , Statement.Try
    , Statement.While
@@ -91,8 +92,6 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
-   , Syntax.Program
-   , Syntax.Statements
    , Type.Annotation
    , []
    ]
@@ -102,7 +101,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program . Syntax.Statements <$> manyTerm expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Module <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
 
 expression :: Assignment
 expression = handleError (choice expressionChoices)

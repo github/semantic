@@ -72,6 +72,7 @@ type Syntax = '[
   , Statement.Match
   , Statement.Pattern
   , Statement.Return
+  , Statement.Statements
   , Statement.Throw
   , Statement.Try
   , Statement.While
@@ -115,7 +116,6 @@ type Syntax = '[
   , Syntax.NamespaceUseGroupClause
   , Syntax.NewVariable
   , Syntax.PrintIntrinsic
-  , Syntax.Program
   , Syntax.PropertyDeclaration
   , Syntax.PropertyModifier
   , Syntax.QualifiedName
@@ -126,7 +126,6 @@ type Syntax = '[
   , Syntax.ScalarType
   , Syntax.ShellCommand
   , Syntax.SimpleVariable
-  , Syntax.Statements
   , Syntax.Static
   , Syntax.Text
   , Syntax.TraitDeclaration
@@ -145,7 +144,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . Syntax.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)

@@ -3,14 +3,12 @@
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable
-import Data.Aeson (ToJSON(..), ToJSON1(..), object)
+import Data.Aeson (ToJSON(..), object)
 import Data.AST
 import Data.JSON.Fields
 import Data.Range
 import Data.Record
 import Data.Span
-import Data.Semigroup.App
-import Data.Semigroup.Foldable
 import Data.Sum
 import Data.Term
 import Diffing.Algorithm hiding (Empty)
@@ -149,34 +147,6 @@ instance FreeVariables1 Identifier where
 
 instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
-
-
-newtype Program a = Program (Statements a)
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
-
-instance Eq1 Program where liftEq = genericLiftEq
-instance Ord1 Program where liftCompare = genericLiftCompare
-instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable Program where
-  eval (Program statements) = eval statements
-
--- | Imperative sequence of statements/declarations s.t.:
---
---   1. Each statement’s effects on the store are accumulated;
---   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
---   3. Only the last statement’s return value is returned.
-newtype Statements a = Statements [a]
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
-
-instance Eq1 Statements where liftEq = genericLiftEq
-instance Ord1 Statements where liftCompare = genericLiftCompare
-instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
-instance ToJSON1 Statements
-
-instance Evaluatable Statements where
-  eval (Statements xs) = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
-
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

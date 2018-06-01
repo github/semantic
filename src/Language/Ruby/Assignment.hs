@@ -80,6 +80,7 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Statements
   , Statement.Try
   , Statement.While
   , Statement.Yield
@@ -87,8 +88,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Program
-  , Syntax.Statements
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
@@ -104,7 +103,7 @@ type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . Syntax.Statements <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))

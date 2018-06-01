@@ -91,6 +91,7 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Statements
   , Statement.Throw
   , Statement.Try
   , Statement.While
@@ -99,8 +100,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Program
-  , Syntax.Statements
   , Syntax.Context
   , Type.Readonly
   , Type.TypeParameters
@@ -187,7 +186,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program . Syntax.Statements <$> manyTerm statement) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
 
 expression :: Assignment
 expression = handleError everything

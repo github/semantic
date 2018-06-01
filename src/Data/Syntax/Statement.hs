@@ -2,11 +2,30 @@
 module Data.Syntax.Statement where
 
 import Data.Abstract.Evaluatable
+import Data.Aeson (ToJSON1 (..))
 import Data.ByteString.Char8 (unpack)
 import Data.JSON.Fields
+import Data.Semigroup.App
+import Data.Semigroup.Foldable
 import Diffing.Algorithm
 import Prelude
 import Prologue
+
+-- | Imperative sequence of statements/declarations s.t.:
+--
+--   1. Each statement’s effects on the store are accumulated;
+--   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
+--   3. Only the last statement’s return value is returned.
+newtype Statements a = Statements [a]
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
+
+instance Eq1 Statements where liftEq = genericLiftEq
+instance Ord1 Statements where liftCompare = genericLiftCompare
+instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
+instance ToJSON1 Statements
+
+instance Evaluatable Statements where
+  eval (Statements xs) = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
