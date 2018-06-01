@@ -62,7 +62,7 @@ handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pur
 
 -- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Sum fs) (Record Location))
-parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
+parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -209,7 +209,7 @@ instance Named String where
 
 instance Message String where
   encodeMessage = encodeMessageField
-  decodeMessage num = (Decode.at decodeMessageField num)
+  decodeMessage = Decode.at decodeMessageField
   dotProto _ = [Proto.DotProtoMessageField $ protoType (Proxy @String)]
 
 
@@ -217,13 +217,13 @@ errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList $ unErrorSite <$> (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
+unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack)) (Error.Error span errorExpected errorActual)
 
 data ErrorSite = ErrorSite { errorMessage :: ByteString, errorLocation :: SrcLoc }
   deriving (Eq, Show, Generic, Named, Message)
 
 errorSite :: (String, SrcLoc) -> ErrorSite
-errorSite = uncurry ErrorSite . (BC.pack *** id)
+errorSite = uncurry ErrorSite . first BC.pack
 
 unErrorSite :: ErrorSite -> (String, SrcLoc)
 unErrorSite ErrorSite{..} = (BC.unpack errorMessage, errorLocation)
