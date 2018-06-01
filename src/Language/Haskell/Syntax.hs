@@ -32,7 +32,7 @@ instance ToJSONFields1 StrictType
 
 instance Evaluatable StrictType
 
-data StrictTypeVariable a = StrictTypeVariable { strictTypeVariableIdentifier :: !a }
+newtype StrictTypeVariable a = StrictTypeVariable { strictTypeVariableIdentifier :: a }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 StrictTypeVariable where liftEq = genericLiftEq
