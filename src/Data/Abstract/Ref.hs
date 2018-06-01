@@ -12,3 +12,6 @@ data ValueRef address value where
   -- | An object member.
   LvalMember :: address -> Name -> ValueRef address value
   deriving (Eq, Ord, Show)
+
+
+newtype Ref address value = Ref address

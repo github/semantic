@@ -78,7 +78,7 @@ javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePat
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = do
   x <- evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-  pure (TermEvaluator (runAllocator (runTermEvaluator x >>= mapM deref)))
+  pure (TermEvaluator (runAllocator (map fst <$> runTermEvaluator x)))
 
 evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 

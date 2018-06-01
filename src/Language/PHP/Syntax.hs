@@ -49,31 +49,30 @@ resolvePHPName :: ( Member (Modules address value) effects
                -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
+  maybeM (throwResumable $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
+           , Member (Env address) effects
            , Member (Modules address value) effects
-           , Member (Reader (Environment address)) effects
-           , Member (Resumable (EnvironmentError address)) effects
            , Member (Resumable ResolutionError) effects
-           , Member (State (Environment address)) effects
-           , Member (State (Exports address)) effects
+           , Member (Resumable (EnvironmentError address)) effects
            , Member (State (Heap address (Cell address) value)) effects
            , Member Trace effects
            , Ord address
            , Reducer value (Cell address value)
            )
         => Subterm term (Evaluator address value effects (ValueRef address value))
-        -> (ModulePath -> Evaluator address value effects (Maybe (Environment address, address)))
+        -> (ModulePath -> Evaluator address value effects (Maybe (address, Environment address)))
         -> Evaluator address value effects (ValueRef address value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> box unit)
+  unitPtr <- box unit -- TODO don't always allocate, use maybeM
+  (v, importedEnv) <- fromMaybe (unitPtr, emptyEnv) <$> f path
   bindAll importedEnv
   pure (Rval v)
 

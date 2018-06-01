@@ -1,7 +1,6 @@
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
-  , intersect
   , delete
   , head
   , emptyEnv
@@ -10,6 +9,7 @@ module Data.Abstract.Environment
   , insert
   , lookup
   , names
+  , intersect
   , overwrite
   , pairs
   , unpairs

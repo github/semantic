@@ -42,7 +42,7 @@ instance Ord  (ClosureBody address body) where
   compare = compare `on` closureBodyId
 
 instance Show (ClosureBody address body) where
-  showsPrec d (ClosureBody i _) = showsBinaryWith showsPrec (const showChar) "ClosureBody" d i '_'
+  showsPrec d (ClosureBody i _) = showsUnaryWith showsPrec "ClosureBody" d i
 
 
 instance Ord address => ValueRoots address (Value address body) where
@@ -56,12 +56,12 @@ instance AbstractHole (Value address body) where
 
 instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
+         , Member (Env address) effects
          , Member Fresh effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
          , Member (Return address (Value address body)) effects
-         , Member (State (Environment address)) effects
          , Member (State (Heap address (Cell address) (Value address body))) effects
          , Ord address
          , Reducer (Value address body) (Cell address (Value address body))
@@ -72,7 +72,7 @@ instance ( Coercible body (Eff effects)
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) . Env.intersect (foldr Set.delete freeVariables parameters) <$> getEnv
+    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) <$> close (foldr Set.delete freeVariables parameters)
 
   call op params = do
     case op of
@@ -81,8 +81,8 @@ instance ( Coercible body (Eff effects)
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
-            a <- param
-            Env.insert name a <$> rest) (pure env) (zip names params)
+            addr <- param
+            Env.insert name addr <$> rest) (pure env) (zip names params)
           locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return ptr) -> pure ptr)
       _ -> box =<< throwValueError (CallError op)
 
@@ -107,14 +107,13 @@ instance Show address => AbstractIntro (Value address body) where
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
+         , Member (Env address) effects
          , Member Fresh effects
          , Member (LoopControl address (Value address body)) effects
-         , Member (Reader (Environment address)) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
          , Member (Return address (Value address body)) effects
-         , Member (State (Environment address)) effects
          , Member (State (Heap address (Cell address) (Value address body))) effects
          , Ord address
          , Reducer (Value address body) (Cell address (Value address body))

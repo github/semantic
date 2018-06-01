@@ -5,14 +5,13 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract
+import Control.Monad.Effect.Fail
 import Data.Semilattice.Lower
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 data EvaluatingState address value = EvaluatingState
-  { environment :: Environment address
-  , heap        :: Heap address (Cell address) value
-  , modules     :: ModuleTable (Maybe (Environment address, address))
-  , exports     :: Exports address
+  { heap        :: Heap address (Cell address) value
+  , modules     :: ModuleTable (Maybe (address, Environment address))
   }
 
 deriving instance (Eq (Cell address value), Eq address, Eq value) => Eq (EvaluatingState address value)
@@ -23,19 +22,13 @@ deriving instance (Show (Cell address value), Show address, Show value) => Show 
 evaluating :: Evaluator address value
                 (  Fail
                 ': Fresh
-                ': Reader (Environment address)
-                ': State (Environment address)
                 ': State (Heap address (Cell address) value)
-                ': State (ModuleTable (Maybe (Environment address, address)))
-                ': State (Exports address)
+                ': State (ModuleTable (Maybe (address, Environment address)))
                 ': effects) result
            -> Evaluator address value effects (Either String result, EvaluatingState address value)
 evaluating
-  = fmap (\ ((((result, env), heap), modules), exports) -> (result, EvaluatingState env heap modules exports))
-  . runState lowerBound -- State (Exports address)
-  . runState lowerBound -- State (ModuleTable (Maybe (Environment address, Address location value)))
+  = fmap (\ ((result, heap), modules) -> (result, EvaluatingState heap modules))
+  . runState lowerBound -- State (ModuleTable (Maybe (address, Environment address)))
   . runState lowerBound -- State (Heap address (Cell address) value)
-  . runState lowerBound -- State (Environment address)
-  . runReader lowerBound -- Reader (Environment address)
   . runFresh 0
   . runFail

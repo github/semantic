@@ -27,8 +27,7 @@ instance Evaluatable Function where
   eval Function{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
     (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermAddress functionBody))
-    bind name addr
-    rvalBox v
+    Rval addr <$ bind name addr
     where paramNames = foldMap (freeVariables . subterm)
 
 instance Declarations a => Declarations (Function a) where
@@ -53,8 +52,7 @@ instance Evaluatable Method where
   eval Method{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
     (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermAddress methodBody))
-    bind name addr
-    rvalBox v
+    Rval addr <$ bind name addr
     where paramNames = foldMap (freeVariables . subterm)
 
 

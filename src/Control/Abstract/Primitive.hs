@@ -14,9 +14,9 @@ import Prologue
 
 builtin :: ( HasCallStack
            , Member (Allocator address value) effects
+           , Member (Env address) effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
-           , Member (State (Environment address)) effects
            , Member (State (Heap address (Cell address) value)) effects
            , Ord address
            , Reducer value (Cell address value)
@@ -40,12 +40,11 @@ lambda body = do
 defineBuiltins :: ( AbstractValue address value effects
                   , HasCallStack
                   , Member (Allocator address value) effects
+                  , Member (Env address) effects
                   , Member Fresh effects
-                  , Member (Reader (Environment address)) effects
                   , Member (Reader ModuleInfo) effects
                   , Member (Reader Span) effects
                   , Member (Resumable (EnvironmentError address)) effects
-                  , Member (State (Environment address)) effects
                   , Member (State (Heap address (Cell address) value)) effects
                   , Member Trace effects
                   , Ord address

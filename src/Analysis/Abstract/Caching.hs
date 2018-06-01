@@ -62,7 +62,7 @@ cachingTerms :: ( Cacheable term address (Cell address) value
                 , Member (Reader (Cache term address (Cell address) value)) effects
                 , Member (Reader (Live address)) effects
                 , Member (State (Cache term address (Cell address) value)) effects
-                , Member (State (Environment address)) effects
+                , Member (Env address) effects
                 , Member (State (Heap address (Cell address) value)) effects
                 )
              => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address value))
@@ -82,11 +82,10 @@ convergingModules :: ( AbstractValue address value effects
                      , Member Fresh effects
                      , Member NonDet effects
                      , Member (Reader (Cache term address (Cell address) value)) effects
-                     , Member (Reader (Environment address)) effects
                      , Member (Reader (Live address)) effects
                      , Member (Resumable (EnvironmentError address)) effects
                      , Member (State (Cache term address (Cell address) value)) effects
-                     , Member (State (Environment address)) effects
+                     , Member (Env address) effects
                      , Member (State (Heap address (Cell address) value)) effects
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects address)
@@ -94,8 +93,7 @@ convergingModules :: ( AbstractValue address value effects
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
-  cache <- converge lowerBound (\ prevCache -> isolateCache $ do
-    TermEvaluator (putEnv  (configurationEnvironment c))
+  cache <- converge lowerBound (\ prevCache -> isolateCache $ raiseHandler locally $ do
     TermEvaluator (putHeap (configurationHeap        c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $

@@ -12,22 +12,22 @@ spec :: Spec
 spec = parallel $ do
   describe "PHP" $ do
     it "evaluates include and require" $ do
-      ((res, state), _) <- evaluate "main.php"
-      res `shouldBe` Right [unit]
-      Env.names (environment state) `shouldBe` [ "bar", "foo" ]
+      ((Right [(res, env)], state), _) <- evaluate "main.php"
+      res `shouldBe` unit
+      Env.names env `shouldBe` [ "bar", "foo" ]
 
     it "evaluates include_once and require_once" $ do
-      ((res, state), _) <- evaluate "main_once.php"
-      res `shouldBe` Right [unit]
-      Env.names (environment state) `shouldBe` [ "bar", "foo" ]
+      ((Right [(res, env)], state), _) <- evaluate "main_once.php"
+      res `shouldBe` unit
+      Env.names env `shouldBe` [ "bar", "foo" ]
 
     it "evaluates namespaces" $ do
-      ((_, state), _) <- evaluate "namespaces.php"
-      Env.names (environment state) `shouldBe` [ "Foo", "NS1" ]
+      ((Right [(_, env)], state), _) <- evaluate "namespaces.php"
+      Env.names env `shouldBe` [ "Foo", "NS1" ]
 
-      (derefQName (heap state) ("NS1" :| [])               (environment state) >>= deNamespace) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])
-      (derefQName (heap state) ("NS1" :| ["Sub1"])         (environment state) >>= deNamespace) `shouldBe` Just ("Sub1", ["Sub2"])
-      (derefQName (heap state) ("NS1" :| ["Sub1", "Sub2"]) (environment state) >>= deNamespace) `shouldBe` Just ("Sub2", ["f"])
+      (derefQName (heap state) ("NS1" :| [])               env >>= deNamespace) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])
+      (derefQName (heap state) ("NS1" :| ["Sub1"])         env >>= deNamespace) `shouldBe` Just ("Sub1", ["Sub2"])
+      (derefQName (heap state) ("NS1" :| ["Sub1", "Sub2"]) env >>= deNamespace) `shouldBe` Just ("Sub2", ["f"])
 
   where
     fixtures = "test/fixtures/php/analysis/"

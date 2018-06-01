@@ -161,7 +161,7 @@ asBool value = ifthenelse value (pure True) (pure False)
 
 -- | C-style for loops.
 forLoop :: ( AbstractValue address value effects
-           , Member (State (Environment address)) effects
+           , Member (Env address) effects
            )
         => Evaluator address value effects value -- ^ Initial statement
         -> Evaluator address value effects value -- ^ Condition
@@ -190,7 +190,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue address value effects
-                 , Member (State (Environment address)) effects
+                 , Member (Env address) effects
                  , Member (State (Heap address (Cell address) value)) effects
                  , Ord address
                  , Reducer value (Cell address value)
@@ -209,7 +209,7 @@ makeNamespace name addr super = do
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 evaluateInScopedEnv :: ( AbstractValue address value effects
-                       , Member (State (Environment address)) effects
+                       , Member (Env address) effects
                        )
                     => Evaluator address value effects value
                     -> Evaluator address value effects a
@@ -222,9 +222,8 @@ evaluateInScopedEnv scopedEnvTerm term = do
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
          , Member (Allocator address value) effects
-         , Member (Reader (Environment address)) effects
+         , Member (Env address) effects
          , Member (Resumable (EnvironmentError address)) effects
-         , Member (State (Environment address)) effects
          )
       => ValueRef address value
       -> Evaluator address value effects value
@@ -233,9 +232,8 @@ value = deref <=< address
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
                 , Member (Allocator address value) effects
-                , Member (Reader (Environment address)) effects
+                , Member (Env address) effects
                 , Member (Resumable (EnvironmentError address)) effects
-                , Member (State (Environment address)) effects
                 )
              => Subterm term (Evaluator address value effects (ValueRef address value))
              -> Evaluator address value effects value
@@ -243,9 +241,8 @@ subtermValue = value <=< subtermRef
 
 address :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
-           , Member (Reader (Environment address)) effects
+           , Member (Env address) effects
            , Member (Resumable (EnvironmentError address)) effects
-           , Member (State (Environment address)) effects
            )
         => ValueRef address value
         -> Evaluator address value effects address
@@ -255,9 +252,8 @@ address (Rval addr) = pure addr
 
 subtermAddress :: ( AbstractValue address value effects
                   , Member (Allocator address value) effects
-                  , Member (Reader (Environment address)) effects
+                  , Member (Env address) effects
                   , Member (Resumable (EnvironmentError address)) effects
-                  , Member (State (Environment address)) effects
                   )
                => Subterm term (Evaluator address value effects (ValueRef address value))
                -> Evaluator address value effects address
