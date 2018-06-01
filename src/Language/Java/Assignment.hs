@@ -314,7 +314,7 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
   where
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
-    makeInterface modifiers identifier typeParams interfaceBody = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier interfaceBody
+    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
@@ -324,12 +324,8 @@ package :: Assignment
 -- package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
 package = do
   loc <- symbol PackageDeclaration -- location which is calling the symbol API
-  c <- children $ do
-                  expressions <- someTerm expression
-                  pure (Java.Syntax.Package expressions)
+  c <- children $ do Java.Syntax.Package <$> someTerm expression
   pure (makeTerm loc c) -- pure is re-wrapping it back into the outer context, which in this case is Assignment (ie., the return type of the function)
-
-
 
 enum :: Assignment
 enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
