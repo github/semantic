@@ -10,7 +10,6 @@ module Data.Abstract.Type
 import Control.Abstract
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
-import Data.Semigroup.Reducer (Reducer)
 import Prologue hiding (TypeError)
 
 type TName = Int
@@ -121,9 +120,6 @@ instance ( Member (Allocator address Type) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
          , Member (Return address Type) effects
-         , Member (State (Heap address (Cell address) Type)) effects
-         , Ord address
-         , Reducer Type (Cell address Type)
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
@@ -151,9 +147,6 @@ instance ( Member (Allocator address Type) effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
          , Member (Return address Type) effects
-         , Member (State (Heap address (Cell address) Type)) effects
-         , Ord address
-         , Reducer Type (Cell address Type)
          )
       => AbstractValue address Type effects where
   array fields = do

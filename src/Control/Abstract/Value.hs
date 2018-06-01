@@ -15,20 +15,16 @@ module Control.Abstract.Value
 , rvalBox
 , subtermValue
 , subtermAddress
-, ValueRoots(..)
 ) where
 
-import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Environment as Env
-import Data.Abstract.Live (Live)
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
-import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Prelude
 import Prologue hiding (TypeError)
@@ -191,9 +187,7 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Env address) effects
-                 , Member (State (Heap address (Cell address) value)) effects
-                 , Ord address
-                 , Reducer value (Cell address value)
+                 , Member (Allocator address value) effects
                  )
               => Name
               -> address
@@ -259,17 +253,7 @@ subtermAddress :: ( AbstractValue address value effects
                -> Evaluator address value effects address
 subtermAddress = address <=< subtermRef
 
-rvalBox :: ( Member (Allocator address value) effects
-           , Member (State (Heap address (Cell address) value)) effects
-           , Ord address
-           , Reducer value (Cell address value)
-           )
+rvalBox :: Member (Allocator address value) effects
         => value
         -> Evaluator address value effects (ValueRef address value)
 rvalBox val = Rval <$> (box val)
-
-
--- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots address value where
-  -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: value -> Live address

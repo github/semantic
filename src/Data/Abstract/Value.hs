@@ -10,7 +10,6 @@ import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
-import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Prologue
 
@@ -62,9 +61,6 @@ instance ( Coercible body (Eff effects)
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
          , Member (Return address (Value address body)) effects
-         , Member (State (Heap address (Cell address) (Value address body))) effects
-         , Ord address
-         , Reducer (Value address body) (Cell address (Value address body))
          , Show address
          )
       => AbstractFunction address (Value address body) effects where
@@ -114,9 +110,6 @@ instance ( Coercible body (Eff effects)
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
          , Member (Return address (Value address body)) effects
-         , Member (State (Heap address (Cell address) (Value address body))) effects
-         , Ord address
-         , Reducer (Value address body) (Cell address (Value address body))
          , Show address
          )
       => AbstractValue address (Value address body) effects where

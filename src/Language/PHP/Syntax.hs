@@ -7,7 +7,6 @@ import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import           Data.Semigroup.Reducer (Reducer)
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue hiding (Text)
@@ -59,10 +58,7 @@ include :: ( AbstractValue address value effects
            , Member (Modules address value) effects
            , Member (Resumable ResolutionError) effects
            , Member (Resumable (EnvironmentError address)) effects
-           , Member (State (Heap address (Cell address) value)) effects
            , Member Trace effects
-           , Ord address
-           , Reducer value (Cell address value)
            )
         => Subterm term (Evaluator address value effects (ValueRef address value))
         -> (ModulePath -> Evaluator address value effects (Maybe (address, Environment address)))

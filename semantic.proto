@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "types.proto";
 package semantic;
 
 message HealthCheckRequest {
@@ -33,12 +34,6 @@ message BlobPair {
   Blob after = 2;
 }
 
-message Blob {
-  string source = 1;
-  string path = 2;
-  string language = 3;
-}
-
 message SummariesResponse {
   repeated Summary changes = 1;
   repeated Error errors = 2;
@@ -60,14 +55,4 @@ message Error {
   string error = 1;
   Span span = 2;
   string language = 3;
-}
-
-message Span {
-  Pos start = 1;
-  Pos end = 2;
-}
-
-message Pos {
-  int32 line = 1;
-  int32 column = 2;
 }
