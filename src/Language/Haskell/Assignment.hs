@@ -34,6 +34,7 @@ type Syntax = '[
   , Literal.Integer
   , Literal.TextElement
   , Syntax.Context
+  , Syntax.Deriving
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Field
@@ -78,6 +79,7 @@ expressionChoices = [
                     , character
                     , comment
                     , constructorIdentifier
+                    , derivingClause
                     , float
                     , functionConstructor
                     , functionDeclaration
@@ -107,7 +109,8 @@ algebraicDatatypeDeclaration = makeTerm
                             <*> children (Declaration.Datatype
                                         <$> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters))
                                         <*> ((symbol Constructors *> children (many constructor))
-                                            <|> pure []))
+                                            <|> pure [])
+                                        <*> (derivingClause <|> emptyTerm))
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -115,6 +118,9 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 constructor :: Assignment
 constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> typeConstructor <*> typeParameters))
            <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
+
+derivingClause :: Assignment
+derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> many typeConstructor)
 
 fields :: Assignment
 fields = makeTerm <$> symbol Fields <*> children (many field)
@@ -133,6 +139,9 @@ constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Id
 
 moduleIdentifier :: Assignment
 moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+
+typeClassIdentifier :: Assignment
+typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 typeConstructorIdentifier :: Assignment
 typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
@@ -205,13 +214,14 @@ string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 typeConstructor :: Assignment
-typeConstructor = typeConstructorIdentifier
+typeConstructor =  constructorIdentifier
                <|> functionConstructor
                <|> listConstructor
                <|> listType
+               <|> typeClassIdentifier
+               <|> typeConstructorIdentifier
                <|> tuplingConstructor
                <|> unitConstructor
-               <|> constructorIdentifier
 
 typeSynonymDeclaration :: Assignment
 typeSynonymDeclaration = makeTerm

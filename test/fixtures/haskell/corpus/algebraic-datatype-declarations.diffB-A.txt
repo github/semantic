@@ -5,7 +5,8 @@
       (Type
       { (Identifier)
       ->(Identifier) }
-        (TypeParameters)))
+        (TypeParameters))
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
@@ -16,7 +17,8 @@
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
-          (Identifier))))
+          (Identifier)))
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
@@ -28,7 +30,8 @@
       ->(Identifier) }
         (TypeParameters
           (StrictTypeVariable
-            (Identifier)))))
+            (Identifier))))
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
@@ -42,12 +45,21 @@
         (TypeParameters
           (StrictTypeVariable
             (Identifier))
-          (Identifier))))
+          (Identifier)))
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
+      (Constructor
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters))
+      (Constructor
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters))
     {+(Constructor
       {+(Identifier)+}
       {+(TypeParameters)+})+}
@@ -61,14 +73,6 @@
     {+(Constructor
       {+(Identifier)+}
       {+(TypeParameters)+})+}
-      (Constructor
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (Constructor
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
     {-(Constructor
       {-(Identifier)-}
       {-(TypeParameters)-})-}
@@ -77,7 +81,8 @@
       {-(TypeParameters)-})-}
     {-(Constructor
       {-(Identifier)-}
-      {-(TypeParameters)-})-})
+      {-(TypeParameters)-})-}
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
@@ -90,7 +95,8 @@
           (Field
             (Statements
               (Identifier))
-            (Identifier)))))
+            (Identifier))))
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
@@ -104,7 +110,8 @@
             (Statements
               (Identifier)
               (Identifier))
-            (Identifier)))))
+            (Identifier))))
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
@@ -123,7 +130,8 @@
           (Field
             (Statements
               (Identifier))
-            (Identifier)))))
+            (Identifier))))
+      (Empty))
     (Datatype
       (Type
       { (Identifier)
@@ -145,7 +153,8 @@
           (Field
             (Statements
               (Identifier))
-            (Identifier)))))
+            (Identifier))))
+      (Empty))
   {+(Datatype
     {+(Type
       {+(Identifier)+}
@@ -163,7 +172,8 @@
         {+(Field
           {+(Statements
             {+(Identifier)+})+}
-          {+(Identifier)+})+})+})+})+}
+          {+(Identifier)+})+})+})+}
+    {+(Empty)+})+}
     (Datatype
       (Type
         (Identifier)
@@ -181,7 +191,8 @@
           (Field
             (Statements
               (Identifier))
-            (Identifier)))))
+            (Identifier))))
+      (Empty))
   {-(Datatype
     {-(Type
       {-(Identifier)-}
@@ -199,4 +210,29 @@
         {-(Field
           {-(Statements
             {-(Identifier)-})-}
-          {-(Identifier)-})-})-})-})-}))
+          {-(Identifier)-})-})-})-}
+    {-(Empty)-})-}
+    (Datatype
+      (Type
+        (Identifier)
+        (TypeParameters))
+      (Constructor
+        (Identifier)
+        (TypeParameters))
+      (Deriving
+        (Identifier)))
+    (Datatype
+      (Type
+        (Identifier)
+        (TypeParameters))
+      (Constructor
+        (Identifier)
+        (TypeParameters))
+      (Deriving
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Identifier)))))

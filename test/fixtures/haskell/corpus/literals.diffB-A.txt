@@ -18,48 +18,48 @@
     {+(Identifier)+}
     {+(Statements
       {+(Integer)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Integer)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Integer)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
     (Function
     { (Identifier)
     ->(Identifier) }
       (Statements
-      {+(Float)+}
-      {-(Integer)-}))
+      { (Integer)
+      ->(Integer) }))
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Integer)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Float)+})+})+}
   {+(Function
     {+(Identifier)+}
     {+(Statements

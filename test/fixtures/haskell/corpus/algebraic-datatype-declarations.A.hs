@@ -16,3 +16,6 @@ data N = N { a :: !Int, b :: Int }
 data N = N { a, b :: {-#  UNPACK #-} !Int, c :: String }
 data N = N { a :: Int } | O { b :: String }
 data N = N { b :: Int } | O { c :: String }
+
+data N = N deriving Show
+data N = N deriving (Eq, Ord, Enum, Bounded, Show, Read)
