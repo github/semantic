@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds #-}
+{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving, DerivingStrategies #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
 module Data.Syntax where
 
@@ -209,8 +209,21 @@ errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorE
 unError :: Span -> Error a -> Error.Error String
 unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
 
-newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
-  deriving (Eq, Show)
+data ErrorSite = ErrorSite { errorMessage :: ByteString, errorLocation :: SrcLoc }
+  deriving (Eq, Show, Generic, Named, Message)
+
+newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Named, Message)
+  deriving newtype (MessageField)
+
+
+instance HasDefault ErrorStack where
+  def = ErrorStack mempty
+
+deriving instance Generic SrcLoc
+deriving instance Named SrcLoc
+deriving instance MessageField SrcLoc
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
