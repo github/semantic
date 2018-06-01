@@ -12,7 +12,6 @@ import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
-import           Data.Semigroup.Reducer (Reducer)
 import           Diffing.Algorithm
 import           Prelude
 import           Prologue
@@ -135,19 +134,14 @@ javascriptExtensions = ["js"]
 
 evalRequire :: ( AbstractValue address value effects
                , Member (Allocator address value) effects
+               , Member (Env address) effects
                , Member (Modules address value) effects
-               , Member (Reader (Environment address)) effects
-               , Member (State (Environment address)) effects
-               , Member (State (Exports address)) effects
-               , Member (State (Heap address (Cell address) value)) effects
-               , Ord address
-               , Reducer value (Cell address value)
                )
             => M.ModulePath
             -> Name
             -> Evaluator address value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
-  importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
+  importedEnv <- maybe emptyEnv snd <$> require modulePath
   bindAll importedEnv
   unit <$ makeNamespace alias addr Nothing
 
@@ -164,7 +158,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
+    importedEnv <- maybe emptyEnv snd <$> require modulePath
     bindAll (renamed importedEnv) $> Rval unit
     where
       renamed importedEnv
@@ -214,7 +208,7 @@ instance ToJSONFields1 SideEffectImport
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    void $ isolate (require modulePath)
+    void $ require modulePath
     pure (Rval unit)
 
 
@@ -232,7 +226,7 @@ instance Evaluatable QualifiedExport where
   eval (QualifiedExport exportSymbols) = do
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
-      addExport name alias Nothing
+      export name alias Nothing
     pure (Rval unit)
 
 
@@ -249,11 +243,11 @@ instance ToJSONFields1 QualifiedExportFrom
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
+    importedEnv <- maybe emptyEnv snd <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
-      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
+      maybe (throwEvalError $ ExportError modulePath name) (export name alias . Just) address
     pure (Rval unit)
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
@@ -272,8 +266,8 @@ instance Evaluatable DefaultExport where
       Just name -> do
         addr <- lookupOrAlloc name
         assign addr v
-        addExport name name Nothing
-        void $ bind name addr
+        export name name Nothing
+        bind name addr
       Nothing -> throwEvalError DefaultExportError
     pure (Rval unit)
 

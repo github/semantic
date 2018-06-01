@@ -12,20 +12,16 @@ module Control.Abstract.Value
 , evaluateInScopedEnv
 , value
 , subtermValue
-, ValueRoots(..)
 ) where
 
-import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Environment as Env
-import Data.Abstract.Live (Live)
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
-import Data.Semigroup.Reducer hiding (unit)
 import Data.Semilattice.Lower
 import Prelude
 import Prologue hiding (TypeError)
@@ -158,7 +154,7 @@ asBool value = ifthenelse value (pure True) (pure False)
 
 -- | C-style for loops.
 forLoop :: ( AbstractValue address value effects
-           , Member (State (Environment address)) effects
+           , Member (Env address) effects
            )
         => Evaluator address value effects value -- ^ Initial statement
         -> Evaluator address value effects value -- ^ Condition
@@ -187,10 +183,8 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue address value effects
-                 , Member (State (Environment address)) effects
-                 , Member (State (Heap address (Cell address) value)) effects
-                 , Ord address
-                 , Reducer value (Cell address value)
+                 , Member (Env address) effects
+                 , Member (Allocator address value) effects
                  )
               => Name
               -> address
@@ -206,7 +200,7 @@ makeNamespace name addr super = do
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 evaluateInScopedEnv :: ( AbstractValue address value effects
-                       , Member (State (Environment address)) effects
+                       , Member (Env address) effects
                        )
                     => Evaluator address value effects value
                     -> Evaluator address value effects value
@@ -219,9 +213,8 @@ evaluateInScopedEnv scopedEnvTerm term = do
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
          , Member (Allocator address value) effects
-         , Member (Reader (Environment address)) effects
+         , Member (Env address) effects
          , Member (Resumable (EnvironmentError address)) effects
-         , Member (State (Environment address)) effects
          )
       => ValueRef value
       -> Evaluator address value effects value
@@ -232,16 +225,9 @@ value (Rval val) = pure val
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
                 , Member (Allocator address value) effects
-                , Member (Reader (Environment address)) effects
+                , Member (Env address) effects
                 , Member (Resumable (EnvironmentError address)) effects
-                , Member (State (Environment address)) effects
                 )
              => Subterm term (Evaluator address value effects (ValueRef value))
              -> Evaluator address value effects value
 subtermValue = value <=< subtermRef
-
-
--- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots address value where
-  -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: value -> Live address

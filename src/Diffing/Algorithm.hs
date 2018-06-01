@@ -221,7 +221,7 @@ instance Diffable [] where
 
 -- | Diff two non-empty lists using RWS.
 instance Diffable NonEmpty where
-  algorithmFor (a1:|as1) (a2:|as2) = nonEmpty <$> byRWS (a1:as1) (a2:as2) >>= maybe empty pure
+  algorithmFor (a1:|as1) (a2:|as2) = nonEmpty <$> byRWS (a1:as1) (a2:as2) >>= maybeM empty
 
   tryAlignWith f (a1:|as1) (a2:|as2) = (:|) <$> f (These a1 a2) <*> tryAlignWith f as1 as2
 

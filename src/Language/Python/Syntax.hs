@@ -16,7 +16,6 @@ import           System.FilePath.Posix
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
-import qualified Data.Semigroup.Reducer as Reducer
 
 data QualifiedName
   = QualifiedName (NonEmpty FilePath)
@@ -82,7 +81,7 @@ resolvePythonModules q = do
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybe (throwResumable $ NotFoundError path searchPaths Language.Python) pure modulePath
+      maybeM (throwResumable $ NotFoundError path searchPaths Language.Python) modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).
@@ -113,11 +112,11 @@ instance Evaluatable Import where
     modulePaths <- resolvePythonModules name
 
     -- Eval parent modules first
-    for_ (NonEmpty.init modulePaths) (isolate . require)
+    for_ (NonEmpty.init modulePaths) require
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedEnv <- maybe emptyEnv fst <$> isolate (require path)
+    importedEnv <- maybe emptyEnv snd <$> require path
     bindAll (select importedEnv)
     pure (Rval unit)
     where
@@ -129,17 +128,12 @@ instance Evaluatable Import where
 -- Evaluate a qualified import
 evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (Allocator address value) effects
+                       , Member (Env address) effects
                        , Member (Modules address value) effects
-                       , Member (Reader (Environment address)) effects
-                       , Member (State (Environment address)) effects
-                       , Member (State (Exports address)) effects
-                       , Member (State (Heap address (Cell address) value)) effects
-                       , Ord address
-                       , Reducer.Reducer value (Cell address value)
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
-  importedEnv <- maybe emptyEnv fst <$> isolate (require path)
+  importedEnv <- maybe emptyEnv snd <$> require path
   bindAll importedEnv
   unit <$ makeNamespace name addr Nothing
 
@@ -163,7 +157,7 @@ instance Evaluatable QualifiedImport where
       go ((name, path) :| []) = evalQualifiedImport name path
       -- Evaluate each parent module, just creating a namespace
       go ((name, path) :| xs) = letrec' name $ \addr -> do
-        void $ isolate (require path)
+        void $ require path
         void $ go (NonEmpty.fromList xs)
         makeNamespace name addr Nothing
 
@@ -182,13 +176,13 @@ instance Evaluatable QualifiedAliasedImport where
     modulePaths <- resolvePythonModules name
 
     -- Evaluate each parent module
-    for_ (NonEmpty.init modulePaths) (isolate . require)
+    for_ (NonEmpty.init modulePaths) require
 
     -- Evaluate and import the last module, aliasing and updating the environment
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     Rval <$> letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
-      importedEnv <- maybe emptyEnv fst <$> isolate (require path)
+      importedEnv <- maybe emptyEnv snd <$> require path
       bindAll importedEnv
       unit <$ makeNamespace alias addr Nothing)
 

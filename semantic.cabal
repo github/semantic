@@ -40,7 +40,6 @@ library
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
-                     , Control.Abstract.Exports
                      , Control.Abstract.Heap
                      , Control.Abstract.Hole
                      , Control.Abstract.Matching
@@ -209,6 +208,8 @@ library
                      , text >= 1.2.1.3
                      , these
                      , time
+                     , proto3-suite
+                     , proto3-wire
                      , unix
                      , unordered-containers
                      , haskell-tree-sitter

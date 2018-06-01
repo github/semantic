@@ -20,13 +20,13 @@ spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
     (expected, _) <- evaluate (pure (integer 123))
-    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+    fst <$> expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
     (expected, _) <- evaluate $ do
       identity <- closure [name "x"] lowerBound (variable (name "x"))
       call identity [pure (integer 123)]
-    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+    fst <$> expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
 evaluate
   = runM
@@ -38,6 +38,7 @@ evaluate
   . runEnvironmentError
   . runAddressError
   . runAllocator
+  . runEnv lowerBound
   . runReturn
   . runLoopControl
 
