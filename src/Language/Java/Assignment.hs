@@ -352,7 +352,7 @@ type' =  choice [
      , identifier
      , generic
     ]
-    where array type' = foldl (\into each -> makeTerm1 (Type.Array (Just each) into)) type'
+    where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
 
 if' :: Assignment
 if' = makeTerm <$> symbol IfThenElseStatement <*> children (Statement.If <$> term expression <*> term expression <*> (term expression <|> emptyTerm))
