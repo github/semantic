@@ -1,7 +1,9 @@
 (Statements
   (Assignment
     (Identifier)
-    (And
-      (Identifier)
-    { (Integer)
-    ->(Integer) })))
+  { (Or
+    {-(Identifier)-}
+    {-(Integer)-})
+  ->(And
+    {+(Identifier)+}
+    {+(Integer)+}) }))

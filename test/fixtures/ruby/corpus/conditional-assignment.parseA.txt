@@ -1,6 +1,6 @@
 (Statements
   (Assignment
     (Identifier)
-    (And
+    (Or
       (Identifier)
       (Integer))))

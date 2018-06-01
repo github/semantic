@@ -4,6 +4,7 @@ module Data.Syntax.Type where
 import Data.Abstract.Evaluatable
 import Data.JSON.Fields
 import Diffing.Algorithm
+import Prelude hiding (Int, Float, Bool)
 import Prologue hiding (Map)
 
 data Array a = Array { arraySize :: !(Maybe a), arrayElementType :: !a }
@@ -127,3 +128,45 @@ instance Show1 TypeParameters where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for TypeParameters
 instance Evaluatable TypeParameters
+
+-- data instead of newtype because no payload
+data Void a = Void
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+
+instance Eq1 Void where liftEq = genericLiftEq
+instance Ord1 Void where liftCompare = genericLiftCompare
+instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Void
+instance Evaluatable Void
+
+-- data instead of newtype because no payload
+data Int a = Int
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+
+instance Eq1 Int where liftEq = genericLiftEq
+instance Ord1 Int where liftCompare = genericLiftCompare
+instance Show1 Int where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Int
+instance Evaluatable Int
+
+data Float a = Float | Double
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+
+instance Eq1 Float where liftEq = genericLiftEq
+instance Ord1 Float where liftCompare = genericLiftCompare
+instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Float
+instance Evaluatable Float
+
+data Bool a = Bool
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+
+instance Eq1 Bool where liftEq = genericLiftEq
+instance Ord1 Bool where liftCompare = genericLiftCompare
+instance Show1 Bool where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Float
+instance Evaluatable Bool

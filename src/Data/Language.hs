@@ -9,6 +9,7 @@ import Proto3.Suite
 data Language
     = Go
     | Haskell
+    | Java
     | JavaScript
     | JSON
     | JSX
@@ -22,6 +23,7 @@ data Language
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
+    ".java" -> Just Java
     ".json" -> Just JSON
     ".hs" -> Just Haskell
     ".md" -> Just Markdown
