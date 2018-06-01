@@ -279,7 +279,7 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
-    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) body = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params body
+    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params
 
 -- TODO: add genericType
 -- Question: should this genericType be part of type or not? Its own type because it's different structurally
