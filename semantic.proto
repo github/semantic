@@ -37,17 +37,16 @@ message BlobPair {
 
 message SummariesResponse {
   repeated Summary changes = 1;
-  repeated Error errors = 2;
+  repeated SummaryError errors = 2;
 }
 
 message ParseResponse {
   bytes json_tree = 1;
-  repeated Error errors = 2;
+  repeated SummaryError errors = 2;
 }
 
 message RawParseResponse {
   repeated Term terms = 1;
-  repeated Error errors = 2;
 }
 
 message Summary {
@@ -57,7 +56,7 @@ message Summary {
   string changeType = 4;
 }
 
-message Error {
+message SummaryError {
   string error = 1;
   Span span = 2;
   string language = 3;
