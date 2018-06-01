@@ -19,3 +19,7 @@ data N = N { b :: Text } | O { c :: Bool }
 
 data N = N deriving Show
 data N = N deriving (Functor, Ord, Enum, Bounded, Show, Read)
+
+data Monad a => N a = N a
+data (Ord a, Show a, Eq b) => N a b = N a b
+data (Eq (f a), Applicative f) => N f a = N f a

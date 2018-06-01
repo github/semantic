@@ -33,7 +33,9 @@ type Syntax = '[
   , Literal.Float
   , Literal.Integer
   , Literal.TextElement
+  , Syntax.Class
   , Syntax.Context
+  , Syntax.Context'
   , Syntax.Deriving
   , Syntax.Empty
   , Syntax.Error
@@ -78,6 +80,7 @@ expressionChoices = [
                       algebraicDatatypeDeclaration
                     , character
                     , comment
+                    , context'
                     , constructorIdentifier
                     , derivingClause
                     , float
@@ -107,7 +110,8 @@ algebraicDatatypeDeclaration :: Assignment
 algebraicDatatypeDeclaration = makeTerm
                             <$> symbol AlgebraicDatatypeDeclaration
                             <*> children (Declaration.Datatype
-                                        <$> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters))
+                                        <$> (context' <|> emptyTerm)
+                                        <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters))
                                         <*> ((symbol Constructors *> children (many constructor))
                                             <|> pure [])
                                         <*> (derivingClause <|> emptyTerm))
@@ -118,6 +122,15 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 constructor :: Assignment
 constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> typeConstructor <*> typeParameters))
            <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
+
+class' :: Assignment
+class' = makeTerm <$> symbol Class <*> children (Syntax.Class <$> typeConstructor <*> typeParameters)
+
+context' :: Assignment
+context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> many (type' <|> contextPattern))
+
+contextPattern :: Assignment
+contextPattern = symbol ContextPattern *> children (type')
 
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> many typeConstructor)
@@ -186,6 +199,9 @@ listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array 
 listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> many type')
 
+parenthesizedTypePattern :: Assignment
+parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children (typeParameters)
+
 strictType :: Assignment
 strictType = makeTerm' <$> symbol StrictType <*> children ((inject <$> (Syntax.StrictType <$> typeConstructor <*> typeParameters))
                                                         <|> (inject <$> (Syntax.StrictTypeVariable <$> typeVariableIdentifier)))
@@ -198,8 +214,10 @@ tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity 
 type' :: Assignment
 type' = (makeTerm <$> symbol Type <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))
      <|> (makeTerm <$> symbol TypePattern <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))
+     <|> parenthesizedTypePattern
      <|> strictType
      <|> typeConstructor
+     <|> class'
 
 typeParameters :: Assignment
 typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> many expression)

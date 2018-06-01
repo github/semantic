@@ -2,11 +2,13 @@
   (Empty)
   (Statements
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters
@@ -17,6 +19,7 @@
           (Identifier)))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters
@@ -28,6 +31,7 @@
             (Identifier))))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters
@@ -41,6 +45,7 @@
           (Identifier)))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -64,6 +69,7 @@
         (TypeParameters))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -76,6 +82,7 @@
             (Identifier))))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -89,6 +96,7 @@
             (Identifier))))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -107,6 +115,7 @@
             (Identifier))))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -128,6 +137,7 @@
             (Identifier))))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -147,6 +157,7 @@
             (Identifier))))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -166,6 +177,7 @@
             (Identifier))))
       (Empty))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -175,6 +187,7 @@
       (Deriving
         (Identifier)))
     (Datatype
+      (Empty)
       (Type
         (Identifier)
         (TypeParameters))
@@ -187,4 +200,67 @@
         (Identifier)
         (Identifier)
         (Identifier)
-        (Identifier)))))
+        (Identifier)))
+    (Datatype
+      (Context'
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier))))
+      (Type
+        (Identifier)
+        (TypeParameters
+          (Identifier)))
+      (Constructor
+        (Identifier)
+        (TypeParameters
+          (Identifier)))
+      (Empty))
+    (Datatype
+      (Context'
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier)))
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier)))
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier))))
+      (Type
+        (Identifier)
+        (TypeParameters
+          (Identifier)
+          (Identifier)))
+      (Constructor
+        (Identifier)
+        (TypeParameters
+          (Identifier)
+          (Identifier)))
+      (Empty))
+    (Datatype
+      (Context'
+        (Class
+          (Identifier)
+          (TypeParameters
+            (TypeParameters
+              (Identifier)
+              (Identifier))))
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier))))
+      (Type
+        (Identifier)
+        (TypeParameters
+          (Identifier)
+          (Identifier)))
+      (Constructor
+        (Identifier)
+        (TypeParameters
+          (Identifier)
+          (Identifier)))
+      (Empty))))

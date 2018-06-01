@@ -1,11 +1,6 @@
 (Module
   (Identifier)
   (Statements
-    (Function
-    { (Identifier)
-    ->(Identifier) }
-      (Statements
-        (Integer)))
   {+(Function
     {+(Identifier)+}
     {+(Statements
@@ -18,12 +13,14 @@
     {+(Identifier)+}
     {+(Statements
       {+(Integer)+})+})+}
-    (Function
-    { (Identifier)
-    ->(Identifier) }
-      (Statements
-      { (Integer)
-      ->(Integer) }))
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Integer)+})+})+}
+  {+(Function
+    {+(Identifier)+}
+    {+(Statements
+      {+(Integer)+})+})+}
   {+(Function
     {+(Identifier)+}
     {+(Statements
@@ -266,6 +263,14 @@
         {+(TextElement)+}
         {+(TextElement)+}
         {+(TextElement)+})+})+})+}
+  {-(Function
+    {-(Identifier)-}
+    {-(Statements
+      {-(Integer)-})-})-}
+  {-(Function
+    {-(Identifier)-}
+    {-(Statements
+      {-(Integer)-})-})-}
   {-(Function
     {-(Identifier)-}
     {-(Statements
