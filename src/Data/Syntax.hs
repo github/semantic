@@ -225,7 +225,6 @@ newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
   deriving anyclass (Named, Message)
   deriving newtype (MessageField)
 
-
 instance HasDefault ErrorStack where
   def = ErrorStack mempty
 
