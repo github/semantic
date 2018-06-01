@@ -145,13 +145,12 @@ expressionChoices =
   , continue
   , constructorDeclaration
   , explicitConstructorInvocation
-  -- , constantDeclaration
+  -- , TODO: constantDeclaration
   , doWhile
   , fieldDeclaration
   , float
   , for
   , enum
-  -- , hexadecimal
   , if'
   , interface
   , identifier
