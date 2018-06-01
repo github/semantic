@@ -332,7 +332,7 @@ enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.Enu
     where enumConstant = symbol EnumConstant *> children (term identifier)
 
 return' :: Assignment
-return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children (expression))
+return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expression)
 
 -- method expressions
 dims :: Assignment.Assignment [] Grammar [Term]
