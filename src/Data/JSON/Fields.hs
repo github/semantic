@@ -90,6 +90,9 @@ instance (GConstructorName1 f, GConstructorName1 g) => GConstructorName1 (f :+: 
 
 -- | A typeclass to calculate a list of 'KeyValue's describing the record selector names and associated values on a datatype.
 class GToJSONFields1 f where
+  -- FIXME: Not ideal to allocate a Map each time here, but not an obvious way
+  -- to deal with product types without record selectors that all end up as an
+  -- array under a "children" property.
   gtoJSONFields1 :: (ToJSON a) => f a -> Map.Map Text [SomeJSON]
 
 instance GToJSONFields1 f => GToJSONFields1 (M1 D c f) where
