@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Java.Syntax where
 
-import Data.Abstract.Evaluatable hiding (Label)
+import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import Prologue hiding (Constructor)
 import Data.JSON.Fields

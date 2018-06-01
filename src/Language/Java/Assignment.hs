@@ -7,7 +7,6 @@ module Language.Java.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error, while, try)
-import Data.Abstract.FreeVariables
 import Data.Abstract.Name
 import Data.Functor (($>))
 import Data.List.NonEmpty (some1)
@@ -28,9 +27,6 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Prelude hiding (break)
 import Prologue hiding (for, try, This)
-import GHC.TypeLits -- this is just to make sense of the Data kind (len :: Nat) example
-
--- data Vec a (len :: Nat)
 
 type Syntax =
   '[ Comment.Comment
