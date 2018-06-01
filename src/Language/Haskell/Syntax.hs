@@ -26,8 +26,6 @@ instance Eq1 StrictType where liftEq = genericLiftEq
 instance Ord1 StrictType where liftCompare = genericLiftCompare
 instance Show1 StrictType where liftShowsPrec = genericLiftShowsPrec
 
-instance ToJSONFields1 StrictType
-
 instance Evaluatable StrictType
 
 newtype StrictTypeVariable a = StrictTypeVariable { strictTypeVariableIdentifier :: a }
@@ -36,8 +34,6 @@ newtype StrictTypeVariable a = StrictTypeVariable { strictTypeVariableIdentifier
 instance Eq1 StrictTypeVariable where liftEq = genericLiftEq
 instance Ord1 StrictTypeVariable where liftCompare = genericLiftCompare
 instance Show1 StrictTypeVariable where liftShowsPrec = genericLiftShowsPrec
-
-instance ToJSONFields1 StrictTypeVariable
 
 instance Evaluatable StrictTypeVariable
 
@@ -102,18 +98,14 @@ instance Eq1 RecordDataConstructor where liftEq = genericLiftEq
 instance Ord1 RecordDataConstructor where liftCompare = genericLiftCompare
 instance Show1 RecordDataConstructor where liftShowsPrec = genericLiftShowsPrec
 
-instance ToJSONFields1 RecordDataConstructor
-
 instance Evaluatable RecordDataConstructor
 
-data Field a = Field { fieldName :: !a, fieldBody :: !a } 
+data Field a = Field { fieldName :: !a, fieldBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Field where liftEq = genericLiftEq
 instance Ord1 Field where liftCompare = genericLiftCompare
 instance Show1 Field where liftShowsPrec = genericLiftShowsPrec
-
-instance ToJSONFields1 Field
 
 instance Evaluatable Field
 
@@ -124,36 +116,31 @@ instance Eq1 Pragma where liftEq = genericLiftEq
 instance Ord1 Pragma where liftCompare = genericLiftCompare
 instance Show1 Pragma where liftShowsPrec = genericLiftShowsPrec
 
-instance ToJSONFields1 Pragma
-
 instance Evaluatable Pragma
 
-newtype Deriving a = Deriving [a] deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+newtype Deriving a = Deriving [a]
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Deriving where liftEq = genericLiftEq
 instance Ord1 Deriving where liftCompare = genericLiftCompare
 instance Show1 Deriving where liftShowsPrec = genericLiftShowsPrec
 
-instance ToJSONFields1 Deriving
-
 instance Evaluatable Deriving
 
-newtype Context' a = Context' [a] deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+newtype Context' a = Context' [a]
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Context' where liftEq = genericLiftEq
 instance Ord1 Context' where liftCompare = genericLiftCompare
 instance Show1 Context' where liftShowsPrec = genericLiftShowsPrec
 
-instance ToJSONFields1 Context'
-
 instance Evaluatable Context'
 
-data Class a = Class { classType :: a, classTypeParameters :: a } deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+data Class a = Class { classType :: a, classTypeParameters :: a }
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Class where liftEq = genericLiftEq
 instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
-
-instance ToJSONFields1 Class
 
 instance Evaluatable Class
