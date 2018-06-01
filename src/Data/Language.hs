@@ -3,6 +3,7 @@ module Data.Language where
 
 import Prologue
 import Data.Aeson
+import Proto3.Suite
 
 -- | A programming language.
 data Language
@@ -16,7 +17,7 @@ data Language
     | Ruby
     | TypeScript
     | PHP
-    deriving (Eq, Generic, Ord, Read, Show, ToJSON)
+    deriving (Eq, Generic, Ord, Read, Show, ToJSON, Named, Enum, Finite, Message)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language

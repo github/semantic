@@ -16,7 +16,6 @@ import           System.FilePath.Posix
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
-import qualified Data.Semigroup.Reducer as Reducer
 
 data QualifiedName
   = QualifiedName (NonEmpty FilePath)
@@ -129,9 +128,6 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (Allocator address value) effects
                        , Member (Env address) effects
                        , Member (Modules address value) effects
-                       , Member (State (Heap address (Cell address) value)) effects
-                       , Ord address
-                       , Reducer.Reducer value (Cell address value)
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do

@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Source
 ( Source
 , sourceBytes
@@ -36,10 +36,11 @@ import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
+import Proto3.Suite
 
 -- | The contents of a source file, represented as a 'ByteString'.
 newtype Source = Source { sourceBytes :: B.ByteString }
-  deriving (Eq, IsString, Show)
+  deriving (Eq, IsString, Show, Generic, MessageField)
 
 fromBytes :: B.ByteString -> Source
 fromBytes = Source
