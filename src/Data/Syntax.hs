@@ -202,6 +202,14 @@ instance ToJSONFields1 Error where
                                              , "actual" .= errorActual
                                              ]
 
+instance Named String where
+  nameOf _ = "String"
+
+instance Message String where
+  encodeMessage = encodeMessageField
+  decodeMessage num = (at decodeMessageField num)
+  dotProto _ = [Proto.DotProtoMessageField $ protoType (Proxy @String)]
+
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
