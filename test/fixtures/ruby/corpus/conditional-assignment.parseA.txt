@@ -1,6 +1,6 @@
 (Program
   (Assignment
     (Identifier)
-    (And
+    (Or
       (Identifier)
       (Integer))))

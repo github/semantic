@@ -250,7 +250,7 @@ functionDefinition =
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
 
 classDefinition :: Assignment
-classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> pure [] <*> term expression <*> argumentList <*> expressions)
+classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class [] <$> term expression <*> argumentList <*> expressions)
   where argumentList = symbol ArgumentList *> children (manyTerm expression)
                     <|> pure []
 

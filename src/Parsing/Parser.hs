@@ -12,6 +12,7 @@ module Parsing.Parser
 , ApplyAll'
 -- À la carte parsers
 , goParser
+, javaParser
 , jsonParser
 , markdownParser
 , pythonParser
@@ -35,6 +36,7 @@ import           Foreign.Ptr
 import qualified GHC.TypeLits as TypeLevel
 import qualified Language.Go.Assignment as Go
 import qualified Language.Haskell.Assignment as Haskell
+import qualified Language.Java.Assignment as Java
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
@@ -46,6 +48,7 @@ import           Prologue
 import           TreeSitter.Go
 import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
+import           TreeSitter.Java
 import           TreeSitter.PHP
 import           TreeSitter.Python
 import           TreeSitter.Ruby
@@ -67,6 +70,7 @@ data SomeAnalysisParser typeclasses ann where
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
+                      , ApplyAll' typeclasses Java.Syntax
                       , ApplyAll' typeclasses PHP.Syntax
                       , ApplyAll' typeclasses Python.Syntax
                       , ApplyAll' typeclasses Ruby.Syntax
@@ -77,6 +81,7 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    -> Language                                         -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
+someAnalysisParser _ Java       = SomeAnalysisParser javaParser Nothing
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just JavaScript))
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser Nothing
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
@@ -112,6 +117,7 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *
 --   > runTask (parse (someParser @'[Show1] language) blob) >>= putStrLn . withSomeTerm show
 someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum Haskell.Syntax)
+              , ApplyAll typeclasses (Sum Java.Syntax)
               , ApplyAll typeclasses (Sum JSON.Syntax)
               , ApplyAll typeclasses (Sum Markdown.Syntax)
               , ApplyAll typeclasses (Sum Python.Syntax)
@@ -122,6 +128,7 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
            => Language                                        -- ^ The 'Language' to select.
            -> Parser (SomeTerm typeclasses (Record Location)) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
 someParser Go         = SomeParser goParser
+someParser Java       = SomeParser javaParser
 someParser JavaScript = SomeParser typescriptParser
 someParser JSON       = SomeParser jsonParser
 someParser Haskell    = SomeParser haskellParser
@@ -144,6 +151,9 @@ phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+
+javaParser :: Parser Java.Term
+javaParser = AssignmentParser (ASTParser tree_sitter_java) Java.assignment
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
