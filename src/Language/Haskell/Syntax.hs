@@ -19,6 +19,28 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module
 
+data StrictType a = StrictType { strictTypeIdentifier :: !a, strictTypeParameters :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 StrictType where liftEq = genericLiftEq
+instance Ord1 StrictType where liftCompare = genericLiftCompare
+instance Show1 StrictType where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 StrictType
+
+instance Evaluatable StrictType
+
+newtype StrictTypeVariable a = StrictTypeVariable { strictTypeVariableIdentifier :: a }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 StrictTypeVariable where liftEq = genericLiftEq
+instance Ord1 StrictTypeVariable where liftCompare = genericLiftCompare
+instance Show1 StrictTypeVariable where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 StrictTypeVariable
+
+instance Evaluatable StrictTypeVariable
+
 data Type a = Type { typeIdentifier :: !a, typeParameters :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
@@ -68,3 +90,33 @@ instance Ord1 FunctionConstructor where liftCompare = genericLiftCompare
 instance Show1 FunctionConstructor where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable FunctionConstructor
+
+data RecordDataConstructor a = RecordDataConstructor { recordDataConstructorName :: !a, recordDataConstructorFields :: !a } deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 RecordDataConstructor where liftEq = genericLiftEq
+instance Ord1 RecordDataConstructor where liftCompare = genericLiftCompare
+instance Show1 RecordDataConstructor where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 RecordDataConstructor
+
+instance Evaluatable RecordDataConstructor
+
+data Field a = Field { fieldName :: !a, fieldBody :: !a } deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 Field where liftEq = genericLiftEq
+instance Ord1 Field where liftCompare = genericLiftCompare
+instance Show1 Field where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Field
+
+instance Evaluatable Field
+
+newtype Pragma a = Pragma ByteString deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 Pragma where liftEq = genericLiftEq
+instance Ord1 Pragma where liftCompare = genericLiftCompare
+instance Show1 Pragma where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Pragma
+
+instance Evaluatable Pragma

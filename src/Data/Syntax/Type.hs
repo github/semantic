@@ -6,7 +6,7 @@ import Data.JSON.Fields
 import Diffing.Algorithm
 import Prologue hiding (Map)
 
-data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
+data Array a = Array { arraySize :: !(Maybe a), arrayElementType :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Array where liftEq = genericLiftEq
@@ -30,7 +30,7 @@ instance Evaluatable Annotation where
   eval Annotation{annotationSubject = Subterm _ action} = action
 
 
-data Function a = Function { functionParameters :: [a], functionReturn :: a }
+data Function a = Function { functionParameters :: ![a], functionReturn :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Function where liftEq = genericLiftEq
@@ -52,7 +52,7 @@ instance Show1 Interface where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Interface
 
 
-data Map a = Map { mapKeyType :: a, mapElementType :: a }
+data Map a = Map { mapKeyType :: !a, mapElementType :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Map where liftEq = genericLiftEq
