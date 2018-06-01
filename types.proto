@@ -20,6 +20,22 @@ message Pos { int64 posLine = 1;
 message Span { Pos spanStart = 1;
                Pos spanEnd = 2;
              }
+message SrcLoc { string srcLocPackage = 1;
+                 string srcLocModule = 2;
+                 string srcLocFile = 3;
+                 int64 srcLocStartLine = 4;
+                 int64 srcLocStartCol = 5;
+                 int64 srcLocEndLine = 6;
+                 int64 srcLocEndCol = 7;
+               }
+message ErrorSite { bytes errorMessage = 1;
+                    SrcLoc errorLocation = 2;
+                  }
+message Error { repeated ErrorSite errorCallStack = 1;
+                repeated string errorExpected = 2;
+                string errorActual = 3;
+                repeated Term errorChildren = 4;
+              }
 message Array { repeated Term arrayElements = 1;
               }
 message Boolean { bool booleanContent = 1;

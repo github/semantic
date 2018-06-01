@@ -205,7 +205,7 @@ instance ToJSONFields1 Error where
                                              ]
 
 instance Named String where
-  nameOf _ = "String"
+  nameOf _ = "string"
 
 instance Message String where
   encodeMessage = encodeMessageField
