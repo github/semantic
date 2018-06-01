@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Data.Abstract.Name
 ( Name
 -- * Constructors
@@ -13,12 +14,24 @@ import           Data.String
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
 import           Prologue
+import Proto3.Suite
+import qualified Proto3.Wire.Decode as Decode
+import qualified Proto3.Wire.Encode as Encode
 
 -- | The type of variable names.
 data Name
   = Name ByteString
   | I Int
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, MessageField)
+
+instance HasDefault Name where
+  def = Name mempty
+
+instance Primitive Name where
+  encodePrimitive num (Name bytes) = Encode.byteString num bytes
+  encodePrimitive num (I _) = error "We should never be encoding I :: Name constructors"
+  decodePrimitive = Name <$> Decode.byteString
+  primType _ = Bytes
 
 -- | Construct a 'Name' from a 'ByteString'.
 name :: ByteString -> Name
