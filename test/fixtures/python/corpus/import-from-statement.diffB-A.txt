@@ -1,10 +1,10 @@
-(Program
-{+(Import)+}
-{ (Import)
-->(Import) }
+(Statements
 {+(Import)+}
 {+(Import)+}
 {+(Import)+}
+{+(Import)+}
+{+(Import)+}
+{-(Import)-}
 {-(Import)-}
 {-(Import)-}
 {-(Import)-}

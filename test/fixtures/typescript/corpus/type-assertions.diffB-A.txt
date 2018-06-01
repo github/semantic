@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(TypeAssertion
   {+(TypeArguments
     {+(PredefinedType)+})+}

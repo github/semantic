@@ -86,11 +86,11 @@ type Syntax =
    , Statement.NoOp
    , Statement.Pattern
    , Statement.Return
+   , Statement.Statements
    , Syntax.Context
    , Syntax.Error
    , Syntax.Empty
    , Syntax.Identifier
-   , Syntax.Program
    , Type.Annotation
    , Type.Array
    , Type.Function
@@ -111,7 +111,7 @@ assignment :: Assignment
 assignment = handleError program <|> parseError
 
 program :: Assignment
-program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> manyTerm expression)
+program = makeTerm <$> symbol SourceFile <*> children (Statement.Statements <$> manyTerm expression)
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))

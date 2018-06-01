@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Annotation
     (Function
     { (Identifier)
