@@ -5,7 +5,6 @@ import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Aeson
-import qualified Data.ByteString.Char8 as BC
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import qualified Data.Language as Language

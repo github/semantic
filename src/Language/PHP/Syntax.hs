@@ -4,7 +4,6 @@ module Language.PHP.Syntax where
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
-import qualified Data.ByteString.Char8 as BC
 import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
@@ -12,11 +11,11 @@ import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue hiding (Text)
 
-newtype Text a = Text ByteString
+newtype Text a = Text T.Text
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Text where
-  toJSONFields1 (Text t) = noChildren ["asString" .= BC.unpack t]
+  toJSONFields1 (Text t) = noChildren ["asString" .= t]
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Ord1 Text where liftCompare = genericLiftCompare
@@ -158,7 +157,7 @@ instance Evaluatable SimpleVariable
 
 
 -- | TODO: Unify with TypeScript's PredefinedType
-newtype CastType a = CastType { _castType :: ByteString }
+newtype CastType a = CastType { _castType :: T.Text }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 CastType
@@ -188,7 +187,7 @@ instance Ord1 Clone where liftCompare = genericLiftCompare
 instance Show1 Clone where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Clone
 
-newtype ShellCommand a = ShellCommand ByteString
+newtype ShellCommand a = ShellCommand T.Text
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ShellCommand
@@ -219,7 +218,7 @@ instance Ord1 NewVariable where liftCompare = genericLiftCompare
 instance Show1 NewVariable where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NewVariable
 
-newtype RelativeScope a = RelativeScope ByteString
+newtype RelativeScope a = RelativeScope T.Text
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 RelativeScope
@@ -335,7 +334,7 @@ instance Ord1 BaseTypeDeclaration where liftCompare = genericLiftCompare
 instance Show1 BaseTypeDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BaseTypeDeclaration
 
-newtype ScalarType a = ScalarType ByteString
+newtype ScalarType a = ScalarType T.Text
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ScalarType
@@ -516,7 +515,7 @@ instance Ord1 DestructorDeclaration where liftCompare = genericLiftCompare
 instance Show1 DestructorDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable DestructorDeclaration
 
-newtype Static a = Static ByteString
+newtype Static a = Static T.Text
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Static
@@ -526,7 +525,7 @@ instance Ord1 Static where liftCompare = genericLiftCompare
 instance Show1 Static where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Static
 
-newtype ClassModifier a = ClassModifier ByteString
+newtype ClassModifier a = ClassModifier T.Text
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 ClassModifier

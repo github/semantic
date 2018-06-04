@@ -2,7 +2,6 @@
 module Data.Syntax.Statement where
 
 import Data.Abstract.Evaluatable
-import Data.ByteString.Char8 (unpack)
 import Data.JSON.Fields
 import Diffing.Algorithm
 import Prelude
@@ -368,7 +367,7 @@ instance ToJSONFields1 ScopeExit
 instance Evaluatable ScopeExit
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
-newtype HashBang a = HashBang ByteString
+newtype HashBang a = HashBang Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 HashBang where liftEq = genericLiftEq
@@ -376,7 +375,7 @@ instance Ord1 HashBang where liftCompare = genericLiftCompare
 instance Show1 HashBang where liftShowsPrec = genericLiftShowsPrec
 
 instance ToJSONFields1 HashBang where
-  toJSONFields1 (HashBang f) = noChildren [ "contents" .= unpack f ]
+  toJSONFields1 (HashBang f) = noChildren [ "contents" .= f ]
 
 -- TODO: Implement Eval instance for HashBang
 instance Evaluatable HashBang

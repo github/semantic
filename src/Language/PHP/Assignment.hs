@@ -159,10 +159,10 @@ someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
 someTerm' = NonEmpty.some1 . commentedTerm
 
 text :: Assignment
-text = makeTerm <$> symbol Text <*> (Syntax.Text <$> rawSource)
+text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
 
 textInterpolation :: Assignment
-textInterpolation = makeTerm <$> symbol TextInterpolation <*> (Syntax.Text <$> rawSource)
+textInterpolation = makeTerm <$> symbol TextInterpolation <*> (Syntax.Text <$> source)
 
 statement :: Assignment
 statement = handleError everything
@@ -407,7 +407,7 @@ baseTypeDeclaration :: Assignment
 baseTypeDeclaration = makeTerm <$> symbol BaseTypeDeclaration <*> children (Syntax.BaseTypeDeclaration <$> term (scalarType <|> qualifiedName <|> emptyTerm))
 
 scalarType :: Assignment
-scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> rawSource)
+scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> source)
 
 compoundStatement :: Assignment
 compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
@@ -466,7 +466,7 @@ memberName :: Assignment
 memberName = name <|> simpleVariable' <|> expression
 
 relativeScope :: Assignment
-relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> rawSource)
+relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
 
 qualifiedName :: Assignment
 qualifiedName = makeTerm <$> symbol QualifiedName <*> children (Syntax.QualifiedName <$> (term namespaceNameAsPrefix <|> emptyTerm) <*> term name)
@@ -481,7 +481,7 @@ updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
 
 shellCommandExpression :: Assignment
-shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> (Syntax.ShellCommand <$> rawSource)
+shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> (Syntax.ShellCommand <$> source)
 
 literal :: Assignment
 literal = integer <|> float <|> string
@@ -502,7 +502,7 @@ castExpression :: Assignment
 castExpression = makeTerm <$> (symbol CastExpression <|> symbol CastExpression') <*> children (flip Expression.Cast <$> term castType <*> term unaryExpression)
 
 castType :: Assignment
-castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> rawSource)
+castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
 
 expressionStatement :: Assignment
 expressionStatement = symbol ExpressionStatement *> children (term expression)
@@ -671,10 +671,10 @@ methodModifier = choice [
   ]
 
 staticModifier :: Assignment
-staticModifier = makeTerm <$> symbol StaticModifier <*> (Syntax.Static <$> rawSource)
+staticModifier = makeTerm <$> symbol StaticModifier <*> (Syntax.Static <$> source)
 
 classModifier :: Assignment
-classModifier = makeTerm <$> symbol ClassModifier <*> (Syntax.ClassModifier <$> rawSource)
+classModifier = makeTerm <$> symbol ClassModifier <*> (Syntax.ClassModifier <$> source)
 
 traitUseClause :: Assignment
 traitUseClause = makeTerm <$> symbol TraitUseClause <*> children (Syntax.TraitUseClause <$> someTerm qualifiedName <*> (term traitUseSpecification <|> emptyTerm))

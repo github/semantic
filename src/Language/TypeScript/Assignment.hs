@@ -632,7 +632,7 @@ throwStatement :: Assignment
 throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> term expressions)
 
 hashBang :: Assignment
-hashBang = makeTerm <$> symbol HashBangLine <*> (Statement.HashBang <$> rawSource)
+hashBang = makeTerm <$> symbol HashBangLine <*> (Statement.HashBang <$> source)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (TypeScript.Syntax.LabeledStatement <$> statementIdentifier <*> term statement)
