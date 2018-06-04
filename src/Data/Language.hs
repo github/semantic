@@ -38,7 +38,7 @@ instance Primitive Language where
   primType _ = primType (Proxy @(Enumerated Language))
   encodePrimitive f = encodePrimitive f . Enumerated . Right
   decodePrimitive   = decodePrimitive >>= \case
-    (Enumerated (Right r)) -> pure (succ r)
+    (Enumerated (Right r)) -> pure r
     other                  -> Prelude.fail ("Language decodeMessageField: unexpected value" <> show other)
 
 -- | Returns a Language based on the file extension (including the ".").
