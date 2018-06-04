@@ -181,7 +181,7 @@ programWithChange body = merge (programInfo, programInfo) (inject [ function' ])
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (programInfo, programInfo) (inject [ function', term' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (inject (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inject []))))
+    function' = merge (Just (FunctionDeclaration "foo" mempty Unknown) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Unknown) :. emptyInfo) (inject (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inject []))))
     name' = let info = Nothing :. emptyInfo in  merge (info, info) (inject (Syntax.Identifier (name "foo")))
     term' = inserting term
 
@@ -198,7 +198,7 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (programInfo, programInfo) (inject [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf n body = termIn (Just (FunctionDeclaration n mempty Nothing) :. emptyInfo) (inject (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inject [body]))))
+functionOf n body = termIn (Just (FunctionDeclaration n mempty Unknown) :. emptyInfo) (inject (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inject [body]))))
   where
     name' = termIn (Nothing :. emptyInfo) (inject (Syntax.Identifier (name n)))
 
