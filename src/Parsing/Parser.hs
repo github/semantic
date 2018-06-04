@@ -193,4 +193,5 @@ someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: 
 someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
 someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
 someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
+someASTParser Markdown   = Nothing
 someASTParser Unknown    = Nothing

@@ -9,7 +9,6 @@ import Data.Blob
 import Data.JSON.Fields
 import Data.Record
 import Data.Term
-import Data.Language (ensureLanguage)
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
