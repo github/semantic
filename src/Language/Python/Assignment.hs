@@ -366,7 +366,7 @@ integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))

@@ -2,8 +2,8 @@
 module Language.Markdown.Syntax where
 
 import Prologue hiding (Text)
-import Data.ByteString.Char8 (unpack)
 import Data.JSON.Fields
+import qualified Data.Text as T
 import Diffing.Algorithm
 
 newtype Document a = Document [a]
@@ -73,9 +73,9 @@ instance Ord1 ThematicBreak where liftCompare = genericLiftCompare
 instance Show1 ThematicBreak where liftShowsPrec = genericLiftShowsPrec
 
 instance ToJSONFields1 HTMLBlock where
-  toJSONFields1 (HTMLBlock b) = noChildren [ "asString" .= unpack b ]
+  toJSONFields1 (HTMLBlock b) = noChildren [ "asString" .= b ]
 
-newtype HTMLBlock a = HTMLBlock ByteString
+newtype HTMLBlock a = HTMLBlock T.Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 HTMLBlock where liftEq = genericLiftEq
@@ -130,17 +130,18 @@ instance Eq1 Emphasis where liftEq = genericLiftEq
 instance Ord1 Emphasis where liftCompare = genericLiftCompare
 instance Show1 Emphasis where liftShowsPrec = genericLiftShowsPrec
 
-newtype Text a = Text ByteString
+-- TODO: Rename this and import Data.Text unqualified
+newtype Text a = Text T.Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Text where
-  toJSONFields1 (Text s) = noChildren ["asString" .= unpack s ]
+  toJSONFields1 (Text s) = noChildren ["asString" .= s ]
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Ord1 Text where liftCompare = genericLiftCompare
 instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
 
-data Link a = Link { linkURL :: ByteString, linkTitle :: Maybe ByteString }
+data Link a = Link { linkURL :: T.Text, linkTitle :: Maybe T.Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 -- TODO: Better ToJSONFields1 instance
@@ -150,7 +151,7 @@ instance Eq1 Link where liftEq = genericLiftEq
 instance Ord1 Link where liftCompare = genericLiftCompare
 instance Show1 Link where liftShowsPrec = genericLiftShowsPrec
 
-data Image a = Image { imageURL :: ByteString, imageTitle :: Maybe ByteString }
+data Image a = Image { imageURL :: T.Text, imageTitle :: Maybe T.Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 -- TODO: Better ToJSONFields1 instance
@@ -160,7 +161,7 @@ instance Eq1 Image where liftEq = genericLiftEq
 instance Ord1 Image where liftCompare = genericLiftCompare
 instance Show1 Image where liftShowsPrec = genericLiftShowsPrec
 
-data Code a = Code { codeLanguage :: Maybe ByteString, codeContent :: ByteString }
+data Code a = Code { codeLanguage :: Maybe T.Text, codeContent :: T.Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 -- TODO: Better ToJSONFields1 instance

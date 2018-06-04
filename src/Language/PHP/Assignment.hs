@@ -757,7 +757,7 @@ staticVariableDeclaration :: Assignment
 staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment <$> pure [] <*> term variableName <*> (term expression <|> emptyTerm))
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 string :: Assignment
 string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.TextElement <$> source)

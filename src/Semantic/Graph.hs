@@ -21,7 +21,6 @@ import           Analysis.Abstract.Graph
 import           Control.Abstract
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
-import           Control.Monad.Effect.Trace
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module

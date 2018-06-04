@@ -216,7 +216,7 @@ expressions = makeTerm'' <$> location <*> manyTerm expression
 -- Literals
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 compositeLiteral :: Assignment
 compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Go.Syntax.Composite <$> expression <*> expression)

@@ -69,7 +69,7 @@ term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 variableIdentifier :: Assignment
 variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)

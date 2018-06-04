@@ -774,7 +774,7 @@ arrowFunction = makeArrowFun <$> symbol ArrowFunction <*> children ((,,) <$> emp
   where makeArrowFun loc (identifier, (typeParams, params, returnTy), body) = makeTerm loc (Declaration.Function [ typeParams, returnTy ] identifier params body)
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 ifStatement :: Assignment
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term parenthesizedExpression <*> term statement <*> (term statement <|> emptyTerm))

@@ -282,7 +282,7 @@ block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
         params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
-comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> rawSource)
+comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
 alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
