@@ -38,6 +38,7 @@ import Prologue
 -- | The type of TypeScript syntax.
 type Syntax = '[
     Comment.Comment
+  , Comment.HashBang    
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
@@ -83,7 +84,6 @@ type Syntax = '[
   , Statement.Finally
   , Statement.For
   , Statement.ForEach
-  , Statement.HashBang
   , Statement.If
   , Statement.Match
   , Statement.Pattern
@@ -636,7 +636,7 @@ throwStatement :: Assignment
 throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> term expressions)
 
 hashBang :: Assignment
-hashBang = makeTerm <$> symbol HashBangLine <*> (Statement.HashBang <$> source)
+hashBang = makeTerm <$> symbol HashBangLine <*> (Comment.HashBang <$> source)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (TypeScript.Syntax.LabeledStatement <$> statementIdentifier <*> term statement)

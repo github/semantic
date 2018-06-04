@@ -21,7 +21,7 @@ data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
 importPath :: Text -> ImportPath
 importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- TODO: head is partial
+    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- head call here is safe
                 | otherwise = NonRelative
 
 defaultAlias :: ImportPath -> Name

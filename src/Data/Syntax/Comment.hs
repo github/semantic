@@ -21,3 +21,14 @@ instance Evaluatable Comment where
 -- TODO: documentation comment types
 -- TODO: literate programming comment types? alternatively, consider those as markup
 -- TODO: Differentiate between line/block comments?
+
+-- | HashBang line (e.g. `#!/usr/bin/env node`)
+newtype HashBang a = HashBang Text
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
+
+instance Eq1 HashBang where liftEq = genericLiftEq
+instance Ord1 HashBang where liftCompare = genericLiftCompare
+instance Show1 HashBang where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for HashBang
+instance Evaluatable HashBang
