@@ -274,7 +274,7 @@ instance Listable Declaration where
   tiers
     =  cons4 MethodDeclaration
     \/ cons3 FunctionDeclaration
-    \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
+    \/ cons2 (\ a b -> ErrorDeclaration a b Language.Unknown)
 
 instance Listable CyclomaticComplexity where
   tiers = cons1 CyclomaticComplexity
