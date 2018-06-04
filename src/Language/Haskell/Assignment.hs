@@ -130,7 +130,7 @@ context' :: Assignment
 context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> many (type' <|> contextPattern))
 
 contextPattern :: Assignment
-contextPattern = symbol ContextPattern *> children (type')
+contextPattern = symbol ContextPattern *> children type'
 
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> many typeConstructor)
@@ -200,7 +200,7 @@ listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> many type')
 
 parenthesizedTypePattern :: Assignment
-parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children (typeParameters)
+parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children typeParameters
 
 strictType :: Assignment
 strictType = makeTerm' <$> symbol StrictType <*> children ((inject <$> (Syntax.StrictType <$> typeConstructor <*> typeParameters))
