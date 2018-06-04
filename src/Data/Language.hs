@@ -1,12 +1,13 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, LambdaCase #-}
 module Data.Language where
 
-import Prologue
 import Data.Aeson
-import Debug.Trace
+import Prologue
 import Proto3.Suite
 
--- | A programming language.
+-- | The various languages we support.
+-- Please do not reorder any of the field names: the current implementation of 'Primitive'
+-- delegates to the auto-generated 'Enum' instance.
 data Language
     = Unknown
     | Go
@@ -22,14 +23,16 @@ data Language
     | PHP
     deriving (Eq, Generic, Ord, Read, Show, Bounded, ToJSON, Named, Enum, Finite, MessageField)
 
+-- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
 knownLanguage = (/= Unknown)
 
+-- | Returns 'Nothing' when passed 'Unknown'.
 ensureLanguage :: Language -> Maybe Language
 ensureLanguage Unknown = Nothing
-ensureLanguage x = Just x
+ensureLanguage x       = Just x
 
--- | Defaults to 'PACKAGE'.
+-- | Defaults to 'Unknown'.
 instance HasDefault Language where def = Unknown
 
 -- | Piggybacks on top of the 'Enumerated' instance, as the generated code would.
@@ -46,26 +49,26 @@ languageForType :: String -> Language
 languageForType mediaType = case mediaType of
     ".java" -> Java
     ".json" -> JSON
-    ".hs" -> Haskell
-    ".md" -> Markdown
-    ".rb" -> Ruby
-    ".go" -> Go
-    ".js" -> JavaScript
-    ".ts" -> TypeScript
-    ".tsx" -> TypeScript
-    ".jsx" -> JSX
-    ".py" -> Python
-    ".php" -> PHP
+    ".hs"   -> Haskell
+    ".md"   -> Markdown
+    ".rb"   -> Ruby
+    ".go"   -> Go
+    ".js"   -> JavaScript
+    ".ts"   -> TypeScript
+    ".tsx"  -> TypeScript
+    ".jsx"  -> JSX
+    ".py"   -> Python
+    ".php"  -> PHP
     ".phpt" -> PHP
-    _ -> Unknown
+    _       -> Unknown
 
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
-  Go -> [".go"]
-  Haskell -> [".hs"]
+  Go         -> [".go"]
+  Haskell    -> [".hs"]
   JavaScript -> [".js"]
-  PHP -> [".php"]
-  Python -> [".py"]
-  Ruby -> [".rb"]
+  PHP        -> [".php"]
+  Python     -> [".py"]
+  Ruby       -> [".rb"]
   TypeScript -> [".ts", ".tsx", ".d.tsx"]
-  _ -> []
+  _          -> []
