@@ -11,7 +11,18 @@ import Data.Abstract.Name (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm''
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -80,6 +91,7 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Statements
   , Statement.Throw
   , Statement.Try
   , Statement.While
@@ -88,7 +100,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Program
   , Syntax.Context
   , Type.Readonly
   , Type.TypeParameters
@@ -175,14 +186,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyTerm statement) <|> parseError
-
--- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
-manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
-
-term :: Assignment -> Assignment
-term term = contextualize comment (postContextualize comment term)
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
 
 expression :: Assignment
 expression = handleError everything
@@ -857,6 +861,16 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inject .) . Expression.GreaterThanEqual   <$ symbol AnonRAngleEqual
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
+
+
+-- Helpers
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
+term :: Assignment -> Assignment
+term term = contextualize comment (postContextualize comment term)
 
 emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)

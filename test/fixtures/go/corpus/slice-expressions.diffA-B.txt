@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -18,24 +18,33 @@
       { (Integer)
       ->(Integer) }
         (Empty))
-      (Slice
-        (Identifier)
-      { (Empty)
-      ->(Integer) }
-      { (Empty)
-      ->(Integer) }
-        (Empty))
-      (Slice
-        (Identifier)
-      { (Integer)
-      ->(Integer) }
-      { (Integer)
-      ->(Integer) }
-      { (Integer)
-      ->(Integer) })
-      (Slice
-      { (Identifier)
-      ->(Identifier) }
-        (Integer)
-        (Integer)
-        (Empty)))))
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Integer)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Integer)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Empty)-})-})))

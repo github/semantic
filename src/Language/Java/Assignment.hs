@@ -80,6 +80,7 @@ type Syntax =
    , Statement.PreIncrement
    , Statement.PreDecrement
    , Statement.While
+   , Statement.Statements
    , Statement.Throw
    , Statement.Try
    , Syntax.Context
@@ -87,7 +88,6 @@ type Syntax =
    , Syntax.Error
    , Syntax.Identifier
    , Syntax.AccessibilityModifier
-   , Syntax.Program
    , Type.Array
    , Type.Bool
    , Type.Int
@@ -103,7 +103,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Java's grammar onto a program in Java's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Grammar.Program <*> children (Syntax.Program <$> manyTerm expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Grammar.Program <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]

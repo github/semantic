@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(Not
   {+(Equal
     {+(Identifier)+}
@@ -17,9 +17,12 @@
   {+(Equal
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-{+(GreaterThan
+{ (LessThan
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(GreaterThan
   {+(Identifier)+}
-  {+(Identifier)+})+}
+  {+(Identifier)+}) }
 {+(GreaterThanEqual
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -27,18 +30,14 @@
   {+(Equal
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-{+(LessThanEqual
-  {+(Identifier)+}
-  {+(Identifier)+})+}
+  (LessThanEqual
+  { (Identifier)
+  ->(Identifier) }
+  { (Identifier)
+  ->(Identifier) })
 {+(LessThan
   {+(Identifier)+}
   {+(Identifier)+})+}
-{-(LessThan
-  {-(Identifier)-}
-  {-(Identifier)-})-}
-{-(LessThanEqual
-  {-(Identifier)-}
-  {-(Identifier)-})-}
 {-(Not
   {-(Equal
     {-(Identifier)-}

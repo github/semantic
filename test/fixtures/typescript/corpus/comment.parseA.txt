@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Context
     (Comment)
     (Empty)))

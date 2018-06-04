@@ -1,8 +1,18 @@
-(Program
+(Statements
 {+(LessThan
   {+(Identifier)+}
   {+(Identifier)+})+}
 {+(LessThanEqual
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(Not
+  {+(Equal
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
+{+(GreaterThanEqual
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(GreaterThan
   {+(Identifier)+}
   {+(Identifier)+})+}
   (Not
@@ -11,34 +21,22 @@
     ->(Identifier) }
     { (Identifier)
     ->(Identifier) }))
-{+(GreaterThanEqual
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{+(GreaterThan
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{+(Not
-  {+(Equal
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
 {+(Member
   {+(Identifier)+}
   {+(Identifier)+})+}
 {+(Equal
   {+(Identifier)+}
   {+(Identifier)+})+}
-{+(Not
-  {+(Member
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
+  (Not
+    (Member
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) }))
 {+(Not
   {+(Equal
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-{-(Not
-  {-(Member
-    {-(Identifier)-}
-    {-(Identifier)-})-})-}
 {-(Equal
   {-(Identifier)-}
   {-(Identifier)-})-}

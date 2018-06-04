@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Class
     (Identifier)
     (Statements
@@ -51,36 +51,52 @@
           (TypeIdentifier))
         (Identifier)
         (Float))
-      (PublicFieldDefinition
-      {-(Identifier)-}
-        (Empty)
-      {+(Readonly)+}
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
-      (PublicFieldDefinition
+    {+(PublicFieldDefinition
       {+(Empty)+}
-      {-(Identifier)-}
-        (Readonly)
-        (Annotation
-        { (TypeIdentifier)
-        ->(TypeIdentifier) })
-        (Identifier)
-      { (TextElement)
-      ->(Float) })
+      {+(Readonly)+}
+      {+(Annotation
+        {+(TypeIdentifier)+})+}
+      {+(Identifier)+}
+      {+(Float)+})+}
+    {+(PublicFieldDefinition
+      {+(Empty)+}
+      {+(Readonly)+}
+      {+(Annotation
+        {+(TypeIdentifier)+})+}
+      {+(Identifier)+}
+      {+(Float)+})+}
       (PublicFieldDefinition
+      {-(Identifier)-}
         (Empty)
-        (Empty)
+      {+(Empty)+}
         (Annotation
           (TypeIdentifier))
       { (Identifier)
       ->(Identifier) }
         (Float))
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-      { (Float)
-      ->(Float) }))))
+    {+(PublicFieldDefinition
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Float)+})+}
+    {-(PublicFieldDefinition
+      {-(Identifier)-}
+      {-(Readonly)-}
+      {-(Annotation
+        {-(TypeIdentifier)-})-}
+      {-(Identifier)-}
+      {-(TextElement)-})-}
+    {-(PublicFieldDefinition
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Annotation
+        {-(TypeIdentifier)-})-}
+      {-(Identifier)-}
+      {-(Float)-})-}
+    {-(PublicFieldDefinition
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(Float)-})-})))
