@@ -8,7 +8,8 @@ import Proto3.Suite
 
 -- | A programming language.
 data Language
-    = Go
+    = Unknown
+    | Go
     | Haskell
     | Java
     | JavaScript
@@ -19,7 +20,6 @@ data Language
     | Ruby
     | TypeScript
     | PHP
-    | Unknown
     deriving (Eq, Generic, Ord, Read, Show, Bounded, ToJSON, Named, Enum, Finite, MessageField)
 
 knownLanguage :: Language -> Bool
