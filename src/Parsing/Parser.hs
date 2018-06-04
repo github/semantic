@@ -138,6 +138,7 @@ someParser Python     = SomeParser pythonParser
 someParser Ruby       = SomeParser rubyParser
 someParser TypeScript = SomeParser typescriptParser
 someParser PHP        = SomeParser phpParser
+someParser Unknown    = error "No parser suitable for an unknown language."
 
 
 goParser :: Parser Go.Term

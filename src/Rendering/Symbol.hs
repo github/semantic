@@ -10,6 +10,7 @@ import Prologue
 import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
+import Data.Language (ensureLanguage)
 import Data.Record
 import Data.Span
 import Data.Term
@@ -43,7 +44,7 @@ symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
   Just declaration -> Just Symbol
     { symbolName = when symbolFieldsName (declarationIdentifier declaration)
     , symbolPath = when symbolFieldsPath (T.pack path)
-    , symbolLang = when symbolFieldsLang (T.pack (show (declarationLanguage declaration)))
+    , symbolLang = join (when symbolFieldsLang (T.pack . show <$> ensureLanguage (declarationLanguage declaration)))
     , symbolKind = when symbolFieldsKind (toCategoryName declaration)
     , symbolLine = when symbolFieldsLine (declarationText declaration)
     , symbolSpan = when symbolFieldsSpan (getField record)
