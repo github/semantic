@@ -2,10 +2,9 @@
 module Data.Syntax.Literal where
 
 import           Data.Abstract.Evaluatable
-import           Data.ByteString.Char8 (readInteger, unpack)
-import qualified Data.ByteString.Char8 as B
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
+import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prelude hiding (Float, null)
 import           Prologue hiding (Set, hash, null)
@@ -33,7 +32,7 @@ instance Evaluatable Boolean where
 -- Numeric
 
 -- | A literal integer of unspecified width. No particular base is implied.
-newtype Integer a = Integer { integerContent :: ByteString }
+newtype Integer a = Integer { integerContent :: Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
@@ -41,15 +40,13 @@ instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Data.Syntax.Literal.Integer where
-  -- TODO: This instance probably shouldn't have readInteger?
+  -- TODO: We should use something more robust than shelling out to readMaybe.
   eval (Data.Syntax.Literal.Integer x) =
-    Rval . integer <$> maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x)
-
--- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
--- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
+    Rval . integer <$> maybeM (throwEvalError (IntegerFormatError x)) (readMaybe (T.unpack x))
 
 -- | A literal float of unspecified width.
-newtype Float a = Float { floatContent  :: ByteString }
+
+newtype Float a = Float { floatContent :: Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
@@ -61,7 +58,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
     Rval . float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
 
 -- Rational literals e.g. `2/3r`
-newtype Rational a = Rational ByteString
+newtype Rational a = Rational Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Data.Syntax.Literal.Rational where liftEq = genericLiftEq
@@ -71,12 +68,12 @@ instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftSho
 instance Evaluatable Data.Syntax.Literal.Rational where
   eval (Rational r) =
     let
-      trimmed = B.takeWhile (/= 'r') r
-      parsed = readMaybe @Prelude.Integer (unpack trimmed)
+      trimmed = T.takeWhile (/= 'r') r
+      parsed = readMaybe @Prelude.Integer (T.unpack trimmed)
     in Rval . rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
 
 -- Complex literals e.g. `3 + 2i`
-newtype Complex a = Complex ByteString
+newtype Complex a = Complex Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Data.Syntax.Literal.Complex where liftEq = genericLiftEq
@@ -100,7 +97,7 @@ instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShows
 -- TODO: Implement Eval instance for String
 instance Evaluatable Data.Syntax.Literal.String
 
-newtype Character a = Character { characterContent :: ByteString }
+newtype Character a = Character { characterContent :: Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Data.Syntax.Literal.Character where liftEq = genericLiftEq
@@ -121,7 +118,7 @@ instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable InterpolationElement
 
 -- | A sequence of textual contents within a string literal.
-newtype TextElement a = TextElement { textElementContent :: ByteString }
+newtype TextElement a = TextElement { textElementContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
@@ -140,7 +137,7 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Null where eval _ = pure (Rval null)
 
-newtype Symbol a = Symbol { symbolContent :: ByteString }
+newtype Symbol a = Symbol { symbolContent :: Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
@@ -150,7 +147,7 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Symbol where
   eval (Symbol s) = pure (Rval (symbol s))
 
-newtype Regex a = Regex { regexContent :: ByteString }
+newtype Regex a = Regex { regexContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Regex where liftEq = genericLiftEq
@@ -161,7 +158,6 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Regex
 instance Evaluatable Regex
-
 
 -- Collections
 

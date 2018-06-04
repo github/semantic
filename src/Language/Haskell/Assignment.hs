@@ -207,7 +207,7 @@ strictType = makeTerm' <$> symbol StrictType <*> children ((inject <$> (Syntax.S
                                                         <|> (inject <$> (Syntax.StrictTypeVariable <$> typeVariableIdentifier)))
 
 tuplingConstructor :: Assignment
-tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> source)
+tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> rawSource)
         -- a tuple (,) has arity two, but only one comma, so apply the successor to the count of commas for the correct arity.
   where tupleWithArity = Syntax.TupleConstructor . succ . count ','
 

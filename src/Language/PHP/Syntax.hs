@@ -4,14 +4,14 @@ module Language.PHP.Syntax where
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
-import qualified Data.ByteString.Char8 as BC
+import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue hiding (Text)
 
-newtype Text a = Text ByteString
+newtype Text a = Text T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Text where liftEq = genericLiftEq
@@ -39,13 +39,13 @@ instance Evaluatable VariableName
 resolvePHPName :: ( Member (Modules address value) effects
                   , Member (Resumable ResolutionError) effects
                   )
-               => ByteString
+               => T.Text
                -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybeM (throwResumable $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
-        toName = BC.unpack . dropRelativePrefix . stripQuotes
+        toName = T.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
@@ -136,7 +136,7 @@ instance Evaluatable SimpleVariable
 
 
 -- | TODO: Unify with TypeScript's PredefinedType
-newtype CastType a = CastType { _castType :: ByteString }
+newtype CastType a = CastType { _castType :: T.Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 CastType where liftEq = genericLiftEq
@@ -160,7 +160,7 @@ instance Ord1 Clone where liftCompare = genericLiftCompare
 instance Show1 Clone where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Clone
 
-newtype ShellCommand a = ShellCommand ByteString
+newtype ShellCommand a = ShellCommand T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 ShellCommand where liftEq = genericLiftEq
@@ -185,7 +185,7 @@ instance Ord1 NewVariable where liftCompare = genericLiftCompare
 instance Show1 NewVariable where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NewVariable
 
-newtype RelativeScope a = RelativeScope ByteString
+newtype RelativeScope a = RelativeScope T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 RelativeScope where liftEq = genericLiftEq
@@ -279,7 +279,7 @@ instance Ord1 BaseTypeDeclaration where liftCompare = genericLiftCompare
 instance Show1 BaseTypeDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BaseTypeDeclaration
 
-newtype ScalarType a = ScalarType ByteString
+newtype ScalarType a = ScalarType T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 ScalarType where liftEq = genericLiftEq
@@ -426,7 +426,7 @@ instance Ord1 DestructorDeclaration where liftCompare = genericLiftCompare
 instance Show1 DestructorDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable DestructorDeclaration
 
-newtype Static a = Static ByteString
+newtype Static a = Static T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Static where liftEq = genericLiftEq
@@ -434,7 +434,7 @@ instance Ord1 Static where liftCompare = genericLiftCompare
 instance Show1 Static where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Static
 
-newtype ClassModifier a = ClassModifier ByteString
+newtype ClassModifier a = ClassModifier T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 ClassModifier where liftEq = genericLiftEq

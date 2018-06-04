@@ -17,39 +17,27 @@
             ->(Integer) })
           { (Identifier)
           ->(Identifier) })))
-    {+(Statements
-      {+(Type
-        {+(Identifier)+}
-        {+(Array
-          {+(Integer)+}
-          {+(Array
-            {+(Integer)+}
-            {+(Identifier)+})+})+})+})+}
-    {+(Statements
-      {+(Type
-        {+(Identifier)+}
-        {+(Array
-          {+(Integer)+}
-          {+(Array
-            {+(Integer)+}
-            {+(Array
-              {+(Integer)+}
-              {+(Identifier)+})+})+})+})+})+}
-    {-(Statements
-      {-(Type
-        {-(Identifier)-}
-        {-(Array
-          {-(Integer)-}
-          {-(Array
-            {-(Integer)-}
-            {-(Identifier)-})-})-})-})-}
-    {-(Statements
-      {-(Type
-        {-(Identifier)-}
-        {-(Array
-          {-(Integer)-}
-          {-(Array
-            {-(Integer)-}
-            {-(Array
-              {-(Integer)-}
-              {-(Identifier)-})-})-})-})-})-})))
+      (Statements
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Array
+          { (Integer)
+          ->(Integer) }
+            (Array
+            { (Integer)
+            ->(Integer) }
+              (Identifier)))))
+      (Statements
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Array
+          { (Integer)
+          ->(Integer) }
+            (Array
+              (Integer)
+              (Array
+              { (Integer)
+              ->(Integer) }
+                (Identifier)))))))))

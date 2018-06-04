@@ -42,7 +42,7 @@ formatError includeSource colourize Blob{..} Error{..}
        . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else id)
   . showCallStack colourize callStack . showChar '\n'
-  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromBytes (pack (showLineNumber i)) <> fromBytes ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
+  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
 

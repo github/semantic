@@ -464,7 +464,7 @@ boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
        <|> makeTerm <$> token Grammar.False <*> pure Literal.false
 
 none :: Assignment
-none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
+none = makeTerm <$> symbol None <*> (Literal.Null <$ rawSource)
 
 comprehension :: Assignment
 comprehension =  makeTerm <$> symbol ListComprehension       <*> children (Declaration.Comprehension <$> term expression <*> expressions)

@@ -17,12 +17,9 @@
   {+(Equal
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-{ (LessThan
-  {-(Identifier)-}
-  {-(Identifier)-})
-->(GreaterThan
+{+(GreaterThan
   {+(Identifier)+}
-  {+(Identifier)+}) }
+  {+(Identifier)+})+}
 {+(GreaterThanEqual
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -30,14 +27,17 @@
   {+(Equal
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-  (LessThanEqual
+{+(LessThanEqual
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+  (LessThan
   { (Identifier)
   ->(Identifier) }
   { (Identifier)
   ->(Identifier) })
-{+(LessThan
-  {+(Identifier)+}
-  {+(Identifier)+})+}
+{-(LessThanEqual
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Not
   {-(Equal
     {-(Identifier)-}

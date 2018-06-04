@@ -4,17 +4,18 @@ module Assigning.Assignment.Spec (spec) where
 import Assigning.Assignment
 import Data.AST
 import Data.Bifunctor (first)
-import Data.ByteString.Char8 as B (ByteString, length, words)
 import Data.Ix
 import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Span
 import Data.Term
+import Data.Text as T (Text, length, words)
+import Data.Text.Encoding (encodeUtf8)
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
 import Test.Hspec
-import TreeSitter.Language (Symbol(..), SymbolType(..))
+import TreeSitter.Language (Symbol (..), SymbolType (..))
 
 spec :: Spec
 spec = do
@@ -33,8 +34,8 @@ spec = do
     it "matches repetitions" $
       let s = "colourless green ideas sleep furiously"
           w = words s
-          (_, nodes) = foldl (\ (i, prev) word -> (i + B.length word + 1, prev <> [node Red i (i + B.length word) []])) (0, []) w in
-      fst <$> runAssignment (fromBytes s) (many red) (makeState nodes)
+          (_, nodes) = foldl (\ (i, prev) word -> (i + T.length word + 1, prev <> [node Red i (i + T.length word) []])) (0, []) w in
+      fst <$> runAssignment (fromUTF8 (encodeUtf8 s)) (many red) (makeState nodes)
       `shouldBe`
         Right (Out <$> w)
 
@@ -259,9 +260,9 @@ data Grammar = Palette | Red | Green | Blue | Magenta
 
 instance Symbol Grammar where
   symbolType Magenta = Anonymous
-  symbolType _ = Regular
+  symbolType _       = Regular
 
-data Out = Out B.ByteString | OutError B.ByteString
+data Out = Out T.Text | OutError T.Text
   deriving (Eq, Show)
 
 red :: HasCallStack => Assignment [] Grammar Out

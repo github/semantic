@@ -109,7 +109,7 @@ instance Show1 Field where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Field
 
-newtype Pragma a = Pragma ByteString
+newtype Pragma a = Pragma Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Pragma where liftEq = genericLiftEq
