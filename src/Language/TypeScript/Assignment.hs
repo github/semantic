@@ -38,7 +38,7 @@ import Prologue
 -- | The type of TypeScript syntax.
 type Syntax = '[
     Comment.Comment
-  , Comment.HashBang    
+  , Comment.HashBang
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
