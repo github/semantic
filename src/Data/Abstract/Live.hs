@@ -36,6 +36,10 @@ liveMember addr = Set.member addr . unLive
 liveSplit :: Live address -> Maybe (address, Live address)
 liveSplit = fmap (fmap Live) . Set.minView . unLive
 
+-- | Map a function over the addresses in a 'Live' set.
+liveMap :: Ord b => (a -> b) -> Live a -> Live b
+liveMap f = Live . Set.map f . unLive
+
 
 instance Show address => Show (Live address) where
   showsPrec d = showsUnaryWith showsPrec "Live" d . Set.toList . unLive

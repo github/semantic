@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables #-}
 module Data.Term
 ( Term(..)
 , termIn
@@ -16,6 +16,7 @@ import Data.Aeson
 import Data.JSON.Fields
 import Data.Record
 import Text.Show
+import Proto3.Suite.Class
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
@@ -77,6 +78,14 @@ instance Show1 f => Show1 (Term f) where
 
 instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
+
+instance Message1 f => Message (Term f ()) where
+  encodeMessage num (Term (In _ f)) = liftEncodeMessage encodeMessage num f
+  decodeMessage num = termIn () <$> liftDecodeMessage decodeMessage num
+  dotProto _ = liftDotProto (Proxy @(f (Term f ())))
+
+instance Named (Term f a) where
+  nameOf _ = "Term"
 
 instance Ord1 f => Ord1 (Term f) where
   liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unTerm t1) (unTerm t2)

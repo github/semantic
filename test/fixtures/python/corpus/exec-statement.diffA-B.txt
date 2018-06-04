@@ -1,8 +1,18 @@
+<<<<<<< HEAD
 (Program
   (Call
     (Identifier)
   { (TextElement)
   ->(TextElement) }
+=======
+(Statements
+{+(Call
+  {+(Identifier)+}
+  {+(TextElement)+}
+  {+(Identifier)+}
+  {+(Empty)+})+}
+{+(Call
+>>>>>>> origin/master
   {+(Identifier)+}
     (Empty))
   (Call

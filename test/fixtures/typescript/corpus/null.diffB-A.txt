@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(Null)+}
 {-(Return
   {-(Null)-})-})

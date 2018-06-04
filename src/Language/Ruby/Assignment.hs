@@ -10,7 +10,18 @@ import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (name)
 import Data.List (elem)
 import Data.Record
-import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm''
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import Language.Ruby.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
@@ -69,6 +80,7 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Statements
   , Statement.Try
   , Statement.While
   , Statement.Yield
@@ -76,7 +88,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Program
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
@@ -92,7 +103,7 @@ type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
@@ -396,7 +407,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
                 , assign Expression.Times     <$ symbol AnonStarEqual
                 , assign Expression.Power     <$ symbol AnonStarStarEqual
                 , assign Expression.DividedBy <$ symbol AnonSlashEqual
-                , assign Expression.And       <$ symbol AnonPipePipeEqual
+                , assign Expression.Or        <$ symbol AnonPipePipeEqual
                 , assign Expression.BOr       <$ symbol AnonPipeEqual
                 , assign Expression.And       <$ symbol AnonAmpersandAmpersandEqual
                 , assign Expression.BAnd      <$ symbol AnonAmpersandEqual
@@ -480,7 +491,7 @@ emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ rawSource <|> pure Syntax.Empty)
 
 
--- Helper functions
+-- Helpers
 
 invert :: Assignment -> Assignment
 invert term = makeTerm <$> location <*> fmap Expression.Not term

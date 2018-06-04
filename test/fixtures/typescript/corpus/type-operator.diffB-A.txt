@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(Typeof
   {+(Identifier)+})+}
 {-(InstanceOf

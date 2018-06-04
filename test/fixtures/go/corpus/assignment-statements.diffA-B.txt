@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -38,12 +38,23 @@
         {-(Integer)-})
       ->(Plus
         {+(Identifier)+}
+<<<<<<< HEAD
         {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(LShift
-        {+(Identifier)+}
+=======
         {+(Integer)+})+})+}
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Times
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(LShift
+>>>>>>> origin/master
+        {+(Identifier)+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(RShift
@@ -88,6 +99,14 @@
                 {+(Integer)+})+})+})+})+})+})+}
     {-(Assignment
       {-(Identifier)-}
+<<<<<<< HEAD
+=======
+      {-(Plus
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
+    {-(Assignment
+      {-(Identifier)-}
+>>>>>>> origin/master
       {-(LShift
         {-(Identifier)-}
         {-(Integer)-})-})-}

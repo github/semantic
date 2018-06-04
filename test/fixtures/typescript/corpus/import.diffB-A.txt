@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 (Program
 { (Import)
 ->(Import) }
@@ -7,6 +8,13 @@
   {+(Identifier)+}) }
 { (Import)
 ->(Import) }
+=======
+(Statements
+{+(Import)+}
+{+(QualifiedAliasedImport
+  {+(Identifier)+})+}
+{+(Import)+}
+>>>>>>> origin/master
 {+(Import)+}
 {+(Import)+}
 {+(Statements

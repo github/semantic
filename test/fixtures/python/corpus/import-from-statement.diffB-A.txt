@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 (Program
 { (Import)
 ->(Import) }
@@ -7,6 +8,17 @@
 ->(Import) }
 { (Import)
 ->(Import) }
+=======
+(Statements
+{+(Import)+}
+{+(Import)+}
+{+(Import)+}
+{+(Import)+}
+{+(Import)+}
+{-(Import)-}
+{-(Import)-}
+{-(Import)-}
+>>>>>>> origin/master
 {-(Import)-}
 {-(Import)-}
 {-(Import)-})

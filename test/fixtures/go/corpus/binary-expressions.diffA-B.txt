@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -22,6 +22,7 @@
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) }))
+<<<<<<< HEAD
       (Equal
       { (Identifier)
       ->(Identifier) }
@@ -38,6 +39,18 @@
       ->(Identifier) }
       { (Identifier)
       ->(Identifier) })
+=======
+    {+(Equal
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(Not
+      {+(Equal
+        {+(Identifier)+}
+        {+(Identifier)+})+})+}
+    {+(LessThan
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+>>>>>>> origin/master
     {+(LessThanEqual
       {+(Identifier)+}
       {+(Identifier)+})+}
@@ -80,6 +93,19 @@
     {+(BAnd
       {+(Identifier)+}
       {+(Identifier)+})+}
+<<<<<<< HEAD
+=======
+    {-(Equal
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(Not
+      {-(Equal
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
+    {-(LessThan
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+>>>>>>> origin/master
     {-(LessThanEqual
       {-(Identifier)-}
       {-(Identifier)-})-}

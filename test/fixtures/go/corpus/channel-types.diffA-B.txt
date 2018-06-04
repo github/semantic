@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -21,6 +21,7 @@
     {+(Type
       {+(Identifier)+}
       {+(SendChannel
+<<<<<<< HEAD
         {+(ReceiveChannel
           {+(Identifier)+})+})+})+}
       (Type
@@ -30,14 +31,21 @@
         {-(ReceiveChannel
           {-(Identifier)-})-})
       ->(ReceiveChannel
+=======
+>>>>>>> origin/master
         {+(ReceiveChannel
-          {+(Identifier)+})+}) })
+          {+(Identifier)+})+})+})+}
     {+(Type
       {+(Identifier)+}
       {+(BidirectionalChannel
         {+(Parenthesized
           {+(ReceiveChannel
             {+(Identifier)+})+})+})+})+}
+    {-(Type
+      {-(Identifier)-}
+      {-(BidirectionalChannel
+        {-(ReceiveChannel
+          {-(Identifier)-})-})-})-}
     {-(Type
       {-(Identifier)-}
       {-(SendChannel

@@ -10,7 +10,6 @@ module Data.Abstract.Type
 import Control.Abstract
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
-import Data.Semigroup.Reducer (Reducer)
 import Prologue hiding (TypeError)
 
 type TName = Int
@@ -117,21 +116,18 @@ instance AbstractIntro Type where
 
 
 instance ( Member (Allocator address Type) effects
+         , Member (Env address) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Environment address)) effects
-         , Member (State (Heap address (Cell address) Type)) effects
-         , Ord address
-         , Reducer Type (Cell address Type)
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
+      addr <- alloc name
       tvar <- Var <$> fresh
-      assign a tvar
-      bimap (Env.insert name a) (tvar :) <$> rest) (pure (emptyEnv, [])) names
+      assign addr tvar
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (emptyEnv, [])) names
     (zeroOrMoreProduct tvars :->) <$> locally (bindAll env *> body `catchReturn` \ (Return value) -> pure value)
 
   call op params = do
@@ -146,14 +142,11 @@ instance ( Member (Allocator address Type) effects
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address Type) effects
+         , Member (Env address) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Environment address)) effects
-         , Member (State (Heap address (Cell address) Type)) effects
-         , Ord address
-         , Reducer Type (Cell address Type)
          )
       => AbstractValue address Type effects where
   array fields = do

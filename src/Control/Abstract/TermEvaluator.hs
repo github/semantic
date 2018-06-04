@@ -7,7 +7,6 @@ module Control.Abstract.TermEvaluator
 
 import Control.Abstract.Evaluator
 import Control.Monad.Effect           as X
-import Control.Monad.Effect.Fail      as X
 import Control.Monad.Effect.Fresh     as X
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X

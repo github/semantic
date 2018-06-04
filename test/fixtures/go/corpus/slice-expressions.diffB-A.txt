@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -18,6 +18,7 @@
       { (Integer)
       ->(Integer) }
         (Empty))
+<<<<<<< HEAD
       (Slice
         (Identifier)
       { (Integer)
@@ -30,6 +31,20 @@
       {+(Integer)+}
       {+(Integer)+}
       {+(Integer)+})+}
+=======
+    {+(Slice
+      {+(Identifier)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+})+}
+      (Slice
+      { (Identifier)
+      ->(Identifier) }
+        (Integer)
+        (Integer)
+      { (Empty)
+      ->(Integer) })
+>>>>>>> origin/master
     {+(Slice
       {+(Identifier)+}
       {+(Integer)+}
