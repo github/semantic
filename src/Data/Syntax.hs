@@ -130,7 +130,7 @@ instance Evaluatable Program where
 
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
-newtype AccessibilityModifier a = AccessibilityModifier ByteString
+newtype AccessibilityModifier a = AccessibilityModifier Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq

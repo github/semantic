@@ -181,7 +181,7 @@ instance ToJSONFields1 Label
 instance Evaluatable Label
 
 -- | A rune literal in Go (e.g. `'⌘'`).
-newtype Rune a = Rune { _runeLiteral :: ByteString }
+newtype Rune a = Rune { _runeLiteral :: Text }
   deriving (Diffable, Eq, FreeVariables1, Declarations1, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Rune

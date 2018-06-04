@@ -290,7 +290,7 @@ instance Show1 LookupType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LookupType
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
-newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
+newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 ShorthandPropertyIdentifier
@@ -462,7 +462,7 @@ instance Ord1 ParenthesizedType where liftCompare = genericLiftCompare
 instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ParenthesizedType
 
-newtype PredefinedType a = PredefinedType { _predefinedType :: ByteString }
+newtype PredefinedType a = PredefinedType { _predefinedType :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 PredefinedType
@@ -472,7 +472,7 @@ instance Ord1 PredefinedType where liftCompare = genericLiftCompare
 instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PredefinedType
 
-newtype TypeIdentifier a = TypeIdentifier ByteString
+newtype TypeIdentifier a = TypeIdentifier Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 TypeIdentifier
@@ -627,7 +627,7 @@ instance Ord1 TypeArguments where liftCompare = genericLiftCompare
 instance Show1 TypeArguments where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeArguments
 
-newtype ThisType a = ThisType ByteString
+newtype ThisType a = ThisType Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 ThisType
@@ -637,7 +637,7 @@ instance Ord1 ThisType where liftCompare = genericLiftCompare
 instance Show1 ThisType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ThisType
 
-newtype ExistentialType a = ExistentialType ByteString
+newtype ExistentialType a = ExistentialType Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 ExistentialType
@@ -866,7 +866,7 @@ instance Ord1 JsxElement where liftCompare = genericLiftCompare
 instance Show1 JsxElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JsxElement
 
-newtype JsxText a = JsxText ByteString
+newtype JsxText a = JsxText Text
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance ToJSONFields1 JsxText

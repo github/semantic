@@ -13,7 +13,6 @@ module Data.JSON.Fields
 import           Data.Aeson
 import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
-import qualified Data.Text.Encoding as Text
 import           Prologue
 
 class ToJSONFields a where
@@ -130,13 +129,7 @@ instance ToJSON1 f => GSelectorJSONValue1 (Rec1 f) where
 instance ToJSON k => GSelectorJSONValue1 (K1 r k) where
   gselectorJSONValue1 = SomeJSON . unK1
 
-
--- TODO: Fix this orphan instance.
-instance ToJSON ByteString where
-  toJSON = toJSON . Text.decodeUtf8
-  toEncoding = toEncoding . Text.decodeUtf8
-
-
+-- | An existential type wrapping an JSON-compatible data type.
 data SomeJSON where
   SomeJSON :: ToJSON a => a -> SomeJSON
 
