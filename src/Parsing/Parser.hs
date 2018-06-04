@@ -82,11 +82,11 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
 someAnalysisParser _ Java       = SomeAnalysisParser javaParser Nothing
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just JavaScript))
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) JavaScript)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser Nothing
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Python)
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Ruby)
 someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser Nothing
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 

@@ -1,6 +1,9 @@
+{-# LANGUAGE MultiWayIf #-}
+
 module Data.Project where
 
-import           Data.ByteString.Char8 as BC (pack)
+import           Data.ByteString.Char8 as BC (pack, writeFile)
+import           Data.Blob
 import           Data.Language
 import           Prologue
 import           System.FilePath.Posix
@@ -22,11 +25,14 @@ projectExtensions = extensionsForLanguage . projectLanguage
 
 
 data File = File
-  { filePath :: FilePath
-  , fileLanguage :: Maybe Language
+  { filePath     :: FilePath
+  , fileLanguage :: Language
   }
   deriving (Eq, Ord, Show)
 
 file :: FilePath -> File
 file path = File path (languageForFilePath path)
   where languageForFilePath = languageForType . takeExtension
+
+blobToFile :: Blob -> File
+blobToFile (Blob _ f l) = File f l

@@ -9,6 +9,7 @@ import Data.Blob
 import Data.JSON.Fields
 import Data.Record
 import Data.Term
+import Data.Language (ensureLanguage)
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
@@ -30,4 +31,4 @@ withParsedBlobs :: (Member (Distribute WrappedTask) effs, Monoid output) => (for
 withParsedBlobs render = distributeFoldMap (\ blob -> WrapTask (parseSomeBlob blob >>= withSomeTerm (render blob)))
 
 parseSomeBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1] (Record Location))
-parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (flip parse blob . someParser) blobLanguage
+parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (flip parse blob . someParser) (ensureLanguage blobLanguage)

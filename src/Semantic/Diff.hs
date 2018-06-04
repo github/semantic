@@ -54,6 +54,6 @@ withParsedBlobPair :: (Member (Distribute WrappedTask) effs, Member (Exc SomeExc
                    -> BlobPair
                    -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] (Record fields))
 withParsedBlobPair decorate blobs
-  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] <$> languageForBlobPair blobs
+  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] <$> (Just (languageForBlobPair blobs))
   = SomeTermPair <$> distributeFor blobs (\ blob -> WrapTask (parse parser blob >>= decorate blob))
   | otherwise = noLanguageForBlob (pathForBlobPair blobs)
