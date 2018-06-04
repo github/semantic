@@ -11,16 +11,8 @@ import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue hiding (Text)
 
-<<<<<<< HEAD
 newtype Text a = Text T.Text
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 Text where
-  toJSONFields1 (Text t) = noChildren ["asString" .= t]
-=======
-newtype Text a = Text ByteString
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Ord1 Text where liftCompare = genericLiftCompare
@@ -144,15 +136,8 @@ instance Evaluatable SimpleVariable
 
 
 -- | TODO: Unify with TypeScript's PredefinedType
-<<<<<<< HEAD
 newtype CastType a = CastType { _castType :: T.Text }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 CastType
-=======
-newtype CastType a = CastType { _castType :: ByteString }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 CastType where liftEq = genericLiftEq
 instance Ord1 CastType where liftCompare = genericLiftCompare
@@ -175,15 +160,8 @@ instance Ord1 Clone where liftCompare = genericLiftCompare
 instance Show1 Clone where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Clone
 
-<<<<<<< HEAD
 newtype ShellCommand a = ShellCommand T.Text
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 ShellCommand
-=======
-newtype ShellCommand a = ShellCommand ByteString
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 ShellCommand where liftEq = genericLiftEq
 instance Ord1 ShellCommand where liftCompare = genericLiftCompare
@@ -207,15 +185,8 @@ instance Ord1 NewVariable where liftCompare = genericLiftCompare
 instance Show1 NewVariable where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NewVariable
 
-<<<<<<< HEAD
 newtype RelativeScope a = RelativeScope T.Text
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 RelativeScope
-=======
-newtype RelativeScope a = RelativeScope ByteString
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 RelativeScope where liftEq = genericLiftEq
 instance Ord1 RelativeScope where liftCompare = genericLiftCompare
@@ -308,15 +279,8 @@ instance Ord1 BaseTypeDeclaration where liftCompare = genericLiftCompare
 instance Show1 BaseTypeDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BaseTypeDeclaration
 
-<<<<<<< HEAD
 newtype ScalarType a = ScalarType T.Text
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 ScalarType
-=======
-newtype ScalarType a = ScalarType ByteString
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 ScalarType where liftEq = genericLiftEq
 instance Ord1 ScalarType where liftCompare = genericLiftCompare
@@ -462,30 +426,16 @@ instance Ord1 DestructorDeclaration where liftCompare = genericLiftCompare
 instance Show1 DestructorDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable DestructorDeclaration
 
-<<<<<<< HEAD
 newtype Static a = Static T.Text
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 Static
-=======
-newtype Static a = Static ByteString
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 Static where liftEq = genericLiftEq
 instance Ord1 Static where liftCompare = genericLiftCompare
 instance Show1 Static where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Static
 
-<<<<<<< HEAD
 newtype ClassModifier a = ClassModifier T.Text
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 ClassModifier
-=======
-newtype ClassModifier a = ClassModifier ByteString
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 ClassModifier where liftEq = genericLiftEq
 instance Ord1 ClassModifier where liftCompare = genericLiftCompare

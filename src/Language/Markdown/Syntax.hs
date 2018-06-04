@@ -103,62 +103,29 @@ instance Eq1 Emphasis where liftEq = genericLiftEq
 instance Ord1 Emphasis where liftCompare = genericLiftCompare
 instance Show1 Emphasis where liftShowsPrec = genericLiftShowsPrec
 
-<<<<<<< HEAD
--- TODO: Rename this and import Data.Text unqualified
 newtype Text a = Text T.Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
-instance ToJSONFields1 Text where
-  toJSONFields1 (Text s) = noChildren ["asString" .= s ]
-=======
-newtype Text a = Text ByteString
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Ord1 Text where liftCompare = genericLiftCompare
 instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
 
-<<<<<<< HEAD
 data Link a = Link { linkURL :: T.Text, linkTitle :: Maybe T.Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
--- TODO: Better ToJSONFields1 instance
-instance ToJSONFields1 Link
-=======
-data Link a = Link { linkURL :: ByteString, linkTitle :: Maybe ByteString }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 Link where liftEq = genericLiftEq
 instance Ord1 Link where liftCompare = genericLiftCompare
 instance Show1 Link where liftShowsPrec = genericLiftShowsPrec
 
-<<<<<<< HEAD
 data Image a = Image { imageURL :: T.Text, imageTitle :: Maybe T.Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
--- TODO: Better ToJSONFields1 instance
-instance ToJSONFields1 Image
-=======
-data Image a = Image { imageURL :: ByteString, imageTitle :: Maybe ByteString }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 Image where liftEq = genericLiftEq
 instance Ord1 Image where liftCompare = genericLiftCompare
 instance Show1 Image where liftShowsPrec = genericLiftShowsPrec
 
-<<<<<<< HEAD
 data Code a = Code { codeLanguage :: Maybe T.Text, codeContent :: T.Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
-
--- TODO: Better ToJSONFields1 instance
-instance ToJSONFields1 Code
-=======
-data Code a = Code { codeLanguage :: Maybe ByteString, codeContent :: ByteString }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 Code where liftEq = genericLiftEq
 instance Ord1 Code where liftCompare = genericLiftCompare

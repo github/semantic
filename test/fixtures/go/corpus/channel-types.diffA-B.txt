@@ -21,18 +21,11 @@
     {+(Type
       {+(Identifier)+}
       {+(SendChannel
-<<<<<<< HEAD
         {+(ReceiveChannel
           {+(Identifier)+})+})+})+}
-      (Type
-      { (Identifier)
-      ->(Identifier) }
-      { (BidirectionalChannel
-        {-(ReceiveChannel
-          {-(Identifier)-})-})
-      ->(ReceiveChannel
-=======
->>>>>>> origin/master
+    {+(Type
+      {+(Identifier)+}
+      {+(ReceiveChannel
         {+(ReceiveChannel
           {+(Identifier)+})+})+})+}
     {+(Type

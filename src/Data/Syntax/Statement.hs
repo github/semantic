@@ -359,23 +359,12 @@ instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ScopeExit
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
-<<<<<<< HEAD
 newtype HashBang a = HashBang Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-=======
-newtype HashBang a = HashBang ByteString
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 HashBang where liftEq = genericLiftEq
 instance Ord1 HashBang where liftCompare = genericLiftCompare
 instance Show1 HashBang where liftShowsPrec = genericLiftShowsPrec
 
-<<<<<<< HEAD
-instance ToJSONFields1 HashBang where
-  toJSONFields1 (HashBang f) = noChildren [ "contents" .= f ]
-
-=======
->>>>>>> origin/master
 -- TODO: Implement Eval instance for HashBang
 instance Evaluatable HashBang

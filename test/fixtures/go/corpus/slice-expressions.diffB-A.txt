@@ -18,38 +18,22 @@
       { (Integer)
       ->(Integer) }
         (Empty))
-<<<<<<< HEAD
-      (Slice
-        (Identifier)
-      { (Integer)
-      ->(Empty) }
-      { (Integer)
-      ->(Empty) }
-        (Empty))
+    {+(Slice
+      {+(Identifier)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+})+}
     {+(Slice
       {+(Identifier)+}
       {+(Integer)+}
       {+(Integer)+}
       {+(Integer)+})+}
-=======
-    {+(Slice
-      {+(Identifier)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+})+}
       (Slice
       { (Identifier)
       ->(Identifier) }
         (Integer)
         (Integer)
-      { (Empty)
-      ->(Integer) })
->>>>>>> origin/master
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Integer)+}
-      {+(Empty)+})+}
+        (Empty))
     {-(Slice
       {-(Identifier)-}
       {-(Integer)-}

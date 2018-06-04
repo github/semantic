@@ -10,11 +10,7 @@ import           Data.Aeson
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
-<<<<<<< HEAD
-import           Data.Semigroup.Reducer (Reducer)
 import qualified Data.Text as T
-=======
->>>>>>> origin/master
 import           Diffing.Algorithm
 import           Prelude
 import           Prologue
@@ -271,15 +267,8 @@ instance Show1 LookupType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LookupType
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
-<<<<<<< HEAD
-newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 ShorthandPropertyIdentifier
-=======
-newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
+newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
 instance Ord1 ShorthandPropertyIdentifier where liftCompare = genericLiftCompare
@@ -416,30 +405,16 @@ instance Ord1 ParenthesizedType where liftCompare = genericLiftCompare
 instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ParenthesizedType
 
-<<<<<<< HEAD
-newtype PredefinedType a = PredefinedType { _predefinedType :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 PredefinedType
-=======
-newtype PredefinedType a = PredefinedType { _predefinedType :: ByteString }
+newtype PredefinedType a = PredefinedType { _predefinedType :: T.Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 PredefinedType where liftEq = genericLiftEq
 instance Ord1 PredefinedType where liftCompare = genericLiftCompare
 instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PredefinedType
 
-<<<<<<< HEAD
-newtype TypeIdentifier a = TypeIdentifier Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 TypeIdentifier
-=======
-newtype TypeIdentifier a = TypeIdentifier ByteString
+newtype TypeIdentifier a = TypeIdentifier T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
 instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
@@ -563,30 +538,16 @@ instance Ord1 TypeArguments where liftCompare = genericLiftCompare
 instance Show1 TypeArguments where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeArguments
 
-<<<<<<< HEAD
-newtype ThisType a = ThisType Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 ThisType
-=======
-newtype ThisType a = ThisType ByteString
+newtype ThisType a = ThisType T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 ThisType where liftEq = genericLiftEq
 instance Ord1 ThisType where liftCompare = genericLiftCompare
 instance Show1 ThisType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ThisType
 
-<<<<<<< HEAD
-newtype ExistentialType a = ExistentialType Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 ExistentialType
-=======
-newtype ExistentialType a = ExistentialType ByteString
+newtype ExistentialType a = ExistentialType T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 ExistentialType where liftEq = genericLiftEq
 instance Ord1 ExistentialType where liftCompare = genericLiftCompare
@@ -774,15 +735,8 @@ instance Ord1 JsxElement where liftCompare = genericLiftCompare
 instance Show1 JsxElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JsxElement
 
-<<<<<<< HEAD
-newtype JsxText a = JsxText Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 JsxText
-=======
-newtype JsxText a = JsxText ByteString
+newtype JsxText a = JsxText T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
->>>>>>> origin/master
 
 instance Eq1 JsxText where liftEq = genericLiftEq
 instance Ord1 JsxText where liftCompare = genericLiftCompare

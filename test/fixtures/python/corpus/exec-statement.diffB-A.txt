@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-(Program
-=======
 (Statements
-{+(Call
-  {+(Identifier)+}
-  {+(TextElement)+}
-  {+(Empty)+})+}
->>>>>>> origin/master
   (Call
     (Identifier)
   { (TextElement)
