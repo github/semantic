@@ -18,8 +18,7 @@ withSomeAST f (SomeAST ast) = f ast
 
 astParseBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs SomeAST
 astParseBlob blob@Blob{..}
-  | Just (SomeASTParser parser) <- someASTParser <$> (Just blobLanguage)
-  = SomeAST <$> parse parser blob
+  | Just (SomeASTParser parser) <- someASTParser blobLanguage = SomeAST <$> parse parser blob
   | otherwise = noLanguageForBlob blobPath
 
 

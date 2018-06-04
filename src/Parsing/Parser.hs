@@ -126,19 +126,19 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum PHP.Syntax)
               )
            => Language                                        -- ^ The 'Language' to select.
-           -> Parser (SomeTerm typeclasses (Record Location)) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
-someParser Go         = SomeParser goParser
-someParser Java       = SomeParser javaParser
-someParser JavaScript = SomeParser typescriptParser
-someParser JSON       = SomeParser jsonParser
-someParser Haskell    = SomeParser haskellParser
-someParser JSX        = SomeParser typescriptParser
-someParser Markdown   = SomeParser markdownParser
-someParser Python     = SomeParser pythonParser
-someParser Ruby       = SomeParser rubyParser
-someParser TypeScript = SomeParser typescriptParser
-someParser PHP        = SomeParser phpParser
-someParser Unknown    = error "No parser suitable for an unknown language."
+           -> Maybe (Parser (SomeTerm typeclasses (Record Location))) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
+someParser Go         = Just (SomeParser goParser)
+someParser Java       = Just (SomeParser javaParser)
+someParser JavaScript = Just (SomeParser typescriptParser)
+someParser JSON       = Just (SomeParser jsonParser)
+someParser Haskell    = Just (SomeParser haskellParser)
+someParser JSX        = Just (SomeParser typescriptParser)
+someParser Markdown   = Just (SomeParser markdownParser)
+someParser Python     = Just (SomeParser pythonParser)
+someParser Ruby       = Just (SomeParser rubyParser)
+someParser TypeScript = Just (SomeParser typescriptParser)
+someParser PHP        = Just (SomeParser phpParser)
+someParser Unknown    = Nothing
 
 
 goParser :: Parser Go.Term
@@ -182,14 +182,14 @@ data SomeASTParser where
                 => Parser (AST [] grammar)
                 -> SomeASTParser
 
-someASTParser :: Language -> SomeASTParser
-someASTParser Go         = SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar))
-someASTParser Haskell    = SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar))
-someASTParser JavaScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
-someASTParser JSON       = SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar))
-someASTParser JSX        = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
-someASTParser Python     = SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar))
-someASTParser Ruby       = SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar))
-someASTParser TypeScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
-someASTParser PHP        = SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar))
-someASTParser l          = error $ "Tree-Sitter AST parsing not supported for: " <> show l
+someASTParser :: Language -> Maybe SomeASTParser
+someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
+someASTParser Haskell    = Just (SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar)))
+someASTParser JavaScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser JSON       = Just (SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar)))
+someASTParser JSX        = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar)))
+someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
+someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
+someASTParser l          = Nothing
