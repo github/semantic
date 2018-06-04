@@ -26,7 +26,7 @@ import Data.Source as Source
 data Blob = Blob
   { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
   , blobPath :: FilePath -- ^ The file path to the blob.
-  , blobLanguage :: Language -- ^ The language of this blob. Nothing denotes a langauge we don't support yet.
+  , blobLanguage :: Language -- ^ The language of this blob.
   }
   deriving (Show, Eq, Generic, Message, Named)
 
