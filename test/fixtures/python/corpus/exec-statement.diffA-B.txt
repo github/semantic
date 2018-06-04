@@ -1,28 +1,21 @@
 (Statements
-{+(Call
-  {+(Identifier)+}
-  {+(TextElement)+}
-  {+(Identifier)+}
-  {+(Empty)+})+}
-{+(Call
-  {+(Identifier)+}
-  {+(TextElement)+}
-  {+(Identifier)+}
-  {+(Identifier)+}
-  {+(Empty)+})+}
   (Call
     (Identifier)
   { (TextElement)
   ->(TextElement) }
+  {+(Identifier)+}
     (Empty))
-{-(Call
-  {-(Identifier)-}
-  {-(TextElement)-}
+  (Call
+    (Identifier)
+    (TextElement)
+  {+(Identifier)+}
+  {+(Identifier)+}
   {-(Null)-}
-  {-(Empty)-})-}
-{-(Call
+    (Empty))
+  (Call
+    (Identifier)
+  { (TextElement)
+  ->(TextElement) }
   {-(Identifier)-}
-  {-(TextElement)-}
   {-(Identifier)-}
-  {-(Identifier)-}
-  {-(Empty)-})-})
+    (Empty)))

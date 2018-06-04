@@ -111,7 +111,7 @@ instance ToJSONFields1 Field
 
 instance Evaluatable Field
 
-newtype Pragma a = Pragma ByteString deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+newtype Pragma a = Pragma Text deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Pragma where liftEq = genericLiftEq
 instance Ord1 Pragma where liftCompare = genericLiftCompare

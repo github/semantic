@@ -6,9 +6,8 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import           Data.Aeson
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
+import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue
 import           System.FilePath.Posix
@@ -19,15 +18,14 @@ data Relative = Relative | NonRelative
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
   deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
-importPath :: ByteString -> ImportPath
-importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)
+importPath :: Text -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    stripQuotes = B.filter (`B.notElem` "\'\"")
-    pathType xs | not (B.null xs), BC.head xs == '.' = Relative
+    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- head call here is safe
                 | otherwise = NonRelative
 
 defaultAlias :: ImportPath -> Name
-defaultAlias = name . BC.pack . takeFileName . unPath
+defaultAlias = name . T.pack . takeFileName . unPath
 
 resolveGoImport :: ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
@@ -44,14 +42,14 @@ resolveGoImport (ImportPath path Relative) = do
     [] -> throwResumable $ GoImportError path
     _ -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
-  package <- BC.unpack . unName . Package.packageName <$> currentPackage
+  package <- T.unpack . unName . Package.packageName <$> currentPackage
   trace ("attempting to resolve " <> show path <> " for package " <> package)
   case splitDirectories path of
     -- Import an absolute path that's defined in this package being analyzed.
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
-    _ -> throwResumable $ GoImportError path
+    _  -> throwResumable $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
@@ -166,7 +164,7 @@ instance Show1 Label where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Label
 
 -- | A rune literal in Go (e.g. `'⌘'`).
-newtype Rune a = Rune { _runeLiteral :: ByteString }
+newtype Rune a = Rune { _runeLiteral :: Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 -- TODO: Implement Eval instance for Rune

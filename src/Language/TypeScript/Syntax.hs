@@ -7,11 +7,10 @@ import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
 import           Data.Abstract.Path
 import           Data.Aeson
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as BC
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
+import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prelude
 import           Prologue
@@ -23,15 +22,15 @@ data Relative = Relative | NonRelative
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
   deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
-importPath :: ByteString -> ImportPath
-importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)
+-- TODO: fix the duplication present in this and Python
+importPath :: Text -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    stripQuotes = B.filter (`B.notElem` "\'\"")
-    pathType xs | not (B.null xs), BC.head xs == '.' = Relative
+    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- TODO: fix partiality
                 | otherwise = NonRelative
 
 toName :: ImportPath -> Name
-toName = name . BC.pack . unPath
+toName = name . T.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 --
@@ -268,7 +267,7 @@ instance Show1 LookupType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LookupType
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
-newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
+newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
@@ -406,7 +405,7 @@ instance Ord1 ParenthesizedType where liftCompare = genericLiftCompare
 instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ParenthesizedType
 
-newtype PredefinedType a = PredefinedType { _predefinedType :: ByteString }
+newtype PredefinedType a = PredefinedType { _predefinedType :: T.Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 PredefinedType where liftEq = genericLiftEq
@@ -414,7 +413,7 @@ instance Ord1 PredefinedType where liftCompare = genericLiftCompare
 instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PredefinedType
 
-newtype TypeIdentifier a = TypeIdentifier ByteString
+newtype TypeIdentifier a = TypeIdentifier T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
@@ -539,7 +538,7 @@ instance Ord1 TypeArguments where liftCompare = genericLiftCompare
 instance Show1 TypeArguments where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeArguments
 
-newtype ThisType a = ThisType ByteString
+newtype ThisType a = ThisType T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 ThisType where liftEq = genericLiftEq
@@ -547,7 +546,7 @@ instance Ord1 ThisType where liftCompare = genericLiftCompare
 instance Show1 ThisType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ThisType
 
-newtype ExistentialType a = ExistentialType ByteString
+newtype ExistentialType a = ExistentialType T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 ExistentialType where liftEq = genericLiftEq
@@ -736,7 +735,7 @@ instance Ord1 JsxElement where liftCompare = genericLiftCompare
 instance Show1 JsxElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JsxElement
 
-newtype JsxText a = JsxText ByteString
+newtype JsxText a = JsxText T.Text
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 JsxText where liftEq = genericLiftEq
