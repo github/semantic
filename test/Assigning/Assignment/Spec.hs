@@ -35,7 +35,7 @@ spec = do
       let s = "colourless green ideas sleep furiously"
           w = words s
           (_, nodes) = foldl (\ (i, prev) word -> (i + T.length word + 1, prev <> [node Red i (i + T.length word) []])) (0, []) w in
-      fst <$> runAssignment (fromBytes (encodeUtf8 s)) (many red) (makeState nodes)
+      fst <$> runAssignment (fromUTF8 (encodeUtf8 s)) (many red) (makeState nodes)
       `shouldBe`
         Right (Out <$> w)
 
