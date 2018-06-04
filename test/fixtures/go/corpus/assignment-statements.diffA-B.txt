@@ -35,25 +35,25 @@
       {+(Plus
         {+(Identifier)+}
         {+(Integer)+})+})+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(LShift
+        {+(Identifier)+}
+        {+(Integer)+})+})+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(RShift
+        {+(Identifier)+}
+        {+(Integer)+})+})+}
       (Assignment
       { (Identifier)
       ->(Identifier) }
       { (Times
         {-(Identifier)-}
         {-(Integer)-})
-      ->(LShift
+      ->(DividedBy
         {+(Identifier)+}
         {+(Integer)+}) })
-    {+(Assignment
-      {+(Identifier)+}
-      {+(RShift
-        {+(Identifier)+}
-        {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(DividedBy
-        {+(Identifier)+}
-        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(BXOr

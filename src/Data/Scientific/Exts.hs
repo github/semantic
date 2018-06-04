@@ -7,9 +7,9 @@ module Data.Scientific.Exts
 import Control.Applicative
 import Control.Exception as Exc (evaluate, try)
 import Control.Monad hiding (fail)
-import Data.Attoparsec.ByteString.Char8
-import Data.ByteString.Char8 hiding (readInt, takeWhile)
-import Data.Char (isOctDigit)
+import Data.Attoparsec.Text
+import Data.Text hiding (takeWhile)
+import Data.Char (isDigit, isOctDigit)
 import Data.Scientific
 import Numeric
 import Prelude hiding (fail, filter, null, takeWhile)
@@ -17,7 +17,7 @@ import Prologue hiding (null)
 import Text.Read (readMaybe)
 import System.IO.Unsafe
 
-parseScientific :: ByteString -> Either String Scientific
+parseScientific :: Text -> Either String Scientific
 parseScientific = parseOnly parser
 
 -- | This is a very flexible and forgiving parser for Scientific values.

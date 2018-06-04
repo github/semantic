@@ -3,6 +3,7 @@ module Diffing.Interpreter.Spec where
 
 import Data.Diff
 import Data.Functor.Listable
+import Data.Maybe
 import Data.Record
 import Data.Sum
 import Data.Term
@@ -12,6 +13,7 @@ import qualified Data.Syntax as Syntax
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
+import Test.LeanCheck.Core
 
 spec :: Spec
 spec = parallel $ do
@@ -34,8 +36,11 @@ spec = parallel $ do
           wrap = termIn Nil . inject in
       diffTerms (wrap [ term "b" ]) (wrap [ term "a", term "b" ]) `shouldBe` merge (Nil, Nil) (inject [ inserting (term "a"), merging (term "b") ])
 
-    prop "compares nodes against context" $
-      \ a b -> diffTerms a (termIn Nil (inject (Syntax.Context (pure b) a))) `shouldBe` insertF (In Nil (inject (Syntax.Context (pure (inserting b)) (merging (a :: Term ListableSyntax (Record '[]))))))
+    let noContext :: Term ListableSyntax a -> Bool
+        noContext = isNothing . project @Syntax.Context . termOut
+
+    prop "compares nodes against context" . forAll (filterT (noContext . fst) tiers) $
+      \ (a, b) -> diffTerms a (termIn Nil (inject (Syntax.Context (pure b) a))) `shouldBe` insertF (In Nil (inject (Syntax.Context (pure (inserting b)) (merging (a :: Term ListableSyntax (Record '[]))))))
 
     prop "diffs forward permutations as changes" $
       \ a -> let wrap = termIn Nil . inject

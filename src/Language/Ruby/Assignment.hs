@@ -361,11 +361,11 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
 
     selector = Just <$> term methodSelector
     require = inject <$> (symbol Identifier *> do
-      s <- source
+      s <- rawSource
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
     load = inject <$> (symbol Identifier *> do
-      s <- source
+      s <- rawSource
       guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
     loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
@@ -427,7 +427,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment' (Record Location, ByteString, [ByteString])
+identWithLocals :: Assignment' (Record Location, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getRubyLocals first
@@ -488,7 +488,7 @@ conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> expression <*> expression <*> expression)
 
 emptyStatement :: Assignment
-emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
+emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ rawSource <|> pure Syntax.Empty)
 
 
 -- Helpers

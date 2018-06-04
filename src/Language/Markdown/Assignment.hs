@@ -10,11 +10,9 @@ import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
 import Data.Syntax (makeTerm)
 import Data.Term as Term (Term(..), TermF(..), termFAnnotation, termFOut, termIn)
-import Data.Text.Encoding (encodeUtf8)
 import Parsing.CMark as Grammar (Grammar(..))
 import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
-import qualified Data.ByteString as B
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Text as Text
@@ -148,14 +146,14 @@ htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
 link :: Assignment
 link = makeTerm <$> symbol Link <*> (makeLink . termFAnnotation . termFOut <$> currentNode) <* advance
   where
-    makeLink (CMarkGFM.LINK url title) = Markup.Link (encodeUtf8 url) (nullText title)
-    makeLink _ = Markup.Link B.empty Nothing
+    makeLink (CMarkGFM.LINK url title) = Markup.Link url (nullText title)
+    makeLink _ = Markup.Link mempty Nothing
 
 image :: Assignment
 image = makeTerm <$> symbol Image <*> (makeImage . termFAnnotation . termFOut <$> currentNode) <* advance
   where
-    makeImage (CMarkGFM.IMAGE url title) = Markup.Image (encodeUtf8 url) (nullText title)
-    makeImage _ = Markup.Image B.empty Nothing
+    makeImage (CMarkGFM.IMAGE url title) = Markup.Image url (nullText title)
+    makeImage _ = Markup.Image mempty Nothing
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)
@@ -169,5 +167,5 @@ softBreak = makeTerm <$> token SoftBreak <*> pure Markup.LineBreak
 
 -- Implementation details
 
-nullText :: Text.Text -> Maybe ByteString
-nullText text = if Text.null text then Nothing else Just (encodeUtf8 text)
+nullText :: Text.Text -> Maybe Text.Text
+nullText text = if Text.null text then Nothing else Just text
