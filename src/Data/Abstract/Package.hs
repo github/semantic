@@ -5,6 +5,7 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Map as Map
 import Data.Abstract.Name
+import Prologue
 
 type PackageName = Name
 
@@ -20,7 +21,7 @@ newtype Version = Version { versionString :: String }
   deriving (Eq, Ord, Show)
 
 data PackageBody term = PackageBody
-  { packageModules     :: ModuleTable [Module term]
+  { packageModules     :: ModuleTable (NonEmpty (Module term))
   , packagePrelude     :: Maybe (Module term)
   , packageEntryPoints :: ModuleTable (Maybe Name)
   }

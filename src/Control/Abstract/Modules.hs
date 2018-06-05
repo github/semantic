@@ -66,9 +66,9 @@ runModules :: forall term address value effects a
               )
            => (Module term -> Evaluator address value (Modules address value ': effects) (value, Environment address))
            -> Evaluator address value (Modules address value ': effects) a
-           -> Evaluator address value (Reader (ModuleTable [Module term]) ': effects) a
+           -> Evaluator address value (Reader (ModuleTable (NonEmpty (Module term))) ': effects) a
 runModules evaluateModule = go
-  where go :: forall a . Evaluator address value (Modules address value ': effects) a -> Evaluator address value (Reader (ModuleTable [Module term]) ': effects) a
+  where go :: forall a . Evaluator address value (Modules address value ': effects) a -> Evaluator address value (Reader (ModuleTable (NonEmpty (Module term))) ': effects) a
         go = reinterpret (\ m -> case m of
           Load name -> askModuleTable @term >>= maybe (moduleNotFound name) (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
             where
@@ -95,7 +95,7 @@ getModuleTable = get
 cacheModule :: Member (State (ModuleTable (Maybe (value, Environment address)))) effects => ModulePath -> Maybe (value, Environment address) -> Evaluator address value effects (Maybe (value, Environment address))
 cacheModule path result = modify' (ModuleTable.insert path result) $> result
 
-askModuleTable :: Member (Reader (ModuleTable [Module term])) effects => Evaluator address value effects (ModuleTable [Module term])
+askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module term)))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module term)))
 askModuleTable = ask
 
 
