@@ -8,7 +8,7 @@ import Diffing.Algorithm
 
 -- | A Bidirectional channel in Go (e.g. `chan`).
 newtype BidirectionalChannel a = BidirectionalChannel a
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 BidirectionalChannel where liftEq = genericLiftEq
 instance Ord1 BidirectionalChannel where liftCompare = genericLiftCompare
@@ -19,7 +19,7 @@ instance Evaluatable BidirectionalChannel
 
 -- | A Receive channel in Go (e.g. `<-chan`).
 newtype ReceiveChannel a = ReceiveChannel a
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 ReceiveChannel where liftEq = genericLiftEq
 instance Ord1 ReceiveChannel where liftCompare = genericLiftCompare
@@ -30,7 +30,7 @@ instance Evaluatable ReceiveChannel
 
 -- | A Send channel in Go (e.g. `chan<-`).
 newtype SendChannel a = SendChannel a
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 SendChannel where liftEq = genericLiftEq
 instance Ord1 SendChannel where liftCompare = genericLiftCompare
