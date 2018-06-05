@@ -41,6 +41,7 @@ type Syntax =
    , Expression.Boolean
    , Expression.InstanceOf
    , Expression.MemberAccess
+   , Expression.Subscript
    , Expression.Super
    , Expression.This
    , Java.Syntax.Annotation
@@ -136,6 +137,7 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
     arrayInitializer
+  , arrayAccess
   , assignment'
   , block
   , binary
@@ -535,3 +537,6 @@ spreadParameter = makeTerm <$> symbol Grammar.SpreadParameter <*> children (Java
     variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
     makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
     makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
+
+arrayAccess :: Assignment
+arrayAccess = makeTerm <$> symbol ArrayAccess <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
