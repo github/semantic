@@ -204,7 +204,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 
 
 -- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
--- 
+--
 -- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
 --
 --   1. Each statement’s effects on the store are accumulated;
