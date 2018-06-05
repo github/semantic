@@ -9,7 +9,6 @@ module Semantic.Task
 , IO.readBlob
 , IO.readBlobs
 , IO.readBlobPairs
-, IO.readBlobPairs'
 , IO.readProject
 , IO.findFiles
 , IO.write

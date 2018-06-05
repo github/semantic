@@ -16,8 +16,7 @@ module Semantic.IO
 , openFileForReading
 , readBlob
 , readBlobPairs
-, readBlobPairs'
-, readBlobPairsFromByteString
+, decodeBlobPairs
 , readBlobPairsFromHandle
 , readBlobs
 , readBlobsFromDir
@@ -82,20 +81,16 @@ isDirectory path = liftIO (doesDirectoryExist path)
 languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . takeExtension
 
-readBlobPairsFromByteString :: MonadIO m => BL.ByteString -> m [Blob.BlobPair]
-readBlobPairsFromByteString = fmap toBlobPairs . readFromByteString
-  where
-    toBlobPairs :: BlobDiff -> [Blob.BlobPair]
-    toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
-    toBlobPair blobs = toBlob <$> blobs
+decodeBlobPairs :: BL.ByteString -> Either String [Blob.BlobPair]
+decodeBlobPairs = fmap toBlobPairs . eitherDecode
 
 -- | Read JSON encoded blob pairs from a handle.
 readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.BlobPair]
 readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
-  where
-    toBlobPairs :: BlobDiff -> [Blob.BlobPair]
-    toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
-    toBlobPair blobs = toBlob <$> blobs
+
+toBlobPairs :: BlobDiff -> [Blob.BlobPair]
+toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
+  where toBlobPair blobs = toBlob <$> blobs
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.Blob]
@@ -218,9 +213,6 @@ readBlobPairs :: Member Files effs => Either (Handle 'IO.ReadMode) [Both File] -
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle))
 readBlobPairs (Right paths) = traverse (send . Read . FromPathPair) paths
 
-readBlobPairs' :: Member Files effs => BL.ByteString -> Eff effs [Blob.BlobPair]
-readBlobPairs' bs = send (Read (FromByteString bs))
-
 readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
@@ -259,7 +251,6 @@ data Source blob where
   FromHandle     :: Handle 'IO.ReadMode -> Source [Blob.Blob]
   FromPathPair   :: Both File           -> Source Blob.BlobPair
   FromPairHandle :: Handle 'IO.ReadMode -> Source [Blob.BlobPair]
-  FromByteString :: BL.ByteString       -> Source [Blob.BlobPair]
 
 data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
@@ -277,7 +268,6 @@ runFiles = interpret $ \ files -> case files of
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)
   Read (FromPathPair paths)    -> rethrowing (runBothWith readFilePair paths)
   Read (FromPairHandle handle) -> rethrowing (readBlobPairsFromHandle handle)
-  Read (FromByteString bs)     -> rethrowing (readBlobPairsFromByteString bs)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
   FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
