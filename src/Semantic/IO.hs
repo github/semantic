@@ -16,11 +16,12 @@ module Semantic.IO
 , openFileForReading
 , readBlob
 , readBlobPairs
-, decodeBlobPairs
 , readBlobPairsFromHandle
 , readBlobs
 , readBlobsFromDir
 , readBlobsFromHandle
+, decodeBlobPairs
+, decodeBlobs
 , readFile
 , readFilePair
 , readProject
@@ -92,10 +93,15 @@ toBlobPairs :: BlobDiff -> [Blob.BlobPair]
 toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
   where toBlobPair blobs = toBlob <$> blobs
 
+decodeBlobs :: BL.ByteString -> Either String [Blob.Blob]
+decodeBlobs = fmap toBlobs . eitherDecode
+
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
-  where toBlobs BlobParse{..} = fmap toBlob blobs
+
+toBlobs :: BlobParse -> [Blob.Blob]
+toBlobs BlobParse{..} = fmap toBlob blobs
 
 readBlobFromPath :: MonadIO m => File -> m Blob.Blob
 readBlobFromPath file = do
@@ -145,12 +151,6 @@ readBlobsFromDir path = do
   let paths' = catMaybes $ fmap (\p -> File p . Just <$> languageForFilePath p) paths
   blobs <- traverse readFile paths'
   pure (catMaybes blobs)
-
-readFromByteString :: (FromJSON a, MonadIO m) => BL.ByteString -> m a
-readFromByteString bs = do
-  case eitherDecode bs of
-    Left e  -> liftIO (die (e <> ". Invalid JSON."))
-    Right d -> pure d
 
 readFromHandle :: (FromJSON a, MonadIO m) => Handle 'IO.ReadMode -> m a
 readFromHandle (ReadHandle h) = do

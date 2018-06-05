@@ -114,13 +114,4 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     findOption options value = maybe "" fst (find ((== value) . snd) options)
 
     -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
-    symbolFieldsReader = eitherReader parseSymbolFields
-    parseSymbolFields arg = let fields = splitWhen (== ',') arg in
-                      Right SymbolFields
-                        { symbolFieldsName = "symbol" `elem` fields
-                        , symbolFieldsPath = "path" `elem` fields
-                        , symbolFieldsLang = "language" `elem` fields
-                        , symbolFieldsKind = "kind" `elem` fields
-                        , symbolFieldsLine = "line" `elem` fields
-                        , symbolFieldsSpan = "span" `elem` fields
-                        }
+    symbolFieldsReader = eitherReader (Right . parseSymbolFields)

@@ -4,6 +4,7 @@ module Rendering.Symbol
 , renderToTags
 , SymbolFields(..)
 , defaultSymbolFields
+, parseSymbolFields
 ) where
 
 import Prologue
@@ -12,6 +13,7 @@ import Data.Aeson
 import Data.Blob
 import Data.Record
 import Data.Span
+import Data.List.Split (splitWhen)
 import Data.Term
 import qualified Data.Text as T
 import Rendering.TOC
@@ -99,3 +101,15 @@ defaultSymbolFields = SymbolFields True False False True False True
 
 defaultTagSymbolFields :: SymbolFields
 defaultTagSymbolFields = SymbolFields True True True True True True
+
+parseSymbolFields :: String -> SymbolFields
+parseSymbolFields arg =
+  let fields = splitWhen (== ',') arg in
+  SymbolFields
+    { symbolFieldsName = "symbol" `elem` fields
+    , symbolFieldsPath = "path" `elem` fields
+    , symbolFieldsLang = "language" `elem` fields
+    , symbolFieldsKind = "kind" `elem` fields
+    , symbolFieldsLine = "line" `elem` fields
+    , symbolFieldsSpan = "span" `elem` fields
+    }
