@@ -44,7 +44,7 @@ keys = Map.keys . unModuleTable
 
 -- | Construct a 'ModuleTable' from a non-empty list of 'Module's.
 fromModules :: [Module term] -> ModuleTable (NonEmpty (Module term))
-fromModules modules = ModuleTable (Map.fromListWith (<>) (fmap toEntry modules))
+fromModules modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
   where toEntry m = (modulePath (moduleInfo m), m:|[])
 
 toPairs :: ModuleTable a -> [(ModulePath, a)]
