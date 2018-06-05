@@ -147,3 +147,23 @@ instance Show1 TypeWithModifiers where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for TypeWithModifiers
 instance Evaluatable TypeWithModifiers
+
+data Wildcard a = Wildcard { wildcardAnnotation :: [a], wildcardBounds :: Maybe a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Wildcard where liftEq = genericLiftEq
+instance Ord1 Wildcard where liftCompare = genericLiftCompare
+instance Show1 Wildcard where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeWithModifiers
+instance Evaluatable Wildcard
+
+data WildcardBounds a = WildcardBoundExtends { wildcardBoundType :: a} | WildcardBoundSuper { wildcardBoundType :: a}
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 WildcardBounds where liftEq = genericLiftEq
+instance Ord1 WildcardBounds where liftCompare = genericLiftCompare
+instance Show1 WildcardBounds where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeWithModifiers
+instance Evaluatable WildcardBounds

@@ -57,6 +57,8 @@ type Syntax =
    , Java.Syntax.TypeParameter
    , Java.Syntax.TypeWithModifiers
    , Java.Syntax.Variable
+   , Java.Syntax.Wildcard
+   , Java.Syntax.WildcardBounds
    , Literal.Array
    , Literal.Boolean
    , Literal.Integer
@@ -318,17 +320,17 @@ type' =  choice [
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
      , symbol TypeArgument *> children (term type')
-     , symbol WildCard *> children (term type')
+     , wildcard
      , identifier
      , generic
     ]
     where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
 
 wildcard :: Assignment
-wildcard = makeTerm <$> symbol Wildcard <*> children (super <|> extends)
+wildcard = makeTerm <$> symbol Grammar.Wildcard <*> children (Java.Syntax.Wildcard <$> manyTerm annotation <*> optional (super <|> extends))
   where
-    super =
-
+    super = makeTerm <$> token Super <*> (Java.Syntax.WildcardBoundSuper <$> type')
+    extends = makeTerm1 <$> (Java.Syntax.WildcardBoundExtends <$> type')
 
 if' :: Assignment
 if' = makeTerm <$> symbol IfThenElseStatement <*> children (Statement.If <$> term expression <*> term expression <*> (term expression <|> emptyTerm))
@@ -478,6 +480,8 @@ argumentList = symbol ArgumentList *> children (manyTerm expression)
 
 super :: Assignment
 super = makeTerm <$> token Super <*> pure Expression.Super
+-- INCORRECT: super = makeTerm <$> token Super $> Expression.Super
+-- Take partially applied function and replace it instead of applying
 
 this :: Assignment
 this = makeTerm <$> token This <*> pure Expression.This
