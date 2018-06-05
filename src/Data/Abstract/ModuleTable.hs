@@ -16,10 +16,10 @@ import Data.Abstract.Module
 import qualified Data.Map as Map
 import Data.Semigroup
 import Data.Semilattice.Lower
-import Prologue
-import System.FilePath.Posix
 import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
+import Prologue
+import System.FilePath.Posix
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
   deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Traversable)
