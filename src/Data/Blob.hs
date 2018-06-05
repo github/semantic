@@ -53,7 +53,11 @@ blobPairDeleting = Join . This
 languageForBlobPair :: BlobPair -> Language
 languageForBlobPair (Join (This Blob{..})) = blobLanguage
 languageForBlobPair (Join (That Blob{..})) = blobLanguage
-languageForBlobPair (Join (These _ Blob{..})) = blobLanguage
+languageForBlobPair (Join (These a b))
+  | blobLanguage a == Unknown || blobLanguage b == Unknown
+    = Unknown
+  | otherwise
+    = blobLanguage b
 
 pathForBlobPair :: BlobPair -> FilePath
 pathForBlobPair (Join (This Blob{..})) = blobPath
