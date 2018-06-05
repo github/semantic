@@ -318,11 +318,17 @@ type' =  choice [
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
      , symbol TypeArgument *> children (term type')
-     -- , symbol WildCard *> children (term type')
+     , symbol WildCard *> children (term type')
      , identifier
      , generic
     ]
     where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
+
+wildcard :: Assignment
+wildcard = makeTerm <$> symbol Wildcard <*> children (super <|> extends)
+  where
+    super =
+
 
 if' :: Assignment
 if' = makeTerm <$> symbol IfThenElseStatement <*> children (Statement.If <$> term expression <*> term expression <*> (term expression <|> emptyTerm))
