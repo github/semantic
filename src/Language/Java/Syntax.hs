@@ -167,3 +167,13 @@ instance Show1 WildcardBounds where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for TypeWithModifiers
 instance Evaluatable WildcardBounds
+
+newtype SpreadParameter a = SpreadParameter { spreadParameterVariableDeclarator :: a}
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 SpreadParameter where liftEq = genericLiftEq
+instance Ord1 SpreadParameter where liftCompare = genericLiftCompare
+instance Show1 SpreadParameter where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for SpreadParameter
+instance Evaluatable SpreadParameter

@@ -53,6 +53,7 @@ type Syntax =
    , Java.Syntax.Module
    , Java.Syntax.New
    , Java.Syntax.Package
+   , Java.Syntax.SpreadParameter
    , Java.Syntax.Synchronized
    , Java.Syntax.TypeParameter
    , Java.Syntax.TypeWithModifiers
@@ -307,7 +308,7 @@ enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.Enu
       enumBodyDeclarations = symbol EnumBodyDeclarations *> children (manyTerm expression)
 
 return' :: Assignment
-return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expression)
+return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children (expression <|> emptyTerm))
 
 -- method expressions
 dims :: Assignment.Assignment [] Grammar [Term]
@@ -516,7 +517,7 @@ throws :: Assignment.Assignment [] Grammar [Term]
 throws = symbol Throws *> children (symbol ExceptionTypeList *> children(manyTerm type'))
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
-formalParameters = manyTerm parameter
+formalParameters = manyTerm (parameter <|> spreadParameter)
   where
     parameter = makeTerm <$> symbol FormalParameter <*> children (makeAnnotation <$> manyTerm modifier <*> type' <* symbol VariableDeclaratorId <*> children identifier)
     makeAnnotation [] type' variableName = Type.Annotation variableName type'
@@ -527,3 +528,10 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Type.Anno
 
 fieldAccess :: Assignment
 fieldAccess = makeTerm <$> symbol FieldAccess <*> children (Expression.MemberAccess <$> term expression <*> term expression)
+
+spreadParameter :: Assignment
+spreadParameter = makeTerm <$> symbol Grammar.SpreadParameter <*> children (Java.Syntax.SpreadParameter <$> (makeSingleDecl <$> manyTerm modifier <*> type' <*> variableDeclarator))
+  where
+    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
+    makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
+    makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
