@@ -43,6 +43,7 @@ type Syntax = '[
   , Syntax.FunctionConstructor
   , Syntax.FunctionType
   , Syntax.GADT
+  , Syntax.GADTConstructor
   , Syntax.Identifier
   , Syntax.ListConstructor
   , Syntax.Module
@@ -90,6 +91,7 @@ expressionChoices = [
                     , functionConstructor
                     , functionDeclaration
                     , functionType
+                    , gadtConstructor
                     , gadtDeclaration
                     , integer
                     , listConstructor
@@ -100,6 +102,7 @@ expressionChoices = [
                     , string
                     , type'
                     , typeConstructorIdentifier
+                    , typeSignature
                     , typeSynonymDeclaration
                     , typeVariableIdentifier
                     , tuplingConstructor
@@ -191,6 +194,15 @@ functionDeclaration = makeTerm
 functionType :: Assignment
 functionType = makeTerm <$> symbol FunctionType <*> children (Syntax.FunctionType <$> type' <*> type')
 
+gadtConstructor :: Assignment
+gadtConstructor = makeTerm
+               <$> symbol GadtConstructor
+               <*> children (Syntax.GADTConstructor
+                           <$> (context' <|> emptyTerm)
+                           <*> typeConstructor
+                           <* token Annotation
+                           <*> type')
+
 gadtDeclaration :: Assignment
 gadtDeclaration = makeTerm
                <$> symbol GadtDeclaration
@@ -200,6 +212,9 @@ gadtDeclaration = makeTerm
                            <*> where')
   where
     typeParameters' = makeTerm <$> location <*> (manyTermsTill expression (symbol Where'))
+
+-- gadtConstructor :: Assignment
+-- gadtConstructor = makeTerm <$> symbol GadtConstructor <*> children
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
@@ -239,6 +254,7 @@ type' =  class'
      <|> functionType
      <|> parenthesizedTypePattern
      <|> strictType
+     <|> type''
      <|> typeConstructor
      <|> typePattern
 

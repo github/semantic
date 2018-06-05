@@ -154,6 +154,15 @@ instance Show1 GADT where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable GADT
 
+data GADTConstructor a = GADTConstructor { gadtConstructorContext :: a, gadtConstructorName :: a, gadtConstructorTypeSignature :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 GADTConstructor where liftEq = genericLiftEq
+instance Ord1 GADTConstructor where liftCompare = genericLiftCompare
+instance Show1 GADTConstructor where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable GADTConstructor
+
 data FunctionType a = FunctionType { functionTypeLeft :: a, functionTypeRight :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
@@ -163,3 +172,11 @@ instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable FunctionType
 
+data TypeSignature a = TypeSignature { typeSignatureName :: a, typeSignatureContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeSignature where liftEq = genericLiftEq
+instance Ord1 TypeSignature where liftCompare = genericLiftCompare
+instance Show1 TypeSignature where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeSignature

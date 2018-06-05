@@ -8,4 +8,25 @@
         (Identifier)
         (Identifier)
         (Identifier)))
-    (Statements)))
+    (Statements
+      (GADTConstructor
+        (Empty)
+        (Identifier)
+        (FunctionType
+          (Type
+            (Identifier)
+            (TypeParameters))
+          (FunctionType
+            (Type
+              (Identifier)
+              (TypeParameters))
+            (FunctionType
+              (Type
+                (Identifier)
+                (TypeParameters))
+              (Type
+                (Identifier)
+                (TypeParameters
+                  (Identifier)
+                  (Identifier)
+                  (Identifier))))))))))
