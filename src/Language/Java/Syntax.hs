@@ -38,7 +38,7 @@ instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for ArrayType
 instance Evaluatable Package
 
-data EnumDeclaration a = EnumDeclaration { _enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
+data EnumDeclaration a = EnumDeclaration { enumDeclarationModifier :: ![a], enumDeclarationIdentifier :: !a, enumDeclarationBody :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 EnumDeclaration where liftEq = genericLiftEq

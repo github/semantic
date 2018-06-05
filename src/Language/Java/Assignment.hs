@@ -301,7 +301,7 @@ package :: Assignment
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
 
 enum :: Assignment
-enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
+enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> manyTerm modifier <*> term identifier <*> manyTerm enumConstant)
     where enumConstant = symbol EnumConstant *> children (term identifier)
 
 return' :: Assignment
