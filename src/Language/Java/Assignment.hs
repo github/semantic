@@ -149,6 +149,7 @@ expressionChoices =
   , explicitConstructorInvocation
   -- , TODO: constantDeclaration
   , doWhile
+  , fieldAccess
   , fieldDeclaration
   , float
   , for
@@ -521,3 +522,6 @@ formalParameters = manyTerm parameter
 
 castExpression :: Assignment
 castExpression = makeTerm <$> symbol CastExpression <*> children (flip Type.Annotation <$> type' <*> term expression)
+
+fieldAccess :: Assignment
+fieldAccess = makeTerm <$> symbol FieldAccess <*> children (Expression.MemberAccess <$> term expression <*> term expression)
