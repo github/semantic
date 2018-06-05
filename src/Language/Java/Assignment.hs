@@ -272,7 +272,7 @@ generic :: Assignment
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
 
 methodInvocation :: Assignment
-methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ token AnonDot <*> (token AnonLAngle *> manyTerm type' <* token AnonRAngle <|> pure []) <*> expression)) <*> (argumentList <|> pure []) <*> emptyTerm)
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ token AnonDot <*> manyTerm typeArgument <*> expression)) <*> (argumentList <|> pure []) <*> emptyTerm)
   where
     callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
     callFunction a Nothing = ([], a)
@@ -325,12 +325,14 @@ type' =  choice [
      , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
-     , symbol TypeArgument *> children (term type')
      , wildcard
      , identifier
      , generic
     ]
     where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
+
+typeArgument :: Assignment
+typeArgument = symbol TypeArgument *> children (term type')
 
 wildcard :: Assignment
 wildcard = makeTerm <$> symbol Grammar.Wildcard <*> children (Java.Syntax.Wildcard <$> manyTerm annotation <*> optional (super <|> extends))
