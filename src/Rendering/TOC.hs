@@ -54,7 +54,7 @@ data TOCSummary
     , summarySpan :: Span
     , summaryChangeType :: T.Text
     }
-  | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
+  | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON TOCSummary where
@@ -146,7 +146,7 @@ recordSummary changeText record = case getDeclaration record of
   Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (getField record) changeText
   Nothing -> Nothing
   where
-    formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiver)) = "(" <> receiver <> ") " <> identifier
+    formatIdentifier (MethodDeclaration identifier _ Language.Go        (Just receiver)) = "(" <> receiver <> ") " <> identifier
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
