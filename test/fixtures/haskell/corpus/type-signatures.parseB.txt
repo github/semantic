@@ -1,0 +1,24 @@
+(Module
+  (Empty)
+  (TypeSignature
+    (Identifier)
+    (FunctionType
+      (Type
+        (Identifier)
+        (TypeParameters))
+      (FunctionType
+        (Type
+          (Identifier)
+          (TypeParameters))
+        (FunctionType
+          (Type
+            (Identifier)
+            (TypeParameters))
+          (FunctionType
+            (Type
+              (Identifier)
+              (TypeParameters))
+            (Type
+              (Identifier)
+              (TypeParameters
+                (Identifier)))))))))

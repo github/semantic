@@ -65,31 +65,43 @@
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
+    {+(Constructor
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
       (Constructor
         (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
-      (Constructor
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (Constructor
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (Constructor
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (Constructor
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
+    {+(Constructor
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {-(Constructor
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
       (Empty))
     (Datatype
       (Empty)

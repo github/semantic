@@ -41,6 +41,7 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Field
   , Syntax.FunctionConstructor
+  , Syntax.FunctionType
   , Syntax.GADT
   , Syntax.Identifier
   , Syntax.ListConstructor
@@ -51,6 +52,7 @@ type Syntax = '[
   , Syntax.StrictTypeVariable
   , Syntax.TupleConstructor
   , Syntax.Type
+  , Syntax.TypeSignature
   , Syntax.TypeSynonym
   , Syntax.UnitConstructor
   , Type.TypeParameters
@@ -87,6 +89,7 @@ expressionChoices = [
                     , float
                     , functionConstructor
                     , functionDeclaration
+                    , functionType
                     , gadtDeclaration
                     , integer
                     , listConstructor
@@ -161,6 +164,9 @@ typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.Identi
 typeConstructorIdentifier :: Assignment
 typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
+typeSignature :: Assignment
+typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> type')
+
 typeVariableIdentifier :: Assignment
 typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
@@ -181,6 +187,9 @@ functionDeclaration = makeTerm
                                <*> variableIdentifier
                                <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
+
+functionType :: Assignment
+functionType = makeTerm <$> symbol FunctionType <*> children (Syntax.FunctionType <$> type' <*> type')
 
 gadtDeclaration :: Assignment
 gadtDeclaration = makeTerm
@@ -226,15 +235,25 @@ tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity 
   where tupleWithArity = Syntax.TupleConstructor . succ . count ','
 
 type' :: Assignment
-type' = (makeTerm <$> symbol Type <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))
-     <|> (makeTerm <$> symbol TypePattern <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))
+type' =  class'
+     <|> functionType
      <|> parenthesizedTypePattern
      <|> strictType
      <|> typeConstructor
-     <|> class'
+     <|> typePattern
+
+type'' :: Assignment
+type'' = makeTerm
+      <$> symbol Type
+      <*> children (Syntax.Type
+                  <$> (typeConstructor <|> typeVariableIdentifier)
+                  <*> typeParameters)
 
 typeParameters :: Assignment
 typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> many expression)
+
+typePattern :: Assignment
+typePattern = makeTerm <$> symbol TypePattern <*> children (Syntax.Type <$> typeConstructor <*> typeParameters)
 
 float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)

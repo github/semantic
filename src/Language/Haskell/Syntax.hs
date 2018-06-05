@@ -153,3 +153,13 @@ instance Ord1 GADT where liftCompare = genericLiftCompare
 instance Show1 GADT where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable GADT
+
+data FunctionType a = FunctionType { functionTypeLeft :: a, functionTypeRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FunctionType where liftEq = genericLiftEq
+instance Ord1 FunctionType where liftCompare = genericLiftCompare
+instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FunctionType
+
