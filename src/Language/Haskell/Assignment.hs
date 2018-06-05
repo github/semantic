@@ -41,6 +41,7 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Field
   , Syntax.FunctionConstructor
+  , Syntax.GADT
   , Syntax.Identifier
   , Syntax.ListConstructor
   , Syntax.Module
@@ -86,6 +87,7 @@ expressionChoices = [
                     , float
                     , functionConstructor
                     , functionDeclaration
+                    , gadtDeclaration
                     , integer
                     , listConstructor
                     , listExpression
@@ -180,6 +182,16 @@ functionDeclaration = makeTerm
                                <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
 
+gadtDeclaration :: Assignment
+gadtDeclaration = makeTerm
+               <$> symbol GadtDeclaration
+               <*> children (Syntax.GADT
+                           <$> (context' <|> emptyTerm)
+                           <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters'))
+                           <*> where')
+  where
+    typeParameters' = makeTerm <$> location <*> (manyTermsTill expression (symbol Where'))
+
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
@@ -203,8 +215,10 @@ parenthesizedTypePattern :: Assignment
 parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children typeParameters
 
 strictType :: Assignment
-strictType = makeTerm' <$> symbol StrictType <*> children ((inject <$> (Syntax.StrictType <$> typeConstructor <*> typeParameters))
-                                                        <|> (inject <$> (Syntax.StrictTypeVariable <$> typeVariableIdentifier)))
+strictType = makeTerm'
+          <$> symbol StrictType
+          <*> children (  (inject <$> (Syntax.StrictType <$> typeConstructor <*> typeParameters))
+                      <|> (inject <$> (Syntax.StrictTypeVariable <$> typeVariableIdentifier)))
 
 tuplingConstructor :: Assignment
 tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> rawSource)

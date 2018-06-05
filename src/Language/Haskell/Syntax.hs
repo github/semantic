@@ -144,3 +144,12 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class
+
+data GADT a = GADT { gadtContext :: a, gadtName :: a, gadtConstructors :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 GADT where liftEq = genericLiftEq
+instance Ord1 GADT where liftCompare = genericLiftCompare
+instance Show1 GADT where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable GADT

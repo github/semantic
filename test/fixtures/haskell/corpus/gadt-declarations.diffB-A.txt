@@ -1,0 +1,12 @@
+(Module
+  (Empty)
+  (GADT
+    (Empty)
+    (Type
+    { (Identifier)
+    ->(Identifier) }
+      (Statements
+        (Identifier)
+        (Identifier)
+        (Identifier)))
+    (Statements)))
