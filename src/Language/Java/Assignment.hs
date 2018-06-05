@@ -301,8 +301,10 @@ package :: Assignment
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
 
 enum :: Assignment
-enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> manyTerm modifier <*> term identifier <*> (superInterfaces <|> pure []) <*> manyTerm enumConstant)
-    where enumConstant = symbol EnumConstant *> children (term identifier)
+enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> manyTerm modifier <*> term identifier <*> (superInterfaces <|> pure []) <*> manyTerm enumConstant <*> (enumBodyDeclarations <|> pure []))
+    where
+      enumConstant = symbol EnumConstant *> children (term identifier)
+      enumBodyDeclarations = symbol EnumBodyDeclarations *> children (manyTerm expression)
 
 return' :: Assignment
 return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expression)
