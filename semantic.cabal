@@ -312,6 +312,7 @@ test-suite test
                      , mtl
                      , network
                      , proto3-suite
+                     , proto3-wire
                      , recursion-schemes >= 4.1
                      , semantic
                      , text >= 1.2.1.3
