@@ -120,7 +120,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 constructor :: Assignment
-constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> typeConstructor <*> typeParameters))
+constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> (context' <|> emptyTerm) <*> typeConstructor <*> typeParameters))
            <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
 
 class' :: Assignment

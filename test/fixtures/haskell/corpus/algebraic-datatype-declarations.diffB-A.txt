@@ -16,6 +16,7 @@
         (TypeParameters
           (Identifier)))
       (Constructor
+        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -29,6 +30,7 @@
         (TypeParameters
           (Identifier)))
       (Constructor
+        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -44,6 +46,7 @@
           (Identifier)
           (Identifier)))
       (Constructor
+        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -58,114 +61,119 @@
       ->(Identifier) }
         (TypeParameters))
     {+(Constructor
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(Empty)+}
       {+(Identifier)+}
       {+(TypeParameters)+})+}
       (Constructor
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (Constructor
+        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
     {+(Constructor
+      {+(Empty)+}
       {+(Identifier)+}
       {+(TypeParameters)+})+}
     {+(Constructor
+      {+(Empty)+}
       {+(Identifier)+}
       {+(TypeParameters)+})+}
     {+(Constructor
+      {+(Empty)+}
       {+(Identifier)+}
       {+(TypeParameters)+})+}
     {-(Constructor
+      {-(Empty)-}
       {-(Identifier)-}
       {-(TypeParameters)-})-}
     {-(Constructor
+      {-(Empty)-}
       {-(Identifier)-}
       {-(TypeParameters)-})-}
     {-(Constructor
+      {-(Empty)-}
       {-(Identifier)-}
       {-(TypeParameters)-})-}
     {-(Constructor
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(Empty)-}
       {-(Identifier)-}
       {-(TypeParameters)-})-}
       (Empty))
-    (Datatype
-      (Empty)
-      (Type
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (RecordDataConstructor
-      { (Identifier)
-      ->(Identifier) }
-        (Statements
-          (Field
-            (Statements
-              (Identifier))
-            (Identifier))))
-      (Empty))
-    (Datatype
-      (Empty)
-      (Type
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (RecordDataConstructor
-      { (Identifier)
-      ->(Identifier) }
-        (Statements
-          (Field
-            (Statements
-              (Identifier)
-              (Identifier))
-            (Identifier))))
-      (Empty))
-    (Datatype
-      (Empty)
-      (Type
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (RecordDataConstructor
-      { (Identifier)
-      ->(Identifier) }
-        (Statements
-          (Field
-            (Statements
-              (Identifier))
-            (StrictType
-              (Identifier)
-              (TypeParameters)))
-          (Field
-            (Statements
-              (Identifier))
-            (Identifier))))
-      (Empty))
-    (Datatype
-      (Empty)
-      (Type
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (RecordDataConstructor
-      { (Identifier)
-      ->(Identifier) }
-        (Statements
-          (Field
-            (Statements
-              (Identifier)
-              (Identifier))
-            (Context
-              (Pragma)
-              (StrictType
-                (Identifier)
-                (TypeParameters))))
-          (Field
-            (Statements
-              (Identifier))
-            (Identifier))))
-      (Empty))
+  {+(Datatype
+    {+(Empty)+}
+    {+(Type
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(RecordDataConstructor
+      {+(Identifier)+}
+      {+(Statements
+        {+(Field
+          {+(Statements
+            {+(Identifier)+})+}
+          {+(Identifier)+})+})+})+}
+    {+(Empty)+})+}
+  {+(Datatype
+    {+(Empty)+}
+    {+(Type
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(RecordDataConstructor
+      {+(Identifier)+}
+      {+(Statements
+        {+(Field
+          {+(Statements
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(Identifier)+})+})+})+}
+    {+(Empty)+})+}
+  {+(Datatype
+    {+(Empty)+}
+    {+(Type
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(RecordDataConstructor
+      {+(Identifier)+}
+      {+(Statements
+        {+(Field
+          {+(Statements
+            {+(Identifier)+})+}
+          {+(StrictType
+            {+(Identifier)+}
+            {+(TypeParameters)+})+})+}
+        {+(Field
+          {+(Statements
+            {+(Identifier)+})+}
+          {+(Identifier)+})+})+})+}
+    {+(Empty)+})+}
+  {+(Datatype
+    {+(Empty)+}
+    {+(Type
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
+    {+(RecordDataConstructor
+      {+(Identifier)+}
+      {+(Statements
+        {+(Field
+          {+(Statements
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(Context
+            {+(Pragma)+}
+            {+(StrictType
+              {+(Identifier)+}
+              {+(TypeParameters)+})+})+})+}
+        {+(Field
+          {+(Statements
+            {+(Identifier)+})+}
+          {+(Identifier)+})+})+})+}
+    {+(Empty)+})+}
   {+(Datatype
     {+(Empty)+}
     {+(Type
@@ -186,6 +194,74 @@
             {+(Identifier)+})+}
           {+(Identifier)+})+})+})+}
     {+(Empty)+})+}
+  {-(Datatype
+    {-(Empty)-}
+    {-(Type
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(RecordDataConstructor
+      {-(Identifier)-}
+      {-(Statements
+        {-(Field
+          {-(Statements
+            {-(Identifier)-})-}
+          {-(Identifier)-})-})-})-}
+    {-(Empty)-})-}
+  {-(Datatype
+    {-(Empty)-}
+    {-(Type
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(RecordDataConstructor
+      {-(Identifier)-}
+      {-(Statements
+        {-(Field
+          {-(Statements
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(Identifier)-})-})-})-}
+    {-(Empty)-})-}
+  {-(Datatype
+    {-(Empty)-}
+    {-(Type
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(RecordDataConstructor
+      {-(Identifier)-}
+      {-(Statements
+        {-(Field
+          {-(Statements
+            {-(Identifier)-})-}
+          {-(StrictType
+            {-(Identifier)-}
+            {-(TypeParameters)-})-})-}
+        {-(Field
+          {-(Statements
+            {-(Identifier)-})-}
+          {-(Identifier)-})-})-})-}
+    {-(Empty)-})-}
+  {-(Datatype
+    {-(Empty)-}
+    {-(Type
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
+    {-(RecordDataConstructor
+      {-(Identifier)-}
+      {-(Statements
+        {-(Field
+          {-(Statements
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(Context
+            {-(Pragma)-}
+            {-(StrictType
+              {-(Identifier)-}
+              {-(TypeParameters)-})-})-})-}
+        {-(Field
+          {-(Statements
+            {-(Identifier)-})-}
+          {-(Identifier)-})-})-})-}
+    {-(Empty)-})-}
     (Datatype
       (Empty)
       (Type
@@ -232,6 +308,7 @@
         (Identifier)
         (TypeParameters))
       (Constructor
+        (Empty)
         (Identifier)
         (TypeParameters))
       (Deriving
@@ -242,6 +319,7 @@
         (Identifier)
         (TypeParameters))
       (Constructor
+        (Empty)
         (Identifier)
         (TypeParameters))
       (Deriving
@@ -264,6 +342,7 @@
         (TypeParameters
           (Identifier)))
       (Constructor
+        (Empty)
         (Identifier)
         (TypeParameters
           (Identifier)))
@@ -289,6 +368,7 @@
           (Identifier)
           (Identifier)))
       (Constructor
+        (Empty)
         (Identifier)
         (TypeParameters
           (Identifier)
@@ -313,8 +393,42 @@
           (Identifier)
           (Identifier)))
       (Constructor
+        (Empty)
         (Identifier)
         (TypeParameters
           (Identifier)
           (Identifier)))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+        (Identifier)
+        (TypeParameters
+          (Identifier)))
+      (Constructor
+        (Context'
+          (Identifier))
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters
+          (Identifier)))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+        (Identifier)
+        (TypeParameters
+        { (Identifier)
+        ->(Identifier) }))
+      (Constructor
+        (Context'
+          (Class
+            (Identifier)
+            (TypeParameters
+            { (Identifier)
+            ->(Identifier) })))
+        (Identifier)
+        (TypeParameters
+        { (Identifier)
+        ->(Identifier) }))
       (Empty))))

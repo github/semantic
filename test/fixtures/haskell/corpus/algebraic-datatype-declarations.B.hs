@@ -23,3 +23,6 @@ data N = N deriving (Functor, Ord, Enum, Bounded, Show, Read)
 data Monad a => N a = N a
 data (Ord a, Show a, Eq b) => N a b = N a b
 data (Eq (f a), Applicative f) => N f a = N f a
+
+data Foo bar = HasCallStack => Wiz bar
+data Baz a = Show a => Baz a
