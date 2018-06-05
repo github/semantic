@@ -272,16 +272,16 @@ generic :: Assignment
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
 
 methodInvocation :: Assignment
-methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> expression <*> optional (token AnonDot *> expression)) <*> (argumentList <|> pure []) <*> emptyTerm)
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ token AnonDot <*> (token AnonLAngle *> manyTerm type' <* token AnonRAngle <|> pure []) <*> expression)) <*> (argumentList <|> pure []) <*> emptyTerm)
   where
-    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
-    callFunction a Nothing = a
+    callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
+    callFunction a Nothing = ([], a)
 
 explicitConstructorInvocation :: Assignment
-explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
+explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ token AnonDot <*> manyTerm type' <*> term expression)) <*> argumentList <*> emptyTerm)
   where
-    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
-    callFunction a Nothing = a
+    callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
+    callFunction a Nothing = ([], a)
 
 module' :: Assignment
 module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
