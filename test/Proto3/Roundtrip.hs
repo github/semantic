@@ -25,12 +25,14 @@ spec = parallel $ do
       let bl = Blob (fromUTF8 "puts 'hi'") "example.rb" Ruby
       shouldRoundtrip bl
 
-  -- This will fail if anyone messes up the Enum instance for Language
   describe "languages" $ do
+    -- If this test broke, it means you've probably added another 'Language'.
+    -- Add it to the list of languages below and everything should be good,
+    -- as long as you added it in a way that doesn't break prior Enum encodings.
     it "should match up with Enum declarations" $ do
       let go :: (Primitive f, MessageField f) => [f] -> [L.ByteString]
           go x = E.toLazyByteString . encodePrimitive (fieldNumber 0) <$> x
-      let ints = [0..11] :: [Int]
+      let ints = [0..fromEnum (maxBound @Language)]
       let langs = [Unknown, Go, Haskell, Java, JavaScript, JSON,
                    JSX, Markdown, Python, Ruby, TypeScript, PHP]
       go ints `shouldBe` go langs
