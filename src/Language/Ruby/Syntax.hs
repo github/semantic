@@ -5,7 +5,7 @@ import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path
-import qualified Data.ByteString.Char8 as BC
+import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
@@ -20,7 +20,7 @@ import           System.FilePath.Posix
 resolveRubyName :: ( Member (Modules address value) effects
                    , Member (Resumable ResolutionError) effects
                    )
-                => ByteString
+                => Text
                 -> Evaluator address value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
@@ -32,15 +32,15 @@ resolveRubyName name = do
 resolveRubyPath :: ( Member (Modules address value) effects
                    , Member (Resumable ResolutionError) effects
                    )
-                => ByteString
+                => Text
                 -> Evaluator address value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
   maybeM (throwResumable $ NotFoundError name' [name'] Language.Ruby) modulePath
 
-cleanNameOrPath :: ByteString -> String
-cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
+cleanNameOrPath :: Text -> String
+cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
@@ -108,7 +108,7 @@ doLoad :: ( AbstractValue address value effects
           , Member (Resumable ResolutionError) effects
           , Member Trace effects
           )
-       => ByteString
+       => Text
        -> Bool
        -> Evaluator address value effects value
 doLoad path shouldWrap = do

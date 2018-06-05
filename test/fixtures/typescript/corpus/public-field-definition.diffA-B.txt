@@ -51,57 +51,36 @@
           (TypeIdentifier))
         (Identifier)
         (Float))
-    {+(PublicFieldDefinition
+      (PublicFieldDefinition
       {+(Identifier)+}
-      {+(Empty)+}
-      {+(Annotation
-        {+(TypeIdentifier)+})+}
-      {+(Identifier)+}
-      {+(Float)+})+}
-    {+(PublicFieldDefinition
-      {+(Identifier)+}
-      {+(Readonly)+}
-      {+(Annotation
-        {+(TypeIdentifier)+})+}
-      {+(Identifier)+}
-      {+(TextElement)+})+}
-    {+(PublicFieldDefinition
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Annotation
-        {+(TypeIdentifier)+})+}
-      {+(Identifier)+}
-      {+(Float)+})+}
-    {+(PublicFieldDefinition
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Float)+})+}
-    {-(PublicFieldDefinition
-      {-(Empty)-}
+        (Empty)
       {-(Readonly)-}
-      {-(Annotation
-        {-(TypeIdentifier)-})-}
-      {-(Identifier)-}
-      {-(Float)-})-}
-    {-(PublicFieldDefinition
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)
+        (Float))
+      (PublicFieldDefinition
+      {+(Identifier)+}
       {-(Empty)-}
-      {-(Readonly)-}
-      {-(Annotation
-        {-(TypeIdentifier)-})-}
-      {-(Identifier)-}
-      {-(Float)-})-}
-    {-(PublicFieldDefinition
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Annotation
-        {-(TypeIdentifier)-})-}
-      {-(Identifier)-}
-      {-(Float)-})-}
-    {-(PublicFieldDefinition
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(Float)-})-})))
+        (Readonly)
+        (Annotation
+        { (TypeIdentifier)
+        ->(TypeIdentifier) })
+        (Identifier)
+      { (Float)
+      ->(TextElement) })
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Annotation
+          (TypeIdentifier))
+      { (Identifier)
+      ->(Identifier) }
+        (Float))
+      (PublicFieldDefinition
+        (Empty)
+        (Empty)
+        (Empty)
+        (Identifier)
+      { (Float)
+      ->(Float) }))))

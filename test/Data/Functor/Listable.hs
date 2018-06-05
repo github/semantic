@@ -299,7 +299,7 @@ instance Listable Span where
 
 
 instance Listable Source where
-  tiers = fromBytes `mapT` tiers
+  tiers = fromUTF8 `mapT` tiers
 
 instance Listable ByteString where
   tiers = (T.encodeUtf8 . T.pack) `mapT` strings

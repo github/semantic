@@ -7,27 +7,27 @@ import           Data.Abstract.Module
 import           Data.Aeson
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
+import qualified Data.Language as Language
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
+import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.Language as Language
-import qualified Data.List.NonEmpty as NonEmpty
 
 data QualifiedName
   = QualifiedName (NonEmpty FilePath)
   | RelativeQualifiedName FilePath (Maybe QualifiedName)
   deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
-qualifiedName :: NonEmpty ByteString -> QualifiedName
-qualifiedName xs = QualifiedName (BC.unpack <$> xs)
+qualifiedName :: NonEmpty Text -> QualifiedName
+qualifiedName xs = QualifiedName (T.unpack <$> xs)
 
-relativeQualifiedName :: ByteString -> [ByteString] -> QualifiedName
-relativeQualifiedName prefix []    = RelativeQualifiedName (BC.unpack prefix) Nothing
-relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (Just (qualifiedName (NonEmpty.fromList paths)))
+relativeQualifiedName :: Text -> [Text] -> QualifiedName
+relativeQualifiedName prefix []    = RelativeQualifiedName (T.unpack prefix) Nothing
+relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Just (qualifiedName (NonEmpty.fromList paths)))
 
 -- Python module resolution.
 -- https://docs.python.org/3/reference/import.html#importsystem
@@ -147,7 +147,7 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport (RelativeQualifiedName _ _))        = raiseEff (fail "technically this is not allowed in python")
   eval (QualifiedImport qname@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules qname
-    Rval <$> go (NonEmpty.zip (name . BC.pack <$> qualifiedName) modulePaths)
+    Rval <$> go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = evalQualifiedImport name path

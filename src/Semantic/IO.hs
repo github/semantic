@@ -44,7 +44,7 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
-import           Data.Source (fromBytes, fromText)
+import           Data.Source (fromUTF8, fromText)
 import           Prelude hiding (readFile)
 import           Prologue hiding (MonadError (..), fail)
 import           System.Directory (doesDirectoryExist)
@@ -61,7 +61,7 @@ readFile :: forall m. MonadIO m => File -> m (Maybe Blob.Blob)
 readFile (File "/dev/null" _) = pure Nothing
 readFile (File path language) = do
   raw <- liftIO (Just <$> B.readFile path)
-  pure $ Blob.sourceBlob path language . fromBytes <$> raw
+  pure $ Blob.sourceBlob path language . fromUTF8 <$> raw
 
 readFilePair :: forall m. MonadIO m => File -> File -> m Blob.BlobPair
 readFilePair a b = Join <$> join (maybeThese <$> readFile a <*> readFile b)
