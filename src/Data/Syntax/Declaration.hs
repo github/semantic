@@ -182,7 +182,7 @@ instance Evaluatable Decorator
 
 
 -- | An ADT, i.e. a disjoint sum of products, like 'data' in Haskell, or 'enum' in Rust or Swift.
-data Datatype a = Datatype { datatypeName :: !a, datatypeConstructors :: ![a] }
+data Datatype a = Datatype { datatypeContext :: a, datatypeName :: a, datatypeConstructors :: [a], datatypeDeriving :: a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Eq1 Data.Syntax.Declaration.Datatype where liftEq = genericLiftEq
