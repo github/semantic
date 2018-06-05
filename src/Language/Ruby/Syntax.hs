@@ -43,7 +43,7 @@ cleanNameOrPath :: Text -> String
 cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Send where liftEq = genericLiftEq
 instance Ord1 Send where liftCompare = genericLiftCompare
@@ -58,7 +58,7 @@ instance Evaluatable Send where
     Rval <$> call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Require where liftEq = genericLiftEq
 instance Ord1 Require where liftCompare = genericLiftCompare
@@ -86,7 +86,7 @@ doRequire path = do
 
 
 newtype Load a = Load { loadArgs :: [a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Load where liftEq = genericLiftEq
 instance Ord1 Load where liftCompare = genericLiftCompare
@@ -138,7 +138,7 @@ instance Evaluatable Class where
       subtermValue classBody <* makeNamespace name addr super)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
@@ -153,7 +153,7 @@ instance Evaluatable Module where
 data LowPrecedenceBoolean a
   = LowAnd !a !a
   | LowOr !a !a
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Evaluatable LowPrecedenceBoolean where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
