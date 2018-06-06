@@ -191,7 +191,7 @@ gadtConstructor = makeTerm
                            <$> (context' <|> emptyTerm)
                            <*> typeConstructor
                            <* token Annotation
-                           <*> type')
+                           <*> term type')
 
 gadtDeclaration :: Assignment
 gadtDeclaration = makeTerm

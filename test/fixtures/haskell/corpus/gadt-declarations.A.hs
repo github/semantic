@@ -10,3 +10,6 @@ data Number a where
   Integer :: !Prelude.Integer  -> Number Prelude.Integer
   Ratio   :: !Prelude.Rational -> Number Prelude.Rational
   Decimal :: !Scientific       -> Number Scientific
+
+data Union r v where
+  Union :: {-# UNPACK #-} !Int -> t v -> Union r v
