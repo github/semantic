@@ -9,6 +9,7 @@ import Analysis.Declaration
 import Analysis.PackageDef
 import Data.Aeson
 import Data.Blob
+import Data.Language (ensureLanguage)
 import Data.Record
 import Data.Span
 import Data.Term
@@ -44,7 +45,7 @@ renderToImports blob term = ImportSummary $ toMap (termToModule blob term)
           _ -> defaultModuleName
 
 makeModule :: (HasField fields Span, HasField fields (Maybe Declaration)) => T.Text -> Blob -> [Record fields] -> Module
-makeModule name Blob{..} ds = Module name [T.pack blobPath] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe (declarationSummary name) ds) (mapMaybe referenceSummary ds)
+makeModule name Blob{..} ds = Module name [T.pack blobPath] (T.pack . show <$> ensureLanguage blobLanguage) (mapMaybe importSummary ds) (mapMaybe (declarationSummary name) ds) (mapMaybe referenceSummary ds)
 
 
 getPackageDef :: HasField fields (Maybe PackageDef) => Record fields -> Maybe PackageDef

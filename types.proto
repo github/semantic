@@ -1,15 +1,17 @@
 syntax = "proto3";
 package semantic;
-enum Language {Go = 0;
-               Haskell = 1;
-               JavaScript = 2;
-               JSON = 3;
-               JSX = 4;
-               Markdown = 5;
-               Python = 6;
-               Ruby = 7;
-               TypeScript = 8;
-               PHP = 9;}
+enum Language {Unknown = 0;
+               Go = 1;
+               Haskell = 2;
+               Java = 3;
+               JavaScript = 4;
+               JSON = 5;
+               JSX = 6;
+               Markdown = 7;
+               Python = 8;
+               Ruby = 9;
+               TypeScript = 10;
+               PHP = 11;}
 message Blob { bytes blobSource = 1;
                string blobPath = 2;
                Language blobLanguage = 3;

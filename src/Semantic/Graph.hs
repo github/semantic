@@ -18,7 +18,6 @@ module Semantic.Graph
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
-import           Control.Monad.Effect.Trace
 import           Control.Abstract
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
@@ -26,12 +25,12 @@ import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
-import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
-import           Data.ByteString.Char8 (pack)
+import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
 import           Data.Record
 import           Data.Term
+import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Semantic.IO (Files)

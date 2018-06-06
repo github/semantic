@@ -9,10 +9,11 @@ import           Data.Sum
 import qualified Data.Syntax.Declaration as Decl
 import qualified Data.Syntax.Literal as Lit
 import qualified Data.Syntax.Statement as Stmt
+import           Data.Text (Text)
 import           SpecHelpers
 
--- This gets the ByteString contents of all integers
-integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) ByteString
+-- This gets the Text contents of all integers
+integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) Text
 integerMatcher = match Lit.integerContent target
 
 -- This matches all for-loops with its index variable new variable bound to 0,

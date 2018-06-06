@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
 { (QualifiedImport

@@ -10,7 +10,7 @@ import Assigning.Assignment hiding (Assignment, Error, count)
 import Data.ByteString.Char8 (count)
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm'', contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm', makeTerm'', contextualize, postContextualize)
 import Language.Haskell.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
@@ -25,19 +25,29 @@ import Prologue
 
 type Syntax = '[
     Comment.Comment
+  , Declaration.Constructor
+  , Declaration.Datatype
   , Declaration.Function
   , Literal.Array
   , Literal.Character
   , Literal.Float
   , Literal.Integer
   , Literal.TextElement
+  , Syntax.Class
   , Syntax.Context
+  , Syntax.Context'
+  , Syntax.Deriving
   , Syntax.Empty
   , Syntax.Error
+  , Syntax.Field
   , Syntax.FunctionConstructor
   , Syntax.Identifier
   , Syntax.ListConstructor
   , Syntax.Module
+  , Syntax.Pragma
+  , Syntax.RecordDataConstructor
+  , Syntax.StrictType
+  , Syntax.StrictTypeVariable
   , Syntax.TupleConstructor
   , Syntax.Type
   , Syntax.TypeSynonym
@@ -67,9 +77,12 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices = [
-                      character
+                      algebraicDatatypeDeclaration
+                    , character
                     , comment
+                    , context'
                     , constructorIdentifier
+                    , derivingClause
                     , float
                     , functionConstructor
                     , functionDeclaration
@@ -78,6 +91,7 @@ expressionChoices = [
                     , listExpression
                     , listType
                     , moduleIdentifier
+                    , strictType
                     , string
                     , type'
                     , typeConstructorIdentifier
@@ -90,19 +104,57 @@ expressionChoices = [
                     ]
 
 term :: Assignment -> Assignment
-term term = contextualize comment (postContextualize comment term)
+term term = contextualize (comment <|> pragma) (postContextualize (comment <|> pragma) term)
+
+algebraicDatatypeDeclaration :: Assignment
+algebraicDatatypeDeclaration = makeTerm
+                            <$> symbol AlgebraicDatatypeDeclaration
+                            <*> children (Declaration.Datatype
+                                        <$> (context' <|> emptyTerm)
+                                        <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters))
+                                        <*> ((symbol Constructors *> children (many constructor))
+                                            <|> pure [])
+                                        <*> (derivingClause <|> emptyTerm))
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
+constructor :: Assignment
+constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> typeConstructor <*> typeParameters))
+           <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
+
+class' :: Assignment
+class' = makeTerm <$> symbol Class <*> children (Syntax.Class <$> typeConstructor <*> typeParameters)
+
+context' :: Assignment
+context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> many (type' <|> contextPattern))
+
+contextPattern :: Assignment
+contextPattern = symbol ContextPattern *> children type'
+
+derivingClause :: Assignment
+derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> many typeConstructor)
+
+fields :: Assignment
+fields = makeTerm <$> symbol Fields <*> children (many field)
+
+field :: Assignment
+field = makeTerm <$> symbol Field <*> children (Syntax.Field <$> variableIdentifiers <* token Annotation <*> term type')
+
 variableIdentifier :: Assignment
 variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+
+variableIdentifiers :: Assignment
+variableIdentifiers = makeTerm <$> location <*> many variableIdentifier
 
 constructorIdentifier :: Assignment
 constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 moduleIdentifier :: Assignment
 moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+
+typeClassIdentifier :: Assignment
+typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 typeConstructorIdentifier :: Assignment
 typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
@@ -134,6 +186,9 @@ integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 listConstructor :: Assignment
 listConstructor = makeTerm <$> token ListConstructor <*> pure Syntax.ListConstructor
 
+pragma :: Assignment
+pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
+
 unitConstructor :: Assignment
 unitConstructor = makeTerm <$> token UnitConstructor <*> pure Syntax.UnitConstructor
 
@@ -144,14 +199,25 @@ listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array 
 listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> many type')
 
+parenthesizedTypePattern :: Assignment
+parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children typeParameters
+
+strictType :: Assignment
+strictType = makeTerm' <$> symbol StrictType <*> children ((inject <$> (Syntax.StrictType <$> typeConstructor <*> typeParameters))
+                                                        <|> (inject <$> (Syntax.StrictTypeVariable <$> typeVariableIdentifier)))
+
 tuplingConstructor :: Assignment
-tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> source)
+tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> rawSource)
         -- a tuple (,) has arity two, but only one comma, so apply the successor to the count of commas for the correct arity.
   where tupleWithArity = Syntax.TupleConstructor . succ . count ','
 
 type' :: Assignment
 type' = (makeTerm <$> symbol Type <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))
      <|> (makeTerm <$> symbol TypePattern <*> children (Syntax.Type <$> typeConstructor <*> typeParameters))
+     <|> parenthesizedTypePattern
+     <|> strictType
+     <|> typeConstructor
+     <|> class'
 
 typeParameters :: Assignment
 typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> many expression)
@@ -166,10 +232,12 @@ string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 typeConstructor :: Assignment
-typeConstructor = typeConstructorIdentifier
+typeConstructor =  constructorIdentifier
                <|> functionConstructor
                <|> listConstructor
                <|> listType
+               <|> typeClassIdentifier
+               <|> typeConstructorIdentifier
                <|> tuplingConstructor
                <|> unitConstructor
 

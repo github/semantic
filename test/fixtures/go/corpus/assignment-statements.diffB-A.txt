@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -30,11 +30,15 @@
       {+(Times
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(Plus
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Times
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(Plus
         {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(LShift
@@ -60,12 +64,16 @@
       {+(Modulo
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(Not
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Plus
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(Not
         {+(BAnd
           {+(Identifier)+}
-          {+(Integer)+})+})+})+}
+          {+(Integer)+})+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(Statements
@@ -78,16 +86,6 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Times
-        {-(Identifier)-}
-        {-(Integer)-})-})-}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Plus
-        {-(Identifier)-}
-        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(LShift

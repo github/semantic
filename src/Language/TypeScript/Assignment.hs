@@ -11,7 +11,18 @@ import Data.Abstract.Name (name)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm''
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -27,6 +38,7 @@ import Prologue
 -- | The type of TypeScript syntax.
 type Syntax = '[
     Comment.Comment
+  , Comment.HashBang
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
@@ -72,7 +84,6 @@ type Syntax = '[
   , Statement.Finally
   , Statement.For
   , Statement.ForEach
-  , Statement.HashBang
   , Statement.If
   , Statement.Match
   , Statement.Pattern
@@ -80,6 +91,7 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Statements
   , Statement.Throw
   , Statement.Try
   , Statement.While
@@ -88,7 +100,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Program
   , Syntax.Context
   , Type.Readonly
   , Type.TypeParameters
@@ -175,14 +186,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyTerm statement) <|> parseError
-
--- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
-manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
-
-term :: Assignment -> Assignment
-term term = contextualize comment (postContextualize comment term)
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> manyTerm statement) <|> parseError
 
 expression :: Assignment
 expression = handleError everything
@@ -228,7 +232,7 @@ expression = handleError everything
       ]
 
 undefined' :: Assignment
-undefined' = makeTerm <$> symbol Grammar.Undefined <*> (TypeScript.Syntax.Undefined <$ source)
+undefined' = makeTerm <$> symbol Grammar.Undefined <*> (TypeScript.Syntax.Undefined <$ rawSource)
 
 assignmentExpression :: Assignment
 assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> term (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
@@ -278,13 +282,13 @@ yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol Grammar.YieldExpression <*> children (Statement.Yield <$> term (expression <|> emptyTerm))
 
 this :: Assignment
-this = makeTerm <$> symbol Grammar.This <*> (TypeScript.Syntax.This <$ source)
+this = makeTerm <$> symbol Grammar.This <*> (TypeScript.Syntax.This <$ rawSource)
 
 regex :: Assignment
 regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)
 
 null' :: Assignment
-null' = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
+null' = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
 
 anonymousClass :: Assignment
 anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
@@ -309,7 +313,7 @@ implementsClause' :: Assignment
 implementsClause' = makeTerm <$> symbol Grammar.ImplementsClause <*> children (TypeScript.Syntax.ImplementsClause <$> manyTerm ty)
 
 super :: Assignment
-super = makeTerm <$> symbol Grammar.Super <*> (TypeScript.Syntax.Super <$ source)
+super = makeTerm <$> symbol Grammar.Super <*> (TypeScript.Syntax.Super <$ rawSource)
 
 typeAssertion :: Assignment
 typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> children (TypeScript.Syntax.TypeAssertion <$> term typeArguments' <*> term expression)
@@ -336,10 +340,10 @@ string :: Assignment
 string = makeTerm <$> symbol Grammar.String <*> (Literal.TextElement <$> source)
 
 true :: Assignment
-true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
+true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ rawSource)
 
 false :: Assignment
-false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
 
 identifier :: Assignment
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
@@ -419,7 +423,7 @@ spreadElement :: Assignment
 spreadElement = symbol SpreadElement *> children (term expression)
 
 readonly' :: Assignment
-readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ source)
+readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ rawSource)
 
 methodDefinition :: Assignment
 methodDefinition = makeMethod <$>
@@ -632,7 +636,7 @@ throwStatement :: Assignment
 throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> term expressions)
 
 hashBang :: Assignment
-hashBang = makeTerm <$> symbol HashBangLine <*> (Statement.HashBang <$> source)
+hashBang = makeTerm <$> symbol HashBangLine <*> (Comment.HashBang <$> source)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (TypeScript.Syntax.LabeledStatement <$> statementIdentifier <*> term statement)
@@ -676,7 +680,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     fromClause = symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source)
 
 debuggerStatement :: Assignment
-debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
+debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ rawSource)
 
 expressionStatement' :: Assignment
 expressionStatement' = symbol ExpressionStatement *> children (term expressions)
@@ -858,8 +862,18 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
+
+-- Helpers
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
+term :: Assignment -> Assignment
+term term = contextualize comment (postContextualize comment term)
+
 emptyStatement :: Assignment
-emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
+emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ rawSource <|> pure Syntax.Empty)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment

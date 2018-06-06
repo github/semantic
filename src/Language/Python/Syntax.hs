@@ -7,27 +7,27 @@ import           Data.Abstract.Module
 import           Data.Aeson
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
+import qualified Data.Language as Language
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
+import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.Language as Language
-import qualified Data.List.NonEmpty as NonEmpty
 
 data QualifiedName
   = QualifiedName (NonEmpty FilePath)
   | RelativeQualifiedName FilePath (Maybe QualifiedName)
   deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
 
-qualifiedName :: NonEmpty ByteString -> QualifiedName
-qualifiedName xs = QualifiedName (BC.unpack <$> xs)
+qualifiedName :: NonEmpty Text -> QualifiedName
+qualifiedName xs = QualifiedName (T.unpack <$> xs)
 
-relativeQualifiedName :: ByteString -> [ByteString] -> QualifiedName
-relativeQualifiedName prefix []    = RelativeQualifiedName (BC.unpack prefix) Nothing
-relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (Just (qualifiedName (NonEmpty.fromList paths)))
+relativeQualifiedName :: Text -> [Text] -> QualifiedName
+relativeQualifiedName prefix []    = RelativeQualifiedName (T.unpack prefix) Nothing
+relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Just (qualifiedName (NonEmpty.fromList paths)))
 
 -- Python module resolution.
 -- https://docs.python.org/3/reference/import.html#importsystem
@@ -88,9 +88,7 @@ resolvePythonModules q = do
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![(Name, Name)] }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 Import
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
@@ -138,9 +136,7 @@ evalQualifiedImport name path = letrec' name $ \addr -> do
   unit <$ makeNamespace name addr Nothing
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 QualifiedImport
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
@@ -151,7 +147,7 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport (RelativeQualifiedName _ _))        = raiseEff (fail "technically this is not allowed in python")
   eval (QualifiedImport qname@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules qname
-    Rval <$> go (NonEmpty.zip (name . BC.pack <$> qualifiedName) modulePaths)
+    Rval <$> go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = evalQualifiedImport name path
@@ -162,9 +158,7 @@ instance Evaluatable QualifiedImport where
         makeNamespace name addr Nothing
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 QualifiedAliasedImport
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -188,26 +182,22 @@ instance Evaluatable QualifiedAliasedImport where
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Ord1 Ellipsis where liftCompare = genericLiftCompare
 instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
-
-instance ToJSONFields1 Ellipsis
 
 -- TODO: Implement Eval instance for Ellipsis
 instance Evaluatable Ellipsis
 
 
 data Redirect a = Redirect !a !a
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Ord1 Redirect where liftCompare = genericLiftCompare
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
-
-instance ToJSONFields1 Redirect
 
 -- TODO: Implement Eval instance for Redirect
 instance Evaluatable Redirect

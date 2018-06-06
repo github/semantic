@@ -1,4 +1,4 @@
-(Program
+(Statements
   (ForEach
     (Identifier)
     (Identifier)

@@ -142,9 +142,9 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 data EvalError return where
   FreeVariablesError :: [Name] -> EvalError Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: ByteString -> EvalError Integer
-  FloatFormatError    :: ByteString -> EvalError Scientific
-  RationalFormatError :: ByteString -> EvalError Rational
+  IntegerFormatError  :: Text -> EvalError Integer
+  FloatFormatError    :: Text -> EvalError Scientific
+  RationalFormatError :: Text -> EvalError Rational
   DefaultExportError  :: EvalError ()
   ExportError         :: ModulePath -> Name -> EvalError ()
 
@@ -202,11 +202,14 @@ instance Apply Evaluatable fs => Evaluatable (Sum fs) where
 instance Evaluatable s => Evaluatable (TermF s a) where
   eval = eval . termFOut
 
---- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
----
----   1. Each statement’s effects on the store are accumulated;
----   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
----   3. Only the last statement’s return value is returned.
+
+-- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
+-- 
+-- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
+--
+--   1. Each statement’s effects on the store are accumulated;
+--   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
+--   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

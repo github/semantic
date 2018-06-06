@@ -1,14 +1,18 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, LambdaCase #-}
 module Data.Language where
 
-import Prologue
 import Data.Aeson
+import Prologue
 import Proto3.Suite
 
--- | A programming language.
+-- | The various languages we support.
+-- Please do not reorder any of the field names: the current implementation of 'Primitive'
+-- delegates to the auto-generated 'Enum' instance.
 data Language
-    = Go
+    = Unknown
+    | Go
     | Haskell
+    | Java
     | JavaScript
     | JSON
     | JSX
@@ -17,32 +21,54 @@ data Language
     | Ruby
     | TypeScript
     | PHP
-    deriving (Eq, Generic, Ord, Read, Show, ToJSON, Named, Enum, Finite, Message)
+    deriving (Eq, Generic, Ord, Read, Show, Bounded, ToJSON, Named, Enum, Finite, MessageField)
+
+-- | Predicate failing on 'Unknown' and passing in all other cases.
+knownLanguage :: Language -> Bool
+knownLanguage = (/= Unknown)
+
+-- | Returns 'Nothing' when passed 'Unknown'.
+ensureLanguage :: Language -> Maybe Language
+ensureLanguage Unknown = Nothing
+ensureLanguage x       = Just x
+
+-- | Defaults to 'Unknown'.
+instance HasDefault Language where def = Unknown
+
+-- | Piggybacks on top of the 'Enumerated' instance, as the generated code would.
+-- This instance will get easier when we have DerivingVia.
+instance Primitive Language where
+  primType _ = primType (Proxy @(Enumerated Language))
+  encodePrimitive f = encodePrimitive f . Enumerated . Right
+  decodePrimitive   = decodePrimitive >>= \case
+    (Enumerated (Right r)) -> pure r
+    other                  -> Prelude.fail ("Language decodeMessageField: unexpected value" <> show other)
 
 -- | Returns a Language based on the file extension (including the ".").
-languageForType :: String -> Maybe Language
+languageForType :: String -> Language
 languageForType mediaType = case mediaType of
-    ".json" -> Just JSON
-    ".hs" -> Just Haskell
-    ".md" -> Just Markdown
-    ".rb" -> Just Ruby
-    ".go" -> Just Go
-    ".js" -> Just JavaScript
-    ".ts" -> Just TypeScript
-    ".tsx" -> Just TypeScript
-    ".jsx" -> Just JSX
-    ".py" -> Just Python
-    ".php" -> Just PHP
-    ".phpt" -> Just PHP
-    _ -> Nothing
+    ".java" -> Java
+    ".json" -> JSON
+    ".hs"   -> Haskell
+    ".md"   -> Markdown
+    ".rb"   -> Ruby
+    ".go"   -> Go
+    ".js"   -> JavaScript
+    ".ts"   -> TypeScript
+    ".tsx"  -> TypeScript
+    ".jsx"  -> JSX
+    ".py"   -> Python
+    ".php"  -> PHP
+    ".phpt" -> PHP
+    _       -> Unknown
 
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
-  Go -> [".go"]
-  Haskell -> [".hs"]
+  Go         -> [".go"]
+  Haskell    -> [".hs"]
   JavaScript -> [".js"]
-  PHP -> [".php"]
-  Python -> [".py"]
-  Ruby -> [".rb"]
+  PHP        -> [".php"]
+  Python     -> [".py"]
+  Ruby       -> [".rb"]
   TypeScript -> [".ts", ".tsx", ".d.tsx"]
-  _ -> []
+  _          -> []
