@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -40,7 +40,7 @@ import Data.Term
 import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
-class Evaluatable constr where
+class Show1 constr => Evaluatable constr where
   eval :: ( AbstractValue address value effects
           , Declarations term
           , FreeVariables term
@@ -58,7 +58,6 @@ class Evaluatable constr where
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
-  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
@@ -194,11 +193,11 @@ runUnspecializedWith = runResumableWith
 -- Instances
 
 -- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
-instance Apply Evaluatable fs => Evaluatable (Sum fs) where
+instance (Apply Evaluatable fs, Apply Show1 fs) => Evaluatable (Sum fs) where
   eval = apply @Evaluatable eval
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
-instance Evaluatable s => Evaluatable (TermF s a) where
+instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
   eval = eval . termFOut
 
 
