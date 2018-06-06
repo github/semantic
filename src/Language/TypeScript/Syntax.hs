@@ -248,7 +248,7 @@ instance Evaluatable DefaultExport where
     v <- subtermValue term
     case declaredName term of
       Just name -> do
-        addr <- lookupEnv name
+        addr <- lookupOrAlloc name
         assign addr v
         export name name Nothing
         bind name addr

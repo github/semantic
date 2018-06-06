@@ -120,7 +120,7 @@ instance Evaluatable Assignment where
 
     case lhs of
       LvalLocal nam -> do
-        addr <- lookupEnv nam
+        addr <- lookupOrAlloc nam
         assign addr rhs
         bind nam addr
       LvalMember _ _ ->
