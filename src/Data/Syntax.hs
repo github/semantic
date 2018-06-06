@@ -150,7 +150,7 @@ instance Declarations1 Identifier where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier Text
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
@@ -174,7 +174,7 @@ instance Evaluatable Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -190,7 +190,11 @@ unError :: Span -> Error a -> Error.Error String
 unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show ErrorStack where
+  showsPrec _ = shows . map showPair . unErrorStack
+    where showPair (sym, loc) = sym <> " " <> srcLocFile loc <> ":" <> show (srcLocStartLine loc) <> ":" <> show (srcLocStartCol loc)
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where

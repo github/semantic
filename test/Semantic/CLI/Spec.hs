@@ -39,9 +39,9 @@ parseFixtures =
   , (show (SymbolsTermRenderer defaultSymbolFields), runParse (SymbolsTermRenderer defaultSymbolFields), path'', prefix </> "parse-tree.symbols.json")
   , (show TagsTermRenderer, runParse TagsTermRenderer, path'', prefix </> "parse-tree.tags.json")
   ]
-  where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby)]
-        path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby), File "test/fixtures/ruby/corpus/and-or.B.rb" (Just Ruby)]
-        path'' = [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)]
+  where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
+        path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
+        path'' = [File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby]
         prefix = "test/fixtures/cli"
 
 diffFixtures :: [(String, [BlobPair] -> TaskEff Builder, [Both File], FilePath)]
@@ -50,5 +50,5 @@ diffFixtures =
   , (show SExpressionDiffRenderer, runDiff SExpressionDiffRenderer, pathMode, "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
   , (show ToCDiffRenderer, runDiff ToCDiffRenderer, pathMode, prefix </> "diff-tree.toc.json")
   ]
-  where pathMode = [both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  (Just Ruby))]
+  where pathMode = [both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
         prefix = "test/fixtures/cli"

@@ -23,9 +23,8 @@ projectExtensions = extensionsForLanguage . projectLanguage
 
 data File = File
   { filePath     :: FilePath
-  , fileLanguage :: Maybe Language
-  }
-  deriving (Eq, Ord, Show)
+  , fileLanguage :: Language
+  } deriving (Eq, Ord, Show)
 
 file :: FilePath -> File
 file path = File path (languageForFilePath path)

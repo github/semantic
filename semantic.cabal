@@ -36,7 +36,6 @@ library
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
                      , Control.Abstract.Addressable
-                     , Control.Abstract.Configuration
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
@@ -282,6 +281,7 @@ test-suite test
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
                      , Matching.Go.Spec
+                     , Proto3.Roundtrip
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
@@ -296,6 +296,7 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
+                     , containers
                      , effects
                      , fastsum
                      , filepath
@@ -310,7 +311,8 @@ test-suite test
                      , leancheck
                      , mtl
                      , network
-                     , containers
+                     , proto3-suite
+                     , proto3-wire
                      , recursion-schemes >= 4.1
                      , semantic
                      , text >= 1.2.1.3

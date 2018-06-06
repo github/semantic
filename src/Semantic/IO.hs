@@ -79,7 +79,7 @@ isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path)
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
-languageForFilePath :: FilePath -> Maybe Language
+languageForFilePath :: FilePath -> Language
 languageForFilePath = languageForType . takeExtension
 
 decodeBlobPairs :: BL.ByteString -> Either String [Blob.BlobPair]
@@ -118,7 +118,7 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
   paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
   pure $ Project rootDir (toFile <$> paths) lang entryPoints excludeDirs
   where
-    toFile path = File path (Just lang)
+    toFile path = File path lang
     exts = extensionsForLanguage lang
 
 -- Recursively find files in a directory.
@@ -148,7 +148,7 @@ findFilesInDir path exts excludeDirs = do
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
   paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
-  let paths' = catMaybes $ fmap (\p -> File p . Just <$> languageForFilePath p) paths
+  let paths' = fmap (\p -> File p (languageForFilePath p)) paths
   blobs <- traverse readFile paths'
   pure (catMaybes blobs)
 
@@ -163,7 +163,7 @@ toBlob :: Blob -> Blob.Blob
 toBlob Blob{..} = Blob.sourceBlob path language' (fromText content)
   where language' = case language of
           "" -> languageForFilePath path
-          _  -> readMaybe language
+          _  -> fromMaybe Unknown (readMaybe language)
 
 
 newtype BlobDiff = BlobDiff { blobs :: [BlobPair] }

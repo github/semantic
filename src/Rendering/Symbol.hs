@@ -11,6 +11,7 @@ import Prologue
 import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
+import Data.Language (ensureLanguage)
 import Data.Record
 import Data.Span
 import Data.List.Split (splitWhen)
@@ -36,7 +37,7 @@ renderToSymbols :: (HasField fields (Maybe Declaration), HasField fields Span, F
 renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
   where
     termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => SymbolFields -> FilePath -> Term f (Record fields) -> File
-    termToC fields path = File (T.pack path) (T.pack . show <$> blobLanguage) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
+    termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
 symbolSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => SymbolFields -> FilePath -> T.Text -> Record fields -> Maybe Symbol
@@ -45,7 +46,7 @@ symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
   Just declaration -> Just Symbol
     { symbolName = when symbolFieldsName (declarationIdentifier declaration)
     , symbolPath = when symbolFieldsPath (T.pack path)
-    , symbolLang = join (when symbolFieldsLang (T.pack . show <$> declarationLanguage declaration))
+    , symbolLang = join (when symbolFieldsLang (T.pack . show <$> ensureLanguage (declarationLanguage declaration)))
     , symbolKind = when symbolFieldsKind (toCategoryName declaration)
     , symbolLine = when symbolFieldsLine (declarationText declaration)
     , symbolSpan = when symbolFieldsSpan (getField record)
@@ -54,7 +55,7 @@ symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
 
 data File = File
   { filePath :: T.Text
-  , fileLanguage :: Maybe T.Text
+  , fileLanguage :: T.Text
   , fileSymbols :: [Symbol]
   } deriving (Generic, Eq, Show)
 

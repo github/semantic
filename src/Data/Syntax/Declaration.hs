@@ -54,7 +54,7 @@ instance Evaluatable Method where
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 MethodSignature where liftEq = genericLiftEq
 instance Ord1 MethodSignature where liftCompare = genericLiftCompare
@@ -65,7 +65,7 @@ instance Evaluatable MethodSignature
 
 
 newtype RequiredParameter a = RequiredParameter { requiredParameter :: a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 RequiredParameter where liftEq = genericLiftEq
 instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
@@ -76,7 +76,7 @@ instance Evaluatable RequiredParameter
 
 
 newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 OptionalParameter where liftEq = genericLiftEq
 instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
@@ -91,7 +91,7 @@ instance Evaluatable OptionalParameter
 -- TODO: It would be really nice to have a more meaningful type contained in here than [a]
 -- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
 newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 VariableDeclaration where liftEq = genericLiftEq
 instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
@@ -109,7 +109,7 @@ instance Declarations a => Declarations (VariableDeclaration a) where
 
 -- | A TypeScript/Java style interface declaration to implement.
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
 instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
@@ -124,7 +124,7 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 
 -- | A public field definition such as a field definition in a JavaScript class.
 data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
 instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
@@ -135,7 +135,7 @@ instance Evaluatable PublicFieldDefinition
 
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Variable where liftEq = genericLiftEq
 instance Ord1 Variable where liftCompare = genericLiftCompare
@@ -169,7 +169,7 @@ instance Evaluatable Class where
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Decorator where liftEq = genericLiftEq
 instance Ord1 Decorator where liftCompare = genericLiftCompare
@@ -182,8 +182,8 @@ instance Evaluatable Decorator
 
 
 -- | An ADT, i.e. a disjoint sum of products, like 'data' in Haskell, or 'enum' in Rust or Swift.
-data Datatype a = Datatype { datatypeName :: !a, datatypeConstructors :: ![a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+data Datatype a = Datatype { datatypeContext :: a, datatypeName :: a, datatypeConstructors :: [a], datatypeDeriving :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Data.Syntax.Declaration.Datatype where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Declaration.Datatype where liftCompare = genericLiftCompare
@@ -195,7 +195,7 @@ instance Evaluatable Data.Syntax.Declaration.Datatype
 
 -- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
 data Constructor a = Constructor { constructorName :: !a, constructorFields :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Declaration.Constructor where liftCompare = genericLiftCompare
@@ -207,7 +207,7 @@ instance Evaluatable Data.Syntax.Declaration.Constructor
 
 -- | Comprehension (e.g. ((a for b in c if a()) in Python)
 data Comprehension a = Comprehension { comprehensionValue :: !a, comprehensionBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Comprehension where liftEq = genericLiftEq
 instance Ord1 Comprehension where liftCompare = genericLiftCompare
@@ -219,7 +219,7 @@ instance Evaluatable Comprehension
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Type where liftEq = genericLiftEq
 instance Ord1 Type where liftCompare = genericLiftCompare
@@ -231,7 +231,7 @@ instance Evaluatable Type
 
 -- | Type alias declarations in Javascript/Haskell, etc.
 data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: !a, typeAliasKind :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 TypeAlias where liftEq = genericLiftEq
 instance Ord1 TypeAlias where liftCompare = genericLiftCompare

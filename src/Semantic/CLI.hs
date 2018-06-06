@@ -8,6 +8,7 @@ module Semantic.CLI
 ) where
 
 import           Data.Project
+import           Data.Language (ensureLanguage)
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
 import           Data.Version (showVersion)
@@ -98,15 +99,15 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
-      pure $ Task.readProject rootDir filePath (fromJust fileLanguage) excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
+      pure $ Task.readProject rootDir filePath fileLanguage excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
 
     rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
     excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | lang <- readMaybe b -> Right (File a lang)
-               | lang <- readMaybe a -> Right (File b lang)
-        [path] -> maybe (Left $ "Cannot identify language for path: " <> path) (Right . File path . Just) (languageForFilePath path)
+        [a, b] | (Just lang) <- readMaybe b >>= ensureLanguage -> Right (File a lang)
+               | (Just lang) <- readMaybe a >>= ensureLanguage -> Right (File b lang)
+        [path] -> maybe (Left $ "Cannot identify language for path: " <> path) (Right . File path) (ensureLanguage (languageForFilePath path))
         args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
