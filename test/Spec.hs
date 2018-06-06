@@ -23,6 +23,7 @@ import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
+import qualified Proto3.Roundtrip
 import Test.Hspec
 
 main :: IO ()
@@ -51,3 +52,4 @@ main = hspec $ do
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
     describe "Integration" Integration.Spec.spec
+    describe "Protobuf roundtripping" Proto3.Roundtrip.spec
