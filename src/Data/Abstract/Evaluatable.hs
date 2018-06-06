@@ -59,7 +59,6 @@ type EvaluatableConstraints term address value effects =
   , Member (Reader ModuleInfo) effects
   , Member (Reader PackageInfo) effects
   , Member (Reader Span) effects
-  , Member (Resumable (EnvironmentError address)) effects
   , Member (Resumable EvalError) effects
   , Member (Resumable ResolutionError) effects
   , Member (Resumable (Unspecialized value)) effects
@@ -78,6 +77,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member Fail outer
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
+                       , Member (Resumable (EnvironmentError address)) outer
                        , Member (Resumable (LoadError address value)) outer
                        , Member (State (Heap address (Cell address) value)) outer
                        , Member (State (ModuleTable (Maybe (value, Environment address)))) outer

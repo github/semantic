@@ -214,7 +214,6 @@ evaluateInScopedEnv scopedEnvTerm term = do
 value :: ( AbstractValue address value effects
          , Member (Allocator address value) effects
          , Member (Env address) effects
-         , Member (Resumable (EnvironmentError address)) effects
          )
       => ValueRef value
       -> Evaluator address value effects value
@@ -226,7 +225,6 @@ value (Rval val) = pure val
 subtermValue :: ( AbstractValue address value effects
                 , Member (Allocator address value) effects
                 , Member (Env address) effects
-                , Member (Resumable (EnvironmentError address)) effects
                 )
              => Subterm term (Evaluator address value effects (ValueRef value))
              -> Evaluator address value effects value

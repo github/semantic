@@ -36,7 +36,7 @@ export name alias addr = send (Export name alias addr)
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: Member (Env address) effects => Name -> Evaluator address value effects (Maybe address)
+lookupEnv :: Member (Env address) effects => Name -> Evaluator address value effects address
 lookupEnv name = send (Lookup name)
 
 -- | Bind a 'Name' to an address in the current scope.
@@ -61,7 +61,7 @@ close = send . Close
 -- Effects
 
 data Env address return where
-  Lookup :: Name            -> Env address (Maybe address)
+  Lookup :: Name            -> Env address address
   Bind   :: Name -> address -> Env address ()
   Close  :: Set Name        -> Env address (Environment address)
   Push   ::                    Env address ()
@@ -70,13 +70,14 @@ data Env address return where
   Export :: Name -> Name -> Maybe address -> Env address ()
 
 handleEnv :: forall address effects value result
-          .  ( Member (State (Environment address)) effects
+          .  ( Member (Resumable (EnvironmentError address)) effects
+             , Member (State (Environment address)) effects
              , Member (State (Exports address)) effects
              )
           => Env address result
           -> Evaluator address value effects result
 handleEnv = \case
-  Lookup name -> Env.lookup name <$> get
+  Lookup name -> Env.lookup name <$> get >>= maybeM (freeVariableError name)
   Bind name addr -> modify (Env.insert name addr)
   Close names -> Env.intersect names <$> get
   Push -> modify (Env.push @address)
@@ -84,7 +85,8 @@ handleEnv = \case
   GetEnv -> get
   Export name alias addr -> modify (Exports.insert name alias addr)
 
-runEnv :: Environment address
+runEnv :: Member (Resumable (EnvironmentError address)) effects
+       => Environment address
        -> Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects (a, Environment address)
 runEnv initial = fmap (uncurry filterEnv . first (fmap Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 handleEnv
