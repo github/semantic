@@ -99,7 +99,7 @@ instance Evaluatable Import where
   -- from . import moduleY
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval (Import (RelativeQualifiedName n Nothing) [(name, _)]) = do
-    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (unName name :| []))))
+    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName name :| []))))
     Rval <$> evalQualifiedImport name path
 
   -- from a import b
