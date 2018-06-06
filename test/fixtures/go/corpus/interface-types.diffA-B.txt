@@ -18,7 +18,6 @@
         ->(Identifier) }
           (Interface
             (MemberAccess
-              (Identifier)
               (Identifier)))))
       (Statements
         (Type
@@ -28,7 +27,6 @@
             (Statements
               (Identifier)
               (MemberAccess
-                (Identifier)
                 (Identifier))
               (MethodSignature
                 (Identifier)

@@ -62,7 +62,7 @@ graphingTerms :: ( Element Syntax.Identifier syntax
 graphingTerms recur term@(In _ syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
-      moduleInclusion (Variable (unName name))
+      moduleInclusion (Variable (formatName name))
       variableDefinition name
     _ -> pure ()
   recur term
@@ -90,7 +90,7 @@ graphingModules recur m = interpose @(Modules address value) pure (\ m yield -> 
 
 
 packageVertex :: PackageInfo -> Vertex
-packageVertex = Package . unName . packageName
+packageVertex = Package . formatName . packageName
 
 moduleVertex :: ModuleInfo -> Vertex
 moduleVertex = Module . T.pack . modulePath
@@ -127,7 +127,7 @@ variableDefinition :: ( Member (Env (Hole (Located address))) effects
                    -> TermEvaluator term (Hole (Located address)) value effects ()
 variableDefinition name = do
   graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
-  appendGraph (vertex (Variable (unName name)) `connect` graph)
+  appendGraph (vertex (Variable (formatName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
 appendGraph = modify' . (<>)
