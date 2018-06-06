@@ -35,9 +35,9 @@ import qualified Language.TypeScript.Assignment as TypeScript
 
 justEvaluating
   = runM
-  . fmap (first reassociate)
   . evaluating
   . runPrintingTrace
+  . fmap reassociate
   . runLoadError
   . runUnspecialized
   . runResolutionError
@@ -87,13 +87,10 @@ blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
 
 
-injectConst :: a -> SomeExc (Sum '[Const a])
-injectConst = SomeExc . inject . Const
-
 mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
 mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)
 
-reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . Right
 
 
 newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }
