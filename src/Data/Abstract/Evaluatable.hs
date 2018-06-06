@@ -41,9 +41,7 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( EvaluatableConstraints term address value effects
-          , Member Fail effects
-          )
+  eval :: EvaluatableConstraints term address value effects
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
   default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
@@ -74,7 +72,6 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Evaluatable (Base term)
                        , EvaluatableConstraints term address value inner
                        , Foldable (Cell address)
-                       , Member Fail outer
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (EnvironmentError address)) outer
