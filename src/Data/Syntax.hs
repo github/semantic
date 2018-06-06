@@ -134,7 +134,9 @@ instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) whe
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier { name :: Name }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, ToJSONFields1, Named1, Message1)
+  deriving newtype (Eq, Ord, Show)
+  deriving stock (Foldable, Functor, Generic1, Traversable)
+  deriving anyclass (Diffable, Hashable1, Mergeable, Message1, Named1, ToJSONFields1)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
@@ -151,7 +153,9 @@ instance Declarations1 Identifier where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier Text
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving newtype (Eq, Ord, Show)
+  deriving stock (Foldable, Functor, Generic1, Traversable)
+  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Mergeable, Message1, Named1, ToJSONFields1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare

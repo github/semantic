@@ -27,7 +27,7 @@ runParse ImportsTermRenderer          = withParsedBlobs (\ blob -> decorate (dec
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
-runRawParse :: (Member (Distribute WrappedTask) effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
+runRawParse :: Member (Distribute WrappedTask) effs => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
 runRawParse = flip distributeFor (\ blob -> WrapTask (do
     term <- parse jsonParser blob
     pure (() <$ term)))
