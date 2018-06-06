@@ -67,15 +67,20 @@ type EvaluatableConstraints term address value effects =
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
-                    -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
-                    .  ( Addressable address inner'
+                    .  ( AbstractValue address value inner
+                       -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
+                       , Addressable address inner'
+                       , Declarations term
                        , Evaluatable (Base term)
-                       , EvaluatableConstraints term address value inner
                        , Foldable (Cell address)
+                       , FreeVariables term
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (EnvironmentError address)) outer
+                       , Member (Resumable EvalError) outer
                        , Member (Resumable (LoadError address value)) outer
+                       , Member (Resumable ResolutionError) outer
+                       , Member (Resumable (Unspecialized value)) outer
                        , Member (State (Heap address (Cell address) value)) outer
                        , Member (State (ModuleTable (Maybe (value, Environment address)))) outer
                        , Member Trace outer
