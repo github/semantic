@@ -13,7 +13,6 @@ import           Data.Mergeable
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
-import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
 
