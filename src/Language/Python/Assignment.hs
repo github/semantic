@@ -26,6 +26,7 @@ import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
 import qualified Assigning.Assignment as Assignment
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -35,7 +36,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Text as T
 import Prologue
 
 
@@ -376,7 +377,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
     -- `import a`
-    plainImport = makeTerm <$> location <*> (Python.Syntax.QualifiedImport <$> importPath)
+    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
     -- `from a import foo `
     importSymbol = makeNameAliasPair <$> aliasIdentifier <*> pure Nothing
     -- `from a import foo as bar`

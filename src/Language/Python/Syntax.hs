@@ -135,7 +135,7 @@ evalQualifiedImport name path = letrec' name $ \addr -> do
   bindAll importedEnv
   unit <$ makeNamespace name addr Nothing
 
-newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
+newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
@@ -144,9 +144,8 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (RelativeQualifiedName _ _))        = raiseEff (fail "technically this is not allowed in python")
-  eval (QualifiedImport qname@(QualifiedName qualifiedName)) = do
-    modulePaths <- resolvePythonModules qname
+  eval (QualifiedImport qualifiedName) = do
+    modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
     Rval <$> go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
