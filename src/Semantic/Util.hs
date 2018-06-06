@@ -54,6 +54,7 @@ checking
   . runTermEvaluator @_ @Monovariant @Type
   . caching @[]
   . providingLiveSet
+  . fmap reassociate
   . runLoadError
   . runUnspecialized
   . runResolutionError
