@@ -6,67 +6,83 @@
     {-(FunctionType
       {-(Type
         {-(Identifier)-}
-        {-(TypeParameters)-})-}
+        {-(TypeParameters)-}
+        {-(Empty)-})-}
       {-(FunctionType
         {-(Type
           {-(Identifier)-}
-          {-(TypeParameters)-})-}
+          {-(TypeParameters)-}
+          {-(Empty)-})-}
         {-(FunctionType
           {-(Type
             {-(Identifier)-}
-            {-(TypeParameters)-})-}
+            {-(TypeParameters)-}
+            {-(Empty)-})-}
           {-(FunctionType
             {-(Type
               {-(Identifier)-}
-              {-(TypeParameters)-})-}
+              {-(TypeParameters)-}
+              {-(Empty)-})-}
             {-(Type
               {-(Identifier)-}
               {-(TypeParameters
-                {-(Identifier)-})-})-})-})-})-})-})-}
+                {-(Identifier)-})-}
+              {-(Empty)-})-})-})-})-})-})-}
   {-(TypeSignature
     {-(Identifier)-}
     {-(FunctionType
       {-(Type
         {-(Identifier)-}
-        {-(TypeParameters)-})-}
+        {-(TypeParameters)-}
+        {-(Empty)-})-}
       {-(FunctionType
         {-(Type
           {-(Identifier)-}
-          {-(TypeParameters)-})-}
+          {-(TypeParameters)-}
+          {-(Empty)-})-}
         {-(FunctionType
           {-(Type
             {-(Identifier)-}
-            {-(TypeParameters)-})-}
+            {-(TypeParameters)-}
+            {-(Empty)-})-}
           {-(FunctionType
             {-(Type
               {-(Array
                 {-(Type
                   {-(Identifier)-}
-                  {-(TypeParameters)-})-})-}
-              {-(TypeParameters)-})-}
+                  {-(TypeParameters)-}
+                  {-(Empty)-})-})-}
+              {-(TypeParameters)-}
+              {-(Empty)-})-}
             {-(Type
               {-(Identifier)-}
               {-(TypeParameters
-                {-(Identifier)-})-})-})-})-})-})-})-})
+                {-(Identifier)-})-}
+              {-(Empty)-})-})-})-})-})-})-})
 ->(TypeSignature
   {+(Identifier)+}
   {+(FunctionType
     {+(Type
       {+(Identifier)+}
-      {+(TypeParameters)+})+}
+      {+(TypeParameters)+}
+      {+(Empty)+})+}
     {+(FunctionType
       {+(Type
         {+(Identifier)+}
-        {+(TypeParameters)+})+}
+        {+(TypeParameters)+}
+        {+(Empty)+})+}
       {+(FunctionType
         {+(Type
           {+(Identifier)+}
-          {+(TypeParameters)+})+}
+          {+(TypeParameters)+}
+          {+(Empty)+})+}
         {+(FunctionType
           {+(Type
             {+(Identifier)+}
-            {+(TypeParameters)+})+}
+            {+(TypeParameters)+}
+            {+(Empty)+})+}
           {+(Type
             {+(Identifier)+}
             {+(TypeParameters
-              {+(Identifier)+})+})+})+})+})+})+}) })
+              {+(Identifier)+})+}
+            {+(Empty)+})+})+})+})+})+}) })

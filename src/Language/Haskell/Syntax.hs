@@ -37,7 +37,7 @@ instance Show1 StrictTypeVariable where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable StrictTypeVariable
 
-data Type a = Type { typeIdentifier :: !a, typeParameters :: !a }
+data Type a = Type { typeIdentifier :: a, typeParameters :: a, typeKindSignature :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Type where liftEq = genericLiftEq
@@ -180,3 +180,48 @@ instance Ord1 TypeSignature where liftCompare = genericLiftCompare
 instance Show1 TypeSignature where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeSignature
+
+newtype KindSignature a = KindSignature { kindSignatureContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindSignature where liftEq = genericLiftEq
+instance Ord1 KindSignature where liftCompare = genericLiftCompare
+instance Show1 KindSignature where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindSignature
+
+data KindFunctionType a = KindFunctionType { kindFunctionTypeLeft :: a, kindFunctionTypeRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindFunctionType where liftEq = genericLiftEq
+instance Ord1 KindFunctionType where liftCompare = genericLiftCompare
+instance Show1 KindFunctionType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindFunctionType
+
+newtype Kind a = Kind { kindKind :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Kind where liftEq = genericLiftEq
+instance Ord1 Kind where liftCompare = genericLiftCompare
+instance Show1 Kind where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Kind
+
+newtype KindListType a = KindListType { kindListTypeKind :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindListType where liftEq = genericLiftEq
+instance Ord1 KindListType where liftCompare = genericLiftCompare
+instance Show1 KindListType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindListType
+
+data Star a = Star
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Star where liftEq = genericLiftEq
+instance Ord1 Star where liftCompare = genericLiftCompare
+instance Show1 Star where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Star

@@ -3,3 +3,5 @@ data Bar a b c where
 
 data Bar f a where
   Baz :: { jolo :: Maybe String, runJolo :: f a } -> Bar f a
+
+data Bar a :: [*] -> [*] where

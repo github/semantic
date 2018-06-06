@@ -3,3 +3,5 @@ data Foo a b c where
 
 data Foo f a where
   Bar :: { jolo :: Maybe String, runJolo :: f a } -> Foo f a
+
+data Foo a :: [*] -> * where

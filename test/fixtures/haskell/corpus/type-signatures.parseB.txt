@@ -5,20 +5,25 @@
     (FunctionType
       (Type
         (Identifier)
-        (TypeParameters))
+        (TypeParameters)
+        (Empty))
       (FunctionType
         (Type
           (Identifier)
-          (TypeParameters))
+          (TypeParameters)
+          (Empty))
         (FunctionType
           (Type
             (Identifier)
-            (TypeParameters))
+            (TypeParameters)
+            (Empty))
           (FunctionType
             (Type
               (Identifier)
-              (TypeParameters))
+              (TypeParameters)
+              (Empty))
             (Type
               (Identifier)
               (TypeParameters
-                (Identifier)))))))))
+                (Identifier))
+              (Empty))))))))

@@ -9,7 +9,8 @@
         (Statements
           (Identifier)
           (Identifier)
-          (Identifier)))
+          (Identifier))
+        (Empty))
       (Statements
         (GADTConstructor
           (Empty)
@@ -17,22 +18,26 @@
           (FunctionType
             (Type
               (Identifier)
-              (TypeParameters))
+              (TypeParameters)
+              (Empty))
             (FunctionType
               (Type
                 (Identifier)
-                (TypeParameters))
+                (TypeParameters)
+                (Empty))
               (FunctionType
                 (Type
                   (Identifier)
-                  (TypeParameters))
+                  (TypeParameters)
+                  (Empty))
                 (Type
                 { (Identifier)
                 ->(Identifier) }
                   (TypeParameters
                     (Identifier)
                     (Identifier)
-                    (Identifier)))))))))
+                    (Identifier))
+                  (Empty))))))))
     (GADT
       (Empty)
       (Type
@@ -40,7 +45,8 @@
       ->(Identifier) }
         (Statements
           (Identifier)
-          (Identifier)))
+          (Identifier))
+        (Empty))
       (Statements
         (GADTConstructor
           (Empty)
@@ -55,18 +61,39 @@
                   (Type
                     (Identifier)
                     (TypeParameters
-                      (Identifier))))
+                      (Identifier))
+                    (Empty)))
                 (Field
                   (Statements
                     (Identifier))
                   (Type
                     (Identifier)
                     (TypeParameters
-                      (Identifier)))))
-              (TypeParameters))
+                      (Identifier))
+                    (Empty))))
+              (TypeParameters)
+              (Empty))
             (Type
             { (Identifier)
             ->(Identifier) }
               (TypeParameters
                 (Identifier)
-                (Identifier)))))))))
+                (Identifier))
+              (Empty))))))
+    (GADT
+      (Empty)
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (Statements
+          (Identifier))
+        (KindSignature
+          (KindFunctionType
+            (Kind
+              (KindListType
+                (Star)))
+            (Kind
+            { (KindListType
+              {-(Star)-})
+            ->(Star) }))))
+      (Statements))))
