@@ -1,5 +1,5 @@
 (Statements
-  (MemberAccess
-    (Identifier)
-  { (Identifier)
-  ->(Identifier) }))
+{ (MemberAccess
+  {-(Identifier)-})
+->(MemberAccess
+  {+(Identifier)+}) })
