@@ -227,6 +227,9 @@ element = symbol Element *> children expression
 fieldIdentifier :: Assignment
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> source)
 
+fieldIdentifier' :: Assignment.Assignment [] Grammar Name
+fieldIdentifier' = symbol FieldIdentifier *> (name <$> source)
+
 floatLiteral :: Assignment
 floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
@@ -262,6 +265,9 @@ runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> so
 
 typeIdentifier :: Assignment
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
+
+typeIdentifier' :: Assignment.Assignment [] Grammar Name
+typeIdentifier' = symbol TypeIdentifier *> (name <$> source)
 
 
 -- Primitive Types
@@ -304,7 +310,7 @@ pointerType :: Assignment
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 qualifiedType :: Assignment
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> identifier')
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> (identifier' <|> typeIdentifier'))
 
 sliceType :: Assignment
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
@@ -435,7 +441,7 @@ parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment
-selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> identifier')
+selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> (identifier' <|> fieldIdentifier'))
 
 sliceExpression :: Assignment
 sliceExpression = makeTerm <$> symbol SliceExpression <*> children (Go.Syntax.Slice <$> expression <* token AnonLBracket <*> (emptyTerm <|> expression) <* token AnonColon <*> (expression <|> emptyTerm) <* optional (token AnonColon) <*> (expression <|> emptyTerm))
