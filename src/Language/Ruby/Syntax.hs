@@ -9,7 +9,6 @@ import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
-import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
 
@@ -85,7 +84,7 @@ doRequire path = do
     Just (_, env) -> pure (boolean False, env)
 
 
-newtype Load a = Load { loadArgs :: [a] }
+data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Load where liftEq = genericLiftEq
@@ -93,14 +92,13 @@ instance Ord1 Load where liftCompare = genericLiftCompare
 instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Load where
-  eval (Load [x]) = do
+  eval (Load x Nothing) = do
     path <- subtermValue x >>= asString
     Rval <$> doLoad path False
-  eval (Load [x, wrap]) = do
+  eval (Load x (Just wrap)) = do
     path <- subtermValue x >>= asString
     shouldWrap <- subtermValue wrap >>= asBool
     Rval <$> doLoad path shouldWrap
-  eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
 doLoad :: ( AbstractValue address value effects
           , Member (Env address) effects
