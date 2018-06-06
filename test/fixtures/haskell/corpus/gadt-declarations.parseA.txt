@@ -1,21 +1,18 @@
 (Module
   (Empty)
-  (GADT
-    (Empty)
-    (Type
-      (Identifier)
+  (Statements
+    (GADT
+      (Empty)
+      (Type
+        (Identifier)
+        (Statements
+          (Identifier)
+          (Identifier)
+          (Identifier)))
       (Statements
-        (Identifier)
-        (Identifier)
-        (Identifier)))
-    (Statements
-      (GADTConstructor
-        (Empty)
-        (Identifier)
-        (FunctionType
-          (Type
-            (Identifier)
-            (TypeParameters))
+        (GADTConstructor
+          (Empty)
+          (Identifier)
           (FunctionType
             (Type
               (Identifier)
@@ -24,9 +21,47 @@
               (Type
                 (Identifier)
                 (TypeParameters))
-              (Type
+              (FunctionType
+                (Type
+                  (Identifier)
+                  (TypeParameters))
+                (Type
+                  (Identifier)
+                  (TypeParameters
+                    (Identifier)
+                    (Identifier)
+                    (Identifier)))))))))
+    (GADT
+      (Empty)
+      (Type
+        (Identifier)
+        (Statements
+          (Identifier)
+          (Identifier)))
+      (Statements
+        (GADTConstructor
+          (Empty)
+          (Identifier)
+          (FunctionType
+            (Type
+              (Statements
+                (Field
+                  (Statements
+                    (Identifier))
+                  (Type
+                    (Identifier)
+                    (TypeParameters
+                      (Identifier))))
+                (Field
+                  (Statements
+                    (Identifier))
+                  (Type
+                    (Identifier)
+                    (TypeParameters
+                      (Identifier)))))
+              (TypeParameters))
+            (Type
+              (Identifier)
+              (TypeParameters
                 (Identifier)
-                (TypeParameters
-                  (Identifier)
-                  (Identifier)
-                  (Identifier))))))))))
+                (Identifier)))))))))

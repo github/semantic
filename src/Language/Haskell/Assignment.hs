@@ -147,7 +147,14 @@ fields :: Assignment
 fields = makeTerm <$> symbol Fields <*> children (many field)
 
 field :: Assignment
-field = makeTerm <$> symbol Field <*> children (Syntax.Field <$> variableIdentifiers <* token Annotation <*> term type')
+field = makeTerm
+     <$> symbol Field
+     <*> children (Syntax.Field
+                 <$> variableIdentifiers
+                 <* token Annotation
+                 <*> fieldType)
+  where
+    fieldType = makeTerm <$> location <*> (Syntax.Type <$> term (type' <|> typeVariableIdentifier) <*> typeParameters)
 
 variableIdentifier :: Assignment
 variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
@@ -213,9 +220,6 @@ gadtDeclaration = makeTerm
   where
     typeParameters' = makeTerm <$> location <*> (manyTermsTill expression (symbol Where'))
 
--- gadtConstructor :: Assignment
--- gadtConstructor = makeTerm <$> symbol GadtConstructor <*> children
-
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
@@ -251,6 +255,7 @@ tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity 
 
 type' :: Assignment
 type' =  class'
+     <|> fields
      <|> functionType
      <|> parenthesizedTypePattern
      <|> strictType
@@ -261,9 +266,7 @@ type' =  class'
 type'' :: Assignment
 type'' = makeTerm
       <$> symbol Type
-      <*> children (Syntax.Type
-                  <$> (typeConstructor <|> typeVariableIdentifier)
-                  <*> typeParameters)
+      <*> children (Syntax.Type <$> (typeConstructor <|> typeVariableIdentifier <|> type') <*> typeParameters)
 
 typeParameters :: Assignment
 typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> many expression)

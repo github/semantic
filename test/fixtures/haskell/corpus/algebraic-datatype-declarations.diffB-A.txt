@@ -116,7 +116,9 @@
           (Field
             (Statements
               (Identifier))
-            (Identifier))))
+            (Type
+              (Identifier)
+              (TypeParameters)))))
       (Empty))
     (Datatype
       (Empty)
@@ -132,7 +134,9 @@
             (Statements
               (Identifier)
               (Identifier))
-            (Identifier))))
+            (Type
+              (Identifier)
+              (TypeParameters)))))
       (Empty))
     (Datatype
       (Empty)
@@ -147,13 +151,17 @@
           (Field
             (Statements
               (Identifier))
-            (StrictType
-              (Identifier)
+            (Type
+              (StrictType
+                (Identifier)
+                (TypeParameters))
               (TypeParameters)))
           (Field
             (Statements
               (Identifier))
-            (Identifier))))
+            (Type
+              (Identifier)
+              (TypeParameters)))))
       (Empty))
     (Datatype
       (Empty)
@@ -169,15 +177,19 @@
             (Statements
               (Identifier)
               (Identifier))
-            (Context
-              (Pragma)
-              (StrictType
-                (Identifier)
-                (TypeParameters))))
+            (Type
+              (Context
+                (Pragma)
+                (StrictType
+                  (Identifier)
+                  (TypeParameters)))
+              (TypeParameters)))
           (Field
             (Statements
               (Identifier))
-            (Identifier))))
+            (Type
+              (Identifier)
+              (TypeParameters)))))
       (Empty))
   {+(Datatype
     {+(Empty)+}
@@ -190,14 +202,18 @@
         {+(Field
           {+(Statements
             {+(Identifier)+})+}
-          {+(Identifier)+})+})+})+}
+          {+(Type
+            {+(Identifier)+}
+            {+(TypeParameters)+})+})+})+})+}
     {+(RecordDataConstructor
       {+(Identifier)+}
       {+(Statements
         {+(Field
           {+(Statements
             {+(Identifier)+})+}
-          {+(Identifier)+})+})+})+}
+          {+(Type
+            {+(Identifier)+}
+            {+(TypeParameters)+})+})+})+})+}
     {+(Empty)+})+}
     (Datatype
       (Empty)
@@ -210,14 +226,18 @@
           (Field
             (Statements
               (Identifier))
-            (Identifier))))
+            (Type
+              (Identifier)
+              (TypeParameters)))))
       (RecordDataConstructor
         (Identifier)
         (Statements
           (Field
             (Statements
               (Identifier))
-            (Identifier))))
+            (Type
+              (Identifier)
+              (TypeParameters)))))
       (Empty))
   {-(Datatype
     {-(Empty)-}
@@ -230,14 +250,18 @@
         {-(Field
           {-(Statements
             {-(Identifier)-})-}
-          {-(Identifier)-})-})-})-}
+          {-(Type
+            {-(Identifier)-}
+            {-(TypeParameters)-})-})-})-})-}
     {-(RecordDataConstructor
       {-(Identifier)-}
       {-(Statements
         {-(Field
           {-(Statements
             {-(Identifier)-})-}
-          {-(Identifier)-})-})-})-}
+          {-(Type
+            {-(Identifier)-}
+            {-(TypeParameters)-})-})-})-})-}
     {-(Empty)-})-}
     (Datatype
       (Empty)
