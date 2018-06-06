@@ -5,3 +5,8 @@ data Foo f a where
   Bar :: { jolo :: Maybe String, runJolo :: f a } -> Foo f a
 
 data Foo a :: [*] -> * where
+
+data Number a where
+  Integer :: !Prelude.Integer  -> Number Prelude.Integer
+  Ratio   :: !Prelude.Rational -> Number Prelude.Rational
+  Decimal :: !Scientific       -> Number Scientific

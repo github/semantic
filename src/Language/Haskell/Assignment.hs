@@ -52,6 +52,7 @@ type Syntax = '[
   , Syntax.ListConstructor
   , Syntax.Module
   , Syntax.Pragma
+  , Syntax.QualifiedTypeConstructorIdentifier
   , Syntax.RecordDataConstructor
   , Syntax.Star
   , Syntax.StrictType
@@ -134,6 +135,7 @@ expressionChoices = [
                     , listExpression
                     , listType
                     , moduleIdentifier
+                    , qualifiedTypeConstructorIdentifier
                     , star
                     , strictType
                     , string
@@ -246,6 +248,9 @@ parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children typeParam
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
 
+qualifiedTypeConstructorIdentifier :: Assignment
+qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> (many expression))
+
 star :: Assignment
 star = makeTerm <$> token Star <*> pure Syntax.Star
 
@@ -301,6 +306,7 @@ typeConstructor =  constructorIdentifier
                <|> functionConstructor
                <|> listConstructor
                <|> listType
+               <|> qualifiedTypeConstructorIdentifier
                <|> typeClassIdentifier
                <|> typeConstructorIdentifier
                <|> tuplingConstructor

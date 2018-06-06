@@ -96,4 +96,69 @@
             { (KindListType
               {-(Star)-})
             ->(Star) }))))
-      (Statements))))
+      (Statements))
+    (GADT
+      (Empty)
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (Statements
+          (Identifier))
+        (Empty))
+      (Statements
+        (GADTConstructor
+          (Empty)
+        { (Identifier)
+        ->(Identifier) }
+          (FunctionType
+            (Type
+              (StrictType
+                (QualifiedTypeConstructorIdentifier
+                  (Identifier)
+                  (Identifier))
+                (TypeParameters))
+              (TypeParameters)
+              (Empty))
+            (Type
+              (Identifier)
+              (TypeParameters
+                (QualifiedTypeConstructorIdentifier
+                  (Identifier)
+                  (Identifier)))
+              (Empty))))
+        (GADTConstructor
+          (Empty)
+        { (Identifier)
+        ->(Identifier) }
+          (FunctionType
+            (Type
+              (StrictType
+                (QualifiedTypeConstructorIdentifier
+                  (Identifier)
+                  (Identifier))
+                (TypeParameters))
+              (TypeParameters)
+              (Empty))
+            (Type
+              (Identifier)
+              (TypeParameters
+                (QualifiedTypeConstructorIdentifier
+                  (Identifier)
+                  (Identifier)))
+              (Empty))))
+        (GADTConstructor
+          (Empty)
+        { (Identifier)
+        ->(Identifier) }
+          (FunctionType
+            (Type
+              (StrictType
+                (Identifier)
+                (TypeParameters))
+              (TypeParameters)
+              (Empty))
+            (Type
+              (Identifier)
+              (TypeParameters
+                (Identifier))
+              (Empty))))))))
