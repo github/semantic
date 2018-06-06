@@ -9,7 +9,6 @@ module Control.Abstract.Heap
 , alloc
 , deref
 , assign
-, lookupOrAlloc
 , letrec
 , letrec'
 , variable
@@ -69,13 +68,6 @@ assign :: Member (Allocator address value) effects
 assign address = send . Assign address
 
 
--- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: Member (Env address) effects
-              => Name
-              -> Evaluator address value effects address
-lookupOrAlloc = lookupEnv
-
-
 letrec :: ( Member (Allocator address value) effects
           , Member (Env address) effects
           )
@@ -83,7 +75,7 @@ letrec :: ( Member (Allocator address value) effects
        -> Evaluator address value effects value
        -> Evaluator address value effects (value, address)
 letrec name body = do
-  addr <- lookupOrAlloc name
+  addr <- lookupEnv name
   v <- locally (bind name addr *> body)
   assign addr v
   pure (v, addr)

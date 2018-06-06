@@ -242,7 +242,7 @@ instance Evaluatable TypeAlias where
   eval TypeAlias{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable (subterm typeAliasIdentifier))
     v <- subtermValue typeAliasKind
-    addr <- lookupOrAlloc name
+    addr <- lookupEnv name
     assign addr v
     Rval v <$ bind name addr
 
