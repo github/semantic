@@ -29,7 +29,7 @@ instance HasDefault Name where
 
 instance Primitive Name where
   encodePrimitive num (Name text) = Encode.text num (LT.fromStrict text)
-  encodePrimitive num (I _) = error "We should never be encoding I :: Name constructors"
+  encodePrimitive _ (I _) = error "We should never be encoding I :: Name constructors"
   decodePrimitive = Name . LT.toStrict <$> Decode.text
   primType _ = Bytes
 

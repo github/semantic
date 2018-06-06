@@ -24,7 +24,6 @@ import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import Data.Char (toLower)
-import qualified Data.ByteString.Char8 as BC
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
