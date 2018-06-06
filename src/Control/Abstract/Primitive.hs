@@ -39,6 +39,7 @@ defineBuiltins :: ( AbstractValue address value effects
                   , Member Fresh effects
                   , Member (Reader ModuleInfo) effects
                   , Member (Reader Span) effects
+                  , Member (Resumable (EnvironmentError address)) effects
                   , Member Trace effects
                   )
                => Evaluator address value effects ()

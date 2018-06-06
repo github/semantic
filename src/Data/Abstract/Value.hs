@@ -127,7 +127,8 @@ instance ( Coercible body (Eff effects)
     pure $ Class n (mergeEnvs product env)
 
   namespace n env = do
-    env' <- lookupEnv n >>= deref >>= asNamespaceEnv
+    maybeAddr <- lookupEnv n
+    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
     pure (Namespace n (Env.mergeNewer env' env))
     where asNamespaceEnv v
             | Namespace _ env' <- v = pure env'

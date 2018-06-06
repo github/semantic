@@ -70,10 +70,12 @@ assign address = send . Assign address
 
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: Member (Env address) effects
+lookupOrAlloc :: ( Member (Allocator address value) effects
+                 , Member (Env address) effects
+                 )
               => Name
               -> Evaluator address value effects address
-lookupOrAlloc = lookupEnv
+lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
 letrec :: ( Member (Allocator address value) effects
@@ -89,12 +91,14 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: Member (Env address) effects
+letrec' :: ( Member (Allocator address value) effects
+           , Member (Env address) effects
+           )
         => Name
         -> (address -> Evaluator address value effects value)
         -> Evaluator address value effects value
 letrec' name body = do
-  addr <- lookupEnv name
+  addr <- lookupOrAlloc name
   v <- locally (body addr)
   v <$ bind name addr
 
@@ -102,10 +106,11 @@ letrec' name body = do
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: ( Member (Allocator address value) effects
             , Member (Env address) effects
+            , Member (Resumable (EnvironmentError address)) effects
             )
          => Name
          -> Evaluator address value effects value
-variable name = lookupEnv name >>= deref
+variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
 
 
 -- Garbage collection

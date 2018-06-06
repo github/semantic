@@ -126,7 +126,7 @@ variableDefinition :: ( Member (Env (Hole (Located address))) effects
                    => Name
                    -> TermEvaluator term (Hole (Located address)) value effects ()
 variableDefinition name = do
-  graph <- maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe <$> TermEvaluator (lookupEnv name)
+  graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
   appendGraph (vertex (Variable (formatName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()

@@ -51,6 +51,7 @@ include :: ( AbstractValue address value effects
            , Member (Env address) effects
            , Member (Modules address value) effects
            , Member (Resumable ResolutionError) effects
+           , Member (Resumable (EnvironmentError address)) effects
            , Member Trace effects
            )
         => Subterm term (Evaluator address value effects (ValueRef value))

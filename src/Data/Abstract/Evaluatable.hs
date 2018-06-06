@@ -51,6 +51,7 @@ class Show1 constr => Evaluatable constr where
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
+          , Member (Resumable (EnvironmentError address)) effects
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
           , Member (Resumable (Unspecialized value)) effects
