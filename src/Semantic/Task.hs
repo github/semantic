@@ -38,6 +38,7 @@ module Semantic.Task
 -- * Interpreting
 , runTask
 , runTaskWithOptions
+, runTaskWithOptions'
 -- * Re-exports
 , Distribute
 , Eff
@@ -151,6 +152,23 @@ runTaskWithOptions options task = do
   closeQueue statter
   closeStatClient (asyncQueueExtra statter)
   closeQueue logger
+  either (die . displayException) pure result
+
+runTaskWithOptions' :: Options -> AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> TaskEff a -> IO a
+runTaskWithOptions' options logger statter task = do
+  (result, stat) <- withTiming "run" [] $ do
+    let run :: TaskEff a -> IO (Either SomeException a)
+        run = runM . runError
+                   . runTelemetry logger statter
+                   . runTraceInTelemetry
+                   . runReader options
+                   . IO.runFiles
+                   . runResolution
+                   . runTaskF
+                   . runDistribute (run . unwrapTask)
+    run task
+  queue statter stat
+
   either (die . displayException) pure result
 
 runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
