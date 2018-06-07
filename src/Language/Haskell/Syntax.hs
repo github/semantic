@@ -234,3 +234,12 @@ instance Ord1 QualifiedTypeConstructorIdentifier where liftCompare = genericLift
 instance Show1 QualifiedTypeConstructorIdentifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedTypeConstructorIdentifier
+
+data AnnotatedTypeVariable a = AnnotatedTypeVariable { annotatedTypeVariableIdentifier :: a, annotatedTypeVariableannotation :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AnnotatedTypeVariable where liftEq = genericLiftEq
+instance Ord1 AnnotatedTypeVariable where liftCompare = genericLiftCompare
+instance Show1 AnnotatedTypeVariable where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable AnnotatedTypeVariable

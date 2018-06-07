@@ -11,5 +11,5 @@ data Number a where
   Ratio   :: !Prelude.Rational -> Number Prelude.Rational
   Decimal :: !Scientific       -> Number Scientific
 
-data Union r v where
+data Union (r :: [ * -> * ]) (v :: *) where
   Union :: {-# UNPACK #-} !Int -> t v -> Union r v

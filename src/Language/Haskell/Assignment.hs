@@ -33,6 +33,7 @@ type Syntax = '[
   , Literal.Float
   , Literal.Integer
   , Literal.TextElement
+  , Syntax.AnnotatedTypeVariable
   , Syntax.Class
   , Syntax.Context
   , Syntax.Context'
@@ -83,6 +84,9 @@ algebraicDatatypeDeclaration = makeTerm
                                             <|> pure [])
                                         <*> (derivingClause <|> emptyTerm))
 
+annotatedTypeVariable :: Assignment
+annotatedTypeVariable = makeTerm <$> symbol AnnotatedTypeVariable <*> children (Syntax.AnnotatedTypeVariable <$> typeVariableIdentifier <* token Annotation <*> (kind <|> type'))
+
 character :: Assignment
 character = makeTerm <$> symbol Char <*> (Literal.Character <$> source)
 
@@ -117,6 +121,7 @@ expression = term (handleError (choice expressionChoices))
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices = [
                       algebraicDatatypeDeclaration
+                    , annotatedTypeVariable
                     , character
                     , comment
                     , context'

@@ -167,8 +167,17 @@
       (Type
         (Identifier)
         (Statements
-          (Identifier)
-          (Identifier))
+          (AnnotatedTypeVariable
+            (Identifier)
+            (KindListType
+              (KindFunctionType
+                (Kind
+                  (Star))
+                (Kind
+                  (Star)))))
+          (AnnotatedTypeVariable
+            (Identifier)
+            (Star)))
         (Empty))
       (Statements
         (GADTConstructor
