@@ -5,77 +5,96 @@
       (Type
       { (Identifier)
       ->(Identifier) }
-        (TypeParameters))
+        (TypeParameters)
+        (Empty))
       (Type
       { (Identifier)
       ->(Identifier) }
-        (TypeParameters)))
+        (TypeParameters)
+        (Empty)))
     (TypeSynonym
       (Type
       { (Identifier)
       ->(Identifier) }
-        (TypeParameters))
+        (TypeParameters)
+        (Empty))
       (Type
         (ListConstructor)
-        (TypeParameters)))
+        (TypeParameters)
+        (Empty)))
     (TypeSynonym
       (Type
         (Identifier)
         (TypeParameters
           (Identifier)
-        {+(Identifier)+}))
+        {+(Identifier)+})
+        (Empty))
       (Type
         (Identifier)
         (TypeParameters
           (Identifier)
-        {+(Identifier)+})))
+        {+(Identifier)+})
+        (Empty)))
     (TypeSynonym
       (Type
         (Identifier)
         (TypeParameters
-          (Identifier)))
+          (Identifier))
+        (Empty))
       (Type
         (Array
           (Type
           { (Identifier)
           ->(Identifier) }
             (TypeParameters
-              (Identifier))))
-        (TypeParameters)))
+              (Identifier))
+            (Empty)))
+        (TypeParameters)
+        (Empty)))
     (TypeSynonym
       (Type
       { (Identifier)
       ->(Identifier) }
-        (TypeParameters))
+        (TypeParameters)
+        (Empty))
       (Type
         (UnitConstructor)
-        (TypeParameters)))
+        (TypeParameters)
+        (Empty)))
   {-(TypeSynonym
     {-(Type
       {-(Identifier)-}
-      {-(TypeParameters)-})-}
+      {-(TypeParameters)-}
+      {-(Empty)-})-}
     {-(Type
       {-(TupleConstructor)-}
-      {-(TypeParameters)-})-})-}
+      {-(TypeParameters)-}
+      {-(Empty)-})-})-}
     (TypeSynonym
       (Type
         (Identifier)
-        (TypeParameters))
+        (TypeParameters)
+        (Empty))
       (Type
         (TupleConstructor)
-        (TypeParameters)))
+        (TypeParameters)
+        (Empty)))
     (TypeSynonym
       (Type
         (Identifier)
-        (TypeParameters))
+        (TypeParameters)
+        (Empty))
       (Type
       { (FunctionConstructor)
       ->(TupleConstructor) }
-        (TypeParameters)))
+        (TypeParameters)
+        (Empty)))
   {+(TypeSynonym
     {+(Type
       {+(Identifier)+}
-      {+(TypeParameters)+})+}
+      {+(TypeParameters)+}
+      {+(Empty)+})+}
     {+(Type
       {+(FunctionConstructor)+}
-      {+(TypeParameters)+})+})+}))
+      {+(TypeParameters)+}
+      {+(Empty)+})+})+}))

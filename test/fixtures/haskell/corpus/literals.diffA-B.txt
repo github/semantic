@@ -49,10 +49,12 @@
     {+(Identifier)+}
     {+(Statements
       {+(Float)+})+})+}
-  {+(Function
-    {+(Identifier)+}
-    {+(Statements
-      {+(Float)+})+})+}
+    (Function
+    { (Identifier)
+    ->(Identifier) }
+      (Statements
+      {+(Float)+}
+      {-(Integer)-}))
   {+(Function
     {+(Identifier)+}
     {+(Statements
@@ -263,10 +265,6 @@
         {+(TextElement)+}
         {+(TextElement)+}
         {+(TextElement)+})+})+})+}
-  {-(Function
-    {-(Identifier)-}
-    {-(Statements
-      {-(Integer)-})-})-}
   {-(Function
     {-(Identifier)-}
     {-(Statements
