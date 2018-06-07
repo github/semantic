@@ -243,3 +243,66 @@ instance Ord1 AnnotatedTypeVariable where liftCompare = genericLiftCompare
 instance Show1 AnnotatedTypeVariable where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AnnotatedTypeVariable
+
+newtype QualifiedModuleIdentifier a = QualifiedModuleIdentifier { qualifiedModuleIdentifierName :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QualifiedModuleIdentifier where liftEq = genericLiftEq
+instance Ord1 QualifiedModuleIdentifier where liftCompare = genericLiftCompare
+instance Show1 QualifiedModuleIdentifier where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedModuleIdentifier
+
+newtype Export a = Export { exportContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Export where liftEq = genericLiftEq
+instance Ord1 Export where liftCompare = genericLiftCompare
+instance Show1 Export where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Export
+
+newtype ModuleExport a = ModuleExport { moduleExportContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ModuleExport where liftEq = genericLiftEq
+instance Ord1 ModuleExport where liftCompare = genericLiftCompare
+instance Show1 ModuleExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ModuleExport
+
+newtype TypeConstructorExport a = TypeConstructorExport { typeConstructorExportContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeConstructorExport where liftEq = genericLiftEq
+instance Ord1 TypeConstructorExport where liftCompare = genericLiftCompare
+instance Show1 TypeConstructorExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeConstructorExport
+
+newtype VariableOperator a = VariableOperator { variableOperatorContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 VariableOperator where liftEq = genericLiftEq
+instance Ord1 VariableOperator where liftCompare = genericLiftCompare
+instance Show1 VariableOperator where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable VariableOperator
+
+data AllConstructors a = AllConstructors
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AllConstructors where liftEq = genericLiftEq
+instance Ord1 AllConstructors where liftCompare = genericLiftCompare
+instance Show1 AllConstructors where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable AllConstructors
+
+newtype ConstructorOperator a = ConstructorOperator { constructorOperatorContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ConstructorOperator where liftEq = genericLiftEq
+instance Ord1 ConstructorOperator where liftCompare = genericLiftCompare
+instance Show1 ConstructorOperator where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ConstructorOperator
