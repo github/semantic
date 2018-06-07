@@ -267,6 +267,7 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params
+-- methodHeader needs to include typeParameters (it does)
 
 generic :: Assignment
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
@@ -328,6 +329,7 @@ type' =  choice [
      , wildcard
      , identifier
      , generic
+     , typeArgument
     ]
     where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
 
