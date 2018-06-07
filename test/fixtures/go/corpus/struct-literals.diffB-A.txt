@@ -23,6 +23,7 @@
         (Composite
           (Constructor
             (Empty)
+            (Empty)
             (Field
             { (Identifier)
             ->(Identifier) }
