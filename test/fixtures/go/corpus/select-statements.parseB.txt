@@ -31,7 +31,6 @@
               (ReceiveOperator
                 (Call
                   (MemberAccess
-                    (Identifier)
                     (Identifier))
                   (Integer)
                   (Empty))))

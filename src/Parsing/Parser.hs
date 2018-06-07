@@ -13,6 +13,7 @@ module Parsing.Parser
 -- À la carte parsers
 , goParser
 , javaParser
+, javaASTParser
 , jsonParser
 , markdownParser
 , pythonParser
@@ -154,7 +155,10 @@ pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 javaParser :: Parser Java.Term
-javaParser = AssignmentParser (ASTParser tree_sitter_java) Java.assignment
+javaParser = AssignmentParser javaASTParser Java.assignment
+
+javaASTParser :: Parser (AST [] Java.Grammar)
+javaASTParser = ASTParser tree_sitter_java
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment

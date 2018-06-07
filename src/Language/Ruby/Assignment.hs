@@ -364,11 +364,10 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
       s <- rawSource
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
-    load = inject <$> (symbol Identifier *> do
+    load = inject <$ symbol Identifier <*> do
       s <- rawSource
       guard (s == "load")
-      Ruby.Syntax.Load <$> loadArgs)
-    loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
+      (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 methodSelector :: Assignment

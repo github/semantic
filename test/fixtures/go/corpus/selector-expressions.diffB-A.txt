@@ -6,13 +6,11 @@
     (Identifier)
     (Statements)
     (Call
-      (MemberAccess
-        (MemberAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })
-      { (Identifier)
-      ->(Identifier) })
+    { (MemberAccess
+      {-(MemberAccess
+        {-(Identifier)-})-})
+    ->(MemberAccess
+      {+(MemberAccess
+        {+(Identifier)+})+}) }
       (Statements)
       (Empty))))

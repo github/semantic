@@ -8,5 +8,4 @@
     (TypeAssertion
       (Identifier)
       (MemberAccess
-        (Identifier)
         (Identifier)))))

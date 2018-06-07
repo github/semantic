@@ -1,7 +1,6 @@
 (Statements
   (Call
     (MemberAccess
-      (Identifier)
       (Identifier))
     (Identifier)
   { (TextElement)

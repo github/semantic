@@ -3,7 +3,6 @@
   { (Empty)
   ->(Identifier) }
   { (MemberAccess
-    {-(Identifier)-}
     {-(Identifier)-})
   ->(Call
     {+(Identifier)+}
@@ -26,7 +25,6 @@
     {-(Empty)-}
     {-(Call
       {-(MemberAccess
-        {-(Identifier)-}
         {-(Identifier)-})-}
       {-(Identifier)-}
       {-(TextElement)-}
@@ -37,7 +35,6 @@
     {-(Empty)-}
     {-(Call
       {-(MemberAccess
-        {-(Identifier)-}
         {-(Identifier)-})-}
       {-(Identifier)-}
       {-(TextElement)-}

@@ -4,5 +4,4 @@
     {-(Identifier)-}
     {-(TextElement)-})
   ->(MemberAccess
-    {+(Identifier)+}
     {+(Identifier)+}) }))

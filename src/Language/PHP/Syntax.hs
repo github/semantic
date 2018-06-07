@@ -8,7 +8,6 @@ import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
-import           Prelude hiding (fail)
 import           Prologue hiding (Text)
 
 newtype Text a = Text T.Text
@@ -367,16 +366,16 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = Rval <$> go names
+  eval Namespace{..} = Rval <$> go (freeVariables (subterm namespaceName))
     where
-      names = freeVariables (subterm namespaceName)
-      go [] = raiseEff (fail "expected at least one free variable in namespaceName, found none")
-      -- The last name creates a closure over the namespace body.
-      go [name] = letrec' name $ \addr ->
-        subtermValue namespaceBody *> makeNamespace name addr Nothing
       -- Each namespace name creates a closure over the subsequent namespace closures
-      go (name:xs) = letrec' name $ \addr ->
-        go xs <* makeNamespace name addr Nothing
+      go (name:x:xs) = letrec' name $ \addr ->
+        go (x:xs) <* makeNamespace name addr Nothing
+      -- The last name creates a closure over the namespace body.
+      go names = do
+        name <- maybeM (throwEvalError (FreeVariablesError [])) (listToMaybe names)
+        letrec' name $ \addr ->
+          subtermValue namespaceBody *> makeNamespace name addr Nothing
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)

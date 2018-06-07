@@ -30,10 +30,10 @@ spec = parallel $ do
 
 evaluate
   = runM
-  . fmap (first reassociate)
   . evaluating @Precise @(Value Precise (Eff _))
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . fmap reassociate
   . runValueError
   . runEnvironmentError
   . runAddressError
@@ -42,6 +42,5 @@ evaluate
   . runReturn
   . runLoopControl
 
-reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
-reassociate (Left s) = Left (SomeExc (inject (Const s)))
-reassociate (Right (Right (Right (Right a)))) = Right a
+reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
+reassociate = mergeExcs . mergeExcs . mergeExcs . Right

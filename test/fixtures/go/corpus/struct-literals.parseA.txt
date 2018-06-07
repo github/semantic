@@ -35,6 +35,5 @@
         (Identifier)
         (Composite
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Statements))))))
