@@ -88,7 +88,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner (address))            -> SubtermAlgebra Module      term (TermEvaluator term address value inner (address)))
+                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address value)))
                     -> Package term
                     -> TermEvaluator term address value outer [(address, Environment address)]
@@ -123,7 +123,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
           maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> (box unit)))
+          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
           second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
 
         withPrelude Nothing f = f emptyEnv

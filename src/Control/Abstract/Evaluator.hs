@@ -52,7 +52,7 @@ earlyReturn = send . Return @address @value
 catchReturn :: Member (Return address value) effects => Evaluator address value effects a -> (forall x . Return address value x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Effectful (m address value) => m address value (Return address value ': effects) (address) -> m address value effects (address)
+runReturn :: Effectful (m address value) => m address value (Return address value ': effects) address -> m address value effects address
 runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 

@@ -256,4 +256,4 @@ subtermAddress = address <=< subtermRef
 rvalBox :: Member (Allocator address value) effects
         => value
         -> Evaluator address value effects (ValueRef address value)
-rvalBox val = Rval <$> (box val)
+rvalBox val = Rval <$> box val

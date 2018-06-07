@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
 import           Data.Abstract.Evaluatable
@@ -213,7 +213,7 @@ instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
   eval (NamespaceName xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
-    where f ns id = evaluateInScopedEnv (ns >>= deref) id
+    where f ns = evaluateInScopedEnv (ns >>= deref)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
