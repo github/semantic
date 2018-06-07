@@ -14,6 +14,7 @@ import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm', mak
 import Language.Haskell.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
+import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -287,10 +288,10 @@ pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
 
 qualifiedModuleIdentifier :: Assignment
-qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> many expression)
+qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> NonEmpty.some1 expression)
 
 qualifiedTypeConstructorIdentifier :: Assignment
-qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> many expression)
+qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> NonEmpty.some1 expression)
 
 star :: Assignment
 star = makeTerm <$> token Star <*> pure Syntax.Star

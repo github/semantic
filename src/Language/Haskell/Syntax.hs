@@ -226,12 +226,13 @@ instance Show1 Star where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Star
 
-newtype QualifiedTypeConstructorIdentifier a = QualifiedTypeConstructorIdentifier { qualifiedTypeConstructorIdentifierName :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+newtype QualifiedTypeConstructorIdentifier a = QualifiedTypeConstructorIdentifier { qualifiedTypeConstructorIdentifierName :: NonEmpty a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedTypeConstructorIdentifier where liftEq = genericLiftEq
 instance Ord1 QualifiedTypeConstructorIdentifier where liftCompare = genericLiftCompare
 instance Show1 QualifiedTypeConstructorIdentifier where liftShowsPrec = genericLiftShowsPrec
+instance Hashable1 QualifiedTypeConstructorIdentifier where liftHashWithSalt = foldl
 
 instance Evaluatable QualifiedTypeConstructorIdentifier
 
@@ -244,12 +245,13 @@ instance Show1 AnnotatedTypeVariable where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AnnotatedTypeVariable
 
-newtype QualifiedModuleIdentifier a = QualifiedModuleIdentifier { qualifiedModuleIdentifierName :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+newtype QualifiedModuleIdentifier a = QualifiedModuleIdentifier { qualifiedModuleIdentifierName :: NonEmpty a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedModuleIdentifier where liftEq = genericLiftEq
 instance Ord1 QualifiedModuleIdentifier where liftCompare = genericLiftCompare
 instance Show1 QualifiedModuleIdentifier where liftShowsPrec = genericLiftShowsPrec
+instance Hashable1 QualifiedModuleIdentifier where liftHashWithSalt = foldl
 
 instance Evaluatable QualifiedModuleIdentifier
 
