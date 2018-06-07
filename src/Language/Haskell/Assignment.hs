@@ -206,7 +206,7 @@ gadtDeclaration = makeTerm
                            <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters' <*> (kindSignature <|> emptyTerm)))
                            <*> where')
   where
-    typeParameters' = makeTerm <$> location <*> (manyTermsTill expression (symbol KindSignature <|> symbol Where'))
+    typeParameters' = makeTerm <$> location <*> manyTermsTill expression (symbol KindSignature <|> symbol Where')
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
@@ -254,7 +254,7 @@ pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
 
 qualifiedTypeConstructorIdentifier :: Assignment
-qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> (many expression))
+qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> many expression)
 
 star :: Assignment
 star = makeTerm <$> token Star <*> pure Syntax.Star
