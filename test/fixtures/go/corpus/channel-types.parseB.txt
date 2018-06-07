@@ -17,6 +17,7 @@
           (SendChannel
             (Constructor
               (Empty)
+              (Empty)
               (Statements)))))
       (Type
         (Identifier)
