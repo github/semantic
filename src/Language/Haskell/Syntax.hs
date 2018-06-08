@@ -361,3 +361,13 @@ instance Ord1 DefaultDeclaration where liftCompare = genericLiftCompare
 instance Show1 DefaultDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultDeclaration
+
+data EqualityConstraint a = EqualityConstraint { equalityConstraintLeft :: a, equalityConstraintRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 EqualityConstraint where liftEq = genericLiftEq
+instance Ord1 EqualityConstraint where liftCompare = genericLiftCompare
+instance Show1 EqualityConstraint where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable EqualityConstraint
+

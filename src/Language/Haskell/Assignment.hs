@@ -45,6 +45,7 @@ type Syntax = '[
   , Syntax.Deriving
   , Syntax.Empty
   , Syntax.Error
+  , Syntax.EqualityConstraint
   , Syntax.Export
   , Syntax.Field
   , Syntax.FunctionConstructor
@@ -128,16 +129,22 @@ constructorSymbol :: Assignment
 constructorSymbol = makeTerm <$> symbol ConstructorSymbol <*> (Syntax.Identifier . Name.name <$> source)
 
 context' :: Assignment
-context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> manyTerm (type' <|> contextPattern))
+context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> manyTerm expression)
 
 contextPattern :: Assignment
-contextPattern = symbol ContextPattern *> children type'
+contextPattern = makeTerm <$> symbol ContextPattern <*> children (manyTerm expression)
 
 defaultDeclaration :: Assignment
 defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
 
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
+
+equalityConstraint :: Assignment
+equalityConstraint = makeTerm <$> symbol EqualityConstraint <*> children (Syntax.EqualityConstraint <$> equalityLhs <*> equalityRhs)
+  where
+    equalityLhs = symbol EqualityLhs *> children expression
+    equalityRhs = symbol EqualityRhs *> children expression
 
 export :: Assignment
 export = makeTerm <$> symbol Export <*> children (Syntax.Export <$> expressions)
@@ -156,11 +163,13 @@ expressionChoices = [
                     , character
                     , comment
                     , context'
+                    , contextPattern
                     , constructorIdentifier
                     , constructorOperator
                     , constructorSymbol
                     , defaultDeclaration
                     , derivingClause
+                    , equalityConstraint
                     , float
                     , functionConstructor
                     , functionDeclaration
