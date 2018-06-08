@@ -10,7 +10,7 @@ import Assigning.Assignment hiding (Assignment, Error, count)
 import Data.ByteString.Char8 (count)
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm', makeTerm'', contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm1, makeTerm', makeTerm'', contextualize, postContextualize)
 import Language.Haskell.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
@@ -92,7 +92,7 @@ algebraicDatatypeDeclaration = makeTerm
                             <*> children (Declaration.Datatype
                                         <$> (context' <|> emptyTerm)
                                         <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters <*> (kindSignature <|> emptyTerm)))
-                                        <*> ((symbol Constructors *> children (many constructor))
+                                        <*> ((symbol Constructors *> children (manyTerm constructor))
                                             <|> pure [])
                                         <*> (derivingClause <|> emptyTerm))
 
@@ -125,19 +125,19 @@ constructorSymbol :: Assignment
 constructorSymbol = makeTerm <$> symbol ConstructorSymbol <*> (Syntax.Identifier . Name.name <$> source)
 
 context' :: Assignment
-context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> many (type' <|> contextPattern))
+context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> manyTerm (type' <|> contextPattern))
 
 contextPattern :: Assignment
 contextPattern = symbol ContextPattern *> children type'
 
 derivingClause :: Assignment
-derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> many typeConstructor)
+derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
 
 export :: Assignment
 export = makeTerm <$> symbol Export <*> children (Syntax.Export <$> expressions)
 
 expressions :: Assignment
-expressions = makeTerm'' <$> location <*> many expression
+expressions = makeTerm'' <$> location <*> manyTerm expression
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
@@ -197,7 +197,7 @@ expressionChoices = [
                     ]
 
 fields :: Assignment
-fields = makeTerm <$> symbol Fields <*> children (many field)
+fields = makeTerm <$> symbol Fields <*> children (manyTerm field)
 
 field :: Assignment
 field = makeTerm
@@ -213,7 +213,7 @@ float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 functionBody :: Assignment
-functionBody = makeTerm <$> symbol FunctionBody <*> children (many expression)
+functionBody = makeTerm <$> symbol FunctionBody <*> children (manyTerm expression)
 
 functionConstructor :: Assignment
 functionConstructor = makeTerm <$> token FunctionConstructor  <*> pure Syntax.FunctionConstructor
@@ -277,18 +277,18 @@ listConstructor :: Assignment
 listConstructor = makeTerm <$> token ListConstructor <*> pure Syntax.ListConstructor
 
 listExpression :: Assignment
-listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array <$> many listElement)
+listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array <$> manyTerm listElement)
   where listElement = symbol Expression *> children expression
 
 listType :: Assignment
-listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> many type')
+listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> manyTerm type')
 
 module' :: Assignment
 module' = makeTerm
        <$> symbol Module
        <*> children (Syntax.Module <$> (term moduleIdentifier <|> emptyTerm) <*> moduleExports <*> (where' <|> expressions <|> emptyTerm))
   where
-    moduleExports = symbol ModuleExports *> children (many export)
+    moduleExports = symbol ModuleExports *> children (manyTerm export)
                  <|> pure []
 
 moduleExport :: Assignment
@@ -307,10 +307,10 @@ pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
 
 qualifiedModuleIdentifier :: Assignment
-qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> NonEmpty.some1 expression)
+qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> someTerm' expression)
 
 qualifiedTypeConstructorIdentifier :: Assignment
-qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> NonEmpty.some1 expression)
+qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> someTerm' expression)
 
 quotedName :: Assignment
 quotedName = makeTerm <$> symbol QuotedName <*> children (Syntax.QuotedName <$> expression)
@@ -343,7 +343,7 @@ typeOperator :: Assignment
 typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.Identifier . Name.name <$> source)
 
 typeSignature :: Assignment
-typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> (many context' <|> pure []) <*> type')
+typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> (manyTerm context' <|> pure []) <*> type')
 
 typeVariableIdentifier :: Assignment
 typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
@@ -393,7 +393,7 @@ typeSynonymDeclaration = makeTerm
                       <*> children (typeSynonym <$> typeLeft <*> typeRight)
   where
     typeLeft = makeTerm <$> location <*> manyTill expression (symbol TypeSynonymBody)
-    typeRight = symbol TypeSynonymBody *> children ((,) <$> many (context' <|> scopedTypeVariables) <*> expression)
+    typeRight = symbol TypeSynonymBody *> children ((,) <$> manyTerm (context' <|> scopedTypeVariables) <*> expression)
     typeSynonym typeLeft (contexts, typeRight) = Syntax.TypeSynonym typeLeft contexts typeRight
 
 unitConstructor :: Assignment
@@ -412,13 +412,21 @@ variableIdentifiers :: Assignment
 variableIdentifiers = makeTerm <$> location <*> many variableIdentifier
 
 where' :: Assignment
-where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (many expression)
+where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (manyTerm expression)
 
 -- | Helpers
 
--- | Match a series of terms or comments until a delimiter is matched.
+commentedTerm :: Assignment -> Assignment
+commentedTerm term = contextualize (comment <|> pragma) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> pragma) <*> emptyTerm)
+
+manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+manyTerm = many . commentedTerm
+
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step = manyTill (step <|> comment)
+
+someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
+someTerm' = NonEmpty.some1 . commentedTerm
 
 term :: Assignment -> Assignment
 term term = contextualize (comment <|> pragma) (postContextualize (comment <|> pragma) term)
