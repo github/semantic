@@ -72,6 +72,7 @@ type Syntax = '[
   , Syntax.QuotedName
   , Syntax.RecordDataConstructor
   , Syntax.ScopedTypeVariables
+  , Syntax.StandaloneDerivingInstance
   , Syntax.Star
   , Syntax.StrictType
   , Syntax.StrictTypeVariable
@@ -120,7 +121,7 @@ character :: Assignment
 character = makeTerm <$> symbol Char <*> (Literal.Character <$> source)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Syntax.Class <$> typeConstructor <*> typeParameters)
+class' = makeTerm <$> symbol Class <*> children (Syntax.Class <$> manyTerm expression)
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -139,10 +140,10 @@ constructorSymbol :: Assignment
 constructorSymbol = makeTerm <$> symbol ConstructorSymbol <*> (Syntax.ConstructorSymbol . Name.name <$> source)
 
 context' :: Assignment
-context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> manyTerm expression)
+context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> expressions)
 
 contextPattern :: Assignment
-contextPattern = makeTerm <$> symbol ContextPattern <*> children (manyTerm expression)
+contextPattern = symbol ContextPattern *> children (expressions)
 
 defaultDeclaration :: Assignment
 defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
@@ -204,12 +205,14 @@ expressionChoices = [
                     , qualifiedTypeConstructorIdentifier
                     , quotedName
                     , scopedTypeVariables
+                    , standaloneDerivingInstance
                     , star
                     , strictType
                     , string
                     , tupleType
                     , type'
                     , type''
+                    , typeClassIdentifier
                     , typePattern
                     , typeConstructorExport
                     , typeConstructorIdentifier
@@ -358,6 +361,11 @@ quotedName = makeTerm <$> symbol QuotedName <*> children (Syntax.QuotedName <$> 
 scopedTypeVariables :: Assignment
 scopedTypeVariables = makeTerm <$> symbol ScopedTypeVariables <*> children (Syntax.ScopedTypeVariables <$> expressions <* token Dot)
 
+standaloneDerivingInstance :: Assignment
+standaloneDerivingInstance = makeTerm <$> symbol StandaloneDerivingDeclaration <*> children (Syntax.StandaloneDerivingInstance <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> instance')
+  where
+    instance' = symbol Instance *> children (expressions)
+
 star :: Assignment
 star = makeTerm <$> token Star <*> pure Syntax.Star
 
@@ -386,7 +394,7 @@ typeOperator :: Assignment
 typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.TypeOperator . Name.name <$> source)
 
 typeSignature :: Assignment
-typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expression)
+typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
 
 typeVariableIdentifier :: Assignment
 typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.TypeVariableIdentifier . Name.name <$> source)

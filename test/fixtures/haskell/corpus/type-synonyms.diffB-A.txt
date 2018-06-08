@@ -52,11 +52,12 @@
         (TypeConstructorIdentifier))
       (TypePattern
         (TupleConstructor)))
-  {+(TypeSynonym
-    {+(Statements
-      {+(TypeConstructorIdentifier)+})+}
-    {+(TypePattern
-      {+(FunctionConstructor)+})+})+}
+    (TypeSynonym
+      (Statements
+        (TypeConstructorIdentifier))
+      (TypePattern
+      { (TupleConstructor)
+      ->(FunctionConstructor) }))
   {+(TypeSynonym
     {+(Statements
       {+(TypeConstructorIdentifier)+})+}
@@ -120,7 +121,7 @@
       ->(TypeConstructorIdentifier) }
       {+(TypeConstructorIdentifier)+})
     { (TypePattern
-      {-(TupleConstructor)-})
+      {-(FunctionConstructor)-})
     ->(TextElement) })
   {+(TypeSynonym
     {+(Statements
@@ -138,8 +139,7 @@
     {+(Statements
       {+(TypeConstructorIdentifier)+})+}
     {+(Context'
-      {+(Statements
-        {+(TypeConstructorIdentifier)+})+})+}
+      {+(TypeConstructorIdentifier)+})+}
     {+(TypePattern
       {+(Statements
         {+(TypeConstructorIdentifier)+}
@@ -171,11 +171,6 @@
           {+(TypeConstructorIdentifier)+}
           {+(TypeVariableIdentifier)+}
           {+(TypeVariableIdentifier)+})+})+})+})+}
-  {-(TypeSynonym
-    {-(Statements
-      {-(TypeConstructorIdentifier)-})-}
-    {-(TypePattern
-      {-(FunctionConstructor)-})-})-}
   {-(TypeSynonym
     {-(Statements
       {-(TypeConstructorIdentifier)-})-}
@@ -254,8 +249,7 @@
     {-(Statements
       {-(TypeConstructorIdentifier)-})-}
     {-(Context'
-      {-(Statements
-        {-(TypeConstructorIdentifier)-})-})-}
+      {-(TypeConstructorIdentifier)-})-}
     {-(TypePattern
       {-(Statements
         {-(TypeConstructorIdentifier)-}

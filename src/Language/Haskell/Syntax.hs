@@ -126,7 +126,7 @@ instance Ord1 Deriving where liftCompare = genericLiftCompare
 instance Show1 Deriving where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Deriving
-newtype Context' a = Context' [a]
+newtype Context' a = Context' a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Context' where liftEq = genericLiftEq
@@ -135,7 +135,7 @@ instance Show1 Context' where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context'
 
-data Class a = Class { classType :: a, classTypeParameters :: a }
+data Class a = Class { classContent :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Class where liftEq = genericLiftEq
@@ -460,3 +460,12 @@ instance Ord1 VariableSymbol where liftCompare = genericLiftCompare
 instance Show1 VariableSymbol where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableSymbol
+
+data StandaloneDerivingInstance a = StandaloneDerivingInstance { standaloneDerivingInstanceContext :: [a], standaloneDerivingInstanceClass :: a, standaloneDerivingInstanceInstance :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 StandaloneDerivingInstance where liftEq = genericLiftEq
+instance Ord1 StandaloneDerivingInstance where liftCompare = genericLiftCompare
+instance Show1 StandaloneDerivingInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable StandaloneDerivingInstance

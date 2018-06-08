@@ -31,11 +31,9 @@
     (TypeSignature
       (VariableIdentifier)
       (Context'
-        (Statements
-          (Class
-            (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+        (Class
+          (TypeClassIdentifier)
+          (TypeVariableIdentifier)))
       (FunctionType
         (Type
           (TypeVariableIdentifier)
@@ -234,18 +232,16 @@
     (TypeSignature
       (VariableIdentifier)
       (Context'
-        (Statements
-          (EqualityConstraint
-            (TypeVariableIdentifier)
-            (TypeConstructorIdentifier))))
+        (EqualityConstraint
+          (TypeVariableIdentifier)
+          (TypeConstructorIdentifier)))
       (TypeVariableIdentifier))
     (TypeSignature
       (VariableIdentifier)
       (Context'
-        (Statements
-          (EqualityConstraint
-            (TypeVariableIdentifier)
-            (TypeConstructorIdentifier))))
+        (EqualityConstraint
+          (TypeVariableIdentifier)
+          (TypeConstructorIdentifier)))
       (TypeVariableIdentifier))
     (TypeSignature
       (VariableIdentifier)
@@ -257,23 +253,17 @@
         (Statements
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier))))
-        (Statements
+            (TypeVariableIdentifier))
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier))))
-        (Statements
+            (TypeVariableIdentifier))
           (EqualityConstraint
             (Class
               (TypeClassIdentifier)
-              (TypeParameters
-                (TypeVariableIdentifier)))
+              (TypeVariableIdentifier))
             (Class
               (TypeClassIdentifier)
-              (TypeParameters
-                (TypeVariableIdentifier))))))
+              (TypeVariableIdentifier)))))
       (FunctionType
         (Type
           (TypeVariableIdentifier)
@@ -291,35 +281,31 @@
     (TypeSignature
       (VariableIdentifier)
       (Context'
-        (Statements
-          (Class
-            (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+        (Class
+          (TypeClassIdentifier)
+          (TypeVariableIdentifier)))
       (Context'
-        (Statements
-          (Class
-            (TypeClassIdentifier)
-            (TypeParameters
-              (Array
-                (Type
-                  (TypeConstructorIdentifier)
-                  (TypeParameters
-                    (TypeConstructorIdentifier))
-                  (Empty))
-                (Type
-                  (TypeConstructorIdentifier)
-                  (TypeParameters)
-                  (Empty))
-                (Type
-                  (TypeConstructorIdentifier)
-                  (TypeParameters)
-                  (Empty))
-                (Type
-                  (TypeConstructorIdentifier)
-                  (TypeParameters)
-                  (Empty)))
-              (TypeVariableIdentifier)))))
+        (Class
+          (TypeClassIdentifier)
+          (Array
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters
+                (TypeConstructorIdentifier))
+              (Empty))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty)))
+          (TypeVariableIdentifier)))
       (FunctionType
         (Type
           (TypeVariableIdentifier)
@@ -336,21 +322,18 @@
         (Statements
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (QuotedName
-                (Array
-                  (Type
+            (QuotedName
+              (Array
+                (Type
+                  (TypeConstructorIdentifier)
+                  (TypeParameters
                     (TypeConstructorIdentifier)
-                    (TypeParameters
-                      (TypeConstructorIdentifier)
-                      (TypeVariableIdentifier))
-                    (Empty))))
-              (TypeVariableIdentifier))))
-        (Statements
+                    (TypeVariableIdentifier))
+                  (Empty))))
+            (TypeVariableIdentifier))
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+            (TypeVariableIdentifier))))
       (FunctionType
         (Type
           (TypeConstructorIdentifier)
@@ -395,9 +378,8 @@
         (Statements
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)
-              (TypeVariableIdentifier)))
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier))
           (ConstructorOperator
             (ConstructorSymbol))
           (TypeVariableIdentifier)))

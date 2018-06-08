@@ -130,8 +130,7 @@
       (Statements
         (TypeConstructorIdentifier))
       (Context'
-        (Statements
-          (TypeConstructorIdentifier)))
+        (TypeConstructorIdentifier))
       (TypePattern
         (Statements
           (TypeConstructorIdentifier)
