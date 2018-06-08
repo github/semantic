@@ -1,12 +1,8 @@
 (Module
   (Empty)
-  (TypeSignature
-    (Identifier)
-    (FunctionType
-      (Type
-        (Identifier)
-        (TypeParameters)
-        (Empty))
+  (Statements
+    (TypeSignature
+      (Identifier)
       (FunctionType
         (Type
           (Identifier)
@@ -22,8 +18,29 @@
               (Identifier)
               (TypeParameters)
               (Empty))
-            (Type
-              (Identifier)
-              (TypeParameters
-                (Identifier))
-              (Empty))))))))
+            (FunctionType
+              (Type
+                (Identifier)
+                (TypeParameters)
+                (Empty))
+              (Type
+                (Identifier)
+                (TypeParameters
+                  (Identifier))
+                (Empty)))))))
+    (TypeSignature
+      (Identifier)
+      (Context'
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier))))
+      (FunctionType
+        (Type
+          (Identifier)
+          (TypeParameters)
+          (Empty))
+        (Type
+          (Identifier)
+          (TypeParameters)
+          (Empty))))))
