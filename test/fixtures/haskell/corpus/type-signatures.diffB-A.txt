@@ -94,30 +94,21 @@
         {+(TypeConstructorIdentifier)+}
         {+(TypeParameters)+}
         {+(Empty)+})+})+})+}
-    (TypeSignature
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-    {-(Context'
-      {-(Statements
-        {-(Class
-          {-(TypeClassIdentifier)-}
-          {-(TypeParameters
-            {-(TypeVariableIdentifier)-})-})-})-})-}
-      (FunctionType
-        (Type
-        { (TypeVariableIdentifier)
-        ->(Array
+  {+(TypeSignature
+    {+(VariableIdentifier)+}
+    {+(FunctionType
+      {+(Type
+        {+(Array
           {+(Type
             {+(TypeConstructorIdentifier)+}
             {+(TypeParameters)+}
-            {+(Empty)+})+}) }
-          (TypeParameters)
-          (Empty))
-        (Type
-        { (TypeVariableIdentifier)
-        ->(TypeConstructorIdentifier) }
-          (TypeParameters)
-          (Empty))))
+            {+(Empty)+})+})+}
+        {+(TypeParameters)+}
+        {+(Empty)+})+}
+      {+(Type
+        {+(TypeConstructorIdentifier)+}
+        {+(TypeParameters)+}
+        {+(Empty)+})+})+})+}
   {+(TypeSignature
     {+(VariableIdentifier)+}
     {+(FunctionType
@@ -278,9 +269,185 @@
             {+(TypeVariableIdentifier)+}
             {+(TypeParameters)+}
             {+(Empty)+})+})+})+})+})+}
-  {-(TypeSignature
-    {-(VariableIdentifier)-}
-    {-(FunctionType
+  {+(TypeSignature
+    {+(VariableIdentifier)+}
+    {+(Context'
+      {+(Statements
+        {+(EqualityConstraint
+          {+(TypeVariableIdentifier)+}
+          {+(TypeConstructorIdentifier)+})+})+})+}
+    {+(TypeVariableIdentifier)+})+}
+  {+(TypeSignature
+    {+(VariableIdentifier)+}
+    {+(Context'
+      {+(Statements
+        {+(EqualityConstraint
+          {+(TypeVariableIdentifier)+}
+          {+(TypeConstructorIdentifier)+})+})+})+}
+    {+(TypeVariableIdentifier)+})+}
+  {+(TypeSignature
+    {+(VariableIdentifier)+}
+    {+(ScopedTypeVariables
+      {+(Statements
+        {+(TypeVariableIdentifier)+}
+        {+(TypeVariableIdentifier)+})+})+}
+    {+(Context'
+      {+(Statements
+        {+(Class
+          {+(TypeClassIdentifier)+}
+          {+(TypeParameters
+            {+(TypeVariableIdentifier)+})+})+})+}
+      {+(Statements
+        {+(Class
+          {+(TypeClassIdentifier)+}
+          {+(TypeParameters
+            {+(TypeVariableIdentifier)+})+})+})+}
+      {+(Statements
+        {+(EqualityConstraint
+          {+(Class
+            {+(TypeClassIdentifier)+}
+            {+(TypeParameters
+              {+(TypeVariableIdentifier)+})+})+}
+          {+(Class
+            {+(TypeClassIdentifier)+}
+            {+(TypeParameters
+              {+(TypeVariableIdentifier)+})+})+})+})+})+}
+    {+(FunctionType
+      {+(Type
+        {+(TypeVariableIdentifier)+}
+        {+(TypeParameters)+}
+        {+(Empty)+})+}
+      {+(FunctionType
+        {+(Type
+          {+(TypeVariableIdentifier)+}
+          {+(TypeParameters)+}
+          {+(Empty)+})+}
+        {+(Type
+          {+(TypeVariableIdentifier)+}
+          {+(TypeParameters)+}
+          {+(Empty)+})+})+})+})+}
+  {+(TypeSignature
+    {+(VariableIdentifier)+}
+    {+(Context'
+      {+(Statements
+        {+(Class
+          {+(TypeClassIdentifier)+}
+          {+(TypeParameters
+            {+(TypeVariableIdentifier)+})+})+})+})+}
+    {+(Context'
+      {+(Statements
+        {+(Class
+          {+(TypeClassIdentifier)+}
+          {+(TypeParameters
+            {+(Array
+              {+(Type
+                {+(TypeConstructorIdentifier)+}
+                {+(TypeParameters
+                  {+(TypeConstructorIdentifier)+})+}
+                {+(Empty)+})+}
+              {+(Type
+                {+(TypeConstructorIdentifier)+}
+                {+(TypeParameters)+}
+                {+(Empty)+})+}
+              {+(Type
+                {+(TypeConstructorIdentifier)+}
+                {+(TypeParameters)+}
+                {+(Empty)+})+}
+              {+(Type
+                {+(TypeConstructorIdentifier)+}
+                {+(TypeParameters)+}
+                {+(Empty)+})+})+}
+            {+(TypeVariableIdentifier)+})+})+})+})+}
+    {+(FunctionType
+      {+(Type
+        {+(TypeVariableIdentifier)+}
+        {+(TypeParameters)+}
+        {+(Empty)+})+}
+      {+(Type
+        {+(TypeConstructorIdentifier)+}
+        {+(TypeParameters
+          {+(TypeVariableIdentifier)+})+}
+        {+(Empty)+})+})+})+}
+  {+(TypeSignature
+    {+(VariableIdentifier)+}
+    {+(Context'
+      {+(Statements
+        {+(Class
+          {+(TypeClassIdentifier)+}
+          {+(TypeParameters
+            {+(QuotedName
+              {+(Array
+                {+(Type
+                  {+(TypeConstructorIdentifier)+}
+                  {+(TypeParameters
+                    {+(TypeConstructorIdentifier)+}
+                    {+(TypeVariableIdentifier)+})+}
+                  {+(Empty)+})+})+})+}
+            {+(TypeVariableIdentifier)+})+})+})+}
+      {+(Statements
+        {+(Class
+          {+(TypeClassIdentifier)+}
+          {+(TypeParameters
+            {+(TypeVariableIdentifier)+})+})+})+})+}
+    {+(FunctionType
+      {+(Type
+        {+(TypeConstructorIdentifier)+}
+        {+(TypeParameters
+          {+(TypeVariableIdentifier)+})+}
+        {+(Empty)+})+}
+      {+(FunctionType
+        {+(Type
+          {+(Array
+            {+(Type
+              {+(TypeConstructorIdentifier)+}
+              {+(TypeParameters)+}
+              {+(Empty)+})+})+}
+          {+(TypeParameters)+}
+          {+(Empty)+})+}
+        {+(Type
+          {+(TypeConstructorIdentifier)+}
+          {+(TypeParameters
+            {+(TypeVariableIdentifier)+}
+            {+(TypeConstructorIdentifier)+})+}
+          {+(Empty)+})+})+})+})+}
+    (TypeSignature
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Context'
+        (Statements
+        {+(TypeVariableIdentifier)+}
+        {+(ConstructorOperator
+          {+(ConstructorSymbol)+})+}
+        {+(TypeConstructorIdentifier)+}
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(TypeVariableIdentifier)-})-})-}))
+      (FunctionType
+        (Type
+        { (TypeVariableIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (TypeParameters)
+          (Empty))
+        (Type
+        { (TypeVariableIdentifier)
+        ->(TypeVariableIdentifier) }
+          (TypeParameters)
+          (Empty))))
+    (TypeSignature
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+    {+(Context'
+      {+(Statements
+        {+(Class
+          {+(TypeClassIdentifier)+}
+          {+(TypeParameters
+            {+(TypeVariableIdentifier)+}
+            {+(TypeVariableIdentifier)+})+})+}
+        {+(ConstructorOperator
+          {+(ConstructorSymbol)+})+}
+        {+(TypeVariableIdentifier)+})+})+}
+    { (FunctionType
       {-(Type
         {-(TypeConstructorIdentifier)-}
         {-(TypeParameters)-}
@@ -288,7 +455,8 @@
       {-(Type
         {-(TypeConstructorIdentifier)-}
         {-(TypeParameters)-}
-        {-(Empty)-})-})-})-}
+        {-(Empty)-})-})
+    ->(TypeVariableIdentifier) })
   {-(TypeSignature
     {-(VariableIdentifier)-}
     {-(FunctionType
@@ -463,4 +631,175 @@
           {-(Type
             {-(TypeVariableIdentifier)-}
             {-(TypeParameters)-}
-            {-(Empty)-})-})-})-})-})-}))
+            {-(Empty)-})-})-})-})-})-}
+  {-(TypeSignature
+    {-(VariableIdentifier)-}
+    {-(Context'
+      {-(Statements
+        {-(EqualityConstraint
+          {-(TypeVariableIdentifier)-}
+          {-(TypeConstructorIdentifier)-})-})-})-}
+    {-(TypeVariableIdentifier)-})-}
+  {-(TypeSignature
+    {-(VariableIdentifier)-}
+    {-(Context'
+      {-(Statements
+        {-(EqualityConstraint
+          {-(TypeVariableIdentifier)-}
+          {-(TypeConstructorIdentifier)-})-})-})-}
+    {-(TypeVariableIdentifier)-})-}
+  {-(TypeSignature
+    {-(VariableIdentifier)-}
+    {-(ScopedTypeVariables
+      {-(Statements
+        {-(TypeVariableIdentifier)-}
+        {-(TypeVariableIdentifier)-})-})-}
+    {-(Context'
+      {-(Statements
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(TypeVariableIdentifier)-})-})-})-}
+      {-(Statements
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(TypeVariableIdentifier)-})-})-})-}
+      {-(Statements
+        {-(EqualityConstraint
+          {-(Class
+            {-(TypeClassIdentifier)-}
+            {-(TypeParameters
+              {-(TypeVariableIdentifier)-})-})-}
+          {-(Class
+            {-(TypeClassIdentifier)-}
+            {-(TypeParameters
+              {-(TypeVariableIdentifier)-})-})-})-})-})-}
+    {-(FunctionType
+      {-(Type
+        {-(TypeVariableIdentifier)-}
+        {-(TypeParameters)-}
+        {-(Empty)-})-}
+      {-(FunctionType
+        {-(Type
+          {-(TypeVariableIdentifier)-}
+          {-(TypeParameters)-}
+          {-(Empty)-})-}
+        {-(Type
+          {-(TypeVariableIdentifier)-}
+          {-(TypeParameters)-}
+          {-(Empty)-})-})-})-})-}
+  {-(TypeSignature
+    {-(VariableIdentifier)-}
+    {-(Context'
+      {-(Statements
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(TypeVariableIdentifier)-})-})-})-})-}
+    {-(Context'
+      {-(Statements
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(Array
+              {-(Type
+                {-(TypeConstructorIdentifier)-}
+                {-(TypeParameters
+                  {-(TypeConstructorIdentifier)-})-}
+                {-(Empty)-})-}
+              {-(Type
+                {-(TypeConstructorIdentifier)-}
+                {-(TypeParameters)-}
+                {-(Empty)-})-}
+              {-(Type
+                {-(TypeConstructorIdentifier)-}
+                {-(TypeParameters)-}
+                {-(Empty)-})-}
+              {-(Type
+                {-(TypeConstructorIdentifier)-}
+                {-(TypeParameters)-}
+                {-(Empty)-})-})-}
+            {-(TypeVariableIdentifier)-})-})-})-})-}
+    {-(FunctionType
+      {-(Type
+        {-(TypeVariableIdentifier)-}
+        {-(TypeParameters)-}
+        {-(Empty)-})-}
+      {-(Type
+        {-(TypeConstructorIdentifier)-}
+        {-(TypeParameters
+          {-(TypeVariableIdentifier)-})-}
+        {-(Empty)-})-})-})-}
+  {-(TypeSignature
+    {-(VariableIdentifier)-}
+    {-(Context'
+      {-(Statements
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(QuotedName
+              {-(Array
+                {-(Type
+                  {-(TypeConstructorIdentifier)-}
+                  {-(TypeParameters
+                    {-(TypeConstructorIdentifier)-}
+                    {-(TypeVariableIdentifier)-})-}
+                  {-(Empty)-})-})-})-}
+            {-(TypeVariableIdentifier)-})-})-})-}
+      {-(Statements
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(TypeVariableIdentifier)-})-})-})-})-}
+    {-(FunctionType
+      {-(Type
+        {-(TypeConstructorIdentifier)-}
+        {-(TypeParameters
+          {-(TypeVariableIdentifier)-})-}
+        {-(Empty)-})-}
+      {-(FunctionType
+        {-(Type
+          {-(Array
+            {-(Type
+              {-(TypeConstructorIdentifier)-}
+              {-(TypeParameters)-}
+              {-(Empty)-})-})-}
+          {-(TypeParameters)-}
+          {-(Empty)-})-}
+        {-(Type
+          {-(TypeConstructorIdentifier)-}
+          {-(TypeParameters
+            {-(TypeVariableIdentifier)-}
+            {-(TypeConstructorIdentifier)-})-}
+          {-(Empty)-})-})-})-})-}
+  {-(TypeSignature
+    {-(VariableIdentifier)-}
+    {-(Context'
+      {-(Statements
+        {-(TypeVariableIdentifier)-}
+        {-(ConstructorOperator
+          {-(ConstructorSymbol)-})-}
+        {-(TypeConstructorIdentifier)-})-})-}
+    {-(FunctionType
+      {-(Type
+        {-(TypeConstructorIdentifier)-}
+        {-(TypeParameters)-}
+        {-(Empty)-})-}
+      {-(Type
+        {-(TypeVariableIdentifier)-}
+        {-(TypeParameters)-}
+        {-(Empty)-})-})-})-}
+  {-(TypeSignature
+    {-(VariableIdentifier)-}
+    {-(Context'
+      {-(Statements
+        {-(Class
+          {-(TypeClassIdentifier)-}
+          {-(TypeParameters
+            {-(TypeVariableIdentifier)-}
+            {-(TypeVariableIdentifier)-})-})-}
+        {-(ConstructorOperator
+          {-(ConstructorSymbol)-})-}
+        {-(TypeVariableIdentifier)-})-})-}
+    {-(TypeVariableIdentifier)-})-}))
