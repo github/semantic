@@ -352,3 +352,12 @@ instance Ord1 NewType where liftCompare = genericLiftCompare
 instance Show1 NewType where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NewType
+
+newtype DefaultDeclaration a = DefaultDeclaration { defaultDeclarationContent :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DefaultDeclaration where liftEq = genericLiftEq
+instance Ord1 DefaultDeclaration where liftCompare = genericLiftCompare
+instance Show1 DefaultDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultDeclaration

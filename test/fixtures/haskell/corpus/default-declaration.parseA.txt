@@ -1,0 +1,7 @@
+(Module
+  (Identifier)
+  (Statements
+    (DefaultDeclaration)
+    (DefaultDeclaration
+      (Identifier)
+      (Identifier))))

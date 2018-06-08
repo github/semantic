@@ -62,13 +62,13 @@
       ->(Identifier) }
         (TypeParameters)
         (Empty))
+    {+(Constructor
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
       (Constructor
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
-    {+(Constructor
-      {+(Identifier)+}
-      {+(TypeParameters)+})+}
     {+(Constructor
       {+(Identifier)+}
       {+(TypeParameters)+})+}

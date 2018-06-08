@@ -40,6 +40,7 @@ type Syntax = '[
   , Syntax.ConstructorOperator
   , Syntax.Context
   , Syntax.Context'
+  , Syntax.DefaultDeclaration
   , Syntax.Deriving
   , Syntax.Empty
   , Syntax.Error
@@ -131,6 +132,9 @@ context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> manyTer
 contextPattern :: Assignment
 contextPattern = symbol ContextPattern *> children type'
 
+defaultDeclaration :: Assignment
+defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
+
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
 
@@ -154,6 +158,7 @@ expressionChoices = [
                     , constructorIdentifier
                     , constructorOperator
                     , constructorSymbol
+                    , defaultDeclaration
                     , derivingClause
                     , float
                     , functionConstructor

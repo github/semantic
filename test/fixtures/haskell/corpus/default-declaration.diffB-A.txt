@@ -1,0 +1,9 @@
+(Module
+  (Identifier)
+  (Statements
+    (DefaultDeclaration
+    {-(Identifier)-}
+    {-(Identifier)-})
+  {+(DefaultDeclaration
+    {+(Identifier)+}
+    {+(Identifier)+})+}))
