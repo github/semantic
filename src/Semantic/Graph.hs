@@ -27,6 +27,7 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
+import qualified Data.Project as Project (Concrete)
 import           Data.Record
 import           Data.Term
 import           Data.Text (pack)
@@ -40,7 +41,7 @@ data GraphType = ImportGraph | CallGraph
 runGraph :: ( Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
-         -> Project
+         -> Project.Concrete
          -> Eff effs (Graph Vertex)
 runGraph graphType includePackages project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
@@ -71,21 +72,21 @@ runGraph graphType includePackages project
 parsePackage :: (Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Maybe File  -- ^ Prelude (optional).
-             -> Project     -- ^ Project to parse into a package.
+             -> Project.Concrete     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
-  let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p resMap
+  let pkg = Package.fromModules n Nothing prelude (length projectEntryPaths) p resMap
   pkg <$ trace ("project: " <> show pkg)
 
   where
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
-    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
+    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project.Concrete -> Eff effs [Module term]
+    parseModules parser Project{..} = distributeFor (projectEntryPoints project <> projectFiles project) (WrapTask . parseModule parser (Just projectRootDir))
 
 -- | Parse a file into a 'Module'.
 parseModule :: (Member Files effs, Member Task effs) => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
