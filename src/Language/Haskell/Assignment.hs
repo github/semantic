@@ -174,6 +174,7 @@ expressionChoices = [
                     , operator
                     , parenthesizedTypePattern
                     , pragma
+                    , primitiveConstructorIdentifier
                     , qualifiedModuleIdentifier
                     , qualifiedTypeConstructorIdentifier
                     , quotedName
@@ -316,6 +317,9 @@ parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressio
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
 
+primitiveConstructorIdentifier :: Assignment
+primitiveConstructorIdentifier = makeTerm <$> symbol PrimitiveConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+
 qualifiedModuleIdentifier :: Assignment
 qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> someTerm' expression)
 
@@ -335,7 +339,7 @@ strictType :: Assignment
 strictType = makeTerm'
           <$> symbol StrictType
           <*> children (  (inject <$> (Syntax.StrictType <$> typeConstructor <*> typeParameters))
-                      <|> (inject <$> (Syntax.StrictTypeVariable <$> typeVariableIdentifier)))
+                      <|> (inject <$> (Syntax.StrictTypeVariable <$> expression)))
 
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)

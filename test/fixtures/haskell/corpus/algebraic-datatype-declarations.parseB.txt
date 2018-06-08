@@ -354,4 +354,17 @@
         (Identifier)
         (TypeParameters
           (Identifier)))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+        (Identifier)
+        (TypeParameters)
+        (Empty))
+      (Constructor
+        (Empty)
+        (Identifier)
+        (TypeParameters
+          (StrictTypeVariable
+            (Identifier))))
       (Empty))))
