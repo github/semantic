@@ -12,9 +12,6 @@ enum Language {Unknown = 0;
                Ruby = 9;
                TypeScript = 10;
                PHP = 11;}
-enum VertexType {PACKAGE = 0;
-                 MODULE = 1;
-                 VARIABLE = 2;}
 message Blob { bytes blobSource = 1;
                string blobPath = 2;
                Language blobLanguage = 3;
@@ -25,21 +22,15 @@ message Pos { int64 posLine = 1;
 message Span { Pos spanStart = 1;
                Pos spanEnd = 2;
              }
-message Vertex { VertexType vertexType = 1;
-                 string vertexContents = 2;
-                 uint64 vertexTag = 3;
-               }
-message Edge { uint64 edgeFrom = 1;
-               uint64 edgeTo = 2;
-             }
 message AdjList { repeated Vertex graphVertices = 1;
                   repeated Edge graphEdges = 2;
                 }
-message Guide { string rootDir = 1;
-                repeated Blob allBlobs = 2;
-                repeated Blob entryPoints = 3;
-                repeated string excludes = 4 [packed = false];
-              }
+message Project { string projectRootDir = 1;
+                  repeated Blob projectBlobs = 2;
+                  Language projectLanguage = 3;
+                  repeated string projectEntryPaths = 4 [packed = false];
+                  repeated string projectExcludeDirs = 5 [packed = false];
+                }
 message Array { repeated Term arrayElements = 1;
               }
 message Boolean { bool booleanContent = 1;
