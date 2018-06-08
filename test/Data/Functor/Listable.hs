@@ -274,7 +274,7 @@ instance Listable Declaration where
   tiers
     =  cons4 MethodDeclaration
     \/ cons3 FunctionDeclaration
-    \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
+    \/ cons2 (\ a b -> ErrorDeclaration a b Language.Unknown)
 
 instance Listable CyclomaticComplexity where
   tiers = cons1 CyclomaticComplexity
@@ -299,7 +299,7 @@ instance Listable Span where
 
 
 instance Listable Source where
-  tiers = fromBytes `mapT` tiers
+  tiers = fromUTF8 `mapT` tiers
 
 instance Listable ByteString where
   tiers = (T.encodeUtf8 . T.pack) `mapT` strings

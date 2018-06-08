@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Return
     (Call
       (MemberAccess
@@ -6,18 +6,13 @@
           (MemberAccess
             (Call
               (MemberAccess
-                (Identifier)
                 (Identifier))
-              (Empty))
-            (Identifier))
+              (Empty)))
           (MemberAccess
           { (Identifier)
-          ->(Identifier) }
-            (Identifier))
-          (Empty))
-        (Identifier))
+          ->(Identifier) })
+          (Empty)))
       (MemberAccess
       { (Identifier)
-      ->(Identifier) }
-        (Identifier))
+      ->(Identifier) })
       (Empty))))

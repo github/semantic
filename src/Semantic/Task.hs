@@ -227,7 +227,7 @@ runParser blob@Blob{..} parser = case parser of
       in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser blob parser
   where blobFields = ("path", blobPath) : languageTag
-        languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
+        languageTag = pure . (,) ("language" :: String) . show $ blobLanguage
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError (getField a) err]

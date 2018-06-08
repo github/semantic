@@ -18,20 +18,18 @@ module Semantic.Graph
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
-import           Control.Monad.Effect.Trace
 import           Control.Abstract
-import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
-import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
-import           Data.ByteString.Char8 (pack)
+import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
 import           Data.Record
 import           Data.Term
+import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Semantic.IO (Files)
@@ -39,7 +37,7 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-runGraph :: ( Member (Distribute WrappedTask) effs, Member (Exc SomeException) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: ( Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -54,8 +52,7 @@ runGraph graphType includePackages project
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
     analyze runGraphAnalysis (evaluatePackageWith analyzeModule analyzeTerm package) >>= extractGraph
     where extractGraph result = case result of
-            (Right ((_, graph), _), _) -> pure (simplify graph)
-            _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+            (((_, graph), _), _) -> pure (simplify graph)
           runGraphAnalysis
             = run
             . evaluating

@@ -1,15 +1,11 @@
-(Program
-  (MemberAccess
-  { (MemberAccess
-    {-(Identifier)-}
-    {-(Identifier)-})
-  ->(Identifier) }
-  { (Identifier)
-  ->(Identifier) })
-  (MemberAccess
-  { (Identifier)
-  ->(MemberAccess
-    {+(Identifier)+}
-    {+(Identifier)+}) }
-  { (Identifier)
-  ->(Identifier) }))
+(Statements
+{ (MemberAccess
+  {-(MemberAccess
+    {-(Identifier)-})-})
+->(MemberAccess
+  {+(Identifier)+}) }
+{ (MemberAccess
+  {-(Identifier)-})
+->(MemberAccess
+  {+(MemberAccess
+    {+(Identifier)+})+}) })

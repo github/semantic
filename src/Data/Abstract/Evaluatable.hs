@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -40,49 +40,44 @@ import Data.Term
 import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
-class Evaluatable constr where
-  eval :: ( EvaluatableConstraints term address value effects
-          , Member Fail effects
+class Show1 constr => Evaluatable constr where
+  eval :: ( AbstractValue address value effects
+          , Declarations term
+          , FreeVariables term
+          , Member (Allocator address value) effects
+          , Member (Env address) effects
+          , Member (LoopControl address value) effects
+          , Member (Modules address value) effects
+          , Member (Reader ModuleInfo) effects
+          , Member (Reader PackageInfo) effects
+          , Member (Reader Span) effects
+          , Member (Resumable (EnvironmentError address)) effects
+          , Member (Resumable EvalError) effects
+          , Member (Resumable ResolutionError) effects
+          , Member (Resumable (Unspecialized value)) effects
+          , Member (Return address value) effects
+          , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address value))
-  default eval :: ( Member (Resumable (Unspecialized value)) effects
-                  , Member (Allocator address value) effects
-                  , Show1 constr
-                  )
-               => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address value))
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
-
-type EvaluatableConstraints term address value effects =
-  ( AbstractValue address value effects
-  , Declarations term
-  , FreeVariables term
-  , Member (Allocator address value) effects
-  , Member (Env address) effects
-  , Member (LoopControl address value) effects
-  , Member (Modules address value) effects
-  , Member (Reader ModuleInfo) effects
-  , Member (Reader PackageInfo) effects
-  , Member (Reader Span) effects
-  , Member (Resumable (EnvironmentError address)) effects
-  , Member (Resumable EvalError) effects
-  , Member (Resumable ResolutionError) effects
-  , Member (Resumable (Unspecialized value)) effects
-  , Member (Return address value) effects
-  , Member Trace effects
-  )
 
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
-                    -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
-                    .  ( Addressable address inner'
+                    .  ( AbstractValue address value inner
+                       -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
+                       , Addressable address inner'
+                       , Declarations term
                        , Evaluatable (Base term)
-                       , EvaluatableConstraints term address value inner
                        , Foldable (Cell address)
-                       , Member Fail outer
+                       , FreeVariables term
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
+                       , Member (Resumable (EnvironmentError address)) outer
+                       , Member (Resumable EvalError) outer
                        , Member (Resumable (LoadError address value)) outer
+                       , Member (Resumable ResolutionError) outer
+                       , Member (Resumable (Unspecialized value)) outer
                        , Member (State (Heap address (Cell address) value)) outer
                        , Member (State (ModuleTable (Maybe (address, Environment address)))) outer
                        , Member Trace outer
@@ -147,9 +142,9 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 data EvalError return where
   FreeVariablesError :: [Name] -> EvalError Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: ByteString -> EvalError Integer
-  FloatFormatError    :: ByteString -> EvalError Scientific
-  RationalFormatError :: ByteString -> EvalError Rational
+  IntegerFormatError  :: Text -> EvalError Integer
+  FloatFormatError    :: Text -> EvalError Scientific
+  RationalFormatError :: Text -> EvalError Rational
   DefaultExportError  :: EvalError ()
   ExportError         :: ModulePath -> Name -> EvalError ()
 
@@ -200,18 +195,21 @@ runUnspecializedWith = runResumableWith
 -- Instances
 
 -- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
-instance Apply Evaluatable fs => Evaluatable (Sum fs) where
+instance (Apply Evaluatable fs, Apply Show1 fs) => Evaluatable (Sum fs) where
   eval = apply @Evaluatable eval
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
-instance Evaluatable s => Evaluatable (TermF s a) where
+instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
   eval = eval . termFOut
 
---- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
----
----   1. Each statement’s effects on the store are accumulated;
----   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
----   3. Only the last statement’s return value is returned.
+
+-- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
+--
+-- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
+--
+--   1. Each statement’s effects on the store are accumulated;
+--   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
+--   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

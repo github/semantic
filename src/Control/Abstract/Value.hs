@@ -58,11 +58,11 @@ class Show value => AbstractIntro value where
   boolean :: Bool -> value
 
   -- | Construct an abstract string value.
-  string :: ByteString -> value
+  string :: Text -> value
 
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: ByteString -> value
+  symbol :: Text -> value
 
   -- | Construct an abstract integral value.
   integer :: Integer -> value
@@ -120,8 +120,8 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator address value effects (value, value)
 
-  -- | Extract a 'ByteString' from a given value.
-  asString :: value -> Evaluator address value effects ByteString
+  -- | Extract a 'Text' from a given value.
+  asString :: value -> Evaluator address value effects Text
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a

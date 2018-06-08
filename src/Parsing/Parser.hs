@@ -13,6 +13,7 @@ module Parsing.Parser
 -- À la carte parsers
 , goParser
 , javaParser
+, javaASTParser
 , jsonParser
 , markdownParser
 , pythonParser
@@ -82,11 +83,11 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
 someAnalysisParser _ Java       = SomeAnalysisParser javaParser Nothing
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just JavaScript))
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) JavaScript)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser Nothing
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Python)
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Ruby)
 someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser Nothing
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
@@ -126,18 +127,19 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum PHP.Syntax)
               )
            => Language                                        -- ^ The 'Language' to select.
-           -> Parser (SomeTerm typeclasses (Record Location)) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
-someParser Go         = SomeParser goParser
-someParser Java       = SomeParser javaParser
-someParser JavaScript = SomeParser typescriptParser
-someParser JSON       = SomeParser jsonParser
-someParser Haskell    = SomeParser haskellParser
-someParser JSX        = SomeParser typescriptParser
-someParser Markdown   = SomeParser markdownParser
-someParser Python     = SomeParser pythonParser
-someParser Ruby       = SomeParser rubyParser
-someParser TypeScript = SomeParser typescriptParser
-someParser PHP        = SomeParser phpParser
+           -> Maybe (Parser (SomeTerm typeclasses (Record Location))) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
+someParser Go         = Just (SomeParser goParser)
+someParser Java       = Just (SomeParser javaParser)
+someParser JavaScript = Just (SomeParser typescriptParser)
+someParser JSON       = Just (SomeParser jsonParser)
+someParser Haskell    = Just (SomeParser haskellParser)
+someParser JSX        = Just (SomeParser typescriptParser)
+someParser Markdown   = Just (SomeParser markdownParser)
+someParser Python     = Just (SomeParser pythonParser)
+someParser Ruby       = Just (SomeParser rubyParser)
+someParser TypeScript = Just (SomeParser typescriptParser)
+someParser PHP        = Just (SomeParser phpParser)
+someParser Unknown    = Nothing
 
 
 goParser :: Parser Go.Term
@@ -153,7 +155,10 @@ pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 javaParser :: Parser Java.Term
-javaParser = AssignmentParser (ASTParser tree_sitter_java) Java.assignment
+javaParser = AssignmentParser javaASTParser Java.assignment
+
+javaASTParser :: Parser (AST [] Java.Grammar)
+javaASTParser = ASTParser tree_sitter_java
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
@@ -181,14 +186,16 @@ data SomeASTParser where
                 => Parser (AST [] grammar)
                 -> SomeASTParser
 
-someASTParser :: Language -> SomeASTParser
-someASTParser Go         = SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar))
-someASTParser Haskell    = SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar))
-someASTParser JavaScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
-someASTParser JSON       = SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar))
-someASTParser JSX        = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
-someASTParser Python     = SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar))
-someASTParser Ruby       = SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar))
-someASTParser TypeScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
-someASTParser PHP        = SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar))
-someASTParser l          = error $ "Tree-Sitter AST parsing not supported for: " <> show l
+someASTParser :: Language -> Maybe SomeASTParser
+someASTParser Go         = Just (SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar)))
+someASTParser Haskell    = Just (SomeASTParser (ASTParser tree_sitter_haskell :: Parser (AST [] Haskell.Grammar)))
+someASTParser Java       = Just (SomeASTParser (ASTParser tree_sitter_java :: Parser (AST [] Java.Grammar)))
+someASTParser JavaScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser JSON       = Just (SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar)))
+someASTParser JSX        = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser Python     = Just (SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar)))
+someASTParser Ruby       = Just (SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar)))
+someASTParser TypeScript = Just (SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar)))
+someASTParser PHP        = Just (SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar)))
+someASTParser Markdown   = Nothing
+someASTParser Unknown    = Nothing

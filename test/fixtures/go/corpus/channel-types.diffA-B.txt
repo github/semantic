@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -17,16 +17,13 @@
         {+(SendChannel
           {+(Constructor
             {+(Empty)+}
+            {+(Empty)+}
             {+(Statements)+})+})+})+})+}
-      (Type
-      { (Identifier)
-      ->(Identifier) }
-      { (BidirectionalChannel
-        {-(ReceiveChannel
-          {-(Identifier)-})-})
-      ->(SendChannel
+    {+(Type
+      {+(Identifier)+}
+      {+(SendChannel
         {+(ReceiveChannel
-          {+(Identifier)+})+}) })
+          {+(Identifier)+})+})+})+}
     {+(Type
       {+(Identifier)+}
       {+(ReceiveChannel
@@ -40,9 +37,15 @@
             {+(Identifier)+})+})+})+})+}
     {-(Type
       {-(Identifier)-}
+      {-(BidirectionalChannel
+        {-(ReceiveChannel
+          {-(Identifier)-})-})-})-}
+    {-(Type
+      {-(Identifier)-}
       {-(SendChannel
         {-(SendChannel
           {-(Constructor
+            {-(Empty)-}
             {-(Empty)-}
             {-(Statements)-})-})-})-})-}
     {-(Type

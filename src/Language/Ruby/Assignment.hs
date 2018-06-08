@@ -10,7 +10,18 @@ import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (name)
 import Data.List (elem)
 import Data.Record
-import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm''
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import Language.Ruby.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import Data.Sum
@@ -69,6 +80,7 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Statements
   , Statement.Try
   , Statement.While
   , Statement.Yield
@@ -76,7 +88,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Program
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
@@ -92,7 +103,7 @@ type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
@@ -350,14 +361,13 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
 
     selector = Just <$> term methodSelector
     require = inject <$> (symbol Identifier *> do
-      s <- source
+      s <- rawSource
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
-    load = inject <$> (symbol Identifier *> do
-      s <- source
+    load = inject <$ symbol Identifier <*> do
+      s <- rawSource
       guard (s == "load")
-      Ruby.Syntax.Load <$> loadArgs)
-    loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
+      (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 methodSelector :: Assignment
@@ -416,7 +426,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment' (Record Location, ByteString, [ByteString])
+identWithLocals :: Assignment' (Record Location, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getRubyLocals first
@@ -477,10 +487,10 @@ conditional :: Assignment
 conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> expression <*> expression <*> expression)
 
 emptyStatement :: Assignment
-emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
+emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ rawSource <|> pure Syntax.Empty)
 
 
--- Helper functions
+-- Helpers
 
 invert :: Assignment -> Assignment
 invert term = makeTerm <$> location <*> fmap Expression.Not term

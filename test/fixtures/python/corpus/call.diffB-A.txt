@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Call
     (Identifier)
   {+(Identifier)+}
@@ -15,7 +15,6 @@
     (Empty))
 {-(Call
   {-(MemberAccess
-    {-(Identifier)-}
     {-(Identifier)-})-}
   {-(Integer)-}
   {-(Empty)-})-})

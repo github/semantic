@@ -8,13 +8,25 @@ module Language.Python.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (name)
+import Data.Abstract.Name (Name, name)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm''
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
 import qualified Assigning.Assignment as Assignment
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -24,7 +36,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Text as T
 import Prologue
 
 
@@ -68,6 +80,7 @@ type Syntax =
    , Statement.Let
    , Statement.NoOp
    , Statement.Return
+   , Statement.Statements
    , Statement.Throw
    , Statement.Try
    , Statement.While
@@ -80,7 +93,6 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
-   , Syntax.Program
    , Type.Annotation
    , []
    ]
@@ -90,17 +102,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> manyTerm expression) <|> parseError
-
--- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
-manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
-
-someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
-
-term :: Assignment -> Assignment
-term term = contextualize comment (postContextualize comment term)
+assignment = handleError $ makeTerm <$> symbol Module <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
 
 expression :: Assignment
 expression = handleError (choice expressionChoices)
@@ -341,6 +343,9 @@ yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expr
 identifier :: Assignment
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
+identifier' :: Assignment.Assignment [] Grammar Name
+identifier' = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> (name <$> source)
+
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
 
@@ -375,7 +380,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
     -- `import a`
-    plainImport = makeTerm <$> location <*> (Python.Syntax.QualifiedImport <$> importPath)
+    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
     -- `from a import foo `
     importSymbol = makeNameAliasPair <$> aliasIdentifier <*> pure Nothing
     -- `from a import foo as bar`
@@ -394,7 +399,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     makeNameAliasPair from Nothing = (from, from)
 
 assertStatement :: Assignment
-assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
+assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 printStatement :: Assignment
 printStatement = do
@@ -408,19 +413,19 @@ printStatement = do
     printCallTerm location identifier = makeTerm location <$> (Expression.Call [] identifier <$> manyTerm expression <*> emptyTerm)
 
 nonlocalStatement :: Assignment
-nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
+nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call [] <$> term (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 globalStatement :: Assignment
-globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
+globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call [] <$> term (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 await :: Assignment
-await = makeTerm <$> symbol Await <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
+await = makeTerm <$> symbol Await <*> children (Expression.Call [] <$> term (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> term (expressionList <|> emptyTerm))
 
 deleteStatement :: Assignment
-deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> pure [] <*> term deleteIdentifier <* symbol ExpressionList <*> children (manyTerm expression) <*> emptyTerm)
+deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call [] <$> term deleteIdentifier <* symbol ExpressionList <*> children (manyTerm expression) <*> emptyTerm)
   where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier . name <$> source)
 
 raiseStatement :: Assignment
@@ -432,7 +437,7 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> ter
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 execStatement :: Assignment
-execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> manyTerm (string <|> expression) <*> emptyTerm)
+execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call [] <$> term (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> manyTerm (string <|> expression) <*> emptyTerm)
 
 passStatement :: Assignment
 passStatement = makeTerm <$> symbol PassStatement <*> (Statement.NoOp <$> emptyTerm <* advance)
@@ -444,7 +449,7 @@ continueStatement :: Assignment
 continueStatement = makeTerm <$> symbol ContinueStatement <*> (Statement.Continue <$> emptyTerm <* advance)
 
 memberAccess :: Assignment
-memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> identifier)
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> identifier')
 
 subscript :: Assignment
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
@@ -456,14 +461,14 @@ slice = makeTerm <$> symbol Slice <*> children
                           <*> (term expression <|> emptyTerm))
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> term (identifier <|> expression) <*> (symbol ArgumentList *> children (manyTerm expression) <|> someTerm comprehension) <*> emptyTerm)
+call = makeTerm <$> symbol Call <*> children (Expression.Call [] <$> term (identifier <|> expression) <*> (symbol ArgumentList *> children (manyTerm expression) <|> someTerm comprehension) <*> emptyTerm)
 
 boolean :: Assignment
 boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
        <|> makeTerm <$> token Grammar.False <*> pure Literal.false
 
 none :: Assignment
-none = makeTerm <$> symbol None <*> (Literal.Null <$ source)
+none = makeTerm <$> symbol None <*> (Literal.Null <$ rawSource)
 
 comprehension :: Assignment
 comprehension =  makeTerm <$> symbol ListComprehension       <*> children (Declaration.Comprehension <$> term expression <*> expressions)
@@ -482,6 +487,19 @@ ifClause = symbol IfClause *> children expressions
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (flip Statement.If <$> term expression <*> term expression <*> expressions)
+
+
+-- Helpers
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
+someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
+term :: Assignment -> Assignment
+term term = contextualize comment (postContextualize comment term)
 
 -- | Match a left-associated infix chain of terms, optionally followed by comments. Like 'chainl1' but assigning comment nodes automatically.
 chainl1Term :: Assignment -> Assignment.Assignment [] Grammar (Term -> Term -> Term) -> Assignment

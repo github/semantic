@@ -6,8 +6,8 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import Data.Abstract.Name
-import Data.ByteString.Char8 (pack, unpack)
 import Data.Semilattice.Lower
+import Data.Text (pack, unpack)
 import Prologue
 
 builtin :: ( HasCallStack
@@ -20,7 +20,7 @@ builtin :: ( HasCallStack
         -> Evaluator address value effects value
         -> Evaluator address value effects ()
 builtin s def = withCurrentCallStack callStack $ do
-  let name' = name (pack ("__semantic_" <> s))
+  let name' = name ("__semantic_" <> pack s)
   addr <- alloc name'
   bind name' addr
   def >>= assign addr

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (VariableDeclaration
     (Assignment
       (Empty)
@@ -10,14 +10,12 @@
           {+(Call
             {+(Identifier)+}
             {+(MemberAccess
-              {+(Identifier)+}
               {+(Identifier)+})+}
             {+(Empty)+})+})+}
         {-(JsxAttribute
           {-(Identifier)-}
           {-(JsxExpression
             {-(MemberAccess
-              {-(Identifier)-}
               {-(Identifier)-})-})-})-})
         (JsxExpression
           (Identifier))

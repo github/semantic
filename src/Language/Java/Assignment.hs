@@ -41,6 +41,7 @@ type Syntax =
    , Expression.Boolean
    , Expression.InstanceOf
    , Expression.MemberAccess
+   , Expression.Subscript
    , Expression.Super
    , Expression.This
    , Java.Syntax.Annotation
@@ -53,10 +54,13 @@ type Syntax =
    , Java.Syntax.Module
    , Java.Syntax.New
    , Java.Syntax.Package
+   , Java.Syntax.SpreadParameter
    , Java.Syntax.Synchronized
    , Java.Syntax.TypeParameter
    , Java.Syntax.TypeWithModifiers
    , Java.Syntax.Variable
+   , Java.Syntax.Wildcard
+   , Java.Syntax.WildcardBounds
    , Literal.Array
    , Literal.Boolean
    , Literal.Integer
@@ -80,6 +84,7 @@ type Syntax =
    , Statement.PreIncrement
    , Statement.PreDecrement
    , Statement.While
+   , Statement.Statements
    , Statement.Throw
    , Statement.Try
    , Syntax.Context
@@ -87,7 +92,6 @@ type Syntax =
    , Syntax.Error
    , Syntax.Identifier
    , Syntax.AccessibilityModifier
-   , Syntax.Program
    , Type.Array
    , Type.Bool
    , Type.Int
@@ -103,7 +107,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Java's grammar onto a program in Java's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Grammar.Program <*> children (Syntax.Program <$> manyTerm expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Grammar.Program <*> children (Statement.Statements <$> manyTerm expression) <|> parseError
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
@@ -133,6 +137,7 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
     arrayInitializer
+  , arrayAccess
   , assignment'
   , block
   , binary
@@ -145,13 +150,13 @@ expressionChoices =
   , continue
   , constructorDeclaration
   , explicitConstructorInvocation
-  -- , constantDeclaration
+  -- , TODO: constantDeclaration
   , doWhile
+  , fieldAccess
   , fieldDeclaration
   , float
   , for
   , enum
-  -- , hexadecimal
   , if'
   , interface
   , identifier
@@ -234,21 +239,14 @@ char = makeTerm <$> symbol CharacterLiteral <*> (Literal.TextElement <$> source)
 identifier :: Assignment
 identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
 
+identifier' :: Assignment.Assignment [] Grammar Name
+identifier' = (symbol Identifier <|> symbol TypeIdentifier) *> (name <$> source)
+
 scopedIdentifier :: Assignment
-scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> term expression)
+scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> identifier')
 
 superInterfaces :: Assignment.Assignment [] Grammar [Term]
 superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *> children(manyTerm type'))
--- a *> b
--- both of these are impure
--- getLine *> getLine
--- in half apply, they're both monadic impure actions
--- :t (<$)
--- :t (*>)
-
--- what does it mean to say monadic action? more precise term: sequence-able
--- a sequence of applicative actions can be executed left to right
--- applicative computations can't do branch and control flow; applicative computations can only compute in a direct line, monadic can compute arbitrary branches
 
 -- Declarations
 class' :: Assignment
@@ -257,19 +255,11 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many m
     makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass ++ superInterfaces) -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
     superClass = symbol Superclass *> children type'
-    -- matching term expression won't work since there is no node for that; it's AnonExtends
-    -- superClass = makeTerm <$> symbol SuperClass <*> children (Java.Syntax.SuperClass <$> term expression <*> type')
-    -- We'd still like to match the SuperClass node, but we don't need to create a syntax to make a term
-    -- Do you lose info by omitting the superclass term? No...
-    -- Don't need to make a term since we're not using syntax
-    -- what's the difference between using tokens: AnonExtends GenericType?
-    -- optional: when something can or can't exist and you want to produce a Maybe
--- TODO: superclass -- need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
--- optional, when we have a single term
--- superInterfaces is also optional but since it produces a list, lists already have an empty value so we don't need to wrap it up in a maybe to get an empty value
+-- TODO: superclass
+--       need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
+--       optional, when we have a single term
+--       superInterfaces is also optional but since it produces a list, lists already have an empty value so we don't need to wrap it up in a maybe to get an empty value
 
--- define this at the top level, we may change TS grammar so that if someone wants to write a Java snippet we could assign
--- it correctly; fieldDeclaration is standalone (compared to a type, which doesn't say anything by itself)
 fieldDeclaration :: Assignment
 fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
 
@@ -281,26 +271,20 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params
 
--- TODO: add genericType
--- Question: should this genericType be part of type or not? Its own type because it's different structurally
-
 generic :: Assignment
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
--- when do we make a term again? - if we want to wrap something in a syntax constructor, because each piece of syntax
--- will be populated by further terms inside it. in this case, we wrap two terms in a piece of syntax.
--- Q to help decide: do we lose anything by omitting the term?
 
 methodInvocation :: Assignment
-methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> expression <*> optional (token AnonDot *> expression)) <*> (argumentList <|> pure []) <*> emptyTerm)
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ token AnonDot <*> manyTerm typeArgument <*> identifier')) <*> (argumentList <|> pure []) <*> emptyTerm)
   where
-    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
-    callFunction a Nothing = a
+    callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
+    callFunction a Nothing = ([], a)
 
 explicitConstructorInvocation :: Assignment
-explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
+explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
   where
-    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
-    callFunction a Nothing = a
+    callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
+    callFunction a Nothing = ([], a)
 
 module' :: Assignment
 module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
@@ -318,21 +302,18 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
-    -- we won't make a term because we have a choice of a bunch of things
 
 package :: Assignment
--- package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
-package = do
-  loc <- symbol PackageDeclaration -- location which is calling the symbol API
-  c <- children $ do Java.Syntax.Package <$> someTerm expression
-  pure (makeTerm loc c) -- pure is re-wrapping it back into the outer context, which in this case is Assignment (ie., the return type of the function)
+package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
 
 enum :: Assignment
-enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
-    where enumConstant = symbol EnumConstant *> children (term identifier)
+enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> manyTerm modifier <*> term identifier <*> (superInterfaces <|> pure []) <*> manyTerm enumConstant <*> (enumBodyDeclarations <|> pure []))
+    where
+      enumConstant = symbol EnumConstant *> children (term identifier)
+      enumBodyDeclarations = symbol EnumBodyDeclarations *> children (manyTerm expression)
 
 return' :: Assignment
-return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expression)
+return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children (expression <|> emptyTerm))
 
 -- method expressions
 dims :: Assignment.Assignment [] Grammar [Term]
@@ -347,12 +328,20 @@ type' =  choice [
      , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
-     , symbol TypeArgument *> children (term type')
-     -- , symbol WildCard *> children (term type')
+     , wildcard
      , identifier
      , generic
     ]
     where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
+
+typeArgument :: Assignment
+typeArgument = symbol TypeArgument *> children (term type')
+
+wildcard :: Assignment
+wildcard = makeTerm <$> symbol Grammar.Wildcard <*> children (Java.Syntax.Wildcard <$> manyTerm annotation <*> optional (super <|> extends))
+  where
+    super = makeTerm <$> token Super <*> (Java.Syntax.WildcardBoundSuper <$> type')
+    extends = makeTerm1 <$> (Java.Syntax.WildcardBoundExtends <$> type')
 
 if' :: Assignment
 if' = makeTerm <$> symbol IfThenElseStatement <*> children (Statement.If <$> term expression <*> term expression <*> (term expression <|> emptyTerm))
@@ -502,6 +491,8 @@ argumentList = symbol ArgumentList *> children (manyTerm expression)
 
 super :: Assignment
 super = makeTerm <$> token Super <*> pure Expression.Super
+-- INCORRECT: super = makeTerm <$> token Super $> Expression.Super
+-- Take partially applied function and replace it instead of applying
 
 this :: Assignment
 this = makeTerm <$> token This <*> pure Expression.This
@@ -515,12 +506,10 @@ constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children
       constructor modifiers (typeParameters, identifier, formalParameters) = Java.Syntax.Constructor modifiers typeParameters identifier formalParameters -- let partial application do its thing
 
 typeParameters :: Assignment.Assignment [] Grammar [Term]
-typeParameters = symbol TypeParameters *> children (manyTerm typeParam) -- this produces a list, which is what we need to return given by the type definition
+typeParameters = symbol TypeParameters *> children (manyTerm typeParam)
   where
-    typeParam = makeTerm <$> symbol Grammar.TypeParameter <*> children (Java.Syntax.TypeParameter <$> manyTerm annotation <*> term identifier <*> (typeBound <|> pure [])) -- wrapping up all three of those fields so we need to makeTerm (producing a term here)
+    typeParam = makeTerm <$> symbol Grammar.TypeParameter <*> children (Java.Syntax.TypeParameter <$> manyTerm annotation <*> term identifier <*> (typeBound <|> pure []))
     typeBound = symbol TypeBound *> children (manyTerm type')
-    -- manyTerm typeParam made sense because each type Parameter was wrapped up into a Grammar.TypeParameter node, dissimilar
-    -- to superInterfaces
 
 annotation :: Assignment
 annotation = makeTerm <$> symbol NormalAnnotation <*> children (Java.Syntax.Annotation <$> term expression <*> (elementValuePairList <|> pure []))
@@ -535,19 +524,24 @@ throws :: Assignment.Assignment [] Grammar [Term]
 throws = symbol Throws *> children (symbol ExceptionTypeList *> children(manyTerm type'))
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
-formalParameters = manyTerm parameter
+formalParameters = manyTerm (parameter <|> spreadParameter)
   where
     parameter = makeTerm <$> symbol FormalParameter <*> children (makeAnnotation <$> manyTerm modifier <*> type' <* symbol VariableDeclaratorId <*> children identifier)
     makeAnnotation [] type' variableName = Type.Annotation variableName type'
     makeAnnotation modifiers type' variableName = Type.Annotation variableName (makeTerm1 (Java.Syntax.TypeWithModifiers modifiers type'))
--- know when we are in a functor context and fmap is all gravy
--- we're just wrapping stuff up in data, we aren't building a pattern (assignment) so we aren't in an applicative context
--- when in an applicative context, we're also in a functor context (ie., defining how fmap will work over it)
--- sometimes it is nice to be able to say you're in an applicative context without refering to any particular applicative instance
-
--- constantDeclaration :: Assignment
--- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
 
 castExpression :: Assignment
 castExpression = makeTerm <$> symbol CastExpression <*> children (flip Type.Annotation <$> type' <*> term expression)
--- term expression, because we can deal with comments
+
+fieldAccess :: Assignment
+fieldAccess = makeTerm <$> symbol FieldAccess <*> children (Expression.MemberAccess <$> term expression <*> identifier')
+
+spreadParameter :: Assignment
+spreadParameter = makeTerm <$> symbol Grammar.SpreadParameter <*> children (Java.Syntax.SpreadParameter <$> (makeSingleDecl <$> manyTerm modifier <*> type' <*> variableDeclarator))
+  where
+    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
+    makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
+    makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
+
+arrayAccess :: Assignment
+arrayAccess = makeTerm <$> symbol ArrayAccess <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)

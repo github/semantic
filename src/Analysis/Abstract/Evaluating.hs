@@ -5,7 +5,6 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract
-import Control.Monad.Effect.Fail
 import Data.Semilattice.Lower
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
@@ -20,15 +19,13 @@ deriving instance (Show (Cell address value), Show address, Show value) => Show 
 
 
 evaluating :: Evaluator address value
-                (  Fail
-                ': Fresh
+                (  Fresh
                 ': State (Heap address (Cell address) value)
                 ': State (ModuleTable (Maybe (address, Environment address)))
                 ': effects) result
-           -> Evaluator address value effects (Either String result, EvaluatingState address value)
+           -> Evaluator address value effects (result, EvaluatingState address value)
 evaluating
   = fmap (\ ((result, heap), modules) -> (result, EvaluatingState heap modules))
   . runState lowerBound -- State (ModuleTable (Maybe (address, Environment address)))
   . runState lowerBound -- State (Heap address (Cell address) value)
   . runFresh 0
-  . runFail

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -16,6 +16,7 @@
         (SendChannel
           (SendChannel
             (Constructor
+              (Empty)
               (Empty)
               (Statements)))))
       (Type

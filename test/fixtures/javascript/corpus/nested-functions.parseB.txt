@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Function
     (Empty)
     (Empty)
@@ -39,13 +39,11 @@
         (Statements
           (Call
             (MemberAccess
-              (Identifier)
               (Identifier))
             (Identifier)
             (Empty))
           (Call
             (MemberAccess
-              (Identifier)
               (Identifier))
             (Identifier)
             (Empty)))))))

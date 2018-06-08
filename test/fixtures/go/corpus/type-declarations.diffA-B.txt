@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -30,6 +30,7 @@
           { (Identifier)
           ->(Identifier) }
             (Constructor
+              (Empty)
               (Empty)
               (Statements
                 (Field

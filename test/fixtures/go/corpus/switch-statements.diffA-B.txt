@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -18,39 +18,27 @@
             (Identifier)
             (Statements)
             (Empty)))
-      {+(Pattern
-        {+(LessThan
-          {+(Identifier)+}
-          {+(Identifier)+})+}
-        {+(Call
-          {+(Identifier)+}
-          {+(Statements)+}
-          {+(Empty)+})+})+}
-      {+(Pattern
-        {+(Equal
-          {+(Identifier)+}
-          {+(Integer)+})+}
-        {+(Call
-          {+(Identifier)+}
-          {+(Statements)+}
-          {+(Empty)+})+})+}
-      {-(Pattern
-        {-(LessThan
-          {-(Identifier)-}
-          {-(Identifier)-})-}
+        (Pattern
+          (LessThan
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
         {-(Context
           {-(Comment)-}
-          {-(Call
-            {-(Identifier)-}
-            {-(Statements)-}
-            {-(Empty)-})-})-})-}
+            (Call
+              (Identifier)
+              (Statements)
+              (Empty)))-})
       {-(Context
         {-(Comment)-}
-        {-(Pattern
-          {-(Equal
-            {-(Identifier)-}
-            {-(Integer)-})-}
-          {-(Call
-            {-(Identifier)-}
-            {-(Statements)-}
-            {-(Empty)-})-})-})-}))))
+          (Pattern
+            (Equal
+            { (Identifier)
+            ->(Identifier) }
+              (Integer))
+            (Call
+            { (Identifier)
+            ->(Identifier) }
+              (Statements)
+              (Empty))))-}))))

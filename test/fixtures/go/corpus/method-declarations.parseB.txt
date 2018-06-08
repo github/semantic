@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -35,36 +35,29 @@
     (Return
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Plus
           (Plus
             (Plus
               (Call
                 (MemberAccess
-                  (Identifier)
                   (Identifier))
                 (Statements
                   (MemberAccess
-                    (Identifier)
                     (Identifier))
                   (Integer))
                 (Empty))
               (MemberAccess
-                (Identifier)
                 (Identifier)))
             (Call
               (MemberAccess
-                (Identifier)
                 (Identifier))
               (Statements
                 (MemberAccess
-                  (Identifier)
                   (Identifier))
                 (Integer))
               (Empty)))
           (MemberAccess
-            (Identifier)
             (Identifier)))
         (Empty))))
   (Method
@@ -80,20 +73,16 @@
     (Statements
       (Assignment
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Times
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Identifier)))
       (Assignment
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Times
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Identifier)))))
   (Method

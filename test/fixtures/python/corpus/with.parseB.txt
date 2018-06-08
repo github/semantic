@@ -1,8 +1,7 @@
-(Program
+(Statements
   (Let
     (Empty)
     (MemberAccess
-      (Identifier)
       (Identifier))
     (Statements
       (Assignment
@@ -13,7 +12,6 @@
       (Empty)
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Identifier)
         (TextElement)
@@ -24,7 +22,6 @@
       (Empty)
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Identifier)
         (TextElement)

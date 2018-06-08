@@ -69,6 +69,7 @@ module Assigning.Assignment
 , location
 , currentNode
 , symbol
+, rawSource
 , source
 , children
 , advance
@@ -104,6 +105,8 @@ import Data.Record
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import Data.Span
 import Data.Term
+import Data.Text (Text)
+import Data.Text.Encoding (decodeUtf8')
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
@@ -123,8 +126,8 @@ data AssignmentF ast grammar a where
   Alt :: [a] -> AssignmentF ast grammar a
   Label :: Assignment ast grammar a -> String -> AssignmentF ast grammar a
   Fail :: String -> AssignmentF ast grammar a
-  GetRubyLocals :: AssignmentF ast grammar [ByteString]
-  PutRubyLocals :: [ByteString] -> AssignmentF ast grammar ()
+  GetRubyLocals :: AssignmentF ast grammar [Text]
+  PutRubyLocals :: [Text] -> AssignmentF ast grammar ()
 
 data Tracing f a where
   Tracing :: { tracingCallSite :: Maybe (String, SrcLoc), runTracing :: f a } -> Tracing f a
@@ -144,10 +147,10 @@ tracing f = case getCallStack callStack of
 location :: HasCallStack => Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
 
-getRubyLocals :: HasCallStack => Assignment ast grammar [ByteString]
+getRubyLocals :: HasCallStack => Assignment ast grammar [Text]
 getRubyLocals = tracing GetRubyLocals `Then` return
 
-putRubyLocals :: (HasCallStack, Enum grammar, Eq1 ast, Ix grammar) => [ByteString] -> Assignment ast grammar ()
+putRubyLocals :: (HasCallStack, Enum grammar, Eq1 ast, Ix grammar) => [Text] -> Assignment ast grammar ()
 putRubyLocals l = (tracing (PutRubyLocals l) `Then` return)
               <|> (tracing End `Then` return)
 
@@ -160,8 +163,13 @@ symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast 
 symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` return
 
 -- | A rule to produce a node’s source as a ByteString.
-source :: HasCallStack => Assignment ast grammar ByteString
-source = tracing Source `Then` return
+-- You probably want to use 'source', unless you're throwing away the result.
+rawSource :: HasCallStack => Assignment ast grammar ByteString
+rawSource = tracing Source `Then` return
+
+-- | A rule to produce a node's source as Text. Fails if the node's source can't be parsed as UTF-8.
+source :: HasCallStack => Assignment ast grammar Text
+source = fmap decodeUtf8' rawSource >>= either (\e -> fail ("UTF-8 decoding failed: " <> show e)) pure
 
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
@@ -299,7 +307,7 @@ data State ast grammar = State
   , statePos :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
   , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
-  , stateRubyLocals :: ![ByteString]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment
+  , stateRubyLocals :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment
   }
 
 deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)

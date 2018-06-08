@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -33,7 +33,6 @@
               (ReceiveOperator
                 (Call
                   (MemberAccess
-                    (Identifier)
                     (Identifier))
                 { (Integer)
                 ->(Integer) }

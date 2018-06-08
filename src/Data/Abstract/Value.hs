@@ -20,8 +20,8 @@ data Value address body
   | Integer  (Number.Number Integer)
   | Rational (Number.Number Rational)
   | Float    (Number.Number Scientific)
-  | String ByteString
-  | Symbol ByteString
+  | String Text
+  | Symbol Text
   | Tuple [Value address body]
   | Array [Value address body]
   | Class Name (Environment address)
@@ -223,7 +223,7 @@ instance ( Coercible body (Eff effects)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError address body resume where
-  StringError            :: Value address body                       -> ValueError address body ByteString
+  StringError            :: Value address body                       -> ValueError address body Text
   BoolError              :: Value address body                       -> ValueError address body Bool
   IndexError             :: Value address body -> Value address body -> ValueError address body (Value address body)
   NamespaceError         :: Prelude.String                           -> ValueError address body (Environment address)

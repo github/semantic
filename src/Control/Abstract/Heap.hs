@@ -1,6 +1,9 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
+, Configuration(..)
+, Live
+, getConfiguration
 , getHeap
 , putHeap
 , box
@@ -25,11 +28,18 @@ import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
+import Control.Abstract.TermEvaluator
+import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Name
 import Data.Semigroup.Reducer
 import Prologue
+
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address (Cell address) value)) effects) => term -> TermEvaluator term address value effects (Configuration term address (Cell address) value)
+getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEnv <*> TermEvaluator getHeap
+
 
 -- | Retrieve the heap.
 getHeap :: Member (State (Heap address (Cell address) value)) effects => Evaluator address value effects (Heap address (Cell address) value)

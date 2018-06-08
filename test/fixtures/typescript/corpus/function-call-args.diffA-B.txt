@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Call
     (Identifier)
     (Float)
@@ -32,7 +32,6 @@
       (Statements
         (Call
           (MemberAccess
-            (Identifier)
             (Identifier))
         { (Identifier)
         ->(Identifier) }

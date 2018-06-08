@@ -35,9 +35,9 @@ import qualified Language.TypeScript.Assignment as TypeScript
 
 justEvaluating
   = runM
-  . fmap (first reassociate)
   . evaluating
   . runPrintingTrace
+  . fmap reassociate
   . runLoadError
   . runUnspecialized
   . runResolutionError
@@ -54,6 +54,7 @@ checking
   . runTermEvaluator @_ @Monovariant @Type
   . caching @[]
   . providingLiveSet
+  . fmap reassociate
   . runLoadError
   . runUnspecialized
   . runResolutionError
@@ -71,9 +72,9 @@ evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser
 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
 
-rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
-pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
-javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just Language.JavaScript)
+rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Language.Ruby
+pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Language.Python
+javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) Language.JavaScript
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = do
@@ -90,14 +91,11 @@ blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
 
 
-injectConst :: a -> SomeExc (Sum '[Const a])
-injectConst = SomeExc . inject . Const
-
 mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
 mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)
 
-reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
-reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
+reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) (Either (SomeExc exc4) (Either (SomeExc exc5) (Either (SomeExc exc6) (Either (SomeExc exc7) result)))))) -> Either (SomeExc (Sum '[exc7, exc6, exc5, exc4, exc3, exc2, exc1])) result
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . Right
 
 
 newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }

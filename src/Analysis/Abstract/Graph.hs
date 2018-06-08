@@ -21,23 +21,23 @@ import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
-import qualified Data.ByteString.Char8 as BC
 import           Data.Graph
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Data.Text.Encoding as T
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import           Prologue hiding (packageName, project)
 
 -- | A vertex of some specific type.
 data Vertex
-  = Package  { vertexName :: ByteString }
-  | Module   { vertexName :: ByteString }
-  | Variable { vertexName :: ByteString }
+  = Package  { vertexName :: Text }
+  | Module   { vertexName :: Text }
+  | Variable { vertexName :: Text }
   deriving (Eq, Ord, Show)
 
 style :: Style Vertex Builder
-style = (defaultStyle (byteString . vertexName))
+style = (defaultStyle (T.encodeUtf8Builder . vertexName))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
@@ -62,7 +62,7 @@ graphingTerms :: ( Element Syntax.Identifier syntax
 graphingTerms recur term@(In _ syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
-      moduleInclusion (Variable (unName name))
+      moduleInclusion (Variable (formatName name))
       variableDefinition name
     _ -> pure ()
   recur term
@@ -90,10 +90,10 @@ graphingModules recur m = interpose @(Modules address value) pure (\ m yield -> 
 
 
 packageVertex :: PackageInfo -> Vertex
-packageVertex = Package . unName . packageName
+packageVertex = Package . formatName . packageName
 
 moduleVertex :: ModuleInfo -> Vertex
-moduleVertex = Module . BC.pack . modulePath
+moduleVertex = Module . T.pack . modulePath
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
@@ -127,7 +127,7 @@ variableDefinition :: ( Member (Env (Hole (Located address))) effects
                    -> TermEvaluator term (Hole (Located address)) value effects ()
 variableDefinition name = do
   graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
-  appendGraph (vertex (Variable (unName name)) `connect` graph)
+  appendGraph (vertex (Variable (formatName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
 appendGraph = modify' . (<>)
@@ -137,7 +137,7 @@ instance ToJSON Vertex where
   toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
 
 vertexToText :: Vertex -> Text
-vertexToText = decodeUtf8 . vertexName
+vertexToText = vertexName
 
 vertexToType :: Vertex -> Text
 vertexToType Package{}  = "package"

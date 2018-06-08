@@ -148,21 +148,9 @@ instance FreeVariables1 Identifier where
 instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
 
-
-newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
-
-instance Eq1 Program where liftEq = genericLiftEq
-instance Ord1 Program where liftCompare = genericLiftCompare
-instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable Program where
-  eval (Program xs) = eval xs
-
-
 -- | An accessibility modifier, e.g. private, public, protected, etc.
-newtype AccessibilityModifier a = AccessibilityModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
+newtype AccessibilityModifier a = AccessibilityModifier Text
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
@@ -175,9 +163,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, Named1, Message1)
-
-instance ToJSONFields1 Empty
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
@@ -188,19 +174,13 @@ instance Evaluatable Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
-
-instance ToJSONFields1 Error where
-  toJSONFields1 f@Error{..} = withChildren f [ "stack" .= errorCallStack
-                                             , "expected" .= errorExpected
-                                             , "actual" .= errorActual
-                                             ]
 
 
 errorSyntax :: Error.Error String -> [a] -> Error a
@@ -210,7 +190,11 @@ unError :: Span -> Error a -> Error.Error String
 unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show ErrorStack where
+  showsPrec _ = shows . map showPair . unErrorStack
+    where showPair (sym, loc) = sym <> " " <> srcLocFile loc <> ":" <> show (srcLocStartLine loc) <> ":" <> show (srcLocStartCol loc)
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
@@ -241,9 +225,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
-
-instance ToJSONFields1 Context
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s

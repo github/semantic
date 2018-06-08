@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -9,6 +9,7 @@
       (Type
         (Identifier)
         (Constructor
+          (Empty)
           (Empty)
           (Field
             (Identifier)

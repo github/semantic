@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
@@ -9,14 +9,12 @@
       (Defer
         (Call
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Statements)
           (Empty)))
       (Go
         (Call
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Statements)
           (Empty))))))
