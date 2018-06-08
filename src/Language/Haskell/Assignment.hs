@@ -386,7 +386,7 @@ typeOperator :: Assignment
 typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.TypeOperator . Name.name <$> source)
 
 typeSignature :: Assignment
-typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> (manyTerm (context' <|> scopedTypeVariables)) <*> expression)
+typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expression)
 
 typeVariableIdentifier :: Assignment
 typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.TypeVariableIdentifier . Name.name <$> source)
