@@ -7,7 +7,6 @@
       { (Identifier)
       ->(Identifier) })
       (Constructor
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -23,7 +22,6 @@
       { (Identifier)
       ->(Identifier) })
       (Constructor
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -35,7 +33,6 @@
       { (Identifier)
       ->(Identifier) })
       (Constructor
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -66,7 +63,6 @@
                 (Star)))))
         (Identifier))
       (Constructor
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -81,7 +77,6 @@
       { (Identifier)
       ->(Identifier) })
       (Constructor
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters
@@ -94,7 +89,6 @@
       { (Identifier)
       ->(Identifier) })
       (Constructor
-        (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters

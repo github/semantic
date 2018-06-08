@@ -29,3 +29,5 @@ data Baz a = Show a => Baz a
 
 
 data Bar = Bar !Double#
+
+data SomeNumber = forall b . Show b => SomeNumber (Number b)

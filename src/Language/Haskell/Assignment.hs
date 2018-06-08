@@ -113,7 +113,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 constructor :: Assignment
-constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> (context' <|> emptyTerm) <*> typeConstructor <*> typeParameters))
+constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters))
            <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
 
 constructorIdentifier :: Assignment
@@ -301,7 +301,7 @@ moduleIdentifier :: Assignment
 moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
 newConstructor :: Assignment
-newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> (context' <|> emptyTerm) <*> typeConstructor <*> typeParameters)
+newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters)
 
 newType :: Assignment
 newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$> (context' <|> emptyTerm) <*> typeLeft <*> newConstructor <*> (derivingClause <|> emptyTerm))

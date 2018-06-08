@@ -6,7 +6,6 @@
       (Statements
         (Identifier))
       (Constructor
-        (Empty)
         (Identifier)
         (TypeParameters
           (Identifier)))
@@ -20,7 +19,6 @@
       (Statements
         (Identifier))
       (Constructor
-        (Empty)
         (Identifier)
         (TypeParameters
           (Identifier)))
@@ -30,7 +28,6 @@
       (Statements
         (Identifier))
       (Constructor
-        (Empty)
         (Identifier)
         (TypeParameters
           (Statements
@@ -58,7 +55,6 @@
                 (Star)))))
         (Identifier))
       (Constructor
-        (Empty)
         (Identifier)
         (TypeParameters
           (Statements
@@ -71,7 +67,6 @@
       (Statements
         (Identifier))
       (Constructor
-        (Empty)
         (Identifier)
         (TypeParameters
           (Identifier)))
@@ -82,7 +77,6 @@
       (Statements
         (Identifier))
       (Constructor
-        (Empty)
         (Identifier)
         (TypeParameters
           (Identifier)))
