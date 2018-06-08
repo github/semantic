@@ -15,6 +15,7 @@ module Semantic.IO
 , noLanguageForBlob
 , openFileForReading
 , readBlob
+, readBlobFromPath
 , readBlobPairs
 , readBlobPairsFromHandle
 , readBlobs
@@ -65,7 +66,6 @@ import           Debug.Trace (trace)
 readFile :: forall m. MonadIO m => File -> m (Maybe Blob.Blob)
 readFile (File "/dev/null" _) = pure Nothing
 readFile (File path language) = do
-  liftIO (print "Wrong readFile")
   raw <- liftIO (Just <$> B.readFile path)
   pure $ Blob.sourceBlob path language . fromUTF8 <$> raw
 
