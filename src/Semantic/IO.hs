@@ -26,6 +26,7 @@ module Semantic.IO
 , readProjectFromPaths
 , rethrowing
 , runFiles
+, runFilesGuided
 , stderr
 , stdin
 , stdout
@@ -34,19 +35,20 @@ module Semantic.IO
 
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect
+import           Control.Monad.Effect.Reader
+import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
 import           Data.Aeson
 import qualified Data.Blob as Blob
 import           Data.Bool
-import           Data.Project (File (..), Project (..))
 import qualified Data.Project as Project
+import           Data.Project (File (..), ProjectException (..))
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
 import           Data.Source (fromUTF8, fromText)
-import qualified Data.Text as T
 import           Prelude hiding (readFile)
 import           Prologue hiding (MonadError (..), fail)
 import           System.Directory (doesDirectoryExist)
@@ -56,12 +58,14 @@ import           System.Exit
 import           System.FilePath
 import           System.FilePath.Glob
 import qualified System.IO as IO
-import           Text.Read
+import           Text.Read hiding (get)
+import           Debug.Trace (trace)
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readFile :: forall m. MonadIO m => File -> m (Maybe Blob.Blob)
 readFile (File "/dev/null" _) = pure Nothing
 readFile (File path language) = do
+  liftIO (print "Wrong readFile")
   raw <- liftIO (Just <$> B.readFile path)
   pure $ Blob.sourceBlob path language . fromUTF8 <$> raw
 
@@ -102,17 +106,20 @@ readBlobFromPath file = do
 
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project.Concrete
 readProjectFromPaths maybeRoot path lang excludeDirs = do
+  liftIO $ putStrLn "Starting readProjectFromPath"
   isDir <- isDirectory path
   let (filterFun, entryPoints, rootDir) = if isDir
       then (id, [], fromMaybe path maybeRoot)
       else (filter (/= path), [toFile path], fromMaybe (takeDirectory path) maybeRoot)
 
-  paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
-  blobs <- traverse (readBlobFromPath . toFile) paths
 
-  pure $ Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs
+  paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
+  blobs <- traverse readBlobFromPath (toFile <$> paths)
+  let p = Project.Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs
+  liftIO $ putStrLn "Done"
+  pure p
   where
-    toFile p = File p lang
+    toFile path = File path lang
     exts = extensionsForLanguage lang
 
 -- Recursively find files in a directory.
@@ -267,6 +274,15 @@ runFiles = interpret $ \ files -> case files of
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
 
+runFilesGuided :: (Member (State Project.Concrete) effs, Member (Exc SomeException) effs, Member IO effs) => Eff (Files ': effs) a -> Eff effs a
+runFilesGuided = interpret $ \files -> case files of
+  Read (FromHandle _)            -> throwError (SomeException HandleNotSupported)
+  Read (FromPairHandle _)        -> throwError (SomeException HandleNotSupported)
+  Write _ _                      -> throwError (SomeException WritesNotSupported)
+  Read (FromPath path)           -> get >>= \p -> Project.readBlobFromPath p path
+  Read (FromPathPair paths)      -> get >>= \p -> runBothWith (Project.readBlobPair p) paths
+  FindFiles dir exts excludeDirs -> get >>= \p -> Project.findFiles (p { Project.projectExcludeDirs = excludeDirs }) dir exts
+  ReadProject{}                  -> get
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
 --

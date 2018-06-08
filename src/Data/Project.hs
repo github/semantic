@@ -1,12 +1,22 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE MultiWayIf #-}
+
 module Data.Project where
 
+import Prelude hiding (readFile)
+import Prologue hiding (throwError)
+
+import Control.Monad.Effect
+import Control.Monad.IO.Class
+import Data.Source
+import Control.Monad.Effect.Exception
 import Data.Blob
 import Data.Language
 import qualified Data.Text as T
-import Prologue
 import Proto3.Suite
 import System.FilePath.Posix
+import qualified Data.ByteString as B
+import Debug.Trace
 
 data Project blobs paths path = Project
   { projectRootDir     :: path
@@ -65,3 +75,64 @@ file path = File path (languageForFilePath path)
 
 toFile :: Blob -> File
 toFile (Blob _ p l) = File p l
+
+data ProjectException
+  = FileNotFound FilePath
+  | EmptyPairProvided
+  | PairNotFound (Both FilePath)
+  | HandleNotSupported
+  | WritesNotSupported
+  | NoLanguagesSpecified
+  | UnknownLanguage
+  | MultipleLanguagesSpecified [Language]
+  | TODO
+    deriving (Show, Eq, Typeable, Exception)
+
+readBlobFromPath :: Member (Exc SomeException) effs
+                 => Concrete
+                 -> File
+                 -> Eff effs Blob
+readBlobFromPath g f = readFile g f >>= maybeM (throwError (SomeException (FileNotFound (filePath f))))
+
+addPrelude :: MonadIO m
+           => Concrete
+           -> File
+           -> m Concrete
+addPrelude g File{..} = do
+  traceM "Adding to prelude"
+  contents <- liftIO (B.readFile filePath)
+  let blob = Blob (fromUTF8 contents) filePath fileLanguage
+  pure $ g { projectBlobs = blob : projectBlobs g }
+
+readFile :: Member (Exc SomeException) effs
+         => Concrete
+         -> File
+         -> Eff effs (Maybe Blob)
+readFile Project{..} f =
+  let p         = filePath f
+      candidate = find (\b -> blobPath b == p) (traceShowId projectBlobs)
+  in if
+    | p == "/dev/null"  -> pure Nothing
+    | isJust candidate  -> pure candidate
+    | otherwise         -> throwError (SomeException (FileNotFound p))
+
+readBlobPair :: Member (Exc SomeException) effs
+             => Concrete
+             -> File
+             -> File
+             -> Eff effs BlobPair
+readBlobPair g f1 f2 = Join <$> join (maybeThese <$> readFile g f1 <*> readFile g f2)
+
+maybeThese :: Member (Exc SomeException) effs => Maybe a -> Maybe b -> Eff effs (These a b)
+maybeThese a b = case (a, b) of
+  (Just a, Nothing) -> pure (This a)
+  (Nothing, Just b) -> pure (That b)
+  (Just a, Just b)  -> pure (These a b)
+  _                 -> throwError (SomeException EmptyPairProvided)
+
+findFiles :: Member (Exc SomeException) effs
+          => Concrete
+          -> FilePath
+          -> [String]
+          -> Eff effs [FilePath]
+findFiles _ _ _ = throwError (SomeException TODO)

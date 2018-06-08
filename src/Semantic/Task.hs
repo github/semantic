@@ -3,6 +3,7 @@ module Semantic.Task
 ( Task
 , TaskEff
 , WrappedTask(..)
+, WrappedTask'(..)
 , Level(..)
 , RAlgebra
 -- * I/O
@@ -38,6 +39,7 @@ module Semantic.Task
 -- * Interpreting
 , runTask
 , runTaskWithOptions
+, runTaskWithProject
 -- * Re-exports
 , Distribute
 , Eff
@@ -54,6 +56,7 @@ import           Control.Monad
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
+import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Trace
 import           Data.Blob
 import           Data.Bool
@@ -64,6 +67,7 @@ import           Data.Record
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
+import           Data.Project
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter
 import           Parsing.CMark
@@ -92,8 +96,23 @@ type TaskEff = Eff '[Distribute WrappedTask
                     , Exc SomeException
                     , IO]
 
+type TaskEff' = Eff '[Distribute WrappedTask'
+                     , Task
+                     , Resolution
+                     , IO.Files
+                     , State Concrete
+                     , Reader Options
+                     , Trace
+                     , Telemetry
+                     , Exc SomeException
+                     , IO]
+
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
+  deriving (Applicative, Functor, Monad)
+
+-- | A wrapper for a 'Task', to embed in other effects.
+newtype WrappedTask' a = WrapTask' { unwrapTask' :: TaskEff' a }
   deriving (Applicative, Functor, Monad)
 
 -- | A function to render terms or diffs.
@@ -152,6 +171,33 @@ runTaskWithOptions options task = do
   closeStatClient (asyncQueueExtra statter)
   closeQueue logger
   either (die . displayException) pure result
+
+-- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
+runTaskWithProject :: Concrete -> Options -> TaskEff' a -> IO a
+runTaskWithProject proj options task = do
+  options <- configureOptionsForHandle stderr options
+  statter <- defaultStatsClient >>= newQueue sendStat
+  logger <- newQueue logMessage options
+
+  (result, stat) <- withTiming "run" [] $ do
+    let run :: TaskEff' a -> IO (Either SomeException a)
+        run = fmap (fmap fst) . runM . runError
+                   . runTelemetry logger statter
+                   . runTraceInTelemetry
+                   . runReader options
+                   . runState proj
+                   . IO.runFilesGuided
+                   . runResolution
+                   . runTaskF
+                   . runDistribute (run . unwrapTask')
+    run task
+  queue statter stat
+
+  closeQueue statter
+  closeStatClient (asyncQueueExtra statter)
+  closeQueue logger
+  either (die . displayException) pure result
+
 
 runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
 runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
