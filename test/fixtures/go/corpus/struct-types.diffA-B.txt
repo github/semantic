@@ -12,14 +12,12 @@
         ->(Identifier) }
           (Constructor
             (Empty)
-            (Empty)
             (Statements))))
       (Statements
         (Type
         { (Identifier)
         ->(Identifier) }
           (Constructor
-            (Empty)
             (Empty)
             (Field
               (Identifier)
@@ -29,7 +27,6 @@
         { (Identifier)
         ->(Identifier) }
           (Constructor
-            (Empty)
             (Empty)
             (Field
               (Identifier)
@@ -41,7 +38,6 @@
         { (Identifier)
         ->(Identifier) }
           (Constructor
-            (Empty)
             (Empty)
             (Statements
               (Field
