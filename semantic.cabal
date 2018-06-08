@@ -154,6 +154,7 @@ library
                      , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.Graph
+                     , Semantic.Haystack
                      , Semantic.IO
                      , Semantic.Log
                      , Semantic.Parse
@@ -180,6 +181,7 @@ library
                      , bytestring
                      , cmark-gfm
                      , containers
+                     , cryptohash
                      , directory
                      , directory-tree
                      , effects
@@ -192,6 +194,9 @@ library
                      , Glob
                      , hashable
                      , hscolour
+                     , http-client
+                     , http-client-tls
+                     , http-types
                      , kdt
                      , mersenne-random-pure64
                      , mtl
