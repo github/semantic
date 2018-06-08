@@ -36,7 +36,6 @@ module Semantic.IO
 
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect
-import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
@@ -60,7 +59,6 @@ import           System.FilePath
 import           System.FilePath.Glob
 import qualified System.IO as IO
 import           Text.Read hiding (get)
-import           Debug.Trace (trace)
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readFile :: forall m. MonadIO m => File -> m (Maybe Blob.Blob)
@@ -274,7 +272,7 @@ runFiles = interpret $ \ files -> case files of
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
 
-runFilesGuided :: (Member (State Project.Concrete) effs, Member (Exc SomeException) effs, Member IO effs) => Eff (Files ': effs) a -> Eff effs a
+runFilesGuided :: (Member (State Project.Concrete) effs, Member (Exc SomeException) effs) => Eff (Files ': effs) a -> Eff effs a
 runFilesGuided = interpret $ \files -> case files of
   Read (FromHandle _)            -> throwError (SomeException HandleNotSupported)
   Read (FromPairHandle _)        -> throwError (SomeException HandleNotSupported)
