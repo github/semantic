@@ -34,6 +34,7 @@ type Syntax = '[
   , Literal.Float
   , Literal.Integer
   , Literal.TextElement
+  , Literal.Tuple
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.Class
@@ -187,6 +188,7 @@ expressionChoices = [
                     , star
                     , strictType
                     , string
+                    , tupleType
                     , type'
                     , type''
                     , typePattern
@@ -349,6 +351,9 @@ strictType = makeTerm'
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
+tupleType :: Assignment
+tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm type')
+
 typeClassIdentifier :: Assignment
 typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
@@ -401,9 +406,10 @@ typeConstructor =  constructorIdentifier
                <|> qualifiedModuleIdentifier
                <|> qualifiedTypeConstructorIdentifier
                <|> quotedName
+               <|> tupleType
+               <|> tuplingConstructor
                <|> typeClassIdentifier
                <|> typeConstructorIdentifier
-               <|> tuplingConstructor
                <|> unitConstructor
 
 typeSynonymDeclaration :: Assignment
