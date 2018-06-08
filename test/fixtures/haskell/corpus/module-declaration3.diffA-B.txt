@@ -2,8 +2,8 @@
   (Empty)
   (Statements
     (QualifiedModuleIdentifier
-    { (Identifier)
-    ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) })
+    { (ModuleIdentifier)
+    ->(ModuleIdentifier) }
+    { (ModuleIdentifier)
+    ->(ModuleIdentifier) })
     (Statements)))

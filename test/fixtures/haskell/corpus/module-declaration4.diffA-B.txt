@@ -1,12 +1,12 @@
 (Module
-  (Identifier)
+  (ModuleIdentifier)
   (Export
     (TypeConstructorExport
       (VariableOperator
-      { (Identifier)
-      ->(Identifier) })))
+      { (VariableSymbol)
+      ->(VariableSymbol) })))
   (Export
     (VariableOperator
-    { (Identifier)
-    ->(Identifier) }))
+    { (VariableSymbol)
+    ->(VariableSymbol) }))
   (Statements))

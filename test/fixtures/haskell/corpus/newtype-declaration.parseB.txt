@@ -2,88 +2,84 @@
   (Empty)
   (Statements
     (NewType
-      (Empty)
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (Constructor
-        (Identifier)
+        (ConstructorIdentifier)
         (TypeParameters
-          (Identifier)))
+          (TypeConstructorIdentifier)))
       (Empty))
     (NewType
       (Context'
-        (Class
-          (Identifier)
-          (TypeParameters
-            (Identifier))))
+        (Statements
+          (Class
+            (TypeClassIdentifier)
+            (TypeParameters
+              (TypeVariableIdentifier)))))
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (Constructor
-        (Identifier)
+        (ConstructorIdentifier)
         (TypeParameters
-          (Identifier)))
+          (TypeVariableIdentifier)))
       (Empty))
     (NewType
-      (Empty)
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (Constructor
-        (Identifier)
+        (ConstructorIdentifier)
         (TypeParameters
           (Statements
             (Field
               (Statements
-                (Identifier))
+                (VariableIdentifier))
               (Type
-                (Identifier)
+                (TypeConstructorIdentifier)
                 (TypeParameters
-                  (Identifier))
+                  (TypeConstructorIdentifier))
                 (Empty))))))
       (Empty))
     (NewType
-      (Empty)
       (Statements
-        (Identifier)
-        (Identifier)
+        (TypeConstructorIdentifier)
+        (TypeVariableIdentifier)
         (AnnotatedTypeVariable
-          (Identifier)
+          (TypeVariableIdentifier)
           (KindListType
             (KindFunctionType
               (Kind
                 (Star))
               (Kind
                 (Star)))))
-        (Identifier))
+        (TypeVariableIdentifier))
       (Constructor
-        (Identifier)
+        (ConstructorIdentifier)
         (TypeParameters
           (Statements
-            (Identifier)
-            (Identifier)
-            (Identifier))))
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier))))
       (Empty))
     (NewType
-      (Empty)
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (Constructor
-        (Identifier)
+        (ConstructorIdentifier)
         (TypeParameters
-          (Identifier)))
+          (TypeConstructorIdentifier)))
       (Deriving
-        (Identifier)))
+        (TypeClassIdentifier)))
     (NewType
-      (Empty)
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (Constructor
-        (Identifier)
+        (ConstructorIdentifier)
         (TypeParameters
-          (Identifier)))
+          (TypeVariableIdentifier)))
       (Deriving
-        (Identifier)
-        (Identifier)
-        (Identifier)
-        (Identifier)
-        (Identifier)
-        (Identifier)))))
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)))))
