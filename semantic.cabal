@@ -150,6 +150,7 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.AST
                      , Semantic.CLI
+                     , Semantic.Config
                      , Semantic.Diff
                      , Semantic.Distribute
                      , Semantic.Env

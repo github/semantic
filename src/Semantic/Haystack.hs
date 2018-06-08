@@ -2,13 +2,10 @@ module Semantic.Haystack where
 
 import Control.Monad.IO.Class
 import Data.Aeson
-import Network.BSD
 import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Network.HTTP.Types.Status (statusCode)
 import Prologue hiding (hash)
 import Semantic.Queue
-import System.Environment
 import System.IO.Error
 import qualified Data.Text.Encoding as Text
 import Crypto.Hash
@@ -32,21 +29,18 @@ data HaystackClient
 queueErrorReport :: MonadIO io => AsyncQueue ErrorReport HaystackClient -> Text -> [(Text, Text)] -> io ()
 queueErrorReport q@AsyncQueue{..} message = liftIO . queue q . ErrorReport message
 
--- Create the default Haystack client.
-defaultHaystackClient :: MonadIO io => io HaystackClient
-defaultHaystackClient = do
-  url <- liftIO $ lookupEnv "HAYSTACK_URL"
-  case url of
-    Nothing -> pure NullHaystackClient
-    Just url -> do
-      hostname <- liftIO getHostName
-      manager  <- liftIO $ newManager tlsManagerSettings
-      request' <- liftIO $ parseRequest url
+-- Create a Haystack HTTP client.
+haystackClient :: Maybe String -> ManagerSettings -> String -> String -> IO HaystackClient
+haystackClient maybeURL managerSettings hostName appName
+  | Just url <- maybeURL = do
+      manager  <- newManager managerSettings
+      request' <- parseRequest url
       let request = request'
             { method = "POST"
             , requestHeaders = [ ("Content-Type", "application/json; charset=utf-8") ]
             }
-      pure $ HaystackClient request manager hostname "semantic"
+      pure $ HaystackClient request manager hostName appName
+  | otherwise = pure NullHaystackClient
 
 -- Report an error to Haystack over HTTP.
 reportError :: MonadIO io => HaystackClient -> ErrorReport -> io (Maybe Int)

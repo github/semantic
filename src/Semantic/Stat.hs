@@ -13,6 +13,7 @@ module Semantic.Stat
 
 -- Client
 , defaultStatsClient
+, statsClient
 , StatsClient(..)
 , closeStatClient
 
