@@ -77,10 +77,7 @@ pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Py
 javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) Language.JavaScript
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = do
-  x <- evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-  pure (TermEvaluator (runAllocator (runTermEvaluator x)))
-
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
