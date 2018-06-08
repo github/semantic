@@ -19,14 +19,12 @@ import           Data.Abstract.Address
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
 import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo(..))
-import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.Vertex
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import           Prologue hiding (packageName, project)
 
