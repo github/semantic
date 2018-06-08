@@ -84,15 +84,15 @@
       {+(Empty)+}
       {+(Identifier)+}
       {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
       (Constructor
         (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
-    {+(Constructor
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(TypeParameters)+})+}
     {-(Constructor
       {-(Empty)-}
       {-(Identifier)-}
@@ -362,7 +362,7 @@
         (Class
           (Identifier)
           (TypeParameters
-            (TypeParameters
+            (Statements
               (Identifier)
               (Identifier))))
         (Class

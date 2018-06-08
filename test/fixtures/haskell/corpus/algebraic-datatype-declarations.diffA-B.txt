@@ -365,7 +365,7 @@
         (Class
           (Identifier)
           (TypeParameters
-            (TypeParameters
+            (Statements
               (Identifier)
               (Identifier))))
         (Class
