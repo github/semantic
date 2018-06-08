@@ -13,7 +13,6 @@ import           Data.Mergeable
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
-import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
 
@@ -99,7 +98,7 @@ instance Evaluatable Import where
   -- from . import moduleY
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval (Import (RelativeQualifiedName n Nothing) [(name, _)]) = do
-    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (unName name :| []))))
+    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName name :| []))))
     Rval <$> evalQualifiedImport name path
 
   -- from a import b
@@ -135,7 +134,7 @@ evalQualifiedImport name path = letrec' name $ \addr -> do
   bindAll importedEnv
   unit <$ makeNamespace name addr Nothing
 
-newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
+newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
@@ -144,9 +143,8 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (RelativeQualifiedName _ _))        = raiseEff (fail "technically this is not allowed in python")
-  eval (QualifiedImport qname@(QualifiedName qualifiedName)) = do
-    modulePaths <- resolvePythonModules qname
+  eval (QualifiedImport qualifiedName) = do
+    modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
     Rval <$> go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment

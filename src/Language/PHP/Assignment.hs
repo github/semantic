@@ -281,7 +281,7 @@ parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children (term expression)
 
 classConstantAccessExpression :: Assignment
-classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> term name)
+classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> name')
 
 variable :: Assignment
 variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression <|> castExpression
@@ -296,11 +296,11 @@ callableVariable = choice [
   ]
 
 memberCallExpression :: Assignment
-memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term dereferencableExpression <*> term memberName) <*> arguments <*> emptyTerm)
+memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term dereferencableExpression <*> memberName') <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 scopedCallExpression :: Assignment
-scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term scopeResolutionQualifier <*> term memberName) <*> arguments <*> emptyTerm)
+scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term scopeResolutionQualifier <*> memberName') <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 functionCallExpression :: Assignment
@@ -318,13 +318,13 @@ subscriptExpression :: Assignment
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> term dereferencableExpression <*> (pure <$> (term expression <|> emptyTerm)))
 
 memberAccessExpression :: Assignment
-memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> term dereferencableExpression <*> term memberName)
+memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> term dereferencableExpression <*> memberName')
 
 dereferencableExpression :: Assignment
 dereferencableExpression = symbol DereferencableExpression *> children (term (variable <|> expression <|> arrayCreationExpression <|> string))
 
 scopedPropertyAccessExpression :: Assignment
-scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> term simpleVariable')
+scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> simpleVariable'')
 
 scopeResolutionQualifier :: Assignment
 scopeResolutionQualifier = choice [
@@ -452,6 +452,9 @@ newVariable = makeTerm <$> symbol NewVariable <*> children (Syntax.NewVariable <
 
 memberName :: Assignment
 memberName = name <|> simpleVariable' <|> expression
+
+memberName' :: Assignment.Assignment [] Grammar Name.Name
+memberName' = name' <|> simpleVariable''
 
 relativeScope :: Assignment
 relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
@@ -711,6 +714,9 @@ simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleV
 simpleVariable' :: Assignment
 simpleVariable' = choice [simpleVariable, variableName]
 
+simpleVariable'' :: Assignment.Assignment [] Grammar Name.Name
+simpleVariable'' = variableName'
+
 
 yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol YieldExpression <*> children (Statement.Yield <$> term (arrayElementInitializer <|> expression))
@@ -735,8 +741,14 @@ requireOnceExpression = makeTerm <$> symbol RequireOnceExpression <*> children (
 variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
+variableName' :: Assignment.Assignment [] Grammar Name.Name
+variableName' = symbol VariableName *> children name'
+
 name :: Assignment
 name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> source)
+
+name' :: Assignment.Assignment [] Grammar Name.Name
+name' = (symbol Name <|> symbol Name') *> (Name.name <$> source)
 
 functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)

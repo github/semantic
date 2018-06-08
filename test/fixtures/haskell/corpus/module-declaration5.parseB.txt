@@ -1,0 +1,23 @@
+(Module
+  (Identifier)
+  (Export
+    (Statements
+      (Identifier)
+      (AllConstructors)))
+  (Export
+    (TypeConstructorExport
+      (ConstructorOperator
+        (Identifier))))
+  (Export
+    (TypeConstructorExport
+      (VariableOperator
+        (Identifier))))
+  (Export
+    (Identifier))
+  (Export
+    (ModuleExport
+      (Identifier)))
+  (Export
+    (TypeConstructorExport
+      (Identifier)))
+  (Statements))

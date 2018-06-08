@@ -42,7 +42,7 @@ resolveGoImport (ImportPath path Relative) = do
     [] -> throwResumable $ GoImportError path
     _ -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
-  package <- T.unpack . unName . Package.packageName <$> currentPackage
+  package <- T.unpack . formatName . Package.packageName <$> currentPackage
   trace ("attempting to resolve " <> show path <> " for package " <> package)
   case splitDirectories path of
     -- Import an absolute path that's defined in this package being analyzed.

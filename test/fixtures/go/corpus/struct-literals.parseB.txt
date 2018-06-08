@@ -22,6 +22,7 @@
         (Composite
           (Constructor
             (Empty)
+            (Empty)
             (Field
               (Identifier)
               (Statements
@@ -34,6 +35,5 @@
         (Identifier)
         (Composite
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Statements))))))

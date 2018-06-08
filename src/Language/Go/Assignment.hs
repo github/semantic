@@ -7,7 +7,7 @@ module Language.Go.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (name)
+import Data.Abstract.Name (Name, name)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Go.Grammar as Grammar
@@ -227,11 +227,17 @@ element = symbol Element *> children expression
 fieldIdentifier :: Assignment
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> source)
 
+fieldIdentifier' :: Assignment.Assignment [] Grammar Name
+fieldIdentifier' = symbol FieldIdentifier *> (name <$> source)
+
 floatLiteral :: Assignment
 floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
 identifier :: Assignment
 identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
+
+identifier' :: Assignment.Assignment [] Grammar Name
+identifier' =  (symbol Identifier <|> symbol Identifier') *> (name <$> source)
 
 imaginaryLiteral :: Assignment
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
@@ -259,6 +265,9 @@ runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> so
 
 typeIdentifier :: Assignment
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
+
+typeIdentifier' :: Assignment.Assignment [] Grammar Name
+typeIdentifier' = symbol TypeIdentifier *> (name <$> source)
 
 
 -- Primitive Types
@@ -301,13 +310,13 @@ pointerType :: Assignment
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 qualifiedType :: Assignment
-qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> expression)
+qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> (identifier' <|> typeIdentifier'))
 
 sliceType :: Assignment
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
 
 structType :: Assignment
-structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> expressions)
+structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> emptyTerm <*> expressions)
 
 typeAlias :: Assignment
 typeAlias = makeTerm <$> symbol TypeAlias <*> children (Declaration.TypeAlias [] <$> expression <*> expression)
@@ -432,7 +441,7 @@ parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment
-selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> expression)
+selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> (identifier' <|> fieldIdentifier'))
 
 sliceExpression :: Assignment
 sliceExpression = makeTerm <$> symbol SliceExpression <*> children (Go.Syntax.Slice <$> expression <* token AnonLBracket <*> (emptyTerm <|> expression) <* token AnonColon <*> (expression <|> emptyTerm) <* optional (token AnonColon) <*> (expression <|> emptyTerm))

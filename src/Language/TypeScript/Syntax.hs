@@ -12,7 +12,6 @@ import qualified Data.Language as Language
 import qualified Data.Map as Map
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import           Prelude
 import           Prologue
 import           System.FilePath.Posix
 

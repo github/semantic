@@ -2,80 +2,282 @@
   (Empty)
   (Statements
     (TypeSynonym
-      (Type
+      (Statements
       { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (Type
+      ->(Identifier) })
+      (TypePattern
       { (Identifier)
-      ->(Identifier) }
-        (TypeParameters)))
+      ->(Identifier) }))
     (TypeSynonym
-      (Type
+      (Statements
       { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
-      (Type
-        (ListConstructor)
-        (TypeParameters)))
+      ->(Identifier) })
+      (TypePattern
+        (ListConstructor)))
     (TypeSynonym
-      (Type
+      (Statements
         (Identifier)
-        (TypeParameters
+        (Identifier)
+      {-(Identifier)-})
+      (TypePattern
+        (Statements
           (Identifier)
-        {-(Identifier)-}))
-      (Type
-        (Identifier)
-        (TypeParameters
           (Identifier)
         {-(Identifier)-})))
     (TypeSynonym
-      (Type
+      (Statements
         (Identifier)
-        (TypeParameters
-          (Identifier)))
-      (Type
+        (Identifier))
+      (TypePattern
         (Array
           (Type
           { (Identifier)
           ->(Identifier) }
             (TypeParameters
-              (Identifier))))
-        (TypeParameters)))
+              (Identifier))
+            (Empty)))))
     (TypeSynonym
-      (Type
+      (Statements
+      { (Identifier)
+      ->(Identifier) })
+      (TypePattern
+        (UnitConstructor)))
+  {+(TypeSynonym
+    {+(Statements
+      {+(Identifier)+})+}
+    {+(TypePattern
+      {+(TupleConstructor)+})+})+}
+    (TypeSynonym
+      (Statements
+        (Identifier))
+      (TypePattern
+        (TupleConstructor)))
+    (TypeSynonym
+      (Statements
+        (Identifier))
+      (TypePattern
+      { (TupleConstructor)
+      ->(FunctionConstructor) }))
+  {+(TypeSynonym
+    {+(Statements
+      {+(Identifier)+})+}
+    {+(TypePattern
+      {+(InfixOperatorPattern
+        {+(Type
+          {+(Identifier)+}
+          {+(TypeParameters)+}
+          {+(Empty)+})+}
+        {+(Identifier)+}
+        {+(Type
+          {+(InfixOperatorPattern
+            {+(Type
+              {+(Identifier)+}
+              {+(TypeParameters
+                {+(Identifier)+})+}
+              {+(Empty)+})+}
+            {+(Identifier)+}
+            {+(Type
+              {+(InfixOperatorPattern
+                {+(Type
+                  {+(Identifier)+}
+                  {+(TypeParameters
+                    {+(Statements
+                      {+(Identifier)+}
+                      {+(Identifier)+})+})+}
+                  {+(Empty)+})+}
+                {+(Identifier)+}
+                {+(Type
+                  {+(QuotedName
+                    {+(ListConstructor)+})+}
+                  {+(TypeParameters)+}
+                  {+(Empty)+})+})+}
+              {+(TypeParameters)+}
+              {+(Empty)+})+})+}
+          {+(TypeParameters)+}
+          {+(Empty)+})+})+})+})+}
+  {+(TypeSynonym
+    {+(Statements
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(TypePattern
+      {+(QuotedName
+        {+(Array
+          {+(Type
+            {+(Identifier)+}
+            {+(TypeParameters)+}
+            {+(Empty)+})+}
+          {+(Type
+            {+(Identifier)+}
+            {+(TypeParameters
+              {+(Statements
+                {+(Identifier)+}
+                {+(Identifier)+})+})+}
+            {+(Empty)+})+})+})+})+})+}
+    (TypeSynonym
+      (Statements
       { (Identifier)
       ->(Identifier) }
-        (TypeParameters))
-      (Type
-        (UnitConstructor)
-        (TypeParameters)))
+      {+(Identifier)+})
+    { (TypePattern
+      {-(FunctionConstructor)-})
+    ->(TextElement) })
   {+(TypeSynonym
-    {+(Type
+    {+(Statements
       {+(Identifier)+}
-      {+(TypeParameters)+})+}
-    {+(Type
-      {+(TupleConstructor)+}
-      {+(TypeParameters)+})+})+}
-    (TypeSynonym
-      (Type
-        (Identifier)
-        (TypeParameters))
-      (Type
-        (TupleConstructor)
-        (TypeParameters)))
-    (TypeSynonym
-      (Type
-        (Identifier)
-        (TypeParameters))
-      (Type
-      { (TupleConstructor)
-      ->(FunctionConstructor) }
-        (TypeParameters)))
+      {+(Statements
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Identifier)+})+})+}
+    {+(TypePattern
+      {+(Statements
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Identifier)+})+})+})+}
+  {+(TypeSynonym
+    {+(Statements
+      {+(Identifier)+})+}
+    {+(Context'
+      {+(Identifier)+})+}
+    {+(TypePattern
+      {+(Statements
+        {+(Identifier)+}
+        {+(ListConstructor)+})+})+})+}
+  {+(TypeSynonym
+    {+(Statements
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(ScopedTypeVariables
+      {+(Statements
+        {+(Identifier)+}
+        {+(Identifier)+})+})+}
+    {+(TypePattern
+      {+(Statements
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Identifier)+})+})+})+}
+  {+(TypeSynonym
+    {+(Statements
+      {+(Statements
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Identifier)+})+})+}
+    {+(TypePattern
+      {+(Statements
+        {+(Identifier)+}
+        {+(Statements
+          {+(Identifier)+}
+          {+(Identifier)+}
+          {+(Identifier)+})+})+})+})+}
   {-(TypeSynonym
-    {-(Type
+    {-(Statements
+      {-(Identifier)-})-}
+    {-(TypePattern
+      {-(InfixOperatorPattern
+        {-(Type
+          {-(Identifier)-}
+          {-(TypeParameters
+            {-(Statements
+              {-(Identifier)-}
+              {-(Identifier)-})-})-}
+          {-(Empty)-})-}
+        {-(Identifier)-}
+        {-(Type
+          {-(InfixOperatorPattern
+            {-(Type
+              {-(Identifier)-}
+              {-(TypeParameters
+                {-(Identifier)-})-}
+              {-(Empty)-})-}
+            {-(Identifier)-}
+            {-(Type
+              {-(InfixOperatorPattern
+                {-(Type
+                  {-(Identifier)-}
+                  {-(TypeParameters)-}
+                  {-(Empty)-})-}
+                {-(Identifier)-}
+                {-(Type
+                  {-(QuotedName
+                    {-(ListConstructor)-})-}
+                  {-(TypeParameters)-}
+                  {-(Empty)-})-})-}
+              {-(TypeParameters)-}
+              {-(Empty)-})-})-}
+          {-(TypeParameters)-}
+          {-(Empty)-})-})-})-})-}
+  {-(TypeSynonym
+    {-(Statements
       {-(Identifier)-}
-      {-(TypeParameters)-})-}
-    {-(Type
-      {-(FunctionConstructor)-}
-      {-(TypeParameters)-})-})-}))
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(TypePattern
+      {-(QuotedName
+        {-(Array
+          {-(Type
+            {-(Identifier)-}
+            {-(TypeParameters)-}
+            {-(Empty)-})-}
+          {-(Type
+            {-(Identifier)-}
+            {-(TypeParameters
+              {-(Statements
+                {-(Identifier)-}
+                {-(Identifier)-})-})-}
+            {-(Empty)-})-})-})-})-})-}
+  {-(TypeSynonym
+    {-(Statements
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(TextElement)-})-}
+  {-(TypeSynonym
+    {-(Statements
+      {-(Identifier)-}
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
+    {-(TypePattern
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Identifier)-})-})-})-}
+  {-(TypeSynonym
+    {-(Statements
+      {-(Identifier)-})-}
+    {-(Context'
+      {-(Identifier)-})-}
+    {-(TypePattern
+      {-(Statements
+        {-(Identifier)-}
+        {-(ListConstructor)-})-})-})-}
+  {-(TypeSynonym
+    {-(Statements
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(ScopedTypeVariables
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
+    {-(TypePattern
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Identifier)-})-})-})-}
+  {-(TypeSynonym
+    {-(Statements
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
+    {-(TypePattern
+      {-(Statements
+        {-(Identifier)-}
+        {-(Statements
+          {-(Identifier)-}
+          {-(Identifier)-}
+          {-(Identifier)-})-})-})-})-}))

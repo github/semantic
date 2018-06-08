@@ -194,7 +194,7 @@ instance Evaluatable Data.Syntax.Declaration.Datatype
 
 
 -- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
-data Constructor a = Constructor { constructorName :: !a, constructorFields :: !a }
+data Constructor a = Constructor { constructorContext :: a, constructorName :: a, constructorFields :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq

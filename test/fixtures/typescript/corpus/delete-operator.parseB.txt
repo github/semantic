@@ -1,5 +1,4 @@
 (Statements
   (Delete
     (MemberAccess
-      (Identifier)
       (Identifier))))
