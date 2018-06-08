@@ -7,7 +7,7 @@ module Language.TypeScript.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (name)
+import Data.Abstract.Name (Name, name)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Sum
@@ -270,7 +270,7 @@ ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
 
 memberExpression :: Assignment
-memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> term propertyIdentifier)
+memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> propertyIdentifier')
 
 newExpression :: Assignment
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New . pure <$> term expression)
@@ -400,6 +400,9 @@ jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript
 
 propertyIdentifier :: Assignment
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier . name <$> source)
+
+propertyIdentifier' :: Assignment.Assignment [] Grammar Name
+propertyIdentifier' = symbol PropertyIdentifier *> (name <$> source)
 
 sequenceExpression :: Assignment
 sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)

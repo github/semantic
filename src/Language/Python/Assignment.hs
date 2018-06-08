@@ -8,7 +8,7 @@ module Language.Python.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (name)
+import Data.Abstract.Name (Name, name)
 import Data.Record
 import Data.Syntax
     ( contextualize
@@ -26,6 +26,7 @@ import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
 import qualified Assigning.Assignment as Assignment
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -35,7 +36,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.List.NonEmpty as NonEmpty
+import qualified Data.Text as T
 import Prologue
 
 
@@ -342,6 +343,9 @@ yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expr
 identifier :: Assignment
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
+identifier' :: Assignment.Assignment [] Grammar Name
+identifier' = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> (name <$> source)
+
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
 
@@ -376,7 +380,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
     -- `import a`
-    plainImport = makeTerm <$> location <*> (Python.Syntax.QualifiedImport <$> importPath)
+    plainImport = makeTerm <$> symbol DottedName <*> children (Python.Syntax.QualifiedImport . NonEmpty.map T.unpack <$> NonEmpty.some1 identifierSource)
     -- `from a import foo `
     importSymbol = makeNameAliasPair <$> aliasIdentifier <*> pure Nothing
     -- `from a import foo as bar`
@@ -445,7 +449,7 @@ continueStatement :: Assignment
 continueStatement = makeTerm <$> symbol ContinueStatement <*> (Statement.Continue <$> emptyTerm <* advance)
 
 memberAccess :: Assignment
-memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> identifier)
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> identifier')
 
 subscript :: Assignment
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)

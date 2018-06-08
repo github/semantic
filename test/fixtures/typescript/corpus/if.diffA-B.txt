@@ -2,7 +2,6 @@
   (If
   { (Identifier)
   ->(MemberAccess
-    {+(Identifier)+}
     {+(Identifier)+}) }
     (Statements
       (Call

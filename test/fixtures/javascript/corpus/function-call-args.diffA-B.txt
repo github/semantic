@@ -32,7 +32,6 @@
       (Statements
         (Call
           (MemberAccess
-            (Identifier)
             (Identifier))
         { (Identifier)
         ->(Identifier) }

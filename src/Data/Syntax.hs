@@ -190,7 +190,11 @@ unError :: Span -> Error a -> Error.Error String
 unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show ErrorStack where
+  showsPrec _ = shows . map showPair . unErrorStack
+    where showPair (sym, loc) = sym <> " " <> srcLocFile loc <> ":" <> show (srcLocStartLine loc) <> ":" <> show (srcLocStartCol loc)
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where

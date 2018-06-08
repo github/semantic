@@ -190,7 +190,7 @@ instance Evaluatable Bitwise where
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a
-  = MemberAccess !a !a
+  = MemberAccess !a !Name
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 MemberAccess where liftEq = genericLiftEq
@@ -198,12 +198,9 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval (MemberAccess obj prop) = do
-    obj <- subtermValue obj
-    prop <- subtermRef prop
-    case prop of
-      LvalLocal propName -> pure (LvalMember obj propName)
-      _ -> raiseEff (Prologue.fail "Non-Identifier as right hand side of MemberAccess!")
+  eval (MemberAccess obj propName) = do
+    obj' <- subtermValue obj
+    pure $! LvalMember obj' propName
 
 -- | Subscript (e.g a[1])
 data Subscript a
