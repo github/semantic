@@ -58,6 +58,7 @@ type Syntax = '[
   , Syntax.ListConstructor
   , Syntax.Module
   , Syntax.ModuleExport
+  , Syntax.NewType
   , Syntax.Pragma
   , Syntax.QualifiedModuleIdentifier
   , Syntax.QualifiedTypeConstructorIdentifier
@@ -169,6 +170,7 @@ expressionChoices = [
                     , listType
                     , moduleExport
                     , moduleIdentifier
+                    , newType
                     , operator
                     , parenthesizedTypePattern
                     , pragma
@@ -297,6 +299,14 @@ moduleExport = makeTerm <$> symbol ModuleExport <*> children (Syntax.ModuleExpor
 moduleIdentifier :: Assignment
 moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> source)
 
+newConstructor :: Assignment
+newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> (context' <|> emptyTerm) <*> typeConstructor <*> typeParameters)
+
+newType :: Assignment
+newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$> (context' <|> emptyTerm) <*> typeLeft <*> newConstructor <*> (derivingClause <|> emptyTerm))
+  where
+    typeLeft = makeTerm <$> location <*> manyTermsTill expression (symbol NewConstructor)
+
 operator :: Assignment
 operator = typeOperator <|> constructorOperator <|> variableOperator
 
@@ -369,7 +379,7 @@ type'' = makeTerm
       <*> children (Syntax.Type <$> expression <*> typeParameters <*> (kindSignature <|> emptyTerm))
 
 typeParameters :: Assignment
-typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> (manyTermsTill expression (symbol Annotation) <|> many expression))
+typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> (manyTermsTill expression (symbol Annotation) <|> manyTerm expression))
 
 typePattern :: Assignment
 typePattern = makeTerm <$> symbol TypePattern <*> children (Syntax.TypePattern <$> expressions)

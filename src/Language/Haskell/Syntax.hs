@@ -343,3 +343,12 @@ instance Ord1 ScopedTypeVariables where liftCompare = genericLiftCompare
 instance Show1 ScopedTypeVariables where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ScopedTypeVariables
+
+data NewType a = NewType { newTypeContext :: a, newTypeLeft :: a, newTypeRight :: a, newTypeDeriving :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 NewType where liftEq = genericLiftEq
+instance Ord1 NewType where liftCompare = genericLiftCompare
+instance Show1 NewType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable NewType

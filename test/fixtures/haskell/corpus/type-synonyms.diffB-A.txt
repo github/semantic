@@ -52,12 +52,11 @@
         (Identifier))
       (TypePattern
         (TupleConstructor)))
-    (TypeSynonym
-      (Statements
-        (Identifier))
-      (TypePattern
-      { (TupleConstructor)
-      ->(FunctionConstructor) }))
+  {+(TypeSynonym
+    {+(Statements
+      {+(Identifier)+})+}
+    {+(TypePattern
+      {+(FunctionConstructor)+})+})+}
   {+(TypeSynonym
     {+(Statements
       {+(Identifier)+})+}
@@ -115,14 +114,11 @@
                 {+(Identifier)+}
                 {+(Identifier)+})+})+}
             {+(Empty)+})+})+})+})+})+}
-    (TypeSynonym
-      (Statements
-      { (Identifier)
-      ->(Identifier) }
-      {+(Identifier)+})
-    { (TypePattern
-      {-(FunctionConstructor)-})
-    ->(TextElement) })
+  {+(TypeSynonym
+    {+(Statements
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(TextElement)+})+}
   {+(TypeSynonym
     {+(Statements
       {+(Identifier)+}
@@ -171,6 +167,16 @@
           {+(Identifier)+}
           {+(Identifier)+}
           {+(Identifier)+})+})+})+})+}
+  {-(TypeSynonym
+    {-(Statements
+      {-(Identifier)-})-}
+    {-(TypePattern
+      {-(TupleConstructor)-})-})-}
+  {-(TypeSynonym
+    {-(Statements
+      {-(Identifier)-})-}
+    {-(TypePattern
+      {-(FunctionConstructor)-})-})-}
   {-(TypeSynonym
     {-(Statements
       {-(Identifier)-})-}

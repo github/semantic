@@ -1,0 +1,108 @@
+(Module
+  (Empty)
+  (Statements
+    (NewType
+      (Empty)
+      (Statements
+      { (Identifier)
+      ->(Identifier) })
+      (Constructor
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters
+          (Identifier)))
+      (Empty))
+    (NewType
+      (Context'
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier))))
+      (Statements
+      { (Identifier)
+      ->(Identifier) })
+      (Constructor
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters
+          (Identifier)))
+      (Empty))
+    (NewType
+      (Empty)
+      (Statements
+      { (Identifier)
+      ->(Identifier) })
+      (Constructor
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters
+          (Statements
+            (Field
+              (Statements
+              { (Identifier)
+              ->(Identifier) })
+              (Type
+                (Identifier)
+                (TypeParameters
+                  (Identifier))
+                (Empty))))))
+      (Empty))
+    (NewType
+      (Empty)
+      (Statements
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (AnnotatedTypeVariable
+          (Identifier)
+          (KindListType
+            (KindFunctionType
+              (Kind
+                (Star))
+              (Kind
+                (Star)))))
+        (Identifier))
+      (Constructor
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters
+          (Statements
+            (Identifier)
+            (Identifier)
+            (Identifier))))
+      (Empty))
+    (NewType
+      (Empty)
+      (Statements
+      { (Identifier)
+      ->(Identifier) })
+      (Constructor
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters
+          (Identifier)))
+      (Deriving
+        (Identifier)))
+    (NewType
+      (Empty)
+      (Statements
+      { (Identifier)
+      ->(Identifier) })
+      (Constructor
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (TypeParameters
+          (Identifier)))
+      (Deriving
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Identifier)))))

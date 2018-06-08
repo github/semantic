@@ -75,11 +75,6 @@
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
-      (Constructor
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (TypeParameters))
     {+(Constructor
       {+(Empty)+}
       {+(Identifier)+}
@@ -88,11 +83,19 @@
       {+(Empty)+}
       {+(Identifier)+}
       {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(TypeParameters)+})+}
       (Constructor
         (Empty)
       { (Identifier)
       ->(Identifier) }
         (TypeParameters))
+    {-(Constructor
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(TypeParameters)-})-}
     {-(Constructor
       {-(Empty)-}
       {-(Identifier)-}
