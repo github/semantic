@@ -36,11 +36,6 @@ import qualified Proto3.Suite as PB
 import           Data.Graph
 import qualified Data.Graph.Vertex as V
 
--- There are a lot of boilerplate instances for protobuf compatibility in this file.
--- Some of them could be reduced by changing the data types and using generic deriving,
--- but then you have to sacrifice derived JSON instances. Ultimately the protobuf ones
--- aren't too onerous to write by hand.
-
 -- | Sum type corresponding to a protobuf enum for vertex types.
 data VertexType
   = PACKAGE
@@ -52,7 +47,8 @@ data VertexType
 instance PB.HasDefault VertexType where def = PACKAGE
 
 -- | Piggybacks on top of the 'Enumerated' instance, as the generated code would.
--- This instance will get easier when we have DerivingVia.
+-- This instance will get easier when we have DerivingVia, or a Generic instance
+-- that hooks into Enumerated.
 instance PB.Primitive VertexType where
   primType _ = PB.primType (Proxy @(PB.Enumerated VertexType))
   encodePrimitive f = PB.encodePrimitive f . PB.Enumerated . Right
