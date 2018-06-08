@@ -21,8 +21,6 @@ import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Abstract
 import           Control.Monad.Effect (reinterpret)
-import           Control.Monad.Effect.State
-import           Control.Monad.IO.Class
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -33,7 +31,6 @@ import           Data.Project
 import qualified Data.Project as Project (Concrete)
 import           Data.Record
 import           Data.Term
-import           Debug.Trace (traceShowId, traceM)
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
