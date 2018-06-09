@@ -54,7 +54,11 @@ type Syntax = '[
   , Syntax.FunctionType
   , Syntax.GADT
   , Syntax.GADTConstructor
+  , Syntax.HiddenImport
   , Syntax.Identifier
+  , Syntax.Import
+  , Syntax.ImportAlias
+  , Syntax.ImportDeclaration
   , Syntax.InfixOperatorPattern
   , Syntax.Kind
   , Syntax.KindFunctionType
@@ -67,6 +71,8 @@ type Syntax = '[
   , Syntax.NewType
   , Syntax.Pragma
   , Syntax.PrimitiveConstructorIdentifier
+  , Syntax.PrimitiveVariableIdentifier
+  , Syntax.QualifiedImportDeclaration
   , Syntax.QualifiedModuleIdentifier
   , Syntax.QualifiedTypeConstructorIdentifier
   , Syntax.QuotedName
@@ -187,6 +193,8 @@ expressionChoices = [
                     , functionType
                     , gadtConstructor
                     , gadtDeclaration
+                    , importAlias
+                    , importDeclaration
                     , infixOperatorPattern
                     , integer
                     , kind
@@ -201,6 +209,8 @@ expressionChoices = [
                     , parenthesizedTypePattern
                     , pragma
                     , primitiveConstructorIdentifier
+                    , primitiveVariableIdentifier
+                    , qualifiedImportDeclaration
                     , qualifiedModuleIdentifier
                     , qualifiedTypeConstructorIdentifier
                     , quotedName
@@ -281,6 +291,29 @@ gadtDeclaration = makeTerm
   where
     typeParameters' = makeTerm <$> location <*> manyTermsTill expression (symbol KindSignature <|> symbol Where')
 
+hiddenImport :: Assignment
+hiddenImport = makeTerm <$> symbol HiddenImport <*> children (Syntax.HiddenImport <$> expressions)
+
+hiddenImportSpec :: Assignment.Assignment [] Grammar [Term]
+hiddenImportSpec = symbol HiddenImportSpec *> children (manyTerm hiddenImport)
+
+import' :: Assignment
+import' = makeTerm <$> symbol Import <*> children (Syntax.Import <$> expressions)
+
+importAlias :: Assignment
+importAlias = makeTerm <$> symbol ImportAlias <*> children (Syntax.ImportAlias <$> expression <*> expression)
+
+importDeclaration :: Assignment
+importDeclaration = makeTerm
+                 <$> symbol ImportDeclaration
+                 <*> children (Syntax.ImportDeclaration
+                             <$> (packageQualifiedImport <|> emptyTerm)
+                             <*> expression
+                             <*> (importSpec <|> hiddenImportSpec <|> pure []))
+
+importSpec :: Assignment.Assignment [] Grammar [Term]
+importSpec = symbol ImportSpec *> children (manyTerm import')
+
 infixOperatorPattern :: Assignment
 infixOperatorPattern = makeTerm <$> symbol InfixOperatorPattern <*> children (Syntax.InfixOperatorPattern <$> expression <*> operator <*> expression)
 
@@ -318,7 +351,10 @@ listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> manyTerm
 module' :: Assignment
 module' = makeTerm
        <$> symbol Module
-       <*> children (Syntax.Module <$> (term moduleIdentifier <|> emptyTerm) <*> moduleExports <*> (where' <|> expressions <|> emptyTerm))
+       <*> children (Syntax.Module
+                   <$> (term moduleIdentifier <|> emptyTerm)
+                   <*> moduleExports
+                   <*> (where' <|> expressions <|> emptyTerm))
   where
     moduleExports = symbol ModuleExports *> children (manyTerm export)
                  <|> pure []
@@ -340,6 +376,9 @@ newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$
 operator :: Assignment
 operator = typeOperator <|> constructorOperator <|> variableOperator
 
+packageQualifiedImport :: Assignment
+packageQualifiedImport = makeTerm <$> symbol PackageQualifiedImport <*> (Literal.TextElement <$> source)
+
 parenthesizedTypePattern :: Assignment
 parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressions
 
@@ -348,6 +387,17 @@ pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
 
 primitiveConstructorIdentifier :: Assignment
 primitiveConstructorIdentifier = makeTerm <$> symbol PrimitiveConstructorIdentifier <*> (Syntax.PrimitiveConstructorIdentifier . Name.name <$> source)
+
+primitiveVariableIdentifier :: Assignment
+primitiveVariableIdentifier = makeTerm <$> symbol PrimitiveVariableIdentifier <*> (Syntax.PrimitiveVariableIdentifier . Name.name <$> source)
+
+qualifiedImportDeclaration :: Assignment
+qualifiedImportDeclaration = makeTerm
+                          <$> symbol QualifiedImportDeclaration
+                          <*> children (Syntax.QualifiedImportDeclaration
+                                      <$> (packageQualifiedImport <|> emptyTerm)
+                                      <*> expression
+                                      <*> (importSpec <|> hiddenImportSpec <|> pure []))
 
 qualifiedModuleIdentifier :: Assignment
 qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> someTerm' expression)

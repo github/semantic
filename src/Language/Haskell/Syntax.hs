@@ -434,6 +434,15 @@ instance Show1 PrimitiveConstructorIdentifier where liftShowsPrec = genericLiftS
 
 instance Evaluatable PrimitiveConstructorIdentifier
 
+newtype PrimitiveVariableIdentifier a = PrimitiveVariableIdentifier { primitiveVariableIdentifierName :: Name }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 PrimitiveVariableIdentifier where liftEq = genericLiftEq
+instance Ord1 PrimitiveVariableIdentifier where liftCompare = genericLiftCompare
+instance Show1 PrimitiveVariableIdentifier where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable PrimitiveVariableIdentifier
+
 newtype ConstructorSymbol a = ConstructorSymbol { constructorSymbolName :: Name }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
@@ -469,3 +478,48 @@ instance Ord1 StandaloneDerivingInstance where liftCompare = genericLiftCompare
 instance Show1 StandaloneDerivingInstance where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable StandaloneDerivingInstance
+
+data ImportDeclaration a = ImportDeclaration { importPackageQualifiedContent :: a, importModule :: a, importSpec :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ImportDeclaration where liftEq = genericLiftEq
+instance Ord1 ImportDeclaration where liftCompare = genericLiftCompare
+instance Show1 ImportDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ImportDeclaration
+
+data QualifiedImportDeclaration a = QualifiedImportDeclaration { qualifiedImportPackageQualifiedContent :: a, qualifiedImportModule :: a, qualifiedImportSpec :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QualifiedImportDeclaration where liftEq = genericLiftEq
+instance Ord1 QualifiedImportDeclaration where liftCompare = genericLiftCompare
+instance Show1 QualifiedImportDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedImportDeclaration
+
+newtype Import a = Import { importContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Ord1 Import where liftCompare = genericLiftCompare
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Import
+
+newtype HiddenImport a = HiddenImport { hiddenimportContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 HiddenImport where liftEq = genericLiftEq
+instance Ord1 HiddenImport where liftCompare = genericLiftCompare
+instance Show1 HiddenImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable HiddenImport
+
+data ImportAlias a = ImportAlias { importAliasSource :: a, importAliasName :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ImportAlias where liftEq = genericLiftEq
+instance Ord1 ImportAlias where liftCompare = genericLiftCompare
+instance Show1 ImportAlias where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ImportAlias
