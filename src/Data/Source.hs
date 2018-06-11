@@ -49,7 +49,7 @@ fromUTF8 :: B.ByteString -> Source
 fromUTF8 = Source
 
 instance FromJSON Source where
-  parseJSON = withText "Source" (pure . fromUTF8 . T.encodeUtf8)
+  parseJSON = withText "Source" (pure . fromText)
 
 -- Measurement
 

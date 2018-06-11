@@ -26,19 +26,19 @@ data Language
     deriving (Eq, Generic, Ord, Read, Show, Bounded, ToJSON, Named, Enum, Finite, MessageField)
 
 instance FromJSON Language where
-  parseJSON = withText "Language" $ \l -> case T.toLower l of
-    "go"         -> pure Go
-    "haskell"    -> pure Haskell
-    "java"       -> pure Java
-    "javascript" -> pure JavaScript
-    "json"       -> pure JSON
-    "jsx"        -> pure JSX
-    "markdown"   -> pure Markdown
-    "python"     -> pure Python
-    "ruby"       -> pure Ruby
-    "typescript" -> pure TypeScript
-    "php"        -> pure PHP
-    _            -> Prelude.fail ("unknown language: " <> show l)
+  parseJSON = withText "Language" $ \l -> pure $ case T.toLower l of
+    "go"         -> Go
+    "haskell"    -> Haskell
+    "java"       -> Java
+    "javascript" -> JavaScript
+    "json"       -> JSON
+    "jsx"        -> JSX
+    "markdown"   -> Markdown
+    "python"     -> Python
+    "ruby"       -> Ruby
+    "typescript" -> TypeScript
+    "php"        -> PHP
+    _            -> Unknown
 
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool

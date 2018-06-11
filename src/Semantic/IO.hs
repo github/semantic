@@ -62,8 +62,8 @@ import           Text.Read
 readFile :: forall m. MonadIO m => File -> m (Maybe Blob)
 readFile (File "/dev/null" _) = pure Nothing
 readFile (File path language) = do
-  raw <- liftIO (B.readFile path)
-  pure . Just $ sourceBlob path language (fromUTF8 raw)
+  raw <- liftIO $ B.readFile path
+  pure . Just . sourceBlob path language . fromUTF8 $ raw
 
 readFilePair :: forall m. MonadIO m => File -> File -> m BlobPair
 readFilePair a b = Join <$> join (maybeThese <$> readFile a <*> readFile b)
@@ -75,22 +75,25 @@ maybeThese a b = case (a, b) of
   (Just a, Just b)  -> pure (These a b)
   _                 -> fail "expected file pair with content on at least one side"
 
+newtype Blobs a = Blobs { blobs :: [a] }
+  deriving (Generic, FromJSON)
+
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path)
 
 decodeBlobPairs :: BL.ByteString -> Either String [BlobPair]
-decodeBlobPairs = eitherDecode
+decodeBlobPairs = fmap blobs <$> eitherDecode
 
 -- | Read JSON encoded blob pairs from a handle.
 readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [BlobPair]
-readBlobPairsFromHandle = readFromHandle
+readBlobPairsFromHandle = fmap blobs <$> readFromHandle
 
 decodeBlobs :: BL.ByteString -> Either String [Blob]
-decodeBlobs = eitherDecode
+decodeBlobs = fmap blobs <$> eitherDecode
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob]
-readBlobsFromHandle = readFromHandle
+readBlobsFromHandle = fmap blobs <$> readFromHandle
 
 readBlobFromPath :: MonadIO m => File -> m Blob
 readBlobFromPath file = do

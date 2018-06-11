@@ -21,7 +21,6 @@ import Data.JSON.Fields
 import Data.Language
 import Data.Source as Source
 
-
 -- | The source, path, and language of a blob.
 data Blob = Blob
   { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
@@ -31,7 +30,7 @@ data Blob = Blob
   deriving (Show, Eq, Generic, Message, Named)
 
 instance FromJSON Blob where
-  parseJSON = withObject "Blob" $ \b -> Blob
+  parseJSON = withObject "Blob" $ \b -> inferringLanguage
     <$> b .: "content"
     <*> b .: "path"
     <*> b .: "language"
@@ -41,6 +40,11 @@ nullBlob Blob{..} = nullSource blobSource
 
 sourceBlob :: FilePath -> Language -> Source -> Blob
 sourceBlob filepath language source = Blob source filepath language
+
+inferringLanguage :: Source -> FilePath -> Language -> Blob
+inferringLanguage src pth lang
+  | knownLanguage lang = Blob src pth lang
+  | otherwise = Blob src pth (languageForFilePath pth)
 
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
@@ -72,7 +76,7 @@ languageForBlobPair (Join (These a b))
   | blobLanguage a == Unknown || blobLanguage b == Unknown
     = Unknown
   | otherwise
-    = blobLanguage b    
+    = blobLanguage b
 
 pathForBlobPair :: BlobPair -> FilePath
 pathForBlobPair (Join (This Blob{..})) = blobPath
