@@ -54,9 +54,9 @@ include :: ( AbstractValue address value effects
            , Member (Resumable (EnvironmentError address)) effects
            , Member Trace effects
            )
-        => Subterm term (Evaluator address value effects (ValueRef address value))
+        => Subterm term (Evaluator address value effects (ValueRef address))
         -> (ModulePath -> Evaluator address value effects (Maybe (address, Environment address)))
-        -> Evaluator address value effects (ValueRef address value)
+        -> Evaluator address value effects (ValueRef address)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
