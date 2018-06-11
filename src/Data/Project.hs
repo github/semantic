@@ -129,9 +129,17 @@ maybeThese a b = case (a, b) of
   (Just a, Just b)  -> pure (These a b)
   _                 -> throwError (SomeException EmptyPairProvided)
 
+-- TODO: write some tests so we can be sure this actually works
+-- and does what findFileInDir does
 findFiles :: Member (Exc SomeException) effs
           => Concrete
           -> FilePath
           -> [String]
-          -> Eff effs [FilePath]
-findFiles _ _ _ = throwError (SomeException TODO)
+          -> [FilePath]
+findFiles Project{..} dir exts = do
+  p <- blobPath <$> projectBlobs
+  guard (p == dir)
+  guard (takeExtension p `elem` exts)
+  -- TODO: not clear to me the best way to ensure these are in the
+  -- exclude directories
+  pure p

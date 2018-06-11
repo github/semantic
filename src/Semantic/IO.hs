@@ -289,7 +289,7 @@ runFilesGuided = interpret $ \files -> case files of
   Write _ _                      -> throwError (SomeException WritesNotSupported)
   Read (FromPath path)           -> get >>= \p -> Project.readBlobFromPath p path
   Read (FromPathPair paths)      -> get >>= \p -> runBothWith (Project.readBlobPair p) paths
-  FindFiles dir exts excludeDirs -> get >>= \p -> Project.findFiles (p { Project.projectExcludeDirs = excludeDirs }) dir exts
+  FindFiles dir exts excludeDirs -> get >>= \p -> pure (Project.findFiles (p { Project.projectExcludeDirs = excludeDirs }) dir exts)
   ReadProject{}                  -> get
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
