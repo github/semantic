@@ -2,6 +2,6 @@
   (Empty)
   (Statements
     (QualifiedModuleIdentifier
-      (Identifier)
-      (Identifier))
+      (ModuleIdentifier)
+      (ModuleIdentifier))
     (Statements)))
