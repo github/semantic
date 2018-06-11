@@ -56,7 +56,6 @@ import           System.Exit
 import           System.FilePath
 import           System.FilePath.Glob
 import qualified System.IO as IO
-import           Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readFile :: forall m. MonadIO m => File -> m (Maybe Blob)
