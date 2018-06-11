@@ -1,4 +1,4 @@
-(Program
+(Statements
   (QualifiedExport)
   (QualifiedExport)
   (DefaultExport
@@ -40,13 +40,13 @@
       (Empty)
       (Empty)
       (Empty)
-      ([])))
+      (Statements)))
   (DefaultExport
     (Function
       (Empty)
       (Empty)
       (Identifier)
-      ([])))
+      (Statements)))
   (QualifiedExport)
   (DefaultExport
     (TextElement))

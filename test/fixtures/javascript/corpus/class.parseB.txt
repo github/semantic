@@ -1,7 +1,7 @@
-(Program
+(Statements
   (Class
     (Identifier)
-    (
+    (Statements
       (Method
         (Empty)
         (Empty)
@@ -16,7 +16,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -33,7 +33,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -50,6 +50,6 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier)))))))

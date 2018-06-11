@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Context
         (Comment)
         (Or
@@ -22,17 +22,13 @@
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) }))
-      (Equal
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })
-      (Not
-        (Equal
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) }))
+    {+(Equal
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(Not
+      {+(Equal
+        {+(Identifier)+}
+        {+(Identifier)+})+})+}
     {+(LessThan
       {+(Identifier)+}
       {+(Identifier)+})+}
@@ -78,6 +74,13 @@
     {+(BAnd
       {+(Identifier)+}
       {+(Identifier)+})+}
+    {-(Equal
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(Not
+      {-(Equal
+        {-(Identifier)-}
+        {-(Identifier)-})-})-}
     {-(LessThan
       {-(Identifier)-}
       {-(Identifier)-})-}

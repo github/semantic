@@ -1,4 +1,3 @@
-(Program
+(Statements
   (MemberAccess
-    (Identifier)
     (Identifier)))

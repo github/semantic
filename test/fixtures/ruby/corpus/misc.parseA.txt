@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Send
     (Identifier)
     (Send
       (Identifier))
     (Function
       (Empty)
-      ([])))
+      (Statements)))
   (Send
     (Send
       (Identifier))
@@ -15,7 +15,7 @@
       (Identifier)
       (Identifier)
       (Identifier)
-      ([])))
+      (Statements)))
   (Send
     (Identifier)
     (Send
@@ -23,5 +23,5 @@
     (Function
       (Empty)
       (Identifier)
-      ([])))
+      (Statements)))
   (Identifier))

@@ -1,9 +1,9 @@
-(Program
+(Statements
   (While
     (Not
       (Send
         (Identifier)))
-    ([]))
+    (Statements))
   (While
     (Not
       (Send

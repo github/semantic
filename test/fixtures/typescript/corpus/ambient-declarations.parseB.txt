@@ -1,11 +1,11 @@
-(Program
+(Statements
   (AmbientDeclaration
     (InternalModule
       (Identifier)))
   (AmbientDeclaration
     (Class
       (Identifier)
-      ([])))
+      (Statements)))
   (AmbientDeclaration
     (InterfaceDeclaration
       (Empty)
@@ -15,7 +15,7 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (
+      (Statements
         (MethodSignature
           (Empty)
           (Empty)

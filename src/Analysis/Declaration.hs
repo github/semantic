@@ -5,7 +5,7 @@ module Analysis.Declaration
 , declarationAlgebra
 ) where
 
-import Data.Abstract.Name (unName)
+import Data.Abstract.Name (formatName)
 import Data.Blob
 import Data.Error (Error(..), showExpectation)
 import Data.Language as Language
@@ -19,20 +19,19 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import Data.Term
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import Prologue hiding (project)
 
 -- | A declaration’s identifier and type.
 data Declaration
-  = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
-  | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)] }
-  | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
-  | CallReference       { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationImportIdentifier :: [T.Text] }
-  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Language, declarationReceiver :: Maybe T.Text }
+  | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Language }
+  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Language, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)] }
+  | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Language }
+  | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Language, declarationLevel :: Int }
+  | CallReference       { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Language, declarationImportIdentifier :: [T.Text] }
+  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Language }
   deriving (Eq, Generic, Show)
 
 
@@ -109,7 +108,7 @@ instance CustomHasDeclaration whole Declaration.Method where
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
-    | blobLanguage == Just Go
+    | blobLanguage == Go
     , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource blobSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
     | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource blobSource receiverAnn))
@@ -129,13 +128,13 @@ getSource blobSource = toText . flip Source.slice blobSource . getField
 
 instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Sum fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
-    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- project fromF = Just $ CallReference (getSource idenAnn) mempty blobLanguage (memberAccess leftAnn leftF)
-    | Just (Syntax.Identifier name) <- project fromF = Just $ CallReference (T.decodeUtf8 (unName name)) mempty blobLanguage []
+    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) name) <- project fromF = Just $ CallReference (formatName name) mempty blobLanguage (memberAccess leftAnn leftF)
+    | Just (Syntax.Identifier name) <- project fromF = Just $ CallReference (formatName name) mempty blobLanguage []
     | otherwise = Just $ CallReference (getSource fromAnn) mempty blobLanguage []
     where
       memberAccess modAnn termFOut
-        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In rightAnn rightF))) <- project termFOut
-        = memberAccess leftAnn leftF <> memberAccess rightAnn rightF
+        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) name) <- project termFOut
+        = memberAccess leftAnn leftF <> [formatName name]
         | otherwise = [getSource modAnn]
       getSource = toText . flip Source.slice blobSource . getField
 

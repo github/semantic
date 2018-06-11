@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Call
         (Identifier)
         (SendChannel
@@ -13,7 +13,7 @@
         (Empty))
       (Call
         (Identifier)
-        (
+        (Statements
           (SendChannel
             (Identifier))
           (Minus
@@ -22,7 +22,7 @@
         (Empty))
       (Call
         (Identifier)
-        (
+        (Statements
           (SendChannel
             (Identifier))
           (Integer)

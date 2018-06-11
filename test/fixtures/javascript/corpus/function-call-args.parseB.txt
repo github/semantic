@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Call
     (Identifier)
     (Float)
@@ -21,10 +21,9 @@
         (Assignment
           (Identifier)
           (Empty)))
-      (
+      (Statements
         (Call
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Identifier)
           (Empty))

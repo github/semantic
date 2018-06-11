@@ -1,9 +1,8 @@
-(Program
+(Statements
   (If
     (MemberAccess
-      (Identifier)
       (Identifier))
-    (
+    (Statements
       (Call
         (Identifier)
         (Identifier)

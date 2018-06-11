@@ -1,6 +1,6 @@
-(Program
+(Statements
   (ForEach
-    (
+    (Statements
       (Send
         (Identifier)))
     (Array

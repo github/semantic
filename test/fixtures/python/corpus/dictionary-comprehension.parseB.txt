@@ -1,10 +1,10 @@
-(Program
+(Statements
   (Comprehension
     (KeyValue
       (Identifier)
       (Identifier))
-    (
-      (
+    (Statements
+      (Statements
         (Identifier)
         (Identifier))
       (Identifier)))
@@ -12,6 +12,6 @@
     (KeyValue
       (Identifier)
       (Integer))
-    (
+    (Statements
       (Identifier)
       (Identifier))))

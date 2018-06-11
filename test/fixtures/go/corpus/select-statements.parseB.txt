@@ -1,13 +1,13 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Select
-        (
+        (Statements
           (Pattern
             (Receive
               (Identifier)
@@ -31,11 +31,10 @@
               (ReceiveOperator
                 (Call
                   (MemberAccess
-                    (Identifier)
                     (Identifier))
                   (Integer)
                   (Empty))))
-            (
+            (Statements
               (Call
                 (Identifier)
                 (Integer)
@@ -43,14 +42,14 @@
               (PostIncrement
                 (Identifier))
               (If
-                (
+                (Statements
                   (Identifier))
-                (
+                (Statements
                   (Send
                     (Identifier)
                     (Composite
                       (Identifier)
-                      (
+                      (Statements
                         (Identifier)
                         (Identifier))))
                   (Return
@@ -58,20 +57,20 @@
                 (Empty))))
           (Pattern
             (DefaultPattern
-              ([]))
+              (Statements))
             (Return
               (Empty)))))
       (Select
-        (
+        (Statements
           (Pattern
             (Receive
               (Empty)
               (ReceiveOperator
                 (Identifier)))
-            ([]))
+            (Statements))
           (Pattern
             (Receive
               (Empty)
               (ReceiveOperator
                 (Identifier)))
-            ([])))))))
+            (Statements)))))))

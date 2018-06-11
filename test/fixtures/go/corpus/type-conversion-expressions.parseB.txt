@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Pointer
         (Call
           (Identifier)
@@ -27,52 +27,46 @@
         (Identifier))
       (TypeConversion
         (Function
-          ([])
+          (Statements)
           (Empty))
         (Identifier))
       (TypeConversion
         (Parenthesized
           (Function
-            ([])
+            (Statements)
             (Empty)))
         (Identifier))
       (TypeConversion
         (Parenthesized
           (Function
-            ([])
+            (Statements)
             (Identifier)))
         (Identifier))
       (TypeConversion
         (Function
-          ([])
+          (Statements)
           (Identifier))
         (Identifier))
       (TypeConversion
         (Slice
           (MemberAccess
-            (Identifier)
             (Identifier)))
         (MemberAccess
-          (Identifier)
           (Identifier)))
       (TypeConversion
         (Parenthesized
           (Slice
             (MemberAccess
-              (Identifier)
               (Identifier))))
         (MemberAccess
-          (Identifier)
           (Identifier)))
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Identifier)
         (Empty))
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Identifier)
         (Empty)))))

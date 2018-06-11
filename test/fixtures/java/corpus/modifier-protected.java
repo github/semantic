@@ -1,0 +1,3 @@
+protected class Point {
+
+}

@@ -1,37 +1,37 @@
-(Program
+(Statements
   (Try
     (Identifier)
     (Identifier)
     (Catch
-      (
+      (Statements
         (Identifier)
         (Identifier)
         (Identifier))
-      ([]))
+      (Statements))
     (Catch
       (Let
         (Identifier)
         (Identifier)
         (Empty))
-      (
+      (Statements
         (Identifier)
         (Identifier)))
     (Catch
-      (
+      (Statements
         (Identifier)
         (Identifier)
         (Identifier)
         (Identifier))
-      ([]))
+      (Statements))
     (Catch
-      (
+      (Statements
         (Identifier)
         (Identifier))
-      ([])))
+      (Statements)))
   (Try
     (Identifier)
     (Identifier)
     (Finally
-      (
+      (Statements
         (Identifier)
         (Identifier)))))

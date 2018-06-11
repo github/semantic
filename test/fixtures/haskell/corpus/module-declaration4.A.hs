@@ -1,0 +1,1 @@
+module A (type(+), (+)) where

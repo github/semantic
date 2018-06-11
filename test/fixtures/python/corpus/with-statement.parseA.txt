@@ -1,6 +1,6 @@
-(Program
+(Statements
   (Let
     (Identifier)
     (Identifier)
-    (
+    (Statements
       (Identifier))))

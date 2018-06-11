@@ -1,17 +1,17 @@
-(Program
+(Statements
   (If
   { (Identifier)
   ->(Identifier) }
-    (
+    (Statements
     {+(Identifier)+}
       (Identifier)
     {-(Identifier)-})
   { (If
     {-(Identifier)-}
-    {-(
+    {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-}
-    {-(
+    {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-})
   ->(Empty) }))

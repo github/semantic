@@ -9,7 +9,17 @@ module Language.PHP.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Record
 import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
+import Data.Syntax
+    ( contextualize
+    , emptyTerm
+    , handleError
+    , infixContext
+    , makeTerm
+    , makeTerm'
+    , makeTerm1
+    , parseError
+    , postContextualize
+    )
 import Language.PHP.Grammar as Grammar
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
@@ -62,6 +72,7 @@ type Syntax = '[
   , Statement.Match
   , Statement.Pattern
   , Statement.Return
+  , Statement.Statements
   , Statement.Throw
   , Statement.Try
   , Statement.While
@@ -105,7 +116,6 @@ type Syntax = '[
   , Syntax.NamespaceUseGroupClause
   , Syntax.NewVariable
   , Syntax.PrintIntrinsic
-  , Syntax.Program
   , Syntax.PropertyDeclaration
   , Syntax.PropertyModifier
   , Syntax.QualifiedName
@@ -132,31 +142,9 @@ type Syntax = '[
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
-append :: a -> [a] -> [a]
-append x xs = xs ++ [x]
-
-bookend :: a -> [a] -> a -> [a]
-bookend head list last = head : append last list
-
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
-
-term :: Assignment -> Assignment
-term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
-
-commentedTerm :: Assignment -> Assignment
-commentedTerm term = contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm)
-
--- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
-manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm = many . commentedTerm
-
-someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm = fmap NonEmpty.toList . someTerm'
-
-someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
-someTerm' = NonEmpty.some1 . commentedTerm
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
@@ -293,7 +281,7 @@ parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children (term expression)
 
 classConstantAccessExpression :: Assignment
-classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> term name)
+classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> name')
 
 variable :: Assignment
 variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression <|> castExpression
@@ -308,11 +296,11 @@ callableVariable = choice [
   ]
 
 memberCallExpression :: Assignment
-memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term dereferencableExpression <*> term memberName) <*> arguments <*> emptyTerm)
+memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term dereferencableExpression <*> memberName') <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 scopedCallExpression :: Assignment
-scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term scopeResolutionQualifier <*> term memberName) <*> arguments <*> emptyTerm)
+scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> term scopeResolutionQualifier <*> memberName') <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 functionCallExpression :: Assignment
@@ -330,13 +318,13 @@ subscriptExpression :: Assignment
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> term dereferencableExpression <*> (pure <$> (term expression <|> emptyTerm)))
 
 memberAccessExpression :: Assignment
-memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> term dereferencableExpression <*> term memberName)
+memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> term dereferencableExpression <*> memberName')
 
 dereferencableExpression :: Assignment
 dereferencableExpression = symbol DereferencableExpression *> children (term (variable <|> expression <|> arrayCreationExpression <|> string))
 
 scopedPropertyAccessExpression :: Assignment
-scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> term simpleVariable')
+scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> simpleVariable'')
 
 scopeResolutionQualifier :: Assignment
 scopeResolutionQualifier = choice [
@@ -464,6 +452,9 @@ newVariable = makeTerm <$> symbol NewVariable <*> children (Syntax.NewVariable <
 
 memberName :: Assignment
 memberName = name <|> simpleVariable' <|> expression
+
+memberName' :: Assignment.Assignment [] Grammar Name.Name
+memberName' = name' <|> simpleVariable''
 
 relativeScope :: Assignment
 relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
@@ -723,6 +714,9 @@ simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleV
 simpleVariable' :: Assignment
 simpleVariable' = choice [simpleVariable, variableName]
 
+simpleVariable'' :: Assignment.Assignment [] Grammar Name.Name
+simpleVariable'' = variableName'
+
 
 yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol YieldExpression <*> children (Statement.Yield <$> term (arrayElementInitializer <|> expression))
@@ -747,20 +741,51 @@ requireOnceExpression = makeTerm <$> symbol RequireOnceExpression <*> children (
 variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
+variableName' :: Assignment.Assignment [] Grammar Name.Name
+variableName' = symbol VariableName *> children name'
+
 name :: Assignment
 name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . Name.name <$> source)
+
+name' :: Assignment.Assignment [] Grammar Name.Name
+name' = (symbol Name <|> symbol Name') *> (Name.name <$> source)
 
 functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
 
 staticVariableDeclaration :: Assignment
-staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment <$> pure [] <*> term variableName <*> (term expression <|> emptyTerm))
+staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment [] <$> term variableName <*> (term expression <|> emptyTerm))
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 string :: Assignment
 string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.TextElement <$> source)
+
+
+-- Helpers
+
+append :: a -> [a] -> [a]
+append x xs = xs ++ [x]
+
+bookend :: a -> [a] -> a -> [a]
+bookend head list last = head : append last list
+
+term :: Assignment -> Assignment
+term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
+
+commentedTerm :: Assignment -> Assignment
+commentedTerm term = contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm)
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+manyTerm = many . commentedTerm
+
+someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+someTerm = fmap NonEmpty.toList . someTerm'
+
+someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
+someTerm' = NonEmpty.some1 . commentedTerm
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment

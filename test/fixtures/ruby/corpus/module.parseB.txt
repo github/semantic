@@ -1,7 +1,7 @@
-(Program
+(Statements
   (Module
     (Identifier)
     (Method
       (Empty)
       (Identifier)
-      ([]))))
+      (Statements))))

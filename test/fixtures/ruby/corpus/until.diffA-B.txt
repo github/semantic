@@ -1,9 +1,9 @@
-(Program
+(Statements
   (While
     (Not
       (Send
         (Identifier)))
-  { ([])
+  { (Statements)
   ->(Send
     {+(Identifier)+}) })
 {-(While

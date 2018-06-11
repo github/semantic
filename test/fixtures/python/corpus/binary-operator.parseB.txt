@@ -1,4 +1,4 @@
-(Program
+(Statements
   (RShift
     (Identifier)
     (Identifier))

@@ -1,13 +1,13 @@
-(Program
+(Statements
   (Match
     (Send
       (Identifier))
-    (
+    (Statements
       (Pattern
-        (
+        (Statements
           (Send
             (Identifier)))
-        (
+        (Statements
           (Send
             (Identifier))
           (Send

@@ -1,9 +1,9 @@
-(Program
+(Statements
   (Let
   { (Identifier)
   ->(Identifier) }
   { (Identifier)
   ->(Identifier) }
-    (
+    (Statements
     { (Identifier)
     ->(Identifier) })))

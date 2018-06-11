@@ -1,21 +1,20 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
       (Identifier)
       (Reference
         (Composite
           (Identifier)
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (Call
                 (Identifier)
                 (MemberAccess
-                  (Identifier)
                   (Identifier))
                 (Empty)))))))))

@@ -1,26 +1,24 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Defer
         (Call
-          (MemberAccess
-          { (Identifier)
-          ->(Identifier) }
-          { (Identifier)
-          ->(Identifier) })
-          ([])
+        { (MemberAccess
+          {-(Identifier)-})
+        ->(MemberAccess
+          {+(Identifier)+}) }
+          (Statements)
           (Empty)))
       (Go
         (Call
-          (MemberAccess
-          { (Identifier)
-          ->(Identifier) }
-          { (Identifier)
-          ->(Identifier) })
-          ([])
+        { (MemberAccess
+          {-(Identifier)-})
+        ->(MemberAccess
+          {+(Identifier)+}) }
+          (Statements)
           (Empty))))))

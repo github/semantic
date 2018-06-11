@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Function
     (Empty)
     (Empty)
@@ -24,7 +24,7 @@
     {-(Assignment
       {-(Identifier)-}
       {-(Empty)-})-})-}
-    (
+    (Statements
       (Return
       { (Times
         {-(Identifier)-}

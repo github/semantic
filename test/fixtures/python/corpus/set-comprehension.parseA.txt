@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Comprehension
     (Identifier)
-    (
+    (Statements
       (Identifier)
       (Identifier)))
   (Comprehension
     (Identifier)
-    (
+    (Statements
       (Identifier)
       (Identifier))))

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Decorator
     (Identifier)
     (Class
@@ -6,7 +6,7 @@
     ->(Identifier) }
       (Decorator
         (Identifier)
-        ([])
+        (Statements)
         (Decorator
         { (Identifier)
         ->(Identifier) }
@@ -15,7 +15,7 @@
           (Decorator
           { (Identifier)
           ->(Identifier) }
-          {+(
+          {+(Statements
             {+(Integer)+}
             {+(Integer)+})+}
           {-(Identifier)-}
@@ -24,7 +24,7 @@
             {+(Assignment
               {+(Identifier)+}
               {+(Boolean)+})+}
-            {-(
+            {-(Statements
               {-(Integer)-}
               {-(Assignment
                 {-(Identifier)-}
@@ -44,7 +44,7 @@
                 {+(Identifier)+}
                 {+(Decorator
                   {+(Identifier)+}
-                  {+(
+                  {+(Statements
                     {+(Integer)+}
                     {+(Assignment
                       {+(Identifier)+}

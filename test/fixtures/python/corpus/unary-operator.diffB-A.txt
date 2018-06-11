@@ -1,10 +1,11 @@
-(Program
+(Statements
 {+(Negate
   {+(Identifier)+})+}
 {+(Identifier)+}
-  (Complement
-  { (Identifier)
-  ->(Identifier) })
+{+(Complement
+  {+(Identifier)+})+}
+{-(Complement
+  {-(Identifier)-})-}
 {-(Negate
   {-(Identifier)-})-}
 {-(Identifier)-})

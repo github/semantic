@@ -1,23 +1,23 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([]))
+    (Statements)
+    (Statements))
   (Function
     (Empty)
     (Identifier)
-    (
-      (
+    (Statements
+      (Statements
       { (Identifier)
       ->(Identifier) }
       { (Identifier)
       ->(Identifier) })
-      (
+      (Statements
       { (Identifier)
       ->(Identifier) }
       { (Identifier)
       ->(Identifier) }))
-    ([])))
+    (Statements)))

@@ -1,133 +1,118 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([]))
+    (Statements)
+    (Statements))
   (Method
     (Empty)
     (Identifier)
   { (Identifier)
   ->(Identifier) }
-    ([])
+    (Statements)
     (Empty))
   (Method
-    (
+    (Statements
       (Identifier))
-    (
+    (Statements
       (Identifier)
     { (Identifier)
     ->(Identifier) })
     (Identifier)
-    (
+    (Statements
       (Identifier)
     { (Identifier)
     ->(Identifier) })
-    ([]))
+    (Statements))
   (Method
-    (
+    (Statements
       (Identifier))
-    (
+    (Statements
       (Identifier)
       (Pointer
         (Identifier)))
   { (Identifier)
   ->(Identifier) }
-    ([])
+    (Statements)
     (Return
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Plus
         { (Plus
           {-(Plus
             {-(Call
               {-(MemberAccess
-                {-(Identifier)-}
                 {-(Identifier)-})-}
-              {-(
+              {-(Statements
                 {-(MemberAccess
-                  {-(Identifier)-}
                   {-(Identifier)-})-}
                 {-(Integer)-})-}
               {-(Empty)-})-}
             {-(MemberAccess
-              {-(Identifier)-}
               {-(Identifier)-})-})-}
           {-(Call
             {-(MemberAccess
-              {-(Identifier)-}
               {-(Identifier)-})-}
-            {-(
+            {-(Statements
               {-(MemberAccess
-                {-(Identifier)-}
                 {-(Identifier)-})-}
               {-(Integer)-})-}
             {-(Empty)-})-})
         ->(Times
           {+(MemberAccess
-            {+(Identifier)+}
             {+(Identifier)+})+}
           {+(MemberAccess
-            {+(Identifier)+}
             {+(Identifier)+})+}) }
         { (MemberAccess
-          {-(Identifier)-}
           {-(Identifier)-})
         ->(Times
           {+(MemberAccess
-            {+(Identifier)+}
             {+(Identifier)+})+}
           {+(MemberAccess
-            {+(Identifier)+}
             {+(Identifier)+})+}) })
         (Empty))))
   (Method
-    ([])
-    (
+    (Statements)
+    (Statements
     { (Identifier)
     ->(Identifier) }
       (Pointer
         (Identifier)))
     (Identifier)
-    (
+    (Statements
       (Identifier)
     { (Identifier)
     ->(Identifier) })
-    (
+    (Statements
       (Assignment
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Times
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Identifier)))
       (Assignment
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Times
           (MemberAccess
-            (Identifier)
             (Identifier))
           (Identifier)))))
   (Method
-    (
+    (Statements
       (Identifier))
-    (
+    (Statements
       (Identifier)
       (Pointer
         (Identifier)))
     (Identifier)
-    (
+    (Statements
     { (Identifier)
     ->(Identifier) }
     { (Identifier)
     ->(Identifier) }
       (Identifier))
-    ([])))
+    (Statements)))

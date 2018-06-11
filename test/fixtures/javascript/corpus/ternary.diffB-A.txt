@@ -1,21 +1,16 @@
-(Program
+(Statements
 {+(If
   {+(Identifier)+}
   {+(Identifier)+}
   {+(Identifier)+})+}
 {-(Assignment
   {-(MemberAccess
-    {-(Identifier)-}
     {-(Identifier)-})-}
   {-(If
     {-(MemberAccess
-      {-(Identifier)-}
       {-(Identifier)-})-}
     {-(MemberAccess
-      {-(Identifier)-}
       {-(Identifier)-})-}
     {-(MemberAccess
       {-(MemberAccess
-        {-(Identifier)-}
-        {-(Identifier)-})-}
-      {-(Identifier)-})-})-})-})
+        {-(Identifier)-})-})-})-})-})

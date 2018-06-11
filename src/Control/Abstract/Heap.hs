@@ -1,9 +1,11 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
+, Configuration(..)
+, Live
+, getConfiguration
 , getHeap
 , putHeap
-, modifyHeap
 , alloc
 , deref
 , assign
@@ -11,6 +13,8 @@ module Control.Abstract.Heap
 , letrec
 , letrec'
 , variable
+-- * Garbage collection
+, gc
 -- * Effects
 , Allocator(..)
 , runAllocator
@@ -22,125 +26,160 @@ module Control.Abstract.Heap
 import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Control.Monad.Effect.Internal
-import Data.Abstract.Address
-import Data.Abstract.Environment
+import Control.Abstract.Roots
+import Control.Abstract.TermEvaluator
+import Data.Abstract.Configuration
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Name
 import Data.Semigroup.Reducer
 import Prologue
 
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address (Cell address) value)) effects) => term -> TermEvaluator term address value effects (Configuration term address (Cell address) value)
+getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEnv <*> TermEvaluator getHeap
+
+
 -- | Retrieve the heap.
-getHeap :: Member (State (Heap location (Cell location) value)) effects => Evaluator location value effects (Heap location (Cell location) value)
+getHeap :: Member (State (Heap address (Cell address) value)) effects => Evaluator address value effects (Heap address (Cell address) value)
 getHeap = get
 
 -- | Set the heap.
-putHeap :: Member (State (Heap location (Cell location) value)) effects => Heap location (Cell location) value -> Evaluator location value effects ()
+putHeap :: Member (State (Heap address (Cell address) value)) effects => Heap address (Cell address) value -> Evaluator address value effects ()
 putHeap = put
 
 -- | Update the heap.
-modifyHeap :: Member (State (Heap location (Cell location) value)) effects => (Heap location (Cell location) value -> Heap location (Cell location) value) -> Evaluator location value effects ()
+modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Heap address (Cell address) value -> Heap address (Cell address) value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
 
-alloc :: Member (Allocator location value) effects => Name -> Evaluator location value effects (Address location value)
-alloc = send . Alloc
+alloc :: Member (Allocator address value) effects => Name -> Evaluator address value effects address
+alloc = sendAllocator . Alloc
 
--- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: Member (Allocator location value) effects => Address location value -> Evaluator location value effects value
+-- | Dereference the given address in the heap, or fail if the address is uninitialized.
+deref :: Member (Allocator address value) effects => address -> Evaluator address value effects value
 deref = send . Deref
 
 
--- | Write a value to the given 'Address' in the 'Store'.
-assign :: ( Member (State (Heap location (Cell location) value)) effects
-          , Ord location
-          , Reducer value (Cell location value)
-          )
-       => Address location value
+-- | Write a value to the given address in the 'Allocator'.
+assign :: Member (Allocator address value) effects
+       => address
        -> value
-       -> Evaluator location value effects ()
-assign address = modifyHeap . heapInsert address
+       -> Evaluator address value effects ()
+assign address = send . Assign address
 
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( Member (Allocator location value) effects
-                 , Member (Reader (Environment location)) effects
-                 , Member (State (Environment location)) effects
+lookupOrAlloc :: ( Member (Allocator address value) effects
+                 , Member (Env address) effects
                  )
               => Name
-              -> Evaluator location value effects (Address location value)
-lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
+              -> Evaluator address value effects address
+lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
-letrec :: ( Member (Allocator location value) effects
-          , Member (Reader (Environment location)) effects
-          , Member (State (Environment location)) effects
-          , Member (State (Heap location (Cell location) value)) effects
-          , Ord location
-          , Reducer value (Cell location value)
+letrec :: ( Member (Allocator address value) effects
+          , Member (Env address) effects
           )
        => Name
-       -> Evaluator location value effects value
-       -> Evaluator location value effects (value, Address location value)
+       -> Evaluator address value effects value
+       -> Evaluator address value effects (value, address)
 letrec name body = do
   addr <- lookupOrAlloc name
-  v <- localEnv (insert name addr) body
+  v <- locally (bind name addr *> body)
   assign addr v
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( Member (Allocator location value) effects
-           , Member (Reader (Environment location)) effects
-           , Member (State (Environment location)) effects
+letrec' :: ( Member (Allocator address value) effects
+           , Member (Env address) effects
            )
         => Name
-        -> (Address location value -> Evaluator location value effects value)
-        -> Evaluator location value effects value
+        -> (address -> Evaluator address value effects value)
+        -> Evaluator address value effects value
 letrec' name body = do
   addr <- lookupOrAlloc name
-  v <- localEnv id (body addr)
-  v <$ modifyEnv (insert name addr)
+  v <- locally (body addr)
+  v <$ bind name addr
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Allocator location value) effects
-            , Member (Reader (Environment location)) effects
-            , Member (Resumable (EnvironmentError location)) effects
-            , Member (State (Environment location)) effects
+variable :: ( Member (Allocator address value) effects
+            , Member (Env address) effects
+            , Member (Resumable (EnvironmentError address)) effects
             )
          => Name
-         -> Evaluator location value effects value
-variable name = lookupEnv name >>= maybeM (Address <$> freeVariableError name) >>= deref
+         -> Evaluator address value effects value
+variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
+
+
+-- Garbage collection
+
+-- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
+gc :: Member (Allocator address value) effects
+   => Live address                       -- ^ The set of addresses to consider rooted.
+   -> Evaluator address value effects ()
+gc roots = sendAllocator (GC roots)
+
+-- | Compute the set of addresses reachable from a given root set in a given heap.
+reachable :: ( Ord address
+             , Foldable (Cell address)
+             , ValueRoots address value
+             )
+          => Live address                      -- ^ The set of root addresses.
+          -> Heap address (Cell address) value -- ^ The heap to trace addresses through.
+          -> Live address                      -- ^ The set of addresses reachable from the root set.
+reachable roots heap = go mempty roots
+  where go seen set = case liveSplit set of
+          Nothing -> seen
+          Just (a, as) -> go (liveInsert a seen) $ case heapLookupAll a heap of
+            Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
+            _           -> seen
 
 
 -- Effects
 
-data Allocator location value return where
-  Alloc :: Name                   -> Allocator location value (Address location value)
-  Deref :: Address location value -> Allocator location value value
+sendAllocator :: Member (Allocator address value) effects => Allocator address value return -> Evaluator address value effects return
+sendAllocator = send
 
-runAllocator :: (Addressable location effects, Effectful (m location value), Member (Resumable (AddressError location value)) effects, Member (State (Heap location (Cell location) value)) effects) => m location value (Allocator location value ': effects) a -> m location value effects a
-runAllocator = raiseHandler (interpret (\ eff -> case eff of
-  Alloc name -> lowerEff $ Address <$> allocCell name
-  Deref addr -> lowerEff $ heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))))
+data Allocator address value return where
+  Alloc  :: Name             -> Allocator address value address
+  Deref  :: address          -> Allocator address value value
+  Assign :: address -> value -> Allocator address value ()
+  GC     :: Live address     -> Allocator address value ()
+
+runAllocator :: ( Addressable address effects
+                , Foldable (Cell address)
+                , Member (Resumable (AddressError address value)) effects
+                , Member (State (Heap address (Cell address) value)) effects
+                , Reducer value (Cell address value)
+                , ValueRoots address value
+                )
+             => Evaluator address value (Allocator address value ': effects) a
+             -> Evaluator address value effects a
+runAllocator = interpret $ \ eff -> case eff of
+  Alloc name -> allocCell name
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
+  Assign addr value -> modifyHeap (heapInsert addr value)
+  GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
 
-data AddressError location value resume where
-  UnallocatedAddress   :: Address location value -> AddressError location value (Cell location value)
-  UninitializedAddress :: Address location value -> AddressError location value value
+data AddressError address value resume where
+  UnallocatedAddress   :: address -> AddressError address value (Cell address value)
+  UninitializedAddress :: address -> AddressError address value value
 
-deriving instance Eq location => Eq (AddressError location value resume)
-deriving instance Show location => Show (AddressError location value resume)
-instance Show location => Show1 (AddressError location value) where
+deriving instance Eq address => Eq (AddressError address value resume)
+deriving instance Show address => Show (AddressError address value resume)
+instance Show address => Show1 (AddressError address value) where
   liftShowsPrec _ _ = showsPrec
-instance Eq location => Eq1 (AddressError location value) where
+instance Eq address => Eq1 (AddressError address value) where
   liftEq _ (UninitializedAddress a) (UninitializedAddress b) = a == b
   liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
   liftEq _ _                        _                        = False
 
 
-runAddressError :: Effectful (m location value) => m location value (Resumable (AddressError location value) ': effects) a -> m location value effects (Either (SomeExc (AddressError location value)) a)
+runAddressError :: Effectful (m address value) => m address value (Resumable (AddressError address value) ': effects) a -> m address value effects (Either (SomeExc (AddressError address value)) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: Effectful (m location value) => (forall resume . AddressError location value resume -> m location value effects resume) -> m location value (Resumable (AddressError location value) ': effects) a -> m location value effects a
+runAddressErrorWith :: Effectful (m address value) => (forall resume . AddressError address value resume -> m address value effects resume) -> m address value (Resumable (AddressError address value) ': effects) a -> m address value effects a
 runAddressErrorWith = runResumableWith

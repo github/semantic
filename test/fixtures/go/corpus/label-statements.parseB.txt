@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Label
         (Identifier)
         (NoOp
@@ -25,7 +25,7 @@
                 (Integer))
               (PostIncrement
                 (Identifier))
-              (
+              (Statements
                 (Call
                   (Identifier)
                   (Identifier)

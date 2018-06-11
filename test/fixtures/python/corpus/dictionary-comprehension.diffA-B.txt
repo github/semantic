@@ -1,12 +1,12 @@
-(Program
+(Statements
   (Comprehension
     (KeyValue
     { (Identifier)
     ->(Identifier) }
     { (Identifier)
     ->(Identifier) })
-    (
-    {+(
+    (Statements
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+})+}
     { (Identifier)
@@ -18,10 +18,10 @@
     ->(Identifier) }
     { (Identifier)
     ->(Integer) })
-    (
+    (Statements
     {+(Identifier)+}
     {+(Identifier)+}
-    {-(
+    {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-}
     {-(Identifier)-})))

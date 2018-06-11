@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Class
     (TypeParameter
     { (Identifier)
@@ -10,7 +10,7 @@
     (ExtendsClause
     { (TypeIdentifier)
     ->(TypeIdentifier) })
-    (
+    (Statements
     {+(PublicFieldDefinition
       {+(Empty)+}
       {+(Empty)+}
@@ -32,7 +32,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -50,7 +50,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -68,6 +68,6 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier)))))))

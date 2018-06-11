@@ -1,14 +1,18 @@
-(Program
+(Statements
+{ (Import)
+->(Import) }
+{ (QualifiedAliasedImport
+  {-(Identifier)-})
+->(QualifiedAliasedImport
+  {+(Identifier)+}) }
+{ (Import)
+->(Import) }
 {+(Import)+}
-{+(QualifiedAliasedImport
-  {+(Identifier)+})+}
 {+(Import)+}
-{+(Import)+}
-{+(Import)+}
-{+(
+{+(Statements
   {+(Import)+}
   {+(Import)+})+}
-{+(
+{+(Statements
   {+(Import)+}
   {+(QualifiedAliasedImport
     {+(Identifier)+})+})+}
@@ -16,15 +20,11 @@
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
 {-(Import)-}
-{-(QualifiedAliasedImport
-  {-(Identifier)-})-}
 {-(Import)-}
-{-(Import)-}
-{-(Import)-}
-{-(
+{-(Statements
   {-(Import)-}
   {-(Import)-})-}
-{-(
+{-(Statements
   {-(Import)-}
   {-(QualifiedAliasedImport
     {-(Identifier)-})-})-}

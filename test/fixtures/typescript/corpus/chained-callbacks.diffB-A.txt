@@ -1,9 +1,9 @@
-(Program
+(Statements
   (Call
-    (MemberAccess
-      (This)
-    { (Identifier)
-    ->(Identifier) })
+  { (MemberAccess
+    {-(This)-})
+  ->(MemberAccess
+    {+(This)+}) }
     (Function
       (Empty)
       (Empty)
@@ -15,11 +15,10 @@
         (Assignment
           (Identifier)
           (Empty)))
-      (
+      (Statements
         (Return
-          (MemberAccess
-          { (Identifier)
-          ->(Identifier) }
-          { (Identifier)
-          ->(Identifier) }))))
+        { (MemberAccess
+          {-(Identifier)-})
+        ->(MemberAccess
+          {+(Identifier)+}) })))
     (Empty)))

@@ -21,23 +21,23 @@ import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
-import qualified Data.ByteString.Char8 as BC
 import           Data.Graph
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Data.Text.Encoding as T
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import           Prologue hiding (packageName, project)
 
 -- | A vertex of some specific type.
 data Vertex
-  = Package  { vertexName :: ByteString }
-  | Module   { vertexName :: ByteString }
-  | Variable { vertexName :: ByteString }
+  = Package  { vertexName :: Text }
+  | Module   { vertexName :: Text }
+  | Variable { vertexName :: Text }
   deriving (Eq, Ord, Show)
 
 style :: Style Vertex Builder
-style = (defaultStyle (byteString . vertexName))
+style = (defaultStyle (T.encodeUtf8Builder . vertexName))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
@@ -52,18 +52,17 @@ style = (defaultStyle (byteString . vertexName))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Member (Reader (Environment (Hole (Located location)))) effects
                  , Member (Reader ModuleInfo) effects
-                 , Member (State (Environment (Hole (Located location)))) effects
+                 , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
                  , term ~ Term (Sum syntax) ann
                  )
-              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located location)) value effects a)
-              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located location)) value effects a)
+              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
+              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
 graphingTerms recur term@(In _ syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
-      moduleInclusion (Variable (unName name))
+      moduleInclusion (Variable (formatName name))
       variableDefinition name
     _ -> pure ()
   recur term
@@ -71,19 +70,19 @@ graphingTerms recur term@(In _ syntax) = do
 graphingPackages :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph Vertex)) effects
                     )
-                 => SubtermAlgebra Module term (TermEvaluator term location value effects a)
-                 -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
+                 => SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                 -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
-graphingModules :: forall term location value effects a
-                .  ( Member (Modules location value) effects
+graphingModules :: forall term address value effects a
+                .  ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph Vertex)) effects
                    )
-               => SubtermAlgebra Module term (TermEvaluator term location value effects a)
-               -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
-graphingModules recur m = interpose @(Modules location value) pure (\ m yield -> case m of
+               => SubtermAlgebra Module term (TermEvaluator term address value effects a)
+               -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+graphingModules recur m = interpose @(Modules address value) pure (\ m yield -> case m of
   Load   path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
   Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
   _ -> send m >>= yield)
@@ -91,10 +90,10 @@ graphingModules recur m = interpose @(Modules location value) pure (\ m yield ->
 
 
 packageVertex :: PackageInfo -> Vertex
-packageVertex = Package . unName . packageName
+packageVertex = Package . formatName . packageName
 
 moduleVertex :: ModuleInfo -> Vertex
-moduleVertex = Module . BC.pack . modulePath
+moduleVertex = Module . T.pack . modulePath
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
@@ -121,15 +120,14 @@ moduleInclusion v = do
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Reader (Environment (Hole (Located location)))) effects
-                      , Member (State (Environment (Hole (Located location)))) effects
+variableDefinition :: ( Member (Env (Hole (Located address))) effects
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name
-                   -> TermEvaluator term (Hole (Located location)) value effects ()
+                   -> TermEvaluator term (Hole (Located address)) value effects ()
 variableDefinition name = do
-  graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . locationModule) . toMaybe . unAddress) <$> TermEvaluator (lookupEnv name)
-  appendGraph (vertex (Variable (unName name)) `connect` graph)
+  graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
+  appendGraph (vertex (Variable (formatName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
 appendGraph = modify' . (<>)
@@ -139,7 +137,7 @@ instance ToJSON Vertex where
   toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
 
 vertexToText :: Vertex -> Text
-vertexToText = decodeUtf8 . vertexName
+vertexToText = vertexName
 
 vertexToType :: Vertex -> Text
 vertexToType Package{}  = "package"

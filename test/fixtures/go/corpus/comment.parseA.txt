@@ -1,10 +1,10 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Context
       (Comment)
       (Empty))))

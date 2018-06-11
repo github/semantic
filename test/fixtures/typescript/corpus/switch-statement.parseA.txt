@@ -1,17 +1,17 @@
-(Program
+(Statements
   (Match
     (Float)
-    (
+    (Statements
       (Pattern
         (Float)
-        (
+        (Statements
           (Float)))
       (Pattern
         (Float)
-        (
+        (Statements
           (Float)))
       (Pattern
         (Float)
-        (
+        (Statements
           (Float)))))
   (Empty))

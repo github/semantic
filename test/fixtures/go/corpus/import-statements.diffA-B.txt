@@ -1,7 +1,7 @@
-(Program
+(Statements
   (Package
     (Identifier))
-  (
+  (Statements
     (Comment)
     (Comment)
   { (QualifiedImport
@@ -12,5 +12,5 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([])))
+    (Statements)
+    (Statements)))

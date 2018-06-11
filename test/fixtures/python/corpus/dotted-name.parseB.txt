@@ -1,9 +1,6 @@
-(Program
+(Statements
   (MemberAccess
     (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Identifier))
+      (Identifier)))
   (MemberAccess
-    (Identifier)
     (Identifier)))

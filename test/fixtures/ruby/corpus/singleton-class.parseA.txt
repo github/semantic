@@ -1,7 +1,7 @@
-(Program
+(Statements
   (Class
     (Identifier)
-    ([]))
+    (Statements))
   (Class
     (ScopeResolution
       (Identifier)

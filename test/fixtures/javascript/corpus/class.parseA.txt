@@ -1,7 +1,7 @@
-(Program
+(Statements
   (Class
     (Identifier)
-    (
+    (Statements
       (PublicFieldDefinition
         (Empty)
         (Empty)
@@ -22,7 +22,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -39,7 +39,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -56,6 +56,6 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier)))))))

@@ -1,9 +1,9 @@
-(Program
+(Statements
   (Function
     (Empty)
     (Empty)
     (Empty)
-    (
+    (Statements
       (Return
       { (TextElement)
       ->(TextElement) }))))

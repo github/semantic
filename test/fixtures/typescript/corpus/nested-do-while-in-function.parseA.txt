@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Function
     (Empty)
     (Empty)
@@ -17,10 +17,10 @@
       (Assignment
         (Identifier)
         (Empty)))
-    (
+    (Statements
       (DoWhile
         (Identifier)
-        (
+        (Statements
           (Call
             (Identifier)
             (Identifier)

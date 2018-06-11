@@ -1,5 +1,5 @@
-(Program
-  (
+(Statements
+  (Statements
   {+(QualifiedImport)+}
     (QualifiedImport)
   {-(QualifiedAliasedImport
@@ -7,7 +7,7 @@
 {+(QualifiedAliasedImport
   {+(Identifier)+})+}
 {+(QualifiedImport)+}
-{-(
+{-(Statements
   {-(QualifiedAliasedImport
     {-(Identifier)-})-}
   {-(QualifiedImport)-})-}

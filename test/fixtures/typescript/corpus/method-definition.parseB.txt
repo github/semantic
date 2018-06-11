@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Class
     (Identifier)
     (Method
@@ -9,4 +9,4 @@
         (PredefinedType))
       (Empty)
       (Identifier)
-      ([]))))
+      (Statements))))

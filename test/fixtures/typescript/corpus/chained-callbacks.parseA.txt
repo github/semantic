@@ -1,8 +1,7 @@
-(Program
+(Statements
   (Call
     (MemberAccess
-      (This)
-      (Identifier))
+      (This))
     (Function
       (Empty)
       (Empty)
@@ -14,9 +13,8 @@
         (Assignment
           (Identifier)
           (Empty)))
-      (
+      (Statements
         (Return
           (MemberAccess
-            (Identifier)
             (Identifier)))))
     (Empty)))

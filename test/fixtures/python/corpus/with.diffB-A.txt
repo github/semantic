@@ -1,47 +1,44 @@
-(Program
+(Statements
   (Let
   { (Empty)
   ->(Identifier) }
   { (MemberAccess
-    {-(Identifier)-}
     {-(Identifier)-})
   ->(Call
     {+(Identifier)+}
     {+(Identifier)+}
     {+(TextElement)+}
     {+(Empty)+}) }
-    (
+    (Statements
       (Assignment
         (Identifier)
         (Boolean))
     {+(ForEach
       {+(Identifier)+}
       {+(Identifier)+}
-      {+(
+      {+(Statements
         {+(Assignment
           {+(Identifier)+}
           {+(Boolean)+})+})+})+}))
-{-(
+{-(Statements
   {-(Let
     {-(Empty)-}
     {-(Call
       {-(MemberAccess
-        {-(Identifier)-}
         {-(Identifier)-})-}
       {-(Identifier)-}
       {-(TextElement)-}
       {-(Identifier)-}
       {-(Empty)-})-}
-    {-([])-})-}
+    {-(Statements)-})-}
   {-(Let
     {-(Empty)-}
     {-(Call
       {-(MemberAccess
-        {-(Identifier)-}
         {-(Identifier)-})-}
       {-(Identifier)-}
       {-(TextElement)-}
       {-(Identifier)-}
       {-(Empty)-})-}
-    {-(
+    {-(Statements
       {-(Identifier)-})-})-})-})

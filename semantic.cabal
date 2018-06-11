@@ -29,7 +29,6 @@ library
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
                      , Analysis.Declaration
-                     , Analysis.IdentifierName
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
@@ -37,11 +36,9 @@ library
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
                      , Control.Abstract.Addressable
-                     , Control.Abstract.Configuration
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
-                     , Control.Abstract.Exports
                      , Control.Abstract.Heap
                      , Control.Abstract.Hole
                      , Control.Abstract.Matching
@@ -135,6 +132,9 @@ library
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
+                     , Language.Java.Assignment
+                     , Language.Java.Grammar
+                     , Language.Java.Syntax
                      -- Parser glue
                      , Parsing.CMark
                      , Parsing.Parser
@@ -210,6 +210,8 @@ library
                      , text >= 1.2.1.3
                      , these
                      , time
+                     , proto3-suite
+                     , proto3-wire
                      , unix
                      , unordered-containers
                      , haskell-tree-sitter
@@ -220,6 +222,7 @@ library
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
+                     , tree-sitter-java
   default-language:    Haskell2010
   default-extensions:  DataKinds
                      , DeriveFoldable
@@ -277,6 +280,7 @@ test-suite test
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
                      , Matching.Go.Spec
+                     , Proto3.Roundtrip
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
@@ -291,6 +295,7 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
+                     , containers
                      , effects
                      , fastsum
                      , filepath
@@ -305,7 +310,8 @@ test-suite test
                      , leancheck
                      , mtl
                      , network
-                     , containers
+                     , proto3-suite
+                     , proto3-wire
                      , recursion-schemes >= 4.1
                      , semantic
                      , text >= 1.2.1.3

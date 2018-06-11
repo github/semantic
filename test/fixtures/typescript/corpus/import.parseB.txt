@@ -1,14 +1,14 @@
-(Program
+(Statements
   (Import)
   (QualifiedAliasedImport
     (Identifier))
   (Import)
   (Import)
   (Import)
-  (
+  (Statements
     (Import)
     (Import))
-  (
+  (Statements
     (Import)
     (QualifiedAliasedImport
       (Identifier)))

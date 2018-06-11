@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Class
     (TypeParameter
       (Identifier)
@@ -7,7 +7,7 @@
     (Identifier)
     (ExtendsClause
       (TypeIdentifier))
-    (
+    (Statements
       (Method
         (Empty)
         (Empty)
@@ -22,7 +22,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -39,7 +39,7 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier))))
       (Method
@@ -56,6 +56,6 @@
           (Assignment
             (Identifier)
             (Empty)))
-        (
+        (Statements
           (Return
             (Identifier)))))))

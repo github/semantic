@@ -1,8 +1,9 @@
-(Program
+(Statements
   (Method
     (Empty)
   { (Identifier)
   ->(Identifier) }
   {-(Identifier)-}
-    ({-(Send
+    (Statements
+    {-(Send
       {-(Identifier)-})-})))

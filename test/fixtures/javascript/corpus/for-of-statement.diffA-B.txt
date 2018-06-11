@@ -1,10 +1,10 @@
-(Program
+(Statements
   (ForOf
   { (Identifier)
   ->(Identifier) }
   { (Identifier)
   ->(Identifier) }
-    (
+    (Statements
       (Call
         (Identifier)
       { (Identifier)

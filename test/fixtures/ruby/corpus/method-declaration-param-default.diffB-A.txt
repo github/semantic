@@ -1,6 +1,6 @@
-(Program
+(Statements
   (Method
     (Empty)
     (Identifier)
   {-(Identifier)-}
-    ([])))
+    (Statements)))

@@ -1,28 +1,28 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
       { (Identifier)
       ->(Identifier) }
         (Integer))
       (Assignment
-        (
+        (Statements
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) })
         (Plus
-          (
+          (Statements
           { (Identifier)
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
-          (
+          (Statements
             (Integer)
             (Integer))))
     {+(Assignment
@@ -45,11 +45,15 @@
       {+(RShift
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(DividedBy
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Times
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(DividedBy
         {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(BXOr
@@ -68,21 +72,16 @@
           {+(Integer)+})+})+})+}
     {+(Assignment
       {+(Identifier)+}
-      {+(
+      {+(Statements
         {+(Pointer
           {+(Identifier)+})+}
         {+(Reference
           {+(Composite
             {+(Identifier)+}
-            {+(
+            {+(Statements
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Times
-        {-(Identifier)-}
-        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(Plus
@@ -121,13 +120,13 @@
           {-(Integer)-})-})-})-}
     {-(Assignment
       {-(Identifier)-}
-      {-(
+      {-(Statements
         {-(Pointer
           {-(Identifier)-})-}
         {-(Reference
           {-(Composite
             {-(Identifier)-}
-            {-(
+            {-(Statements
               {-(KeyValue
                 {-(Identifier)-}
                 {-(Integer)-})-})-})-})-})-})-})))

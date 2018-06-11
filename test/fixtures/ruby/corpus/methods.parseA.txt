@@ -1,42 +1,42 @@
-(Program
+(Statements
   (Method
     (Empty)
     (Identifier)
-    ([]))
+    (Statements))
   (Method
     (Empty)
     (Identifier)
-    ([]))
-  (Method
-    (Empty)
-    (Identifier)
-    (Identifier)
-    ([]))
+    (Statements))
   (Method
     (Empty)
     (Identifier)
     (Identifier)
-    (Identifier)
-    (Identifier)
-    (Empty)
-    ([]))
+    (Statements))
   (Method
     (Empty)
     (Identifier)
     (Identifier)
-    ([]))
+    (Identifier)
+    (Identifier)
+    (Empty)
+    (Statements))
   (Method
     (Empty)
     (Identifier)
     (Identifier)
-    ([]))
+    (Statements))
+  (Method
+    (Empty)
+    (Identifier)
+    (Identifier)
+    (Statements))
   (Method
     (Identifier)
     (Identifier)
-    ([]))
+    (Statements))
   (Method
     (Identifier)
     (Identifier)
     (Identifier)
     (Identifier)
-    ([])))
+    (Statements)))

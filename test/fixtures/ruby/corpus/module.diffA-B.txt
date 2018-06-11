@@ -1,10 +1,10 @@
-(Program
+(Statements
   (Module
     (Identifier)
   {+(Method
     {+(Empty)+}
     {+(Identifier)+}
-    {+([])+})+})
+    {+(Statements)+})+})
 {-(Module
   {-(ScopeResolution
     {-(Identifier)-}

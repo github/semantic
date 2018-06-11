@@ -3,39 +3,39 @@ module Data.Abstract.Name
 -- * Constructors
 , name
 , nameI
-, unName
+, formatName
 ) where
 
-import qualified Data.ByteString.Char8 as BC
+import           Data.Aeson
 import qualified Data.Char as Char
+import           Data.Text (Text)
 import qualified Data.Text as Text
-import qualified Data.Text.Encoding as Text
 import           Data.String
 import           Prologue
 
 -- | The type of variable names.
 data Name
-  = Name ByteString
+  = Name Text
   | I Int
   deriving (Eq, Ord)
 
--- | Construct a 'Name' from a 'ByteString'.
-name :: ByteString -> Name
+-- | Construct a 'Name' from a 'Text'.
+name :: Text -> Name
 name = Name
 
 -- | Construct a 'Name' from an 'Int'. This is suitable for automatic generation, e.g. using a Fresh effect, but should not be used for human-generated names.
 nameI :: Int -> Name
 nameI = I
 
--- | Extract a human-readable 'ByteString' from a 'Name'.
-unName :: Name -> ByteString
-unName (Name name) = name
-unName (I i)       = Text.encodeUtf8 . Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
+-- | Extract a human-readable 'Text' from a 'Name'.
+formatName :: Name -> Text
+formatName (Name name) = name
+formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
 
 instance IsString Name where
-  fromString = Name . BC.pack
+  fromString = Name . Text.pack
 
 -- $
 -- >>> I 0
@@ -43,7 +43,7 @@ instance IsString Name where
 -- >>> I 26
 -- "_aʹ"
 instance Show Name where
-  showsPrec _ = prettyShowString . Text.unpack . Text.decodeUtf8 . unName
+  showsPrec _ = prettyShowString . Text.unpack . formatName
     where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'
           prettyChar c
             | c `elem` ['\\', '\"'] = Char.showLitChar c
@@ -53,3 +53,7 @@ instance Show Name where
 instance Hashable Name where
   hashWithSalt salt (Name name) = hashWithSalt salt name
   hashWithSalt salt (I i)       = salt `hashWithSalt` (1 :: Int) `hashWithSalt` i
+
+instance ToJSON Name where
+  toJSON = toJSON . formatName
+  toEncoding = toEncoding . formatName

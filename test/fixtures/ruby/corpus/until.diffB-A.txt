@@ -1,11 +1,11 @@
-(Program
+(Statements
   (While
     (Not
       (Send
         (Identifier)))
   { (Send
     {-(Identifier)-})
-  ->([]) })
+  ->(Statements) })
 {+(While
   {+(Not
     {+(Send

@@ -1,8 +1,8 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Source
 ( Source
 , sourceBytes
-, fromBytes
+, fromUTF8
 -- Measurement
 , sourceLength
 , nullSource
@@ -36,13 +36,16 @@ import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
+import Proto3.Suite
 
--- | The contents of a source file, represented as a 'ByteString'.
+-- | The contents of a source file. This is represented as a UTF-8
+-- 'ByteString' under the hood. Construct these with 'fromUTF8'; obviously,
+-- passing 'fromUTF8' non-UTF8 bytes will cause crashes.
 newtype Source = Source { sourceBytes :: B.ByteString }
-  deriving (Eq, IsString, Show)
+  deriving (Eq, IsString, Show, Generic, MessageField)
 
-fromBytes :: B.ByteString -> Source
-fromBytes = Source
+fromUTF8 :: B.ByteString -> Source
+fromUTF8 = Source
 
 
 -- Measurement

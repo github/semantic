@@ -10,7 +10,6 @@ module Data.Abstract.Type
 import Control.Abstract
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
-import Data.Semigroup.Reducer (Reducer)
 import Prologue hiding (TypeError)
 
 type TName = Int
@@ -94,7 +93,7 @@ unify t1 t2
   | t1 == t2  = pure t2
   | otherwise = throwResumable (UnificationError t1 t2)
 
-instance Ord location => ValueRoots location Type where
+instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
@@ -116,23 +115,20 @@ instance AbstractIntro Type where
   null        = Null
 
 
-instance ( Member (Allocator location Type) effects
+instance ( Member (Allocator address Type) effects
+         , Member (Env address) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Environment location)) effects
-         , Member (State (Heap location (Cell location) Type)) effects
-         , Ord location
-         , Reducer Type (Cell location Type)
          )
-      => AbstractFunction location Type effects where
+      => AbstractFunction address Type effects where
   closure names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
+      addr <- alloc name
       tvar <- Var <$> fresh
-      assign a tvar
-      bimap (Env.insert name a) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    (zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
+      assign addr tvar
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (emptyEnv, [])) names
+    (zeroOrMoreProduct tvars :->) <$> locally (bindAll env *> body `catchReturn` \ (Return value) -> pure value)
 
   call op params = do
     tvar <- fresh
@@ -145,17 +141,14 @@ instance ( Member (Allocator location Type) effects
 
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator location Type) effects
+instance ( Member (Allocator address Type) effects
+         , Member (Env address) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
          , Member (Return Type) effects
-         , Member (State (Environment location)) effects
-         , Member (State (Heap location (Cell location) Type)) effects
-         , Ord location
-         , Reducer Type (Cell location Type)
          )
-      => AbstractValue location Type effects where
+      => AbstractValue address Type effects where
   array fields = do
     var <- fresh
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields

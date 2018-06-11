@@ -1,10 +1,10 @@
-(Program
+(Statements
   (Method
     (Empty)
     (Identifier)
-    (
+    (Statements
       (Try
-      { ([])
+      { (Statements)
       ->(Send
         {+(Identifier)+}
         {+(TextElement)+}) }))))

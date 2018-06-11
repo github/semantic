@@ -1,4 +1,4 @@
-(Program
+(Statements
   (For
     (SequenceExpression
       (Assignment
@@ -12,7 +12,7 @@
       (Float))
     (Update
       (Identifier))
-    (
+    (Statements
       (Call
         (Identifier)
         (Identifier)

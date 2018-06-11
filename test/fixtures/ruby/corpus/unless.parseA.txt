@@ -1,9 +1,9 @@
-(Program
+(Statements
   (If
     (Not
       (Send
         (Identifier)))
-    (
+    (Statements
       (Send
         (Identifier)))
     (Send
