@@ -126,111 +126,66 @@
                   (TypeConstructorIdentifier)
                   (TypeVariableIdentifier)))
               (Empty))))))
-  {+(TypeSynonym
-    {+(Statements
-      {+(TypeConstructorIdentifier)+}
-      {+(TypeConstructorIdentifier)+})+}
-    {+(TextElement)+})+}
-  {+(TypeSynonym
-    {+(Statements
-      {+(TypeConstructorIdentifier)+}
-      {+(Statements
-        {+(TypeConstructorIdentifier)+}
-        {+(TypeVariableIdentifier)+}
-        {+(TypeVariableIdentifier)+})+})+}
-    {+(TypePattern
-      {+(Statements
-        {+(TypeConstructorIdentifier)+}
-        {+(TypeVariableIdentifier)+}
-        {+(TypeVariableIdentifier)+})+})+})+}
-  {+(TypeSynonym
-    {+(Statements
-      {+(TypeConstructorIdentifier)+})+}
-    {+(Context'
-      {+(Statements
-        {+(TypeConstructorIdentifier)+})+})+}
-    {+(TypePattern
-      {+(Statements
-        {+(TypeConstructorIdentifier)+}
-        {+(ListConstructor)+})+})+})+}
-  {+(TypeSynonym
-    {+(Statements
-      {+(TypeConstructorIdentifier)+}
-      {+(TypeVariableIdentifier)+}
-      {+(TypeVariableIdentifier)+})+}
-    {+(ScopedTypeVariables
-      {+(Statements
-        {+(TypeVariableIdentifier)+}
-        {+(TypeVariableIdentifier)+})+})+}
-    {+(TypePattern
-      {+(Statements
-        {+(TypeConstructorIdentifier)+}
-        {+(TypeVariableIdentifier)+}
-        {+(TypeVariableIdentifier)+})+})+})+}
-  {+(TypeSynonym
-    {+(Statements
-      {+(Statements
-        {+(TypeConstructorIdentifier)+}
-        {+(TypeVariableIdentifier)+}
-        {+(TypeVariableIdentifier)+})+})+}
-    {+(TypePattern
-      {+(Statements
-        {+(TypeConstructorIdentifier)+}
-        {+(Statements
-          {+(TypeConstructorIdentifier)+}
-          {+(TypeVariableIdentifier)+}
-          {+(TypeVariableIdentifier)+})+})+})+})+}
-  {-(TypeSynonym
-    {-(Statements
+    (TypeSynonym
+      (Statements
       {-(TypeConstructorIdentifier)-}
-      {-(TypeConstructorIdentifier)-})-}
-    {-(TextElement)-})-}
-  {-(TypeSynonym
-    {-(Statements
-      {-(TypeConstructorIdentifier)-}
-      {-(Statements
-        {-(TypeConstructorIdentifier)-}
-        {-(TypeVariableIdentifier)-}
-        {-(TypeVariableIdentifier)-})-})-}
-    {-(TypePattern
-      {-(Statements
-        {-(TypeConstructorIdentifier)-}
-        {-(TypeVariableIdentifier)-}
-        {-(TypeVariableIdentifier)-})-})-})-}
-  {-(TypeSynonym
-    {-(Statements
-      {-(TypeConstructorIdentifier)-})-}
-    {-(Context'
-      {-(Statements
-        {-(TypeConstructorIdentifier)-})-})-}
-    {-(TypePattern
-      {-(Statements
-        {-(TypeConstructorIdentifier)-}
-        {-(ListConstructor)-})-})-})-}
-  {-(TypeSynonym
-    {-(Statements
-      {-(TypeConstructorIdentifier)-}
-      {-(TypeVariableIdentifier)-}
-      {-(TypeVariableIdentifier)-})-}
-    {-(ScopedTypeVariables
-      {-(Statements
-        {-(TypeVariableIdentifier)-}
-        {-(TypeVariableIdentifier)-})-})-}
-    {-(TypePattern
-      {-(Statements
-        {-(TypeConstructorIdentifier)-}
-        {-(TypeVariableIdentifier)-}
-        {-(TypeVariableIdentifier)-})-})-})-}
-  {-(TypeSynonym
-    {-(Statements
-      {-(Statements
-        {-(TypeConstructorIdentifier)-}
-        {-(TypeVariableIdentifier)-}
-        {-(TypeVariableIdentifier)-})-})-}
-    {-(TypePattern
-      {-(Statements
-        {-(TypeConstructorIdentifier)-}
-        {-(Statements
-          {-(TypeConstructorIdentifier)-}
-          {-(TypeVariableIdentifier)-}
-          {-(TypeVariableIdentifier)-})-})-})-})-}))
+        (TypeConstructorIdentifier)
+      {+(TypeConstructorIdentifier)+})
+      (TextElement))
+    (TypeSynonym
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (Statements
+        { (TypeConstructorIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
+      (TypePattern
+        (Statements
+          (TypeConstructorIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))))
+    (TypeSynonym
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Context'
+        (Statements
+          (TypeConstructorIdentifier)))
+      (TypePattern
+        (Statements
+        { (TypeConstructorIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (ListConstructor))))
+    (TypeSynonym
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeVariableIdentifier)
+        (TypeVariableIdentifier))
+      (ScopedTypeVariables
+        (Statements
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
+      (TypePattern
+        (Statements
+        { (TypeConstructorIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))))
+    (TypeSynonym
+      (Statements
+        (Statements
+        { (TypeConstructorIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
+      (TypePattern
+        (Statements
+          (TypeConstructorIdentifier)
+          (Statements
+          { (TypeConstructorIdentifier)
+          ->(TypeConstructorIdentifier) }
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier)))))))
