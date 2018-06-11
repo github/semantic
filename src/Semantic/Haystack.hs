@@ -1,14 +1,14 @@
 module Semantic.Haystack where
 
-import Control.Monad.IO.Class
-import Data.Aeson
-import Network.HTTP.Client
-import Network.HTTP.Types.Status (statusCode)
-import Prologue hiding (hash)
-import Semantic.Queue
-import System.IO.Error
+import           Control.Monad.IO.Class
+import           Crypto.Hash
+import           Data.Aeson
 import qualified Data.Text.Encoding as Text
-import Crypto.Hash
+import           Network.HTTP.Client
+import           Network.HTTP.Types.Status (statusCode)
+import           Prologue hiding (hash)
+import           Semantic.Queue
+import           System.IO.Error
 
 data ErrorReport
   = ErrorReport
@@ -42,9 +42,12 @@ haystackClient maybeURL managerSettings hostName appName
       pure $ HaystackClient request manager hostName appName
   | otherwise = pure NullHaystackClient
 
--- Report an error to Haystack over HTTP.
-reportError :: MonadIO io => HaystackClient -> ErrorReport -> io (Maybe Int)
-reportError NullHaystackClient _               = pure (Just 0)
+-- Report an error to Haystack over HTTP (blocking).
+--
+-- Returns Left error if reporting failed (or if using the NullHaystackClient)
+-- or Right status code received from sending the report.
+reportError :: MonadIO io => HaystackClient -> ErrorReport -> io (Either String Int)
+reportError NullHaystackClient _               = pure (Left "Error not reported. NullHaystackClient configured.")
 reportError HaystackClient{..} ErrorReport{..} = do
   let payload = object $
         [ "app"     .= haystackClientAppName
@@ -52,19 +55,20 @@ reportError HaystackClient{..} ErrorReport{..} = do
         , "message" .= errorReportMessage
         , "rollup"  .= rollup errorReportMessage
         ] <> foldr (\(k, v) acc -> k .= v : acc) [] errorReportContext
+  liftIO $ print payload
   let request = haystackClientRequest { requestBody = RequestBodyLBS (encode payload) }
 
   response <- liftIO . tryIOError $ httpLbs request haystackClientManager
   case response of
-    Left _ -> pure Nothing
+    Left e -> pure $ Left (displayException e)
     Right response -> do
       let status = statusCode (responseStatus response)
       liftIO $ print status
       liftIO $ print (responseBody response)
-      pure (Just status)
-
-rollup :: Text -> Text
-rollup = Text.decodeUtf8 . digestToHexByteString . md5 . Text.encodeUtf8
+      pure $ Right status
   where
+    rollup :: Text -> Text
+    rollup = Text.decodeUtf8 . digestToHexByteString . md5 . Text.encodeUtf8
+
     md5 :: ByteString -> Digest MD5
     md5 = hash
