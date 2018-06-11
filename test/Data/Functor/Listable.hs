@@ -44,6 +44,7 @@ import Data.Semigroup (Semigroup(..))
 import Data.Source
 import Data.Span
 import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
@@ -246,6 +247,30 @@ instance Listable1 Syntax.Empty where
 instance Listable1 Syntax.Identifier where
   liftTiers _ = cons1 Syntax.Identifier
 
+instance Listable1 Literal.KeyValue where
+  liftTiers tiers = liftCons2 tiers tiers Literal.KeyValue
+
+instance Listable1 Literal.Array where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Array
+
+instance Listable1 Literal.Boolean where
+  liftTiers tiers = cons1 Literal.Boolean
+
+instance Listable1 Literal.Hash where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Hash
+
+instance Listable1 Literal.Float where
+  liftTiers tiers = cons1 Literal.Float
+
+instance Listable1 Literal.Null where
+  liftTiers tiers = cons0 Literal.Null
+
+instance Listable1 Literal.TextElement where
+  liftTiers tiers = cons1 Literal.TextElement
+
+instance Listable1 Syntax.Error where
+  liftTiers tiers = liftCons4 mempty mempty mempty (liftTiers tiers) Syntax.Error
+
 type ListableSyntax = Sum
   '[ Comment.Comment
    , Declaration.Function
@@ -296,7 +321,6 @@ instance Listable Pos where
 
 instance Listable Span where
   tiers = cons2 Span
-
 
 instance Listable Source where
   tiers = fromUTF8 `mapT` tiers
