@@ -38,7 +38,6 @@ type Syntax = '[
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.Class
-  , Syntax.ConstructorOperator
   , Syntax.ConstructorSymbol
   , Syntax.Context
   , Syntax.Context'
@@ -64,6 +63,7 @@ type Syntax = '[
   , Syntax.Module
   , Syntax.ModuleExport
   , Syntax.NewType
+  , Syntax.Operator
   , Syntax.Pragma
   , Syntax.QualifiedModuleIdentifier
   , Syntax.QualifiedTypeConstructorIdentifier
@@ -76,12 +76,10 @@ type Syntax = '[
   , Syntax.TupleConstructor
   , Syntax.Type
   , Syntax.TypeConstructorExport
-  , Syntax.TypeOperator
   , Syntax.TypePattern
   , Syntax.TypeSignature
   , Syntax.TypeSynonym
   , Syntax.UnitConstructor
-  , Syntax.VariableOperator
   , Syntax.VariableSymbol
   , Type.TypeParameters
   , []

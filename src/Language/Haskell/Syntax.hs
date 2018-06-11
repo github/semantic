@@ -281,15 +281,6 @@ instance Show1 TypeConstructorExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeConstructorExport
 
-newtype VariableOperator a = VariableOperator { variableOperatorContent :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 VariableOperator where liftEq = genericLiftEq
-instance Ord1 VariableOperator where liftCompare = genericLiftCompare
-instance Show1 VariableOperator where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable VariableOperator
-
 data AllConstructors a = AllConstructors
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
@@ -298,15 +289,6 @@ instance Ord1 AllConstructors where liftCompare = genericLiftCompare
 instance Show1 AllConstructors where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AllConstructors
-
-newtype ConstructorOperator a = ConstructorOperator { constructorOperatorContent :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 ConstructorOperator where liftEq = genericLiftEq
-instance Ord1 ConstructorOperator where liftCompare = genericLiftCompare
-instance Show1 ConstructorOperator where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable ConstructorOperator
 
 data InfixOperatorPattern a = InfixOperatorPattern { infixOperatorPatternLeft :: a, infixOperatorPatternOperator :: a, infixOperatorPatternRight :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -386,6 +368,17 @@ instance Show1 EntityIdentifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable EntityIdentifier
 
+data Operator a = VariableOperator a
+                | ConstructorOperator a
+                | TypeOperator Name
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Operator where liftEq = genericLiftEq
+instance Ord1 Operator where liftCompare = genericLiftCompare
+instance Show1 Operator where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Operator
+
 newtype ConstructorSymbol a = ConstructorSymbol { constructorSymbolName :: Name }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
@@ -394,15 +387,6 @@ instance Ord1 ConstructorSymbol where liftCompare = genericLiftCompare
 instance Show1 ConstructorSymbol where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ConstructorSymbol
-
-newtype TypeOperator a = TypeOperator { typeOperatorName :: Name }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 TypeOperator where liftEq = genericLiftEq
-instance Ord1 TypeOperator where liftCompare = genericLiftCompare
-instance Show1 TypeOperator where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable TypeOperator
 
 newtype VariableSymbol a = VariableSymbol { variableSymbolName :: Name }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
