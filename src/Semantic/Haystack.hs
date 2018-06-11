@@ -41,7 +41,7 @@ haystackClient maybeURL managerSettings hostName appName
       request' <- parseRequest url
       let request = request'
             { method = "POST"
-            , requestHeaders = [ ("Content-Type", "application/json; charset=utf-8") ]
+            , requestHeaders = ("Content-Type", "application/json; charset=utf-8") : requestHeaders request'
             }
       pure $ HaystackClient request manager hostName appName
   | otherwise = pure NullHaystackClient
