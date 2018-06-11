@@ -6,13 +6,7 @@ module Semantic.Task
 , WrappedTask'(..)
 , Level(..)
 , RAlgebra
--- * I/O
-, IO.readBlob
-, IO.readBlobs
-, IO.readBlobPairs
-, IO.readProject
-, IO.findFiles
-, IO.write
+, module Semantic.Effect.Files
 -- * Module Resolution
 , resolutionMap
 , Resolution
@@ -76,7 +70,7 @@ import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Prologue hiding (MonadError (..), project)
 import           Semantic.Distribute
-import qualified Semantic.IO as IO
+import           Semantic.Effect.Files
 import           Semantic.Resolution
 import           Semantic.Log
 import           Semantic.Queue
@@ -90,7 +84,7 @@ import           System.IO (stderr)
 type TaskEff = Eff '[Distribute WrappedTask
                     , Task
                     , Resolution
-                    , IO.Files
+                    , Files
                     , Reader Options
                     , Trace
                     , Telemetry
@@ -100,7 +94,7 @@ type TaskEff = Eff '[Distribute WrappedTask
 type TaskEff' = Eff '[Distribute WrappedTask'
                      , Task
                      , Resolution
-                     , IO.Files
+                     , Files
                      , State Concrete
                      , Reader Options
                      , Trace
@@ -170,7 +164,7 @@ runTaskWithOptions' options logger statter task = do
                    . runTelemetry logger statter
                    . runTraceInTelemetry
                    . runReader options
-                   . IO.runFiles
+                   . runFiles
                    . runResolution
                    . runTaskF
                    . runDistribute (run . unwrapTask)
@@ -192,7 +186,7 @@ runTaskWithProject proj options task = do
                    . runTraceInTelemetry
                    . runReader options
                    . runState proj
-                   . IO.runFilesGuided
+                   . runFilesGuided
                    . runResolution
                    . runTaskF
                    . runDistribute (run . unwrapTask')

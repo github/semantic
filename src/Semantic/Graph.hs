@@ -34,7 +34,7 @@ import           Data.Term
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
-import           Semantic.IO (Files)
+import           Semantic.Effect.Files
 import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph

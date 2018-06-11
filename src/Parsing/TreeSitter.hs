@@ -22,6 +22,7 @@ import Foreign
 import Foreign.C.Types (CBool (..))
 import Foreign.Marshal.Array (allocaArray)
 import Semantic.IO hiding (Source)
+import Semantic.Effect.Files (catchException)
 import System.Timeout
 
 import qualified TreeSitter.Language as TS
