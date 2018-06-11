@@ -1,0 +1,120 @@
+(Module
+  (Empty)
+  (Statements
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (VariableIdentifier)
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (App
+              (VariableIdentifier)
+              (VariableIdentifier))
+            (VariableIdentifier))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (ConstructorIdentifier)
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (ConstructorIdentifier)
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (App
+              (ConstructorIdentifier)
+              (VariableIdentifier))
+            (VariableIdentifier))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (UnitConstructor)))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (VariableIdentifier)
+          (Generator
+            (VariableIdentifier)
+            (VariableIdentifier)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (Tuple
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (Generator
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (Generator
+            (VariableIdentifier)
+            (VariableIdentifier)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (VariableIdentifier)
+          (Generator
+            (VariableIdentifier)
+            (Array
+              (Array
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) })
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) }))
+              (Array
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) })
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) }))))
+          (Generator
+            (TuplePattern
+            { (Integer)
+            ->(Integer) }
+              (VariableIdentifier))
+            (VariableIdentifier)))))))

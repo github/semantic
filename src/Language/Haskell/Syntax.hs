@@ -451,3 +451,48 @@ instance Ord1 ImportAlias where liftCompare = genericLiftCompare
 instance Show1 ImportAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ImportAlias
+
+data App a = App { appLeft :: a, appRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 App where liftEq = genericLiftEq
+instance Ord1 App where liftCompare = genericLiftCompare
+instance Show1 App where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable App
+
+data ListComprehension a = ListComprehension { comprehensionValue :: a, comprehensionSource :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ListComprehension where liftEq = genericLiftEq
+instance Ord1 ListComprehension where liftCompare = genericLiftCompare
+instance Show1 ListComprehension where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ListComprehension
+
+data Generator a = Generator { generatorValue :: a, generatorSource :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Generator where liftEq = genericLiftEq
+instance Ord1 Generator where liftCompare = genericLiftCompare
+instance Show1 Generator where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Generator
+
+newtype Tuple a = Tuple [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Tuple where liftEq = genericLiftEq
+instance Ord1 Tuple where liftCompare = genericLiftCompare
+instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Tuple
+
+newtype TuplePattern a = TuplePattern [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TuplePattern where liftEq = genericLiftEq
+instance Ord1 TuplePattern where liftCompare = genericLiftCompare
+instance Show1 TuplePattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TuplePattern
