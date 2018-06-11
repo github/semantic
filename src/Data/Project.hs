@@ -1,24 +1,29 @@
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE DeriveAnyClass, KindSignatures, MultiWayIf #-}
 
 module Data.Project where
 
 import Prelude hiding (readFile)
 import Prologue hiding (throwError)
 
-import Control.Monad.Effect
-import Control.Monad.IO.Class
-import Data.Source
-import Control.Monad.Effect.Exception
-import Data.Blob
-import Data.Language
-import qualified Data.Text as T
-import Proto3.Suite
-import System.FilePath.Posix
+import           Control.Monad.Effect
+import           Control.Monad.Effect.Exception
+import           Control.Monad.IO.Class
+import           Data.Blob
 import qualified Data.ByteString as B
-import Debug.Trace
+import           Data.Language
+import           Data.Source
+import qualified Data.Text as T
+import           Debug.Trace
+import           Proto3.Suite
+import           System.FilePath.Posix
 
-data Project blobs paths path = Project
+-- | A 'Project' contains all the information that semantic needs
+-- to execute an analysis, diffing, or graphing pass. It is higher-kinded
+-- in terms of the container type for paths and blobs, as well as the
+-- path type (this is necessary because protobuf uses different vector
+-- representations for @repeated string@ and @repeated Blob@.
+-- You probably want to use the 'Concrete' or 'PB' type aliases.
+data Project (blobs :: * -> *) (paths :: * -> *) path = Project
   { projectRootDir     :: path
   , projectBlobs       :: blobs Blob
   , projectLanguage    :: Language
@@ -34,9 +39,16 @@ deriving instance ( MessageField path
 deriving instance (Eq path, Eq (blobs Blob), Eq (paths path)) => Eq (Project blobs paths path)
 deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (Project blobs paths path)
 
+-- | This 'Project' type is the one used during semantic's normal
+-- course of diffing, evaluation, and graphing. You probably want to
+-- use this one.
 type Concrete = Project [] [] FilePath
+
+-- | This 'Project' type is protobuf-compatible, and corresponds with
+-- the @Project@ message declaration present in types.proto. 
 type PB = Project NestedVec UnpackedVec Text
 
+-- | Convert from a packed protobuf representatio nto a more useful one.
 fromPB :: PB -> Concrete
 fromPB Project {..} = Project
   { projectRootDir     = T.unpack projectRootDir
@@ -131,8 +143,7 @@ maybeThese a b = case (a, b) of
 
 -- TODO: write some tests so we can be sure this actually works
 -- and does what findFileInDir does
-findFiles :: Member (Exc SomeException) effs
-          => Concrete
+findFiles :: Concrete
           -> FilePath
           -> [String]
           -> [FilePath]
