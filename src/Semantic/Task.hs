@@ -40,6 +40,7 @@ module Semantic.Task
 , runTask
 , runTaskWithOptions
 , runTaskWithProject
+, runTaskWithOptions'
 -- * Re-exports
 , Distribute
 , Eff
@@ -154,6 +155,15 @@ runTaskWithOptions options task = do
   statter <- defaultStatsClient >>= newQueue sendStat
   logger <- newQueue logMessage options
 
+  result <- runTaskWithOptions' options logger statter task
+
+  closeQueue statter
+  closeStatClient (asyncQueueExtra statter)
+  closeQueue logger
+  either (die . displayException) pure result
+
+runTaskWithOptions' :: Options -> AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> TaskEff a -> IO (Either SomeException a)
+runTaskWithOptions' options logger statter task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
         run = runM . runError
@@ -166,11 +176,7 @@ runTaskWithOptions options task = do
                    . runDistribute (run . unwrapTask)
     run task
   queue statter stat
-
-  closeQueue statter
-  closeStatClient (asyncQueueExtra statter)
-  closeQueue logger
-  either (die . displayException) pure result
+  pure result
 
 -- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithProject :: Concrete -> Options -> TaskEff' a -> IO a
