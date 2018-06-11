@@ -29,7 +29,7 @@ data HaystackClient
   }
   | NullHaystackClient -- ^ Doesn't report needles, good for testing or when the 'HAYSTACK_URL' env var isn't set.
 
--- Queue an error to be reported
+-- Queue an error to be reported to haystack.
 queueErrorReport :: MonadIO io => AsyncQueue ErrorReport HaystackClient -> SomeException -> [(String, String)] -> io ()
 queueErrorReport q@AsyncQueue{..} message = liftIO . queue q . ErrorReport message
 
