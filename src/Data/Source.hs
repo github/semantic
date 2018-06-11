@@ -28,6 +28,7 @@ module Data.Source
 
 import Prologue
 import Data.Array
+import Data.Aeson (FromJSON (..), withText)
 import qualified Data.ByteString as B
 import Data.Char (ord)
 import Data.List (span)
@@ -47,6 +48,8 @@ newtype Source = Source { sourceBytes :: B.ByteString }
 fromUTF8 :: B.ByteString -> Source
 fromUTF8 = Source
 
+instance FromJSON Source where
+  parseJSON = withText "Source" (pure . fromUTF8 . T.encodeUtf8)
 
 -- Measurement
 

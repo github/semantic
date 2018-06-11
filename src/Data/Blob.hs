@@ -30,6 +30,12 @@ data Blob = Blob
   }
   deriving (Show, Eq, Generic, Message, Named)
 
+instance FromJSON Blob where
+  parseJSON = withObject "Blob" $ \b -> Blob
+    <$> b .: "content"
+    <*> b .: "path"
+    <*> b .: "language"
+
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = nullSource blobSource
 
@@ -40,6 +46,15 @@ sourceBlob filepath language source = Blob source filepath language
 -- delete, a blob to insert, or a pair of blobs to diff.
 type BlobPair = Join These Blob
 
+instance FromJSON BlobPair where
+  parseJSON = withObject "BlobPair" $ \o -> do
+    before <- o .:? "before"
+    after <- o .:? "after"
+    case (before, after) of
+      (Just b, Just a)  -> pure $ Join (These b a)
+      (Just b, Nothing) -> pure $ Join (This b)
+      (Nothing, Just a) -> pure $ Join (That a)
+      _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
 
 blobPairDiffing :: Blob -> Blob -> BlobPair
 blobPairDiffing a b = Join (These a b)
@@ -57,7 +72,7 @@ languageForBlobPair (Join (These a b))
   | blobLanguage a == Unknown || blobLanguage b == Unknown
     = Unknown
   | otherwise
-    = blobLanguage b
+    = blobLanguage b    
 
 pathForBlobPair :: BlobPair -> FilePath
 pathForBlobPair (Join (This Blob{..})) = blobPath
