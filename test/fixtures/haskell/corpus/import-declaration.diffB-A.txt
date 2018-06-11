@@ -149,6 +149,49 @@
     {+(QualifiedModuleIdentifier
       {+(ModuleIdentifier)+}
       {+(ModuleIdentifier)+})+})+}
+  {+(ImportDeclaration
+    {+(Empty)+}
+    {+(QualifiedModuleIdentifier
+      {+(ModuleIdentifier)+}
+      {+(ModuleIdentifier)+})+}
+    {+(HiddenImport
+      {+(Statements
+        {+(TypeConstructorIdentifier)+}
+        {+(AllConstructors)+})+})+}
+    {+(HiddenImport
+      {+(VariableIdentifier)+})+})+}
+  {+(QualifiedImportDeclaration
+    {+(Empty)+}
+    {+(QualifiedModuleIdentifier
+      {+(ModuleIdentifier)+}
+      {+(ModuleIdentifier)+})+})+}
+  {+(QualifiedImportDeclaration
+    {+(Empty)+}
+    {+(QualifiedModuleIdentifier
+      {+(ModuleIdentifier)+}
+      {+(ModuleIdentifier)+})+}
+    {+(HiddenImport
+      {+(Statements
+        {+(TypeConstructorIdentifier)+}
+        {+(AllConstructors)+})+})+}
+    {+(HiddenImport
+      {+(VariableIdentifier)+})+})+}
+  {+(QualifiedImportDeclaration
+    {+(Empty)+}
+    {+(QualifiedModuleIdentifier
+      {+(ModuleIdentifier)+}
+      {+(ModuleIdentifier)+})+}
+    {+(HiddenImport
+      {+(VariableIdentifier)+})+})+}
+  {+(QualifiedImportDeclaration
+    {+(Empty)+}
+    {+(ImportAlias
+      {+(QualifiedModuleIdentifier
+        {+(ModuleIdentifier)+}
+        {+(ModuleIdentifier)+})+}
+      {+(ModuleIdentifier)+})+}
+    {+(HiddenImport
+      {+(VariableIdentifier)+})+})+}
   {-(ImportDeclaration
     {-(Empty)-}
     {-(QualifiedModuleIdentifier
@@ -318,4 +361,52 @@
     {-(QualifiedModuleIdentifier
       {-(ModuleIdentifier)-}
       {-(ModuleIdentifier)-}
-      {-(ModuleIdentifier)-})-})-}))
+      {-(ModuleIdentifier)-})-})-}
+  {-(ImportDeclaration
+    {-(Empty)-}
+    {-(QualifiedModuleIdentifier
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-})-}
+    {-(HiddenImport
+      {-(Statements
+        {-(TypeConstructorIdentifier)-}
+        {-(AllConstructors)-})-})-}
+    {-(HiddenImport
+      {-(VariableIdentifier)-})-})-}
+  {-(QualifiedImportDeclaration
+    {-(Empty)-}
+    {-(QualifiedModuleIdentifier
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-})-})-}
+  {-(QualifiedImportDeclaration
+    {-(Empty)-}
+    {-(QualifiedModuleIdentifier
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-})-}
+    {-(HiddenImport
+      {-(Statements
+        {-(TypeConstructorIdentifier)-}
+        {-(AllConstructors)-})-})-}
+    {-(HiddenImport
+      {-(VariableIdentifier)-})-})-}
+  {-(QualifiedImportDeclaration
+    {-(Empty)-}
+    {-(QualifiedModuleIdentifier
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-}
+      {-(ModuleIdentifier)-})-}
+    {-(HiddenImport
+      {-(VariableIdentifier)-})-})-}
+  {-(QualifiedImportDeclaration
+    {-(Empty)-}
+    {-(ImportAlias
+      {-(QualifiedModuleIdentifier
+        {-(ModuleIdentifier)-}
+        {-(ModuleIdentifier)-}
+        {-(ModuleIdentifier)-})-}
+      {-(ModuleIdentifier)-})-}
+    {-(HiddenImport
+      {-(VariableIdentifier)-})-})-}))

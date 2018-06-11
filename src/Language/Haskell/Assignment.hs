@@ -283,7 +283,7 @@ gadtDeclaration = makeTerm
     typeParameters' = makeTerm <$> location <*> manyTermsTill expression (symbol KindSignature <|> symbol Where')
 
 hiddenImport :: Assignment
-hiddenImport = makeTerm <$> symbol HiddenImport <*> children (Syntax.HiddenImport <$> expressions)
+hiddenImport = makeTerm <$> symbol Import <*> children (Syntax.HiddenImport <$> expressions)
 
 hiddenImportSpec :: Assignment.Assignment [] Grammar [Term]
 hiddenImportSpec = symbol HiddenImportSpec *> children (manyTerm hiddenImport)

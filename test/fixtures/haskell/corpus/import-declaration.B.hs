@@ -25,3 +25,10 @@ import qualified Data.Util.Maybe as UM (Maybe(..), fromMaybe)
 import GHC.Prim (Box#, box#)
 
 import "hlint" HLint.Util.Default
+
+import Data.Util.Maybe hiding (Maybe(..), fromMaybe)
+
+import qualified Data.Util.Maybe hiding ()
+import qualified Data.Util.Either hiding (Either(..), decodeEither)
+import qualified Data.Util.Function hiding (fix)
+import qualified Data.Util.List as DL hiding (head)
