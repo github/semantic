@@ -18,11 +18,11 @@ data Config
   , configHostName    :: String    -- ^ HostName
   , configProcessID   :: ProcessID -- ^ ProcessID
   , configHaystackURL :: Maybe String
-  , configStatsAddr   :: Addr
+  , configStatsAddr   :: StatsAddr
   , configLogOptions  :: Options
   }
 
-data Addr = Addr { addrHost :: String, addrPort :: String }
+data StatsAddr = StatsAddr { addrHost :: String, addrPort :: String }
 
 defaultConfig :: IO Config
 defaultConfig = do
@@ -52,7 +52,7 @@ defaultStatsClient = defaultConfig >>= statsClientFromConfig
 statsClientFromConfig :: Config -> IO StatsClient
 statsClientFromConfig Config{..} = statsClient (addrHost configStatsAddr) (addrPort configStatsAddr) configAppName
 
-lookupStatsAddr :: IO Addr
+lookupStatsAddr :: IO StatsAddr
 lookupStatsAddr = do
   addr <- lookupEnv "STATS_ADDR"
   let (host', port) = parseAddr (fmap ("statsd://" <>) addr)
@@ -61,7 +61,7 @@ lookupStatsAddr = do
   kubesHost <- lookupEnv "DOGSTATSD_HOST"
   let host = fromMaybe host' kubesHost
 
-  pure (Addr host port)
+  pure (StatsAddr host port)
   where
     defaultHost = "127.0.0.1"
     defaultPort = "28125"
