@@ -26,3 +26,7 @@ data (Eq (f a), Functor f) => N f a = N f a
 
 data Foo bar = HasCallStack => Foo bar
 data Baz foo = Show foo => Baz foo
+
+data Foo = Foo !Double#
+
+data SomeNumber = forall a . Show a => SomeNumber (Number a)
