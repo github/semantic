@@ -20,6 +20,8 @@ module Semantic.IO
 , readBlobs
 , readBlobsFromDir
 , readBlobsFromHandle
+, decodeBlobPairs
+, decodeBlobs
 , readFile
 , readFilePair
 , readProject
@@ -80,18 +82,26 @@ isDirectory path = liftIO (doesDirectoryExist path)
 languageForFilePath :: FilePath -> Language
 languageForFilePath = languageForType . takeExtension
 
+decodeBlobPairs :: BL.ByteString -> Either String [Blob.BlobPair]
+decodeBlobPairs = fmap toBlobPairs . eitherDecode
+
 -- | Read JSON encoded blob pairs from a handle.
 readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.BlobPair]
 readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
-  where
-    toBlobPairs :: BlobDiff -> [Blob.BlobPair]
-    toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
-    toBlobPair blobs = toBlob <$> blobs
+
+toBlobPairs :: BlobDiff -> [Blob.BlobPair]
+toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
+  where toBlobPair blobs = toBlob <$> blobs
+
+decodeBlobs :: BL.ByteString -> Either String [Blob.Blob]
+decodeBlobs = fmap toBlobs . eitherDecode
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
-  where toBlobs BlobParse{..} = fmap toBlob blobs
+
+toBlobs :: BlobParse -> [Blob.Blob]
+toBlobs BlobParse{..} = fmap toBlob blobs
 
 readBlobFromPath :: MonadIO m => File -> m Blob.Blob
 readBlobFromPath file = do
