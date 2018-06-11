@@ -1,23 +1,23 @@
 (Module
-  (Identifier)
+  (ModuleIdentifier)
   (Export
     (Statements
-      (Identifier)
+      (TypeConstructorIdentifier)
       (AllConstructors)))
   (Export
     (TypeConstructorExport
       (ConstructorOperator
-        (Identifier))))
+        (ConstructorSymbol))))
   (Export
     (TypeConstructorExport
       (VariableOperator
-        (Identifier))))
+        (VariableSymbol))))
   (Export
-    (Identifier))
+    (VariableIdentifier))
   (Export
     (ModuleExport
-      (Identifier)))
+      (ModuleIdentifier)))
   (Export
     (TypeConstructorExport
-      (Identifier)))
+      (ConstructorIdentifier)))
   (Statements))
