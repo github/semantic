@@ -107,10 +107,10 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
   liftEncodeMessage encodeMessage num fs = Encode.embedded (FieldNumber . fromIntegral . succ $ elemIndex fs) message
     where message = apply @Message1 (liftEncodeMessage encodeMessage num) fs
-  liftDecodeMessage decodeMessage _ = Decode.oneof undefined listOfParsers
+  liftDecodeMessage decodeMessage num' = Decode.oneof undefined listOfParsers
     where
       listOfParsers =
-        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, fromJust <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
+        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = fromInteger (succ i) in [(num, fromJust <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num'))])
   liftDotProto _ =
     [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (_ :: proxy f) i ->
       let
