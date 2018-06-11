@@ -47,9 +47,6 @@ haystackClient maybeURL managerSettings hostName appName
   | otherwise = pure NullHaystackClient
 
 -- Report an error to Haystack over HTTP (blocking).
---
--- Returns Left error if reporting failed (or if using the NullHaystackClient)
--- or Right status code received from sending the report.
 reportError :: MonadIO io => LogQueue -> HaystackClient -> ErrorReport -> io ()
 reportError logger NullHaystackClient e                 = logError logger e
 reportError logger HaystackClient{..} e@ErrorReport{..} = do

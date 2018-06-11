@@ -14,12 +14,12 @@ import System.Posix.Types
 
 data Config
   = Config
-  { configAppName     :: String
-  , configHostName    :: String    -- ^ HostName
-  , configProcessID   :: ProcessID -- ^ ProcessID
-  , configHaystackURL :: Maybe String
-  , configStatsAddr   :: StatsAddr
-  , configLogOptions  :: Options
+  { configAppName     :: String       -- ^ Application name (semantic)
+  , configHostName    :: String       -- ^ HostName from getHostName
+  , configProcessID   :: ProcessID    -- ^ ProcessID from getProcessID
+  , configHaystackURL :: Maybe String -- ^ URL of Haystack, with creds from environment
+  , configStatsAddr   :: StatsAddr    -- ^ Address of statsd/datadog
+  , configLogOptions  :: Options      -- ^ Options pertaining to logging
   }
 
 data StatsAddr = StatsAddr { addrHost :: String, addrPort :: String }

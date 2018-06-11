@@ -14,9 +14,6 @@ import           System.Posix.Process
 import           System.Posix.Types
 import           Text.Printf
 
-
-type LogQueue = AsyncQueue Message Options
-
 -- | A log message at a specific level.
 data Message = Message Level String [(String, String)] LocalTime.ZonedTime
   deriving (Show)
@@ -28,6 +25,7 @@ data Level
   | Debug
   deriving (Eq, Ord, Show)
 
+type LogQueue = AsyncQueue Message Options
 
 -- | Queue a message to be logged.
 queueLogMessage :: MonadIO io => LogQueue -> Level -> String -> [(String, String)] -> io ()
