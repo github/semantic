@@ -38,14 +38,13 @@ type Syntax = '[
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.Class
-  , Syntax.ConstructorIdentifier
-  , Syntax.ConstructorOperator
   , Syntax.ConstructorSymbol
   , Syntax.Context
   , Syntax.Context'
   , Syntax.DefaultDeclaration
   , Syntax.Deriving
   , Syntax.Empty
+  , Syntax.EntityIdentifier
   , Syntax.Error
   , Syntax.EqualityConstraint
   , Syntax.Export
@@ -67,11 +66,9 @@ type Syntax = '[
   , Syntax.ListConstructor
   , Syntax.Module
   , Syntax.ModuleExport
-  , Syntax.ModuleIdentifier
   , Syntax.NewType
+  , Syntax.Operator
   , Syntax.Pragma
-  , Syntax.PrimitiveConstructorIdentifier
-  , Syntax.PrimitiveVariableIdentifier
   , Syntax.QualifiedImportDeclaration
   , Syntax.QualifiedModuleIdentifier
   , Syntax.QualifiedTypeConstructorIdentifier
@@ -84,17 +81,11 @@ type Syntax = '[
   , Syntax.StrictTypeVariable
   , Syntax.TupleConstructor
   , Syntax.Type
-  , Syntax.TypeClassIdentifier
   , Syntax.TypeConstructorExport
-  , Syntax.TypeConstructorIdentifier
-  , Syntax.TypeOperator
   , Syntax.TypePattern
   , Syntax.TypeSignature
   , Syntax.TypeSynonym
-  , Syntax.TypeVariableIdentifier
   , Syntax.UnitConstructor
-  , Syntax.VariableIdentifier
-  , Syntax.VariableOperator
   , Syntax.VariableSymbol
   , Type.TypeParameters
   , []
