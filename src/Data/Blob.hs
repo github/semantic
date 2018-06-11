@@ -21,7 +21,6 @@ import Data.JSON.Fields
 import Data.Language
 import Data.Source as Source
 
-
 -- | The source, path, and language of a blob.
 data Blob = Blob
   { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
@@ -30,16 +29,36 @@ data Blob = Blob
   }
   deriving (Show, Eq, Generic, Message, Named)
 
+instance FromJSON Blob where
+  parseJSON = withObject "Blob" $ \b -> inferringLanguage
+    <$> b .: "content"
+    <*> b .: "path"
+    <*> b .: "language"
+
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = nullSource blobSource
 
 sourceBlob :: FilePath -> Language -> Source -> Blob
 sourceBlob filepath language source = Blob source filepath language
 
+inferringLanguage :: Source -> FilePath -> Language -> Blob
+inferringLanguage src pth lang
+  | knownLanguage lang = Blob src pth lang
+  | otherwise = Blob src pth (languageForFilePath pth)
+
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
 type BlobPair = Join These Blob
 
+instance FromJSON BlobPair where
+  parseJSON = withObject "BlobPair" $ \o -> do
+    before <- o .:? "before"
+    after <- o .:? "after"
+    case (before, after) of
+      (Just b, Just a)  -> pure $ Join (These b a)
+      (Just b, Nothing) -> pure $ Join (This b)
+      (Nothing, Just a) -> pure $ Join (That a)
+      _                 -> Prelude.fail "Expected object with 'before' and/or 'after' keys only"
 
 blobPairDiffing :: Blob -> Blob -> BlobPair
 blobPairDiffing a b = Join (These a b)
