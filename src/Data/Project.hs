@@ -40,12 +40,11 @@ type PB = Project NestedVec UnpackedVec Text
 fromPB :: PB -> Concrete
 fromPB Project {..} = Project
   { projectRootDir     = T.unpack projectRootDir
-  , projectBlobs       = go projectBlobs
+  , projectBlobs       = toList projectBlobs
   , projectLanguage    = projectLanguage
-  , projectEntryPaths  = T.unpack <$> go projectEntryPaths
-  , projectExcludeDirs = T.unpack <$> go projectExcludeDirs
-  } where go :: Foldable f => f a -> [a]
-          go = foldr (:) []
+  , projectEntryPaths  = T.unpack <$> toList projectEntryPaths
+  , projectExcludeDirs = T.unpack <$> toList projectExcludeDirs
+  }
 
 projectName :: Concrete -> Text
 projectName = T.pack . dropExtensions . takeFileName . projectRootDir
