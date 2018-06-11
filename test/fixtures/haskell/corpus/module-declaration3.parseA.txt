@@ -1,0 +1,7 @@
+(Module
+  (Empty)
+  (Statements
+    (QualifiedModuleIdentifier
+      (Identifier)
+      (Identifier))
+    (Statements)))

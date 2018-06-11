@@ -58,4 +58,25 @@
                 (Identifier)
                 (TypeParameters
                   (Identifier))
-                (Empty)))))))))
+                (Empty)))))))
+    (TypeSignature
+      (Identifier)
+      (Context'
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier))))
+      (Context'
+        (Class
+          (Identifier)
+          (TypeParameters
+            (Identifier))))
+      (FunctionType
+        (Type
+          (Identifier)
+          (TypeParameters)
+          (Empty))
+        (Type
+          (Identifier)
+          (TypeParameters)
+          (Empty))))))
