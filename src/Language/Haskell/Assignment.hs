@@ -47,6 +47,7 @@ type Syntax = '[
   , Syntax.Context'
   , Syntax.DefaultDeclaration
   , Syntax.Deriving
+  , Syntax.Do
   , Syntax.Empty
   , Syntax.EntityIdentifier
   , Syntax.Error
@@ -176,6 +177,9 @@ defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
 
+do' :: Assignment
+do' = makeTerm <$> symbol Do <*> children (Syntax.Do <$> manyTerm expression)
+
 equalityConstraint :: Assignment
 equalityConstraint = makeTerm <$> symbol EqualityConstraint <*> children (Syntax.EqualityConstraint <$> equalityLhs <*> equalityRhs)
   where
@@ -212,6 +216,7 @@ expressionChoices = [
                     , constructorSymbol
                     , defaultDeclaration
                     , derivingClause
+                    , do'
                     , equalityConstraint
                     , expression'
                     , float
