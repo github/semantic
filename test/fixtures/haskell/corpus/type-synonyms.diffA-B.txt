@@ -52,17 +52,17 @@
         (TypeConstructorIdentifier))
       (TypePattern
         (TupleConstructor)))
+    (TypeSynonym
+      (Statements
+        (TypeConstructorIdentifier))
+      (TypePattern
+      { (FunctionConstructor)
+      ->(TupleConstructor) }))
   {+(TypeSynonym
     {+(Statements
       {+(TypeConstructorIdentifier)+})+}
     {+(TypePattern
-      {+(TupleConstructor)+})+})+}
-    (TypeSynonym
-      (Statements
-      { (TypeConstructorIdentifier)
-      ->(TypeConstructorIdentifier) })
-      (TypePattern
-        (FunctionConstructor)))
+      {+(FunctionConstructor)+})+})+}
     (TypeSynonym
       (Statements
         (TypeConstructorIdentifier))

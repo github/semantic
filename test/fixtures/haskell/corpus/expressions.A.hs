@@ -40,3 +40,11 @@ parseJSON (JSON.Object r) = IncPK <$>
 f = do
   a <- b =<< c
   b <- e >>= g
+
+f = \ x -> x
+
+f = \ (Just a) -> a
+
+f = \ x -> x : a : xs
+
+f = \ g a b -> g <$> a <*> b

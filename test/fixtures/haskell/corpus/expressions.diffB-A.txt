@@ -239,20 +239,15 @@
         ->(VariableIdentifier) }
           (ConstructorOperator
             (ConstructorSymbol)))))
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
-      {+(LeftOperatorSection
-        {+(VariableIdentifier)+}
-        {+(ConstructorOperator
-          {+(ConstructorSymbol)+})+})+})+})+}
-  {-(Function
-    {-(VariableIdentifier)-}
-    {-(Statements
-      {-(LeftOperatorSection
-        {-(VariableIdentifier)-}
-        {-(ConstructorOperator
-          {-(ConstructorSymbol)-})-})-})-})-}
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (LeftOperatorSection
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (ConstructorOperator
+            (ConstructorSymbol)))))
   {-(Function
     {-(VariableIdentifier)-}
     {-(Statements
@@ -332,12 +327,16 @@
             {-(VariableOperator
               {-(VariableSymbol)-})-}
             {-(VariableIdentifier)-})-})-})-}))
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
       {+(QualifiedConstructorIdentifier
         {+(ModuleIdentifier)+}
-        {+(ConstructorIdentifier)+})+})+})+}
+        {+(ConstructorIdentifier)+})+}
+      {-(Lambda
+        {-(VariableIdentifier)-}
+        {-(VariableIdentifier)-})-}))
   {+(Function
     {+(VariableIdentifier)+}
     {+(ConstructorPattern
@@ -397,4 +396,53 @@
             {+(VariableIdentifier)+}
             {+(VariableOperator
               {+(VariableSymbol)+})+}
-            {+(VariableIdentifier)+})+})+})+})+})+}))
+            {+(VariableIdentifier)+})+})+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Lambda
+        {+(VariableIdentifier)+}
+        {+(VariableIdentifier)+})+})+})+}
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (ConstructorPattern
+            (Statements
+              (ConstructorIdentifier)
+              (VariableIdentifier)))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (VariableIdentifier)
+          (InfixOperatorApp
+            (VariableIdentifier)
+            (ConstructorOperator
+              (ConstructorSymbol))
+            (InfixOperatorApp
+              (VariableIdentifier)
+              (ConstructorOperator
+                (ConstructorSymbol))
+              (VariableIdentifier))))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (Statements
+            (VariableIdentifier)
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (InfixOperatorApp
+            (VariableIdentifier)
+            (VariableOperator
+              (VariableSymbol))
+            (InfixOperatorApp
+              (VariableIdentifier)
+              (VariableOperator
+                (VariableSymbol))
+              (VariableIdentifier))))))))

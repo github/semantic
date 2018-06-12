@@ -542,3 +542,12 @@ instance Ord1 Do where liftCompare = genericLiftCompare
 instance Show1 Do where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Do
+
+data Lambda a = Lambda { lambdaHead :: a, lambdaBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Lambda where liftEq = genericLiftEq
+instance Ord1 Lambda where liftCompare = genericLiftCompare
+instance Show1 Lambda where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Lambda
