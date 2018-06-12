@@ -69,6 +69,15 @@ data Env address (m :: * -> *) return where
   GetEnv ::                    Env address m (Environment address)
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
+instance Effect (Env address) where
+  handleState c dist (Request (Lookup name) k) = Request (Lookup name) (dist . (<$ c) . k)
+  handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (dist . (<$ c) . k)
+  handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
+  handleState c dist (Request Push k) = Request Push (dist . (<$ c) . k)
+  handleState c dist (Request Pop k) = Request Pop (dist . (<$ c) . k)
+  handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
+  handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
+
 runEnv :: forall address value effects a
        .  Effects effects
        => Environment address
