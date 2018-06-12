@@ -160,7 +160,7 @@ runTaskWithOptions' options logger statter task = do
   queue statter stat
   pure result
 
-runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
+runTraceInTelemetry :: (Member Telemetry effects, Effects effects) => Eff (Trace ': effects) a -> Eff effects a
 runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 
@@ -182,7 +182,7 @@ instance Effect Task where
   handleState c dist (Request (Serialize format input) k) = Request (Serialize format input) (dist . (<$ c) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs, Effects effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
