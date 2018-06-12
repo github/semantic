@@ -40,12 +40,7 @@ data ProjectF (blobs :: * -> *) (paths :: * -> *) path = Project
   , projectLanguage    :: Language
   , projectEntryPaths  :: paths path
   , projectExcludeDirs :: paths path
-  } deriving (Functor, Generic, Named)
-
-deriving instance ( MessageField path
-                  , MessageField (paths path)
-                  , MessageField (blobs Blob)
-                  ) => Message (ProjectF blobs paths path)
+  } deriving (Functor, Generic)
 
 deriving instance (Eq path, Eq (blobs Blob), Eq (paths path)) => Eq (ProjectF blobs paths path)
 deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (ProjectF blobs paths path)
@@ -58,6 +53,9 @@ type Project = ProjectF [] [] FilePath
 -- | This 'Project' type is protobuf-compatible, and corresponds with
 -- the @Project@ message declaration present in types.proto.
 type PB = ProjectF NestedVec UnpackedVec Text
+
+deriving instance Message PB
+instance Named PB where nameOf _ = "Project"
 
 -- | Convert from a packed protobuf representatio nto a more useful one.
 fromPB :: PB -> Project
