@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -164,13 +164,13 @@ runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 
 -- | An effect describing high-level tasks to be performed.
-data Task output where
-  Parse     :: Parser term -> Blob -> Task term
-  Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task result
-  Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
-  Render    :: Renderer input output -> input -> Task output
-  Serialize :: Format input -> input -> Task Builder
+data Task (m :: * -> *) output where
+  Parse     :: Parser term -> Blob -> Task m term
+  Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task m result
+  Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task m (Term f (Record (field ': fields)))
+  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task m (Diff syntax (Record fields1) (Record fields2))
+  Render    :: Renderer input output -> input -> Task m output
+  Serialize :: Format input -> input -> Task m Builder
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
