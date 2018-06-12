@@ -91,7 +91,8 @@ type TaskEff = Eff '[ Distribute WrappedTask
                     , Trace
                     , Telemetry
                     , Exc SomeException
-                    , IO]
+                    , Lift IO
+                    ]
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
