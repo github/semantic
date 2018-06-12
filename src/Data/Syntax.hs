@@ -110,7 +110,11 @@ instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => 
   liftDecodeMessage decodeMessage num' = Decode.oneof undefined listOfParsers
     where
       listOfParsers =
-        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = fromInteger (succ i) in [(num, fromJust <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num'))])
+        generate @Message1 @fs @fs (\ (_ :: proxy f) i ->
+          let
+            num = fromInteger (succ i)
+          in
+            [(num, fromJust <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
   liftDotProto _ =
     [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (_ :: proxy f) i ->
       let

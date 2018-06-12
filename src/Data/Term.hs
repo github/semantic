@@ -17,6 +17,8 @@ import Data.JSON.Fields
 import Data.Record
 import Text.Show
 import Proto3.Suite.Class
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
