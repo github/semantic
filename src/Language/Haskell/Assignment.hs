@@ -75,9 +75,8 @@ type Syntax = '[
   , Syntax.Operator
   , Syntax.OperatorSection
   , Syntax.Pragma
+  , Syntax.QualifiedEntityIdentifier
   , Syntax.QualifiedImportDeclaration
-  , Syntax.QualifiedModuleIdentifier
-  , Syntax.QualifiedTypeConstructorIdentifier
   , Syntax.QuotedName
   , Syntax.RecordDataConstructor
   , Syntax.ScopedTypeVariables
@@ -239,9 +238,12 @@ expressionChoices = [
                     , pragma
                     , primitiveConstructorIdentifier
                     , primitiveVariableIdentifier
+                    , qualifiedConstructorIdentifier
                     , qualifiedImportDeclaration
+                    , qualifiedInfixVariableIdentifier
                     , qualifiedModuleIdentifier
                     , qualifiedTypeConstructorIdentifier
+                    , qualifiedVariableIdentifier
                     , quotedName
                     , scopedTypeVariables
                     , standaloneDerivingInstance
@@ -441,6 +443,9 @@ primitiveConstructorIdentifier = makeTerm <$> symbol PrimitiveConstructorIdentif
 primitiveVariableIdentifier :: Assignment
 primitiveVariableIdentifier = makeTerm <$> symbol PrimitiveVariableIdentifier <*> (Syntax.PrimitiveVariableIdentifier . Name.name <$> source)
 
+qualifiedConstructorIdentifier :: Assignment
+qualifiedConstructorIdentifier = makeTerm <$> symbol QualifiedConstructorIdentifier <*> children (Syntax.QualifiedConstructorIdentifier <$> someTerm' expression)
+
 qualifiedImportDeclaration :: Assignment
 qualifiedImportDeclaration = makeTerm
                           <$> symbol QualifiedImportDeclaration
@@ -449,11 +454,17 @@ qualifiedImportDeclaration = makeTerm
                                       <*> expression
                                       <*> (importSpec <|> hiddenImportSpec <|> pure []))
 
+qualifiedInfixVariableIdentifier :: Assignment
+qualifiedInfixVariableIdentifier = makeTerm <$> symbol QualifiedInfixVariableIdentifier <*> children (Syntax.QualifiedInfixVariableIdentifier <$> someTerm' expression)
+
 qualifiedModuleIdentifier :: Assignment
 qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> someTerm' expression)
 
 qualifiedTypeConstructorIdentifier :: Assignment
 qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> someTerm' expression)
+
+qualifiedVariableIdentifier :: Assignment
+qualifiedVariableIdentifier = makeTerm <$> symbol QualifiedVariableIdentifier <*> children (Syntax.QualifiedVariableIdentifier <$> someTerm' expression)
 
 quotedName :: Assignment
 quotedName = makeTerm <$> symbol QuotedName <*> children (Syntax.QuotedName <$> expression)
