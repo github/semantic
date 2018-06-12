@@ -24,9 +24,9 @@ evaluating :: Effects effects
                 ': State (Heap address (Cell address) value)
                 ': State (ModuleTable (Maybe (Environment address, address)))
                 ': effects) result
-           -> Evaluator address value effects (result, EvaluatingState address value)
+           -> Evaluator address value effects (EvaluatingState address value, result)
 evaluating
-  = fmap (\ (modules, (heap, result)) -> (result, EvaluatingState heap modules))
+  = fmap (\ (modules, (heap, result)) -> (EvaluatingState heap modules, result))
   . runState lowerBound -- State (ModuleTable (Maybe (Environment address, address)))
   . runState lowerBound -- State (Heap address (Cell address) value)
   . runFresh 0
