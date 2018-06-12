@@ -43,7 +43,7 @@ withParsedBlobPairs :: (Member (Distribute WrappedTask) effs, Monoid output)
                     -> [BlobPair]
                     -> Eff effs output
 withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> WrapTask (withParsedBlobPair decorate blobs >>= withSomeTermPair (diffTerms blobs >=> render blobs)))
-  where diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member IO effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax (Record fields)) -> Eff effs (Diff syntax (Record fields) (Record fields))
+  where diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax (Record fields)) -> Eff effs (Diff syntax (Record fields) (Record fields))
         diffTerms blobs terms = time "diff" languageTag $ do
           diff <- diff (runJoin terms)
           diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)

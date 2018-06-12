@@ -221,7 +221,7 @@ data Files out where
   Write       :: Destination -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: (Member (Exc SomeException) effs, Member IO effs) => Eff (Files ': effs) a -> Eff effs a
+runFiles :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Effects effs) => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   Read (FromPath path)         -> rethrowing (readBlobFromPath path)
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)
@@ -237,16 +237,16 @@ runFiles = interpret $ \ files -> case files of
 --
 --   Note that while the type allows 'IO' to occur anywhere within the effect list, it must actually occur at the end to be able to run the computation.
 catchException :: ( Exc.Exception e
-                  , Member IO r
+                  , Member (Lift IO) r
                   )
                => Eff r a
                -> (e -> Eff r a)
                -> Eff r a
-catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
+catchException m handler = interpose pure (\ (Lift m) yield -> liftIO (Exc.try m) >>= either handler yield) m
 
 -- | Lift an 'IO' action into 'Eff', catching and rethrowing any exceptions it throws into an 'Exc' effect.
 rethrowing :: ( Member (Exc SomeException) r
-              , Member IO r
+              , Member (Lift IO) r
               )
            => IO a
            -> Eff r a

@@ -60,7 +60,7 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 -- * @after@ is called on IO exceptions in @handler@, and then rethrown in IO.
 -- * If @handler@ completes successfully, @after@ is called
 -- Call 'catchException' at the call site if you want to recover.
-bracket' :: (Member IO r) => IO a -> (a -> IO b) -> (a -> Eff r c) -> Eff r c
+bracket' :: (Member (Lift IO) r) => IO a -> (a -> IO b) -> (a -> Eff r c) -> Eff r c
 bracket' before after action = do
   a <- liftIO before
   let cleanup = liftIO (after a)
@@ -69,7 +69,7 @@ bracket' before after action = do
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Member IO effects, Member Trace effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
+parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Trace effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
 parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   let parserTimeout = s * 1000
 

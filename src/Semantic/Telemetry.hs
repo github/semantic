@@ -23,7 +23,7 @@ writeStat :: Member Telemetry effs => Stat -> Eff effs ()
 writeStat stat = send (WriteStat stat)
 
 -- | A task which measures and stats the timing of another task.
-time :: (Member IO effs, Member Telemetry effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
+time :: (Member (Lift IO) effs, Member Telemetry effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
 time statName tags task = do
   (a, stat) <- withTiming statName tags task
   a <$ writeStat stat
@@ -35,7 +35,7 @@ data Telemetry output where
   WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: Member IO effects => LogQueue -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
+runTelemetry :: (Member (Lift IO) effects, Effects effects) => LogQueue -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
 runTelemetry logger statter = interpret (\ t -> case t of
   WriteStat stat -> liftIO (queue statter stat)
   WriteLog level message pairs -> queueLogMessage logger level message pairs)
