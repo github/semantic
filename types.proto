@@ -30,7 +30,7 @@ message SrcLoc { string srcLocPackage = 1;
                  int64 srcLocEndLine = 6;
                  int64 srcLocEndCol = 7;
                }
-message ErrorSite { bytes errorMessage = 1;
+message ErrorSite { string errorMessage = 1;
                     SrcLoc errorLocation = 2;
                   }
 message Error { repeated ErrorSite errorCallStack = 1;
@@ -44,20 +44,20 @@ message Boolean { bool booleanContent = 1;
                 }
 message Hash { repeated Term hashElements = 1;
              }
-message Float { bytes floatContent = 1;
+message Float { string floatContent = 1;
               }
 message KeyValue { Term key = 1;
                    Term value = 2;
                  }
 message Null {
              }
-message TextElement { bytes textElementContent = 1;
+message TextElement { string textElementContent = 1;
                     }
-message Term { oneof syntax {Array array = 1;
-                             Boolean boolean = 2;
-                             Hash hash = 3;
-                             Float float = 4;
-                             KeyValue keyValue = 5;
-                             Null null = 6;
+message Term { oneof syntax {Null null = 1;
+                             Array array = 2;
+                             Boolean boolean = 3;
+                             Hash hash = 4;
+                             Float float = 5;
+                             KeyValue keyValue = 6;
                              TextElement textElement = 7;}
              }

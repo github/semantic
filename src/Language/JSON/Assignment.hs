@@ -18,12 +18,12 @@ import Language.JSON.Grammar as Grammar
 import Prologue
 
 type Syntax =
-  [ Literal.Array
+  [ Literal.Null
+  , Literal.Array
   , Literal.Boolean
   , Literal.Hash
   , Literal.Float
   , Literal.KeyValue
-  , Literal.Null
   , Literal.TextElement
   , Syntax.Error
   ]
