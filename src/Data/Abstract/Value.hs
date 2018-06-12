@@ -261,8 +261,8 @@ instance Show address => Show1 (ValueError address body) where
 throwValueError :: Member (Resumable (ValueError address body)) effects => ValueError address body resume -> Evaluator address (Value address body) effects resume
 throwValueError = throwResumable
 
-runValueError :: Effectful (m address (Value address body)) => m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects (Either (SomeExc (ValueError address body)) a)
+runValueError :: (Effectful (m address (Value address body)), Effects effects) => m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects (Either (SomeExc (ValueError address body)) a)
 runValueError = runResumable
 
-runValueErrorWith :: Effectful (m address (Value address body)) => (forall resume . ValueError address body resume -> m address (Value address body) effects resume) -> m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects a
+runValueErrorWith :: (Effectful (m address (Value address body)), Effects effects) => (forall resume . ValueError address body resume -> m address (Value address body) effects resume) -> m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects a
 runValueErrorWith = runResumableWith

@@ -69,10 +69,10 @@ instance Ord1  TypeError where liftCompare _ (UnificationError a1 b1) (Unificati
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
 
-runTypeError :: Effectful m => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
+runTypeError :: (Effectful m, Effects effects) => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
 runTypeError = runResumable
 
-runTypeErrorWith :: Effectful m => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
+runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
 runTypeErrorWith = runResumableWith
 
 
