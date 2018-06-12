@@ -12,7 +12,6 @@ module Semantic.Effect.Files
   , readBlobs
   , readProject
   , runFiles
-  , runFilesGuided
   , write
   ) where
 
@@ -82,16 +81,6 @@ runFiles = interpret $ \ files -> case files of
   FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
-
-runFilesGuided :: (Member (State Project.Concrete) effs, Member (Exc SomeException) effs) => Eff (Files ': effs) a -> Eff effs a
-runFilesGuided = interpret $ \files -> case files of
-  Read (FromHandle _)            -> throwError (SomeException HandleNotSupported)
-  Read (FromPairHandle _)        -> throwError (SomeException HandleNotSupported)
-  Write _ _                      -> throwError (SomeException WritesNotSupported)
-  Read (FromPath path)           -> get >>= \p -> Project.readBlobFromPath p path
-  Read (FromPathPair paths)      -> get >>= \p -> runBothWith (Project.readBlobPair p) paths
-  FindFiles dir exts excludeDirs -> get >>= \p -> pure (Project.findFiles (p { Project.projectExcludeDirs = excludeDirs }) dir exts)
-  ReadProject{}                  -> get
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
 --

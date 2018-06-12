@@ -3,7 +3,6 @@ module Semantic.Task
 ( Task
 , TaskEff
 , WrappedTask(..)
-, WrappedTask'(..)
 , Level(..)
 , RAlgebra
 , module Semantic.Effect.Files
@@ -33,7 +32,6 @@ module Semantic.Task
 -- * Interpreting
 , runTask
 , runTaskWithOptions
-, runTaskWithProject
 , runTaskWithOptions'
 -- * Re-exports
 , Distribute
@@ -91,23 +89,8 @@ type TaskEff = Eff '[Distribute WrappedTask
                     , Exc SomeException
                     , IO]
 
-type TaskEff' = Eff '[Distribute WrappedTask'
-                     , Task
-                     , Resolution
-                     , Files
-                     , State Concrete
-                     , Reader Options
-                     , Trace
-                     , Telemetry
-                     , Exc SomeException
-                     , IO]
-
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
-  deriving (Applicative, Functor, Monad)
-
--- | A wrapper for a 'Task', to embed in other effects.
-newtype WrappedTask' a = WrapTask' { unwrapTask' :: TaskEff' a }
   deriving (Applicative, Functor, Monad)
 
 -- | A function to render terms or diffs.
@@ -171,33 +154,6 @@ runTaskWithOptions' options logger statter task = do
     run task
   queue statter stat
   pure result
-
--- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
-runTaskWithProject :: Concrete -> Options -> TaskEff' a -> IO a
-runTaskWithProject proj options task = do
-  options <- configureOptionsForHandle stderr options
-  statter <- defaultStatsClient >>= newQueue sendStat
-  logger <- newQueue logMessage options
-
-  (result, stat) <- withTiming "run" [] $ do
-    let run :: TaskEff' a -> IO (Either SomeException a)
-        run = fmap (fmap fst) . runM . runError
-                   . runTelemetry logger statter
-                   . runTraceInTelemetry
-                   . runReader options
-                   . runState proj
-                   . runFilesGuided
-                   . runResolution
-                   . runTaskF
-                   . runDistribute (run . unwrapTask')
-    run task
-  queue statter stat
-
-  closeQueue statter
-  closeStatClient (asyncQueueExtra statter)
-  closeQueue logger
-  either (die . displayException) pure result
-
 
 runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
 runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])

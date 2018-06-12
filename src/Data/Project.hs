@@ -1,6 +1,24 @@
 {-# LANGUAGE DeriveAnyClass, KindSignatures, MultiWayIf #-}
 
-module Data.Project where
+module Data.Project (
+  -- * Projects
+    Project (..)
+  , Concrete
+  , PB
+  , ProjectException (..)
+  , fromPB
+  , projectExtensions
+  , projectName
+  , projectEntryPoints
+  , projectFiles
+  , readFile
+  , readBlobFromPath
+  , readBlobPair
+  , addPrelude
+  -- * Files
+  , File (..)
+  , file
+  , )where
 
 import Prelude hiding (readFile)
 import Prologue hiding (throwError)
@@ -45,7 +63,7 @@ deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (Pro
 type Concrete = Project [] [] FilePath
 
 -- | This 'Project' type is protobuf-compatible, and corresponds with
--- the @Project@ message declaration present in types.proto. 
+-- the @Project@ message declaration present in types.proto.
 type PB = Project NestedVec UnpackedVec Text
 
 -- | Convert from a packed protobuf representatio nto a more useful one.
@@ -140,17 +158,3 @@ maybeThese a b = case (a, b) of
   (Nothing, Just b) -> pure (That b)
   (Just a, Just b)  -> pure (These a b)
   _                 -> throwError (SomeException EmptyPairProvided)
-
--- TODO: write some tests so we can be sure this actually works
--- and does what findFileInDir does
-findFiles :: Concrete
-          -> FilePath
-          -> [String]
-          -> [FilePath]
-findFiles Project{..} dir exts = do
-  p <- blobPath <$> projectBlobs
-  guard (p == dir)
-  guard (takeExtension p `elem` exts)
-  -- TODO: not clear to me the best way to ensure these are in the
-  -- exclude directories
-  pure p
