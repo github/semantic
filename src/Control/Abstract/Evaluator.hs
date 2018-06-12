@@ -40,8 +40,8 @@ deriving instance Member NonDet effects => Alternative (Evaluator address value 
 data Return address value resume where
   Return :: address -> Return address value address
 
-deriving instance (Eq address, Eq value) => Eq (Return address value a)
-deriving instance (Show address, Eq value) => Show (Return address value a)
+deriving instance Eq address   => Eq   (Return address value a)
+deriving instance Show address => Show (Return address value a)
 
 earlyReturn :: forall address value effects
             .  Member (Return address value) effects
