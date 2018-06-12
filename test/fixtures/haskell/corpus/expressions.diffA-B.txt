@@ -230,6 +230,15 @@
           (ConstructorOperator
             (ConstructorSymbol))
           (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (LeftOperatorSection
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (ConstructorOperator
+            (ConstructorSymbol)))))
   {+(Function
     {+(VariableIdentifier)+}
     {+(Statements
@@ -240,10 +249,17 @@
   {+(Function
     {+(VariableIdentifier)+}
     {+(Statements
-      {+(LeftOperatorSection
+      {+(InfixOperatorApp
         {+(VariableIdentifier)+}
-        {+(ConstructorOperator
-          {+(ConstructorSymbol)+})+})+})+})+}
+        {+(VariableOperator
+          {+(InfixVariableIdentifier)+})+}
+        {+(VariableIdentifier)+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(QualifiedConstructorIdentifier
+        {+(ModuleIdentifier)+}
+        {+(ConstructorIdentifier)+})+})+})+}
   {-(Function
     {-(VariableIdentifier)-}
     {-(Statements
@@ -254,7 +270,86 @@
   {-(Function
     {-(VariableIdentifier)-}
     {-(Statements
-      {-(LeftOperatorSection
+      {-(InfixOperatorApp
         {-(VariableIdentifier)-}
-        {-(ConstructorOperator
-          {-(ConstructorSymbol)-})-})-})-})-}))
+        {-(VariableOperator
+          {-(InfixVariableIdentifier)-})-}
+        {-(VariableIdentifier)-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(QualifiedConstructorIdentifier
+        {-(ModuleIdentifier)-}
+        {-(ConstructorIdentifier)-})-})-})-}
+    (Function
+      (VariableIdentifier)
+      (ConstructorPattern
+        (Statements
+          (QualifiedConstructorIdentifier
+            (ModuleIdentifier)
+            (ConstructorIdentifier))
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }))
+      (Statements
+        (InfixOperatorApp
+          (ConstructorIdentifier)
+          (VariableOperator
+            (VariableSymbol))
+          (InfixOperatorApp
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (VariableOperator
+              (VariableSymbol))
+            (InfixOperatorApp
+              (TextElement)
+              (VariableOperator
+                (VariableSymbol))
+              (InfixOperatorApp
+              { (VariableIdentifier)
+              ->(VariableIdentifier) }
+                (VariableOperator
+                  (VariableSymbol))
+                (InfixOperatorApp
+                  (TextElement)
+                  (VariableOperator
+                    (VariableSymbol))
+                  (InfixOperatorApp
+                  { (VariableIdentifier)
+                  ->(VariableIdentifier) }
+                    (VariableOperator
+                      (VariableSymbol))
+                    (InfixOperatorApp
+                      (TextElement)
+                      (VariableOperator
+                        (VariableSymbol))
+                      (InfixOperatorApp
+                      { (VariableIdentifier)
+                      ->(VariableIdentifier) }
+                        (VariableOperator
+                          (VariableSymbol))
+                        (TextElement)))))))))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Do
+          (BindPattern
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (InfixOperatorApp
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }
+              (VariableOperator
+                (VariableSymbol))
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }))
+          (BindPattern
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (InfixOperatorApp
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }
+              (VariableOperator
+                (VariableSymbol))
+            { (VariableIdentifier)
+            ->(VariableIdentifier) })))))))

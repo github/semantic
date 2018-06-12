@@ -26,3 +26,17 @@ b = (:< a)
 
 b = (b :)
 b = (b :|)
+
+b = h `i` j
+
+b = Data.Just
+
+parseJSON (JSON.Object s) = IncPK <$>
+  s .: "id" <*>
+  s .: "nullable_string" <*>
+  s .: "non_nullable_string" <*>
+  s .: "inserted_at"
+
+g = do
+  b <- d =<< e
+  c <- f >>= h
