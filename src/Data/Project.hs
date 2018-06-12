@@ -15,7 +15,7 @@ module Data.Project (
   -- * Files
   , File (..)
   , file
-  , )where
+  ) where
 
 import Prelude hiding (readFile)
 import Prologue hiding (throwError)
