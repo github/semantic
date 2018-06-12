@@ -99,7 +99,7 @@ instance Evaluatable Import where
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval (Import (RelativeQualifiedName n Nothing) [(name, _)]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName name :| []))))
-    Rval <$> evalQualifiedImport name path
+    rvalBox =<< evalQualifiedImport name path
 
   -- from a import b
   -- from a import b as c
@@ -115,7 +115,7 @@ instance Evaluatable Import where
     let path = NonEmpty.last modulePaths
     importedEnv <- maybe emptyEnv snd <$> require path
     bindAll (select importedEnv)
-    pure (Rval unit)
+    rvalBox unit
     where
       select importedEnv
         | Prologue.null xs = importedEnv
@@ -145,7 +145,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
-    Rval <$> go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
+    rvalBox =<< go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = evalQualifiedImport name path
@@ -172,7 +172,7 @@ instance Evaluatable QualifiedAliasedImport where
 
     -- Evaluate and import the last module, aliasing and updating the environment
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    Rval <$> letrec' alias (\addr -> do
+    rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
       importedEnv <- maybe emptyEnv snd <$> require path
       bindAll importedEnv

@@ -27,7 +27,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
-  eval (Boolean x) = pure (Rval (boolean x))
+  eval (Boolean x) = rvalBox (boolean x)
 
 -- Numeric
 
@@ -42,7 +42,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: We should use something more robust than shelling out to readMaybe.
   eval (Data.Syntax.Literal.Integer x) =
-    Rval . integer <$> maybeM (throwEvalError (IntegerFormatError x)) (readMaybe (T.unpack x))
+    rvalBox =<< integer <$> maybeM (throwEvalError (IntegerFormatError x)) (readMaybe (T.unpack x))
 
 -- | A literal float of unspecified width.
 
@@ -55,7 +55,7 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
-    Rval . float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
+    rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational Text
@@ -70,7 +70,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     let
       trimmed = T.takeWhile (/= 'r') r
       parsed = readMaybe @Prelude.Integer (T.unpack trimmed)
-    in Rval . rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
+    in rvalBox =<< (rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
 
 -- Complex literals e.g. `3 + 2i`
 newtype Complex a = Complex Text
@@ -126,7 +126,7 @@ instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TextElement where
-  eval (TextElement x) = pure (Rval (string x))
+  eval (TextElement x) = rvalBox (string x)
 
 data Null a = Null
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -135,7 +135,7 @@ instance Eq1 Null where liftEq = genericLiftEq
 instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Null where eval _ = pure (Rval null)
+instance Evaluatable Null where eval _ = rvalBox null
 
 newtype Symbol a = Symbol { symbolContent :: Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -145,7 +145,7 @@ instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Symbol where
-  eval (Symbol s) = pure (Rval (symbol s))
+  eval (Symbol s) = rvalBox (symbol s)
 
 newtype Regex a = Regex { regexContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
@@ -169,7 +169,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Array where
-  eval (Array a) = Rval <$> (array =<< traverse subtermValue a)
+  eval (Array a) = rvalBox =<< (array =<< traverse subtermValue a)
 
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -179,7 +179,7 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Hash where
-  eval t = Rval . hash <$> traverse (subtermValue >=> asPair) (hashElements t)
+  eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -190,7 +190,7 @@ instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable KeyValue where
   eval (fmap subtermValue -> KeyValue{..}) =
-    Rval <$> (kvPair <$> key <*> value)
+    rvalBox =<< (kvPair <$> key <*> value)
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -200,7 +200,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Tuple where
-  eval (Tuple cs) = Rval . multiple <$> traverse subtermValue cs
+  eval (Tuple cs) = rvalBox =<< (multiple <$> traverse subtermValue cs)
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
