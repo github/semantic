@@ -214,6 +214,7 @@ expressionChoices = [
                     , generator
                     , importAlias
                     , importDeclaration
+                    , infixOperatorApp
                     , infixOperatorPattern
                     , infixVariableIdentifier
                     , integer
@@ -341,6 +342,9 @@ importDeclaration = makeTerm
 
 importSpec :: Assignment.Assignment [] Grammar [Term]
 importSpec = symbol ImportSpec *> children (manyTerm import')
+
+infixOperatorApp :: Assignment
+infixOperatorApp = makeTerm <$> symbol InfixOperatorApplication <*> children (Syntax.InfixOperatorApp <$> expression <*> expression <*> expression)
 
 infixOperatorPattern :: Assignment
 infixOperatorPattern = makeTerm <$> symbol InfixOperatorPattern <*> children (Syntax.InfixOperatorPattern <$> expression <*> operator <*> expression)
