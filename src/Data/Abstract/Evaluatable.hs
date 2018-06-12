@@ -46,7 +46,7 @@ class Show1 constr => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address value) effects
           , Member (Env address) effects
-          , Member (LoopControl value) effects
+          , Member (LoopControl address value) effects
           , Member (Modules address value) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
@@ -55,11 +55,11 @@ class Show1 constr => Evaluatable constr where
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
           , Member (Resumable (Unspecialized value)) effects
-          , Member (Return value) effects
+          , Member (Return address value) effects
           , Member Trace effects
           )
-       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
-  eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address value))
+  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 -- | Evaluate a given package.
@@ -79,19 +79,19 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member (Resumable ResolutionError) outer
                        , Member (Resumable (Unspecialized value)) outer
                        , Member (State (Heap address (Cell address) value)) outer
-                       , Member (State (ModuleTable (Maybe (value, Environment address)))) outer
+                       , Member (State (ModuleTable (Maybe (address, Environment address)))) outer
                        , Member Trace outer
                        , Recursive term
                        , Reducer value (Cell address value)
                        , ValueRoots address value
-                       , inner ~ (LoopControl value ': Return value ': Env address ': Allocator address value ': inner')
+                       , inner ~ (LoopControl address value ': Return address value ': Env address ': Allocator address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner value))
-                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)))
+                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
+                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address value)))
                     -> Package term
-                    -> TermEvaluator term address value outer [(value, Environment address)]
+                    -> TermEvaluator term address value outer [(address, Environment address)]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
@@ -106,7 +106,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
           = runInModule preludeEnv (moduleInfo m)
           . analyzeModule (subtermRef . moduleBody)
           $ evalTerm <$> m
-        evalTerm term = Subterm term (TermEvaluator (value =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
+        evalTerm term = Subterm term (TermEvaluator (address =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
 
         runInModule preludeEnv info
           = runReader info
@@ -115,14 +115,15 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . raiseHandler runReturn
           . raiseHandler runLoopControl
 
-        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (value, Environment address)
+        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (address, Environment address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
-          (value, env) <- fromMaybe (unit, emptyEnv) <$> require m
+          addr <- box unit -- TODO don't *always* allocate - use maybeM instead
+          (ptr, env) <- fromMaybe (addr, emptyEnv) <$> require m
           bindAll env
-          maybe (pure value) ((`call` []) <=< variable) sym
+          maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
+          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
           second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
 
         withPrelude Nothing f = f emptyEnv
@@ -173,7 +174,7 @@ runEvalErrorWith = runResumableWith
 
 
 data Unspecialized a b where
-  Unspecialized :: String -> Unspecialized value (ValueRef value)
+  Unspecialized :: String -> Unspecialized value value
 
 deriving instance Eq (Unspecialized a b)
 deriving instance Show (Unspecialized a b)
@@ -211,4 +212,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
+  eval = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

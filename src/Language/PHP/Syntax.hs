@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
 import           Data.Abstract.Evaluatable
@@ -54,14 +54,15 @@ include :: ( AbstractValue address value effects
            , Member (Resumable (EnvironmentError address)) effects
            , Member Trace effects
            )
-        => Subterm term (Evaluator address value effects (ValueRef value))
-        -> (ModulePath -> Evaluator address value effects (Maybe (value, Environment address)))
-        -> Evaluator address value effects (ValueRef value)
+        => Subterm term (Evaluator address value effects (ValueRef address value))
+        -> (ModulePath -> Evaluator address value effects (Maybe (address, Environment address)))
+        -> Evaluator address value effects (ValueRef address value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (v, importedEnv) <- fromMaybe (unit, emptyEnv) <$> f path
+  unitPtr <- box unit -- TODO don't always allocate, use maybeM
+  (v, importedEnv) <- fromMaybe (unitPtr, emptyEnv) <$> f path
   bindAll importedEnv
   pure (Rval v)
 
@@ -200,7 +201,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (fmap subtermValue -> QualifiedName name iden) = Rval <$> evaluateInScopedEnv name iden
+  eval (QualifiedName name iden) = Rval <$> evaluateInScopedEnv (subtermValue name) (subtermAddress iden)
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
@@ -211,7 +212,8 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = Rval <$> foldl1 evaluateInScopedEnv (fmap subtermValue xs)
+  eval (NamespaceName xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
+    where f ns = evaluateInScopedEnv (ns >>= deref)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -366,7 +368,7 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = Rval <$> go (freeVariables (subterm namespaceName))
+  eval Namespace{..} = rvalBox =<< go (freeVariables (subterm namespaceName))
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (name:x:xs) = letrec' name $ \addr ->
