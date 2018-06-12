@@ -25,7 +25,6 @@ import           Control.Monad.Effect.Exception
 import           Data.Blob
 import           Data.Language
 import qualified Data.Text as T
-import           Debug.Trace
 import           Proto3.Suite
 import           System.FilePath.Posix
 
@@ -109,7 +108,7 @@ readFile :: Member (Exc SomeException) effs
          -> Eff effs (Maybe Blob)
 readFile Project{..} f =
   let p         = filePath f
-      candidate = find (\b -> blobPath b == p) (traceShowId projectBlobs)
+      candidate = find (\b -> blobPath b == p) projectBlobs
   in if
     | p == "/dev/null"  -> pure Nothing
     | isJust candidate  -> pure candidate
