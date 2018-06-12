@@ -514,3 +514,13 @@ instance Ord1 OperatorSection where liftCompare = genericLiftCompare
 instance Show1 OperatorSection where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable OperatorSection
+
+newtype ConstructorPattern a = ConstructorPattern a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ConstructorPattern where liftEq = genericLiftEq
+instance Ord1 ConstructorPattern where liftCompare = genericLiftCompare
+instance Show1 ConstructorPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ConstructorPattern
+

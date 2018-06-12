@@ -40,6 +40,7 @@ type Syntax = '[
   , Syntax.App
   , Syntax.ArithmeticSequence
   , Syntax.Class
+  , Syntax.ConstructorPattern
   , Syntax.ConstructorSymbol
   , Syntax.Context
   , Syntax.Context'
@@ -154,6 +155,9 @@ constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Co
 constructorOperator :: Assignment
 constructorOperator = makeTerm <$> symbol ConstructorOperator <*> children (Syntax.ConstructorOperator <$> expression)
 
+constructorPattern :: Assignment
+constructorPattern = makeTerm <$> symbol ConstructorPattern <*> children (Syntax.ConstructorPattern <$> expressions)
+
 constructorSymbol :: Assignment
 constructorSymbol = makeTerm <$> symbol ConstructorSymbol <*> (Syntax.ConstructorSymbol . Name.name <$> source)
 
@@ -200,6 +204,7 @@ expressionChoices = [
                     , contextPattern
                     , constructorIdentifier
                     , constructorOperator
+                    , constructorPattern
                     , constructorSymbol
                     , defaultDeclaration
                     , derivingClause
