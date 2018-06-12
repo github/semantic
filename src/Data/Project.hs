@@ -2,8 +2,8 @@
 
 module Data.Project (
   -- * Projects
-    Project (..)
-  , Concrete
+    ProjectF (..)
+  , Project
   , PB
   , ProjectException (..)
   , fromPB
@@ -33,8 +33,8 @@ import           System.FilePath.Posix
 -- in terms of the container type for paths and blobs, as well as the
 -- path type (this is necessary because protobuf uses different vector
 -- representations for @repeated string@ and @repeated Blob@.
--- You probably want to use the 'Concrete' or 'PB' type aliases.
-data Project (blobs :: * -> *) (paths :: * -> *) path = Project
+-- You probably want to use the 'Project' or 'PB' type aliases.
+data ProjectF (blobs :: * -> *) (paths :: * -> *) path = Project
   { projectRootDir     :: path
   , projectBlobs       :: blobs Blob
   , projectLanguage    :: Language
@@ -45,22 +45,22 @@ data Project (blobs :: * -> *) (paths :: * -> *) path = Project
 deriving instance ( MessageField path
                   , MessageField (paths path)
                   , MessageField (blobs Blob)
-                  ) => Message (Project blobs paths path)
+                  ) => Message (ProjectF blobs paths path)
 
-deriving instance (Eq path, Eq (blobs Blob), Eq (paths path)) => Eq (Project blobs paths path)
-deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (Project blobs paths path)
+deriving instance (Eq path, Eq (blobs Blob), Eq (paths path)) => Eq (ProjectF blobs paths path)
+deriving instance (Show path, Show (blobs Blob), Show (paths path)) => Show (ProjectF blobs paths path)
 
 -- | This 'Project' type is the one used during semantic's normal
 -- course of diffing, evaluation, and graphing. You probably want to
 -- use this one.
-type Concrete = Project [] [] FilePath
+type Project = ProjectF [] [] FilePath
 
 -- | This 'Project' type is protobuf-compatible, and corresponds with
 -- the @Project@ message declaration present in types.proto.
-type PB = Project NestedVec UnpackedVec Text
+type PB = ProjectF NestedVec UnpackedVec Text
 
 -- | Convert from a packed protobuf representatio nto a more useful one.
-fromPB :: PB -> Concrete
+fromPB :: PB -> Project
 fromPB Project {..} = Project
   { projectRootDir     = T.unpack projectRootDir
   , projectBlobs       = toList projectBlobs
@@ -69,20 +69,20 @@ fromPB Project {..} = Project
   , projectExcludeDirs = T.unpack <$> toList projectExcludeDirs
   }
 
-projectName :: Concrete -> Text
+projectName :: Project -> Text
 projectName = T.pack . dropExtensions . takeFileName . projectRootDir
 
-projectExtensions :: Concrete -> [String]
+projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
 
-projectEntryPoints :: Concrete -> [File]
+projectEntryPoints :: Project -> [File]
 projectEntryPoints Project {..} = foldr go [] projectBlobs
   where go b acc =
           if blobPath b `elem` projectEntryPaths
           then toFile b : acc
           else acc
 
-projectFiles :: Concrete -> [File]
+projectFiles :: Project -> [File]
 projectFiles = fmap toFile . projectBlobs
 
 data File = File
@@ -103,7 +103,7 @@ newtype ProjectException
     deriving (Show, Eq, Typeable, Exception)
 
 readFile :: Member (Exc SomeException) effs
-         => Concrete
+         => Project
          -> File
          -> Eff effs (Maybe Blob)
 readFile Project{..} f =

@@ -16,6 +16,8 @@ module Semantic.Graph
 , resumingEnvironmentError
 ) where
 
+import Prelude hiding (readFile)
+
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Abstract
@@ -27,7 +29,6 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
-import qualified Data.Project as Project
 import           Data.Record
 import           Data.Term
 import           Data.Text (pack)
@@ -40,7 +41,7 @@ data GraphType = ImportGraph | CallGraph
 runGraph :: (Member (Exc SomeException) effs, Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
-         -> Project.Concrete
+         -> Project
          -> Eff effs (Graph Vertex)
 runGraph graphType includePackages project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
@@ -71,7 +72,7 @@ runGraph graphType includePackages project
 parsePackage :: (Member (Exc SomeException) effs, Member (Distribute WrappedTask) effs,  Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Maybe File  -- ^ Prelude (optional).
-             -> Project.Concrete     -- ^ Project to parse into a package.
+             -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule project parser) preludeFile
@@ -88,12 +89,12 @@ parsePackage parser preludeFile project@Project{..} = do
     parseModules parser = distributeFor (projectEntryPoints project <> projectFiles project) (WrapTask . parseModule project parser)
 
 -- | Parse a file into a 'Module'.
-parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project.Concrete -> Parser term -> File -> Eff effs (Module term)
+parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
 parseModule proj parser file = do
-  mBlob <- Project.readFile proj file
+  mBlob <- readFile proj file
   case mBlob of
     Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
-    Nothing   -> throwError (SomeException (Project.FileNotFound (Project.filePath file)))
+    Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects

@@ -80,7 +80,7 @@ javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePat
 evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= addPrelude lang >>= parsePackage parser prelude)
 evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= addPrelude lang >>= parsePackage parser prelude)
 
-addPrelude :: Member IO effs => Language.Language -> Concrete -> Eff effs Concrete
+addPrelude :: Member IO effs => Language.Language -> Project -> Eff effs Project
 addPrelude l proj = do
   let p = case l of
         Language.Ruby -> rubyPrelude

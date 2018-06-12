@@ -6,7 +6,6 @@ import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
 import           Data.Project
-import qualified Data.Project as Project (Concrete)
 import qualified Data.Map as Map
 import           Data.Source
 import           Data.Language
@@ -30,7 +29,7 @@ nodeJSResolutionMap rootDir prop excludeDirs = do
       where relPkgDotJSONPath = makeRelative rootDir path
             relEntryPath x = takeDirectory relPkgDotJSONPath </> x
 
-resolutionMap :: Member Resolution effs => Project.Concrete -> Eff effs (Map FilePath FilePath)
+resolutionMap :: Member Resolution effs => Project -> Eff effs (Map FilePath FilePath)
 resolutionMap Project{..} = case projectLanguage of
   TypeScript -> send (NodeJSResolution projectRootDir "types" projectExcludeDirs)
   JavaScript -> send (NodeJSResolution projectRootDir "main" projectExcludeDirs)

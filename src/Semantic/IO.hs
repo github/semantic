@@ -42,8 +42,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Blob
 import           Data.Bool
-import qualified Data.Project as Project
-import           Data.Project (File (..))
+import           Data.Project hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
@@ -101,7 +100,7 @@ readBlobFromPath file = do
   maybeFile <- readFile file
   maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
-readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project.Concrete
+readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
   liftIO $ putStrLn "Starting readProjectFromPath"
   isDir <- isDirectory path
@@ -112,7 +111,7 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
 
   paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
   blobs <- traverse readBlobFromPath (entryPoints <> (toFile <$> paths))
-  let p = Project.Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs
+  let p = Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs
   liftIO $ putStrLn "Done"
   pure p
   where
@@ -179,7 +178,7 @@ readBlobPairs :: Member Files effs => Either (Handle 'IO.ReadMode) [Both File] -
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle))
 readBlobPairs (Right paths) = traverse (send . Read . FromPathPair) paths
 
-readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project.Concrete
+readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
 findFiles :: Member Files effs => FilePath -> [String] -> [FilePath] -> Eff effs [FilePath]
@@ -223,7 +222,7 @@ data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files out where
   Read        :: Source out -> Files out
-  ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project.Concrete
+  ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
   FindFiles   :: FilePath -> [String] -> [FilePath] -> Files [FilePath]
   Write       :: Destination -> B.Builder -> Files ()
 
