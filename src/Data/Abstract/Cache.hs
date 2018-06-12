@@ -13,7 +13,7 @@ newtype Cache term address cell value = Cache { unCache :: Monoidal.Map (Configu
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term address cell value, Cached address cell value), Semigroup)
 
 data Cached address cell value = Cached
-  { cachedValue :: ValueRef address value
+  { cachedValue :: ValueRef address
   , cachedHeap  :: Heap address cell value
   }
   deriving (Eq, Ord, Show)

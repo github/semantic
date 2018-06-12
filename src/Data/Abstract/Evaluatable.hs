@@ -58,7 +58,7 @@ class Show1 constr => Evaluatable constr where
           , Member (Return address value) effects
           , Member Trace effects
           )
-       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address value))
+       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
@@ -89,7 +89,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
-                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address value)))
+                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
                     -> Package term
                     -> TermEvaluator term address value outer [(address, Environment address)]
 evaluatePackageWith analyzeModule analyzeTerm package
