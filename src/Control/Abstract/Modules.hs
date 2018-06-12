@@ -26,7 +26,7 @@ import Data.Language
 import Prologue
 
 -- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
-lookupModule :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Maybe (address, Environment address)))
+lookupModule :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Maybe (Environment address, address)))
 lookupModule = sendModules . Lookup
 
 -- | Resolve a list of module paths to a possible module table entry.
@@ -40,19 +40,19 @@ listModulesInDir = sendModules . List @address @value
 -- | Require/import another module by name and return its environment and value.
 --
 -- Looks up the module's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
+require :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Environment address, address))
 require path = lookupModule path >>= maybeM (load path)
 
 -- | Load another module by name and return its environment and value.
 --
 -- Always loads/evaluates.
-load :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
+load :: Member (Modules address value) effects => ModulePath -> Evaluator address value effects (Maybe (Environment address, address))
 load path = sendModules (Load path)
 
 
 data Modules address value (m :: * -> *) return where
-  Load    :: ModulePath -> Modules address value m (Maybe (address, Environment address))
-  Lookup  :: ModulePath -> Modules address value m (Maybe (Maybe (address, Environment address)))
+  Load    :: ModulePath -> Modules address value m (Maybe (Environment address, address))
+  Lookup  :: ModulePath -> Modules address value m (Maybe (Maybe (Environment address, address)))
   Resolve :: [FilePath] -> Modules address value m (Maybe ModulePath)
   List    :: FilePath   -> Modules address value m [ModulePath]
 
@@ -61,11 +61,11 @@ sendModules = send
 
 runModules :: forall term address value effects a
            .  ( Member (Resumable (LoadError address value)) effects
-              , Member (State (ModuleTable (Maybe (address, Environment address)))) effects
+              , Member (State (ModuleTable (Maybe (Environment address, address)))) effects
               , Member Trace effects
               , Effects effects
               )
-           => (Module term -> Evaluator address value (Modules address value ': effects) (address, Environment address))
+           => (Module term -> Evaluator address value (Modules address value ': effects) (Environment address, address))
            -> Evaluator address value (Modules address value ': effects) a
            -> Evaluator address value (Reader (ModuleTable (NonEmpty (Module term))) ': effects) a
 runModules evaluateModule = go
@@ -90,22 +90,22 @@ runModules evaluateModule = go
             pure (find isMember names)
           List dir -> modulePathsInDir dir <$> askModuleTable @term)
 
-getModuleTable :: Member (State (ModuleTable (Maybe (address, Environment address)))) effects => Evaluator address value effects (ModuleTable (Maybe (address, Environment address)))
+getModuleTable :: Member (State (ModuleTable (Maybe (Environment address, address)))) effects => Evaluator address value effects (ModuleTable (Maybe (Environment address, address)))
 getModuleTable = get
 
-cacheModule :: Member (State (ModuleTable (Maybe (address, Environment address)))) effects => ModulePath -> Maybe (address, Environment address) -> Evaluator address value effects (Maybe (address, Environment address))
+cacheModule :: Member (State (ModuleTable (Maybe (Environment address, address)))) effects => ModulePath -> Maybe (Environment address, address) -> Evaluator address value effects (Maybe (Environment address, address))
 cacheModule path result = modify' (ModuleTable.insert path result) $> result
 
 askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module term)))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module term)))
 askModuleTable = ask
 
 
-newtype Merging m address value = Merging { runMerging :: m (Maybe (address, Environment address)) }
+newtype Merging m address value = Merging { runMerging :: m (Maybe (Environment address, address)) }
 
 instance Applicative m => Semigroup (Merging m address value) where
   Merging a <> Merging b = Merging (merge <$> a <*> b)
     where merge a b = mergeJusts <$> a <*> b <|> a <|> b
-          mergeJusts (_, env1) (v, env2) = (v, mergeEnvs env1 env2)
+          mergeJusts (env1, _) (env2, v) = (mergeEnvs env1 env2, v)
 
 instance Applicative m => Monoid (Merging m address value) where
   mappend = (<>)
@@ -114,7 +114,7 @@ instance Applicative m => Monoid (Merging m address value) where
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError address value resume where
-  ModuleNotFound :: ModulePath -> LoadError address value (Maybe (address, Environment address))
+  ModuleNotFound :: ModulePath -> LoadError address value (Maybe (Environment address, address))
 
 deriving instance Eq (LoadError address value resume)
 deriving instance Show (LoadError address value resume)
@@ -123,7 +123,7 @@ instance Show1 (LoadError address value) where
 instance Eq1 (LoadError address value) where
   liftEq _ (ModuleNotFound a) (ModuleNotFound b) = a == b
 
-moduleNotFound :: forall address value effects . Member (Resumable (LoadError address value)) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
+moduleNotFound :: forall address value effects . Member (Resumable (LoadError address value)) effects => ModulePath -> Evaluator address value effects (Maybe (Environment address, address))
 moduleNotFound = throwResumable . ModuleNotFound @address @value
 
 resumeLoadError :: Member (Resumable (LoadError address value)) effects => Evaluator address value effects a -> (forall resume . LoadError address value resume -> Evaluator address value effects resume) -> Evaluator address value effects a

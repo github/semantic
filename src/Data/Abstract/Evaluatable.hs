@@ -68,6 +68,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
                        , Addressable address inner'
                        , Declarations term
+                       , Effects outer
                        , Evaluatable (Base term)
                        , Foldable (Cell address)
                        , FreeVariables term
@@ -79,7 +80,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member (Resumable ResolutionError) outer
                        , Member (Resumable (Unspecialized value)) outer
                        , Member (State (Heap address (Cell address) value)) outer
-                       , Member (State (ModuleTable (Maybe (address, Environment address)))) outer
+                       , Member (State (ModuleTable (Maybe (Environment address, address)))) outer
                        , Member Trace outer
                        , Recursive term
                        , Reducer value (Cell address value)
@@ -91,7 +92,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                     => (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
                     -> Package term
-                    -> TermEvaluator term address value outer [(address, Environment address)]
+                    -> TermEvaluator term address value outer [(Environment address, address)]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
@@ -115,20 +116,20 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . raiseHandler runReturn
           . raiseHandler runLoopControl
 
-        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (address, Environment address)
+        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (Environment address, address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
           addr <- box unit -- TODO don't *always* allocate - use maybeM instead
-          (ptr, env) <- fromMaybe (addr, emptyEnv) <$> require m
+          (env, ptr) <- fromMaybe (emptyEnv, addr) <$> require m
           bindAll env
           maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
-          second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
+          (builtinsEnv, _) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
+          first (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
 
         withPrelude Nothing f = f emptyEnv
         withPrelude (Just prelude) f = do
-          (_, preludeEnv) <- evalPrelude prelude
+          (preludeEnv, _) <- evalPrelude prelude
           f preludeEnv
 
 
@@ -166,10 +167,10 @@ instance Show1 EvalError where
 throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
 throwEvalError = throwResumable
 
-runEvalError :: Effectful m => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
+runEvalError :: (Effectful m, Effects effects) => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: Effectful m => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
+runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
 runEvalErrorWith = runResumableWith
 
 
@@ -185,10 +186,10 @@ instance Eq1 (Unspecialized a) where
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: (Effectful (m value), Effects effects) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
+runUnspecializedWith :: (Effectful (m value), Effects effects) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 runUnspecializedWith = runResumableWith
 
 
