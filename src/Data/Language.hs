@@ -1,9 +1,11 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, LambdaCase #-}
 module Data.Language where
 
-import Data.Aeson
-import Prologue
-import Proto3.Suite
+import           Data.Aeson
+import qualified Data.Text as T
+import           Prologue
+import           Proto3.Suite
+import           System.FilePath.Posix
 
 -- | The various languages we support.
 -- Please do not reorder any of the field names: the current implementation of 'Primitive'
@@ -22,6 +24,21 @@ data Language
     | TypeScript
     | PHP
     deriving (Eq, Generic, Ord, Read, Show, Bounded, ToJSON, Named, Enum, Finite, MessageField)
+
+instance FromJSON Language where
+  parseJSON = withText "Language" $ \l -> pure $ case T.toLower l of
+    "go"         -> Go
+    "haskell"    -> Haskell
+    "java"       -> Java
+    "javascript" -> JavaScript
+    "json"       -> JSON
+    "jsx"        -> JSX
+    "markdown"   -> Markdown
+    "python"     -> Python
+    "ruby"       -> Ruby
+    "typescript" -> TypeScript
+    "php"        -> PHP
+    _            -> Unknown
 
 -- | Predicate failing on 'Unknown' and passing in all other cases.
 knownLanguage :: Language -> Bool
@@ -72,3 +89,7 @@ extensionsForLanguage language = case language of
   Ruby       -> [".rb"]
   TypeScript -> [".ts", ".tsx", ".d.tsx"]
   _          -> []
+
+-- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
+languageForFilePath :: FilePath -> Language
+languageForFilePath = languageForType . takeExtension

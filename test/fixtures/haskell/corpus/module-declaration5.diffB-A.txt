@@ -1,0 +1,28 @@
+(Module
+{ (ModuleIdentifier)
+->(ModuleIdentifier) }
+  (Export
+    (Statements
+      (TypeConstructorIdentifier)
+      (AllConstructors)))
+  (Export
+    (TypeConstructorExport
+      (ConstructorOperator
+      { (ConstructorSymbol)
+      ->(ConstructorSymbol) })))
+  (Export
+    (TypeConstructorExport
+      (VariableOperator
+      { (VariableSymbol)
+      ->(VariableSymbol) })))
+  (Export
+    (VariableIdentifier))
+  (Export
+    (ModuleExport
+    { (ModuleIdentifier)
+    ->(ModuleIdentifier) }))
+  (Export
+    (TypeConstructorExport
+    { (ConstructorIdentifier)
+    ->(ConstructorIdentifier) }))
+  (Statements))

@@ -18,6 +18,7 @@ module Rendering.Renderer
 , TOCSummary(..)
 , SymbolFields(..)
 , defaultSymbolFields
+, parseSymbolFields
 ) where
 
 import Data.Aeson (Value)

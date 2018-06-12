@@ -316,7 +316,7 @@ sliceType :: Assignment
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
 
 structType :: Assignment
-structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> expressions)
+structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> pure [] <*> emptyTerm <*> expressions)
 
 typeAlias :: Assignment
 typeAlias = makeTerm <$> symbol TypeAlias <*> children (Declaration.TypeAlias [] <$> expression <*> expression)

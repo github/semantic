@@ -34,44 +34,52 @@ newtype Evaluator address value effects a = Evaluator { runEvaluator :: Eff effe
 
 deriving instance Member NonDet effects => Alternative (Evaluator address value effects)
 
-
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-data Return value resume where
-  Return :: value -> Return value value
+data Return address value resume where
+  Return :: address -> Return address value address
 
-deriving instance Eq value => Eq (Return value a)
-deriving instance Show value => Show (Return value a)
+deriving instance (Eq address, Eq value) => Eq (Return address value a)
+deriving instance (Show address, Eq value) => Show (Return address value a)
 
-earlyReturn :: Member (Return value) effects => value -> Evaluator address value effects value
-earlyReturn = send . Return
+earlyReturn :: forall address value effects
+            .  Member (Return address value) effects
+            => address
+            -> Evaluator address value effects address
+earlyReturn = send . Return @address @value
 
-catchReturn :: Member (Return value) effects => Evaluator address value effects a -> (forall x . Return value x -> Evaluator address value effects a) -> Evaluator address value effects a
+catchReturn :: Member (Return address value) effects => Evaluator address value effects a -> (forall x . Return address value x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Effectful (m address value) => m address value (Return value ': effects) value -> m address value effects value
+runReturn :: Effectful (m address value) => m address value (Return address value ': effects) address -> m address value effects address
 runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
-data LoopControl value resume where
-  Break    :: value -> LoopControl value value
-  Continue :: value -> LoopControl value value
+data LoopControl address value resume where
+  Break    :: address -> LoopControl address value address
+  Continue :: address -> LoopControl address value address
 
-deriving instance Eq value => Eq (LoopControl value a)
-deriving instance Show value => Show (LoopControl value a)
+deriving instance (Eq address, Eq value) => Eq (LoopControl address value a)
+deriving instance (Show address, Show value) => Show (LoopControl address value a)
 
-throwBreak :: Member (LoopControl value) effects => value -> Evaluator address value effects value
-throwBreak = send . Break
+throwBreak :: forall address value effects
+           .  Member (LoopControl address value) effects
+           => address
+           -> Evaluator address value effects address
+throwBreak = send . Break @address @value
 
-throwContinue :: Member (LoopControl value) effects => value -> Evaluator address value effects value
-throwContinue = send . Continue
+throwContinue :: forall address value effects
+              .  Member (LoopControl address value) effects
+              => address
+              -> Evaluator address value effects address
+throwContinue = send . Continue @address @value
 
-catchLoopControl :: Member (LoopControl value) effects => Evaluator address value effects a -> (forall x . LoopControl value x -> Evaluator address value effects a) -> Evaluator address value effects a
+catchLoopControl :: Member (LoopControl address value) effects => Evaluator address value effects a -> (forall x . LoopControl address value x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
-runLoopControl :: Effectful (m address value) => m address value (LoopControl value ': effects) value -> m address value effects value
+runLoopControl :: Effectful (m address value) => m address value (LoopControl address value ': effects) address -> m address value effects address
 runLoopControl = raiseHandler (relay pure (\ eff _ -> case eff of
   Break    value -> pure value
   Continue value -> pure value))

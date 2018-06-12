@@ -38,6 +38,7 @@ import Data.Range as X
 import Data.Record as X
 import Data.Source as X
 import Data.Span as X
+import Data.Sum
 import Data.Term as X
 import Parsing.Parser as X
 import Rendering.Renderer as X hiding (error)
@@ -77,6 +78,34 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
+testEvaluating :: TermEvaluator term Precise
+                    (Value Precise (Eff effects))
+                    '[ Resumable (ValueError Precise (Eff effects))
+                     , Resumable (AddressError Precise (Value Precise (Eff effects)))
+                     , Resumable EvalError, Resumable (EnvironmentError Precise)
+                     , Resumable ResolutionError
+                     , Resumable (Unspecialized (Value Precise (Eff effects)))
+                     , Resumable (LoadError Precise (Value Precise (Eff effects)))
+                     , Fresh
+                     , State (Heap Precise Latest (Value Precise (Eff effects)))
+                     , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                     , Trace
+                     ]
+                   [(Precise, Environment Precise)]
+               -> ((Either
+                      (SomeExc
+                         (Data.Sum.Sum
+                          '[ ValueError Precise (Eff effects)
+                           , AddressError Precise (Value Precise (Eff effects))
+                           , EvalError
+                           , EnvironmentError Precise
+                           , ResolutionError
+                           , Unspecialized (Value Precise (Eff effects))
+                           , LoadError Precise (Value Precise (Eff effects))
+                           ]))
+                      [(Value Precise (Eff effects), Environment Precise)],
+                    EvaluatingState Precise (Value Precise (Eff effects))),
+                   [String])
 testEvaluating
   = run
   . runReturningTrace
@@ -89,7 +118,12 @@ testEvaluating
   . runEvalError
   . runAddressError
   . runValueError
+  . (>>= (traverse deref1))
   . runTermEvaluator @_ @_ @(Value Precise (Eff _))
+
+deref1 (ptr, env) = runAllocator $ do
+  val <- deref ptr
+  pure (val, env)
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)
