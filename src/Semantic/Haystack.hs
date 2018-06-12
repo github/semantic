@@ -48,9 +48,7 @@ haystackClient maybeURL managerSettings hostName appName
 
 -- Report an error to Haystack over HTTP (blocking).
 reportError :: MonadIO io => String -> LogQueue -> HaystackClient -> ErrorReport -> io ()
-reportError sha logger NullHaystackClient ErrorReport{..} =
-  let msg = takeWhile (/= '\n') (displayException errorReportException) in
-  queueLogMessage logger Error msg errorReportContext
+reportError _   logger NullHaystackClient ErrorReport{..} = let msg = takeWhile (/= '\n') (displayException errorReportException) in queueLogMessage logger Error msg errorReportContext
 reportError sha logger HaystackClient{..} ErrorReport{..} = do
   let fullMsg = displayException errorReportException
   let summary = takeWhile (/= '\n') fullMsg
