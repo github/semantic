@@ -34,6 +34,10 @@ data Telemetry (m :: * -> *) output where
   WriteStat :: Stat                                  -> Telemetry m ()
   WriteLog  :: Level -> String -> [(String, String)] -> Telemetry m ()
 
+instance Effect Telemetry where
+  handleState c dist (Request (WriteStat stat) k) = Request (WriteStat stat) (dist . (<$ c) . k)
+  handleState c dist (Request (WriteLog level message pairs) k) = Request (WriteLog level message pairs) (dist . (<$ c) . k)
+
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
 runTelemetry :: (Member (Lift IO) effects, Effects effects) => LogQueue -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
 runTelemetry logger statter = interpret (\ t -> case t of
