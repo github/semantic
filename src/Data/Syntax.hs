@@ -105,7 +105,7 @@ infixContext :: (Context :< fs, Assignment.Parsing m, Semigroup a, HasCallStack,
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
-  liftEncodeMessage encodeMessage num fs = Encode.embedded (FieldNumber . fromIntegral . succ $ elemIndex fs) message
+  liftEncodeMessage encodeMessage num fs = Encode.embedded (fromIntegral . succ $ elemIndex fs) message
     where message = apply @Message1 (liftEncodeMessage encodeMessage num) fs
   liftDecodeMessage decodeMessage num' = Decode.oneof undefined listOfParsers
     where
