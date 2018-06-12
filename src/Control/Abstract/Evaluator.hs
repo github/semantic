@@ -11,6 +11,7 @@ module Control.Abstract.Evaluator
   , throwContinue
   , catchLoopControl
   , runLoopControl
+  , Goto(..)
   , module X
   ) where
 
@@ -88,3 +89,10 @@ runLoopControl :: (Effectful (m address value), Effects effects) => m address va
 runLoopControl = raiseHandler (fmap (either id id) . Exc.runError . reinterpret (\ eff -> case eff of
   Break    value -> Exc.throwError value
   Continue value -> Exc.throwError value))
+
+
+type Label = Int
+
+data Goto value m result where
+  Label :: m value -> Goto value m Label
+  Goto  :: Label   -> Goto value m value
