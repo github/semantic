@@ -88,10 +88,10 @@ testEvaluating :: TermEvaluator term Precise
                      , Resumable (LoadError Precise (Value Precise (Eff effects)))
                      , Fresh
                      , State (Heap Precise Latest (Value Precise (Eff effects)))
-                     , State (ModuleTable (Maybe (Value Precise (Eff effects), Environment Precise)))
+                     , State (ModuleTable (Maybe (Precise, Environment Precise)))
                      , Trace
                      ]
-                   [(Value Precise (Eff effects), Environment Precise)]
+                   [(Precise, Environment Precise)]
                -> ((Either
                       (SomeExc
                          (Data.Sum.Sum
@@ -118,7 +118,12 @@ testEvaluating
   . runEvalError
   . runAddressError
   . runValueError
+  . (>>= (traverse deref1))
   . runTermEvaluator @_ @_ @(Value Precise (Eff _))
+
+deref1 (ptr, env) = runAllocator $ do
+  val <- deref ptr
+  pure (val, env)
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)
