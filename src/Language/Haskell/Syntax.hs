@@ -351,6 +351,7 @@ data EntityIdentifier a = TypeVariableIdentifier Name
                         | TypeConstructorIdentifier Name
                         | ModuleIdentifier Name
                         | ConstructorIdentifier Name
+                        | InfixVariableIdentifier Name
                         | TypeClassIdentifier Name
                         | VariableIdentifier Name
                         | PrimitiveConstructorIdentifier Name

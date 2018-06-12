@@ -215,6 +215,7 @@ expressionChoices = [
                     , importAlias
                     , importDeclaration
                     , infixOperatorPattern
+                    , infixVariableIdentifier
                     , integer
                     , kind
                     , kindSignature
@@ -343,6 +344,9 @@ importSpec = symbol ImportSpec *> children (manyTerm import')
 
 infixOperatorPattern :: Assignment
 infixOperatorPattern = makeTerm <$> symbol InfixOperatorPattern <*> children (Syntax.InfixOperatorPattern <$> expression <*> operator <*> expression)
+
+infixVariableIdentifier :: Assignment
+infixVariableIdentifier = makeTerm <$> symbol InfixVariableIdentifier <*> children (Syntax.InfixVariableIdentifier . Name.name <$> source)
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
