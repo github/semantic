@@ -24,8 +24,9 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval Function{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
-    (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermValue functionBody))
-    Rval v <$ bind name addr
+    (_, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermAddress functionBody))
+    bind name addr
+    pure (Rval addr)
     where paramNames = foldMap (freeVariables . subterm)
 
 instance Declarations a => Declarations (Function a) where
@@ -47,8 +48,9 @@ instance Diffable Method where
 instance Evaluatable Method where
   eval Method{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
-    (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermValue methodBody))
-    Rval v <$ bind name addr
+    (_, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermAddress methodBody))
+    bind name addr
+    pure (Rval addr)
     where paramNames = foldMap (freeVariables . subterm)
 
 
@@ -98,8 +100,8 @@ instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
-  eval (VariableDeclaration [])   = pure (Rval unit)
-  eval (VariableDeclaration decs) = Rval . multiple <$> traverse subtermValue decs
+  eval (VariableDeclaration [])   = rvalBox unit
+  eval (VariableDeclaration decs) = rvalBox =<< (multiple <$> traverse subtermValue decs)
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
@@ -165,7 +167,7 @@ instance Evaluatable Class where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    Rval v <$ bind name addr
+    rvalBox =<< (v <$ bind name addr)
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -244,7 +246,7 @@ instance Evaluatable TypeAlias where
     v <- subtermValue typeAliasKind
     addr <- lookupOrAlloc name
     assign addr v
-    Rval v <$ bind name addr
+    rvalBox =<< (v <$ bind name addr)
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier
