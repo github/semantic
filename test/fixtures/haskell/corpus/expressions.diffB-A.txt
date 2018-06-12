@@ -59,6 +59,38 @@
       (Statements
         (UnitConstructor)))
     (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFrom
+        { (Integer)
+        ->(Integer) })))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFromThen
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) })))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFromTo
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) })))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFromThenTo
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) })))
+    (Function
     { (VariableIdentifier)
     ->(VariableIdentifier) }
       (Statements
@@ -117,4 +149,68 @@
             { (Integer)
             ->(Integer) }
               (VariableIdentifier))
-            (VariableIdentifier)))))))
+            (VariableIdentifier)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (Tuple
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (Generator
+            (VariableIdentifier)
+            (Array
+              (Integer)
+              (Integer)
+            {-(Integer)-}
+            {-(Integer)-}))
+          (Generator
+            (VariableIdentifier)
+            (EnumFromTo
+              (Integer)
+            { (Integer)
+            ->(Integer) })))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (ListComprehension
+            (Tuple
+              (VariableIdentifier)
+              (VariableIdentifier))
+            (Generator
+              (VariableIdentifier)
+              (Array
+              {+(Integer)+}
+                (Integer)
+              {-(Integer)-})))
+          (Generator
+            (VariableIdentifier)
+            (EnumFrom
+            { (Integer)
+            ->(Integer) })))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (VariableIdentifier)
+          { (Integer)
+          ->(Integer) })
+          (ListComprehension
+            (ListComprehension
+              (Tuple
+                (VariableIdentifier)
+                (VariableIdentifier))
+              (Generator
+                (VariableIdentifier)
+                (Array
+                  (Integer)
+                  (Integer))))
+            (Generator
+              (VariableIdentifier)
+              (EnumFrom
+                (Integer)))))))))

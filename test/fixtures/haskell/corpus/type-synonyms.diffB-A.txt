@@ -115,11 +115,14 @@
                 {+(TypeConstructorIdentifier)+}
                 {+(TypeVariableIdentifier)+})+})+}
             {+(Empty)+})+})+})+})+})+}
-  {+(TypeSynonym
-    {+(Statements
-      {+(TypeConstructorIdentifier)+}
-      {+(TypeConstructorIdentifier)+})+}
-    {+(TextElement)+})+}
+    (TypeSynonym
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+      {+(TypeConstructorIdentifier)+})
+    { (TypePattern
+      {-(FunctionConstructor)-})
+    ->(TextElement) })
   {+(TypeSynonym
     {+(Statements
       {+(TypeConstructorIdentifier)+}
@@ -168,11 +171,6 @@
           {+(TypeConstructorIdentifier)+}
           {+(TypeVariableIdentifier)+}
           {+(TypeVariableIdentifier)+})+})+})+})+}
-  {-(TypeSynonym
-    {-(Statements
-      {-(TypeConstructorIdentifier)-})-}
-    {-(TypePattern
-      {-(FunctionConstructor)-})-})-}
   {-(TypeSynonym
     {-(Statements
       {-(TypeConstructorIdentifier)-})-}

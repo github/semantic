@@ -496,3 +496,15 @@ instance Ord1 TuplePattern where liftCompare = genericLiftCompare
 instance Show1 TuplePattern where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TuplePattern
+
+data ArithmeticSequence a = EnumFrom a            -- e.g. [1..]
+                          | EnumFromThen a a      -- e.g. [1,2..]
+                          | EnumFromTo a a        -- e.g. [1..2]
+                          | EnumFromThenTo a a a  -- e.g. [1,2..10]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ArithmeticSequence where liftEq = genericLiftEq
+instance Ord1 ArithmeticSequence where liftCompare = genericLiftCompare
+instance Show1 ArithmeticSequence where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ArithmeticSequence

@@ -38,6 +38,7 @@ type Syntax = '[
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.App
+  , Syntax.ArithmeticSequence
   , Syntax.Class
   , Syntax.ConstructorSymbol
   , Syntax.Context
@@ -122,6 +123,17 @@ annotatedTypeVariable = makeTerm <$> symbol AnnotatedTypeVariable <*> children (
 app :: Assignment
 app = makeTerm <$> symbol FunctionApplication <*> children (Syntax.App <$> expression <*> expression)
 
+arithmeticSequence :: Assignment
+arithmeticSequence = symbol ArithmeticSequence *> children (  enumFrom
+                                                          <|> enumFromThen
+                                                          <|> enumFromTo
+                                                          <|> enumFromThenTo)
+  where
+    enumFrom = makeTerm <$> symbol EnumFrom <*> children (Syntax.EnumFrom <$> expression)
+    enumFromThen = makeTerm <$> symbol EnumFromThen <*> children (Syntax.EnumFromThen <$> expression <*> expression)
+    enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.EnumFromTo <$> expression <*> expression)
+    enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.EnumFromThenTo <$> expression <*> expression <*> expression)
+
 character :: Assignment
 character = makeTerm <$> symbol Char <*> (Literal.Character <$> source)
 
@@ -180,6 +192,7 @@ expressionChoices = [
                     , allConstructors
                     , annotatedTypeVariable
                     , app
+                    , arithmeticSequence
                     , character
                     , comment
                     , context'
