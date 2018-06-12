@@ -171,6 +171,12 @@ runAllocator = interpret $ \ eff -> case eff of
   Assign addr value -> modifyHeap (heapInsert addr value)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
+instance Effect (Allocator address value) where
+  handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
+  handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
+  handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (dist . (<$ c) . k)
+  handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
+
 
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Cell address value)
