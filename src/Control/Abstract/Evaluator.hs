@@ -44,6 +44,9 @@ data Return address (m :: * -> *) resume where
 deriving instance Eq address   => Eq   (Return address m a)
 deriving instance Show address => Show (Return address m a)
 
+instance Effect (Return address) where
+  handleState c dist (Request (Return value) k) = Request (Return value) (dist . (<$ c) . k)
+
 earlyReturn :: Member (Return address) effects
             => address
             -> Evaluator address value effects address
