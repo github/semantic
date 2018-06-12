@@ -82,8 +82,8 @@ instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
 instance Message1 f => Message (Term f ()) where
-  encodeMessage num (Term (In _ f)) = liftEncodeMessage encodeMessage num f
-  decodeMessage num = termIn () <$> liftDecodeMessage decodeMessage num
+  encodeMessage num (Term (In _ f)) = Encode.embedded num (liftEncodeMessage encodeMessage num f)
+  decodeMessage num = termIn () . fromMaybe undefined <$> Decode.at (Decode.embedded (liftDecodeMessage decodeMessage num)) num
   dotProto _ = liftDotProto (Proxy @(f (Term f ())))
 
 instance Named (Term f a) where
