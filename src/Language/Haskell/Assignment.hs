@@ -39,6 +39,7 @@ type Syntax = '[
   , Syntax.AnnotatedTypeVariable
   , Syntax.App
   , Syntax.ArithmeticSequence
+  , Syntax.BindPattern
   , Syntax.Class
   , Syntax.ConstructorPattern
   , Syntax.ConstructorSymbol
@@ -135,6 +136,9 @@ arithmeticSequence = symbol ArithmeticSequence *> children (  enumFrom
     enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.EnumFromTo <$> expression <*> expression)
     enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.EnumFromThenTo <$> expression <*> expression <*> expression)
 
+bindPattern :: Assignment
+bindPattern = makeTerm <$> symbol BindPattern <*> children (Syntax.BindPattern <$> expression <*> expression)
+
 character :: Assignment
 character = makeTerm <$> symbol Char <*> (Literal.Character <$> source)
 
@@ -197,6 +201,7 @@ expressionChoices = [
                     , annotatedTypeVariable
                     , app
                     , arithmeticSequence
+                    , bindPattern
                     , character
                     , comment
                     , context'
