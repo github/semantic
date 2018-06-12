@@ -233,6 +233,7 @@ subtermValue :: ( AbstractValue address value effects
              -> Evaluator address value effects value
 subtermValue = value <=< subtermRef
 
+-- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
            , Member (Env address) effects
@@ -244,6 +245,7 @@ address (LvalLocal var) = variable var
 address (LvalMember obj prop) = evaluateInScopedEnv (deref obj) (variable prop)
 address (Rval addr) = pure addr
 
+-- | Evaluates a 'Subterm' to the address of its rval
 subtermAddress :: ( AbstractValue address value effects
                   , Member (Allocator address value) effects
                   , Member (Env address) effects
@@ -253,6 +255,7 @@ subtermAddress :: ( AbstractValue address value effects
                -> Evaluator address value effects address
 subtermAddress = address <=< subtermRef
 
+-- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: Member (Allocator address value) effects
         => value
         -> Evaluator address value effects (ValueRef address value)
