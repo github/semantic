@@ -52,7 +52,7 @@ runGraph graphType includePackages project
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
     analyze runGraphAnalysis (evaluatePackageWith analyzeModule analyzeTerm package) >>= extractGraph
     where extractGraph result = case result of
-            (((graph, _), _), _) -> pure (simplify graph)
+            (_, (_, (graph, _))) -> pure (simplify graph)
           runGraphAnalysis
             = run
             . evaluating
