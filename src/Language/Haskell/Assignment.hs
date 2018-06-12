@@ -171,7 +171,7 @@ context' :: Assignment
 context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> expressions)
 
 contextPattern :: Assignment
-contextPattern = symbol ContextPattern *> children (expressions)
+contextPattern = symbol ContextPattern *> children expressions
 
 defaultDeclaration :: Assignment
 defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
@@ -192,7 +192,7 @@ export :: Assignment
 export = makeTerm <$> symbol Export <*> children (Syntax.Export <$> expressions)
 
 expression' :: Assignment
-expression' = symbol Expression *> children (expression)
+expression' = symbol Expression *> children expression
 
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> manyTerm expression
@@ -399,8 +399,8 @@ kindSignature = makeTerm <$> symbol KindSignature <*> children (Syntax.KindSigna
 lambda :: Assignment
 lambda = makeTerm <$> symbol Lambda <*> children (Syntax.Lambda <$> lambdaHead <*> lambdaBody)
   where
-    lambdaHead = symbol LambdaHead *> children (expressions)
-    lambdaBody = symbol LambdaBody *> children (expressions)
+    lambdaHead = symbol LambdaHead *> children expressions
+    lambdaBody = symbol LambdaBody *> children expressions
 
 listComprehension :: Assignment
 listComprehension = makeTerm <$> symbol ListComprehension <*> children (Syntax.ListComprehension <$> expression <*> manyTerm expression)
@@ -460,7 +460,7 @@ parenthesizedTypePattern :: Assignment
 parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressions
 
 pattern' :: Assignment
-pattern' = symbol Pattern *> children (expression)
+pattern' = symbol Pattern *> children expression
 
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
@@ -506,7 +506,7 @@ scopedTypeVariables = makeTerm <$> symbol ScopedTypeVariables <*> children (Synt
 standaloneDerivingInstance :: Assignment
 standaloneDerivingInstance = makeTerm <$> symbol StandaloneDerivingDeclaration <*> children (Syntax.StandaloneDerivingInstance <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> instance')
   where
-    instance' = symbol Instance *> children (expressions)
+    instance' = symbol Instance *> children expressions
 
 star :: Assignment
 star = makeTerm <$> token Star <*> pure Syntax.Star
