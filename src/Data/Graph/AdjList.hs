@@ -99,13 +99,13 @@ data Acc = Acc [Vertex] (HashSet Edge)
 -- Time complexity, given V vertices and E edges, is at least O(2V + 2E + (V * E * log E)),
 -- plus whatever overhead converting the graph to 'AdjacencyMap' may entail.
 taggedGraphToAdjList :: Graph (V.Vertex, Tag) -> AdjList
-taggedGraphToAdjList = accumToAdj . munge . adjacencyMap . toGraph . simplify
-  where munge :: Map (V.Vertex, Tag) (Set (V.Vertex, Tag)) -> Acc
-        munge = Map.foldlWithKey go (Acc [] mempty)
+taggedGraphToAdjList = accumToAdj . adjMapToAccum . adjacencyMap . toGraph . simplify
+  where adjMapToAccum :: Map (V.Vertex, Tag) (Set (V.Vertex, Tag)) -> Acc
+        adjMapToAccum = Map.foldlWithKey go (Acc [] mempty)
 
         go :: Acc -> (V.Vertex, Tag) -> Set (V.Vertex, Tag) -> Acc
-        go (Acc vs es) (v, from) edges = Acc (vertexToPB v from : vs) (Set.foldr' add es edges)
-          where add (_, to) = HashSet.insert (Edge from to)
+        go (Acc vs es) (v, from) edges = Acc (vertexToPB v from : vs) (Set.foldr' (add . snd) es edges)
+          where add = HashSet.insert . Edge from
 
         accumToAdj :: Acc -> AdjList
         accumToAdj (Acc vs es) = AdjList (fromList vs) (fromList (toList es))
