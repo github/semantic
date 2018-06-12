@@ -6,15 +6,14 @@ import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
-import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Prologue
 
-data Value address body
-  = Closure PackageInfo ModuleInfo [Name] (ClosureBody address body) (Environment address)
+data Value address
+  = Closure PackageInfo ModuleInfo [Name] Label (Environment address)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -22,68 +21,57 @@ data Value address body
   | Float    (Number.Number Scientific)
   | String Text
   | Symbol Text
-  | Tuple [Value address body]
-  | Array [Value address body]
+  | Tuple [Value address]
+  | Array [Value address]
   | Class Name (Environment address)
   | Namespace Name (Environment address)
-  | KVPair (Value address body) (Value address body)
-  | Hash [Value address body]
+  | KVPair (Value address) (Value address)
+  | Hash [Value address]
   | Null
   | Hole
   deriving (Eq, Ord, Show)
 
-data ClosureBody address body = ClosureBody { closureBodyId :: Int, closureBody :: body address }
 
-instance Eq   (ClosureBody address body) where
-  (==) = (==) `on` closureBodyId
-
-instance Ord  (ClosureBody address body) where
-  compare = compare `on` closureBodyId
-
-instance Show (ClosureBody address body) where
-  showsPrec d (ClosureBody i _) = showsUnaryWith showsPrec "ClosureBody" d i
-
-
-instance Ord address => ValueRoots address (Value address body) where
+instance Ord address => ValueRoots address (Value address) where
   valueRoots v
     | Closure _ _ _ _ env <- v = Env.addresses env
     | otherwise                = mempty
 
 
-instance AbstractHole (Value address body) where
+instance AbstractHole (Value address) where
   hole = Hole
 
-instance ( Coercible body (Eff effects)
-         , Member (Allocator address (Value address body)) effects
+instance ( Member (Allocator address (Value address)) effects
          , Member (Env address) effects
          , Member Fresh effects
+         , Member (Goto address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
          , Member (Return address) effects
          , Show address
          )
-      => AbstractFunction address (Value address body) effects where
+      => AbstractFunction address (Value address) effects where
   closure parameters freeVariables body = do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
-    i <- fresh
-    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) <$> close (foldr Set.delete freeVariables parameters)
+    l <- label body
+    Closure packageInfo moduleInfo parameters l <$> close (foldr Set.delete freeVariables parameters)
 
   call op params = do
     case op of
-      Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
+      Closure packageInfo moduleInfo names body env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
             addr <- param
             Env.insert name addr <$> rest) (pure env) (zip names params)
-          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return ptr) -> pure ptr)
+          locally (bindAll bindings *> goto body `catchReturn` \ (Return ptr) -> pure ptr)
       _ -> box =<< throwValueError (CallError op)
 
 
-instance Show address => AbstractIntro (Value address body) where
+instance Show address => AbstractIntro (Value address) where
   unit     = Unit
   integer  = Integer . Number.Integer
   boolean  = Boolean
@@ -101,10 +89,10 @@ instance Show address => AbstractIntro (Value address body) where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Coercible body (Eff effects)
-         , Member (Allocator address (Value address body)) effects
+instance ( Member (Allocator address (Value address)) effects
          , Member (Env address) effects
          , Member Fresh effects
+         , Member (Goto address) effects
          , Member (LoopControl address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
@@ -112,7 +100,7 @@ instance ( Coercible body (Eff effects)
          , Member (Return address) effects
          , Show address
          )
-      => AbstractValue address (Value address body) effects where
+      => AbstractValue address (Value address) effects where
   asPair val
     | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
@@ -175,7 +163,7 @@ instance ( Coercible body (Eff effects)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: (AbstractValue address (Value address body) effects, Member (Resumable (ValueError address body)) effects) => Either ArithException Number.SomeNumber -> Evaluator address (Value address body) effects (Value address body)
+        specialize :: (AbstractValue address (Value address) effects, Member (Resumable (ValueError address body)) effects) => Either ArithException Number.SomeNumber -> Evaluator address (Value address) effects (Value address)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
@@ -194,7 +182,7 @@ instance ( Coercible body (Eff effects)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue address (Value address body) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
+        go :: (AbstractValue address (Value address) effects, Ord a) => a -> a -> Evaluator address (Value address) effects (Value address)
         go l r = case comparator of
           Concrete f  -> pure $ boolean (f l r)
           Generalized -> pure $ integer (orderingToInt (compare l r))
@@ -223,21 +211,21 @@ instance ( Coercible body (Eff effects)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError address body resume where
-  StringError            :: Value address body                       -> ValueError address body Text
-  BoolError              :: Value address body                       -> ValueError address body Bool
-  IndexError             :: Value address body -> Value address body -> ValueError address body (Value address body)
+  StringError            :: Value address                       -> ValueError address body Text
+  BoolError              :: Value address                       -> ValueError address body Bool
+  IndexError             :: Value address -> Value address -> ValueError address body (Value address)
   NamespaceError         :: Prelude.String                           -> ValueError address body (Environment address)
-  CallError              :: Value address body                       -> ValueError address body (Value address body)
-  NumericError           :: Value address body                       -> ValueError address body (Value address body)
-  Numeric2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
-  ComparisonError        :: Value address body -> Value address body -> ValueError address body (Value address body)
-  BitwiseError           :: Value address body                       -> ValueError address body (Value address body)
-  Bitwise2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
-  KeyValueError          :: Value address body                       -> ValueError address body (Value address body, Value address body)
+  CallError              :: Value address                       -> ValueError address body (Value address)
+  NumericError           :: Value address                       -> ValueError address body (Value address)
+  Numeric2Error          :: Value address -> Value address -> ValueError address body (Value address)
+  ComparisonError        :: Value address -> Value address -> ValueError address body (Value address)
+  BitwiseError           :: Value address                       -> ValueError address body (Value address)
+  Bitwise2Error          :: Value address -> Value address -> ValueError address body (Value address)
+  KeyValueError          :: Value address                       -> ValueError address body (Value address, Value address)
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
+  ArithmeticError        :: ArithException                           -> ValueError address body (Value address)
   -- Out-of-bounds error
-  BoundsError            :: [Value address body] -> Prelude.Integer  -> ValueError address body (Value address body)
+  BoundsError            :: [Value address] -> Prelude.Integer  -> ValueError address body (Value address)
 
 
 instance Eq address => Eq1 (ValueError address body) where
@@ -258,11 +246,11 @@ deriving instance Show address => Show (ValueError address body resume)
 instance Show address => Show1 (ValueError address body) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError address body)) effects => ValueError address body resume -> Evaluator address (Value address body) effects resume
+throwValueError :: Member (Resumable (ValueError address body)) effects => ValueError address body resume -> Evaluator address (Value address) effects resume
 throwValueError = throwResumable
 
-runValueError :: (Effectful (m address (Value address body)), Effects effects) => m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects (Either (SomeExc (ValueError address body)) a)
+runValueError :: (Effectful (m address (Value address)), Effects effects) => m address (Value address) (Resumable (ValueError address body) ': effects) a -> m address (Value address) effects (Either (SomeExc (ValueError address body)) a)
 runValueError = runResumable
 
-runValueErrorWith :: (Effectful (m address (Value address body)), Effects effects) => (forall resume . ValueError address body resume -> m address (Value address body) effects resume) -> m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects a
+runValueErrorWith :: (Effectful (m address (Value address)), Effects effects) => (forall resume . ValueError address body resume -> m address (Value address) effects resume) -> m address (Value address) (Resumable (ValueError address body) ': effects) a -> m address (Value address) effects a
 runValueErrorWith = runResumableWith
