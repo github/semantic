@@ -111,7 +111,7 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
 
 
   paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
-  blobs <- traverse readBlobFromPath (toFile <$> paths)
+  blobs <- traverse readBlobFromPath (entryPoints <> (toFile <$> paths))
   let p = Project.Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs
   liftIO $ putStrLn "Done"
   pure p
