@@ -43,6 +43,7 @@ module Semantic.Task
 , Distribute
 , Eff
 , Exc
+, Lift
 , throwError
 , SomeException
 , Telemetry
