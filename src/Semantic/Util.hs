@@ -33,61 +33,56 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
--- justEvaluating
---   = runM
---   . evaluating
---   . runPrintingTrace
---   . fmap reassociate
---   . runLoadError
---   . runUnspecialized
---   . runResolutionError
---   . runEnvironmentError
---   . runEvalError
---   . runAddressError
---   . runTermEvaluator @_ @Precise @(Value Precise (Eff _))
---   . runValueError
+justEvaluating
+  = runM
+  . evaluating
+  . runPrintingTrace
+  . fmap reassociate
+  . runLoadError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTermEvaluator @_ @Precise @(Value Precise (Eff _))
+  . runValueError
 
--- checking
---   = runM @_ @IO
---   . evaluating
---   . runPrintingTrace
---   . runTermEvaluator @_ @Monovariant @Type
---   . caching @[]
---   . providingLiveSet
---   . fmap reassociate
---   . runLoadError
---   . runUnspecialized
---   . runResolutionError
---   . runEnvironmentError
---   . runEvalError
---   . runAddressError
---   . runTypeError
+checking
+  = runM @_ @IO
+  . evaluating
+  . runPrintingTrace
+  . runTermEvaluator @_ @Monovariant @Type
+  . caching @[]
+  . providingLiveSet
+  . fmap reassociate
+  . runLoadError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTypeError
 
--- evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
--- evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
--- evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
--- evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
--- evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript javaScriptPrelude path
--- evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
+evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript javaScriptPrelude path
+evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 
--- typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
+typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
 
--- rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Language.Ruby
--- pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Language.Python
--- javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) Language.JavaScript
+rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Language.Ruby
+pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Language.Python
+javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) Language.JavaScript
 
--- -- Evaluate a project, starting at a single entrypoint.
--- evaluateProject :: a -> -
--- evaluateProject = undefined
--- evaluateProjectWithCaching :: a -> b
--- evaluateProjectWithCaching = undefined
--- evaluateProject :: _
--- evaluateProject parser lang prelude path = do
---   proj <- readProject Nothing path lang []
---   evaluatePackageWith id withTermSpans proj . fmap quieterm <$> runTask' (parsePackage parser prelude proj)
--- evaluateProjectWithCaching parser lang prelude path = do
---   proj <- readProject Nothing path lang []
---   evaluatePackageWith convergingModules (withTermSpans . cachingTerms) proj . fmap quieterm <$> runTask (parsePackage parser prelude)
+-- Evaluate a project, starting at a single entrypoint.
+evaluateProject parser lang prelude path = do
+  proj <- readProject Nothing path lang []
+  evaluatePackageWith id withTermSpans proj . fmap quieterm <$> runTask' (parsePackage parser prelude proj)
+evaluateProjectWithCaching parser lang prelude path = do
+  proj <- readProject Nothing path lang []
+  evaluatePackageWith convergingModules (withTermSpans . cachingTerms) proj . fmap quieterm <$> runTask (parsePackage parser prelude)
 
 
 parseFile :: Parser term -> FilePath -> IO term
