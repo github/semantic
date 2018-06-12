@@ -241,6 +241,7 @@ identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syn
 
 identifier' :: Assignment.Assignment [] Grammar Name
 identifier' = (symbol Identifier <|> symbol TypeIdentifier) *> (name <$> source)
+-- we want a name and not a full term wrapping the same, so we match the same stuff as identifier but we just produce the name
 
 scopedIdentifier :: Assignment
 scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> identifier')
