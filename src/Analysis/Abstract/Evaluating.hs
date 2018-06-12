@@ -13,8 +13,8 @@ data EvaluatingState address value = EvaluatingState
   , modules     :: ModuleTable (Maybe (address, Environment address))
   }
 
-deriving instance (Eq (Cell address value), Eq address, Eq value) => Eq (EvaluatingState address value)
-deriving instance (Ord (Cell address value), Ord address, Ord value) => Ord (EvaluatingState address value)
+deriving instance (Eq   (Cell address value), Eq   address, Eq   value) => Eq   (EvaluatingState address value)
+deriving instance (Ord  (Cell address value), Ord  address, Ord  value) => Ord  (EvaluatingState address value)
 deriving instance (Show (Cell address value), Show address, Show value) => Show (EvaluatingState address value)
 
 
