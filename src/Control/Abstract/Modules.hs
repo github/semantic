@@ -56,6 +56,13 @@ data Modules address value (m :: * -> *) return where
   Resolve :: [FilePath] -> Modules address value m (Maybe ModulePath)
   List    :: FilePath   -> Modules address value m [ModulePath]
 
+instance Effect (Modules address value) where
+  handleState c dist (Request (Load path) k) = Request (Load path) (dist . (<$ c) . k)
+  handleState c dist (Request (Lookup path) k) = Request (Lookup path) (dist . (<$ c) . k)
+  handleState c dist (Request (Resolve paths) k) = Request (Resolve paths) (dist . (<$ c) . k)
+  handleState c dist (Request (List path) k) = Request (List path) (dist . (<$ c) . k)
+
+
 sendModules :: Member (Modules address value) effects => Modules address value (Eff effects) return -> Evaluator address value effects return
 sendModules = send
 
