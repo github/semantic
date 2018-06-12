@@ -102,7 +102,6 @@ readBlobFromPath file = do
 
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
-  liftIO $ putStrLn "Starting readProjectFromPath"
   isDir <- isDirectory path
   let (filterFun, entryPoints, rootDir) = if isDir
       then (id, [], fromMaybe path maybeRoot)
@@ -111,9 +110,7 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
 
   paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
   blobs <- traverse readBlobFromPath (entryPoints <> (toFile <$> paths))
-  let p = Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs
-  liftIO $ putStrLn "Done"
-  pure p
+  pure (Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs)
   where
     toFile path = File path lang
     exts = extensionsForLanguage lang

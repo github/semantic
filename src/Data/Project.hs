@@ -28,7 +28,7 @@ import qualified Data.Text as T
 import           Proto3.Suite
 import           System.FilePath.Posix
 
--- | A 'Project' contains all the information that semantic needs
+-- | A 'ProjectF' contains all the information that semantic needs
 -- to execute an analysis, diffing, or graphing pass. It is higher-kinded
 -- in terms of the container type for paths and blobs, as well as the
 -- path type (this is necessary because protobuf uses different vector
@@ -94,7 +94,8 @@ file :: FilePath -> File
 file path = File path (languageForFilePath path)
   where languageForFilePath = languageForType . takeExtension
 
--- This is kind of a wart; Blob should really hold a 'File'.
+-- This is kind of a wart; Blob and File should be two views of
+-- the same higher-kinded datatype.
 toFile :: Blob -> File
 toFile (Blob _ p l) = File p l
 
