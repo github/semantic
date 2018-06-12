@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Distribute
 ( distribute
 , distributeFor
@@ -34,8 +34,8 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 
 -- | Distribute effects run tasks concurrently.
-data Distribute task output where
-  Distribute :: Traversable t => t (task output) -> Distribute task (t output)
+data Distribute task (m :: * -> *) output where
+  Distribute :: Traversable t => t (task output) -> Distribute task m (t output)
 
 
 -- | Evaluate a 'Distribute' effect concurrently.
