@@ -55,7 +55,7 @@ class Show1 constr => Evaluatable constr where
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
           , Member (Resumable (Unspecialized value)) effects
-          , Member (Return address value) effects
+          , Member (Return address) effects
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
@@ -84,7 +84,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Recursive term
                        , Reducer value (Cell address value)
                        , ValueRoots address value
-                       , inner ~ (LoopControl address value ': Return address value ': Env address ': Allocator address value ': inner')
+                       , inner ~ (LoopControl address value ': Return address ': Env address ': Allocator address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )

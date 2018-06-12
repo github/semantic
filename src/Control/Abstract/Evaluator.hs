@@ -37,22 +37,21 @@ deriving instance Member NonDet effects => Alternative (Evaluator address value 
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-data Return address value resume where
-  Return :: address -> Return address value address
+data Return address resume where
+  Return :: address -> Return address address
 
-deriving instance Eq address   => Eq   (Return address value a)
-deriving instance Show address => Show (Return address value a)
+deriving instance Eq address   => Eq   (Return address a)
+deriving instance Show address => Show (Return address a)
 
-earlyReturn :: forall address value effects
-            .  Member (Return address value) effects
+earlyReturn :: Member (Return address) effects
             => address
             -> Evaluator address value effects address
-earlyReturn = send . Return @address @value
+earlyReturn = send . Return
 
-catchReturn :: Member (Return address value) effects => Evaluator address value effects a -> (forall x . Return address value x -> Evaluator address value effects a) -> Evaluator address value effects a
+catchReturn :: Member (Return address) effects => Evaluator address value effects a -> (forall x . Return address x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Effectful (m address value) => m address value (Return address value ': effects) address -> m address value effects address
+runReturn :: Effectful (m address value) => m address value (Return address ': effects) address -> m address value effects address
 runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 
