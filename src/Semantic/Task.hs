@@ -55,7 +55,6 @@ import           Control.Monad
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
-import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Trace
 import           Data.Blob
 import           Data.Bool
@@ -66,7 +65,6 @@ import           Data.Record
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Data.Project
 import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter
 import           Parsing.CMark

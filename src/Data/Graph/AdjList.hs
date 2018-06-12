@@ -88,6 +88,7 @@ graphToAdjList = taggedGraphToAdjList . tagGraph
 -- Using a PBGraph as the accumulator for the fold would incur
 -- significant overhead associated with Vector concatenation.
 -- We use this and then pay the O(v + e) to-Vector cost once.
+-- The fields are strict because we have StrictData on.
 data Acc = Acc [Vertex] (HashSet Edge)
 
 -- Convert a graph with tagged members to a protobuf-compatible adjacency list.

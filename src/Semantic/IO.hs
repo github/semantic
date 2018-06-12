@@ -37,14 +37,13 @@ module Semantic.IO
 
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect
-import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Blob
 import           Data.Bool
 import qualified Data.Project as Project
-import           Data.Project (File (..), ProjectException (..))
+import           Data.Project (File (..))
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
