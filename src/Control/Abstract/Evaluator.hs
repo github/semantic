@@ -67,6 +67,10 @@ data LoopControl address (m :: * -> *) resume where
 deriving instance Eq address   => Eq   (LoopControl address m a)
 deriving instance Show address => Show (LoopControl address m a)
 
+instance Effect (LoopControl address) where
+  handleState c dist (Request (Break value) k) = Request (Break value) (dist . (<$ c) . k)
+  handleState c dist (Request (Continue value) k) = Request (Continue value) (dist . (<$ c) . k)
+
 throwBreak :: Member (LoopControl address) effects
            => address
            -> Evaluator address value effects address
