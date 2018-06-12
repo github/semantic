@@ -173,6 +173,14 @@ data Task (m :: * -> *) output where
   Render    :: Renderer input output -> input -> Task m output
   Serialize :: Format input -> input -> Task m Builder
 
+instance Effect Task where
+  handleState c dist (Request (Parse parser blob) k) = Request (Parse parser blob) (dist . (<$ c) . k)
+  handleState c dist (Request (Analyze run analysis) k) = Request (Analyze run analysis) (dist . (<$ c) . k)
+  handleState c dist (Request (Decorate decorator term) k) = Request (Decorate decorator term) (dist . (<$ c) . k)
+  handleState c dist (Request (Semantic.Task.Diff terms) k) = Request (Semantic.Task.Diff terms) (dist . (<$ c) . k)
+  handleState c dist (Request (Render renderer input) k) = Request (Render renderer input) (dist . (<$ c) . k)
+  handleState c dist (Request (Serialize format input) k) = Request (Serialize format input) (dist . (<$ c) . k)
+
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
