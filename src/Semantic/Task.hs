@@ -143,7 +143,7 @@ runTaskWithOptions options task = do
   closeQueue logger
   either (die . displayException) pure result
 
-runTaskWithOptions' :: Options -> AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> TaskEff a -> IO (Either SomeException a)
+runTaskWithOptions' :: Options -> LogQueue -> AsyncQueue Stat StatsClient -> TaskEff a -> IO (Either SomeException a)
 runTaskWithOptions' options logger statter task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
