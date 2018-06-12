@@ -12,6 +12,9 @@ module Control.Abstract.Evaluator
   , catchLoopControl
   , runLoopControl
   , Goto(..)
+  , label
+  , goto
+  , runGoto
   , module X
   ) where
 
@@ -19,11 +22,14 @@ import Control.Monad.Effect           as X
 import Control.Monad.Effect.Exception as Exc
 import Control.Monad.Effect.Fresh     as X
 import Control.Monad.Effect.Internal hiding (Return)
+import qualified Control.Monad.Effect.Internal as Eff
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
 import Control.Monad.Effect.State     as X
 import Control.Monad.Effect.Trace     as X
+import qualified Data.IntMap as IntMap
+import Data.Semilattice.Lower
 import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
@@ -96,3 +102,23 @@ type Label = Int
 data Goto address m result where
   Label :: m address -> Goto address m Label
   Goto  :: Label     -> Goto address m address
+
+instance Effect (Goto value) where
+  handleState c dist (Request (Label action) k) = Request (Label (dist (action <$ c))) (dist . fmap k)
+  handleState c dist (Request (Goto label) k) = Request (Goto label) (dist . (<$ c) . k)
+
+label :: Member (Goto address) effects => Evaluator address value effects address -> Evaluator address value effects Label
+label (Evaluator action) = send (Label action)
+
+goto :: Member (Goto address) effects => Label -> Evaluator address value effects address
+goto label = send (Goto label)
+
+runGoto :: forall address value effects a. (Member Fresh effects, Effects effects) => Evaluator address value (Goto address ': effects) a -> Evaluator address value effects a
+runGoto = raiseHandler (fmap snd . go lowerBound)
+  where go :: forall a . IntMap (Eff (Goto address ': effects) address) -> Eff (Goto address ': effects) a -> Eff effects (IntMap (Eff (Goto address ': effects) address), a)
+        go table (Eff.Return a)            = pure (table, a)
+        go table (Effect (Label action) k) = do
+          i <- fresh
+          go (IntMap.insert i action table) (k i)
+        go table (Effect (Goto label) k)   = go table (maybe (error ("programmer error: attempted to goto the unallocated label " <> show label)) (>>= k) (IntMap.lookup label table))
+        go table (Other u k)               = handleStateful (table, ()) (uncurry go) u k
