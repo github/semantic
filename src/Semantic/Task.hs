@@ -83,7 +83,7 @@ import           System.Exit (die)
 import           System.IO (stderr)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type TaskEff = Eff '[Distribute WrappedTask
+type TaskEff = Eff '[ Distribute WrappedTask
                     , Task
                     , Resolution
                     , IO.Files
