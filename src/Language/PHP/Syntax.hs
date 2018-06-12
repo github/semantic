@@ -55,14 +55,14 @@ include :: ( AbstractValue address value effects
            , Member Trace effects
            )
         => Subterm term (Evaluator address value effects (ValueRef address))
-        -> (ModulePath -> Evaluator address value effects (Maybe (address, Environment address)))
+        -> (ModulePath -> Evaluator address value effects (Maybe (Environment address, address)))
         -> Evaluator address value effects (ValueRef address)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
   unitPtr <- box unit -- TODO don't always allocate, use maybeM
-  (v, importedEnv) <- fromMaybe (unitPtr, emptyEnv) <$> f path
+  (importedEnv, v) <- fromMaybe (emptyEnv, unitPtr) <$> f path
   bindAll importedEnv
   pure (Rval v)
 

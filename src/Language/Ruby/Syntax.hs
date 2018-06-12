@@ -68,7 +68,7 @@ instance Evaluatable Require where
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
     traceResolve name path
-    (v, importedEnv) <- doRequire path
+    (importedEnv, v) <- doRequire path
     bindAll importedEnv
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
@@ -76,12 +76,12 @@ doRequire :: ( AbstractValue address value effects
              , Member (Modules address value) effects
              )
           => M.ModulePath
-          -> Evaluator address value effects (value, Environment address)
+          -> Evaluator address value effects (Environment address, value)
 doRequire path = do
   result <- join <$> lookupModule path
   case result of
-    Nothing       -> (,) (boolean True) . maybe emptyEnv snd <$> load path
-    Just (_, env) -> pure (boolean False, env)
+    Nothing       -> flip (,) (boolean True) . maybe emptyEnv fst <$> load path
+    Just (env, _) -> pure (env, boolean False)
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
@@ -112,7 +112,7 @@ doLoad :: ( AbstractValue address value effects
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- maybe emptyEnv snd <$> load path'
+  importedEnv <- maybe emptyEnv fst <$> load path'
   unless shouldWrap $ bindAll importedEnv
   pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
