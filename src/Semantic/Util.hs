@@ -77,9 +77,23 @@ pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Py
 javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) Language.JavaScript
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= addPrelude lang >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= addPrelude lang >>= parsePackage parser prelude)
 
+addPrelude :: Member IO effs => Language.Language -> Concrete -> Eff effs Concrete
+addPrelude l proj = do
+  let p = case l of
+        Language.Ruby -> rubyPrelude
+        Language.Python -> pythonPrelude
+        Language.TypeScript -> javaScriptPrelude
+        Language.JavaScript -> javaScriptPrelude
+        _ -> Nothing
+
+  case p of
+    Nothing -> pure proj
+    Just pth -> do
+      bl <- readBlobFromPath pth
+      pure $ proj { projectBlobs = bl : projectBlobs proj }
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)
