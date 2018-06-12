@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Modules
 ( lookupModule
 , resolve
@@ -50,19 +50,20 @@ load :: Member (Modules address value) effects => ModulePath -> Evaluator addres
 load path = sendModules (Load path)
 
 
-data Modules address value return where
-  Load    :: ModulePath -> Modules address value (Maybe (address, Environment address))
-  Lookup  :: ModulePath -> Modules address value (Maybe (Maybe (address, Environment address)))
-  Resolve :: [FilePath] -> Modules address value (Maybe ModulePath)
-  List    :: FilePath   -> Modules address value [ModulePath]
+data Modules address value (m :: * -> *) return where
+  Load    :: ModulePath -> Modules address value m (Maybe (address, Environment address))
+  Lookup  :: ModulePath -> Modules address value m (Maybe (Maybe (address, Environment address)))
+  Resolve :: [FilePath] -> Modules address value m (Maybe ModulePath)
+  List    :: FilePath   -> Modules address value m [ModulePath]
 
-sendModules :: Member (Modules address value) effects => Modules address value return -> Evaluator address value effects return
+sendModules :: Member (Modules address value) effects => Modules address value (Eff effects) return -> Evaluator address value effects return
 sendModules = send
 
 runModules :: forall term address value effects a
            .  ( Member (Resumable (LoadError address value)) effects
               , Member (State (ModuleTable (Maybe (address, Environment address)))) effects
               , Member Trace effects
+              , Effects effects
               )
            => (Module term -> Evaluator address value (Modules address value ': effects) (address, Environment address))
            -> Evaluator address value (Modules address value ': effects) a
@@ -128,10 +129,10 @@ moduleNotFound = throwResumable . ModuleNotFound @address @value
 resumeLoadError :: Member (Resumable (LoadError address value)) effects => Evaluator address value effects a -> (forall resume . LoadError address value resume -> Evaluator address value effects resume) -> Evaluator address value effects a
 resumeLoadError = catchResumable
 
-runLoadError :: Effectful (m address value) => m address value (Resumable (LoadError address value) ': effects) a -> m address value effects (Either (SomeExc (LoadError address value)) a)
+runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (LoadError address value) ': effects) a -> m address value effects (Either (SomeExc (LoadError address value)) a)
 runLoadError = runResumable
 
-runLoadErrorWith :: Effectful (m address value) => (forall resume . LoadError address value resume -> m address value effects resume) -> m address value (Resumable (LoadError address value) ': effects) a -> m address value effects a
+runLoadErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . LoadError address value resume -> m address value effects resume) -> m address value (Resumable (LoadError address value) ': effects) a -> m address value effects a
 runLoadErrorWith = runResumableWith
 
 
@@ -152,8 +153,8 @@ instance Eq1 ResolutionError where
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
 
-runResolutionError :: Effectful m => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
+runResolutionError :: (Effectful m, Effects effects) => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
 runResolutionError = runResumable
 
-runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
+runResolutionErrorWith :: (Effectful m, Effects effects) => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
 runResolutionErrorWith = runResumableWith
