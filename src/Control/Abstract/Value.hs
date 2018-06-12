@@ -241,7 +241,7 @@ address :: ( AbstractValue address value effects
         => ValueRef address value
         -> Evaluator address value effects address
 address (LvalLocal var) = variable var
-address (LvalMember obj prop) = evaluateInScopedEnv (deref obj) (fromJust <$> lookupEnv prop)
+address (LvalMember obj prop) = evaluateInScopedEnv (deref obj) (variable prop)
 address (Rval addr) = pure addr
 
 subtermAddress :: ( AbstractValue address value effects
