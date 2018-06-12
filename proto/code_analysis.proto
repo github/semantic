@@ -2,19 +2,19 @@ syntax = "proto3";
 import "types.proto";
 package github.semantic.v1alpha1;
 
-// Semanic's CodeAnalysis service provides endpoints for parsing, analyzing, and
+// Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and
 // comparing source code.
 service CodeAnalysis {
   // Parsing
   //
-  // Parse source code and return abstract syntax trees.
+  // Parse source code blobs and return abstract syntax trees.
   rpc Parse (ParseTreeRequest) returns (ParseTreeResponse);
 
   // Diffing
   //
-  // Summary of an AST diff of two source blobs.
+  // Summarize an AST diff of source blobs.
   rpc SummarizeDiff (SummarizeDiffRequest) returns (SummarizeDiffResponse);
-  // AST diff of two source blobs
+  // AST diff of source blobs
   // rpc Diff (DiffRequest) returns (DiffResponse) {}
 
   // Analyzing
@@ -23,7 +23,7 @@ service CodeAnalysis {
   // rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
   // rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
 
-  // Basic server health status check.
+  // Check health & status of the service.
   rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
 }
 
