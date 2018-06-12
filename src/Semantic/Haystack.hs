@@ -57,6 +57,7 @@ reportError logger HaystackClient{..} e@ErrorReport{..} = do
         [ "app"     .= haystackClientAppName
         , "host"    .= haystackClientHostName
         , "message" .= errMsg
+        , "class"   .= takeWhile (/= '\n') errMsg
         , "rollup"  .= rollup errMsg
         ] <> foldr (\(k, v) acc -> Text.pack k .= v : acc) [] errorReportContext
   let request = haystackClientRequest { requestBody = RequestBodyLBS (encode payload) }
