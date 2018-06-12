@@ -61,8 +61,8 @@ data LoopControl address value resume where
   Break    :: address -> LoopControl address value address
   Continue :: address -> LoopControl address value address
 
-deriving instance (Eq address, Eq value) => Eq (LoopControl address value a)
-deriving instance (Show address, Show value) => Show (LoopControl address value a)
+deriving instance Eq address   => Eq   (LoopControl address value a)
+deriving instance Show address => Show (LoopControl address value a)
 
 throwBreak :: forall address value effects
            .  Member (LoopControl address value) effects
