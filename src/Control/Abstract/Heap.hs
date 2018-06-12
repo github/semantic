@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , Configuration(..)
@@ -146,16 +146,17 @@ reachable roots heap = go mempty roots
 
 -- Effects
 
-sendAllocator :: Member (Allocator address value) effects => Allocator address value return -> Evaluator address value effects return
+sendAllocator :: Member (Allocator address value) effects => Allocator address value (Eff effects) return -> Evaluator address value effects return
 sendAllocator = send
 
-data Allocator address value return where
-  Alloc  :: Name             -> Allocator address value address
-  Deref  :: address          -> Allocator address value value
-  Assign :: address -> value -> Allocator address value ()
-  GC     :: Live address     -> Allocator address value ()
+data Allocator address value (m :: * -> *) return where
+  Alloc  :: Name             -> Allocator address value m address
+  Deref  :: address          -> Allocator address value m value
+  Assign :: address -> value -> Allocator address value m ()
+  GC     :: Live address     -> Allocator address value m ()
 
 runAllocator :: ( Addressable address effects
+                , Effects effects
                 , Foldable (Cell address)
                 , Member (Resumable (AddressError address value)) effects
                 , Member (State (Heap address (Cell address) value)) effects
@@ -185,8 +186,8 @@ instance Eq address => Eq1 (AddressError address value) where
   liftEq _ _                        _                        = False
 
 
-runAddressError :: Effectful (m address value) => m address value (Resumable (AddressError address value) ': effects) a -> m address value effects (Either (SomeExc (AddressError address value)) a)
+runAddressError :: (Effectful (m address value), Effects effects) => m address value (Resumable (AddressError address value) ': effects) a -> m address value effects (Either (SomeExc (AddressError address value)) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: Effectful (m address value) => (forall resume . AddressError address value resume -> m address value effects resume) -> m address value (Resumable (AddressError address value) ': effects) a -> m address value effects a
+runAddressErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . AddressError address value resume -> m address value effects resume) -> m address value (Resumable (AddressError address value) ': effects) a -> m address value effects a
 runAddressErrorWith = runResumableWith
