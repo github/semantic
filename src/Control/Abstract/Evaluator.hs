@@ -93,6 +93,6 @@ runLoopControl = raiseHandler (fmap (either id id) . Exc.runError . reinterpret 
 
 type Label = Int
 
-data Goto value m result where
-  Label :: m value -> Goto value m Label
-  Goto  :: Label   -> Goto value m value
+data Goto address m result where
+  Label :: m address -> Goto address m Label
+  Goto  :: Label     -> Goto address m address
