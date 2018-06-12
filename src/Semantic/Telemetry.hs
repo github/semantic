@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 ( writeLog
 , writeStat
@@ -30,9 +30,9 @@ time statName tags task = do
 
 
 -- | Statting and logging effects.
-data Telemetry output where
-  WriteStat :: Stat                                  -> Telemetry ()
-  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
+data Telemetry (m :: * -> *) output where
+  WriteStat :: Stat                                  -> Telemetry m ()
+  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry m ()
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
 runTelemetry :: (Member (Lift IO) effects, Effects effects) => LogQueue -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
@@ -41,7 +41,7 @@ runTelemetry logger statter = interpret (\ t -> case t of
   WriteLog level message pairs -> queueLogMessage logger level message pairs)
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
-ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
+ignoreTelemetry :: Effects effs => Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
   WriteLog{}  -> pure ())
