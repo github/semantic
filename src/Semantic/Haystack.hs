@@ -47,18 +47,22 @@ haystackClient maybeURL managerSettings hostName appName
   | otherwise = pure NullHaystackClient
 
 -- Report an error to Haystack over HTTP (blocking).
-reportError :: MonadIO io => LogQueue -> HaystackClient -> ErrorReport -> io ()
-reportError logger NullHaystackClient e                 = logError logger e
-reportError logger HaystackClient{..} e@ErrorReport{..} = do
-  logError logger e
-
-  let errMsg = displayException errorReportException
+reportError :: MonadIO io => String -> LogQueue -> HaystackClient -> ErrorReport -> io ()
+reportError sha logger NullHaystackClient ErrorReport{..} =
+  let msg = takeWhile (/= '\n') (displayException errorReportException) in
+  queueLogMessage logger Error msg errorReportContext
+reportError sha logger HaystackClient{..} ErrorReport{..} = do
+  let fullMsg = displayException errorReportException
+  let summary = takeWhile (/= '\n') fullMsg
+  queueLogMessage logger Error summary errorReportContext
   let payload = object $
-        [ "app"     .= haystackClientAppName
-        , "host"    .= haystackClientHostName
-        , "message" .= errMsg
-        , "class"   .= takeWhile (/= '\n') errMsg
-        , "rollup"  .= rollup errMsg
+        [ "app"       .= haystackClientAppName
+        , "host"      .= haystackClientHostName
+        , "sha"       .= sha
+        , "message"   .= summary
+        , "class"     .= summary
+        , "backtrace" .= fullMsg
+        , "rollup"    .= rollup fullMsg
         ] <> foldr (\(k, v) acc -> Text.pack k .= v : acc) [] errorReportContext
   let request = haystackClientRequest { requestBody = RequestBodyLBS (encode payload) }
 
@@ -68,7 +72,7 @@ reportError logger HaystackClient{..} e@ErrorReport{..} = do
     Right response -> do
       let status = statusCode (responseStatus response)
       if status /= 201
-        then queueLogMessage logger Error ("Failed to report error to haystack, status = " <> show status <> ".") []
+        then queueLogMessage logger Error ("Failed to report error to haystack, status=" <> show status <> ".") []
         else pure ()
   where
     rollup :: String -> Text
@@ -76,6 +80,3 @@ reportError logger HaystackClient{..} e@ErrorReport{..} = do
 
     md5 :: ByteString -> Digest MD5
     md5 = hash
-
-logError :: MonadIO io => LogQueue -> ErrorReport -> io ()
-logError logger ErrorReport{..} = queueLogMessage logger Error (displayException errorReportException) errorReportContext
