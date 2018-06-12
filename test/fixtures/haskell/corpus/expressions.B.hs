@@ -54,3 +54,5 @@ g = 1 - 1
 g = (-1)
 g = (-a)
 g = -(1)
+
+bar = catMaybes $ fmap (\q -> (q,) . Just <$> baz q) waz

@@ -54,3 +54,5 @@ f = 1 - 1
 f = (-1)
 f = (-a)
 f = -(1)
+
+foo = catMaybes $ fmap (\p -> (p,) . Just <$> bar p) waz

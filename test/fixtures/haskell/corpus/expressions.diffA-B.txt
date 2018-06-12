@@ -417,6 +417,31 @@
       (Statements
         (PrefixNegation
           (Integer))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(InfixOperatorApp
+        {+(VariableIdentifier)+}
+        {+(VariableOperator
+          {+(VariableSymbol)+})+}
+        {+(App
+          {+(App
+            {+(VariableIdentifier)+}
+            {+(Lambda
+              {+(VariableIdentifier)+}
+              {+(InfixOperatorApp
+                {+(Tuple
+                  {+(VariableIdentifier)+})+}
+                {+(VariableOperator
+                  {+(VariableSymbol)+})+}
+                {+(InfixOperatorApp
+                  {+(ConstructorIdentifier)+}
+                  {+(VariableOperator
+                    {+(VariableSymbol)+})+}
+                  {+(App
+                    {+(VariableIdentifier)+}
+                    {+(VariableIdentifier)+})+})+})+})+})+}
+          {+(VariableIdentifier)+})+})+})+})+}
   {-(Function
     {-(VariableIdentifier)-}
     {-(Statements
@@ -426,4 +451,29 @@
     {-(VariableIdentifier)-}
     {-(Statements
       {-(PrefixNegation
-        {-(Integer)-})-})-})-}))
+        {-(Integer)-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(InfixOperatorApp
+        {-(VariableIdentifier)-}
+        {-(VariableOperator
+          {-(VariableSymbol)-})-}
+        {-(App
+          {-(App
+            {-(VariableIdentifier)-}
+            {-(Lambda
+              {-(VariableIdentifier)-}
+              {-(InfixOperatorApp
+                {-(Tuple
+                  {-(VariableIdentifier)-})-}
+                {-(VariableOperator
+                  {-(VariableSymbol)-})-}
+                {-(InfixOperatorApp
+                  {-(ConstructorIdentifier)-}
+                  {-(VariableOperator
+                    {-(VariableSymbol)-})-}
+                  {-(App
+                    {-(VariableIdentifier)-}
+                    {-(VariableIdentifier)-})-})-})-})-})-}
+          {-(VariableIdentifier)-})-})-})-})-}))
