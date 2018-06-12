@@ -243,6 +243,7 @@ expressionChoices = [
                     , newType
                     , operator
                     , operatorSection
+                    , parenthesizedPattern
                     , parenthesizedTypePattern
                     , pattern
                     , pragma
@@ -437,6 +438,9 @@ operatorSection = (makeTerm <$> symbol RightOperatorSection <*> children (Syntax
 
 packageQualifiedImport :: Assignment
 packageQualifiedImport = makeTerm <$> symbol PackageQualifiedImport <*> (Literal.TextElement <$> source)
+
+parenthesizedPattern :: Assignment
+parenthesizedPattern = symbol ParenthesizedPattern *> children expressions
 
 parenthesizedTypePattern :: Assignment
 parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressions
