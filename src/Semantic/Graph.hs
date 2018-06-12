@@ -27,13 +27,12 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
-import qualified Data.Project as Project (readFile, Concrete)
+import qualified Data.Project as Project
 import           Data.Record
 import           Data.Term
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
-import           Semantic.IO (Files)
 import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
@@ -94,7 +93,7 @@ parseModule proj parser file = do
   mBlob <- Project.readFile proj file
   case mBlob of
     Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
-    Nothing   -> error ("file not found: " <> show file)
+    Nothing   -> throwError (SomeException (Project.FileNotFound (Project.filePath file)))
 
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects

@@ -5,7 +5,7 @@ import           Control.Monad.Effect
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
-import           Data.Project hiding (findFiles)
+import           Data.Project
 import qualified Data.Project as Project (Concrete)
 import qualified Data.Map as Map
 import           Data.Source
