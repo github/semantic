@@ -72,6 +72,7 @@ type Syntax = '[
   , Syntax.ModuleExport
   , Syntax.NewType
   , Syntax.Operator
+  , Syntax.OperatorSection
   , Syntax.Pragma
   , Syntax.QualifiedImportDeclaration
   , Syntax.QualifiedModuleIdentifier
@@ -225,6 +226,7 @@ expressionChoices = [
                     , moduleIdentifier
                     , newType
                     , operator
+                    , operatorSection
                     , parenthesizedTypePattern
                     , pattern
                     , pragma
@@ -403,6 +405,10 @@ newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$
 
 operator :: Assignment
 operator = typeOperator <|> constructorOperator <|> variableOperator
+
+operatorSection :: Assignment
+operatorSection = (makeTerm <$> symbol RightOperatorSection <*> children (Syntax.RightOperatorSection <$> expression <*> expression))
+               <|> (makeTerm <$> symbol LeftOperatorSection <*> children (Syntax.LeftOperatorSection <$> expression <*> expression))
 
 packageQualifiedImport :: Assignment
 packageQualifiedImport = makeTerm <$> symbol PackageQualifiedImport <*> (Literal.TextElement <$> source)

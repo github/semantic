@@ -177,4 +177,32 @@
             (Generator
               (VariableIdentifier)
               (EnumFrom
-                (Integer)))))))))
+                (Integer)))))))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (RightOperatorSection
+          (ConstructorOperator
+            (ConstructorSymbol))
+          (VariableIdentifier))))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (RightOperatorSection
+          (ConstructorOperator
+            (ConstructorSymbol))
+          (VariableIdentifier))))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (LeftOperatorSection
+          (VariableIdentifier)
+          (ConstructorOperator
+            (ConstructorSymbol)))))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (LeftOperatorSection
+          (VariableIdentifier)
+          (ConstructorOperator
+            (ConstructorSymbol)))))))

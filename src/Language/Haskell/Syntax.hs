@@ -508,3 +508,13 @@ instance Ord1 ArithmeticSequence where liftCompare = genericLiftCompare
 instance Show1 ArithmeticSequence where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ArithmeticSequence
+
+data OperatorSection a = RightOperatorSection a a
+                       | LeftOperatorSection a a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 OperatorSection where liftEq = genericLiftEq
+instance Ord1 OperatorSection where liftCompare = genericLiftCompare
+instance Show1 OperatorSection where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable OperatorSection
