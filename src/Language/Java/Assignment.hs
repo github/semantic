@@ -277,13 +277,14 @@ generic :: Assignment
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
 
 methodInvocation :: Assignment
-methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ token AnonDot <*> manyTerm typeArgument <*> identifier')) <*> (argumentList <|> pure []) <*> emptyTerm)
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm typeArgument <*> identifier')) <*> (argumentList <|> pure []) <*> emptyTerm)
   where
     callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
     callFunction a Nothing = ([], a)
+    -- optional produces a Maybe type (takes a Maybe a and returns a rule that produces a Maybe a)
 
 explicitConstructorInvocation :: Assignment
-explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
+explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
   where
     callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
     callFunction a Nothing = ([], a)
@@ -299,11 +300,12 @@ interface :: Assignment
 interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> annotationType)
   where
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
-    normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
+    normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> (extends <|> pure []) <*> interfaceBody)
     makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
-    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
+    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> pure [] <*> annotationTypeBody)
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
+    extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))
 
 package :: Assignment
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
@@ -510,9 +512,12 @@ constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children
 
 typeParameters :: Assignment.Assignment [] Grammar [Term]
 typeParameters = symbol TypeParameters *> children (manyTerm typeParam)
+-- not making a term, just matching children and returning the whole list
+-- unpacking the TypeParameters node
   where
     typeParam = makeTerm <$> symbol Grammar.TypeParameter <*> children (Java.Syntax.TypeParameter <$> manyTerm annotation <*> term identifier <*> (typeBound <|> pure []))
     typeBound = symbol TypeBound *> children (manyTerm type')
+
 
 annotation :: Assignment
 annotation = makeTerm <$> symbol NormalAnnotation <*> children (Java.Syntax.Annotation <$> term expression <*> (elementValuePairList <|> pure []))
