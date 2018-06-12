@@ -135,7 +135,7 @@ instance Show1 Context' where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context'
 
-data Class a = Class { classContent :: [a] }
+newtype Class a = Class { classContent :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Class where liftEq = genericLiftEq
