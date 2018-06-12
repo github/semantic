@@ -18,7 +18,7 @@ instance Ord1 File where liftCompare = genericLiftCompare
 instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable File where
-  eval File = Rval . string . T.pack . modulePath <$> currentModule
+  eval File = rvalBox =<< (string . T.pack . modulePath <$> currentModule)
 
 
 -- A line directive like the Ruby constant `__LINE__`.
@@ -30,4 +30,4 @@ instance Ord1 Line where liftCompare = genericLiftCompare
 instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Line where
-  eval Line = Rval . integer . fromIntegral . posLine . spanStart <$> currentSpan
+  eval Line = rvalBox =<< (integer . fromIntegral . posLine . spanStart <$> currentSpan)

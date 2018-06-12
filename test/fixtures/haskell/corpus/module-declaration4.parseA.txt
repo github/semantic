@@ -1,10 +1,10 @@
 (Module
-  (Identifier)
+  (ModuleIdentifier)
   (Export
     (TypeConstructorExport
       (VariableOperator
-        (Identifier))))
+        (VariableSymbol))))
   (Export
     (VariableOperator
-      (Identifier)))
+      (VariableSymbol)))
   (Statements))
