@@ -34,15 +34,19 @@ type Syntax = '[
   , Literal.Float
   , Literal.Integer
   , Literal.TextElement
+  , Literal.Tuple
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.Class
-  , Syntax.ConstructorOperator
+  , Syntax.ConstructorSymbol
   , Syntax.Context
   , Syntax.Context'
+  , Syntax.DefaultDeclaration
   , Syntax.Deriving
   , Syntax.Empty
+  , Syntax.EntityIdentifier
   , Syntax.Error
+  , Syntax.EqualityConstraint
   , Syntax.Export
   , Syntax.Field
   , Syntax.FunctionConstructor
@@ -58,6 +62,8 @@ type Syntax = '[
   , Syntax.ListConstructor
   , Syntax.Module
   , Syntax.ModuleExport
+  , Syntax.NewType
+  , Syntax.Operator
   , Syntax.Pragma
   , Syntax.QualifiedModuleIdentifier
   , Syntax.QualifiedTypeConstructorIdentifier
@@ -74,7 +80,7 @@ type Syntax = '[
   , Syntax.TypeSignature
   , Syntax.TypeSynonym
   , Syntax.UnitConstructor
-  , Syntax.VariableOperator
+  , Syntax.VariableSymbol
   , Type.TypeParameters
   , []
   ]
@@ -112,26 +118,35 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 constructor :: Assignment
-constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> (context' <|> emptyTerm) <*> typeConstructor <*> typeParameters))
+constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters))
            <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
 
 constructorIdentifier :: Assignment
-constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.ConstructorIdentifier . Name.name <$> source)
 
 constructorOperator :: Assignment
 constructorOperator = makeTerm <$> symbol ConstructorOperator <*> children (Syntax.ConstructorOperator <$> expression)
 
 constructorSymbol :: Assignment
-constructorSymbol = makeTerm <$> symbol ConstructorSymbol <*> (Syntax.Identifier . Name.name <$> source)
+constructorSymbol = makeTerm <$> symbol ConstructorSymbol <*> (Syntax.ConstructorSymbol . Name.name <$> source)
 
 context' :: Assignment
-context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> manyTerm (type' <|> contextPattern))
+context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> manyTerm expression)
 
 contextPattern :: Assignment
-contextPattern = symbol ContextPattern *> children type'
+contextPattern = makeTerm <$> symbol ContextPattern <*> children (manyTerm expression)
+
+defaultDeclaration :: Assignment
+defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
 
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
+
+equalityConstraint :: Assignment
+equalityConstraint = makeTerm <$> symbol EqualityConstraint <*> children (Syntax.EqualityConstraint <$> equalityLhs <*> equalityRhs)
+  where
+    equalityLhs = symbol EqualityLhs *> children expression
+    equalityRhs = symbol EqualityRhs *> children expression
 
 export :: Assignment
 export = makeTerm <$> symbol Export <*> children (Syntax.Export <$> expressions)
@@ -150,10 +165,13 @@ expressionChoices = [
                     , character
                     , comment
                     , context'
+                    , contextPattern
                     , constructorIdentifier
                     , constructorOperator
                     , constructorSymbol
+                    , defaultDeclaration
                     , derivingClause
+                    , equalityConstraint
                     , float
                     , functionConstructor
                     , functionDeclaration
@@ -169,9 +187,11 @@ expressionChoices = [
                     , listType
                     , moduleExport
                     , moduleIdentifier
+                    , newType
                     , operator
                     , parenthesizedTypePattern
                     , pragma
+                    , primitiveConstructorIdentifier
                     , qualifiedModuleIdentifier
                     , qualifiedTypeConstructorIdentifier
                     , quotedName
@@ -179,6 +199,7 @@ expressionChoices = [
                     , star
                     , strictType
                     , string
+                    , tupleType
                     , type'
                     , type''
                     , typePattern
@@ -295,7 +316,15 @@ moduleExport :: Assignment
 moduleExport = makeTerm <$> symbol ModuleExport <*> children (Syntax.ModuleExport <$> expressions)
 
 moduleIdentifier :: Assignment
-moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.ModuleIdentifier . Name.name <$> source)
+
+newConstructor :: Assignment
+newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters)
+
+newType :: Assignment
+newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$> manyTerm (context' <|> scopedTypeVariables) <*> typeLeft <*> newConstructor <*> (derivingClause <|> emptyTerm))
+  where
+    typeLeft = makeTerm <$> location <*> manyTermsTill expression (symbol NewConstructor)
 
 operator :: Assignment
 operator = typeOperator <|> constructorOperator <|> variableOperator
@@ -305,6 +334,9 @@ parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressio
 
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
+
+primitiveConstructorIdentifier :: Assignment
+primitiveConstructorIdentifier = makeTerm <$> symbol PrimitiveConstructorIdentifier <*> (Syntax.PrimitiveConstructorIdentifier . Name.name <$> source)
 
 qualifiedModuleIdentifier :: Assignment
 qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> someTerm' expression)
@@ -325,28 +357,31 @@ strictType :: Assignment
 strictType = makeTerm'
           <$> symbol StrictType
           <*> children (  (inject <$> (Syntax.StrictType <$> typeConstructor <*> typeParameters))
-                      <|> (inject <$> (Syntax.StrictTypeVariable <$> typeVariableIdentifier)))
+                      <|> (inject <$> (Syntax.StrictTypeVariable <$> expression)))
 
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
+tupleType :: Assignment
+tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm type')
+
 typeClassIdentifier :: Assignment
-typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.TypeClassIdentifier . Name.name <$> source)
 
 typeConstructorExport :: Assignment
 typeConstructorExport = makeTerm <$> symbol TypeConstructorExport <*> children (Syntax.TypeConstructorExport <$> expression)
 
 typeConstructorIdentifier :: Assignment
-typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.TypeConstructorIdentifier . Name.name <$> source)
 
 typeOperator :: Assignment
-typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.Identifier . Name.name <$> source)
+typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.TypeOperator . Name.name <$> source)
 
 typeSignature :: Assignment
-typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> (manyTerm context' <|> pure []) <*> type')
+typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> variableIdentifier <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expression)
 
 typeVariableIdentifier :: Assignment
-typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.TypeVariableIdentifier . Name.name <$> source)
 
 tuplingConstructor :: Assignment
 tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> rawSource)
@@ -369,7 +404,7 @@ type'' = makeTerm
       <*> children (Syntax.Type <$> expression <*> typeParameters <*> (kindSignature <|> emptyTerm))
 
 typeParameters :: Assignment
-typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> (manyTermsTill expression (symbol Annotation) <|> many expression))
+typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> (manyTermsTill expression (symbol Annotation) <|> manyTerm expression))
 
 typePattern :: Assignment
 typePattern = makeTerm <$> symbol TypePattern <*> children (Syntax.TypePattern <$> expressions)
@@ -382,9 +417,10 @@ typeConstructor =  constructorIdentifier
                <|> qualifiedModuleIdentifier
                <|> qualifiedTypeConstructorIdentifier
                <|> quotedName
+               <|> tupleType
+               <|> tuplingConstructor
                <|> typeClassIdentifier
                <|> typeConstructorIdentifier
-               <|> tuplingConstructor
                <|> unitConstructor
 
 typeSynonymDeclaration :: Assignment
@@ -400,13 +436,13 @@ unitConstructor :: Assignment
 unitConstructor = makeTerm <$> token UnitConstructor <*> pure Syntax.UnitConstructor
 
 variableIdentifier :: Assignment
-variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.Identifier . Name.name <$> source)
+variableIdentifier = makeTerm <$> symbol VariableIdentifier <*> (Syntax.VariableIdentifier . Name.name <$> source)
 
 variableOperator :: Assignment
 variableOperator = makeTerm <$> symbol VariableOperator <*> children (Syntax.VariableOperator <$> expression)
 
 variableSymbol :: Assignment
-variableSymbol = makeTerm <$> (symbol VariableSymbol <|> symbol VariableSymbol') <*> (Syntax.Identifier . Name.name <$> source)
+variableSymbol = makeTerm <$> (symbol VariableSymbol <|> symbol VariableSymbol') <*> (Syntax.VariableSymbol . Name.name <$> source)
 
 variableIdentifiers :: Assignment
 variableIdentifiers = makeTerm <$> location <*> many variableIdentifier

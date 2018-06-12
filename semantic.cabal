@@ -152,6 +152,7 @@ library
                      , Semantic.CLI
                      , Semantic.Diff
                      , Semantic.Distribute
+                     , Semantic.Env
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Log

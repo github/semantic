@@ -6,6 +6,7 @@ module Control.Abstract.Heap
 , getConfiguration
 , getHeap
 , putHeap
+, box
 , alloc
 , deref
 , assign
@@ -52,6 +53,13 @@ putHeap = put
 modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Heap address (Cell address) value -> Heap address (Cell address) value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
+box :: Member (Allocator address value) effects
+    => value
+    -> Evaluator address value effects address
+box val = do
+  addr <- alloc "<box>"
+  assign addr val
+  pure addr
 
 alloc :: Member (Allocator address value) effects => Name -> Evaluator address value effects address
 alloc = sendAllocator . Alloc
@@ -95,8 +103,8 @@ letrec' :: ( Member (Allocator address value) effects
            , Member (Env address) effects
            )
         => Name
-        -> (address -> Evaluator address value effects value)
-        -> Evaluator address value effects value
+        -> (address -> Evaluator address value effects a)
+        -> Evaluator address value effects a
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- locally (body addr)
@@ -104,13 +112,12 @@ letrec' name body = do
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Allocator address value) effects
-            , Member (Env address) effects
+variable :: ( Member (Env address) effects
             , Member (Resumable (EnvironmentError address)) effects
             )
          => Name
-         -> Evaluator address value effects value
-variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
+         -> Evaluator address value effects address
+variable name = lookupEnv name >>= maybeM (freeVariableError name)
 
 
 -- Garbage collection

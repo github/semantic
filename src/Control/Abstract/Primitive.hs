@@ -26,7 +26,7 @@ builtin s def = withCurrentCallStack callStack $ do
   def >>= assign addr
 
 lambda :: (AbstractFunction address value effects, Member Fresh effects)
-       => (Name -> Evaluator address value effects value)
+       => (Name -> Evaluator address value effects address)
        -> Evaluator address value effects value
 lambda body = do
   var <- nameI <$> fresh
@@ -44,4 +44,4 @@ defineBuiltins :: ( AbstractValue address value effects
                   )
                => Evaluator address value effects ()
 defineBuiltins =
-  builtin "print" (lambda (\ v -> variable v >>= asString >>= trace . unpack >> pure unit))
+  builtin "print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))

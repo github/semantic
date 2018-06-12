@@ -4,83 +4,83 @@
     (GADT
       (Empty)
       (Type
-        (Identifier)
+        (TypeConstructorIdentifier)
         (Statements
-          (Identifier)
-          (Identifier)
-          (Identifier))
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))
         (Empty))
       (Statements
         (GADTConstructor
           (Empty)
-          (Identifier)
+          (TypeConstructorIdentifier)
           (FunctionType
             (Type
-              (Identifier)
+              (TypeVariableIdentifier)
               (TypeParameters)
               (Empty))
             (FunctionType
               (Type
-                (Identifier)
+                (TypeVariableIdentifier)
                 (TypeParameters)
                 (Empty))
               (FunctionType
                 (Type
-                  (Identifier)
+                  (TypeVariableIdentifier)
                   (TypeParameters)
                   (Empty))
                 (Type
-                  (Identifier)
+                  (TypeConstructorIdentifier)
                   (TypeParameters
-                    (Identifier)
-                    (Identifier)
-                    (Identifier))
+                    (TypeVariableIdentifier)
+                    (TypeVariableIdentifier)
+                    (TypeVariableIdentifier))
                   (Empty))))))))
     (GADT
       (Empty)
       (Type
-        (Identifier)
+        (TypeConstructorIdentifier)
         (Statements
-          (Identifier)
-          (Identifier))
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))
         (Empty))
       (Statements
         (GADTConstructor
           (Empty)
-          (Identifier)
+          (TypeConstructorIdentifier)
           (FunctionType
             (Type
               (Statements
                 (Field
                   (Statements
-                    (Identifier))
+                    (VariableIdentifier))
                   (Type
-                    (Identifier)
+                    (TypeConstructorIdentifier)
                     (TypeParameters
-                      (Identifier))
+                      (TypeConstructorIdentifier))
                     (Empty)))
                 (Field
                   (Statements
-                    (Identifier))
+                    (VariableIdentifier))
                   (Type
-                    (Identifier)
+                    (TypeVariableIdentifier)
                     (TypeParameters
-                      (Identifier))
+                      (TypeVariableIdentifier))
                     (Empty))))
               (TypeParameters)
               (Empty))
             (Type
-              (Identifier)
+              (TypeConstructorIdentifier)
               (TypeParameters
-                (Identifier)
-                (Identifier))
+                (TypeVariableIdentifier)
+                (TypeVariableIdentifier))
               (Empty))))))
     (GADT
       (Empty)
       (Type
-        (Identifier)
+        (TypeConstructorIdentifier)
         (Statements
-          (Identifier))
+          (TypeVariableIdentifier))
         (KindSignature
           (KindFunctionType
             (Kind
@@ -92,71 +92,71 @@
     (GADT
       (Empty)
       (Type
-        (Identifier)
+        (TypeConstructorIdentifier)
         (Statements
-          (Identifier))
+          (TypeVariableIdentifier))
         (Empty))
       (Statements
         (GADTConstructor
           (Empty)
-          (Identifier)
+          (TypeConstructorIdentifier)
           (FunctionType
             (Type
               (StrictType
                 (QualifiedTypeConstructorIdentifier
-                  (Identifier)
-                  (Identifier))
+                  (ModuleIdentifier)
+                  (TypeConstructorIdentifier))
                 (TypeParameters))
               (TypeParameters)
               (Empty))
             (Type
-              (Identifier)
+              (TypeConstructorIdentifier)
               (TypeParameters
                 (QualifiedTypeConstructorIdentifier
-                  (Identifier)
-                  (Identifier)))
+                  (ModuleIdentifier)
+                  (TypeConstructorIdentifier)))
               (Empty))))
         (GADTConstructor
           (Empty)
-          (Identifier)
+          (TypeConstructorIdentifier)
           (FunctionType
             (Type
               (StrictType
                 (QualifiedTypeConstructorIdentifier
-                  (Identifier)
-                  (Identifier))
+                  (ModuleIdentifier)
+                  (TypeConstructorIdentifier))
                 (TypeParameters))
               (TypeParameters)
               (Empty))
             (Type
-              (Identifier)
+              (TypeConstructorIdentifier)
               (TypeParameters
                 (QualifiedTypeConstructorIdentifier
-                  (Identifier)
-                  (Identifier)))
+                  (ModuleIdentifier)
+                  (TypeConstructorIdentifier)))
               (Empty))))
         (GADTConstructor
           (Empty)
-          (Identifier)
+          (TypeConstructorIdentifier)
           (FunctionType
             (Type
               (StrictType
-                (Identifier)
+                (TypeConstructorIdentifier)
                 (TypeParameters))
               (TypeParameters)
               (Empty))
             (Type
-              (Identifier)
+              (TypeConstructorIdentifier)
               (TypeParameters
-                (Identifier))
+                (TypeConstructorIdentifier))
               (Empty))))))
     (GADT
       (Empty)
       (Type
-        (Identifier)
+        (TypeConstructorIdentifier)
         (Statements
           (AnnotatedTypeVariable
-            (Identifier)
+            (TypeVariableIdentifier)
             (KindListType
               (KindFunctionType
                 (Kind
@@ -164,31 +164,31 @@
                 (Kind
                   (Star)))))
           (AnnotatedTypeVariable
-            (Identifier)
+            (TypeVariableIdentifier)
             (Star)))
         (Empty))
       (Statements
         (GADTConstructor
           (Empty)
-          (Identifier)
+          (TypeConstructorIdentifier)
           (Context
             (Pragma)
             (FunctionType
               (Type
                 (StrictType
-                  (Identifier)
+                  (TypeConstructorIdentifier)
                   (TypeParameters))
                 (TypeParameters)
                 (Empty))
               (FunctionType
                 (Type
-                  (Identifier)
+                  (TypeVariableIdentifier)
                   (TypeParameters
-                    (Identifier))
+                    (TypeVariableIdentifier))
                   (Empty))
                 (Type
-                  (Identifier)
+                  (TypeConstructorIdentifier)
                   (TypeParameters
-                    (Identifier)
-                    (Identifier))
+                    (TypeVariableIdentifier)
+                    (TypeVariableIdentifier))
                   (Empty))))))))))
