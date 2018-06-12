@@ -403,7 +403,7 @@ enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.F
 
 -- TODO: instanceOf
 binary :: Assignment
-binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
+binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expressionAndParens expressionAndParens
   [ (inject .) . Expression.LessThan         <$ symbol AnonLAngle
   , (inject .) . Expression.GreaterThan      <$ symbol AnonRAngle
   , (inject .) . Expression.Equal            <$ symbol AnonEqualEqual
@@ -425,7 +425,11 @@ binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expressio
   , (inject .) . Expression.DividedBy        <$ symbol AnonSlash
   , (inject .) . Expression.InstanceOf       <$ symbol AnonInstanceof
   ])
-  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
+  where
+    invert cons a b = Expression.Not (makeTerm1 (cons a b))
+    expressionAndParens = token AnonLParen *> expressionAndParens <* token AnonRParen <|> expression
+    -- TODO: expressionAndParens is a hack that accommodates Java's nested parens case but
+    -- altering the TreeSitter Java grammar is a better longer term goal.
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack
