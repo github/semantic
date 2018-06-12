@@ -11,7 +11,7 @@ import qualified Data.Map as Map
 import           Data.Source
 import           Data.Language
 import           Prologue
-import           Semantic.Effect.Files
+import           Semantic.IO
 import           System.FilePath.Posix
 
 

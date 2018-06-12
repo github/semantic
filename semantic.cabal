@@ -78,7 +78,6 @@ library
                      , Data.Graph
                      , Data.Graph.AdjList
                      , Data.Graph.Vertex
-                     , Data.Handle
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
@@ -155,7 +154,6 @@ library
                      , Semantic.CLI
                      , Semantic.Diff
                      , Semantic.Distribute
-                     , Semantic.Effect.Files
                      , Semantic.Env
                      , Semantic.Graph
                      , Semantic.IO

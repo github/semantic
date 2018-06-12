@@ -5,7 +5,13 @@ module Semantic.Task
 , WrappedTask(..)
 , Level(..)
 , RAlgebra
-, module Semantic.Effect.Files
+-- * I/O
+, IO.readBlob
+, IO.readBlobs
+, IO.readBlobPairs
+, IO.readProject
+, IO.findFiles
+, IO.write
 -- * Module Resolution
 , resolutionMap
 , Resolution
@@ -68,7 +74,7 @@ import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Prologue hiding (MonadError (..), project)
 import           Semantic.Distribute
-import           Semantic.Effect.Files
+import qualified Semantic.IO as IO
 import           Semantic.Resolution
 import           Semantic.Log
 import           Semantic.Queue
@@ -82,7 +88,7 @@ import           System.IO (stderr)
 type TaskEff = Eff '[Distribute WrappedTask
                     , Task
                     , Resolution
-                    , Files
+                    , IO.Files
                     , Reader Options
                     , Trace
                     , Telemetry
@@ -147,7 +153,7 @@ runTaskWithOptions' options logger statter task = do
                    . runTelemetry logger statter
                    . runTraceInTelemetry
                    . runReader options
-                   . runFiles
+                   . IO.runFiles
                    . runResolution
                    . runTaskF
                    . runDistribute (run . unwrapTask)

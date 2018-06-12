@@ -7,7 +7,6 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
-
 import           Data.Project
 import           Data.Language (ensureLanguage)
 import           Data.List (intercalate)
@@ -25,7 +24,6 @@ import           Semantic.IO as IO
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
-import           Semantic.Effect.Files
 import           Serializing.Format
 import           Text.Read
 

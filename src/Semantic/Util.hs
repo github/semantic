@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-missing-signatures -Wno-unused-imports #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
 import           Analysis.Abstract.Caching
@@ -77,12 +77,8 @@ pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Py
 javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) Language.JavaScript
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = do
-  proj <- readProject Nothing path lang []
-  evaluatePackageWith id withTermSpans proj . fmap quieterm <$> runTask' (parsePackage parser prelude proj)
-evaluateProjectWithCaching parser lang prelude path = do
-  proj <- readProject Nothing path lang []
-  evaluatePackageWith convergingModules (withTermSpans . cachingTerms) proj . fmap quieterm <$> runTask (parsePackage parser prelude)
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
 parseFile :: Parser term -> FilePath -> IO term
