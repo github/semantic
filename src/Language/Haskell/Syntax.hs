@@ -225,15 +225,19 @@ instance Show1 Star where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Star
 
-newtype QualifiedTypeConstructorIdentifier a = QualifiedTypeConstructorIdentifier { qualifiedTypeConstructorIdentifierName :: NonEmpty a }
+data QualifiedEntityIdentifier a = QualifiedTypeConstructorIdentifier (NonEmpty a)
+                                 | QualifiedConstructorIdentifier (NonEmpty a)
+                                 | QualifiedInfixVariableIdentifier (NonEmpty a)
+                                 | QualifiedModuleIdentifier (NonEmpty a)
+                                 | QualifiedVariableIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
-instance Eq1 QualifiedTypeConstructorIdentifier where liftEq = genericLiftEq
-instance Ord1 QualifiedTypeConstructorIdentifier where liftCompare = genericLiftCompare
-instance Show1 QualifiedTypeConstructorIdentifier where liftShowsPrec = genericLiftShowsPrec
-instance Hashable1 QualifiedTypeConstructorIdentifier where liftHashWithSalt = foldl
+instance Eq1 QualifiedEntityIdentifier where liftEq = genericLiftEq
+instance Ord1 QualifiedEntityIdentifier where liftCompare = genericLiftCompare
+instance Show1 QualifiedEntityIdentifier where liftShowsPrec = genericLiftShowsPrec
+instance Hashable1 QualifiedEntityIdentifier where liftHashWithSalt = foldl
 
-instance Evaluatable QualifiedTypeConstructorIdentifier
+instance Evaluatable QualifiedEntityIdentifier
 
 data AnnotatedTypeVariable a = AnnotatedTypeVariable { annotatedTypeVariableIdentifier :: a, annotatedTypeVariableannotation :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -243,16 +247,6 @@ instance Ord1 AnnotatedTypeVariable where liftCompare = genericLiftCompare
 instance Show1 AnnotatedTypeVariable where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AnnotatedTypeVariable
-
-newtype QualifiedModuleIdentifier a = QualifiedModuleIdentifier { qualifiedModuleIdentifierName :: NonEmpty a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 QualifiedModuleIdentifier where liftEq = genericLiftEq
-instance Ord1 QualifiedModuleIdentifier where liftCompare = genericLiftCompare
-instance Show1 QualifiedModuleIdentifier where liftShowsPrec = genericLiftShowsPrec
-instance Hashable1 QualifiedModuleIdentifier where liftHashWithSalt = foldl
-
-instance Evaluatable QualifiedModuleIdentifier
 
 newtype Export a = Export { exportContent :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
