@@ -385,4 +385,45 @@
               (VariableIdentifier)
               (VariableOperator
                 (VariableSymbol))
-              (VariableIdentifier))))))))
+              (VariableIdentifier))))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (VariableOperator
+          (VariableSymbol))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (InfixOperatorApp
+          (Integer)
+          (VariableOperator
+            (VariableSymbol))
+          (Integer))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(PrefixNegation
+        {+(Integer)+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(PrefixNegation
+        {+(VariableIdentifier)+})+})+})+}
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (PrefixNegation
+          (Integer))))
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(PrefixNegation
+        {-(VariableIdentifier)-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(PrefixNegation
+        {-(Integer)-})-})-})-}))

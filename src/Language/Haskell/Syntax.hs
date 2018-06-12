@@ -524,7 +524,7 @@ instance Show1 ConstructorPattern where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ConstructorPattern
 
--- e.g. `a <- b` in a Haskell do block
+-- e.g. `a <- b` in a Haskell do block.
 data BindPattern a = BindPattern { bindPatternLeft :: a, bindPatternRight :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
@@ -551,3 +551,13 @@ instance Ord1 Lambda where liftCompare = genericLiftCompare
 instance Show1 Lambda where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Lambda
+
+-- e.g. -1 or (-a) as an expression and not `-` as a variable operator.
+newtype PrefixNegation a = PrefixNegation a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 PrefixNegation where liftEq = genericLiftEq
+instance Ord1 PrefixNegation where liftCompare = genericLiftCompare
+instance Show1 PrefixNegation where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable PrefixNegation

@@ -78,6 +78,7 @@ type Syntax = '[
   , Syntax.Operator
   , Syntax.OperatorSection
   , Syntax.Pragma
+  , Syntax.PrefixNegation
   , Syntax.QualifiedEntityIdentifier
   , Syntax.QualifiedImportDeclaration
   , Syntax.QuotedName
@@ -245,10 +246,12 @@ expressionChoices = [
                     , newType
                     , operator
                     , operatorSection
+                    , parenthesizedExpression
                     , parenthesizedPattern
                     , parenthesizedTypePattern
                     , pattern
                     , pragma
+                    , prefixNegation
                     , primitiveConstructorIdentifier
                     , primitiveVariableIdentifier
                     , qualifiedConstructorIdentifier
@@ -447,6 +450,9 @@ operatorSection = (makeTerm <$> symbol RightOperatorSection <*> children (Syntax
 packageQualifiedImport :: Assignment
 packageQualifiedImport = makeTerm <$> symbol PackageQualifiedImport <*> (Literal.TextElement <$> source)
 
+parenthesizedExpression :: Assignment
+parenthesizedExpression = symbol ParenthesizedExpression *> children expression
+
 parenthesizedPattern :: Assignment
 parenthesizedPattern = symbol ParenthesizedPattern *> children expressions
 
@@ -458,6 +464,9 @@ pattern = symbol Pattern *> children (expression)
 
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
+
+prefixNegation :: Assignment
+prefixNegation = makeTerm <$> symbol PrefixNegation <*> children (Syntax.PrefixNegation <$> expression)
 
 primitiveConstructorIdentifier :: Assignment
 primitiveConstructorIdentifier = makeTerm <$> symbol PrimitiveConstructorIdentifier <*> (Syntax.PrimitiveConstructorIdentifier . Name.name <$> source)
