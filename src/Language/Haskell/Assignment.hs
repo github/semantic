@@ -249,7 +249,7 @@ expressionChoices = [
                     , parenthesizedExpression
                     , parenthesizedPattern
                     , parenthesizedTypePattern
-                    , pattern
+                    , pattern'
                     , pragma
                     , prefixNegation
                     , primitiveConstructorIdentifier
@@ -459,8 +459,8 @@ parenthesizedPattern = symbol ParenthesizedPattern *> children expressions
 parenthesizedTypePattern :: Assignment
 parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressions
 
-pattern :: Assignment
-pattern = symbol Pattern *> children (expression)
+pattern' :: Assignment
+pattern' = symbol Pattern *> children (expression)
 
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
