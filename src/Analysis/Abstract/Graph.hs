@@ -26,7 +26,7 @@ import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import qualified Data.Text.Encoding as T
-import           Prologue hiding (packageName, project)
+import           Prologue hiding (project)
 
 style :: Style Vertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexName))

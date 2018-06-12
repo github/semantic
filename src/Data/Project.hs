@@ -76,14 +76,14 @@ projectExtensions :: Concrete -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
 
 projectEntryPoints :: Concrete -> [File]
-projectEntryPoints (Project {..})= foldr go [] projectBlobs
+projectEntryPoints Project {..} = foldr go [] projectBlobs
   where go b acc =
           if blobPath b `elem` projectEntryPaths
           then toFile b : acc
           else acc
 
 projectFiles :: Concrete -> [File]
-projectFiles = fmap toFile . projectBlobs where
+projectFiles = fmap toFile . projectBlobs
 
 data File = File
   { filePath     :: FilePath
@@ -98,7 +98,7 @@ file path = File path (languageForFilePath path)
 toFile :: Blob -> File
 toFile (Blob _ p l) = File p l
 
-data ProjectException
+newtype ProjectException
   = FileNotFound FilePath
     deriving (Show, Eq, Typeable, Exception)
 
