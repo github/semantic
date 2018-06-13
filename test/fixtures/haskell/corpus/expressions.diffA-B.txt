@@ -1,0 +1,479 @@
+(Module
+  (Empty)
+  (Statements
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (VariableIdentifier)
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (App
+              (VariableIdentifier)
+              (VariableIdentifier))
+            (VariableIdentifier))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (ConstructorIdentifier)
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (ConstructorIdentifier)
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (App
+              (ConstructorIdentifier)
+              (VariableIdentifier))
+            (VariableIdentifier))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (UnitConstructor)))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFrom
+        { (Integer)
+        ->(Integer) })))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFromThen
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) })))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFromTo
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) })))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (EnumFromThenTo
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) }
+        { (Integer)
+        ->(Integer) })))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (VariableIdentifier)
+          (Generator
+            (VariableIdentifier)
+            (VariableIdentifier)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (Tuple
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (Generator
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (Generator
+            (VariableIdentifier)
+            (VariableIdentifier)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (VariableIdentifier)
+          (Generator
+            (VariableIdentifier)
+            (Array
+              (Array
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) })
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) }))
+              (Array
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) })
+                (Tuple
+                { (Integer)
+                ->(Integer) }
+                { (Integer)
+                ->(Integer) }))))
+          (Generator
+            (TuplePattern
+            { (Integer)
+            ->(Integer) }
+              (VariableIdentifier))
+            (VariableIdentifier)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (Tuple
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (Generator
+            (VariableIdentifier)
+            (Array
+              (Integer)
+              (Integer)
+            {+(Integer)+}
+            {+(Integer)+}))
+          (Generator
+            (VariableIdentifier)
+            (EnumFromTo
+              (Integer)
+            { (Integer)
+            ->(Integer) })))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (ListComprehension
+          (ListComprehension
+            (Tuple
+              (VariableIdentifier)
+              (VariableIdentifier))
+            (Generator
+              (VariableIdentifier)
+              (Array
+              {-(Integer)-}
+                (Integer)
+              {+(Integer)+})))
+          (Generator
+            (VariableIdentifier)
+            (EnumFrom
+            { (Integer)
+            ->(Integer) })))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (App
+          (App
+            (VariableIdentifier)
+          { (Integer)
+          ->(Integer) })
+          (ListComprehension
+            (ListComprehension
+              (Tuple
+                (VariableIdentifier)
+                (VariableIdentifier))
+              (Generator
+                (VariableIdentifier)
+                (Array
+                  (Integer)
+                  (Integer))))
+            (Generator
+              (VariableIdentifier)
+              (EnumFrom
+                (Integer)))))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (RightOperatorSection
+          (ConstructorOperator
+            (ConstructorSymbol))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (RightOperatorSection
+          (ConstructorOperator
+            (ConstructorSymbol))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (LeftOperatorSection
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (ConstructorOperator
+            (ConstructorSymbol)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (LeftOperatorSection
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (ConstructorOperator
+            (ConstructorSymbol)))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (InfixOperatorApp
+          (VariableIdentifier)
+          (VariableOperator
+            (InfixVariableIdentifier))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (QualifiedConstructorIdentifier
+          (ModuleIdentifier)
+          (ConstructorIdentifier))))
+    (Function
+      (VariableIdentifier)
+      (ConstructorPattern
+        (Statements
+          (QualifiedConstructorIdentifier
+            (ModuleIdentifier)
+            (ConstructorIdentifier))
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }))
+      (Statements
+        (InfixOperatorApp
+          (ConstructorIdentifier)
+          (VariableOperator
+            (VariableSymbol))
+          (InfixOperatorApp
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (VariableOperator
+              (VariableSymbol))
+            (InfixOperatorApp
+              (TextElement)
+              (VariableOperator
+                (VariableSymbol))
+              (InfixOperatorApp
+              { (VariableIdentifier)
+              ->(VariableIdentifier) }
+                (VariableOperator
+                  (VariableSymbol))
+                (InfixOperatorApp
+                  (TextElement)
+                  (VariableOperator
+                    (VariableSymbol))
+                  (InfixOperatorApp
+                  { (VariableIdentifier)
+                  ->(VariableIdentifier) }
+                    (VariableOperator
+                      (VariableSymbol))
+                    (InfixOperatorApp
+                      (TextElement)
+                      (VariableOperator
+                        (VariableSymbol))
+                      (InfixOperatorApp
+                      { (VariableIdentifier)
+                      ->(VariableIdentifier) }
+                        (VariableOperator
+                          (VariableSymbol))
+                        (TextElement)))))))))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Do
+          (BindPattern
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (InfixOperatorApp
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }
+              (VariableOperator
+                (VariableSymbol))
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }))
+          (BindPattern
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (InfixOperatorApp
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }
+              (VariableOperator
+                (VariableSymbol))
+            { (VariableIdentifier)
+            ->(VariableIdentifier) })))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (VariableIdentifier)
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (ConstructorPattern
+            (Statements
+              (ConstructorIdentifier)
+              (VariableIdentifier)))
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (VariableIdentifier)
+          (InfixOperatorApp
+            (VariableIdentifier)
+            (ConstructorOperator
+              (ConstructorSymbol))
+            (InfixOperatorApp
+              (VariableIdentifier)
+              (ConstructorOperator
+                (ConstructorSymbol))
+              (VariableIdentifier))))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (Statements
+            (VariableIdentifier)
+            (VariableIdentifier)
+            (VariableIdentifier))
+          (InfixOperatorApp
+            (VariableIdentifier)
+            (VariableOperator
+              (VariableSymbol))
+            (InfixOperatorApp
+              (VariableIdentifier)
+              (VariableOperator
+                (VariableSymbol))
+              (VariableIdentifier))))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (VariableOperator
+          (VariableSymbol))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (InfixOperatorApp
+          (Integer)
+          (VariableOperator
+            (VariableSymbol))
+          (Integer))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(PrefixNegation
+        {+(Integer)+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(PrefixNegation
+        {+(VariableIdentifier)+})+})+})+}
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (PrefixNegation
+          (Integer))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(InfixOperatorApp
+        {+(VariableIdentifier)+}
+        {+(VariableOperator
+          {+(VariableSymbol)+})+}
+        {+(App
+          {+(App
+            {+(VariableIdentifier)+}
+            {+(Lambda
+              {+(VariableIdentifier)+}
+              {+(InfixOperatorApp
+                {+(Tuple
+                  {+(VariableIdentifier)+})+}
+                {+(VariableOperator
+                  {+(VariableSymbol)+})+}
+                {+(InfixOperatorApp
+                  {+(ConstructorIdentifier)+}
+                  {+(VariableOperator
+                    {+(VariableSymbol)+})+}
+                  {+(App
+                    {+(VariableIdentifier)+}
+                    {+(VariableIdentifier)+})+})+})+})+})+}
+          {+(VariableIdentifier)+})+})+})+})+}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(PrefixNegation
+        {-(VariableIdentifier)-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(PrefixNegation
+        {-(Integer)-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(InfixOperatorApp
+        {-(VariableIdentifier)-}
+        {-(VariableOperator
+          {-(VariableSymbol)-})-}
+        {-(App
+          {-(App
+            {-(VariableIdentifier)-}
+            {-(Lambda
+              {-(VariableIdentifier)-}
+              {-(InfixOperatorApp
+                {-(Tuple
+                  {-(VariableIdentifier)-})-}
+                {-(VariableOperator
+                  {-(VariableSymbol)-})-}
+                {-(InfixOperatorApp
+                  {-(ConstructorIdentifier)-}
+                  {-(VariableOperator
+                    {-(VariableSymbol)-})-}
+                  {-(App
+                    {-(VariableIdentifier)-}
+                    {-(VariableIdentifier)-})-})-})-})-})-}
+          {-(VariableIdentifier)-})-})-})-})-}))
