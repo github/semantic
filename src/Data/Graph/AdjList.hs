@@ -117,7 +117,7 @@ taggedGraphToAdjList = accumToAdj . adjMapToAccum . adjacencyMap . toGraph . sim
             V.Module{}   -> MODULE
             V.Variable{} -> VARIABLE
 
--- Annotate all vertices of a 'Graph' with a 'Tag', starting from 0.
+-- Annotate all vertices of a 'Graph' with a 'Tag', starting from 1.
 tagGraph :: Graph vertex -> Graph (vertex, Tag)
 tagGraph = run . runFresh 1 . go where
   go :: Graph vertex -> Eff '[Fresh] (Graph (vertex, Tag))

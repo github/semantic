@@ -4,7 +4,7 @@ module Data.Project (
   -- * Projects
     ProjectF (..)
   , Project
-  , PB
+  , PBProject
   , ProjectException (..)
   , fromPB
   , projectExtensions
@@ -52,13 +52,13 @@ type Project = ProjectF [] [] FilePath
 
 -- | This 'Project' type is protobuf-compatible, and corresponds with
 -- the @Project@ message declaration present in types.proto.
-type PB = ProjectF NestedVec UnpackedVec Text
+type PBProject = ProjectF NestedVec UnpackedVec Text
 
-deriving instance Message PB
-instance Named PB where nameOf _ = "Project"
+deriving instance Message PBProject
+instance Named PBProject where nameOf _ = "Project"
 
--- | Convert from a packed protobuf representatio nto a more useful one.
-fromPB :: PB -> Project
+-- | Convert from a packed protobuf representation to a more useful one.
+fromPB :: PBProject -> Project
 fromPB Project {..} = Project
   { projectRootDir     = T.unpack projectRootDir
   , projectBlobs       = toList projectBlobs
