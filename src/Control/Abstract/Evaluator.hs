@@ -103,7 +103,7 @@ data Goto address m result where
   Label :: m address -> Goto address m Label
   Goto  :: Label     -> Goto address m address
 
-instance Effect (Goto value) where
+instance Effect (Goto address) where
   handleState c dist (Request (Label action) k) = Request (Label (dist (action <$ c))) (dist . fmap k)
   handleState c dist (Request (Goto label) k) = Request (Goto label) (dist . (<$ c) . k)
 
