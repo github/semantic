@@ -8,7 +8,14 @@ module Semantic.Telemetry
 , queueErrorReport
 , queueStat
 
+, Stat.increment
+, Stat.decrement
 , Stat.count
+, Stat.gauge
+, Stat.timing
+, Stat.withTiming
+, Stat.histogram
+, Stat.set
 , statsClient
 , StatsClient
 
