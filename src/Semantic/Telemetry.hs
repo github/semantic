@@ -38,7 +38,6 @@ import Semantic.Telemetry.Haystack
 import Semantic.Telemetry.Log
 import Semantic.Telemetry.Stat as Stat
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
-import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
 
 type LogQueue = AsyncQueue Message LogOptions
