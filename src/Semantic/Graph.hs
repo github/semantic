@@ -4,6 +4,7 @@ module Semantic.Graph
 , GraphType(..)
 , Graph
 , Vertex
+, GraphEff(..)
 , style
 , parsePackage
 , withTermSpans
@@ -64,8 +65,32 @@ runGraph graphType includePackages project
             . resumingResolutionError
             . resumingAddressError
             . resumingValueError
-            . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (Eff _))
+            . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _))
             . graphing
+
+newtype GraphEff address a = GraphEff
+  { runGraphEff :: Eff '[ LoopControl address
+                        , Return address
+                        , Env address
+                        , Allocator address (Value address (GraphEff address))
+                        , Reader ModuleInfo
+                        , Modules address (Value address (GraphEff address))
+                        , Reader Span
+                        , Reader PackageInfo
+                        , State (Graph Vertex)
+                        , Resumable (ValueError address (GraphEff address))
+                        , Resumable (AddressError address (Value address (GraphEff address)))
+                        , Resumable ResolutionError
+                        , Resumable EvalError
+                        , Resumable (EnvironmentError address)
+                        , Resumable (Unspecialized (Value address (GraphEff address)))
+                        , Resumable (LoadError address (Value address (GraphEff address)))
+                        , Trace
+                        , Fresh
+                        , State (Heap address Latest (Value address (GraphEff address)))
+                        , State (ModuleTable (Maybe (address, Environment address)))
+                        ] a
+  }
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: (Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)

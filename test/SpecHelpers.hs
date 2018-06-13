@@ -9,6 +9,7 @@ module SpecHelpers
 , derefQName
 , verbatim
 , TermEvaluator(..)
+, TestEff(..)
 , Verbatim(..)
 ) where
 
@@ -79,15 +80,15 @@ readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
 testEvaluating :: TermEvaluator term Precise
-                    (Value Precise (Eff effects))
-                    '[ Resumable (ValueError Precise (Eff effects))
-                     , Resumable (AddressError Precise (Value Precise (Eff effects)))
+                    Val
+                    '[ Resumable (ValueError Precise TestEff)
+                     , Resumable (AddressError Precise Val)
                      , Resumable EvalError, Resumable (EnvironmentError Precise)
                      , Resumable ResolutionError
-                     , Resumable (Unspecialized (Value Precise (Eff effects)))
-                     , Resumable (LoadError Precise (Value Precise (Eff effects)))
+                     , Resumable (Unspecialized Val)
+                     , Resumable (LoadError Precise Val)
                      , Fresh
-                     , State (Heap Precise Latest (Value Precise (Eff effects)))
+                     , State (Heap Precise Latest Val)
                      , State (ModuleTable (Maybe (Precise, Environment Precise)))
                      , Trace
                      ]
@@ -95,16 +96,16 @@ testEvaluating :: TermEvaluator term Precise
                -> ((Either
                       (SomeExc
                          (Data.Sum.Sum
-                          '[ ValueError Precise (Eff effects)
-                           , AddressError Precise (Value Precise (Eff effects))
+                          '[ ValueError Precise TestEff
+                           , AddressError Precise Val
                            , EvalError
                            , EnvironmentError Precise
                            , ResolutionError
-                           , Unspecialized (Value Precise (Eff effects))
-                           , LoadError Precise (Value Precise (Eff effects))
+                           , Unspecialized Val
+                           , LoadError Precise Val
                            ]))
-                      [(Value Precise (Eff effects), Environment Precise)],
-                    EvaluatingState Precise (Value Precise (Eff effects))),
+                      [(Value Precise TestEff, Environment Precise)],
+                    EvaluatingState Precise Val),
                    [String])
 testEvaluating
   = run
@@ -119,7 +120,31 @@ testEvaluating
   . runAddressError
   . runValueError
   . (>>= traverse deref1)
-  . runTermEvaluator @_ @_ @(Value Precise (Eff _))
+  . runTermEvaluator @_ @_ @Val
+
+type Val = Value Precise TestEff
+newtype TestEff a = TestEff
+  { runTestEff :: Eff '[ LoopControl Precise
+                       , Return Precise
+                       , Env Precise
+                       , Allocator Precise Val
+                       , Reader ModuleInfo
+                       , Modules Precise Val
+                       , Reader Span
+                       , Reader PackageInfo
+                       , Resumable (ValueError Precise TestEff)
+                       , Resumable (AddressError Precise Val)
+                       , Resumable EvalError
+                       , Resumable (EnvironmentError Precise)
+                       , Resumable ResolutionError
+                       , Resumable (Unspecialized Val)
+                       , Resumable (LoadError Precise Val)
+                       , Fresh
+                       , State (Heap Precise Latest Val)
+                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                       , Trace
+                       ] a
+  }
 
 deref1 (ptr, env) = runAllocator $ do
   val <- deref ptr
