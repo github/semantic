@@ -15,6 +15,7 @@ module Semantic.IO
 , noLanguageForBlob
 , openFileForReading
 , readBlob
+, readBlobFromPath
 , readBlobPairs
 , readBlobPairsFromHandle
 , readBlobs
@@ -41,7 +42,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Blob
 import           Data.Bool
-import           Data.Project
+import           Data.Project hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
@@ -106,8 +107,10 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
       then (id, [], fromMaybe path maybeRoot)
       else (filter (/= path), [toFile path], fromMaybe (takeDirectory path) maybeRoot)
 
+
   paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
-  pure $ Project rootDir (toFile <$> paths) lang entryPoints excludeDirs
+  blobs <- traverse readBlobFromPath (entryPoints <> (toFile <$> paths))
+  pure (Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs)
   where
     toFile path = File path lang
     exts = extensionsForLanguage lang
@@ -231,7 +234,6 @@ runFiles = interpret $ \ files -> case files of
   FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
-
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
 --
