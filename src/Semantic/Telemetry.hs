@@ -55,7 +55,7 @@ type HaystackQueue = AsyncQueue ErrorReport HaystackClient
 -- | Queue a message to be logged.
 queueLogMessage :: MonadIO io => LogQueue -> Level -> String -> [(String, String)] -> io ()
 queueLogMessage q@AsyncQueue{..} level message pairs
-  | Just logLevel <- optionsLevel asyncQueueExtra
+  | Just logLevel <- logOptionsLevel asyncQueueExtra
   , level <= logLevel = liftIO Time.getCurrentTime >>= liftIO . LocalTime.utcToLocalZonedTime >>= liftIO . writeAsyncQueue q . Message level message pairs
   | otherwise = pure ()
 

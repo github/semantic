@@ -1,19 +1,23 @@
+{-# OPTIONS_GHC -fforce-recomp #-} -- So that gitHash is correct.
+{-# LANGUAGE TemplateHaskell #-}
 module Semantic.Config where
 
-import Control.Exception
-import Network.BSD
-import Network.HTTP.Client.TLS
-import Network.URI
-import Prologue
-import Semantic.Telemetry
-import Semantic.Telemetry.AsyncQueue
-import qualified Semantic.Telemetry.Stat as Stat
+import           Control.Exception
+import           Network.BSD
+import           Network.HTTP.Client.TLS
+import           Network.URI
+import           Prologue
+import           Semantic.Env
+import           Semantic.Telemetry
+import           Semantic.Telemetry.AsyncQueue
+import qualified Semantic.Telemetry.Haystack as Haystack
 import qualified Semantic.Telemetry.Log as Log
-import Semantic.Env
-import System.Environment
-import System.IO (hIsTerminalDevice, stderr)
-import System.Posix.Process
-import System.Posix.Types
+import qualified Semantic.Telemetry.Stat as Stat
+import           Semantic.Version
+import           System.Environment
+import           System.IO (hIsTerminalDevice, stderr)
+import           System.Posix.Process
+import           System.Posix.Types
 
 data Config
   = Config
@@ -65,13 +69,17 @@ defaultConfig' options@Options{..} = do
     , configMaxTelemetyQueueSize = size
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal
-    , configLogFormatter = logfmtFormatter
+    , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
 
     , configOptions = options
     }
 
+
+defaultHaystackFromConfig :: Config -> Haystack.ErrorLogger IO -> IO HaystackQueue
+defaultHaystackFromConfig c@Config{..} logError = haystackClientFromConfig c >>= newAsyncQueue configMaxTelemetyQueueSize (Haystack.reportError logError)
+
 haystackClientFromConfig :: Config -> IO HaystackClient
-haystackClientFromConfig Config{..} = haystackClient configHaystackURL tlsManagerSettings configHostName configAppName
+haystackClientFromConfig Config{..} = haystackClient configHaystackURL tlsManagerSettings configAppName
 
 
 withLogger :: Config -> (LogQueue -> IO c) -> IO c
@@ -79,12 +87,21 @@ withLogger c = bracket (defaultLoggerFromConfig c) closeAsyncQueue
 
 defaultLoggerFromConfig :: Config -> IO LogQueue
 defaultLoggerFromConfig Config{..} =
-  newAsyncQueue configMaxTelemetyQueueSize Log.writeLogMessage LogOptions{
-    optionsLevel      = optionsLogLevel configOptions
-  , optionsFormatter  = configLogFormatter
-  , optionsLogContext = [("app", configAppName), ("process_id", show configProcessID)] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
+  newAsyncQueue configMaxTelemetyQueueSize Log.writeLogMessage LogOptions {
+    logOptionsLevel     = optionsLogLevel configOptions
+  , logOptionsFormatter = configLogFormatter
+  , logOptionsContext   =
+    [ ("app", configAppName)
+    , ("pid", show configProcessID)
+    , ("hostname", configHostName)
+    , ("sha", buildSHA)
+    ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
   }
 
+withStatter :: Config -> (StatQueue -> IO c) -> IO c
+withStatter c = bracket (defaultStatterFromConfig c) $ \statter -> do
+  closeAsyncQueue statter
+  Stat.closeStatClient (asyncQueueExtra statter)
 
 defaultStatterFromConfig :: Config -> IO StatQueue
 defaultStatterFromConfig c@Config{..} = statsClientFromConfig c >>= newAsyncQueue configMaxTelemetyQueueSize Stat.sendStat

@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -fforce-recomp #-} -- So that gitHash is correct.
-{-# LANGUAGE ApplicativeDo, RankNTypes, TemplateHaskell #-}
+{-# LANGUAGE ApplicativeDo, RankNTypes #-}
 module Semantic.CLI
 ( main
 -- Testing
@@ -11,10 +10,7 @@ import           Data.Language (ensureLanguage)
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
 import           Data.Project
-import           Data.Version (showVersion)
-import           Development.GitRev
 import           Options.Applicative hiding (style)
-import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.AST as AST
@@ -25,6 +21,7 @@ import           Semantic.IO as IO
 import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
 import qualified Semantic.Telemetry.Log as Log
+import           Semantic.Version
 import           Serializing.Format hiding (Options)
 import           Text.Read
 
@@ -38,9 +35,9 @@ arguments :: ParserInfo (Options, Task.TaskEff ())
 arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsParser)) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
-    versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
+    versionString = "semantic version " <> buildVersion <> " (" <> buildSHA <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
-
+    
     optionsParser = do
       logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
                           (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")

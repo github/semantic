@@ -73,14 +73,11 @@ import           Prologue hiding (MonadError (..), project)
 import           Semantic.Config
 import           Semantic.Distribute
 import qualified Semantic.IO as IO
--- import           Semantic.Log
--- import           Semantic.Queue
 import           Semantic.Resolution
-import           Semantic.Telemetry.Stat as Stat
 import           Semantic.Telemetry
+import           Semantic.Telemetry.Stat as Stat
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
-import           System.IO (stderr)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff = Eff '[Distribute WrappedTask
@@ -129,21 +126,16 @@ serialize format = send . Serialize format
 runTask :: TaskEff a -> IO a
 runTask = runTaskWithOptions defaultOptions
 
--- | Execute a 'TaskEff' with the passed 'Config', yielding its result value in 'IO'.
+-- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> TaskEff a -> IO a
 runTaskWithOptions opts task = do
   config <- defaultConfig' opts
-  statter <- defaultStatterFromConfig config
-  -- logger <- defaultLoggerFromConfig c
-
   result <- withLogger config $ \logger ->
-    runTaskWithConfig config logger statter task
-
-  -- closeQueue statter
-  -- closeStatClient (asyncQueueExtra statter)
-  -- closeQueue logger
+    withStatter config $ \statter ->
+      runTaskWithConfig config logger statter task
   either (die . displayException) pure result
 
+-- | Execute a 'TaskEff' yielding its result value in 'IO'.
 runTaskWithConfig :: Config -> LogQueue -> StatQueue -> TaskEff a -> IO (Either SomeException a)
 runTaskWithConfig options logger statter task = do
   (result, stat) <- withTiming "run" [] $ do

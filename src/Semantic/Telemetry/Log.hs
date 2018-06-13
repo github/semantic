@@ -27,14 +27,14 @@ data Level
 
 -- | Options for controlling logging
 data LogOptions = LogOptions
-  { optionsLevel      :: Maybe Level  -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsFormatter  :: LogFormatter -- ^ Log formatter to use.
-  , optionsLogContext :: [(String, String)]
+  { logOptionsLevel      :: Maybe Level  -- ^ What level of messages to log. 'Nothing' disabled logging.
+  , logOptionsFormatter  :: LogFormatter -- ^ Log formatter to use.
+  , logOptionsContext :: [(String, String)]
   }
 
 -- | Write a log a message to stderr.
 writeLogMessage :: MonadIO io => LogOptions -> Message -> io ()
-writeLogMessage options@LogOptions{..} = liftIO . hPutStr stderr . optionsFormatter options
+writeLogMessage options@LogOptions{..} = liftIO . hPutStr stderr . logOptionsFormatter options
 
 -- | Format log messaging using "logfmt".
 --
@@ -49,7 +49,7 @@ logfmtFormatter LogOptions{..} (Message level message pairs time) =
       ( kv "time" (showTime time)
       : kv "msg" (shows message)
       : kv "level" (shows level)
-      : (uncurry kv . second shows <$> (pairs <> optionsLogContext)))
+      : (uncurry kv . second shows <$> (pairs <> logOptionsContext)))
   . showChar '\n' $ ""
   where
     kv k v = showString k . showChar '=' . v
@@ -65,7 +65,7 @@ terminalFormatter LogOptions{..} (Message level message pairs time) =
     showChar '[' . showTime time . showString "] "
   . showLevel level . showChar ' '
   . showString (printf "%-20s " message)
-  . showPairs pairs
+  . showPairs (pairs <> logOptionsContext)
   . showChar '\n' $ ""
   where
     colourize = True
