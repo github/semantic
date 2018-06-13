@@ -59,6 +59,7 @@ defaultConfig' options@Options{..} = do
   haystackURL <- lookupEnv "HAYSTACK_URL"
   statsAddr <- lookupStatsAddr
   size <- envLookupInt 1000 "MAX_TELEMETRY_QUEUE_SIZE"
+  parseTimeout <- envLookupInt 10000 "TREE_SITTER_PARSE_TIMEOUT" -- Default is 10 seconds
   pure Config
     { configAppName = "semantic"
     , configHostName = hostName
@@ -66,7 +67,7 @@ defaultConfig' options@Options{..} = do
     , configHaystackURL = haystackURL
     , configStatsAddr = statsAddr
 
-    , configTreeSitterParseTimeout = Milliseconds 10000 -- 10 seconds
+    , configTreeSitterParseTimeout = Milliseconds parseTimeout
     , configMaxTelemetyQueueSize = size
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal
