@@ -68,7 +68,7 @@ data Vertex = Vertex
 
 -- | A protobuf-compatible edge type. Only tag information is carried;
 -- consumers are expected to look up nodes in the vertex list when necessary.
-data Edge = Edge { edgeFrom :: !Tag, edgeTo :: !Tag }
+data Edge = Edge { edgeFrom :: Tag, edgeTo :: Tag }
   deriving (Eq, Ord, Show, Generic, Hashable, PB.Named, PB.Message)
 
 -- | An adjacency list-representation of a graph. You generally build these by calling
