@@ -22,14 +22,13 @@ data HaystackClient
   = HaystackClient
   { haystackClientRequest  :: Request
   , haystackClientManager  :: Manager
-  , haystackClientHostName :: String
   , haystackClientAppName  :: String
   }
   | NullHaystackClient -- ^ Doesn't report needles, good for testing or when the 'HAYSTACK_URL' env var isn't set.
 
 -- Create a Haystack HTTP client.
-haystackClient :: Maybe String -> ManagerSettings -> String -> String -> IO HaystackClient
-haystackClient maybeURL managerSettings hostName appName
+haystackClient :: Maybe String -> ManagerSettings -> String -> IO HaystackClient
+haystackClient maybeURL managerSettings appName
   | Just url <- maybeURL = do
       manager  <- newManager managerSettings
       request' <- parseRequest url
@@ -37,7 +36,7 @@ haystackClient maybeURL managerSettings hostName appName
             { method = "POST"
             , requestHeaders = ("Content-Type", "application/json; charset=utf-8") : requestHeaders request'
             }
-      pure $ HaystackClient request manager hostName appName
+      pure $ HaystackClient request manager appName
   | otherwise = pure NullHaystackClient
 
 -- Report an error to Haystack over HTTP (blocking).
@@ -49,7 +48,6 @@ reportError sha logger HaystackClient{..} ErrorReport{..} = do
   logger summary errorReportContext
   let payload = object $
         [ "app"       .= haystackClientAppName
-        , "host"      .= haystackClientHostName
         , "sha"       .= sha
         , "message"   .= summary
         , "class"     .= summary
