@@ -26,6 +26,9 @@ data HaystackClient
   }
   | NullHaystackClient -- ^ Doesn't report needles, good for testing or when the 'HAYSTACK_URL' env var isn't set.
 
+-- | Function to log if there are errors reporting to haystack.
+type ErrorLogger io = String -> [(String, String)] -> io ()
+
 -- Create a Haystack HTTP client.
 haystackClient :: Maybe String -> ManagerSettings -> String -> IO HaystackClient
 haystackClient maybeURL managerSettings appName
@@ -40,9 +43,9 @@ haystackClient maybeURL managerSettings appName
   | otherwise = pure NullHaystackClient
 
 -- Report an error to Haystack over HTTP (blocking).
-reportError :: MonadIO io => String -> (String -> [(String, String)] -> io ()) -> HaystackClient -> ErrorReport -> io ()
-reportError _   logger NullHaystackClient ErrorReport{..} = let msg = takeWhile (/= '\n') (displayException errorReportException) in logger msg errorReportContext
-reportError sha logger HaystackClient{..} ErrorReport{..} = do
+reportError :: MonadIO io => ErrorLogger io -> HaystackClient -> ErrorReport -> io ()
+reportError logger NullHaystackClient ErrorReport{..} = let msg = takeWhile (/= '\n') (displayException errorReportException) in logger msg errorReportContext
+reportError logger HaystackClient{..} ErrorReport{..} = do
   let fullMsg = displayException errorReportException
   let summary = takeWhile (/= '\n') fullMsg
   logger summary errorReportContext
