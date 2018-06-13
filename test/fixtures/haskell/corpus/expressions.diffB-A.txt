@@ -327,12 +327,16 @@
             {-(VariableOperator
               {-(VariableSymbol)-})-}
             {-(VariableIdentifier)-})-})-})-}))
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
       {+(QualifiedConstructorIdentifier
         {+(ModuleIdentifier)+}
-        {+(ConstructorIdentifier)+})+})+})+}
+        {+(ConstructorIdentifier)+})+}
+      {-(Lambda
+        {-(VariableIdentifier)-}
+        {-(VariableIdentifier)-})-}))
   {+(Function
     {+(VariableIdentifier)+}
     {+(ConstructorPattern
@@ -393,13 +397,12 @@
             {+(VariableOperator
               {+(VariableSymbol)+})+}
             {+(VariableIdentifier)+})+})+})+})+})+}
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
-        (Lambda
-          (VariableIdentifier)
-          (VariableIdentifier))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Lambda
+        {+(VariableIdentifier)+}
+        {+(VariableIdentifier)+})+})+})+}
     (Function
     { (VariableIdentifier)
     ->(VariableIdentifier) }
@@ -458,83 +461,51 @@
           (VariableOperator
             (VariableSymbol))
           (Integer))))
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
-      {+(PrefixNegation
-        {+(Integer)+})+})+})+}
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
-      {+(PrefixNegation
-        {+(VariableIdentifier)+})+})+})+}
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
-      {+(PrefixNegation
-        {+(Integer)+})+})+})+}
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
-      {+(InfixOperatorApp
-        {+(VariableIdentifier)+}
-        {+(VariableOperator
-          {+(VariableSymbol)+})+}
-        {+(App
-          {+(App
-            {+(VariableIdentifier)+}
-            {+(Lambda
-              {+(VariableIdentifier)+}
-              {+(InfixOperatorApp
-                {+(Tuple
-                  {+(VariableIdentifier)+})+}
-                {+(VariableOperator
-                  {+(VariableSymbol)+})+}
-                {+(InfixOperatorApp
-                  {+(ConstructorIdentifier)+}
-                  {+(VariableOperator
-                    {+(VariableSymbol)+})+}
-                  {+(App
-                    {+(VariableIdentifier)+}
-                    {+(VariableIdentifier)+})+})+})+})+})+}
-          {+(VariableIdentifier)+})+})+})+})+}
-  {-(Function
-    {-(VariableIdentifier)-}
-    {-(Statements
-      {-(PrefixNegation
-        {-(Integer)-})-})-})-}
-  {-(Function
-    {-(VariableIdentifier)-}
-    {-(Statements
-      {-(PrefixNegation
-        {-(VariableIdentifier)-})-})-})-}
-  {-(Function
-    {-(VariableIdentifier)-}
-    {-(Statements
-      {-(PrefixNegation
-        {-(Integer)-})-})-})-}
-  {-(Function
-    {-(VariableIdentifier)-}
-    {-(Statements
-      {-(InfixOperatorApp
-        {-(VariableIdentifier)-}
-        {-(VariableOperator
-          {-(VariableSymbol)-})-}
-        {-(App
-          {-(App
-            {-(VariableIdentifier)-}
-            {-(Lambda
-              {-(VariableIdentifier)-}
-              {-(InfixOperatorApp
-                {-(Tuple
-                  {-(VariableIdentifier)-})-}
-                {-(VariableOperator
-                  {-(VariableSymbol)-})-}
-                {-(InfixOperatorApp
-                  {-(ConstructorIdentifier)-}
-                  {-(VariableOperator
-                    {-(VariableSymbol)-})-}
-                  {-(App
-                    {-(VariableIdentifier)-}
-                    {-(VariableIdentifier)-})-})-})-})-})-}
-          {-(VariableIdentifier)-})-})-})-})-}))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (PrefixNegation
+          (Integer))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (PrefixNegation
+          (VariableIdentifier))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (PrefixNegation
+          (Integer))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (InfixOperatorApp
+          (VariableIdentifier)
+          (VariableOperator
+            (VariableSymbol))
+          (App
+            (App
+              (VariableIdentifier)
+              (Lambda
+              { (VariableIdentifier)
+              ->(VariableIdentifier) }
+                (InfixOperatorApp
+                  (Tuple
+                  { (VariableIdentifier)
+                  ->(VariableIdentifier) })
+                  (VariableOperator
+                    (VariableSymbol))
+                  (InfixOperatorApp
+                    (ConstructorIdentifier)
+                    (VariableOperator
+                      (VariableSymbol))
+                    (App
+                    { (VariableIdentifier)
+                    ->(VariableIdentifier) }
+                    { (VariableIdentifier)
+                    ->(VariableIdentifier) })))))
+            (VariableIdentifier)))))))
