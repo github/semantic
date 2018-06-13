@@ -3,7 +3,7 @@ module Semantic.Parse where
 
 import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
+import Analysis.PackageDef (HasPackageDef)
 import Data.AST
 import Data.Blob
 import Data.JSON.Fields
