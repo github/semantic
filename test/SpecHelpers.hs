@@ -118,7 +118,7 @@ testEvaluating
   . runEvalError
   . runAddressError
   . runValueError
-  . (>>= (traverse deref1))
+  . (>>= traverse deref1)
   . runTermEvaluator @_ @_ @(Value Precise (Eff _))
 
 deref1 (ptr, env) = runAllocator $ do
