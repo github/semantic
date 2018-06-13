@@ -155,13 +155,13 @@ library
                      , Semantic.Distribute
                      , Semantic.Env
                      , Semantic.Graph
-                     , Semantic.Haystack
                      , Semantic.IO
-                     , Semantic.Log
                      , Semantic.Parse
-                     , Semantic.Queue
+                     , Semantic.Telemetry.Log
+                     , Semantic.Telemetry.AsyncQueue
+                     , Semantic.Telemetry.Haystack
+                     , Semantic.Telemetry.Stat
                      , Semantic.Resolution
-                     , Semantic.Stat
                      , Semantic.Task
                      , Semantic.Telemetry
                      , Semantic.Util

@@ -1,53 +1,93 @@
 module Semantic.Config where
 
+import Control.Exception
 import Network.BSD
 import Network.HTTP.Client.TLS
 import Network.URI
 import Prologue
-import Semantic.Haystack
-import Semantic.Log
-import Semantic.Stat
+import Semantic.Telemetry
+import Semantic.Telemetry.AsyncQueue
+import qualified Semantic.Telemetry.Stat as Stat
+import qualified Semantic.Telemetry.Log as Log
+import Semantic.Env
 import System.Environment
-import System.IO (stderr)
+import System.IO (hIsTerminalDevice, stderr)
 import System.Posix.Process
 import System.Posix.Types
 
 data Config
   = Config
-  { configAppName     :: String       -- ^ Application name (semantic)
-  , configHostName    :: String       -- ^ HostName from getHostName
-  , configProcessID   :: ProcessID    -- ^ ProcessID from getProcessID
-  , configHaystackURL :: Maybe String -- ^ URL of Haystack, with creds from environment
-  , configStatsAddr   :: StatsAddr    -- ^ Address of statsd/datadog
-  , configLogOptions  :: Options      -- ^ Options pertaining to logging
+  { configAppName              :: String       -- ^ Application name (semantic)
+  , configHostName             :: String       -- ^ HostName from getHostName
+  , configProcessID            :: ProcessID    -- ^ ProcessID from getProcessID
+  , configHaystackURL          :: Maybe String -- ^ URL of Haystack (with creds) from environment
+  , configStatsAddr            :: StatsAddr    -- ^ Address of statsd/datadog
+
+  , configMaxTelemetyQueueSize :: Int          -- ^ Max size of telemetry queues before messages are dropped.
+  , configIsTerminal           :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , configLogPrintSource       :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
+  , configLogFormatter         :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
+
+  , configOptions              :: Options      -- ^ Options configurable via command line arguments.
+  }
+
+-- Options configurable via command line arguments.
+data Options
+  = Options
+  { optionsLogLevel      :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disabled logging.
+  , optionsRequestID     :: Maybe String  -- ^ Optional request id for tracing across systems.
+  , optionsFailOnWarning :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   }
 
 data StatsAddr = StatsAddr { addrHost :: String, addrPort :: String }
 
+defaultOptions :: Options
+defaultOptions = Options (Just Warning) Nothing False
+
 defaultConfig :: IO Config
-defaultConfig = do
+defaultConfig = defaultConfig' defaultOptions
+
+defaultConfig' :: Options -> IO Config
+defaultConfig' options@Options{..} = do
   pid <- getProcessID
   hostName <- getHostName
+  isTerminal <- hIsTerminalDevice stderr
   haystackURL <- lookupEnv "HAYSTACK_URL"
   statsAddr <- lookupStatsAddr
-  logOptions <- configureOptionsForHandle stderr defaultOptions
+  size <- envLookupInt 1000 "MAX_TELEMETRY_QUEUE_SIZE"
   pure Config
     { configAppName = "semantic"
     , configHostName = hostName
     , configProcessID = pid
     , configHaystackURL = haystackURL
     , configStatsAddr = statsAddr
-    , configLogOptions = logOptions
-    }
 
-defaultHaystackClient :: IO HaystackClient
-defaultHaystackClient = defaultConfig >>= haystackClientFromConfig
+    , configMaxTelemetyQueueSize = size
+    , configIsTerminal = isTerminal
+    , configLogPrintSource = isTerminal
+    , configLogFormatter = logfmtFormatter
+
+    , configOptions = options
+    }
 
 haystackClientFromConfig :: Config -> IO HaystackClient
 haystackClientFromConfig Config{..} = haystackClient configHaystackURL tlsManagerSettings configHostName configAppName
 
-defaultStatsClient :: IO StatsClient
-defaultStatsClient = defaultConfig >>= statsClientFromConfig
+
+withLogger :: Config -> (LogQueue -> IO c) -> IO c
+withLogger c = bracket (defaultLoggerFromConfig c) closeAsyncQueue
+
+defaultLoggerFromConfig :: Config -> IO LogQueue
+defaultLoggerFromConfig Config{..} =
+  newAsyncQueue configMaxTelemetyQueueSize Log.writeLogMessage LogOptions{
+    optionsLevel      = optionsLogLevel configOptions
+  , optionsFormatter  = configLogFormatter
+  , optionsLogContext = [("app", configAppName), ("process_id", show configProcessID)] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
+  }
+
+
+defaultStatterFromConfig :: Config -> IO StatQueue
+defaultStatterFromConfig c@Config{..} = statsClientFromConfig c >>= newAsyncQueue configMaxTelemetyQueueSize Stat.sendStat
 
 statsClientFromConfig :: Config -> IO StatsClient
 statsClientFromConfig Config{..} = statsClient (addrHost configStatsAddr) (addrPort configStatsAddr) configAppName
