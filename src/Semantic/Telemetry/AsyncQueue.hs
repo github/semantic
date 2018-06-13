@@ -2,7 +2,7 @@ module Semantic.Telemetry.AsyncQueue
 (
   AsyncQueue(..)
 , newAsyncQueue
--- , newAsyncQueue'
+, newAsyncQueue'
 , writeAsyncQueue
 , closeAsyncQueue
 )
@@ -24,7 +24,6 @@ data AsyncQueue a extra
   , asyncQueueSink  :: Async ()   -- ^ A sink that will drain the queue.
   , asyncQueueExtra :: extra      -- ^ Any exta data the queue needs to use.
   }
-
 
 -- | Create a new AsyncQueue with the given capacity using the defaultSink.
 newAsyncQueue :: Int -> (extra -> a -> IO ()) -> extra -> IO (AsyncQueue a extra)
