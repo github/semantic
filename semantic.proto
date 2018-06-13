@@ -26,18 +26,10 @@ message SummariesRequest  {
   repeated BlobPair blobPairs = 1;
 }
 
-message ImportGraphRequest {
-  Project project = 1;
-}
-
 message ParseRequest {
   repeated Blob source = 1;
 }
 
-message ImportGraphResponse {
-  AdjList graph = 1;
-  repeated string errorMessages = 2;
-}
 
 message BlobPair {
   Blob before = 1;
