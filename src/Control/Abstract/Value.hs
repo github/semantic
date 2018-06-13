@@ -73,9 +73,6 @@ class Show value => AbstractIntro value where
   -- | Construct a rational value.
   rational :: Rational -> value
 
-  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> value
-
   -- | Construct a key-value pair for use in a hash.
   kvPair :: value -> value -> value
 
@@ -113,6 +110,9 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
                -> (value -> value -> Evaluator address value effects value)
+
+  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
+  tuple :: [value] -> Evaluator address value effects value
 
   -- | Construct an array of zero or more values.
   array :: [value] -> Evaluator address value effects value

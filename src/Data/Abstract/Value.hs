@@ -92,8 +92,6 @@ instance Show address => AbstractIntro (Value address body) where
   symbol   = Symbol
   rational = Rational . Number.Ratio
 
-  multiple = Tuple
-
   kvPair = KVPair
   hash = Hash . map (uncurry KVPair)
 
@@ -117,7 +115,8 @@ instance ( Coercible body (Eff effects)
     | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
 
-  array    = pure . Array
+  tuple = pure . Tuple
+  array = pure . Array
 
   klass n [] env = pure $ Class n env
   klass n supers env = do

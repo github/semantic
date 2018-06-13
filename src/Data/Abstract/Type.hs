@@ -108,7 +108,6 @@ instance AbstractIntro Type where
   float _    = Float
   symbol _   = Symbol
   rational _ = Rational
-  multiple   = zeroOrMoreProduct
   hash       = Hash
   kvPair k v = k :* v
 
@@ -152,6 +151,8 @@ instance ( Member (Allocator address Type) effects
   array fields = do
     var <- fresh
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
+
+  tuple = pure . zeroOrMoreProduct
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
