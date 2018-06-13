@@ -68,6 +68,7 @@ runGraph graphType includePackages project
             . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _))
             . graphing
 
+-- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
 newtype GraphEff address a = GraphEff
   { runGraphEff :: Eff '[ LoopControl address
                         , Return address
