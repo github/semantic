@@ -19,6 +19,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
+import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Language.Haskell.Syntax as Syntax
@@ -35,6 +36,7 @@ type Syntax = '[
   , Literal.Integer
   , Literal.TextElement
   , Literal.Tuple
+  , Statement.If
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.App
@@ -152,6 +154,9 @@ class' = makeTerm <$> symbol Class <*> children (Syntax.Class <$> manyTerm expre
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
+conditionalExpression :: Assignment
+conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (Statement.If <$> expression <*> expression <*> expression)
+
 constructor :: Assignment
 constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters))
            <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
@@ -214,6 +219,7 @@ expressionChoices = [
                     , bindPattern
                     , character
                     , comment
+                    , conditionalExpression
                     , context'
                     , contextPattern
                     , constructorIdentifier

@@ -230,24 +230,34 @@
           (ConstructorOperator
             (ConstructorSymbol))
           (VariableIdentifier))))
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
-        (LeftOperatorSection
-        { (VariableIdentifier)
-        ->(VariableIdentifier) }
-          (ConstructorOperator
-            (ConstructorSymbol)))))
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
-        (LeftOperatorSection
-        { (VariableIdentifier)
-        ->(VariableIdentifier) }
-          (ConstructorOperator
-            (ConstructorSymbol)))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(LeftOperatorSection
+        {+(VariableIdentifier)+}
+        {+(ConstructorOperator
+          {+(ConstructorSymbol)+})+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(LeftOperatorSection
+        {+(VariableIdentifier)+}
+        {+(ConstructorOperator
+          {+(ConstructorSymbol)+})+})+})+})+}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(LeftOperatorSection
+        {-(VariableIdentifier)-}
+        {-(ConstructorOperator
+          {-(ConstructorSymbol)-})-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(LeftOperatorSection
+        {-(VariableIdentifier)-}
+        {-(ConstructorOperator
+          {-(ConstructorSymbol)-})-})-})-})-}
   {-(Function
     {-(VariableIdentifier)-}
     {-(Statements
