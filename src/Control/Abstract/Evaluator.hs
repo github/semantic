@@ -121,4 +121,4 @@ runGoto = raiseHandler (fmap snd . go lowerBound)
           i <- fresh
           go (IntMap.insert i action table) (k i)
         go table (Effect (Goto label) k)   = go table (maybe (error ("programmer error: attempted to goto the unallocated label " <> show label)) (>>= k) (IntMap.lookup label table))
-        go table (Other u k)               = handleStateful (table, ()) (uncurry go) u k
+        go table (Other u k)               = liftStatefulHandler (table, ()) (uncurry go) u k
