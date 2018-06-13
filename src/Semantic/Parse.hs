@@ -22,7 +22,6 @@ runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
 runParse TagsTermRenderer             = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderToTags blob)) >=> serialize JSON
-runParse ImportsTermRenderer          = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)) >=> serialize JSON
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
