@@ -246,11 +246,9 @@
         (TypeClassIdentifier)))
     (Datatype
       (Context'
-        (Statements
-          (Class
-            (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+        (Class
+          (TypeClassIdentifier)
+          (TypeVariableIdentifier)))
       (Type
         (TypeConstructorIdentifier)
         (TypeParameters
@@ -266,18 +264,13 @@
         (Statements
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier))))
-        (Statements
+            (TypeVariableIdentifier))
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier))))
-        (Statements
+            (TypeVariableIdentifier))
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+            (TypeVariableIdentifier))))
       (Type
         (TypeConstructorIdentifier)
         (TypeParameters
@@ -295,15 +288,12 @@
         (Statements
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (Statements
-                (TypeVariableIdentifier)
-                (TypeVariableIdentifier)))))
-        (Statements
+            (Statements
+              (TypeVariableIdentifier)
+              (TypeVariableIdentifier)))
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+            (TypeVariableIdentifier))))
       (Type
         (TypeConstructorIdentifier)
         (TypeParameters
@@ -325,8 +315,7 @@
         (Empty))
       (Constructor
         (Context'
-          (Statements
-            (TypeConstructorIdentifier)))
+          (TypeConstructorIdentifier))
         (ConstructorIdentifier)
         (TypeParameters
           (TypeVariableIdentifier)))
@@ -340,11 +329,9 @@
         (Empty))
       (Constructor
         (Context'
-          (Statements
-            (Class
-              (TypeClassIdentifier)
-              (TypeParameters
-                (TypeVariableIdentifier)))))
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier)))
         (ConstructorIdentifier)
         (TypeParameters
           (TypeVariableIdentifier)))
@@ -371,11 +358,9 @@
         (ScopedTypeVariables
           (TypeVariableIdentifier))
         (Context'
-          (Statements
-            (Class
-              (TypeClassIdentifier)
-              (TypeParameters
-                (TypeVariableIdentifier)))))
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier)))
         (ConstructorIdentifier)
         (TypeParameters
           (Statements
