@@ -51,7 +51,6 @@ reportError logger HaystackClient{..} ErrorReport{..} = do
   logger summary errorReportContext
   let payload = object $
         [ "app"       .= haystackClientAppName
-        , "sha"       .= sha
         , "message"   .= summary
         , "class"     .= summary
         , "backtrace" .= fullMsg
