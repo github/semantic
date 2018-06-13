@@ -1,0 +1,13 @@
+(Module
+  (Empty)
+  (Statements
+  { (CPPDirective)
+  ->(CPPDirective) }
+    (ImportDeclaration
+      (Empty)
+      (QualifiedModuleIdentifier
+        (ModuleIdentifier)
+      {-(ModuleIdentifier)-}
+        (ModuleIdentifier)
+        (ModuleIdentifier)))
+    (CPPDirective)))

@@ -45,6 +45,7 @@ type Syntax = '[
   , Syntax.ConstructorSymbol
   , Syntax.Context
   , Syntax.Context'
+  , Syntax.CPPDirective
   , Syntax.DefaultDeclaration
   , Syntax.Deriving
   , Syntax.Do
@@ -173,6 +174,9 @@ context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> express
 contextPattern :: Assignment
 contextPattern = symbol ContextPattern *> children expressions
 
+cppDirective :: Assignment
+cppDirective = makeTerm <$> symbol CppDirective <*> (Syntax.CPPDirective . Name.name <$> source)
+
 defaultDeclaration :: Assignment
 defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
 
@@ -216,6 +220,7 @@ expressionChoices = [
                     , constructorOperator
                     , constructorPattern
                     , constructorSymbol
+                    , cppDirective
                     , defaultDeclaration
                     , derivingClause
                     , do'
