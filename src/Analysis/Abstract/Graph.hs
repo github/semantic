@@ -19,22 +19,14 @@ import           Data.Abstract.Address
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
 import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo(..))
-import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
 import           Data.Graph
+import           Data.Graph.Vertex
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
-import           Prologue hiding (packageName, project)
-
--- | A vertex of some specific type.
-data Vertex
-  = Package  { vertexName :: Text }
-  | Module   { vertexName :: Text }
-  | Variable { vertexName :: Text }
-  deriving (Eq, Ord, Show)
+import           Prologue hiding (project)
 
 style :: Style Vertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexName))
@@ -88,13 +80,6 @@ graphingModules recur m = interpose @(Modules address value) pure (\ m yield -> 
   _ -> send m >>= yield)
   (recur m)
 
-
-packageVertex :: PackageInfo -> Vertex
-packageVertex = Package . formatName . packageName
-
-moduleVertex :: ModuleInfo -> Vertex
-moduleVertex = Module . T.pack . modulePath
-
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
                     , Member (Reader PackageInfo) effects
@@ -131,18 +116,6 @@ variableDefinition name = do
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
 appendGraph = modify' . (<>)
-
-
-instance ToJSON Vertex where
-  toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
-
-vertexToText :: Vertex -> Text
-vertexToText = vertexName
-
-vertexToType :: Vertex -> Text
-vertexToType Package{}  = "package"
-vertexToType Module{}   = "module"
-vertexToType Variable{} = "variable"
 
 
 graphing :: Effectful m => m (State (Graph Vertex) ': effects) result -> m effects (result, Graph Vertex)
