@@ -8,9 +8,7 @@ maintainer:          rob.rix@github.com
 copyright:           2016 GitHub
 category:            Web
 build-type:          Simple
-extra-source-files:  preludes/javascript.js
-                   , preludes/python.py
-                   , preludes/ruby.rb
+-- extra-source-files:
 cabal-version:       >=1.10
 
 flag release
