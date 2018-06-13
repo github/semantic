@@ -4,6 +4,7 @@ import           Control.Exception
 import           Network.BSD
 import           Network.HTTP.Client.TLS
 import           Network.URI
+import           Parsing.TreeSitter (Timeout (..))
 import           Prologue
 import           Semantic.Env
 import           Semantic.Telemetry
@@ -19,18 +20,19 @@ import           System.Posix.Types
 
 data Config
   = Config
-  { configAppName              :: String       -- ^ Application name (semantic)
-  , configHostName             :: String       -- ^ HostName from getHostName
-  , configProcessID            :: ProcessID    -- ^ ProcessID from getProcessID
-  , configHaystackURL          :: Maybe String -- ^ URL of Haystack (with creds) from environment
-  , configStatsAddr            :: StatsAddr    -- ^ Address of statsd/datadog
+  { configAppName                :: String       -- ^ Application name (semantic)
+  , configHostName               :: String       -- ^ HostName from getHostName
+  , configProcessID              :: ProcessID    -- ^ ProcessID from getProcessID
+  , configHaystackURL            :: Maybe String -- ^ URL of Haystack (with creds) from environment
+  , configStatsAddr              :: StatsAddr    -- ^ Address of statsd/datadog
 
-  , configMaxTelemetyQueueSize :: Int          -- ^ Max size of telemetry queues before messages are dropped.
-  , configIsTerminal           :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
-  , configLogPrintSource       :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
-  , configLogFormatter         :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
+  , configTreeSitterParseTimeout :: Timeout      -- ^ Timeout in milliseconds before canceling tree-sitter parsing
+  , configMaxTelemetyQueueSize   :: Int          -- ^ Max size of telemetry queues before messages are dropped.
+  , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
+  , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
+  , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
 
-  , configOptions              :: Options      -- ^ Options configurable via command line arguments.
+  , configOptions                :: Options      -- ^ Options configurable via command line arguments.
   }
 
 -- Options configurable via command line arguments.
@@ -64,6 +66,7 @@ defaultConfig' options@Options{..} = do
     , configHaystackURL = haystackURL
     , configStatsAddr = statsAddr
 
+    , configTreeSitterParseTimeout = Milliseconds 10000 -- 10 seconds
     , configMaxTelemetyQueueSize = size
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal

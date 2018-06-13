@@ -186,15 +186,13 @@ data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
 
 instance Exception ParserCancelled
 
-defaultTimeout :: Timeout
-defaultTimeout = Milliseconds 5000
-
 -- | Parse a 'Blob' in 'IO'.
 runParser :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $
-      parseToAST defaultTimeout language blob
+    time "parse.tree_sitter_ast_parse" languageTag $ do
+      config <- ask
+      parseToAST (configTreeSitterParseTimeout config) language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
   AssignmentParser parser assignment -> do
