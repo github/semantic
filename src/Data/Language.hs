@@ -23,7 +23,7 @@ data Language
     | Ruby
     | TypeScript
     | PHP
-    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, Finite, MessageField)
+    deriving (Eq, Generic, Ord, Read, Show, Bounded, ToJSON, Named, Enum, Finite, MessageField)
 
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l -> pure $ case T.toLower l of

@@ -16,8 +16,6 @@ module Semantic.Graph
 , resumingEnvironmentError
 ) where
 
-import Prelude hiding (readFile)
-
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Abstract
@@ -34,11 +32,12 @@ import           Data.Term
 import           Data.Text (pack)
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
+import           Semantic.IO (Files)
 import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-runGraph :: (Member (Exc SomeException) effs, Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: ( Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -69,32 +68,31 @@ runGraph graphType includePackages project
             . graphing
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member (Exc SomeException) effs, Member (Distribute WrappedTask) effs,  Member Resolution effs, Member Task effs, Member Trace effs)
+parsePackage :: (Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Maybe File  -- ^ Prelude (optional).
              -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
-  prelude <- traverse (parseModule project parser) preludeFile
-  p <- parseModules parser
+  prelude <- traverse (parseModule parser Nothing) preludeFile
+  p <- parseModules parser project
   resMap <- Task.resolutionMap project
-  let pkg = Package.fromModules n Nothing prelude (length projectEntryPaths) p resMap
+  let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p resMap
   pkg <$ trace ("project: " <> show pkg)
 
   where
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
-    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Eff effs [Module term]
-    parseModules parser = distributeFor (projectEntryPoints project <> projectFiles project) (WrapTask . parseModule project parser)
+    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
+    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
 -- | Parse a file into a 'Module'.
-parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
-parseModule proj parser file = do
-  mBlob <- readFile proj file
-  case mBlob of
-    Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
-    Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
+parseModule :: (Member Files effs, Member Task effs) => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
+parseModule parser rootDir file = do
+  blob <- readBlob file
+  moduleForBlob rootDir blob <$> parse parser blob
+
 
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
