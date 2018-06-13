@@ -45,9 +45,6 @@ type LogQueue = AsyncQueue Message LogOptions
 type StatQueue = AsyncQueue Stat StatsClient
 type HaystackQueue = AsyncQueue ErrorReport HaystackClient
 
--- data TelemetryQueues = TelemetryQueues LogQueue StatQueue HaystackQueue
-
-
 -- | Queue a message to be logged.
 queueLogMessage :: MonadIO io => LogQueue -> Level -> String -> [(String, String)] -> io ()
 queueLogMessage q@AsyncQueue{..} level message pairs
