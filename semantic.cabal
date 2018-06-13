@@ -157,13 +157,13 @@ library
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Parse
-                     , Semantic.Telemetry.Log
-                     , Semantic.Telemetry.AsyncQueue
-                     , Semantic.Telemetry.Haystack
-                     , Semantic.Telemetry.Stat
                      , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Telemetry
+                     , Semantic.Telemetry.AsyncQueue
+                     , Semantic.Telemetry.Haystack
+                     , Semantic.Telemetry.Log
+                     , Semantic.Telemetry.Stat
                      , Semantic.Util
                      , Semantic.Version
                      -- Serialization
