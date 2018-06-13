@@ -1,5 +1,3 @@
-{-# OPTIONS_GHC -fforce-recomp #-} -- So that gitHash is correct.
-{-# LANGUAGE TemplateHaskell #-}
 module Semantic.Config where
 
 import           Control.Exception
