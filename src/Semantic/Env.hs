@@ -5,11 +5,11 @@ import Prologue
 import System.Environment
 import Text.Read (readMaybe)
 
-envLookupHost :: MonadIO io => String -> String -> io String
-envLookupHost defaultHost k = liftIO $ fromMaybe defaultHost <$> lookupEnv k
+envLookupString :: MonadIO io => String -> String -> io String
+envLookupString defaultVal k = liftIO $ fromMaybe defaultVal <$> lookupEnv k
 
-envLookupPort :: MonadIO io => Int -> String -> io Int
-envLookupPort defaultPort k = liftIO $ parsePort <$> lookupEnv k
-  where parsePort x | Just s <- x
+envLookupInt :: MonadIO io => Int -> String -> io Int
+envLookupInt defaultVal k = liftIO $ parse <$> lookupEnv k
+  where parse x | Just s <- x
                     , Just p <- readMaybe s = p
-                    | otherwise = defaultPort
+                    | otherwise = defaultVal
