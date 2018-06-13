@@ -40,12 +40,36 @@ justEvaluating
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runResolutionError
   . runEnvironmentError
   . runEvalError
+  . runResolutionError
   . runAddressError
-  . runTermEvaluator @_ @Precise @(Value Precise (Eff _))
+  . runTermEvaluator @_ @Precise @(Value Precise (EvalEff _))
   . runValueError
+
+newtype EvalEff address a = EvalEff
+  { runEvalEff :: Eff '[ LoopControl address
+                       , Return address
+                       , Env address
+                       , Allocator address (Value address (EvalEff address))
+                       , Reader ModuleInfo
+                       , Modules address (Value address (EvalEff address))
+                       , Reader Span
+                       , Reader PackageInfo
+                       , Resumable (ValueError address (EvalEff address))
+                       , Resumable (AddressError address (Value address (EvalEff address)))
+                       , Resumable ResolutionError
+                       , Resumable EvalError
+                       , Resumable (EnvironmentError address)
+                       , Resumable (Unspecialized (Value address (EvalEff address)))
+                       , Resumable (LoadError address (Value address (EvalEff address)))
+                       , Trace
+                       , Fresh
+                       , State (Heap address Latest (Value address (EvalEff address)))
+                       , State (ModuleTable (Maybe (Environment address, address)))
+                       , Lift IO
+                       ] a
+  }
 
 checking
   = runM @_ @IO
