@@ -1,0 +1,77 @@
+syntax = "proto3";
+import "types.proto";
+package github.semantic.v1alpha1;
+
+// Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and
+// comparing source code.
+service CodeAnalysis {
+  // Parsing
+  //
+  // Parse source code blobs and return abstract syntax trees.
+  rpc Parse (ParseTreeRequest) returns (ParseTreeResponse);
+
+  // Diffing
+  //
+  // Summarize an AST diff of source blobs.
+  rpc SummarizeDiff (SummarizeDiffRequest) returns (SummarizeDiffResponse);
+  // AST diff of source blobs
+  // rpc Diff (DiffRequest) returns (DiffResponse) {}
+
+  // Analyzing
+  //
+  // Calculate an import graph for a project.
+  // rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
+  // rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
+
+  // Check health & status of the service.
+  rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message ParseTreeRequest {
+  repeated Blob blobs = 1;
+}
+
+message ParseTreeResponse {
+  bytes json_tree = 1;
+  repeated ParseError errors = 2;
+}
+
+message SummarizeDiffRequest  {
+  repeated BlobPair blobPairs = 1;
+}
+
+message SummarizeDiffResponse {
+  repeated DiffSummary changes = 1;
+  repeated ParseError errors = 2;
+}
+
+message BlobPair {
+  Blob before = 1;
+  Blob after = 2;
+}
+
+message DiffSummary {
+  string term = 1;
+  string name = 2;
+  Span span = 3;
+  string change = 4;
+}
+
+message ParseError {
+  string error = 1;
+  Span span = 2;
+  string language = 3;
+}
+
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+  }
+  ServingStatus status = 1;
+}
