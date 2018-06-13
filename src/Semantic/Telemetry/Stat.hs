@@ -10,6 +10,7 @@ module Semantic.Telemetry.Stat
 , histogram
 , set
 , Stat
+, Tags
 
 -- Client
 , statsClient
@@ -31,10 +32,8 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import           Network.Socket
     (Socket (..), SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
 import           Network.Socket.ByteString
-import           Network.URI
 import           Numeric
 import           Prologue
-import           System.Environment
 import           System.IO.Error
 
 -- | A named piece of data you wish to record a specific 'Metric' for.
