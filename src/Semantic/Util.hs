@@ -44,8 +44,32 @@ justEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @Precise @(Value Precise (Eff _))
+  . runTermEvaluator @_ @Precise @(Value Precise (UtilEff _))
   . runValueError
+
+newtype UtilEff address a = UtilEff
+  { runUtilEff :: Eff '[ LoopControl address
+                       , Return address
+                       , Env address
+                       , Allocator address (Value address (UtilEff address))
+                       , Reader ModuleInfo
+                       , Modules address (Value address (UtilEff address))
+                       , Reader Span
+                       , Reader PackageInfo
+                       , Resumable (ValueError address (UtilEff address))
+                       , Resumable (AddressError address (Value address (UtilEff address)))
+                       , Resumable EvalError
+                       , Resumable (EnvironmentError address)
+                       , Resumable ResolutionError
+                       , Resumable (Unspecialized (Value address (UtilEff address)))
+                       , Resumable (LoadError address (Value address (UtilEff address)))
+                       , Trace
+                       , Fresh
+                       , State (Heap address Latest (Value address (UtilEff address)))
+                       , State (ModuleTable (Maybe (address, Environment address)))
+                       , IO
+                       ] a
+  }
 
 checking
   = runM @_ @IO
