@@ -108,7 +108,6 @@ instance AbstractIntro Type where
   float _    = Float
   symbol _   = Symbol
   rational _ = Rational
-  multiple   = zeroOrMoreProduct
   hash       = Hash
   kvPair k v = k :* v
 
@@ -151,7 +150,10 @@ instance ( Member (Allocator address Type) effects
       => AbstractValue address Type effects where
   array fields = do
     var <- fresh
-    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
+    fieldTypes <- traverse deref fields
+    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
+
+  tuple fields = zeroOrMoreProduct <$> traverse deref fields
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
@@ -167,7 +169,8 @@ instance ( Member (Allocator address Type) effects
   index arr sub = do
     _ <- unify sub Int
     field <- fresh
-    Var field <$ unify (Array (Var field)) arr
+    _ <- unify (Array (Var field)) arr
+    box (Var field)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
