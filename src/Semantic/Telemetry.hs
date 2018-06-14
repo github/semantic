@@ -31,7 +31,6 @@ module Semantic.Telemetry
 -- Eff interface
 , writeLog
 , writeStat
-, statCount
 , time
 , Telemetry
 , runTelemetry
@@ -77,9 +76,6 @@ writeLog level message pairs = send (WriteLog level message pairs)
 -- | A task which writes a stat.
 writeStat :: Member Telemetry effs => Stat -> Eff effs ()
 writeStat stat = send (WriteStat stat)
-
-statCount :: Member Telemetry effs => String -> Int -> Tags -> Eff effs ()
-statCount n i = send . WriteStat . count n i
 
 -- | A task which measures and stats the timing of another task.
 time :: (Member IO effs, Member Telemetry effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
