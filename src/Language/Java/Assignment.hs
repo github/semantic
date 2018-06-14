@@ -288,7 +288,7 @@ explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocatio
     callFunction a Nothing = ([], a)
 
 module' :: Assignment
-module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
+module' = toTerm (branchNode ModuleDeclaration (Java.Syntax.Module <$> expression <*> many expression))
 
 import' :: Assignment
 import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> someTerm (expression <|> asterisk))
