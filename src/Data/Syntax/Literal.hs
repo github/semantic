@@ -169,7 +169,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Array where
-  eval (Array a) = rvalBox =<< (array =<< traverse subtermValue a)
+  eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -200,7 +200,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Tuple where
-  eval (Tuple cs) = rvalBox =<< tuple =<< traverse subtermValue cs
+  eval (Tuple cs) = rvalBox =<< tuple =<< traverse subtermAddress cs
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)

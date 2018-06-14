@@ -22,8 +22,8 @@ data Value address body
   | Float    (Number.Number Scientific)
   | String Text
   | Symbol Text
-  | Tuple [Value address body]
-  | Array [Value address body]
+  | Tuple [address]
+  | Array [address]
   | Class Name (Environment address)
   | Namespace Name (Environment address)
   | KVPair (Value address body) (Value address body)
@@ -146,12 +146,12 @@ instance ( Coercible body (Eff effects)
 
   index = go where
     tryIdx list ii
-      | ii > genericLength list = throwValueError (BoundsError list ii)
+      | ii > genericLength list = box =<< throwValueError (BoundsError list ii)
       | otherwise               = pure (genericIndex list ii)
     go arr idx
       | (Array arr, Integer (Number.Integer i)) <- (arr, idx) = tryIdx arr i
       | (Tuple tup, Integer (Number.Integer i)) <- (arr, idx) = tryIdx tup i
-      | otherwise = throwValueError (IndexError arr idx)
+      | otherwise = box =<< throwValueError (IndexError arr idx)
 
   liftNumeric f arg
     | Integer (Number.Integer i) <- arg = pure . integer  $ f i
@@ -236,7 +236,7 @@ data ValueError address body resume where
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
   ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
   -- Out-of-bounds error
-  BoundsError            :: [Value address body] -> Prelude.Integer  -> ValueError address body (Value address body)
+  BoundsError            :: [address]          -> Prelude.Integer    -> ValueError address body (Value address body)
 
 
 instance Eq address => Eq1 (ValueError address body) where
