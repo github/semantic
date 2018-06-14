@@ -63,6 +63,7 @@ module Assigning.Assignment
 ( Assignment
 , Location
 -- Combinators
+, toTerm
 , Alternative(..)
 , MonadError(..)
 , MonadFail(..)
@@ -109,6 +110,12 @@ import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
+
+toTerm :: Element syntax syntaxes
+       => Assignment ast grammar (syntax (Term (Sum syntaxes) (Record Location)))
+       -> Assignment ast grammar         (Term (Sum syntaxes) (Record Location))
+toTerm syntax = termIn <$> location <*> (inject <$> syntax)
+
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
