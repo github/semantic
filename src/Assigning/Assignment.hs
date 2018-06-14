@@ -63,6 +63,7 @@ module Assigning.Assignment
 ( Assignment
 , Location
 -- Combinators
+, leafNode
 , toTerm
 , Alternative(..)
 , MonadError(..)
@@ -110,6 +111,9 @@ import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
+
+leafNode :: (Enum grammar, Ix grammar) => grammar -> Assignment ast grammar Text
+leafNode sym = symbol sym *> source
 
 toTerm :: Element syntax syntaxes
        => Assignment ast grammar (syntax (Term (Sum syntaxes) (Record Location)))
