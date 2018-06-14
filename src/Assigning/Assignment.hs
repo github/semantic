@@ -63,6 +63,7 @@ module Assigning.Assignment
 ( Assignment
 , Location
 -- Combinators
+, branchNode
 , leafNode
 , toTerm
 , Alternative(..)
@@ -111,6 +112,9 @@ import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
+
+branchNode :: (Enum grammar, Ix grammar) => grammar -> Assignment ast grammar a -> Assignment ast grammar a
+branchNode sym child = symbol sym *> children child
 
 leafNode :: (Enum grammar, Ix grammar) => grammar -> Assignment ast grammar Text
 leafNode sym = symbol sym *> source
