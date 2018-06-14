@@ -2,7 +2,6 @@
   (New
     (Call
       (MemberAccess
-        (Identifier)
         (Identifier))
       (Float)
       (TextElement)

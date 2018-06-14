@@ -36,8 +36,8 @@ lookupCache configuration = cacheLookup configuration <$> get
 cachingConfiguration :: (Cacheable term address (Cell address) value, Member (State (Cache term address (Cell address) value)) effects, Member (State (Heap address (Cell address) value)) effects)
                      => Configuration term address (Cell address) value
                      -> Set (Cached address (Cell address) value)
-                     -> TermEvaluator term address value effects (ValueRef value)
-                     -> TermEvaluator term address value effects (ValueRef value)
+                     -> TermEvaluator term address value effects (ValueRef address)
+                     -> TermEvaluator term address value effects (ValueRef address)
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
   result <- Cached <$> action <*> TermEvaluator getHeap
@@ -65,8 +65,8 @@ cachingTerms :: ( Cacheable term address (Cell address) value
                 , Member (Env address) effects
                 , Member (State (Heap address (Cell address) value)) effects
                 )
-             => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef value))
-             -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef value))
+             => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
+             -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
 cachingTerms recur term = do
   c <- getConfiguration (embedSubterm term)
   cached <- lookupCache c
@@ -88,8 +88,8 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (Env address) effects
                      , Member (State (Heap address (Cell address) value)) effects
                      )
-                  => SubtermAlgebra Module term (TermEvaluator term address value effects value)
-                  -> SubtermAlgebra Module term (TermEvaluator term address value effects value)
+                  => SubtermAlgebra Module term (TermEvaluator term address value effects address)
+                  -> SubtermAlgebra Module term (TermEvaluator term address value effects address)
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -103,7 +103,7 @@ convergingModules recur m = do
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
-  TermEvaluator (value =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
+  TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
@@ -122,7 +122,7 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address (Cell address) value)) effects) => t (Cached address (Cell address) value) -> TermEvaluator term address value effects (ValueRef value)
+scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address (Cell address) value)) effects) => t (Cached address (Cell address) value) -> TermEvaluator term address value effects (ValueRef address)
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 

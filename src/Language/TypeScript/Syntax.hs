@@ -12,7 +12,6 @@ import qualified Data.Language as Language
 import qualified Data.Map as Map
 import qualified Data.Text as T
 import           Diffing.Algorithm
-import           Prelude
 import           Prologue
 import           System.FilePath.Posix
 
@@ -156,7 +155,8 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedEnv <- maybe emptyEnv snd <$> require modulePath
-    bindAll (renamed importedEnv) $> Rval unit
+    bindAll (renamed importedEnv)
+    rvalBox unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
@@ -173,7 +173,7 @@ instance Evaluatable JavaScriptRequire where
   eval (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    Rval <$> evalRequire modulePath alias
+    rvalBox =<< evalRequire modulePath alias
 
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
@@ -187,7 +187,7 @@ instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    Rval <$> evalRequire modulePath alias
+    rvalBox =<< evalRequire modulePath alias
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -200,7 +200,7 @@ instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ require modulePath
-    pure (Rval unit)
+    rvalBox unit
 
 
 -- | Qualified Export declarations
@@ -216,7 +216,7 @@ instance Evaluatable QualifiedExport where
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
       export name alias Nothing
-    pure (Rval unit)
+    rvalBox unit
 
 
 -- | Qualified Export declarations that export from another module.
@@ -235,7 +235,7 @@ instance Evaluatable QualifiedExportFrom where
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
       maybe (throwEvalError $ ExportError modulePath name) (export name alias . Just) address
-    pure (Rval unit)
+    rvalBox unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -254,7 +254,7 @@ instance Evaluatable DefaultExport where
         export name name Nothing
         bind name addr
       Nothing -> throwEvalError DefaultExportError
-    pure (Rval unit)
+    rvalBox unit
 
 
 -- | Lookup type for a type-level key in a typescript map.
@@ -653,7 +653,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> letrec' name (\addr ->
+    rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 
@@ -668,7 +668,7 @@ instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> letrec' name (\addr ->
+    rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 instance Declarations a => Declarations (InternalModule a) where
@@ -724,7 +724,7 @@ instance Evaluatable AbstractClass where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    Rval v <$ bind name addr
+    rvalBox =<< (v <$ bind name addr)
 
 
 data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }

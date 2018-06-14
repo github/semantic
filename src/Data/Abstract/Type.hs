@@ -119,7 +119,7 @@ instance ( Member (Allocator address Type) effects
          , Member (Env address) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
-         , Member (Return Type) effects
+         , Member (Return address) effects
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
@@ -128,16 +128,16 @@ instance ( Member (Allocator address Type) effects
       tvar <- Var <$> fresh
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (emptyEnv, [])) names
-    (zeroOrMoreProduct tvars :->) <$> locally (bindAll env *> body `catchReturn` \ (Return value) -> pure value)
+    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (bindAll env *> body `catchReturn` \ (Return ptr) -> pure ptr))
 
   call op params = do
     tvar <- fresh
-    paramTypes <- sequenceA params
+    paramTypes <- traverse (>>= deref) params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
     unified <- op `unify` needed
     case unified of
-      _ :-> ret -> pure ret
-      gotten    -> throwResumable (UnificationError needed gotten)
+      _ :-> ret -> box ret
+      gotten    -> box =<< throwResumable (UnificationError needed gotten)
 
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
@@ -146,7 +146,7 @@ instance ( Member (Allocator address Type) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
-         , Member (Return Type) effects
+         , Member (Return address) effects
          )
       => AbstractValue address Type effects where
   array fields = do

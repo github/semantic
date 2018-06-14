@@ -4,7 +4,7 @@ module Data.Abstract.Name
 -- * Constructors
 , name
 , nameI
-, unName
+, formatName
 ) where
 
 import           Data.Aeson
@@ -42,9 +42,9 @@ nameI :: Int -> Name
 nameI = I
 
 -- | Extract a human-readable 'Text' from a 'Name'.
-unName :: Name -> Text
-unName (Name name) = name
-unName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
+formatName :: Name -> Text
+formatName (Name name) = name
+formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
 
@@ -57,7 +57,7 @@ instance IsString Name where
 -- >>> I 26
 -- "_aʹ"
 instance Show Name where
-  showsPrec _ = prettyShowString . Text.unpack . unName
+  showsPrec _ = prettyShowString . Text.unpack . formatName
     where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'
           prettyChar c
             | c `elem` ['\\', '\"'] = Char.showLitChar c
@@ -69,5 +69,5 @@ instance Hashable Name where
   hashWithSalt salt (I i)       = salt `hashWithSalt` (1 :: Int) `hashWithSalt` i
 
 instance ToJSON Name where
-  toJSON = toJSON . unName
-  toEncoding = toEncoding . unName
+  toJSON = toJSON . formatName
+  toEncoding = toEncoding . formatName

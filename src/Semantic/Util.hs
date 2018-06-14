@@ -35,17 +35,41 @@ import qualified Language.TypeScript.Assignment as TypeScript
 
 justEvaluating
   = runM
-  . fmap (first reassociate)
   . evaluating
   . runPrintingTrace
+  . fmap reassociate
   . runLoadError
   . runUnspecialized
   . runResolutionError
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @Precise @(Value Precise (Eff _))
+  . runTermEvaluator @_ @Precise @(Value Precise (UtilEff _))
   . runValueError
+
+newtype UtilEff address a = UtilEff
+  { runUtilEff :: Eff '[ LoopControl address
+                       , Return address
+                       , Env address
+                       , Allocator address (Value address (UtilEff address))
+                       , Reader ModuleInfo
+                       , Modules address (Value address (UtilEff address))
+                       , Reader Span
+                       , Reader PackageInfo
+                       , Resumable (ValueError address (UtilEff address))
+                       , Resumable (AddressError address (Value address (UtilEff address)))
+                       , Resumable EvalError
+                       , Resumable (EnvironmentError address)
+                       , Resumable ResolutionError
+                       , Resumable (Unspecialized (Value address (UtilEff address)))
+                       , Resumable (LoadError address (Value address (UtilEff address)))
+                       , Trace
+                       , Fresh
+                       , State (Heap address Latest (Value address (UtilEff address)))
+                       , State (ModuleTable (Maybe (address, Environment address)))
+                       , IO
+                       ] a
+  }
 
 checking
   = runM @_ @IO
@@ -54,6 +78,7 @@ checking
   . runTermEvaluator @_ @Monovariant @Type
   . caching @[]
   . providingLiveSet
+  . fmap reassociate
   . runLoadError
   . runUnspecialized
   . runResolutionError
@@ -87,14 +112,11 @@ blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
 
 
-injectConst :: a -> SomeExc (Sum '[Const a])
-injectConst = SomeExc . inject . Const
-
 mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
 mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)
 
-reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
-reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
+reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) (Either (SomeExc exc4) (Either (SomeExc exc5) (Either (SomeExc exc6) (Either (SomeExc exc7) result)))))) -> Either (SomeExc (Sum '[exc7, exc6, exc5, exc4, exc3, exc2, exc1])) result
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . Right
 
 
 newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }

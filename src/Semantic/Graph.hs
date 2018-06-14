@@ -4,6 +4,7 @@ module Semantic.Graph
 , GraphType(..)
 , Graph
 , Vertex
+, GraphEff(..)
 , style
 , parsePackage
 , withTermSpans
@@ -19,7 +20,6 @@ module Semantic.Graph
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Abstract
-import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -38,7 +38,7 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-runGraph :: ( Member (Distribute WrappedTask) effs, Member (Exc SomeException) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: ( Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -53,8 +53,7 @@ runGraph graphType includePackages project
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
     analyze runGraphAnalysis (evaluatePackageWith analyzeModule analyzeTerm package) >>= extractGraph
     where extractGraph result = case result of
-            (Right ((_, graph), _), _) -> pure (simplify graph)
-            _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+            (((_, graph), _), _) -> pure (simplify graph)
           runGraphAnalysis
             = run
             . evaluating
@@ -66,8 +65,33 @@ runGraph graphType includePackages project
             . resumingResolutionError
             . resumingAddressError
             . resumingValueError
-            . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (Eff _))
+            . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _))
             . graphing
+
+-- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
+newtype GraphEff address a = GraphEff
+  { runGraphEff :: Eff '[ LoopControl address
+                        , Return address
+                        , Env address
+                        , Allocator address (Value address (GraphEff address))
+                        , Reader ModuleInfo
+                        , Modules address (Value address (GraphEff address))
+                        , Reader Span
+                        , Reader PackageInfo
+                        , State (Graph Vertex)
+                        , Resumable (ValueError address (GraphEff address))
+                        , Resumable (AddressError address (Value address (GraphEff address)))
+                        , Resumable ResolutionError
+                        , Resumable EvalError
+                        , Resumable (EnvironmentError address)
+                        , Resumable (Unspecialized (Value address (GraphEff address)))
+                        , Resumable (LoadError address (Value address (GraphEff address)))
+                        , Trace
+                        , Fresh
+                        , State (Heap address Latest (Value address (GraphEff address)))
+                        , State (ModuleTable (Maybe (address, Environment address)))
+                        ] a
+  }
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: (Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
@@ -121,7 +145,7 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
 
 resumingUnspecialized :: (Member Trace effects, AbstractHole value) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
-resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> Rval hole)
+resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
 
 resumingAddressError :: (AbstractHole value, Lower (Cell address value), Member Trace effects, Show address) => Evaluator address value (Resumable (AddressError address value) ': effects) a -> Evaluator address value effects a
 resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> show err) *> case err of

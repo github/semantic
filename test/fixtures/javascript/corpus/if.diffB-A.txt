@@ -1,7 +1,6 @@
 (Statements
   (If
   { (MemberAccess
-    {-(Identifier)-}
     {-(Identifier)-})
   ->(Identifier) }
     (Statements

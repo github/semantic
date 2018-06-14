@@ -15,7 +15,6 @@
     (Empty))
 {+(Call
   {+(MemberAccess
-    {+(Identifier)+}
     {+(Identifier)+})+}
   {+(Integer)+}
   {+(Empty)+})+})

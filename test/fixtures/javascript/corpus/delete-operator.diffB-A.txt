@@ -1,7 +1,6 @@
 (Statements
   (Delete
   { (MemberAccess
-    {-(Identifier)-}
     {-(Identifier)-})
   ->(Subscript
     {+(Identifier)+}

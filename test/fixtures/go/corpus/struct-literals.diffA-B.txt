@@ -37,8 +37,8 @@
       (Assignment
         (Identifier)
         (Composite
-          (MemberAccess
-            (Identifier)
-          { (Identifier)
-          ->(Identifier) })
+        { (MemberAccess
+          {-(Identifier)-})
+        ->(MemberAccess
+          {+(Identifier)+}) }
           (Statements))))))

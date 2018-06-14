@@ -24,7 +24,7 @@ instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
 instance ToJSON1 Statements
 
 instance Evaluatable Statements where
-  eval (Statements xs) = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
+  eval (Statements xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
@@ -37,7 +37,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
-    Rval <$> ifthenelse bool (subtermValue if') (subtermValue else')
+    rvalBox =<< ifthenelse bool (subtermValue if') (subtermValue else')
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -100,7 +100,7 @@ instance Evaluatable Let where
   eval Let{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
-    Rval <$> locally (bind name addr *> subtermValue letBody)
+    rvalBox =<< locally (bind name addr *> subtermValue letBody)
 
 
 -- Assignment
@@ -130,7 +130,7 @@ instance Evaluatable Assignment where
         -- the left hand side of the assignment expression is invalid:
         pure ()
 
-    pure (Rval rhs)
+    rvalBox rhs
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
@@ -189,7 +189,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval (Return x) = Rval <$> (subtermValue x >>= earlyReturn)
+  eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
 
 newtype Yield a = Yield a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -210,7 +210,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval (Break x) = Rval <$> (subtermValue x >>= throwBreak)
+  eval (Break x) = Rval <$> (subtermAddress x >>= throwBreak)
 
 newtype Continue a = Continue a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -220,7 +220,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval (Continue a) = Rval <$> (subtermValue a >>= throwContinue)
+  eval (Continue x) = Rval <$> (subtermAddress x >>= throwContinue)
 
 newtype Retry a = Retry a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -241,7 +241,7 @@ instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NoOp where
-  eval _ = pure (Rval unit)
+  eval _ = rvalBox unit
 
 -- Loops
 
@@ -253,7 +253,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval (fmap subtermValue -> For before cond step body) = Rval <$> forLoop before cond step body
+  eval (fmap subtermValue -> For before cond step body) = rvalBox =<< forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -275,7 +275,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval While{..} = Rval <$> while (subtermValue whileCondition) (subtermValue whileBody)
+  eval While{..} = rvalBox =<< while (subtermValue whileCondition) (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -285,7 +285,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval DoWhile{..} = Rval <$> doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
+  eval DoWhile{..} = rvalBox =<< doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
 
 -- Exception handling
 
