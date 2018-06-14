@@ -60,7 +60,7 @@ instance ( Coercible body (Eff effects)
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return address (Value address body)) effects
+         , Member (Return address) effects
          , Show address
          )
       => AbstractFunction address (Value address body) effects where
@@ -103,11 +103,11 @@ instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
          , Member (Env address) effects
          , Member Fresh effects
-         , Member (LoopControl address (Value address body)) effects
+         , Member (LoopControl address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return address (Value address body)) effects
+         , Member (Return address) effects
          , Show address
          )
       => AbstractValue address (Value address body) effects where

@@ -35,7 +35,7 @@ data Telemetry output where
   WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: Member IO effects => AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
+runTelemetry :: Member IO effects => LogQueue -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
 runTelemetry logger statter = interpret (\ t -> case t of
   WriteStat stat -> liftIO (queue statter stat)
   WriteLog level message pairs -> queueLogMessage logger level message pairs)
