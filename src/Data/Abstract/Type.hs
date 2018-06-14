@@ -118,7 +118,7 @@ instance ( Member (Allocator address Type) effects
          , Member (Env address) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
-         , Member (Return address Type) effects
+         , Member (Return address) effects
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
@@ -145,7 +145,7 @@ instance ( Member (Allocator address Type) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
-         , Member (Return address Type) effects
+         , Member (Return address) effects
          )
       => AbstractValue address Type effects where
   array fields = do

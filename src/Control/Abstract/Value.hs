@@ -219,7 +219,7 @@ value :: ( AbstractValue address value effects
          , Member (Env address) effects
          , Member (Resumable (EnvironmentError address)) effects
          )
-      => ValueRef address value
+      => ValueRef address
       -> Evaluator address value effects value
 value = deref <=< address
 
@@ -229,7 +229,7 @@ subtermValue :: ( AbstractValue address value effects
                 , Member (Env address) effects
                 , Member (Resumable (EnvironmentError address)) effects
                 )
-             => Subterm term (Evaluator address value effects (ValueRef address value))
+             => Subterm term (Evaluator address value effects (ValueRef address))
              -> Evaluator address value effects value
 subtermValue = value <=< subtermRef
 
@@ -239,7 +239,7 @@ address :: ( AbstractValue address value effects
            , Member (Env address) effects
            , Member (Resumable (EnvironmentError address)) effects
            )
-        => ValueRef address value
+        => ValueRef address
         -> Evaluator address value effects address
 address (LvalLocal var) = variable var
 address (LvalMember obj prop) = evaluateInScopedEnv (deref obj) (variable prop)
@@ -251,12 +251,12 @@ subtermAddress :: ( AbstractValue address value effects
                   , Member (Env address) effects
                   , Member (Resumable (EnvironmentError address)) effects
                   )
-               => Subterm term (Evaluator address value effects (ValueRef address value))
+               => Subterm term (Evaluator address value effects (ValueRef address))
                -> Evaluator address value effects address
 subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: Member (Allocator address value) effects
         => value
-        -> Evaluator address value effects (ValueRef address value)
+        -> Evaluator address value effects (ValueRef address)
 rvalBox val = Rval <$> box val

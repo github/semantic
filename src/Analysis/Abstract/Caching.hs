@@ -36,8 +36,8 @@ lookupCache configuration = cacheLookup configuration <$> get
 cachingConfiguration :: (Cacheable term address (Cell address) value, Member (State (Cache term address (Cell address) value)) effects, Member (State (Heap address (Cell address) value)) effects)
                      => Configuration term address (Cell address) value
                      -> Set (Cached address (Cell address) value)
-                     -> TermEvaluator term address value effects (ValueRef address value)
-                     -> TermEvaluator term address value effects (ValueRef address value)
+                     -> TermEvaluator term address value effects (ValueRef address)
+                     -> TermEvaluator term address value effects (ValueRef address)
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
   result <- Cached <$> action <*> TermEvaluator getHeap
@@ -65,8 +65,8 @@ cachingTerms :: ( Cacheable term address (Cell address) value
                 , Member (Env address) effects
                 , Member (State (Heap address (Cell address) value)) effects
                 )
-             => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address value))
-             -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address value))
+             => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
+             -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
 cachingTerms recur term = do
   c <- getConfiguration (embedSubterm term)
   cached <- lookupCache c
@@ -122,7 +122,7 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address (Cell address) value)) effects) => t (Cached address (Cell address) value) -> TermEvaluator term address value effects (ValueRef address value)
+scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address (Cell address) value)) effects) => t (Cached address (Cell address) value) -> TermEvaluator term address value effects (ValueRef address)
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 
