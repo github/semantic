@@ -11,11 +11,9 @@
       (Empty))
     (NewType
       (Context'
-        (Statements
-          (Class
-            (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+        (Class
+          (TypeClassIdentifier)
+          (TypeVariableIdentifier)))
       (Statements
         (TypeConstructorIdentifier))
       (Constructor
