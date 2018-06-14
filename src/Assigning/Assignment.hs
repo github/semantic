@@ -121,6 +121,7 @@ branchNode sym child = symbol sym *> children child
 leafNode :: (Enum grammar, Ix grammar) => grammar -> Assignment ast grammar Text
 leafNode sym = symbol sym *> source
 
+-- | Wrap an 'Assignment' producing @syntax@ up into an 'Assignment' producing 'Term's.
 toTerm :: Element syntax syntaxes
        => Assignment ast grammar (syntax (Term (Sum syntaxes) (Record Location)))
        -> Assignment ast grammar         (Term (Sum syntaxes) (Record Location))
