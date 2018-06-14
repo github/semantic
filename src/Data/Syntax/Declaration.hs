@@ -101,7 +101,7 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
   eval (VariableDeclaration [])   = rvalBox unit
-  eval (VariableDeclaration decs) = rvalBox =<< (multiple <$> traverse subtermValue decs)
+  eval (VariableDeclaration decs) = rvalBox =<< tuple =<< traverse subtermAddress decs
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of

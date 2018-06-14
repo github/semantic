@@ -73,9 +73,6 @@ class Show value => AbstractIntro value where
   -- | Construct a rational value.
   rational :: Rational -> value
 
-  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> value
-
   -- | Construct a key-value pair for use in a hash.
   kvPair :: value -> value -> value
 
@@ -114,8 +111,11 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
                -> (value -> value -> Evaluator address value effects value)
 
+  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
+  tuple :: [address] -> Evaluator address value effects value
+
   -- | Construct an array of zero or more values.
-  array :: [value] -> Evaluator address value effects value
+  array :: [address] -> Evaluator address value effects value
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator address value effects (value, value)
@@ -127,7 +127,7 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   ifthenelse :: value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
-  index :: value -> value -> Evaluator address value effects value
+  index :: value -> value -> Evaluator address value effects address
 
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
