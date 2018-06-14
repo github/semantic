@@ -20,14 +20,14 @@ import           System.Posix.Types
 
 data Config
   = Config
-  { configAppName                :: String       -- ^ Application name (semantic)
+  { configAppName                :: String       -- ^ Application name ("semantic")
   , configHostName               :: String       -- ^ HostName from getHostName
   , configProcessID              :: ProcessID    -- ^ ProcessID from getProcessID
   , configHaystackURL            :: Maybe String -- ^ URL of Haystack (with creds) from environment
-  , configStatsAddr              :: StatsAddr    -- ^ Address of statsd/datadog
+  , configStatsAddr              :: StatsAddr    -- ^ Address of statsd/datadog (default: "127.0.0.1:28125")
 
-  , configTreeSitterParseTimeout :: Timeout      -- ^ Timeout in milliseconds before canceling tree-sitter parsing
-  , configMaxTelemetyQueueSize   :: Int          -- ^ Max size of telemetry queues before messages are dropped.
+  , configTreeSitterParseTimeout :: Timeout      -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 10000).
+  , configMaxTelemetyQueueSize   :: Int          -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
   , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
@@ -77,7 +77,7 @@ defaultConfig' options@Options{..} = do
     }
 
 
-defaultHaystackFromConfig :: Config -> Haystack.ErrorLogger IO -> IO HaystackQueue
+defaultHaystackFromConfig :: Config -> Haystack.ErrorLogger -> IO HaystackQueue
 defaultHaystackFromConfig c@Config{..} logError = haystackClientFromConfig c >>= newAsyncQueue configMaxTelemetyQueueSize (Haystack.reportError logError)
 
 haystackClientFromConfig :: Config -> IO HaystackClient
