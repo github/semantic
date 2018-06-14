@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
+  -- Async telemetry interface
   LogQueue
 , StatQueue
 , HaystackQueue
@@ -8,6 +9,7 @@ module Semantic.Telemetry
 , queueErrorReport
 , queueStat
 
+-- Create stats
 , Stat.increment
 , Stat.decrement
 , Stat.count
@@ -16,19 +18,23 @@ module Semantic.Telemetry
 , Stat.withTiming
 , Stat.histogram
 , Stat.set
+
+-- Statsd client
 , statsClient
 , StatsClient
 
+-- Haystack client
 , haystackClient
 , HaystackClient
 
+-- Logging options and formatters
 , Level(..)
 , LogOptions(..)
 , logfmtFormatter
 , terminalFormatter
 , LogFormatter
 
--- Eff interface
+-- Eff interface for telemetry
 , writeLog
 , writeStat
 , time

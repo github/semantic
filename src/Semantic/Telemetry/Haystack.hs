@@ -1,7 +1,6 @@
 module Semantic.Telemetry.Haystack where
 
 import           Control.Exception
-import           Control.Monad.IO.Class
 import           Crypto.Hash
 import           Data.Aeson hiding (Error)
 import qualified Data.ByteString.Char8 as BC
@@ -23,11 +22,11 @@ data HaystackClient
   { haystackClientRequest  :: Request
   , haystackClientManager  :: Manager
   , haystackClientAppName  :: String
-  }
+  }                    -- ^ Standard HTTP client for Haystack
   | NullHaystackClient -- ^ Doesn't report needles, good for testing or when the 'HAYSTACK_URL' env var isn't set.
 
 -- | Function to log if there are errors reporting to haystack.
-type ErrorLogger io = String -> [(String, String)] -> io ()
+type ErrorLogger = String -> [(String, String)] -> IO ()
 
 -- Create a Haystack HTTP client.
 haystackClient :: Maybe String -> ManagerSettings -> String -> IO HaystackClient
@@ -43,7 +42,7 @@ haystackClient maybeURL managerSettings appName
   | otherwise = pure NullHaystackClient
 
 -- Report an error to Haystack over HTTP (blocking).
-reportError :: MonadIO io => ErrorLogger io -> HaystackClient -> ErrorReport -> io ()
+reportError :: ErrorLogger -> HaystackClient -> ErrorReport -> IO ()
 reportError logger NullHaystackClient ErrorReport{..} = let msg = takeWhile (/= '\n') (displayException errorReportException) in logger msg errorReportContext
 reportError logger HaystackClient{..} ErrorReport{..} = do
   let fullMsg = displayException errorReportException
@@ -58,7 +57,7 @@ reportError logger HaystackClient{..} ErrorReport{..} = do
         ] <> foldr (\(k, v) acc -> Text.pack k .= v : acc) [] errorReportContext
   let request = haystackClientRequest { requestBody = RequestBodyLBS (encode payload) }
 
-  response <- liftIO . tryIOError $ httpLbs request haystackClientManager
+  response <- tryIOError $ httpLbs request haystackClientManager
   case response of
     Left e -> logger ("Failed to report error to haystack: " <> displayException e) []
     Right response -> do

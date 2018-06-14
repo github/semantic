@@ -2,12 +2,14 @@
 {-# LANGUAGE TemplateHaskell #-}
 module Semantic.Version where
 
-import           Data.Version (showVersion)
-import           Development.GitRev
-import qualified Paths_semantic as Library (version)
+import Data.Version (showVersion)
+import Development.GitRev
+import Paths_semantic (version)
 
+-- The SHA1 hash of this build of semantic.
 buildSHA :: String
 buildSHA = $(gitHash)
 
+-- The version string of this build of semantic.
 buildVersion :: String
-buildVersion = showVersion Library.version
+buildVersion = showVersion version

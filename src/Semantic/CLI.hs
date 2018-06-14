@@ -37,7 +37,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> buildVersion <> " (" <> buildSHA <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
-    
+
     optionsParser = do
       logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
                           (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
