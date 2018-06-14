@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeOperators #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
+, SpecEff(..)
 ) where
 
 import Analysis.Abstract.Evaluating (evaluating)
@@ -19,29 +20,47 @@ import SpecHelpers hiding (reassociate)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (expected, _) <- evaluate (pure (integer 123))
-    fst <$> expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+    (expected, _) <- evaluate (box (integer 123))
+    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
     (expected, _) <- evaluate $ do
       identity <- closure [name "x"] lowerBound (variable (name "x"))
-      call identity [pure (integer 123)]
-    fst <$> expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+      call identity [box (integer 123)]
+    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
 evaluate
   = runM
-  . fmap (first reassociate)
-  . evaluating @Precise @(Value Precise (Eff _))
+  . evaluating @Precise @Val
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . fmap reassociate
   . runValueError
   . runEnvironmentError
   . runAddressError
   . runAllocator
+  . (>>= deref . fst)
   . runEnv lowerBound
   . runReturn
   . runLoopControl
 
-reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
-reassociate (Left s) = Left (SomeExc (inject (Const s)))
-reassociate (Right (Right (Right (Right a)))) = Right a
+reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
+reassociate = mergeExcs . mergeExcs . mergeExcs . Right
+
+type Val = Value Precise SpecEff
+newtype SpecEff a = SpecEff
+  { runSpecEff :: Eff '[ LoopControl Precise
+                       , Return Precise
+                       , Env Precise
+                       , Allocator Precise Val
+                       , Resumable (AddressError Precise Val)
+                       , Resumable (EnvironmentError Precise)
+                       , Resumable (ValueError Precise SpecEff)
+                       , Reader ModuleInfo
+                       , Reader PackageInfo
+                       , Fresh
+                       , State (Heap Precise Latest Val)
+                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                       , IO
+                       ] a
+  }

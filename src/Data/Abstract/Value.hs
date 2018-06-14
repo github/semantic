@@ -32,7 +32,7 @@ data Value address body
   | Hole
   deriving (Eq, Ord, Show)
 
-data ClosureBody address body = ClosureBody { closureBodyId :: Int, closureBody :: body (Value address body) }
+data ClosureBody address body = ClosureBody { closureBodyId :: Int, closureBody :: body address }
 
 instance Eq   (ClosureBody address body) where
   (==) = (==) `on` closureBodyId
@@ -60,7 +60,7 @@ instance ( Coercible body (Eff effects)
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return (Value address body)) effects
+         , Member (Return address) effects
          , Show address
          )
       => AbstractFunction address (Value address body) effects where
@@ -77,12 +77,10 @@ instance ( Coercible body (Eff effects)
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
-            value <- param
-            addr <- alloc name
-            assign addr value
+            addr <- param
             Env.insert name addr <$> rest) (pure env) (zip names params)
-          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return value) -> pure value)
-      _ -> throwValueError (CallError op)
+          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return ptr) -> pure ptr)
+      _ -> box =<< throwValueError (CallError op)
 
 
 instance Show address => AbstractIntro (Value address body) where
@@ -107,11 +105,11 @@ instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
          , Member (Env address) effects
          , Member Fresh effects
-         , Member (LoopControl (Value address body)) effects
+         , Member (LoopControl address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return (Value address body)) effects
+         , Member (Return address) effects
          , Show address
          )
       => AbstractValue address (Value address body) effects where
@@ -218,7 +216,7 @@ instance ( Coercible body (Eff effects)
       where pair = (left, right)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
-    Break value -> pure value
+    Break value -> deref value
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
     Continue _  -> loop x)
 

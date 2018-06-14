@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
 import           Data.Abstract.Evaluatable
@@ -8,7 +8,6 @@ import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
-import           Prelude hiding (fail)
 import           Prologue hiding (Text)
 
 newtype Text a = Text T.Text
@@ -55,14 +54,15 @@ include :: ( AbstractValue address value effects
            , Member (Resumable (EnvironmentError address)) effects
            , Member Trace effects
            )
-        => Subterm term (Evaluator address value effects (ValueRef value))
-        -> (ModulePath -> Evaluator address value effects (Maybe (value, Environment address)))
-        -> Evaluator address value effects (ValueRef value)
+        => Subterm term (Evaluator address value effects (ValueRef address))
+        -> (ModulePath -> Evaluator address value effects (Maybe (address, Environment address)))
+        -> Evaluator address value effects (ValueRef address)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (v, importedEnv) <- fromMaybe (unit, emptyEnv) <$> f path
+  unitPtr <- box unit -- TODO don't always allocate, use maybeM
+  (v, importedEnv) <- fromMaybe (unitPtr, emptyEnv) <$> f path
   bindAll importedEnv
   pure (Rval v)
 
@@ -201,7 +201,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (fmap subtermValue -> QualifiedName name iden) = Rval <$> evaluateInScopedEnv name iden
+  eval (QualifiedName name iden) = Rval <$> evaluateInScopedEnv (subtermValue name) (subtermAddress iden)
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
@@ -212,7 +212,8 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = Rval <$> foldl1 evaluateInScopedEnv (fmap subtermValue xs)
+  eval (NamespaceName xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
+    where f ns = evaluateInScopedEnv (ns >>= deref)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -367,16 +368,16 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = Rval <$> go names
+  eval Namespace{..} = rvalBox =<< go (freeVariables (subterm namespaceName))
     where
-      names = freeVariables (subterm namespaceName)
-      go [] = raiseEff (fail "expected at least one free variable in namespaceName, found none")
-      -- The last name creates a closure over the namespace body.
-      go [name] = letrec' name $ \addr ->
-        subtermValue namespaceBody *> makeNamespace name addr Nothing
       -- Each namespace name creates a closure over the subsequent namespace closures
-      go (name:xs) = letrec' name $ \addr ->
-        go xs <* makeNamespace name addr Nothing
+      go (name:x:xs) = letrec' name $ \addr ->
+        go (x:xs) <* makeNamespace name addr Nothing
+      -- The last name creates a closure over the namespace body.
+      go names = do
+        name <- maybeM (throwEvalError (FreeVariablesError [])) (listToMaybe names)
+        letrec' name $ \addr ->
+          subtermValue namespaceBody *> makeNamespace name addr Nothing
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)

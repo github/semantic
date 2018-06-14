@@ -41,6 +41,7 @@ type Syntax =
    , Expression.Boolean
    , Expression.InstanceOf
    , Expression.MemberAccess
+   , Expression.Subscript
    , Expression.Super
    , Expression.This
    , Java.Syntax.Annotation
@@ -53,10 +54,13 @@ type Syntax =
    , Java.Syntax.Module
    , Java.Syntax.New
    , Java.Syntax.Package
+   , Java.Syntax.SpreadParameter
    , Java.Syntax.Synchronized
    , Java.Syntax.TypeParameter
    , Java.Syntax.TypeWithModifiers
    , Java.Syntax.Variable
+   , Java.Syntax.Wildcard
+   , Java.Syntax.WildcardBounds
    , Literal.Array
    , Literal.Boolean
    , Literal.Integer
@@ -133,6 +137,7 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
     arrayInitializer
+  , arrayAccess
   , assignment'
   , block
   , binary
@@ -147,6 +152,7 @@ expressionChoices =
   , explicitConstructorInvocation
   -- , TODO: constantDeclaration
   , doWhile
+  , fieldAccess
   , fieldDeclaration
   , float
   , for
@@ -233,8 +239,11 @@ char = makeTerm <$> symbol CharacterLiteral <*> (Literal.TextElement <$> source)
 identifier :: Assignment
 identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
 
+identifier' :: Assignment.Assignment [] Grammar Name
+identifier' = (symbol Identifier <|> symbol TypeIdentifier) *> (name <$> source)
+
 scopedIdentifier :: Assignment
-scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> term expression)
+scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> identifier')
 
 superInterfaces :: Assignment.Assignment [] Grammar [Term]
 superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *> children(manyTerm type'))
@@ -261,21 +270,22 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params
+-- methodHeader needs to include typeParameters (it does)
 
 generic :: Assignment
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
 
 methodInvocation :: Assignment
-methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> expression <*> optional (token AnonDot *> expression)) <*> (argumentList <|> pure []) <*> emptyTerm)
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> expression <*> optional ((,) <$ token AnonDot <*> manyTerm typeArgument <*> identifier')) <*> (argumentList <|> pure []) <*> emptyTerm)
   where
-    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
-    callFunction a Nothing = a
+    callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
+    callFunction a Nothing = ([], a)
 
 explicitConstructorInvocation :: Assignment
-explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
+explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
   where
-    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
-    callFunction a Nothing = a
+    callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
+    callFunction a Nothing = ([], a)
 
 module' :: Assignment
 module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
@@ -298,11 +308,13 @@ package :: Assignment
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
 
 enum :: Assignment
-enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
-    where enumConstant = symbol EnumConstant *> children (term identifier)
+enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> manyTerm modifier <*> term identifier <*> (superInterfaces <|> pure []) <*> manyTerm enumConstant <*> (enumBodyDeclarations <|> pure []))
+    where
+      enumConstant = symbol EnumConstant *> children (term identifier)
+      enumBodyDeclarations = symbol EnumBodyDeclarations *> children (manyTerm expression)
 
 return' :: Assignment
-return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children expression)
+return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children (expression <|> emptyTerm))
 
 -- method expressions
 dims :: Assignment.Assignment [] Grammar [Term]
@@ -317,12 +329,21 @@ type' =  choice [
      , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
-     , symbol TypeArgument *> children (term type')
-     -- , symbol WildCard *> children (term type')
+     , wildcard
      , identifier
      , generic
+     , typeArgument
     ]
     where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
+
+typeArgument :: Assignment
+typeArgument = symbol TypeArgument *> children (term type')
+
+wildcard :: Assignment
+wildcard = makeTerm <$> symbol Grammar.Wildcard <*> children (Java.Syntax.Wildcard <$> manyTerm annotation <*> optional (super <|> extends))
+  where
+    super = makeTerm <$> token Super <*> (Java.Syntax.WildcardBoundSuper <$> type')
+    extends = makeTerm1 <$> (Java.Syntax.WildcardBoundExtends <$> type')
 
 if' :: Assignment
 if' = makeTerm <$> symbol IfThenElseStatement <*> children (Statement.If <$> term expression <*> term expression <*> (term expression <|> emptyTerm))
@@ -472,6 +493,8 @@ argumentList = symbol ArgumentList *> children (manyTerm expression)
 
 super :: Assignment
 super = makeTerm <$> token Super <*> pure Expression.Super
+-- INCORRECT: super = makeTerm <$> token Super $> Expression.Super
+-- Take partially applied function and replace it instead of applying
 
 this :: Assignment
 this = makeTerm <$> token This <*> pure Expression.This
@@ -503,7 +526,7 @@ throws :: Assignment.Assignment [] Grammar [Term]
 throws = symbol Throws *> children (symbol ExceptionTypeList *> children(manyTerm type'))
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
-formalParameters = manyTerm parameter
+formalParameters = manyTerm (parameter <|> spreadParameter)
   where
     parameter = makeTerm <$> symbol FormalParameter <*> children (makeAnnotation <$> manyTerm modifier <*> type' <* symbol VariableDeclaratorId <*> children identifier)
     makeAnnotation [] type' variableName = Type.Annotation variableName type'
@@ -511,3 +534,16 @@ formalParameters = manyTerm parameter
 
 castExpression :: Assignment
 castExpression = makeTerm <$> symbol CastExpression <*> children (flip Type.Annotation <$> type' <*> term expression)
+
+fieldAccess :: Assignment
+fieldAccess = makeTerm <$> symbol FieldAccess <*> children (Expression.MemberAccess <$> term expression <*> identifier')
+
+spreadParameter :: Assignment
+spreadParameter = makeTerm <$> symbol Grammar.SpreadParameter <*> children (Java.Syntax.SpreadParameter <$> (makeSingleDecl <$> manyTerm modifier <*> type' <*> variableDeclarator))
+  where
+    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
+    makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
+    makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
+
+arrayAccess :: Assignment
+arrayAccess = makeTerm <$> symbol ArrayAccess <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)

@@ -9,6 +9,7 @@ module SpecHelpers
 , derefQName
 , verbatim
 , TermEvaluator(..)
+, TestEff(..)
 , Verbatim(..)
 ) where
 
@@ -38,6 +39,7 @@ import Data.Range as X
 import Data.Record as X
 import Data.Source as X
 import Data.Span as X
+import Data.Sum
 import Data.Term as X
 import Parsing.Parser as X
 import Rendering.Renderer as X hiding (error)
@@ -77,11 +79,39 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
+testEvaluating :: TermEvaluator term Precise
+                    Val
+                    '[ Resumable (ValueError Precise TestEff)
+                     , Resumable (AddressError Precise Val)
+                     , Resumable EvalError, Resumable (EnvironmentError Precise)
+                     , Resumable ResolutionError
+                     , Resumable (Unspecialized Val)
+                     , Resumable (LoadError Precise Val)
+                     , Fresh
+                     , State (Heap Precise Latest Val)
+                     , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                     , Trace
+                     ]
+                   [(Precise, Environment Precise)]
+               -> ((Either
+                      (SomeExc
+                         (Data.Sum.Sum
+                          '[ ValueError Precise TestEff
+                           , AddressError Precise Val
+                           , EvalError
+                           , EnvironmentError Precise
+                           , ResolutionError
+                           , Unspecialized Val
+                           , LoadError Precise Val
+                           ]))
+                      [(Value Precise TestEff, Environment Precise)],
+                    EvaluatingState Precise Val),
+                   [String])
 testEvaluating
   = run
   . runReturningTrace
-  . fmap (first reassociate)
   . evaluating
+  . fmap reassociate
   . runLoadError
   . runUnspecialized
   . runResolutionError
@@ -89,7 +119,36 @@ testEvaluating
   . runEvalError
   . runAddressError
   . runValueError
-  . runTermEvaluator @_ @_ @(Value Precise (Eff _))
+  . (>>= traverse deref1)
+  . runTermEvaluator @_ @_ @Val
+
+type Val = Value Precise TestEff
+newtype TestEff a = TestEff
+  { runTestEff :: Eff '[ LoopControl Precise
+                       , Return Precise
+                       , Env Precise
+                       , Allocator Precise Val
+                       , Reader ModuleInfo
+                       , Modules Precise Val
+                       , Reader Span
+                       , Reader PackageInfo
+                       , Resumable (ValueError Precise TestEff)
+                       , Resumable (AddressError Precise Val)
+                       , Resumable EvalError
+                       , Resumable (EnvironmentError Precise)
+                       , Resumable ResolutionError
+                       , Resumable (Unspecialized Val)
+                       , Resumable (LoadError Precise Val)
+                       , Fresh
+                       , State (Heap Precise Latest Val)
+                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                       , Trace
+                       ] a
+  }
+
+deref1 (ptr, env) = runAllocator $ do
+  val <- deref ptr
+  pure (val, env)
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)

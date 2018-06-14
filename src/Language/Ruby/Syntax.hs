@@ -9,7 +9,6 @@ import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import           Diffing.Algorithm
-import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
 
@@ -52,10 +51,10 @@ instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Send where
   eval Send{..} = do
     let sel = case sendSelector of
-          Just sel -> subtermValue sel
+          Just sel -> subtermAddress sel
           Nothing  -> variable (name "call")
-    func <- maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
-    Rval <$> call func (map subtermValue sendArgs) -- TODO pass through sendBlock
+    func <- deref =<< maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
+    Rval <$> call func (map subtermAddress sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -71,7 +70,7 @@ instance Evaluatable Require where
     traceResolve name path
     (v, importedEnv) <- doRequire path
     bindAll importedEnv
-    pure (Rval v) -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
+    rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( AbstractValue address value effects
              , Member (Modules address value) effects
@@ -85,7 +84,7 @@ doRequire path = do
     Just (_, env) -> pure (boolean False, env)
 
 
-newtype Load a = Load { loadArgs :: [a] }
+data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Load where liftEq = genericLiftEq
@@ -93,14 +92,13 @@ instance Ord1 Load where liftCompare = genericLiftCompare
 instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Load where
-  eval (Load [x]) = do
+  eval (Load x Nothing) = do
     path <- subtermValue x >>= asString
-    Rval <$> doLoad path False
-  eval (Load [x, wrap]) = do
+    rvalBox =<< doLoad path False
+  eval (Load x (Just wrap)) = do
     path <- subtermValue x >>= asString
     shouldWrap <- subtermValue wrap >>= asBool
-    Rval <$> doLoad path shouldWrap
-  eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
+    rvalBox =<< doLoad path shouldWrap
 
 doLoad :: ( AbstractValue address value effects
           , Member (Env address) effects
@@ -134,7 +132,7 @@ instance Evaluatable Class where
   eval Class{..} = do
     super <- traverse subtermValue classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
-    Rval <$> letrec' name (\addr ->
+    rvalBox =<< letrec' name (\addr ->
       subtermValue classBody <* makeNamespace name addr super)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
@@ -147,7 +145,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> letrec' name (\addr ->
+    rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 data LowPrecedenceBoolean a
@@ -157,7 +155,7 @@ data LowPrecedenceBoolean a
 
 instance Evaluatable LowPrecedenceBoolean where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval t = Rval <$> go (fmap subtermValue t) where
+  eval t = rvalBox =<< go (fmap subtermValue t) where
     go (LowAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)

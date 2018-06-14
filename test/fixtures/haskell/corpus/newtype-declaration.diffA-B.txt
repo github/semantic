@@ -1,0 +1,96 @@
+(Module
+  (Empty)
+  (Statements
+    (NewType
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (TypeConstructorIdentifier)))
+      (Empty))
+    (NewType
+      (Context'
+        (Class
+          (TypeClassIdentifier)
+          (TypeVariableIdentifier)))
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (TypeVariableIdentifier)))
+      (Empty))
+    (NewType
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (Statements
+            (Field
+              (Statements
+              { (VariableIdentifier)
+              ->(VariableIdentifier) })
+              (Type
+                (TypeConstructorIdentifier)
+                (TypeParameters
+                  (TypeConstructorIdentifier))
+                (Empty))))))
+      (Empty))
+    (NewType
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeVariableIdentifier)
+        (AnnotatedTypeVariable
+          (TypeVariableIdentifier)
+          (KindListType
+            (KindFunctionType
+              (Kind
+                (Star))
+              (Kind
+                (Star)))))
+        (TypeVariableIdentifier))
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (Statements
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier))))
+      (Empty))
+    (NewType
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (TypeConstructorIdentifier)))
+      (Deriving
+        (TypeClassIdentifier)))
+    (NewType
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (TypeVariableIdentifier)))
+      (Deriving
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)))))

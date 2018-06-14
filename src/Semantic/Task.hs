@@ -38,6 +38,7 @@ module Semantic.Task
 -- * Interpreting
 , runTask
 , runTaskWithOptions
+, runTaskWithOptions'
 -- * Re-exports
 , Distribute
 , Eff
@@ -131,10 +132,20 @@ runTask = runTaskWithOptions defaultOptions
 -- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> TaskEff a -> IO a
 runTaskWithOptions options task = do
+  let size = 100 -- Max size of telemetry queues, less important for the CLI.
   options <- configureOptionsForHandle stderr options
-  statter <- defaultStatsClient >>= newQueue sendStat
-  logger <- newQueue logMessage options
+  statter <- defaultStatsClient >>= newQueue size sendStat
+  logger <- newQueue size logMessage options
 
+  result <- runTaskWithOptions' options logger statter task
+
+  closeQueue statter
+  closeStatClient (asyncQueueExtra statter)
+  closeQueue logger
+  either (die . displayException) pure result
+
+runTaskWithOptions' :: Options -> LogQueue -> AsyncQueue Stat StatsClient -> TaskEff a -> IO (Either SomeException a)
+runTaskWithOptions' options logger statter task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
         run = runM . runError
@@ -147,11 +158,7 @@ runTaskWithOptions options task = do
                    . runDistribute (run . unwrapTask)
     run task
   queue statter stat
-
-  closeQueue statter
-  closeStatClient (asyncQueueExtra statter)
-  closeQueue logger
-  either (die . displayException) pure result
+  pure result
 
 runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
 runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])

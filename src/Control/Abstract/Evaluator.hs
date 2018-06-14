@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
@@ -34,44 +34,49 @@ newtype Evaluator address value effects a = Evaluator { runEvaluator :: Eff effe
 
 deriving instance Member NonDet effects => Alternative (Evaluator address value effects)
 
-
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-data Return value resume where
-  Return :: value -> Return value value
+data Return address resume where
+  Return :: address -> Return address address
 
-deriving instance Eq value => Eq (Return value a)
-deriving instance Show value => Show (Return value a)
+deriving instance Eq address   => Eq   (Return address a)
+deriving instance Show address => Show (Return address a)
 
-earlyReturn :: Member (Return value) effects => value -> Evaluator address value effects value
+earlyReturn :: Member (Return address) effects
+            => address
+            -> Evaluator address value effects address
 earlyReturn = send . Return
 
-catchReturn :: Member (Return value) effects => Evaluator address value effects a -> (forall x . Return value x -> Evaluator address value effects a) -> Evaluator address value effects a
+catchReturn :: Member (Return address) effects => Evaluator address value effects a -> (forall x . Return address x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
-runReturn :: Effectful (m address value) => m address value (Return value ': effects) value -> m address value effects value
+runReturn :: Effectful (m address value) => m address value (Return address ': effects) address -> m address value effects address
 runReturn = raiseHandler (relay pure (\ (Return value) _ -> pure value))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
-data LoopControl value resume where
-  Break    :: value -> LoopControl value value
-  Continue :: value -> LoopControl value value
+data LoopControl address resume where
+  Break    :: address -> LoopControl address address
+  Continue :: address -> LoopControl address address
 
-deriving instance Eq value => Eq (LoopControl value a)
-deriving instance Show value => Show (LoopControl value a)
+deriving instance Eq address   => Eq   (LoopControl address a)
+deriving instance Show address => Show (LoopControl address a)
 
-throwBreak :: Member (LoopControl value) effects => value -> Evaluator address value effects value
+throwBreak :: Member (LoopControl address) effects
+           => address
+           -> Evaluator address value effects address
 throwBreak = send . Break
 
-throwContinue :: Member (LoopControl value) effects => value -> Evaluator address value effects value
+throwContinue :: Member (LoopControl address) effects
+              => address
+              -> Evaluator address value effects address
 throwContinue = send . Continue
 
-catchLoopControl :: Member (LoopControl value) effects => Evaluator address value effects a -> (forall x . LoopControl value x -> Evaluator address value effects a) -> Evaluator address value effects a
+catchLoopControl :: Member (LoopControl address) effects => Evaluator address value effects a -> (forall x . LoopControl address x -> Evaluator address value effects a) -> Evaluator address value effects a
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
-runLoopControl :: Effectful (m address value) => m address value (LoopControl value ': effects) value -> m address value effects value
+runLoopControl :: Effectful (m address value) => m address value (LoopControl address ': effects) address -> m address value effects address
 runLoopControl = raiseHandler (relay pure (\ eff _ -> case eff of
   Break    value -> pure value
   Continue value -> pure value))

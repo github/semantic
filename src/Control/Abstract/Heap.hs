@@ -1,8 +1,12 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
+, Configuration(..)
+, Live
+, getConfiguration
 , getHeap
 , putHeap
+, box
 , alloc
 , deref
 , assign
@@ -24,11 +28,18 @@ import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
+import Control.Abstract.TermEvaluator
+import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Name
 import Data.Semigroup.Reducer
 import Prologue
+
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address (Cell address) value)) effects) => term -> TermEvaluator term address value effects (Configuration term address (Cell address) value)
+getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEnv <*> TermEvaluator getHeap
+
 
 -- | Retrieve the heap.
 getHeap :: Member (State (Heap address (Cell address) value)) effects => Evaluator address value effects (Heap address (Cell address) value)
@@ -42,6 +53,13 @@ putHeap = put
 modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Heap address (Cell address) value -> Heap address (Cell address) value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
+box :: Member (Allocator address value) effects
+    => value
+    -> Evaluator address value effects address
+box val = do
+  addr <- alloc "<box>"
+  assign addr val
+  pure addr
 
 alloc :: Member (Allocator address value) effects => Name -> Evaluator address value effects address
 alloc = sendAllocator . Alloc
@@ -85,8 +103,8 @@ letrec' :: ( Member (Allocator address value) effects
            , Member (Env address) effects
            )
         => Name
-        -> (address -> Evaluator address value effects value)
-        -> Evaluator address value effects value
+        -> (address -> Evaluator address value effects a)
+        -> Evaluator address value effects a
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- locally (body addr)
@@ -94,13 +112,12 @@ letrec' name body = do
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Allocator address value) effects
-            , Member (Env address) effects
+variable :: ( Member (Env address) effects
             , Member (Resumable (EnvironmentError address)) effects
             )
          => Name
-         -> Evaluator address value effects value
-variable name = lookupEnv name >>= maybeM (freeVariableError name) >>= deref
+         -> Evaluator address value effects address
+variable name = lookupEnv name >>= maybeM (freeVariableError name)
 
 
 -- Garbage collection

@@ -180,7 +180,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = pure (Rval unit)
+  eval _ = rvalBox unit
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
@@ -220,6 +220,10 @@ newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
   deriving stock (Eq, Show, Generic)
   deriving anyclass (Named, Message)
   deriving newtype (MessageField)
+
+-- instance Show ErrorStack where
+--   showsPrec _ = shows . map showPair . unErrorStack
+--     where showPair (sym, loc) = sym <> " " <> srcLocFile loc <> ":" <> show (srcLocStartLine loc) <> ":" <> show (srcLocStartCol loc)
 
 instance HasDefault ErrorStack where
   def = ErrorStack mempty
