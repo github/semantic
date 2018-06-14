@@ -113,6 +113,7 @@ import Data.Text.Encoding (decodeUtf8')
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
+-- | Match a branch node, matching its children with the supplied 'Assignment' & returning the result.
 branchNode :: (Enum grammar, Ix grammar) => grammar -> Assignment ast grammar a -> Assignment ast grammar a
 branchNode sym child = symbol sym *> children child
 
