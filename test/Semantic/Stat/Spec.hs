@@ -82,6 +82,6 @@ spec = do
         info <- recv serverSoc 1024
         info `shouldBe` "semantic.app.metric:1|c"
 
--- Defaults are all drive by defaultConfig.
+-- Defaults are all driven by defaultConfig.
 defaultStatsClient :: IO StatsClient
 defaultStatsClient = defaultConfig >>= \Config{..} -> statsClient (addrHost configStatsAddr) (addrPort configStatsAddr) configAppName
