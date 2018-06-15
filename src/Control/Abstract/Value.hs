@@ -25,8 +25,6 @@ import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
-import Data.Semilattice.Lower
-import Prelude
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP

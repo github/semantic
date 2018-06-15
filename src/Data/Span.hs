@@ -16,7 +16,6 @@ import Proto3.Wire.Decode as Decode
 import Proto3.Wire.Encode as Encode
 import qualified Data.Aeson as A
 import Data.JSON.Fields
-import Data.Semilattice.Lower
 import GHC.Stack
 import Prologue
 

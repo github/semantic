@@ -86,7 +86,6 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
-                     , Data.Semilattice.Lower
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
@@ -211,16 +210,17 @@ library
                      , reducers
                      , scientific
                      , semigroupoids
+                     , semilattices
                      , split
                      , stm-chans
                      , template-haskell
                      , text >= 1.2.1.3
                      , these
                      , time
-                     , proto3-suite
-                     , proto3-wire
                      , unix
                      , unordered-containers
+                     , proto3-suite
+                     , proto3-wire
                      , haskell-tree-sitter
                      , tree-sitter-go
                      , tree-sitter-haskell
@@ -320,6 +320,7 @@ test-suite test
                      , proto3-suite
                      , proto3-wire
                      , recursion-schemes >= 4.1
+                     , semilattices
                      , semantic
                      , text >= 1.2.1.3
                      , these
