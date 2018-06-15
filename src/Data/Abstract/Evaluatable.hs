@@ -30,6 +30,7 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
 import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
+import Data.Graph
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -61,9 +62,9 @@ class Show1 constr => Evaluatable constr where
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
-data LoadOrder a b
-  = Done b
-  | Load a (b -> LoadOrder a b)
+data LoadOrder a b c
+  = Done c
+  | Load a (b -> LoadOrder a b c)
 
 evaluate :: forall address term value effects
          .  ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address value ': effects)
@@ -88,7 +89,7 @@ evaluate :: forall address term value effects
             , Reducer value (Cell address value)
             , ValueRoots address value
             )
-         => LoadOrder (NonEmpty (Module term)) (NonEmpty (Module (address, Environment address)))
+         => LoadOrder (NonEmpty (Module term)) (NonEmpty (Module (address, Environment address))) (NonEmpty (Module (address, Environment address)))
          -> Evaluator address value effects (NonEmpty (Module (address, Environment address)))
 evaluate (Done results) = pure results
 evaluate (Load modules continue)
