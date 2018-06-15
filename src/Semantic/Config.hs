@@ -24,7 +24,8 @@ data Config
   , configHostName               :: String       -- ^ HostName from getHostName
   , configProcessID              :: ProcessID    -- ^ ProcessID from getProcessID
   , configHaystackURL            :: Maybe String -- ^ URL of Haystack (with creds) from environment
-  , configStatsAddr              :: StatsAddr    -- ^ Address of statsd/datadog (default: "127.0.0.1:28125")
+  , configStatsHost              :: Stat.Host    -- ^ Host of statsd/datadog (default: "127.0.0.1")
+  , configStatsPort              :: Stat.Port    -- ^ Port of statsd/datadog (default: "28125")
 
   , configTreeSitterParseTimeout :: Timeout      -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 10000).
   , configMaxTelemetyQueueSize   :: Int          -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
@@ -43,8 +44,6 @@ data Options
   , optionsFailOnWarning :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   }
 
-data StatsAddr = StatsAddr { addrHost :: Stat.Host, addrPort :: Stat.Port }
-
 defaultOptions :: Options
 defaultOptions = Options (Just Warning) Nothing False
 
@@ -54,7 +53,7 @@ defaultConfig options@Options{..} = do
   hostName <- getHostName
   isTerminal <- hIsTerminalDevice stderr
   haystackURL <- lookupEnv "HAYSTACK_URL"
-  statsAddr <- lookupStatsAddr
+  (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupInt 1000 "MAX_TELEMETRY_QUEUE_SIZE"
   parseTimeout <- envLookupInt 10000 "TREE_SITTER_PARSE_TIMEOUT" -- Default is 10 seconds
   pure Config
@@ -62,7 +61,8 @@ defaultConfig options@Options{..} = do
     , configHostName = hostName
     , configProcessID = pid
     , configHaystackURL = haystackURL
-    , configStatsAddr = statsAddr
+    , configStatsHost = statsHost
+    , configStatsPort = statsPort
 
     , configTreeSitterParseTimeout = Milliseconds parseTimeout
     , configMaxTelemetyQueueSize = size
@@ -98,11 +98,10 @@ withHaystackFromConfig Config{..} errorLogger =
   withHaystack configHaystackURL tlsManagerSettings configAppName errorLogger configMaxTelemetyQueueSize
 
 withStatterFromConfig :: Config -> (StatQueue -> IO c) -> IO c
-withStatterFromConfig Config{..} = withStatter host port configAppName configMaxTelemetyQueueSize
-  where host = addrHost configStatsAddr
-        port = addrPort configStatsAddr
+withStatterFromConfig Config{..} =
+  withStatter configStatsHost configStatsPort configAppName configMaxTelemetyQueueSize
 
-lookupStatsAddr :: IO StatsAddr
+lookupStatsAddr :: IO (Stat.Host, Stat.Port)
 lookupStatsAddr = do
   addr <- lookupEnv "STATS_ADDR"
   let (host', port) = parseAddr (fmap ("statsd://" <>) addr)
@@ -111,7 +110,7 @@ lookupStatsAddr = do
   kubesHost <- lookupEnv "DOGSTATSD_HOST"
   let host = fromMaybe host' kubesHost
 
-  pure (StatsAddr host port)
+  pure (host, port)
   where
     defaultHost = "127.0.0.1"
     defaultPort = "28125"
