@@ -9,7 +9,6 @@ import Control.Abstract
 import Data.Abstract.Cache
 import Data.Abstract.Module
 import Data.Abstract.Ref
-import Data.Semilattice.Lower
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.

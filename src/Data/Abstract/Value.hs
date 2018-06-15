@@ -2,7 +2,7 @@
 module Data.Abstract.Value where
 
 import Control.Abstract
-import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
+import Data.Abstract.Environment (Environment, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -22,8 +22,8 @@ data Value address body
   | Float    (Number.Number Scientific)
   | String Text
   | Symbol Text
-  | Tuple [Value address body]
-  | Array [Value address body]
+  | Tuple [address]
+  | Array [address]
   | Class Name (Environment address)
   | Namespace Name (Environment address)
   | KVPair (Value address body) (Value address body)
@@ -60,7 +60,7 @@ instance ( Coercible body (Eff effects)
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return address (Value address body)) effects
+         , Member (Return address) effects
          , Show address
          )
       => AbstractFunction address (Value address body) effects where
@@ -92,8 +92,6 @@ instance Show address => AbstractIntro (Value address body) where
   symbol   = Symbol
   rational = Rational . Number.Ratio
 
-  multiple = Tuple
-
   kvPair = KVPair
   hash = Hash . map (uncurry KVPair)
 
@@ -105,11 +103,11 @@ instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
          , Member (Env address) effects
          , Member Fresh effects
-         , Member (LoopControl address (Value address body)) effects
+         , Member (LoopControl address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return address (Value address body)) effects
+         , Member (Return address) effects
          , Show address
          )
       => AbstractValue address (Value address body) effects where
@@ -117,16 +115,17 @@ instance ( Coercible body (Eff effects)
     | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
 
-  array    = pure . Array
+  tuple = pure . Tuple
+  array = pure . Array
 
   klass n [] env = pure $ Class n env
   klass n supers env = do
-    product <- foldl mergeEnvs emptyEnv . catMaybes <$> traverse scopedEnvironment supers
+    product <- foldl mergeEnvs lowerBound . catMaybes <$> traverse scopedEnvironment supers
     pure $ Class n (mergeEnvs product env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
+    env' <- maybe (pure lowerBound) (asNamespaceEnv <=< deref) maybeAddr
     pure (Namespace n (Env.mergeNewer env' env))
     where asNamespaceEnv v
             | Namespace _ env' <- v = pure env'
@@ -147,12 +146,12 @@ instance ( Coercible body (Eff effects)
 
   index = go where
     tryIdx list ii
-      | ii > genericLength list = throwValueError (BoundsError list ii)
+      | ii > genericLength list = box =<< throwValueError (BoundsError list ii)
       | otherwise               = pure (genericIndex list ii)
     go arr idx
       | (Array arr, Integer (Number.Integer i)) <- (arr, idx) = tryIdx arr i
       | (Tuple tup, Integer (Number.Integer i)) <- (arr, idx) = tryIdx tup i
-      | otherwise = throwValueError (IndexError arr idx)
+      | otherwise = box =<< throwValueError (IndexError arr idx)
 
   liftNumeric f arg
     | Integer (Number.Integer i) <- arg = pure . integer  $ f i
@@ -237,7 +236,7 @@ data ValueError address body resume where
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
   ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
   -- Out-of-bounds error
-  BoundsError            :: [Value address body] -> Prelude.Integer  -> ValueError address body (Value address body)
+  BoundsError            :: [address]          -> Prelude.Integer    -> ValueError address body (Value address body)
 
 
 instance Eq address => Eq1 (ValueError address body) where
