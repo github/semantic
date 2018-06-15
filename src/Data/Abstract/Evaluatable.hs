@@ -61,6 +61,10 @@ class Show1 constr => Evaluatable constr where
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
+data LoadOrder a b
+  = Done (NonEmpty b)
+  | Load (NonEmpty a) (NonEmpty b -> LoadOrder a b)
+
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
                     .  ( AbstractValue address value inner
