@@ -72,6 +72,7 @@ evaluate :: forall address term value effects
             , Evaluatable (Base term)
             , Foldable (Cell address)
             , FreeVariables term
+            , Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (AddressError address value)) effects
@@ -91,7 +92,7 @@ evaluate :: forall address term value effects
          -> Evaluator address value effects (NonEmpty (Module (address, Environment address)))
 evaluate (Done results) = pure results
 evaluate (Load modules continue)
-  = (>>= evaluate . continue)
+  = runRestOfLoadOrder
   . runReader lowerBound
   . runModules evalModule
   $ traverse evalModuleAndRetain modules
@@ -105,6 +106,10 @@ evaluate (Load modules continue)
           $ foldSubterms eval (moduleBody m) >>= address
 
         evalModuleAndRetain m = (<$ m) <$> evalModule m
+
+        runRestOfLoadOrder action = do
+          results <- action
+          local (<> ModuleTable.fromModules (toList results)) (evaluate (continue results))
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
