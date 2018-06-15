@@ -62,10 +62,10 @@ class Show1 constr => Evaluatable constr where
 
 
 data LoadOrder a b
-  = Done (NonEmpty b)
-  | Load (NonEmpty a) (NonEmpty b -> LoadOrder a b)
+  = Done b
+  | Load a (b -> LoadOrder a b)
 
-evaluate :: LoadOrder (Module term) (Module (address, Environment address))
+evaluate :: LoadOrder (NonEmpty (Module term)) (NonEmpty (Module (address, Environment address)))
          -> Eff effects (NonEmpty (Module (address, Environment address)))
 evaluate (Done results) = pure results
 
