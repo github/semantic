@@ -87,14 +87,14 @@ evaluate :: forall address term value effects
             , Reducer value (Cell address value)
             , ValueRoots address value
             )
-         => LoadOrder (NonEmpty (Module term)) (NonEmpty (address, Environment address))
-         -> Evaluator address value effects (NonEmpty (address, Environment address))
+         => LoadOrder (NonEmpty (Module term)) (NonEmpty (Module (address, Environment address)))
+         -> Evaluator address value effects (NonEmpty (Module (address, Environment address)))
 evaluate (Done results) = pure results
 evaluate (Load modules continue)
   = (>>= evaluate . continue)
   . runReader lowerBound
   . runModules evalModule
-  $ traverse evalModule modules
+  $ traverse evalModuleAndRetain modules
   where evalModule :: Module term -> Evaluator address value (Modules address value ': effects) (address, Environment address)
         evalModule m
           = runReader (moduleInfo m)
@@ -103,6 +103,8 @@ evaluate (Load modules continue)
           . runReturn
           . runLoopControl
           $ foldSubterms eval (moduleBody m) >>= address
+
+        evalModuleAndRetain m = (<$ m) <$> evalModule m
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
