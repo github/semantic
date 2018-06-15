@@ -570,3 +570,21 @@ instance Ord1 CPPDirective where liftCompare = genericLiftCompare
 instance Show1 CPPDirective where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable CPPDirective
+
+data QuasiQuotation a = QuasiQuotation { quasiQuotationHead :: a, quasiQuotationBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotation where liftEq = genericLiftEq
+instance Ord1 QuasiQuotation where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotation where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotation
+
+newtype QuasiQuotationExpression a = QuasiQuotationExpression Name
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationExpression where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationExpression where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationExpression where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationExpression

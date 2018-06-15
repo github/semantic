@@ -84,6 +84,8 @@ type Syntax = '[
   , Syntax.PrefixNegation
   , Syntax.QualifiedEntityIdentifier
   , Syntax.QualifiedImportDeclaration
+  , Syntax.QuasiQuotation
+  , Syntax.QuasiQuotationExpression
   , Syntax.QuotedName
   , Syntax.RecordDataConstructor
   , Syntax.ScopedTypeVariables
@@ -201,7 +203,7 @@ export :: Assignment
 export = makeTerm <$> symbol Export <*> children (Syntax.Export <$> expressions)
 
 expression' :: Assignment
-expression' = symbol Expression *> children expression
+expression' = symbol Expression *> children (expression <|> emptyTerm)
 
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> manyTerm expression
@@ -271,6 +273,8 @@ expressionChoices = [
                     , qualifiedModuleIdentifier
                     , qualifiedTypeConstructorIdentifier
                     , qualifiedVariableIdentifier
+                    , quasiQuotation
+                    , quasiQuotationExpression
                     , quotedName
                     , scopedTypeVariables
                     , standaloneDerivingInstance
@@ -507,6 +511,12 @@ qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructo
 
 qualifiedVariableIdentifier :: Assignment
 qualifiedVariableIdentifier = makeTerm <$> symbol QualifiedVariableIdentifier <*> children (Syntax.QualifiedVariableIdentifier <$> someTerm' expression)
+
+quasiQuotation :: Assignment
+quasiQuotation = makeTerm <$> symbol QuasiQuotation <*> children (Syntax.QuasiQuotation <$> expression <*> expression)
+
+quasiQuotationExpression :: Assignment
+quasiQuotationExpression = makeTerm <$> symbol QuasiQuotationExpression <*> (Syntax.QuasiQuotationExpression . Name.name <$> source)
 
 quotedName :: Assignment
 quotedName = makeTerm <$> symbol QuotedName <*> children (Syntax.QuotedName <$> expression)
