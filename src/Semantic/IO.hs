@@ -33,7 +33,6 @@ module Semantic.IO
 , write
 ) where
 
-import qualified Control.Exception as Exc
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
