@@ -34,7 +34,6 @@ import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Data.Semigroup.Reducer hiding (unit)
-import Data.Semilattice.Lower
 import Data.Sum
 import Data.Term
 import Prologue
@@ -118,15 +117,15 @@ evaluatePackageWith analyzeModule analyzeTerm package
         evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (address, Environment address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
           addr <- box unit -- TODO don't *always* allocate - use maybeM instead
-          (ptr, env) <- fromMaybe (addr, emptyEnv) <$> require m
+          (ptr, env) <- fromMaybe (addr, lowerBound) <$> require m
           bindAll env
           maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
-        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
+        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule lowerBound)) $ do
+          (_, builtinsEnv) <- runInModule lowerBound moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
           second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
 
-        withPrelude Nothing f = f emptyEnv
+        withPrelude Nothing f = f lowerBound
         withPrelude (Just prelude) f = do
           (_, preludeEnv) <- evalPrelude prelude
           f preludeEnv

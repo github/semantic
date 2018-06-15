@@ -2,7 +2,7 @@
 module Data.Abstract.Value where
 
 import Control.Abstract
-import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
+import Data.Abstract.Environment (Environment, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -120,12 +120,12 @@ instance ( Coercible body (Eff effects)
 
   klass n [] env = pure $ Class n env
   klass n supers env = do
-    product <- foldl mergeEnvs emptyEnv . catMaybes <$> traverse scopedEnvironment supers
+    product <- foldl mergeEnvs lowerBound . catMaybes <$> traverse scopedEnvironment supers
     pure $ Class n (mergeEnvs product env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
+    env' <- maybe (pure lowerBound) (asNamespaceEnv <=< deref) maybeAddr
     pure (Namespace n (Env.mergeNewer env' env))
     where asNamespaceEnv v
             | Namespace _ env' <- v = pure env'
