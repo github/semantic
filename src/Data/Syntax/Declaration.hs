@@ -163,11 +163,12 @@ instance Evaluatable Class where
   eval Class{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     supers <- traverse subtermValue classSuperclasses
-    (v, addr) <- letrec name $ do
+    (_, addr) <- letrec name $ do
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    rvalBox =<< (v <$ bind name addr)
+    bind name addr
+    pure (Rval addr)
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -246,7 +247,8 @@ instance Evaluatable TypeAlias where
     v <- subtermValue typeAliasKind
     addr <- lookupOrAlloc name
     assign addr v
-    rvalBox =<< (v <$ bind name addr)
+    bind name addr
+    pure (Rval addr)
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier
