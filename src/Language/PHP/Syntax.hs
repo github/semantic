@@ -62,7 +62,7 @@ include pathTerm f = do
   path <- resolvePHPName name
   traceResolve name path
   unitPtr <- box unit -- TODO don't always allocate, use maybeM
-  (v, importedEnv) <- fromMaybe (unitPtr, emptyEnv) <$> f path
+  (v, importedEnv) <- fromMaybe (unitPtr, lowerBound) <$> f path
   bindAll importedEnv
   pure (Rval v)
 

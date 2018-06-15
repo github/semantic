@@ -5,7 +5,6 @@ import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Ref
 import Data.Map.Monoidal as Monoidal
-import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
