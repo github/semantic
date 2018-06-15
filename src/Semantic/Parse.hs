@@ -16,7 +16,7 @@ import Rendering.Renderer
 import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
 import Serializing.Format
-import qualified Language.JSON.Assignment as JSON
+import qualified Language.Ruby.Assignment as Ruby
 
 runParse :: (Member (Distribute WrappedTask) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm) >=> serialize JSON
@@ -27,9 +27,9 @@ runParse ImportsTermRenderer          = withParsedBlobs (\ blob -> decorate (dec
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
-runRawParse :: Member (Distribute WrappedTask) effs => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
+runRawParse :: Member (Distribute WrappedTask) effs => [Blob] -> Eff effs [Term (Sum Ruby.Syntax) ()]
 runRawParse = flip distributeFor (\ blob -> WrapTask (do
-    term <- parse jsonParser blob
+    term <- parse rubyParser blob
     pure (() <$ term)))
 
 withParsedBlobs :: (Member (Distribute WrappedTask) effs, Monoid output) => (forall syntax . (ConstructorName syntax, Foldable syntax, Functor syntax, HasDeclaration syntax, HasPackageDef syntax, Show1 syntax, ToJSONFields1 syntax) => Blob -> Term syntax (Record Location) -> TaskEff output) -> [Blob] -> Eff effs output
