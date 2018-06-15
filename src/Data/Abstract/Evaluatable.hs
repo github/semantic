@@ -15,6 +15,7 @@ module Data.Abstract.Evaluatable
 , Cell
 ) where
 
+import Algebra.Graph.Class (foldg)
 import Control.Abstract hiding (Load)
 import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
@@ -31,6 +32,10 @@ import Data.Abstract.Name as X
 import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
 import Data.Graph
+import Data.List (groupBy, nub, sortBy)
+import qualified Data.Monoid as Monoid
+import qualified Data.Map.Monoidal as Map
+import Data.Ord (comparing)
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -60,6 +65,33 @@ class Show1 constr => Evaluatable constr where
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+
+
+topologicalSort :: Ord v => Graph v -> [[v]]
+topologicalSort
+  = groupByInEdgeCount
+  . allVertices
+  . labelWithInEdgeCounts
+
+labelWithInEdgeCounts :: Ord v => Graph v -> Graph (Monoid.Sum Int, v)
+labelWithInEdgeCounts
+  = uncurry mapGraph
+  . foldg
+    (lowerBound, lowerBound)
+    ((,) lowerBound . vertex)
+    (<>)
+    (\ (outM, outG) (inM, inG) ->
+      ( outM <> inM <> foldMap (flip Map.singleton (Monoid.Sum (length outG))) (allVertices inG)
+      , outG `connect` inG
+      ))
+  where mapGraph edgeCountsByVertex g = pairWithCountIn edgeCountsByVertex <$> g
+        pairWithCountIn edgeCountsByVertex vertex = (fromMaybe 0 (Map.lookup vertex edgeCountsByVertex), vertex)
+
+allVertices :: Eq v => Graph v -> [v]
+allVertices = nub . toList
+
+groupByInEdgeCount :: Ord sum => [(sum, v)] -> [[v]]
+groupByInEdgeCount = map (map snd) . groupBy ((==) `on` fst) . sortBy (comparing fst)
 
 
 data LoadOrder a b c
