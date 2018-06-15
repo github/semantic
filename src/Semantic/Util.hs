@@ -17,7 +17,6 @@ import           Data.Functor.Foldable
 import qualified Data.Language as Language
 import           Data.Sum (weaken)
 import           Data.Term
-import qualified GHC.TypeLits as TypeLevel
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
@@ -96,8 +95,8 @@ pythonPrelude = preludePath "preludes" Language.Python
 javaScriptPrelude = preludePath "preludes" Language.JavaScript
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang "preludes" [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang "preludes" [] >>= parsePackage parser prelude)
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)
