@@ -11,6 +11,9 @@ module Semantic.Telemetry.Stat
 , set
 , Stat
 , Tags
+, Host
+, Port
+, Namespace
 
 -- Client
 , statsClient
@@ -99,17 +102,21 @@ data StatsClient
   = StatsClient
   { statsClientUDPSocket :: Socket
   , statsClientNamespace :: String
-  , statsClientUDPHost   :: String
-  , statsClientUDPPort   :: String
+  , statsClientUDPHost   :: Host
+  , statsClientUDPPort   :: Port
   }
 
+type Host = String
+type Port = String
+type Namespace = String
+
 -- | Create a StatsClient at the specified host and port with a namespace prefix.
-statsClient :: MonadIO io => String -> String -> String -> io StatsClient
-statsClient host port statsClientNamespace = liftIO $ do
+statsClient :: MonadIO io => Host -> Port -> Namespace -> io StatsClient
+statsClient host port ns = liftIO $ do
   (addr:_) <- getAddrInfo Nothing (Just host) (Just port)
   sock <- socket (addrFamily addr) Datagram defaultProtocol
   connect sock (addrAddress addr)
-  pure (StatsClient sock statsClientNamespace host port)
+  pure (StatsClient sock ns host port)
 
 -- | Close the client's underlying socket.
 closeStatClient :: MonadIO io => StatsClient -> io ()

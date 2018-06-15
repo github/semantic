@@ -75,7 +75,6 @@ import           Semantic.Distribute
 import qualified Semantic.IO as IO
 import           Semantic.Resolution
 import           Semantic.Telemetry
-import           Semantic.Telemetry.Stat as Stat
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 
@@ -130,9 +129,8 @@ runTask = runTaskWithOptions defaultOptions
 runTaskWithOptions :: Options -> TaskEff a -> IO a
 runTaskWithOptions opts task = do
   config <- defaultConfig' opts
-  result <- withLogger config $ \logger ->
-    withStatter config $ \statter ->
-      runTaskWithConfig config logger statter task
+  result <- withTelemetry config $ \(TelemetryQueues logger statter _) ->
+    runTaskWithConfig config logger statter task
   either (die . displayException) pure result
 
 -- | Execute a 'TaskEff' yielding its result value in 'IO'.
@@ -197,26 +195,26 @@ runParser blob@Blob{..} parser = case parser of
 
   AssignmentParser parser assignment -> do
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
-      writeStat (Stat.increment "parse.parse_failures" languageTag)
+      writeStat (increment "parse.parse_failures" languageTag)
       writeLog Error "failed parsing" (("task", "parse") : blobFields)
       throwError (toException err)
     config <- ask
     time "parse.assign" languageTag $
       case Assignment.assign blobSource assignment ast of
         Left err -> do
-          writeStat (Stat.increment "parse.assign_errors" languageTag)
+          writeStat (increment "parse.assign_errors" languageTag)
           logError config Error blob err (("task", "assign") : blobFields)
           throwError (toException err)
         Right term -> do
           for_ (errors term) $ \ err -> case Error.errorActual err of
               Just "ParseError" -> do
-                writeStat (Stat.increment "parse.parse_errors" languageTag)
+                writeStat (increment "parse.parse_errors" languageTag)
                 logError config Warning blob err (("task", "parse") : blobFields)
               _ -> do
-                writeStat (Stat.increment "parse.assign_warnings" languageTag)
+                writeStat (increment "parse.assign_warnings" languageTag)
                 logError config Warning blob err (("task", "assign") : blobFields)
                 when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
-          writeStat (Stat.count "parse.nodes" (length term) languageTag)
+          writeStat (count "parse.nodes" (length term) languageTag)
           pure term
   MarkdownParser ->
     time "parse.cmark_parse" languageTag $

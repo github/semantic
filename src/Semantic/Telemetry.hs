@@ -2,9 +2,13 @@
 module Semantic.Telemetry
 (
   -- Async telemetry interface
-  LogQueue
+  withLogger
+, withHaystack
+, withStatter
+, LogQueue
 , StatQueue
 , HaystackQueue
+, TelemetryQueues(..)
 , queueLogMessage
 , queueErrorReport
 , queueStat
@@ -43,19 +47,53 @@ module Semantic.Telemetry
 , ignoreTelemetry
 ) where
 
-import Control.Exception
-import Control.Monad.Effect
-import Control.Monad.IO.Class
-import Semantic.Telemetry.AsyncQueue
-import Semantic.Telemetry.Haystack
-import Semantic.Telemetry.Log
-import Semantic.Telemetry.Stat as Stat
+import           Control.Exception
+import           Control.Monad.Effect
+import           Control.Monad.IO.Class
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
+import           Network.HTTP.Client
+import           Semantic.Telemetry.AsyncQueue
+import           Semantic.Telemetry.Haystack
+import           Semantic.Telemetry.Log
+import           Semantic.Telemetry.Stat as Stat
 
 type LogQueue = AsyncQueue Message LogOptions
 type StatQueue = AsyncQueue Stat StatsClient
 type HaystackQueue = AsyncQueue ErrorReport HaystackClient
+
+data TelemetryQueues
+  = TelemetryQueues
+  { telemetryLogger   :: LogQueue
+  , telemetryStatter  :: StatQueue
+  , telemetryHaystack :: HaystackQueue
+  }
+
+-- | Execute an action in IO with access to a logger (async log queue).
+withLogger :: LogOptions         -- ^ Log options
+           -> Int                -- ^ Max stats queue size before dropping stats
+           -> (LogQueue -> IO c) -- ^ Action in IO
+           -> IO c
+withLogger options size = bracket setup closeAsyncQueue
+  where setup = newAsyncQueue size writeLogMessage options
+
+-- | Execute an action in IO with access to haystack (async error reporting queue).
+withHaystack :: Maybe String -> ManagerSettings -> String -> ErrorLogger -> Int -> (HaystackQueue -> IO c) -> IO c
+withHaystack url settings appName errorLogger size = bracket setup closeAsyncQueue
+  where setup = haystackClient url settings appName >>= newAsyncQueue size (reportError errorLogger)
+
+-- | Execute an action in IO with access to a statter (async stat queue).
+-- Handles the bracketed setup and teardown of the underlying 'AsyncQueue' and
+-- 'StatsClient'.
+withStatter :: Host                -- ^ Statsd host
+            -> Port                -- ^ Statsd port
+            -> Namespace           -- ^ Namespace prefix for stats
+            -> Int                 -- ^ Max stats queue size before dropping stats
+            -> (StatQueue -> IO c) -- ^ Action in IO
+            -> IO c
+withStatter host port ns size = bracket setup teardown
+  where setup = statsClient host port ns >>= newAsyncQueue size sendStat
+        teardown statter = closeAsyncQueue statter >> Stat.closeStatClient (asyncQueueExtra statter)
 
 -- | Queue a message to be logged.
 queueLogMessage :: MonadIO io => LogQueue -> Level -> String -> [(String, String)] -> io ()
