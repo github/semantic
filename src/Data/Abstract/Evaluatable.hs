@@ -65,6 +65,7 @@ class Show1 constr => Evaluatable constr where
 data LoadOrder a b c
   = Done c
   | Load a (b -> LoadOrder a b c)
+  deriving (Functor)
 
 evaluate :: forall address term value effects
          .  ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address value ': effects)
