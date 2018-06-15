@@ -41,7 +41,6 @@ import qualified Language.Java.Assignment as Java
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
-import           Language.Preluded
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
@@ -81,14 +80,14 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                                         -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
-someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
-someAnalysisParser _ Java       = SomeAnalysisParser javaParser Nothing
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) JavaScript)
-someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser Nothing
-someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Python)
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Ruby)
-someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser Nothing
+someAnalysisParser _ Go         = SomeAnalysisParser goParser (preludePath "preludes" Go)
+someAnalysisParser _ Java       = SomeAnalysisParser javaParser (preludePath "preludes" Java)
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ (preludePath "" JavaScript)
+someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser (preludePath "preludes" Haskell)
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser (preludePath "preludes" PHP)
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser (preludePath "preludes" Python)
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser (preludePath "preludes" Ruby)
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (preludePath "preludes" TypeScript)
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 
