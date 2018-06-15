@@ -43,7 +43,7 @@ data Options
   , optionsFailOnWarning :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   }
 
-data StatsAddr = StatsAddr { addrHost :: String, addrPort :: String }
+data StatsAddr = StatsAddr { addrHost :: Stat.Host, addrPort :: Stat.Port }
 
 defaultOptions :: Options
 defaultOptions = Options (Just Warning) Nothing False
@@ -76,40 +76,34 @@ defaultConfig' options@Options{..} = do
     , configOptions = options
     }
 
+withTelemetry :: Config -> (TelemetryQueues -> IO c) -> IO c
+withTelemetry config action =
+  withLoggerFromConfig config $ \logger ->
+  withHaystackFromConfig config (queueLogMessage logger Error) $ \haystack ->
+  withStatterFromConfig config $ \statter ->
+    action (TelemetryQueues logger statter haystack)
 
-defaultHaystackFromConfig :: Config -> Haystack.ErrorLogger -> IO HaystackQueue
-defaultHaystackFromConfig c@Config{..} logError = haystackClientFromConfig c >>= newAsyncQueue configMaxTelemetyQueueSize (Haystack.reportError logError)
+withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c
+withLoggerFromConfig Config{..} = withLogger opts configMaxTelemetyQueueSize
+  where opts = LogOptions {
+      logOptionsLevel     = optionsLogLevel configOptions
+    , logOptionsFormatter = configLogFormatter
+    , logOptionsContext   =
+      [ ("app", configAppName)
+      , ("pid", show configProcessID)
+      , ("hostname", configHostName)
+      , ("sha", buildSHA)
+      ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
+    }
 
-haystackClientFromConfig :: Config -> IO HaystackClient
-haystackClientFromConfig Config{..} = haystackClient configHaystackURL tlsManagerSettings configAppName
+withHaystackFromConfig :: Config -> Haystack.ErrorLogger -> (HaystackQueue -> IO c) -> IO c
+withHaystackFromConfig Config{..} errorLogger =
+  withHaystack configHaystackURL tlsManagerSettings configAppName errorLogger configMaxTelemetyQueueSize
 
-
-withLogger :: Config -> (LogQueue -> IO c) -> IO c
-withLogger c = bracket (defaultLoggerFromConfig c) closeAsyncQueue
-
-defaultLoggerFromConfig :: Config -> IO LogQueue
-defaultLoggerFromConfig Config{..} =
-  newAsyncQueue configMaxTelemetyQueueSize Log.writeLogMessage LogOptions {
-    logOptionsLevel     = optionsLogLevel configOptions
-  , logOptionsFormatter = configLogFormatter
-  , logOptionsContext   =
-    [ ("app", configAppName)
-    , ("pid", show configProcessID)
-    , ("hostname", configHostName)
-    , ("sha", buildSHA)
-    ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
-  }
-
-withStatter :: Config -> (StatQueue -> IO c) -> IO c
-withStatter c = bracket (defaultStatterFromConfig c) $ \statter -> do
-  closeAsyncQueue statter
-  Stat.closeStatClient (asyncQueueExtra statter)
-
-defaultStatterFromConfig :: Config -> IO StatQueue
-defaultStatterFromConfig c@Config{..} = statsClientFromConfig c >>= newAsyncQueue configMaxTelemetyQueueSize Stat.sendStat
-
-statsClientFromConfig :: Config -> IO StatsClient
-statsClientFromConfig Config{..} = statsClient (addrHost configStatsAddr) (addrPort configStatsAddr) configAppName
+withStatterFromConfig :: Config -> (StatQueue -> IO c) -> IO c
+withStatterFromConfig Config{..} = withStatter host port configAppName configMaxTelemetyQueueSize
+  where host = addrHost configStatsAddr
+        port = addrPort configStatsAddr
 
 lookupStatsAddr :: IO StatsAddr
 lookupStatsAddr = do
