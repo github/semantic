@@ -4,7 +4,6 @@ module Data.Record where
 import Data.Aeson
 import Data.JSON.Fields
 import Data.Kind
-import Data.Semilattice.Lower
 import Prologue
 
 -- | A type-safe, extensible record structure.

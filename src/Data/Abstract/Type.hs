@@ -126,7 +126,7 @@ instance ( Member (Allocator address Type) effects
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
-      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (emptyEnv, [])) names
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
     (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (bindAll env *> body `catchReturn` \ (Return ptr) -> pure ptr))
 
   call op params = do
@@ -158,7 +158,7 @@ instance ( Member (Allocator address Type) effects
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
 
-  scopedEnvironment _ = pure (Just emptyEnv)
+  scopedEnvironment _ = pure (Just lowerBound)
 
   asString t = unify t String $> ""
   asPair t   = do
