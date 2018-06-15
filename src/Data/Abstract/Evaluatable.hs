@@ -33,6 +33,7 @@ import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
 import Data.Graph
 import Data.List (groupBy, nub, sortBy)
+import qualified Data.List.NonEmpty as NonEmpty (fromList)
 import qualified Data.Monoid as Monoid
 import qualified Data.Map.Monoidal as Map
 import Data.Ord (comparing)
@@ -67,7 +68,7 @@ class Show1 constr => Evaluatable constr where
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
-topologicalSort :: Ord v => Graph v -> [[v]]
+topologicalSort :: Ord v => Graph v -> [NonEmpty v]
 topologicalSort
   = groupByInEdgeCount
   . allVertices
@@ -90,8 +91,8 @@ labelWithInEdgeCounts
 allVertices :: Eq v => Graph v -> [v]
 allVertices = nub . toList
 
-groupByInEdgeCount :: Ord sum => [(sum, v)] -> [[v]]
-groupByInEdgeCount = map (map snd) . groupBy ((==) `on` fst) . sortBy (comparing fst)
+groupByInEdgeCount :: Ord sum => [(sum, v)] -> [NonEmpty v]
+groupByInEdgeCount = map (NonEmpty.fromList . map snd) . groupBy ((==) `on` fst) . sortBy (comparing fst)
 
 
 data LoadOrder a b c
