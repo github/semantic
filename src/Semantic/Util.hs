@@ -20,7 +20,6 @@ import           Data.Term
 import qualified GHC.TypeLits as TypeLevel
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
-import           Language.Preluded
 import           Parsing.Parser
 import           Prologue hiding (weaken)
 import           Semantic.Graph
@@ -96,9 +95,9 @@ evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser
 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
 
-rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Language.Ruby
-pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Language.Python
-javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) Language.JavaScript
+rubyPrelude = preludePath "preludes" Language.Ruby
+pythonPrelude = preludePath "preludes" Language.Python
+javaScriptPrelude = preludePath "preludes" Language.JavaScript
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= addPrelude lang >>= parsePackage parser prelude)
@@ -116,8 +115,8 @@ addPrelude l proj = do
   case p of
     Nothing -> pure proj
     Just pth -> do
-      bl <- readBlobFromPath pth
-      pure $ proj { projectBlobs = bl : projectBlobs proj }
+      mBlob <- IO.readFile pth
+      pure (maybe proj (\bl -> proj { projectBlobs = bl : projectBlobs proj }) mBlob)
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)

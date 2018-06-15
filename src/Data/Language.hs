@@ -93,3 +93,13 @@ extensionsForLanguage language = case language of
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Language
 languageForFilePath = languageForType . takeExtension
+
+-- | Return the filename representing the prelude for the passed language, if any.
+-- The convention here is "languagename.ext", lowercase. Note that this path
+-- does not include the prelude directory, as that is configurable.
+preludeFilename :: Language -> Maybe FilePath
+preludeFilename l = case l of
+  Python     -> Just "python.py"
+  Ruby       -> Just "ruby.rb"
+  JavaScript -> Just "javascript.js"
+  _          -> Nothing
