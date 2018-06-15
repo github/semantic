@@ -14,7 +14,6 @@ module Data.Map.Monoidal
 import Data.Aeson (ToJSON)
 import qualified Data.Map as Map
 import Data.Semigroup.Reducer as Reducer
-import Data.Semilattice.Lower
 import Prelude hiding (lookup)
 import Prologue hiding (Map)
 

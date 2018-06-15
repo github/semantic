@@ -22,3 +22,6 @@
 [submodule "vendor/proto3-suite"]
 	path = vendor/proto3-suite
 	url = https://github.com/joshvera/proto3-suite
+[submodule "vendor/semilattices"]
+	path = vendor/semilattices
+	url = https://github.com/robrix/semilattices.git

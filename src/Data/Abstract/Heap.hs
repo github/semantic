@@ -4,7 +4,6 @@ module Data.Abstract.Heap where
 import Data.Abstract.Live
 import qualified Data.Map.Monoidal as Monoidal
 import Data.Semigroup.Reducer
-import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of addresses onto cells holding their values.
