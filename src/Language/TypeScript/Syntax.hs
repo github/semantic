@@ -10,6 +10,7 @@ import           Data.Aeson
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
+import           Data.Semilattice.Lower
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue
@@ -139,7 +140,7 @@ evalRequire :: ( AbstractValue address value effects
             -> Name
             -> Evaluator address value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
-  importedEnv <- maybe emptyEnv snd <$> require modulePath
+  importedEnv <- maybe lowerBound snd <$> require modulePath
   bindAll importedEnv
   unit <$ makeNamespace alias addr Nothing
 
@@ -154,7 +155,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- maybe emptyEnv snd <$> require modulePath
+    importedEnv <- maybe lowerBound snd <$> require modulePath
     bindAll (renamed importedEnv)
     rvalBox unit
     where
@@ -230,7 +231,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- maybe emptyEnv snd <$> require modulePath
+    importedEnv <- maybe lowerBound snd <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv

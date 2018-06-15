@@ -7,6 +7,7 @@ import           Data.Abstract.Path
 import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
+import           Data.Semilattice.Lower
 import           Diffing.Algorithm
 import           Prologue hiding (Text)
 
@@ -62,7 +63,7 @@ include pathTerm f = do
   path <- resolvePHPName name
   traceResolve name path
   unitPtr <- box unit -- TODO don't always allocate, use maybeM
-  (v, importedEnv) <- fromMaybe (unitPtr, emptyEnv) <$> f path
+  (v, importedEnv) <- fromMaybe (unitPtr, lowerBound) <$> f path
   bindAll importedEnv
   pure (Rval v)
 

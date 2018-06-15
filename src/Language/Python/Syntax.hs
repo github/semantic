@@ -10,6 +10,7 @@ import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
+import           Data.Semilattice.Lower
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics
@@ -113,7 +114,7 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedEnv <- maybe emptyEnv snd <$> require path
+    importedEnv <- maybe lowerBound snd <$> require path
     bindAll (select importedEnv)
     rvalBox unit
     where
@@ -130,7 +131,7 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
-  importedEnv <- maybe emptyEnv snd <$> require path
+  importedEnv <- maybe lowerBound snd <$> require path
   bindAll importedEnv
   unit <$ makeNamespace name addr Nothing
 
@@ -174,7 +175,7 @@ instance Evaluatable QualifiedAliasedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
-      importedEnv <- maybe emptyEnv snd <$> require path
+      importedEnv <- maybe lowerBound snd <$> require path
       bindAll importedEnv
       unit <$ makeNamespace alias addr Nothing)
 
