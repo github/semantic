@@ -48,11 +48,8 @@ data StatsAddr = StatsAddr { addrHost :: Stat.Host, addrPort :: Stat.Port }
 defaultOptions :: Options
 defaultOptions = Options (Just Warning) Nothing False
 
-defaultConfig :: IO Config
-defaultConfig = defaultConfig' defaultOptions
-
-defaultConfig' :: Options -> IO Config
-defaultConfig' options@Options{..} = do
+defaultConfig :: Options -> IO Config
+defaultConfig options@Options{..} = do
   pid <- getProcessID
   hostName <- getHostName
   isTerminal <- hIsTerminalDevice stderr

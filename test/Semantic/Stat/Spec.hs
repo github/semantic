@@ -84,4 +84,4 @@ spec = do
 
 -- Defaults are all driven by defaultConfig.
 defaultStatsClient :: IO StatsClient
-defaultStatsClient = defaultConfig >>= \Config{..} -> statsClient (addrHost configStatsAddr) (addrPort configStatsAddr) configAppName
+defaultStatsClient = defaultConfig defaultOptions >>= \Config{..} -> statsClient (addrHost configStatsAddr) (addrPort configStatsAddr) configAppName
