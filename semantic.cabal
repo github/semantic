@@ -86,7 +86,6 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
-                     , Data.Semilattice.Lower
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
@@ -211,6 +210,7 @@ library
                      , reducers
                      , scientific
                      , semigroupoids
+                     , semilattices
                      , split
                      , stm-chans
                      , template-haskell
