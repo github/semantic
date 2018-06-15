@@ -15,7 +15,7 @@ module Data.Abstract.Evaluatable
 , Cell
 ) where
 
-import Control.Abstract
+import Control.Abstract hiding (Load)
 import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
@@ -65,9 +65,43 @@ data LoadOrder a b
   = Done b
   | Load a (b -> LoadOrder a b)
 
-evaluate :: LoadOrder (NonEmpty (Module term)) (NonEmpty (Module (address, Environment address)))
-         -> Eff effects (NonEmpty (Module (address, Environment address)))
+evaluate :: forall address term value effects
+         .  ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address value ': effects)
+            , Addressable address (Reader ModuleInfo ': Modules address value ': effects)
+            , Declarations term
+            , Evaluatable (Base term)
+            , Foldable (Cell address)
+            , FreeVariables term
+            , Member (Reader PackageInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (AddressError address value)) effects
+            , Member (Resumable (EnvironmentError address)) effects
+            , Member (Resumable EvalError) effects
+            , Member (Resumable (LoadError address value)) effects
+            , Member (Resumable ResolutionError) effects
+            , Member (Resumable (Unspecialized value)) effects
+            , Member (State (Heap address (Cell address) value)) effects
+            , Member (State (ModuleTable (Maybe (address, Environment address)))) effects
+            , Member Trace effects
+            , Recursive term
+            , Reducer value (Cell address value)
+            , ValueRoots address value
+            )
+         => LoadOrder (NonEmpty (Module term)) (NonEmpty (address, Environment address))
+         -> Evaluator address value effects (NonEmpty (address, Environment address))
 evaluate (Done results) = pure results
+evaluate (Load modules continue)
+  = runReader lowerBound
+  . runModules evalModule
+  $ traverse evalModule modules
+  where evalModule :: Module term -> Evaluator address value (Modules address value ': effects) (address, Environment address)
+        evalModule m
+          = runReader (moduleInfo m)
+          . runAllocator
+          . runEnv lowerBound
+          . runReturn
+          . runLoopControl
+          $ foldSubterms eval (moduleBody m) >>= address
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
