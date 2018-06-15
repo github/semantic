@@ -10,7 +10,6 @@ import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
-import Data.Semilattice.Lower
 import qualified Data.Set as Set
 import Prologue
 

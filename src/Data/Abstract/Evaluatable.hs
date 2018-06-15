@@ -34,7 +34,6 @@ import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Data.Semigroup.Reducer hiding (unit)
-import Data.Semilattice.Lower
 import Data.Sum
 import Data.Term
 import Prologue

@@ -22,7 +22,6 @@ import           Data.Abstract.Name
 import           Data.Align
 import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as Map
-import           Data.Semilattice.Lower
 import           Prelude hiding (head, lookup)
 import           Prologue
 

@@ -10,7 +10,6 @@ import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
-import           Data.Semilattice.Lower
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           GHC.Generics

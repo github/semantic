@@ -10,7 +10,6 @@ import           Data.Aeson
 import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map as Map
-import           Data.Semilattice.Lower
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue

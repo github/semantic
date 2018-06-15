@@ -7,7 +7,6 @@ import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import           Data.Aeson
 import           Data.JSON.Fields
-import           Data.Semilattice.Lower
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue

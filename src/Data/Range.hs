@@ -9,7 +9,6 @@ module Data.Range
 
 import Data.Aeson
 import Data.JSON.Fields
-import Data.Semilattice.Lower
 import Prologue
 
 -- | A half-open interval of integers, defined by start & end indices.

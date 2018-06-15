@@ -10,7 +10,6 @@ module Data.Abstract.Type
 import Control.Abstract
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
-import Data.Semilattice.Lower
 import Prologue hiding (TypeError)
 
 type TName = Int
