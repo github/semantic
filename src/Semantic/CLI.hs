@@ -24,7 +24,6 @@ import           Semantic.IO as IO
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
-import qualified Semantic.Util as Util (addPrelude)
 import           Serializing.Format
 import           Text.Read
 
@@ -99,7 +98,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
-      pure $ Task.readProject rootDir filePath fileLanguage excludeDirs >>= Util.addPrelude fileLanguage >>= Graph.runGraph graphType includePackages >>= serializer
+      pure $ Task.readProject rootDir filePath fileLanguage excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
 
     rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
     excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))

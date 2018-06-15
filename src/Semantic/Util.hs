@@ -28,10 +28,6 @@ import           Semantic.Task
 import           Text.Show (showListWith)
 import           Text.Show.Pretty (ppShow)
 
-import qualified Language.Python.Assignment as Python
-import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TypeScript.Assignment as TypeScript
-
 justEvaluating
   = runM
   . evaluating
@@ -100,23 +96,8 @@ pythonPrelude = preludePath "preludes" Language.Python
 javaScriptPrelude = preludePath "preludes" Language.JavaScript
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= addPrelude lang >>= parsePackage parser prelude)
-evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= addPrelude lang >>= parsePackage parser prelude)
-
-addPrelude :: Member IO effs => Language.Language -> Project -> Eff effs Project
-addPrelude l proj = do
-  let p = case l of
-        Language.Ruby -> rubyPrelude
-        Language.Python -> pythonPrelude
-        Language.TypeScript -> javaScriptPrelude
-        Language.JavaScript -> javaScriptPrelude
-        _ -> Nothing
-
-  case p of
-    Nothing -> pure proj
-    Just pth -> do
-      mBlob <- IO.readFile pth
-      pure (maybe proj (\bl -> proj { projectBlobs = bl : projectBlobs proj }) mBlob)
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)
