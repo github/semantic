@@ -5,7 +5,6 @@ module Analysis.Abstract.Collecting
 ) where
 
 import Control.Abstract
-import Data.Semilattice.Lower
 import Prologue
 
 -- | An analysis performing GC after every instruction.
