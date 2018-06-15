@@ -108,7 +108,6 @@ instance AbstractIntro Type where
   float _    = Float
   symbol _   = Symbol
   rational _ = Rational
-  multiple   = zeroOrMoreProduct
   hash       = Hash
   kvPair k v = k :* v
 
@@ -127,7 +126,7 @@ instance ( Member (Allocator address Type) effects
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
-      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (emptyEnv, [])) names
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
     (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (bindAll env *> body `catchReturn` \ (Return ptr) -> pure ptr))
 
   call op params = do
@@ -151,12 +150,15 @@ instance ( Member (Allocator address Type) effects
       => AbstractValue address Type effects where
   array fields = do
     var <- fresh
-    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
+    fieldTypes <- traverse deref fields
+    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
+
+  tuple fields = zeroOrMoreProduct <$> traverse deref fields
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
 
-  scopedEnvironment _ = pure (Just emptyEnv)
+  scopedEnvironment _ = pure (Just lowerBound)
 
   asString t = unify t String $> ""
   asPair t   = do
@@ -167,7 +169,8 @@ instance ( Member (Allocator address Type) effects
   index arr sub = do
     _ <- unify sub Int
     field <- fresh
-    Var field <$ unify (Array (Var field)) arr
+    _ <- unify (Array (Var field)) arr
+    box (Var field)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 

@@ -103,7 +103,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Java's grammar onto a program in Java's syntax.
 assignment :: Assignment
@@ -215,9 +215,9 @@ variableDeclaratorId = symbol VariableDeclaratorId *> children identifier
 
 -- Literals
 boolean :: Assignment
-boolean =  makeTerm <$> symbol BooleanLiteral <*> children
-          (token Grammar.True $> Literal.true
-          <|> token Grammar.False $> Literal.false)
+boolean = toTerm (branchNode BooleanLiteral
+  (   leafNode Grammar.True  $> Literal.true
+  <|> leafNode Grammar.False $> Literal.false))
 
 null' :: Assignment
 null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
@@ -288,7 +288,7 @@ explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocatio
     callFunction a Nothing = ([], a)
 
 module' :: Assignment
-module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
+module' = toTerm (branchNode ModuleDeclaration (Java.Syntax.Module <$> expression <*> many expression))
 
 import' :: Assignment
 import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> someTerm (expression <|> asterisk))
