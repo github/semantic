@@ -34,7 +34,6 @@ import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Project
 import           Foreign.Ptr
-import qualified GHC.TypeLits as TypeLevel
 import qualified Language.Go.Assignment as Go
 import qualified Language.Haskell.Assignment as Haskell
 import qualified Language.Java.Assignment as Java
@@ -82,7 +81,7 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser (preludePath "preludes" Go)
 someAnalysisParser _ Java       = SomeAnalysisParser javaParser (preludePath "preludes" Java)
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser $ (preludePath "" JavaScript)
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (preludePath "" JavaScript)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser (preludePath "preludes" Haskell)
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser (preludePath "preludes" PHP)
 someAnalysisParser _ Python     = SomeAnalysisParser pythonParser (preludePath "preludes" Python)
