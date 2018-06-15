@@ -1,6 +1,5 @@
 module Semantic.Config where
 
-import           Control.Exception
 import           Network.BSD
 import           Network.HTTP.Client.TLS
 import           Network.URI
@@ -8,9 +7,7 @@ import           Parsing.TreeSitter (Timeout (..))
 import           Prologue
 import           Semantic.Env
 import           Semantic.Telemetry
-import           Semantic.Telemetry.AsyncQueue
 import qualified Semantic.Telemetry.Haystack as Haystack
-import qualified Semantic.Telemetry.Log as Log
 import qualified Semantic.Telemetry.Stat as Stat
 import           Semantic.Version
 import           System.Environment
