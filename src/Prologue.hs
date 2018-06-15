@@ -20,6 +20,7 @@ import Data.Map as X (Map)
 import Data.Maybe as X
 import Data.Monoid (Alt (..))
 import Data.Sequence as X (Seq)
+import Data.Semilattice.Lower as X (Lower(..))
 import Data.Set as X (Set)
 import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
