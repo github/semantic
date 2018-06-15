@@ -3,7 +3,8 @@ module Semantic.Stat.Spec (spec) where
 import Control.Exception
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString
-import Semantic.Stat
+import Semantic.Telemetry.Stat
+import Semantic.Config
 import System.Environment
 
 import SpecHelpers
@@ -80,3 +81,7 @@ spec = do
         sendStat client { statsClientUDPSocket = clientSoc } (increment "app.metric" [])
         info <- recv serverSoc 1024
         info `shouldBe` "semantic.app.metric:1|c"
+
+-- Defaults are all driven by defaultConfig.
+defaultStatsClient :: IO StatsClient
+defaultStatsClient = defaultConfig defaultOptions >>= \Config{..} -> statsClient configStatsHost configStatsPort configAppName

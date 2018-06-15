@@ -10,7 +10,6 @@ module Data.Abstract.Exports
 import Data.Abstract.Environment (Environment, unpairs)
 import Data.Abstract.Name
 import qualified Data.Map as Map
-import Data.Semilattice.Lower
 import Prelude hiding (null)
 import Prologue hiding (null)
 
