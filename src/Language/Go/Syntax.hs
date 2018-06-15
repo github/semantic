@@ -7,6 +7,7 @@ import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import           Data.Aeson
 import           Data.JSON.Fields
+import           Data.Semilattice.Lower
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue
@@ -66,7 +67,7 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      importedEnv <- maybe emptyEnv snd <$> require path
+      importedEnv <- maybe lowerBound snd <$> require path
       bindAll importedEnv
     rvalBox unit
 
@@ -88,7 +89,7 @@ instance Evaluatable QualifiedImport where
     void $ letrec' alias $ \addr -> do
       for_ paths $ \p -> do
         traceResolve (unPath importPath) p
-        importedEnv <- maybe emptyEnv snd <$> require p
+        importedEnv <- maybe lowerBound snd <$> require p
         bindAll importedEnv
       makeNamespace alias addr Nothing
     rvalBox unit

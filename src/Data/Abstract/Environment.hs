@@ -3,7 +3,6 @@ module Data.Abstract.Environment
   , addresses
   , delete
   , head
-  , emptyEnv
   , mergeEnvs
   , mergeNewer
   , insert
@@ -29,7 +28,7 @@ import           Prologue
 
 -- $setup
 -- >>> import Data.Abstract.Address
--- >>> let bright = push (insert (name "foo") (Precise 0) emptyEnv)
+-- >>> let bright = push (insert (name "foo") (Precise 0) lowerBound)
 -- >>> let shadowed = insert (name "foo") (Precise 1) bright
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
@@ -42,16 +41,13 @@ mergeEnvs :: Environment address -> Environment address -> Environment address
 mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
   Environment ((<>) a b :| alignWith (mergeThese (<>)) as bs)
 
-emptyEnv :: Environment address
-emptyEnv = Environment (lowerBound :| [])
-
 -- | Make and enter a new empty scope in the given environment.
 push :: Environment address -> Environment address
 push (Environment (a :| as)) = Environment (mempty :| a : as)
 
 -- | Remove the frontmost scope.
 pop :: Environment address -> Environment address
-pop (Environment (_ :| []))     = emptyEnv
+pop (Environment (_ :| []))     = lowerBound
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
 -- | Drop all scopes save for the frontmost one.
@@ -125,7 +121,7 @@ addresses :: Ord address => Environment address -> Live address
 addresses = fromAddresses . map snd . pairs
 
 
-instance Lower (Environment address) where lowerBound = emptyEnv
+instance Lower (Environment address) where lowerBound = Environment (lowerBound :| [])
 
 instance Show address => Show (Environment address) where
   showsPrec d = showsUnaryWith showsPrec "Environment" d . pairs

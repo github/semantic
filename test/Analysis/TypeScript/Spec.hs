@@ -27,7 +27,7 @@ spec = parallel $ do
 
     it "side effect only imports" $ do
       ((res, _), _) <- evaluate "main2.ts"
-      fmap snd <$> res `shouldBe` Right [emptyEnv]
+      fmap snd <$> res `shouldBe` Right [lowerBound]
 
     it "fails exporting symbols not defined in the module" $ do
       ((res, _), _) <- evaluate "bad-export.ts"
