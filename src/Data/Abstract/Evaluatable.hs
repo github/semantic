@@ -91,7 +91,8 @@ evaluate :: forall address term value effects
          -> Evaluator address value effects (NonEmpty (address, Environment address))
 evaluate (Done results) = pure results
 evaluate (Load modules continue)
-  = runReader lowerBound
+  = (>>= evaluate . continue)
+  . runReader lowerBound
   . runModules evalModule
   $ traverse evalModule modules
   where evalModule :: Module term -> Evaluator address value (Modules address value ': effects) (address, Environment address)
