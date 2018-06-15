@@ -95,10 +95,6 @@ groupByInEdgeCount :: Ord sum => [(sum, v)] -> [NonEmpty v]
 groupByInEdgeCount = map (NonEmpty.fromList . map snd) . groupBy ((==) `on` fst) . sortBy (comparing fst)
 
 
-data LoadOrder a b
-  = Done b
-  | Load a (b -> LoadOrder a b)
-
 evaluate :: forall address term value effects
          .  ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address value ': effects)
             , Addressable address (Reader ModuleInfo ': Modules address value ': effects)
@@ -122,10 +118,10 @@ evaluate :: forall address term value effects
             , Reducer value (Cell address value)
             , ValueRoots address value
             )
-         => LoadOrder (NonEmpty (Module term)) (NonEmpty (Module (address, Environment address)))
-         -> Evaluator address value effects (NonEmpty (Module (address, Environment address)))
-evaluate (Done results) = pure results
-evaluate (Load modules continue)
+         => [NonEmpty (Module term)]
+         -> Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
+evaluate [] = ask
+evaluate (modules : rest)
   = runRestOfLoadOrder
   . runReader lowerBound
   . runModules evalModule
@@ -143,7 +139,7 @@ evaluate (Load modules continue)
 
         runRestOfLoadOrder action = do
           results <- action
-          local (<> ModuleTable.fromModules (toList results)) (evaluate (continue results))
+          local (<> ModuleTable.fromModules (toList results)) (evaluate rest)
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
