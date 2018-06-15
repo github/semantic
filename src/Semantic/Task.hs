@@ -128,7 +128,7 @@ runTask = runTaskWithOptions defaultOptions
 -- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> TaskEff a -> IO a
 runTaskWithOptions opts task = do
-  config <- defaultConfig' opts
+  config <- defaultConfig opts
   result <- withTelemetry config $ \(TelemetryQueues logger statter _) ->
     runTaskWithConfig config logger statter task
   either (die . displayException) pure result
