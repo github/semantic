@@ -6,7 +6,6 @@ import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
 import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer
-import Data.Semilattice.Lower
 import Data.Set as Set
 import Prologue
 

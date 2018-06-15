@@ -8,7 +8,6 @@ import           Data.Abstract.Path
 import qualified Data.Text as T
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import           Data.Semilattice.Lower
 import           Diffing.Algorithm
 import           Prologue
 import           System.FilePath.Posix

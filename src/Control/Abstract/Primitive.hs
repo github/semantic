@@ -6,7 +6,6 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import Data.Abstract.Name
-import Data.Semilattice.Lower
 import Data.Text (pack, unpack)
 import Prologue
 
