@@ -65,6 +65,10 @@ data LoadOrder a b
   = Done (NonEmpty b)
   | Load (NonEmpty a) (NonEmpty b -> LoadOrder a b)
 
+evaluate :: LoadOrder (Module term) (Module (address, Environment address))
+         -> Eff effects (NonEmpty (Module (address, Environment address)))
+evaluate (Done results) = pure results
+
 -- | Evaluate a given package.
 evaluatePackageWith :: forall address term value inner inner' inner'' outer
                     .  ( AbstractValue address value inner
