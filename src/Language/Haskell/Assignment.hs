@@ -85,10 +85,16 @@ type Syntax = '[
   , Syntax.QualifiedEntityIdentifier
   , Syntax.QualifiedImportDeclaration
   , Syntax.QuasiQuotation
+  , Syntax.QuasiQuotationDeclaration
   , Syntax.QuasiQuotationExpression
+  , Syntax.QuasiQuotationExpressionBody
+  , Syntax.QuasiQuotationPattern
+  , Syntax.QuasiQuotationQuoter
+  , Syntax.QuasiQuotationType
   , Syntax.QuotedName
   , Syntax.RecordDataConstructor
   , Syntax.ScopedTypeVariables
+  , Syntax.Splice
   , Syntax.StandaloneDerivingInstance
   , Syntax.Star
   , Syntax.StrictType
@@ -274,9 +280,15 @@ expressionChoices = [
                     , qualifiedTypeConstructorIdentifier
                     , qualifiedVariableIdentifier
                     , quasiQuotation
+                    , quasiQuotationDeclaration
                     , quasiQuotationExpression
+                    , quasiQuotationExpressionBody
+                    , quasiQuotationPattern
+                    , quasiQuotationQuoter
+                    , quasiQuotationType
                     , quotedName
                     , scopedTypeVariables
+                    , splice
                     , standaloneDerivingInstance
                     , star
                     , strictType
@@ -513,16 +525,34 @@ qualifiedVariableIdentifier :: Assignment
 qualifiedVariableIdentifier = makeTerm <$> symbol QualifiedVariableIdentifier <*> children (Syntax.QualifiedVariableIdentifier <$> someTerm' expression)
 
 quasiQuotation :: Assignment
-quasiQuotation = makeTerm <$> symbol QuasiQuotation <*> children (Syntax.QuasiQuotation <$> expression <*> expression)
+quasiQuotation = makeTerm <$> symbol QuasiQuotation <*> children (Syntax.QuasiQuotation <$> (expression <|> emptyTerm) <*> expression)
+
+quasiQuotationDeclaration :: Assignment
+quasiQuotationDeclaration = makeTerm <$> token QuasiQuotationDeclaration <*> pure Syntax.QuasiQuotationDeclaration
 
 quasiQuotationExpression :: Assignment
-quasiQuotationExpression = makeTerm <$> symbol QuasiQuotationExpression <*> (Syntax.QuasiQuotationExpression . Name.name <$> source)
+quasiQuotationExpression = makeTerm <$> token QuasiQuotationExpression <*> pure Syntax.QuasiQuotationExpression
+
+quasiQuotationExpressionBody :: Assignment
+quasiQuotationExpressionBody = makeTerm <$> symbol QuasiQuotationExpressionBody <*> (Syntax.QuasiQuotationExpressionBody . Name.name <$> source)
+
+quasiQuotationPattern :: Assignment
+quasiQuotationPattern = makeTerm <$> token QuasiQuotationPattern <*> pure Syntax.QuasiQuotationPattern
+
+quasiQuotationQuoter :: Assignment
+quasiQuotationQuoter = makeTerm <$> symbol QuasiQuotationQuoter <*> (Syntax.QuasiQuotationQuoter . Name.name <$> source)
+
+quasiQuotationType :: Assignment
+quasiQuotationType = makeTerm <$> token QuasiQuotationType <*> pure Syntax.QuasiQuotationType
 
 quotedName :: Assignment
 quotedName = makeTerm <$> symbol QuotedName <*> children (Syntax.QuotedName <$> expression)
 
 scopedTypeVariables :: Assignment
 scopedTypeVariables = makeTerm <$> symbol ScopedTypeVariables <*> children (Syntax.ScopedTypeVariables <$> expressions <* token Dot)
+
+splice :: Assignment
+splice = makeTerm <$> symbol Splice <*> children (Syntax.Splice <$> expression)
 
 standaloneDerivingInstance :: Assignment
 standaloneDerivingInstance = makeTerm <$> symbol StandaloneDerivingDeclaration <*> children (Syntax.StandaloneDerivingInstance <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> instance')
