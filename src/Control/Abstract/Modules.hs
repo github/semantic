@@ -99,14 +99,14 @@ askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module term)))) effects
 askModuleTable = ask
 
 
-newtype Merging m address value = Merging { runMerging :: m (Maybe (address, Environment address)) }
+newtype Merging m address = Merging { runMerging :: m (Maybe (address, Environment address)) }
 
-instance Applicative m => Semigroup (Merging m address value) where
+instance Applicative m => Semigroup (Merging m address) where
   Merging a <> Merging b = Merging (merge <$> a <*> b)
     where merge a b = mergeJusts <$> a <*> b <|> a <|> b
           mergeJusts (_, env1) (v, env2) = (v, mergeEnvs env1 env2)
 
-instance Applicative m => Monoid (Merging m address value) where
+instance Applicative m => Monoid (Merging m address) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
 
