@@ -94,8 +94,7 @@ evaluate (modules : rest)
   = runRest rest
   . runModules'
   $ traverse evalModule modules
-  where evalModule :: Module term -> Evaluator address value (Modules address value ': effects) (Module (address, Environment address))
-        evalModule m
+  where evalModule m
           = fmap (<$ m)
           . runReader (moduleInfo m)
           . runAllocator
