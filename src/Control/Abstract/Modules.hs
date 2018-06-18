@@ -64,7 +64,7 @@ runModules :: forall term address value effects a
               , Member (State (ModuleTable (Maybe (address, Environment address)))) effects
               , Member Trace effects
               )
-           => (Module term -> Evaluator address value (Modules address value ': effects) (address, Environment address))
+           => (Module term -> Evaluator address value (Modules address value ': effects) (Module (address, Environment address)))
            -> Evaluator address value (Modules address value ': effects) a
            -> Evaluator address value (Reader (ModuleTable (NonEmpty (Module term))) ': effects) a
 runModules evaluateModule = go
@@ -80,7 +80,7 @@ runModules evaluateModule = go
                   else do
                     _ <- cacheModule name Nothing
                     result <- trace ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* trace ("load done:" <> show mPath)
-                    cacheModule name (Just result)
+                    cacheModule name (Just (moduleBody result))
 
               loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
           Lookup path -> ModuleTable.lookup path <$> get

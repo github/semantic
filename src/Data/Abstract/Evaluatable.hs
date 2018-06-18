@@ -91,17 +91,16 @@ evaluate (modules : rest)
   = runRestOfLoadOrder
   . runReader lowerBound
   . runModules evalModule
-  $ traverse evalModuleAndRetain modules
-  where evalModule :: Module term -> Evaluator address value (Modules address value ': effects) (address, Environment address)
+  $ traverse evalModule modules
+  where evalModule :: Module term -> Evaluator address value (Modules address value ': effects) (Module (address, Environment address))
         evalModule m
-          = runReader (moduleInfo m)
+          = fmap (<$ m)
+          . runReader (moduleInfo m)
           . runAllocator
           . runEnv lowerBound
           . runReturn
           . runLoopControl
           $ foldSubterms eval (moduleBody m) >>= address
-
-        evalModuleAndRetain m = (<$ m) <$> evalModule m
 
         runRestOfLoadOrder action = do
           results <- action
@@ -148,7 +147,8 @@ evaluatePackageWith analyzeModule analyzeTerm package
     $ ModuleTable.toPairs (packageEntryPoints (packageBody package))
   where
         evalModule preludeEnv m
-          = runInModule preludeEnv (moduleInfo m)
+          = fmap (<$ m)
+          . runInModule preludeEnv (moduleInfo m)
           . analyzeModule (subtermRef . moduleBody)
           $ evalTerm <$> m
         evalTerm term = Subterm term (TermEvaluator (address =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
@@ -169,7 +169,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule lowerBound)) $ do
           (_, builtinsEnv) <- runInModule lowerBound moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
-          second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
+          second (mergeEnvs builtinsEnv) . moduleBody <$> evalModule builtinsEnv prelude
 
         withPrelude Nothing f = f lowerBound
         withPrelude (Just prelude) f = do
