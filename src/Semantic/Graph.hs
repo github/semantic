@@ -75,7 +75,7 @@ newtype GraphEff address a = GraphEff
                         , Env address
                         , Allocator address (Value address (GraphEff address))
                         , Reader ModuleInfo
-                        , Modules address (Value address (GraphEff address))
+                        , Modules address
                         , Reader Span
                         , Reader PackageInfo
                         , State (Graph Vertex)

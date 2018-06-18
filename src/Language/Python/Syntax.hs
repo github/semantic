@@ -50,7 +50,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: ( Member (Modules address value) effects
+resolvePythonModules :: ( Member (Modules address) effects
                         , Member (Reader ModuleInfo) effects
                         , Member (Resumable ResolutionError) effects
                         , Member Trace effects
@@ -126,7 +126,7 @@ instance Evaluatable Import where
 evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (Allocator address value) effects
                        , Member (Env address) effects
-                       , Member (Modules address value) effects
+                       , Member (Modules address) effects
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do

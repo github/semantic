@@ -35,7 +35,7 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: ( Member (Modules address value) effects
+resolvePHPName :: ( Member (Modules address) effects
                   , Member (Resumable ResolutionError) effects
                   )
                => T.Text
@@ -49,7 +49,7 @@ resolvePHPName n = do
 include :: ( AbstractValue address value effects
            , Member (Allocator address value) effects
            , Member (Env address) effects
-           , Member (Modules address value) effects
+           , Member (Modules address) effects
            , Member (Resumable ResolutionError) effects
            , Member (Resumable (EnvironmentError address)) effects
            , Member Trace effects

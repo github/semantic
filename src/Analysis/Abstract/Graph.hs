@@ -76,13 +76,13 @@ graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> rec
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingModules :: forall term address value effects a
-                .  ( Member (Modules address value) effects
+                .  ( Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph Vertex)) effects
                    )
                => SubtermAlgebra Module term (TermEvaluator term address value effects a)
                -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
-graphingModules recur m = interpose @(Modules address value) pure (\ m yield -> case m of
+graphingModules recur m = interpose @(Modules address) pure (\ m yield -> case m of
   Load   path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
   Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
   _ -> send m >>= yield)
