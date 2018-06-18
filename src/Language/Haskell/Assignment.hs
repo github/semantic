@@ -98,6 +98,7 @@ type Syntax = '[
   , Syntax.QuasiQuotationType
   , Syntax.QuotedName
   , Syntax.RecordDataConstructor
+  , Syntax.RecordWildCards
   , Syntax.ScopedTypeVariables
   , Syntax.Splice
   , Syntax.StandaloneDerivingInstance
@@ -303,6 +304,7 @@ expressionChoices = [
                     , quasiQuotationQuoter
                     , quasiQuotationType
                     , quotedName
+                    , recordWildCards
                     , scopedTypeVariables
                     , splice
                     , standaloneDerivingInstance
@@ -578,6 +580,9 @@ quasiQuotationType = makeTerm <$> token QuasiQuotationType <*> pure Syntax.Quasi
 
 quotedName :: Assignment
 quotedName = makeTerm <$> symbol QuotedName <*> children (Syntax.QuotedName <$> expression)
+
+recordWildCards :: Assignment
+recordWildCards = makeTerm <$> symbol RecordWildCards <*> (Syntax.RecordWildCards <$ source)
 
 scopedTypeVariables :: Assignment
 scopedTypeVariables = makeTerm <$> symbol ScopedTypeVariables <*> children (Syntax.ScopedTypeVariables <$> expressions <* token Dot)

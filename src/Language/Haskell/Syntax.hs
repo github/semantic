@@ -717,3 +717,12 @@ instance Show1 LabeledPattern where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LabeledPattern
 
+-- e.g. The `{..}` in `foo Bar{..} = baz`
+data RecordWildCards a = RecordWildCards
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 RecordWildCards where liftEq = genericLiftEq
+instance Ord1 RecordWildCards where liftCompare = genericLiftCompare
+instance Show1 RecordWildCards where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable RecordWildCards
