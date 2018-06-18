@@ -29,7 +29,11 @@ class Preluded syntax where
 instance Preluded Ruby.Term where
   type PreludePath Ruby.Term = "preludes/ruby.rb"
 
-  definePrelude = pure ()
+  definePrelude = do
+    define "puts" (lambda (\ v -> do
+      print <- variable "__semantic_print" >>= deref
+      void $ call print [variable v]
+      box unit))
 
 instance Preluded Python.Term where
   type PreludePath Python.Term = "preludes/python.py"
