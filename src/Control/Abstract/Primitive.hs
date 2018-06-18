@@ -24,6 +24,20 @@ builtin s def = withCurrentCallStack callStack $ do
   bind name' addr
   def >>= assign addr
 
+define :: ( HasCallStack
+          , Member (Allocator address value) effects
+          , Member (Env address) effects
+          , Member (Reader ModuleInfo) effects
+          , Member (Reader Span) effects
+          )
+       => Name
+       -> Evaluator address value effects value
+       -> Evaluator address value effects ()
+define name def = withCurrentCallStack callStack $ do
+  addr <- alloc name
+  bind name addr
+  def >>= assign addr
+
 lambda :: (AbstractFunction address value effects, Member Fresh effects)
        => (Name -> Evaluator address value effects address)
        -> Evaluator address value effects value
