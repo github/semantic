@@ -670,3 +670,12 @@ instance Ord1 DefaultSignature where liftCompare = genericLiftCompare
 instance Show1 DefaultSignature where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultSignature
+
+data TypeFamily a = TypeFamily { typeFamilyIdentifier :: a, typeFamilyParameters :: [a], typeFamilySignature :: a, typeFamilyBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeFamily where liftEq = genericLiftEq
+instance Ord1 TypeFamily where liftCompare = genericLiftCompare
+instance Show1 TypeFamily where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeFamily

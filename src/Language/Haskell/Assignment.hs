@@ -107,6 +107,7 @@ type Syntax = '[
   , Syntax.Type
   , Syntax.TypeClass
   , Syntax.TypeConstructorExport
+  , Syntax.TypeFamily
   , Syntax.TypePattern
   , Syntax.TypeSignature
   , Syntax.TypeSynonym
@@ -308,6 +309,7 @@ expressionChoices = [
                     , type''
                     , typeClass
                     , typeClassIdentifier
+                    , typeFamily
                     , typePattern
                     , typeConstructorExport
                     , typeConstructorIdentifier
@@ -657,6 +659,13 @@ typeConstructor =  constructorIdentifier
                <|> typeConstructorIdentifier
                <|> unitConstructor
 
+typeFamily :: Assignment
+typeFamily = makeTerm <$> symbol TypeFamilyDeclaration <*> children (Syntax.TypeFamily <$> expression <*> manyTermsTill expression (typeFamilySeperator) <*> (typeSignature <|> kindSignature <|> emptyTerm) <*> (where' <|> emptyTerm))
+  where
+    typeFamilySeperator =  symbol TypeSignature
+                       <|> symbol KindSignature
+                       <|> symbol Where
+
 typeSynonymDeclaration :: Assignment
 typeSynonymDeclaration = makeTerm
                       <$> symbol TypeSynonymDeclaration
@@ -670,6 +679,9 @@ typeSynonymDeclaration = makeTerm
                       <|> symbol TypeSignature
                       <|> symbol KindSignature
     typeSynonym typeLeft (contexts, typeRight) = Syntax.TypeSynonym typeLeft contexts typeRight
+
+typeVariableIdentifier :: Assignment
+typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.TypeVariableIdentifier . Name.name <$> source)
 
 unitConstructor :: Assignment
 unitConstructor = makeTerm <$> token UnitConstructor <*> pure Syntax.UnitConstructor
