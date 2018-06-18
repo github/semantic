@@ -88,7 +88,7 @@ evaluate :: forall address term value effects
          -> Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
 evaluate [] = ask
 evaluate (modules : rest)
-  = runRestOfLoadOrder
+  = runRest rest
   . runReader lowerBound
   . runModules evalModule
   $ traverse evalModule modules
@@ -102,7 +102,7 @@ evaluate (modules : rest)
           . runLoopControl
           $ foldSubterms eval (moduleBody m) >>= address
 
-        runRestOfLoadOrder action = do
+        runRest rest action = do
           results <- action
           local (<> ModuleTable.fromModules (toList results)) (evaluate rest)
 
