@@ -707,3 +707,13 @@ instance Show1 Instance where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Instance
 
+-- e.g. The `Bar{..}` in `foo Bar{..} = baz`.
+newtype LabeledPattern a = LabeledPattern a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 LabeledPattern where liftEq = genericLiftEq
+instance Ord1 LabeledPattern where liftCompare = genericLiftCompare
+instance Show1 LabeledPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LabeledPattern
+

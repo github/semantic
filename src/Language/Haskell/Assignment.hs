@@ -76,6 +76,7 @@ type Syntax = '[
   , Syntax.KindFunctionType
   , Syntax.KindListType
   , Syntax.KindSignature
+  , Syntax.LabeledPattern
   , Syntax.Lambda
   , Syntax.ListComprehension
   , Syntax.ListConstructor
@@ -269,6 +270,7 @@ expressionChoices = [
                     , integer
                     , kind
                     , kindSignature
+                    , labeledPattern
                     , lambda
                     , listConstructor
                     , listComprehension
@@ -448,6 +450,9 @@ kindListType = makeTerm <$> symbol KindListType <*> children (Syntax.KindListTyp
 
 kindSignature :: Assignment
 kindSignature = makeTerm <$> symbol KindSignature <*> children (Syntax.KindSignature <$ token Annotation <*> kind)
+
+labeledPattern :: Assignment
+labeledPattern = makeTerm <$> symbol LabeledPattern <*> children (Syntax.LabeledPattern <$> expressions)
 
 lambda :: Assignment
 lambda = makeTerm <$> symbol Lambda <*> children (Syntax.Lambda <$> lambdaHead <*> lambdaBody)
