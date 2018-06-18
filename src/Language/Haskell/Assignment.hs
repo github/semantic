@@ -59,6 +59,7 @@ type Syntax = '[
   , Syntax.Export
   , Syntax.Field
   , Syntax.Fixity'
+  , Syntax.FunctionalDependency
   , Syntax.FunctionConstructor
   , Syntax.FunctionType
   , Syntax.GADT
@@ -250,6 +251,7 @@ expressionChoices = [
                     , expression'
                     , fixityDeclaration
                     , float
+                    , functionalDependency
                     , functionConstructor
                     , functionDeclaration
                     , functionType
@@ -343,6 +345,9 @@ fixityDeclaration = makeTerm <$> symbol FixityDeclaration <*> children (Syntax.F
 
 float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
+
+functionalDependency :: Assignment
+functionalDependency = makeTerm <$> symbol FunctionalDependency <*> children (Syntax.FunctionalDependency <$> expressions)
 
 functionBody :: Assignment
 functionBody = makeTerm <$> symbol FunctionBody <*> children (manyTerm expression)
