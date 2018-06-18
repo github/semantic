@@ -661,3 +661,12 @@ instance Show1 Fixity' where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Fixity'
 
+-- The default signature of a type class. The default signature has the same shape as a TypeSignature Assignment.
+data DefaultSignature a = DefaultSignature { defaultSignatureName :: [a], defaultSignatureContext :: [a], defaultSignatureContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DefaultSignature where liftEq = genericLiftEq
+instance Ord1 DefaultSignature where liftCompare = genericLiftCompare
+instance Show1 DefaultSignature where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultSignature
