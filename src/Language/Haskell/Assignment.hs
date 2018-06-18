@@ -206,7 +206,7 @@ defaultDeclaration :: Assignment
 defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
 
 defaultSignature :: Assignment
-defaultSignature = makeTerm <$> symbol DefaultSignature <*> children (Syntax.DefaultSignature <$> (manyTermsTill expression (symbol Annotation)) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
+defaultSignature = makeTerm <$> symbol DefaultSignature <*> children (Syntax.DefaultSignature <$> manyTermsTill expression (symbol Annotation) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
 
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
@@ -657,7 +657,7 @@ typeClass :: Assignment
 typeClass = makeTerm <$> symbol TypeClassDeclaration <*> children (Syntax.TypeClass
                                                                  <$> (context' <|> emptyTerm)
                                                                  <*> expression
-                                                                 <*> (manyTermsTill expression (symbol Where))
+                                                                 <*> manyTermsTill expression (symbol Where)
                                                                  <*> where')
 
 typeClassIdentifier :: Assignment
@@ -691,7 +691,7 @@ typeConstructorIdentifier :: Assignment
 typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.TypeConstructorIdentifier . Name.name <$> source)
 
 typeFamily :: Assignment
-typeFamily = makeTerm <$> symbol TypeFamilyDeclaration <*> children (Syntax.TypeFamily <$> expression <*> manyTermsTill expression (typeFamilySeperator) <*> (typeSignature <|> kindSignature <|> emptyTerm) <*> (where' <|> emptyTerm))
+typeFamily = makeTerm <$> symbol TypeFamilyDeclaration <*> children (Syntax.TypeFamily <$> expression <*> manyTermsTill expression typeFamilySeperator <*> (typeSignature <|> kindSignature <|> emptyTerm) <*> (where' <|> emptyTerm))
   where
     typeFamilySeperator =  symbol TypeSignature
                        <|> symbol KindSignature
@@ -700,14 +700,14 @@ typeFamily = makeTerm <$> symbol TypeFamilyDeclaration <*> children (Syntax.Type
 typeInstance :: Assignment
 typeInstance = makeTerm <$> symbol TypeInstanceDeclaration <*> children (Syntax.TypeInstance <$> typeInstanceType <*> typeInstanceBody)
   where
-    typeInstanceType = makeTerm <$> location <*> (manyTermsTill expression (symbol TypeInstanceBody))
-    typeInstanceBody = symbol TypeInstanceBody *> children (expressions)
+    typeInstanceType = makeTerm <$> location <*> manyTermsTill expression (symbol TypeInstanceBody)
+    typeInstanceBody = symbol TypeInstanceBody *> children expressions
 
 typeOperator :: Assignment
 typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.TypeOperator . Name.name <$> source)
 
 typeSignature :: Assignment
-typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> (manyTermsTill expression (symbol Annotation)) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
+typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> manyTermsTill expression (symbol Annotation) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
 
 typeParameters :: Assignment
 typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> (manyTermsTill expression (symbol Annotation) <|> manyTerm expression))
@@ -720,7 +720,7 @@ typeSynonymDeclaration = makeTerm
                       <$> symbol TypeSynonymDeclaration
                       <*> children (typeSynonym <$> typeLeft <*> typeRight)
   where
-    typeLeft = makeTerm <$> location <*> manyTill expression (typeRightSeperator)
+    typeLeft = makeTerm <$> location <*> manyTill expression typeRightSeperator
     typeRight = (symbol TypeSynonymBody *> children ((,) <$> manyTerm (context' <|> scopedTypeVariables) <*> expression))
              <|> ((,) <$> pure [] <*> typeSignature)
              <|> ((,) <$> pure [] <*> kindSignature)
