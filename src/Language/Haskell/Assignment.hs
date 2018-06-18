@@ -665,7 +665,7 @@ typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.TypeCl
 
 typeClassInstance :: Assignment
 typeClassInstance = makeTerm <$> symbol TypeClassInstanceDeclaration <*> children (Syntax.TypeClassInstance
-                                                                      <$> (manyTerm (context' <|> scopedTypeVariables))
+                                                                      <$> manyTerm (context' <|> scopedTypeVariables)
                                                                       <*> expression
                                                                       <*> expression
                                                                       <*> (where' <|> emptyTerm))
