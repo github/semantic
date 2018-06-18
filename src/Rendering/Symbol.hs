@@ -87,9 +87,6 @@ data SymbolFields = SymbolFields
 defaultSymbolFields :: SymbolFields
 defaultSymbolFields = SymbolFields True False False True False True
 
-defaultTagSymbolFields :: SymbolFields
-defaultTagSymbolFields = SymbolFields True True True True True True
-
 parseSymbolFields :: String -> SymbolFields
 parseSymbolFields arg =
   let fields = splitWhen (== ',') arg in
