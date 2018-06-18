@@ -98,8 +98,8 @@ readBlobFromPath file = do
   maybeFile <- readFile file
   maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
 
-readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> FilePath -> [FilePath] -> m Project
-readProjectFromPaths maybeRoot path lang preludeDir excludeDirs = do
+readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
+readProjectFromPaths maybeRoot path lang excludeDirs = do
   isDir <- isDirectory path
   let (filterFun, entryPoints, rootDir) = if isDir
       then (id, [], fromMaybe path maybeRoot)
@@ -108,9 +108,7 @@ readProjectFromPaths maybeRoot path lang preludeDir excludeDirs = do
 
   paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
   let providedFiles = entryPoints <> (toFile <$> paths)
-  -- load the prelude as well, if we need it
-  let allFiles = maybe id (:) (preludePath preludeDir lang) providedFiles
-  blobs <- traverse readBlobFromPath allFiles
+  blobs <- traverse readBlobFromPath providedFiles
   pure (Project rootDir blobs lang (filePath <$> entryPoints) excludeDirs)
   where
     toFile path = File path lang
@@ -176,8 +174,8 @@ readBlobPairs :: Member Files effs => Either (Handle 'IO.ReadMode) [Both File] -
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle))
 readBlobPairs (Right paths) = traverse (send . Read . FromPathPair) paths
 
-readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> FilePath -> [FilePath] -> Eff effs Project
-readProject rootDir dir lang preludeDir = send . ReadProject rootDir dir lang preludeDir
+readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
+readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
 findFiles :: Member Files effs => FilePath -> [String] -> [FilePath] -> Eff effs [FilePath]
 findFiles dir exts = send . FindFiles dir exts
@@ -220,7 +218,7 @@ data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files out where
   Read        :: Source out -> Files out
-  ReadProject :: Maybe FilePath -> FilePath -> Language -> FilePath -> [FilePath] -> Files Project
+  ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
   FindFiles   :: FilePath -> [String] -> [FilePath] -> Files [FilePath]
   Write       :: Destination -> B.Builder -> Files ()
 
@@ -231,7 +229,7 @@ runFiles = interpret $ \ files -> case files of
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)
   Read (FromPathPair paths)    -> rethrowing (runBothWith readFilePair paths)
   Read (FromPairHandle handle) -> rethrowing (readBlobPairsFromHandle handle)
-  ReadProject rootDir dir language prel excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language prel excludeDirs)
+  ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
   FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
