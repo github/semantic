@@ -75,7 +75,9 @@ type Syntax = '[
   , Syntax.Kind
   , Syntax.KindFunctionType
   , Syntax.KindListType
+  , Syntax.KindParenthesizedConstructor
   , Syntax.KindSignature
+  , Syntax.KindTupleType
   , Syntax.LabeledPattern
   , Syntax.Lambda
   , Syntax.ListComprehension
@@ -271,7 +273,11 @@ expressionChoices = [
                     , instance'
                     , integer
                     , kind
+                    , kindListType
+                    , kindFunctionType
+                    , kindParenthesizedConstructor
                     , kindSignature
+                    , kindTupleType
                     , labeledPattern
                     , lambda
                     , listConstructor
@@ -441,19 +447,28 @@ kind :: Assignment
 kind = kind'
     <|> kindFunctionType
     <|> kindListType
+    <|> kindParenthesizedConstructor
+    <|> kindSignature
+    <|> kindTupleType
     <|> star
 
 kind' :: Assignment
-kind' = makeTerm <$> symbol Kind <*> children (Syntax.Kind <$> kind)
+kind' = makeTerm <$> symbol Kind <*> children (Syntax.Kind <$> expression)
 
 kindFunctionType :: Assignment
-kindFunctionType = makeTerm <$> symbol KindFunctionType <*> children (Syntax.KindFunctionType <$> kind <*> kind)
+kindFunctionType = makeTerm <$> symbol KindFunctionType <*> children (Syntax.KindFunctionType <$> expression <*> expression)
 
 kindListType :: Assignment
-kindListType = makeTerm <$> symbol KindListType <*> children (Syntax.KindListType <$> kind)
+kindListType = makeTerm <$> symbol KindListType <*> children (Syntax.KindListType <$> expression)
+
+kindParenthesizedConstructor :: Assignment
+kindParenthesizedConstructor = makeTerm <$> symbol KindParenthesizedConstructor <*> children (Syntax.KindParenthesizedConstructor <$> expression)
 
 kindSignature :: Assignment
-kindSignature = makeTerm <$> symbol KindSignature <*> children (Syntax.KindSignature <$ token Annotation <*> kind)
+kindSignature = makeTerm <$> symbol KindSignature <*> children (Syntax.KindSignature <$ token Annotation <*> expression)
+
+kindTupleType :: Assignment
+kindTupleType = makeTerm <$> symbol KindTupleType <*> children (Syntax.KindTupleType <$> manyTerm expression)
 
 labeledPattern :: Assignment
 labeledPattern = makeTerm <$> symbol LabeledPattern <*> children (Syntax.LabeledPattern <$> expressions)
