@@ -1,7 +1,6 @@
-module Semantic.Haystack where
+module Semantic.Telemetry.Haystack where
 
 import           Control.Exception
-import           Control.Monad.IO.Class
 import           Crypto.Hash
 import           Data.Aeson hiding (Error)
 import qualified Data.ByteString.Char8 as BC
@@ -10,8 +9,6 @@ import qualified Data.Text.Encoding as Text
 import           Network.HTTP.Client
 import           Network.HTTP.Types.Status (statusCode)
 import           Prologue hiding (hash)
-import           Semantic.Log
-import           Semantic.Queue
 import           System.IO.Error
 
 data ErrorReport
@@ -24,18 +21,16 @@ data HaystackClient
   = HaystackClient
   { haystackClientRequest  :: Request
   , haystackClientManager  :: Manager
-  , haystackClientHostName :: String
   , haystackClientAppName  :: String
-  }
+  }                    -- ^ Standard HTTP client for Haystack
   | NullHaystackClient -- ^ Doesn't report needles, good for testing or when the 'HAYSTACK_URL' env var isn't set.
 
--- Queue an error to be reported to haystack.
-queueErrorReport :: MonadIO io => AsyncQueue ErrorReport HaystackClient -> SomeException -> [(String, String)] -> io ()
-queueErrorReport q@AsyncQueue{..} message = liftIO . queue q . ErrorReport message
+-- | Function to log if there are errors reporting to haystack.
+type ErrorLogger = String -> [(String, String)] -> IO ()
 
 -- Create a Haystack HTTP client.
-haystackClient :: Maybe String -> ManagerSettings -> String -> String -> IO HaystackClient
-haystackClient maybeURL managerSettings hostName appName
+haystackClient :: Maybe String -> ManagerSettings -> String -> IO HaystackClient
+haystackClient maybeURL managerSettings appName
   | Just url <- maybeURL = do
       manager  <- newManager managerSettings
       request' <- parseRequest url
@@ -43,20 +38,18 @@ haystackClient maybeURL managerSettings hostName appName
             { method = "POST"
             , requestHeaders = ("Content-Type", "application/json; charset=utf-8") : requestHeaders request'
             }
-      pure $ HaystackClient request manager hostName appName
+      pure $ HaystackClient request manager appName
   | otherwise = pure NullHaystackClient
 
 -- Report an error to Haystack over HTTP (blocking).
-reportError :: MonadIO io => String -> LogQueue -> HaystackClient -> ErrorReport -> io ()
-reportError _   logger NullHaystackClient ErrorReport{..} = let msg = takeWhile (/= '\n') (displayException errorReportException) in queueLogMessage logger Error msg errorReportContext
-reportError sha logger HaystackClient{..} ErrorReport{..} = do
+reportError :: ErrorLogger -> HaystackClient -> ErrorReport -> IO ()
+reportError logger NullHaystackClient ErrorReport{..} = let msg = takeWhile (/= '\n') (displayException errorReportException) in logger msg errorReportContext
+reportError logger HaystackClient{..} ErrorReport{..} = do
   let fullMsg = displayException errorReportException
   let summary = takeWhile (/= '\n') fullMsg
-  queueLogMessage logger Error summary errorReportContext
+  logger summary errorReportContext
   let payload = object $
         [ "app"       .= haystackClientAppName
-        , "host"      .= haystackClientHostName
-        , "sha"       .= sha
         , "message"   .= summary
         , "class"     .= summary
         , "backtrace" .= fullMsg
@@ -64,13 +57,13 @@ reportError sha logger HaystackClient{..} ErrorReport{..} = do
         ] <> foldr (\(k, v) acc -> Text.pack k .= v : acc) [] errorReportContext
   let request = haystackClientRequest { requestBody = RequestBodyLBS (encode payload) }
 
-  response <- liftIO . tryIOError $ httpLbs request haystackClientManager
+  response <- tryIOError $ httpLbs request haystackClientManager
   case response of
-    Left e -> queueLogMessage logger Error ("Failed to report error to haystack: " <> displayException e) []
+    Left e -> logger ("Failed to report error to haystack: " <> displayException e) []
     Right response -> do
       let status = statusCode (responseStatus response)
       if status /= 201
-        then queueLogMessage logger Error ("Failed to report error to haystack, status=" <> show status <> ".") []
+        then logger ("Failed to report error to haystack, status=" <> show status <> ".") []
         else pure ()
   where
     rollup :: String -> Text
