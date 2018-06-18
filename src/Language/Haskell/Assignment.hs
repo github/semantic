@@ -585,39 +585,14 @@ strictType = makeTerm'
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
+tuple :: Assignment
+tuple = makeTerm <$> symbol TupleExpression <*> children (Syntax.Tuple <$> manyTerm expression)
+
 tuplePattern :: Assignment
 tuplePattern = makeTerm <$> symbol TuplePattern <*> children (Syntax.TuplePattern <$> manyTerm expression)
 
 tupleType :: Assignment
 tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm type')
-
-typeClass :: Assignment
-typeClass = makeTerm <$> symbol TypeClassDeclaration <*> children (Syntax.TypeClass
-                                                                 <$> (context' <|> emptyTerm)
-                                                                 <*> expression
-                                                                 <*> (manyTermsTill expression (symbol Where))
-                                                                 <*> where')
-
-typeClassIdentifier :: Assignment
-typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.TypeClassIdentifier . Name.name <$> source)
-
-typeConstructorExport :: Assignment
-typeConstructorExport = makeTerm <$> symbol TypeConstructorExport <*> children (Syntax.TypeConstructorExport <$> expression)
-
-typeConstructorIdentifier :: Assignment
-typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.TypeConstructorIdentifier . Name.name <$> source)
-
-typeOperator :: Assignment
-typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.TypeOperator . Name.name <$> source)
-
-typeSignature :: Assignment
-typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> (manyTermsTill expression (symbol Annotation)) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
-
-typeVariableIdentifier :: Assignment
-typeVariableIdentifier = makeTerm <$> symbol TypeVariableIdentifier <*> (Syntax.TypeVariableIdentifier . Name.name <$> source)
-
-tuple :: Assignment
-tuple = makeTerm <$> symbol TupleExpression <*> children (Syntax.Tuple <$> manyTerm expression)
 
 tuplingConstructor :: Assignment
 tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> rawSource)
@@ -639,11 +614,15 @@ type'' = makeTerm
       <$> symbol Type
       <*> children (Syntax.Type <$> expression <*> typeParameters <*> (kindSignature <|> emptyTerm))
 
-typeParameters :: Assignment
-typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> (manyTermsTill expression (symbol Annotation) <|> manyTerm expression))
+typeClass :: Assignment
+typeClass = makeTerm <$> symbol TypeClassDeclaration <*> children (Syntax.TypeClass
+                                                                 <$> (context' <|> emptyTerm)
+                                                                 <*> expression
+                                                                 <*> (manyTermsTill expression (symbol Where))
+                                                                 <*> where')
 
-typePattern :: Assignment
-typePattern = makeTerm <$> symbol TypePattern <*> children (Syntax.TypePattern <$> expressions)
+typeClassIdentifier :: Assignment
+typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.TypeClassIdentifier . Name.name <$> source)
 
 typeConstructor :: Assignment
 typeConstructor =  constructorIdentifier
@@ -659,12 +638,30 @@ typeConstructor =  constructorIdentifier
                <|> typeConstructorIdentifier
                <|> unitConstructor
 
+typeConstructorExport :: Assignment
+typeConstructorExport = makeTerm <$> symbol TypeConstructorExport <*> children (Syntax.TypeConstructorExport <$> expression)
+
+typeConstructorIdentifier :: Assignment
+typeConstructorIdentifier = makeTerm <$> symbol TypeConstructorIdentifier <*> (Syntax.TypeConstructorIdentifier . Name.name <$> source)
+
 typeFamily :: Assignment
 typeFamily = makeTerm <$> symbol TypeFamilyDeclaration <*> children (Syntax.TypeFamily <$> expression <*> manyTermsTill expression (typeFamilySeperator) <*> (typeSignature <|> kindSignature <|> emptyTerm) <*> (where' <|> emptyTerm))
   where
     typeFamilySeperator =  symbol TypeSignature
                        <|> symbol KindSignature
                        <|> symbol Where
+
+typeOperator :: Assignment
+typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.TypeOperator . Name.name <$> source)
+
+typeSignature :: Assignment
+typeSignature = makeTerm <$> symbol TypeSignature <*> children (Syntax.TypeSignature <$> (manyTermsTill expression (symbol Annotation)) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
+
+typeParameters :: Assignment
+typeParameters = makeTerm <$> location <*> (Type.TypeParameters <$> (manyTermsTill expression (symbol Annotation) <|> manyTerm expression))
+
+typePattern :: Assignment
+typePattern = makeTerm <$> symbol TypePattern <*> children (Syntax.TypePattern <$> expressions)
 
 typeSynonymDeclaration :: Assignment
 typeSynonymDeclaration = makeTerm
