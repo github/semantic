@@ -71,6 +71,7 @@ type Syntax = '[
   , Syntax.ImportAlias
   , Syntax.ImportDeclaration
   , Syntax.InfixOperatorPattern
+  , Syntax.Instance
   , Syntax.Kind
   , Syntax.KindFunctionType
   , Syntax.KindListType
@@ -264,6 +265,7 @@ expressionChoices = [
                     , infixOperatorApp
                     , infixOperatorPattern
                     , infixVariableIdentifier
+                    , instance'
                     , integer
                     , kind
                     , kindSignature
@@ -422,6 +424,9 @@ infixOperatorPattern = makeTerm <$> symbol InfixOperatorPattern <*> children (Sy
 
 infixVariableIdentifier :: Assignment
 infixVariableIdentifier = makeTerm <$> symbol InfixVariableIdentifier <*> children (Syntax.InfixVariableIdentifier . Name.name <$> source)
+
+instance' :: Assignment
+instance' = makeTerm <$> symbol Instance <*> children (Syntax.Instance <$> expressions)
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)

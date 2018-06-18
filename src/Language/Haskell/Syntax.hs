@@ -698,3 +698,12 @@ instance Show1 TypeClassInstance where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeClassInstance
 
+newtype Instance a = Instance a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Instance where liftEq = genericLiftEq
+instance Ord1 Instance where liftCompare = genericLiftCompare
+instance Show1 Instance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Instance
+
