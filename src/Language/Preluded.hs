@@ -43,4 +43,5 @@ instance Preluded Python.Term where
 instance Preluded TypeScript.Term where
   type PreludePath TypeScript.Term = "preludes/javascript.js"
 
+  -- FIXME: define console.log using __semantic_print
   definePrelude = pure ()
