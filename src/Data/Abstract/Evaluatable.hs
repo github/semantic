@@ -200,19 +200,24 @@ instance HasPrelude 'Java
 instance HasPrelude 'JavaScript
 instance HasPrelude 'PHP
 
+builtInPrint :: ( AbstractIntro value
+                , AbstractFunction address value effects
+                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Env address) effects, Member (Allocator address value) effects)
+             => Name
+             -> Evaluator address value effects address
+builtInPrint v = do
+  print <- variable "__semantic_print" >>= deref
+  void $ call print [variable v]
+  box unit
+
 instance HasPrelude 'Python where
   definePrelude _ =
-    define "print" (lambda (\ v -> do
-      print <- variable "__semantic_print" >>= deref
-      void $ call print [variable v]
-      box unit))
+    define "print" (lambda builtInPrint)
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define "puts" (lambda (\ v -> do
-      print <- variable "__semantic_print" >>= deref
-      void $ call print [variable v]
-      box unit))
+    define "puts" (lambda builtInPrint)
 
     defineClass "Object" [] $ do
       define "inspect" (lambda (const (box (string "<object>"))))
