@@ -135,6 +135,9 @@ instance Generate c all '[] where
 instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) where
   generate each = each (Proxy @f) (natVal (Proxy @(ElemIndex f all))) `mappend` generate @c @all @fs each
 
+instance Named1 []
+instance Message1 []
+
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
