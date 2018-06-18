@@ -161,6 +161,7 @@ class HasPrelude (language :: Language) where
 instance HasPrelude 'Go
 instance HasPrelude 'Haskell
 instance HasPrelude 'Java
+instance HasPrelude 'JavaScript
 instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
