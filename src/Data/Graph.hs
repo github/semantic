@@ -6,11 +6,17 @@ module Data.Graph
 , Class.vertex
 , Lower(..)
 , simplify
+, topologicalSort
 ) where
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Class as Class
 import Data.Aeson
+import Data.List (groupBy, nub, sortBy)
+import qualified Data.List.NonEmpty as NonEmpty (fromList)
+import qualified Data.Map.Monoidal as Monoidal
+import qualified Data.Monoid as Monoid
+import Data.Ord (comparing)
 import Prologue
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
@@ -20,6 +26,33 @@ newtype Graph vertex = Graph (G.Graph vertex)
 
 simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
+
+
+topologicalSort :: Ord v => Graph v -> [NonEmpty v]
+topologicalSort
+  = groupByInEdgeCount
+  . allVertices
+  . labelWithInEdgeCounts
+
+labelWithInEdgeCounts :: Ord v => Graph v -> Graph (Monoid.Sum Int, v)
+labelWithInEdgeCounts
+  = uncurry mapGraph
+  . Class.foldg
+    (lowerBound, lowerBound)
+    ((,) lowerBound . Class.vertex)
+    (<>)
+    (\ (outM, outG) (inM, inG) ->
+      ( outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outG))) (allVertices inG)
+      , outG `Class.connect` inG
+      ))
+  where mapGraph edgeCountsByVertex g = pairWithCountIn edgeCountsByVertex <$> g
+        pairWithCountIn edgeCountsByVertex vertex = (fromMaybe 0 (Monoidal.lookup vertex edgeCountsByVertex), vertex)
+
+allVertices :: Eq v => Graph v -> [v]
+allVertices = nub . toList
+
+groupByInEdgeCount :: Ord sum => [(sum, v)] -> [NonEmpty v]
+groupByInEdgeCount = map (NonEmpty.fromList . map snd) . groupBy ((==) `on` fst) . sortBy (comparing fst)
 
 
 instance Lower (Graph vertex) where
