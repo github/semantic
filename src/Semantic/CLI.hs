@@ -64,7 +64,6 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     parseArgumentsParser = do
       renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
-              <|> flag'                                          (Parse.runParse TagsTermRenderer)        (long "tags"        <> help "Output JSON tags")
               <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
