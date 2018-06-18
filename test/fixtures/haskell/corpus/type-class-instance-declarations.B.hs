@@ -54,7 +54,7 @@ instance Foo a b m => Bar a b m where {}
 
 instance ( Foo (Bar a b '[]) c ) => Baz a b (Bix a b c) where
 
-instance (Foo baz ~ bar => Wix baz where
+instance (Foo baz ~ bar) => Wix baz where
   toWix = undefined
   Wix baz <> Wix baz' = Wix (baz <> baz')
 
