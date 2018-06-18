@@ -662,8 +662,13 @@ typeSynonymDeclaration = makeTerm
                       <$> symbol TypeSynonymDeclaration
                       <*> children (typeSynonym <$> typeLeft <*> typeRight)
   where
-    typeLeft = makeTerm <$> location <*> manyTill expression (symbol TypeSynonymBody)
-    typeRight = symbol TypeSynonymBody *> children ((,) <$> manyTerm (context' <|> scopedTypeVariables) <*> expression)
+    typeLeft = makeTerm <$> location <*> manyTill expression (typeRightSeperator)
+    typeRight = (symbol TypeSynonymBody *> children ((,) <$> manyTerm (context' <|> scopedTypeVariables) <*> expression))
+             <|> ((,) <$> pure [] <*> typeSignature)
+             <|> ((,) <$> pure [] <*> kindSignature)
+    typeRightSeperator =  symbol TypeSynonymBody
+                      <|> symbol TypeSignature
+                      <|> symbol KindSignature
     typeSynonym typeLeft (contexts, typeRight) = Syntax.TypeSynonym typeLeft contexts typeRight
 
 unitConstructor :: Assignment
