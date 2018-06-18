@@ -107,6 +107,7 @@ type Syntax = '[
   , Syntax.TuplePattern
   , Syntax.Type
   , Syntax.TypeClass
+  , Syntax.TypeClassInstance
   , Syntax.TypeConstructorExport
   , Syntax.TypeFamily
   , Syntax.TypePattern
@@ -311,6 +312,7 @@ expressionChoices = [
                     , type''
                     , typeClass
                     , typeClassIdentifier
+                    , typeClassInstance
                     , typeFamily
                     , typePattern
                     , typeConstructorExport
@@ -628,6 +630,13 @@ typeClass = makeTerm <$> symbol TypeClassDeclaration <*> children (Syntax.TypeCl
 
 typeClassIdentifier :: Assignment
 typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.TypeClassIdentifier . Name.name <$> source)
+
+typeClassInstance :: Assignment
+typeClassInstance = makeTerm <$> symbol TypeClassInstanceDeclaration <*> children (Syntax.TypeClassInstance
+                                                                      <$> (manyTerm (context' <|> scopedTypeVariables))
+                                                                      <*> expression
+                                                                      <*> expression
+                                                                      <*> (where' <|> emptyTerm))
 
 typeConstructor :: Assignment
 typeConstructor =  constructorIdentifier

@@ -688,3 +688,13 @@ instance Ord1 FunctionalDependency where liftCompare = genericLiftCompare
 instance Show1 FunctionalDependency where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable FunctionalDependency
+
+data TypeClassInstance a = TypeClassInstance { typeClassInstanceContext :: [a], typeClassInstanceIdentifier :: a, typeClassInstanceInstance :: a, typeClassInstanceBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeClassInstance where liftEq = genericLiftEq
+instance Ord1 TypeClassInstance where liftCompare = genericLiftCompare
+instance Show1 TypeClassInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeClassInstance
+
