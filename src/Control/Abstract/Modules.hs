@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Modules
 ( lookupModule
 , resolve
@@ -7,6 +7,7 @@ module Control.Abstract.Modules
 , load
 , Modules(..)
 , runModules
+, runModules'
 , LoadError(..)
 , moduleNotFound
 , resumeLoadError
@@ -23,6 +24,7 @@ import Data.Abstract.Environment
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
+import Data.Semigroup.Foldable (foldMap1)
 import Prologue
 
 -- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
@@ -89,6 +91,17 @@ runModules evaluateModule = go
             pure (find isMember names)
           List dir -> modulePathsInDir dir <$> askModuleTable @term)
 
+runModules' :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+            => Evaluator address value (Modules address value ': effects) a
+            -> Evaluator address value effects a
+runModules' = interpret $ \case
+  Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable'
+  Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable'
+  Resolve names -> do
+    isMember <- flip ModuleTable.member <$> askModuleTable'
+    pure (find isMember names)
+  List dir -> modulePathsInDir dir <$> askModuleTable'
+
 getModuleTable :: Member (State (ModuleTable (Maybe (address, Environment address)))) effects => Evaluator address value effects (ModuleTable (Maybe (address, Environment address)))
 getModuleTable = get
 
@@ -97,6 +110,9 @@ cacheModule path result = modify' (ModuleTable.insert path result) $> result
 
 askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module term)))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module term)))
 askModuleTable = ask
+
+askModuleTable' :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
+askModuleTable' = ask
 
 
 newtype Merging m address = Merging { runMerging :: m (Maybe (address, Environment address)) }
@@ -109,6 +125,12 @@ instance Applicative m => Semigroup (Merging m address) where
 instance Applicative m => Monoid (Merging m address) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
+
+
+newtype Merging' address = Merging' { runMerging' :: (address, Environment address) }
+
+instance Semigroup (Merging' address) where
+  Merging' (_, env1) <> Merging' (addr, env2) = Merging' (addr, mergeEnvs env1 env2)
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
