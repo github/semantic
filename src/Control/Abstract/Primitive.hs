@@ -6,23 +6,8 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import Data.Abstract.Name
-import Data.Text (pack, unpack)
+import Data.Text (unpack)
 import Prologue
-
-builtin :: ( HasCallStack
-           , Member (Allocator address value) effects
-           , Member (Env address) effects
-           , Member (Reader ModuleInfo) effects
-           , Member (Reader Span) effects
-           )
-        => String
-        -> Evaluator address value effects value
-        -> Evaluator address value effects ()
-builtin s def = withCurrentCallStack callStack $ do
-  let name' = name ("__semantic_" <> pack s)
-  addr <- alloc name'
-  bind name' addr
-  def >>= assign addr
 
 define :: ( HasCallStack
           , Member (Allocator address value) effects
@@ -57,4 +42,4 @@ defineBuiltins :: ( AbstractValue address value effects
                   )
                => Evaluator address value effects ()
 defineBuiltins =
-  builtin "print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))
+  define "__semantic_print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))
