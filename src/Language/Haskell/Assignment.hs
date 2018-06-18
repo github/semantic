@@ -362,7 +362,7 @@ functionDeclaration = makeTerm
                    <$> symbol FunctionDeclaration
                    <*> children (Declaration.Function
                                <$> pure []
-                               <*> variableIdentifier
+                               <*> expression
                                <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
 
