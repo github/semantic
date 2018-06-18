@@ -37,7 +37,7 @@ defineClass :: ( AbstractValue address value effects
             -> Evaluator address value effects ()
 defineClass name superclasses scope = define name $ do
   env <- locally $ do
-    void $ scope
+    void scope
     Env.head <$> getEnv
   klass name (map (string . formatName) superclasses) env
 
