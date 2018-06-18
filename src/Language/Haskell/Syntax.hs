@@ -642,3 +642,13 @@ instance Ord1 Splice where liftCompare = genericLiftCompare
 instance Show1 Splice where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Splice
+
+data TypeClass a = TypeClass { typeClassContext :: a, typeClassIdentifier :: a, typeClassParameters :: [a], typeClassBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeClass where liftEq = genericLiftEq
+instance Ord1 TypeClass where liftCompare = genericLiftCompare
+instance Show1 TypeClass where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeClass
+

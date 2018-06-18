@@ -103,6 +103,7 @@ type Syntax = '[
   , Syntax.TupleConstructor
   , Syntax.TuplePattern
   , Syntax.Type
+  , Syntax.TypeClass
   , Syntax.TypeConstructorExport
   , Syntax.TypePattern
   , Syntax.TypeSignature
@@ -298,6 +299,7 @@ expressionChoices = [
                     , tupleType
                     , type'
                     , type''
+                    , typeClass
                     , typeClassIdentifier
                     , typePattern
                     , typeConstructorExport
@@ -576,6 +578,13 @@ tuplePattern = makeTerm <$> symbol TuplePattern <*> children (Syntax.TuplePatter
 
 tupleType :: Assignment
 tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm type')
+
+typeClass :: Assignment
+typeClass = makeTerm <$> symbol TypeClassDeclaration <*> children (Syntax.TypeClass
+                                                                 <$> (context' <|> emptyTerm)
+                                                                 <*> expression
+                                                                 <*> (manyTermsTill expression (symbol Where))
+                                                                 <*> where')
 
 typeClassIdentifier :: Assignment
 typeClassIdentifier = makeTerm <$> symbol TypeClassIdentifier <*> (Syntax.TypeClassIdentifier . Name.name <$> source)
