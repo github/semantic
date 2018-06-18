@@ -15,7 +15,6 @@ module Data.Project (
   -- * Files
   , File (..)
   , file
-  , preludePath
   ) where
 
 import Prelude hiding (readFile)
@@ -113,6 +112,3 @@ readFile Project{..} f =
     | p == "/dev/null"  -> pure Nothing
     | isJust candidate  -> pure candidate
     | otherwise         -> throwError (SomeException (FileNotFound p))
-
-preludePath :: FilePath -> Language -> Maybe File
-preludePath dir lang = fmap (\p -> File (dir </> p) lang) (preludeFilename lang)
