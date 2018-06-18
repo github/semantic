@@ -113,6 +113,7 @@ type Syntax = '[
   , Syntax.TypeClassInstance
   , Syntax.TypeConstructorExport
   , Syntax.TypeFamily
+  , Syntax.TypeInstance
   , Syntax.TypePattern
   , Syntax.TypeSignature
   , Syntax.TypeSynonym
@@ -320,6 +321,7 @@ expressionChoices = [
                     , typeClassIdentifier
                     , typeClassInstance
                     , typeFamily
+                    , typeInstance
                     , typePattern
                     , typeConstructorExport
                     , typeConstructorIdentifier
@@ -679,6 +681,12 @@ typeFamily = makeTerm <$> symbol TypeFamilyDeclaration <*> children (Syntax.Type
     typeFamilySeperator =  symbol TypeSignature
                        <|> symbol KindSignature
                        <|> symbol Where
+
+typeInstance :: Assignment
+typeInstance = makeTerm <$> symbol TypeInstanceDeclaration <*> children (Syntax.TypeInstance <$> typeInstanceType <*> typeInstanceBody)
+  where
+    typeInstanceType = makeTerm <$> location <*> (manyTermsTill expression (symbol TypeInstanceBody))
+    typeInstanceBody = symbol TypeInstanceBody *> children (expressions)
 
 typeOperator :: Assignment
 typeOperator = makeTerm <$> symbol TypeOperator <*> (Syntax.TypeOperator . Name.name <$> source)

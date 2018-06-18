@@ -726,3 +726,14 @@ instance Ord1 RecordWildCards where liftCompare = genericLiftCompare
 instance Show1 RecordWildCards where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable RecordWildCards
+
+-- e.g. `type instance F [Int] = Int` where `F` is an open type family.
+data TypeInstance a = TypeInstance { typeInstanceType :: a, typeInstanceBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeInstance where liftEq = genericLiftEq
+instance Ord1 TypeInstance where liftCompare = genericLiftCompare
+instance Show1 TypeInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeInstance
+
