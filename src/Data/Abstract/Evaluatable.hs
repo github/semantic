@@ -81,7 +81,6 @@ evaluate :: forall address term value effects
             , Member (Resumable ResolutionError) effects
             , Member (Resumable (Unspecialized value)) effects
             , Member (State (Heap address (Cell address) value)) effects
-            , Member (State (ModuleTable (Maybe (address, Environment address)))) effects
             , Member Trace effects
             , Recursive term
             , Reducer value (Cell address value)
