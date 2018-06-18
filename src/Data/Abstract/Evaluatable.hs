@@ -92,8 +92,7 @@ evaluate :: forall address term value effects
 evaluate [] = ask
 evaluate (modules : rest)
   = runRest rest
-  . runReader lowerBound
-  . runModules evalModule
+  . runModules'
   $ traverse evalModule modules
   where evalModule :: Module term -> Evaluator address value (Modules address value ': effects) (Module (address, Environment address))
         evalModule m
