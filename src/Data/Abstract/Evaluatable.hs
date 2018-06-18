@@ -77,7 +77,6 @@ evaluate :: forall address term value effects
             , Member (Resumable (AddressError address value)) effects
             , Member (Resumable (EnvironmentError address)) effects
             , Member (Resumable EvalError) effects
-            , Member (Resumable (LoadError address)) effects
             , Member (Resumable ResolutionError) effects
             , Member (Resumable (Unspecialized value)) effects
             , Member (State (Heap address (Cell address) value)) effects
