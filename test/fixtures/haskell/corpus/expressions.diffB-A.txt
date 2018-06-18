@@ -337,16 +337,12 @@
             {-(VariableOperator
               {-(VariableSymbol)-})-}
             {-(VariableIdentifier)-})-})-})-}))
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
       {+(QualifiedConstructorIdentifier
         {+(ModuleIdentifier)+}
-        {+(ConstructorIdentifier)+})+}
-      {-(Lambda
-        {-(VariableIdentifier)-}
-        {-(VariableIdentifier)-})-}))
+        {+(ConstructorIdentifier)+})+})+})+}
   {+(Function
     {+(VariableIdentifier)+}
     {+(ConstructorPattern
@@ -407,12 +403,13 @@
             {+(VariableOperator
               {+(VariableSymbol)+})+}
             {+(VariableIdentifier)+})+})+})+})+})+}
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
-      {+(Lambda
-        {+(VariableIdentifier)+}
-        {+(VariableIdentifier)+})+})+})+}
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (VariableIdentifier)
+          (VariableIdentifier))))
     (Function
     { (VariableIdentifier)
     ->(VariableIdentifier) }
