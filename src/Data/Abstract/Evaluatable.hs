@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -64,8 +64,7 @@ class Show1 constr => Evaluatable constr where
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
-evaluate :: forall address term value effects
-         .  ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address ': effects)
+evaluate :: ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address ': effects)
             , Addressable address (Reader ModuleInfo ': Modules address ': effects)
             , Declarations term
             , Evaluatable (Base term)
@@ -106,8 +105,7 @@ evaluate (modules : rest)
           local (<> ModuleTable.fromModules (toList results)) (evaluate rest)
 
 -- | Evaluate a given package.
-evaluatePackageWith :: forall proxy lang address term value inner inner' inner'' outer
-                    .  ( AbstractValue address value inner
+evaluatePackageWith :: ( AbstractValue address value inner
                        -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
                        , Addressable address inner'
                        , Declarations term
