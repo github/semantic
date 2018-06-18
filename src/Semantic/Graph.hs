@@ -38,20 +38,20 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-runGraph :: ( Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
          -> Eff effs (Graph Vertex)
 runGraph graphType includePackages project
-  | SomeAnalysisParser parser prelude <- someAnalysisParser
+  | SomeAnalysisParser parser lang <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
-    package <- parsePackage parser prelude project
+    package <- parsePackage parser project
     let analyzeTerm = withTermSpans . case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
-    analyze runGraphAnalysis (evaluatePackageWith analyzeModule analyzeTerm package) >>= extractGraph
+    analyze runGraphAnalysis (evaluatePackageWith lang analyzeModule analyzeTerm package) >>= extractGraph
     where extractGraph result = case result of
             (((_, graph), _), _) -> pure (simplify graph)
           runGraphAnalysis
@@ -94,16 +94,14 @@ newtype GraphEff address a = GraphEff
   }
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member (Distribute WrappedTask) effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
+parsePackage :: (Member (Distribute WrappedTask) effs, Member Resolution effs, Member Trace effs)
              => Parser term -- ^ A parser.
-             -> Maybe File  -- ^ Prelude (optional).
              -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
-parsePackage parser preludeFile project@Project{..} = do
-  prelude <- traverse (parseModule parser Nothing) preludeFile
+parsePackage parser project@Project{..} = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
-  let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p resMap
+  let pkg = Package.fromModules n Nothing (length projectEntryPoints) p resMap
   pkg <$ trace ("project: " <> show pkg)
 
   where
