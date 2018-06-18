@@ -208,8 +208,6 @@ library
                      , parallel
                      , parsers
                      , pretty-show
-                     , proto3-suite
-                     , proto3-wire
                      , recursion-schemes
                      , reducers
                      , scientific
@@ -224,6 +222,8 @@ library
                      , unix
                      , unordered-containers
                      , vector
+                     , proto3-suite
+                     , proto3-wire
                      , haskell-tree-sitter
                      , tree-sitter-go
                      , tree-sitter-haskell
