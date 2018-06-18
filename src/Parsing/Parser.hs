@@ -25,6 +25,7 @@ module Parsing.Parser
 
 import           Assigning.Assignment
 import qualified CMarkGFM
+import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Kind
 import           Data.Language
@@ -32,7 +33,6 @@ import           Data.Record
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Data.Project
 import           Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.Haskell.Assignment as Haskell
@@ -61,10 +61,12 @@ type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *])
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser typeclasses ann where
-  SomeAnalysisParser :: ( Element Syntax.Identifier fs
-                        , ApplyAll' typeclasses fs)
+  SomeAnalysisParser :: ( ApplyAll' typeclasses fs
+                        , Element Syntax.Identifier fs
+                        , HasPrelude lang
+                        )
                      => Parser (Term (Sum fs) ann) -- ^ A parser.
-                     -> Maybe File                   -- ^ Maybe path to prelude.
+                     -> Proxy lang
                      -> SomeAnalysisParser typeclasses ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
@@ -79,14 +81,14 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                                         -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
-someAnalysisParser _ Go         = SomeAnalysisParser goParser (preludePath "preludes" Go)
-someAnalysisParser _ Java       = SomeAnalysisParser javaParser (preludePath "preludes" Java)
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (preludePath "" JavaScript)
-someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser (preludePath "preludes" Haskell)
-someAnalysisParser _ PHP        = SomeAnalysisParser phpParser (preludePath "preludes" PHP)
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser (preludePath "preludes" Python)
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser (preludePath "preludes" Ruby)
-someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (preludePath "preludes" TypeScript)
+someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
+someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
+someAnalysisParser _ Java       = SomeAnalysisParser javaParser       (Proxy :: Proxy 'Java)
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TypeScript)
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser        (Proxy :: Proxy 'PHP)
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser     (Proxy :: Proxy 'Python)
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser       (Proxy :: Proxy 'Ruby)
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser (Proxy :: Proxy 'TypeScript)
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 

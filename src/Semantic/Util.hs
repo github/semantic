@@ -81,22 +81,19 @@ checking
   . runAddressError
   . runTypeError
 
-evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
-evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
-evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
-evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
-evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript javaScriptPrelude path
-evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+evalGoProject path         = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go         path
+evalRubyProject path       = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby       path
+evalPHPProject path        = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser        Language.PHP        path
+evalPythonProject path     = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser     Language.Python     path
+evalJavaScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.JavaScript path
+evalTypeScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript path
 
-typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
-
-rubyPrelude = preludePath "preludes" Language.Ruby
-pythonPrelude = preludePath "preludes" Language.Python
-javaScriptPrelude = preludePath "preludes" Language.JavaScript
+typecheckGoFile path = checking =<< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go path
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang "preludes" [] >>= parsePackage parser prelude)
-evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang "preludes" [] >>= parsePackage parser prelude)
+evaluateProject proxy parser lang path = evaluatePackageWith proxy id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser)
+evaluateProjectWithCaching proxy parser lang path = evaluatePackageWith proxy convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser)
+
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)
