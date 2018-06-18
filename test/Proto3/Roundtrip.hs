@@ -45,6 +45,10 @@ spec = parallel $ do
     prop "roundtrips" $
       \sp -> shouldRoundtrip' @Literal.Boolean @(Term (Sum Syntax) ()) (unListableF sp)
 
+  describe "terms of syntax" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip @(Term (Sum Syntax) ()) (unListableF sp)
+
   describe "arrays" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip' @Literal.Array @(Term (Sum Syntax) ()) (unListableF sp)
