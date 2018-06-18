@@ -35,6 +35,10 @@ instance Preluded Ruby.Term where
       void $ call print [variable v]
       box unit))
 
+    defineClass "Object" [] $ do
+      define "inspect" (lambda (const (box (string "<object>"))))
+
+
 instance Preluded Python.Term where
   type PreludePath Python.Term = "preludes/python.py"
 
