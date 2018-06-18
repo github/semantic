@@ -1,7 +1,6 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Symbol
 ( renderToSymbols
-, renderToTags
 , SymbolFields(..)
 , defaultSymbolFields
 , parseSymbolFields
@@ -18,18 +17,6 @@ import Data.List.Split (splitWhen)
 import Data.Term
 import qualified Data.Text as T
 import Rendering.TOC
-
-
--- | Render a 'Term' to a ctags like output (See 'Tag').
---
--- This format is going away. Prefer the new 'renderToSymbols' as it provides a
--- more compact data representation and custom field selection. This exists to
--- back support the staff shipped tag generation in github/github.
-renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
-renderToTags Blob{..} = fmap toJSON . termToC blobPath
-  where
-    termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => FilePath -> Term f (Record fields) -> [Symbol]
-    termToC path = mapMaybe (symbolSummary defaultTagSymbolFields path "unchanged") . termTableOfContentsBy declaration
 
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
