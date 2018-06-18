@@ -737,3 +737,20 @@ instance Show1 TypeInstance where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeInstance
 
+newtype KindParenthesizedConstructor a = KindParenthesizedConstructor { kindParenthesizedConstructorContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindParenthesizedConstructor where liftEq = genericLiftEq
+instance Ord1 KindParenthesizedConstructor where liftCompare = genericLiftCompare
+instance Show1 KindParenthesizedConstructor where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindParenthesizedConstructor
+
+newtype KindTupleType a = KindTupleType { kindTupleType :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindTupleType where liftEq = genericLiftEq
+instance Ord1 KindTupleType where liftCompare = genericLiftCompare
+instance Show1 KindTupleType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindTupleType
