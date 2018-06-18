@@ -49,6 +49,7 @@ type Syntax = '[
   , Syntax.Context'
   , Syntax.CPPDirective
   , Syntax.DefaultDeclaration
+  , Syntax.DefaultSignature
   , Syntax.Deriving
   , Syntax.Do
   , Syntax.Empty
@@ -195,6 +196,9 @@ cppDirective = makeTerm <$> symbol CppDirective <*> (Syntax.CPPDirective . Name.
 defaultDeclaration :: Assignment
 defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)
 
+defaultSignature :: Assignment
+defaultSignature = makeTerm <$> symbol DefaultSignature <*> children (Syntax.DefaultSignature <$> (manyTermsTill expression (symbol Annotation)) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
+
 derivingClause :: Assignment
 derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
 
@@ -238,6 +242,7 @@ expressionChoices = [
                     , constructorSymbol
                     , cppDirective
                     , defaultDeclaration
+                    , defaultSignature
                     , derivingClause
                     , do'
                     , equalityConstraint
