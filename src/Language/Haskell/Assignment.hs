@@ -57,6 +57,7 @@ type Syntax = '[
   , Syntax.EqualityConstraint
   , Syntax.Export
   , Syntax.Field
+  , Syntax.Fixity'
   , Syntax.FunctionConstructor
   , Syntax.FunctionType
   , Syntax.GADT
@@ -241,6 +242,7 @@ expressionChoices = [
                     , do'
                     , equalityConstraint
                     , expression'
+                    , fixityDeclaration
                     , float
                     , functionConstructor
                     , functionDeclaration
@@ -328,6 +330,9 @@ field = makeTerm
                  <*> fieldType)
   where
     fieldType = makeTerm <$> location <*> (Syntax.Type <$> term (type' <|> typeVariableIdentifier) <*> typeParameters <*> (kindSignature <|> emptyTerm))
+
+fixityDeclaration :: Assignment
+fixityDeclaration = makeTerm <$> symbol FixityDeclaration <*> children (Syntax.Fixity' <$> (integer <|> emptyTerm) <*> manyTerm expression)
 
 float :: Assignment
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)

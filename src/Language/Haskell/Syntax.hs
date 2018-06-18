@@ -652,3 +652,12 @@ instance Show1 TypeClass where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeClass
 
+data Fixity' a = Fixity' { fixityPrecedence :: a, fixityIdentifier :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Fixity' where liftEq = genericLiftEq
+instance Ord1 Fixity' where liftCompare = genericLiftCompare
+instance Show1 Fixity' where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Fixity'
+
