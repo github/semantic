@@ -49,7 +49,7 @@ class Show1 constr => Evaluatable constr where
           , Member (Allocator address value) effects
           , Member (Env address) effects
           , Member (LoopControl address) effects
-          , Member (Modules address value) effects
+          , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
@@ -65,8 +65,8 @@ class Show1 constr => Evaluatable constr where
 
 
 evaluate :: forall address term value effects
-         .  ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address value ': effects)
-            , Addressable address (Reader ModuleInfo ': Modules address value ': effects)
+         .  ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address ': effects)
+            , Addressable address (Reader ModuleInfo ': Modules address ': effects)
             , Declarations term
             , Evaluatable (Base term)
             , Foldable (Cell address)
@@ -131,7 +131,7 @@ evaluatePackageWith :: forall proxy lang address term value inner inner' inner''
                        , ValueRoots address value
                        , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
-                       , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
+                       , inner'' ~ (Modules address ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => proxy lang
                     -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))

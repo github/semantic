@@ -131,7 +131,7 @@ newtype TestEff a = TestEff
                        , Env Precise
                        , Allocator Precise Val
                        , Reader ModuleInfo
-                       , Modules Precise Val
+                       , Modules Precise
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (ValueError Precise TestEff)

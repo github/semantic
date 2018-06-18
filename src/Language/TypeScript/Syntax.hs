@@ -35,7 +35,7 @@ toName = name . T.pack . unPath
 --
 -- NB: TypeScript has a couple of different strategies, but the main one (and the
 -- only one we support) mimics Node.js.
-resolveWithNodejsStrategy :: ( Member (Modules address value) effects
+resolveWithNodejsStrategy :: ( Member (Modules address) effects
                              , Member (Reader M.ModuleInfo) effects
                              , Member (Reader PackageInfo) effects
                              , Member (Resumable ResolutionError) effects
@@ -54,7 +54,7 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: ( Member (Modules address value) effects
+resolveRelativePath :: ( Member (Modules address) effects
                        , Member (Reader M.ModuleInfo) effects
                        , Member (Reader PackageInfo) effects
                        , Member (Resumable ResolutionError) effects
@@ -82,7 +82,7 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: ( Member (Modules address value) effects
+resolveNonRelativePath :: ( Member (Modules address) effects
                           , Member (Reader M.ModuleInfo) effects
                           , Member (Reader PackageInfo) effects
                           , Member (Resumable ResolutionError) effects
@@ -107,7 +107,7 @@ resolveNonRelativePath name exts = do
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
 -- | Resolve a module name to a ModulePath.
-resolveModule :: ( Member (Modules address value) effects
+resolveModule :: ( Member (Modules address) effects
                  , Member (Reader PackageInfo) effects
                  , Member Trace effects
                  )
@@ -133,7 +133,7 @@ javascriptExtensions = ["js"]
 evalRequire :: ( AbstractValue address value effects
                , Member (Allocator address value) effects
                , Member (Env address) effects
-               , Member (Modules address value) effects
+               , Member (Modules address) effects
                )
             => M.ModulePath
             -> Name

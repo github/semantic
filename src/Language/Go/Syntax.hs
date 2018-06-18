@@ -27,7 +27,7 @@ importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathT
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . T.pack . takeFileName . unPath
 
-resolveGoImport :: ( Member (Modules address value) effects
+resolveGoImport :: ( Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Package.PackageInfo) effects
                    , Member (Resumable ResolutionError) effects
