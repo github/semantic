@@ -679,3 +679,12 @@ instance Ord1 TypeFamily where liftCompare = genericLiftCompare
 instance Show1 TypeFamily where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeFamily
+
+newtype FunctionalDependency a = FunctionalDependency { functionalDependencyContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FunctionalDependency where liftEq = genericLiftEq
+instance Ord1 FunctionalDependency where liftCompare = genericLiftCompare
+instance Show1 FunctionalDependency where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FunctionalDependency
