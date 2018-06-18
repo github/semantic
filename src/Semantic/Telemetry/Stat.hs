@@ -1,4 +1,4 @@
-module Semantic.Stat
+module Semantic.Telemetry.Stat
 (
 -- Primary API for creating stats.
   increment
@@ -10,9 +10,12 @@ module Semantic.Stat
 , histogram
 , set
 , Stat
+, Tags
+, Host
+, Port
+, Namespace
 
 -- Client
-, defaultStatsClient
 , statsClient
 , StatsClient(..)
 , closeStatClient
@@ -32,10 +35,8 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import           Network.Socket
     (Socket (..), SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
 import           Network.Socket.ByteString
-import           Network.URI
 import           Numeric
 import           Prologue
-import           System.Environment
 import           System.IO.Error
 
 -- | A named piece of data you wish to record a specific 'Metric' for.
@@ -101,43 +102,21 @@ data StatsClient
   = StatsClient
   { statsClientUDPSocket :: Socket
   , statsClientNamespace :: String
-  , statsClientUDPHost   :: String
-  , statsClientUDPPort   :: String
+  , statsClientUDPHost   :: Host
+  , statsClientUDPPort   :: Port
   }
 
--- | Create a default stats client. This function consults two optional
---   environment variables for the stats URI (default: 127.0.0.1:28125).
---     * STATS_ADDR     - String URI to send stats to in the form of `host:port`.
---     * DOGSTATSD_HOST - String hostname which will override the above host.
---                        Generally used on kubes pods.
-defaultStatsClient :: MonadIO io => io StatsClient
-defaultStatsClient = liftIO $ do
-  addr <- lookupEnv "STATS_ADDR"
-  let (host', port) = parseAddr (fmap ("statsd://" <>) addr)
-
-  -- When running in Kubes, DOGSTATSD_HOST is set with the dogstatsd host.
-  kubesHost <- lookupEnv "DOGSTATSD_HOST"
-  let host = fromMaybe host' kubesHost
-
-  statsClient host port "semantic"
-  where
-    defaultHost = "127.0.0.1"
-    defaultPort = "28125"
-    parseAddr a | Just s <- a
-                , Just (Just (URIAuth _ host port)) <- uriAuthority <$> parseURI s
-                = (parseHost host, parsePort port)
-                | otherwise = (defaultHost, defaultPort)
-    parseHost s = if null s then defaultHost else s
-    parsePort s = if null s then defaultPort else dropWhile (':' ==) s
-
+type Host = String
+type Port = String
+type Namespace = String
 
 -- | Create a StatsClient at the specified host and port with a namespace prefix.
-statsClient :: MonadIO io => String -> String -> String -> io StatsClient
-statsClient host port statsClientNamespace = liftIO $ do
+statsClient :: MonadIO io => Host -> Port -> Namespace -> io StatsClient
+statsClient host port ns = liftIO $ do
   (addr:_) <- getAddrInfo Nothing (Just host) (Just port)
   sock <- socket (addrFamily addr) Datagram defaultProtocol
   connect sock (addrAddress addr)
-  pure (StatsClient sock statsClientNamespace host port)
+  pure (StatsClient sock ns host port)
 
 -- | Close the client's underlying socket.
 closeStatClient :: MonadIO io => StatsClient -> io ()
