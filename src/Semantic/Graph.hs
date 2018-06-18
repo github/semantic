@@ -85,7 +85,7 @@ newtype GraphEff address a = GraphEff
                         , Resumable EvalError
                         , Resumable (EnvironmentError address)
                         , Resumable (Unspecialized (Value address (GraphEff address)))
-                        , Resumable (LoadError address (Value address (GraphEff address)))
+                        , Resumable (LoadError address)
                         , Trace
                         , Fresh
                         , State (Heap address Latest (Value address (GraphEff address)))
@@ -130,7 +130,7 @@ resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionErr
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: Member Trace effects => Evaluator address value (Resumable (LoadError address value) ': effects) a -> Evaluator address value effects a
+resumingLoadError :: Member Trace effects => Evaluator address value (Resumable (LoadError address) ': effects) a -> Evaluator address value effects a
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
 
 resumingEvalError :: Member Trace effects => Evaluator address value (Resumable EvalError ': effects) a -> Evaluator address value effects a

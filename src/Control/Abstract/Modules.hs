@@ -62,7 +62,7 @@ sendModules :: Member (Modules address value) effects => Modules address value r
 sendModules = send
 
 runModules :: forall term address value effects a
-           .  ( Member (Resumable (LoadError address value)) effects
+           .  ( Member (Resumable (LoadError address)) effects
               , Member (State (ModuleTable (Maybe (address, Environment address)))) effects
               , Member Trace effects
               )
@@ -134,26 +134,26 @@ instance Semigroup (Merging' address) where
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError address value resume where
-  ModuleNotFound :: ModulePath -> LoadError address value (Maybe (address, Environment address))
+data LoadError address resume where
+  ModuleNotFound :: ModulePath -> LoadError address (Maybe (address, Environment address))
 
-deriving instance Eq (LoadError address value resume)
-deriving instance Show (LoadError address value resume)
-instance Show1 (LoadError address value) where
+deriving instance Eq (LoadError address resume)
+deriving instance Show (LoadError address resume)
+instance Show1 (LoadError address) where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError address value) where
+instance Eq1 (LoadError address) where
   liftEq _ (ModuleNotFound a) (ModuleNotFound b) = a == b
 
-moduleNotFound :: forall address value effects . Member (Resumable (LoadError address value)) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
-moduleNotFound = throwResumable . ModuleNotFound @address @value
+moduleNotFound :: Member (Resumable (LoadError address)) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
+moduleNotFound = throwResumable . ModuleNotFound
 
-resumeLoadError :: Member (Resumable (LoadError address value)) effects => Evaluator address value effects a -> (forall resume . LoadError address value resume -> Evaluator address value effects resume) -> Evaluator address value effects a
+resumeLoadError :: Member (Resumable (LoadError address)) effects => Evaluator address value effects a -> (forall resume . LoadError address resume -> Evaluator address value effects resume) -> Evaluator address value effects a
 resumeLoadError = catchResumable
 
-runLoadError :: Effectful (m address value) => m address value (Resumable (LoadError address value) ': effects) a -> m address value effects (Either (SomeExc (LoadError address value)) a)
+runLoadError :: Effectful (m address value) => m address value (Resumable (LoadError address) ': effects) a -> m address value effects (Either (SomeExc (LoadError address)) a)
 runLoadError = runResumable
 
-runLoadErrorWith :: Effectful (m address value) => (forall resume . LoadError address value resume -> m address value effects resume) -> m address value (Resumable (LoadError address value) ': effects) a -> m address value effects a
+runLoadErrorWith :: Effectful (m address value) => (forall resume . LoadError address resume -> m address value effects resume) -> m address value (Resumable (LoadError address) ': effects) a -> m address value effects a
 runLoadErrorWith = runResumableWith
 
 

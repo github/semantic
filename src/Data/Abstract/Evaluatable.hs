@@ -77,7 +77,7 @@ evaluate :: forall address term value effects
             , Member (Resumable (AddressError address value)) effects
             , Member (Resumable (EnvironmentError address)) effects
             , Member (Resumable EvalError) effects
-            , Member (Resumable (LoadError address value)) effects
+            , Member (Resumable (LoadError address)) effects
             , Member (Resumable ResolutionError) effects
             , Member (Resumable (Unspecialized value)) effects
             , Member (State (Heap address (Cell address) value)) effects
@@ -120,7 +120,7 @@ evaluatePackageWith :: forall proxy lang address term value inner inner' inner''
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (EnvironmentError address)) outer
                        , Member (Resumable EvalError) outer
-                       , Member (Resumable (LoadError address value)) outer
+                       , Member (Resumable (LoadError address)) outer
                        , Member (Resumable ResolutionError) outer
                        , Member (Resumable (Unspecialized value)) outer
                        , Member (State (Heap address (Cell address) value)) outer

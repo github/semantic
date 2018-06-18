@@ -88,7 +88,7 @@ testEvaluating :: TermEvaluator term Precise
                      , Resumable EvalError, Resumable (EnvironmentError Precise)
                      , Resumable ResolutionError
                      , Resumable (Unspecialized Val)
-                     , Resumable (LoadError Precise Val)
+                     , Resumable (LoadError Precise)
                      , Fresh
                      , State (Heap Precise Latest Val)
                      , State (ModuleTable (Maybe (Precise, Environment Precise)))
@@ -104,7 +104,7 @@ testEvaluating :: TermEvaluator term Precise
                            , EnvironmentError Precise
                            , ResolutionError
                            , Unspecialized Val
-                           , LoadError Precise Val
+                           , LoadError Precise
                            ]))
                       [(Value Precise TestEff, Environment Precise)],
                     EvaluatingState Precise Val),
@@ -140,7 +140,7 @@ newtype TestEff a = TestEff
                        , Resumable (EnvironmentError Precise)
                        , Resumable ResolutionError
                        , Resumable (Unspecialized Val)
-                       , Resumable (LoadError Precise Val)
+                       , Resumable (LoadError Precise)
                        , Fresh
                        , State (Heap Precise Latest Val)
                        , State (ModuleTable (Maybe (Precise, Environment Precise)))

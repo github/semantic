@@ -56,7 +56,7 @@ newtype UtilEff address a = UtilEff
                        , Resumable (EnvironmentError address)
                        , Resumable ResolutionError
                        , Resumable (Unspecialized (Value address (UtilEff address)))
-                       , Resumable (LoadError address (Value address (UtilEff address)))
+                       , Resumable (LoadError address)
                        , Trace
                        , Fresh
                        , State (Heap address Latest (Value address (UtilEff address)))
