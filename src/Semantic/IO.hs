@@ -6,7 +6,6 @@ module Semantic.IO
 , IO.IOMode(..)
 , NoLanguageForBlob(..)
 , Source(..)
-, catchException
 , findFiles
 , findFilesInDir
 , getHandle
@@ -34,7 +33,6 @@ module Semantic.IO
 , write
 ) where
 
-import qualified Control.Exception as Exc
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
@@ -231,23 +229,3 @@ runFiles = interpret $ \ files -> case files of
   FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
-
-
--- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
---
---   Note that while the type allows 'IO' to occur anywhere within the effect list, it must actually occur at the end to be able to run the computation.
-catchException :: ( Exc.Exception e
-                  , Member IO r
-                  )
-               => Eff r a
-               -> (e -> Eff r a)
-               -> Eff r a
-catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
-
--- | Lift an 'IO' action into 'Eff', catching and rethrowing any exceptions it throws into an 'Exc' effect.
-rethrowing :: ( Member (Exc SomeException) r
-              , Member IO r
-              )
-           => IO a
-           -> Eff r a
-rethrowing m = catchException (liftIO m) (throwError . toException @SomeException)
