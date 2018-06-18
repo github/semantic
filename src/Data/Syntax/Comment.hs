@@ -1,14 +1,15 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
 module Data.Syntax.Comment where
 
-import Prologue
 import Data.Abstract.Evaluatable
 import Data.JSON.Fields
 import Diffing.Algorithm
+import Prologue
+import Proto3.Suite.Class
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
@@ -24,7 +25,7 @@ instance Evaluatable Comment where
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
 newtype HashBang a = HashBang Text
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 HashBang where liftEq = genericLiftEq
 instance Ord1 HashBang where liftCompare = genericLiftCompare
