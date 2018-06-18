@@ -85,7 +85,7 @@ evalGoProject path         = justEvaluating =<< evaluateProject (Proxy :: Proxy 
 evalRubyProject path       = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby       path
 evalPHPProject path        = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser        Language.PHP        path
 evalPythonProject path     = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser     Language.Python     path
-evalJavaScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.JavaScript path
+evalJavaScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript path
 evalTypeScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript path
 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go path
