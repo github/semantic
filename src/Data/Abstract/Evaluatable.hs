@@ -161,16 +161,12 @@ evaluatePackageWith lang analyzeModule analyzeTerm package
           . raiseHandler runReturn
           . raiseHandler runLoopControl
 
-        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (address, Environment address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
           addr <- box unit -- TODO don't *always* allocate - use maybeM instead
           (ptr, env) <- fromMaybe (addr, lowerBound) <$> require m
           bindAll env
           maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
-        withPrelude :: Package term
-                    -> (Environment address -> TermEvaluator term address value (Reader (ModuleTable (NonEmpty (Module term))) ': Reader Span ': Reader PackageInfo ': outer) a)
-                    -> TermEvaluator term address value (Reader (ModuleTable (NonEmpty (Module term))) ': Reader Span ': Reader PackageInfo ': outer) a
         withPrelude _ f = do
           (_, preludeEnv) <- raiseHandler (runModules (runTermEvaluator . evalModule lowerBound)) . runInModule lowerBound moduleInfoFromCallStack . TermEvaluator $ do
             defineBuiltins
