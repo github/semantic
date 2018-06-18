@@ -12,7 +12,6 @@ module Rendering.Renderer
 , renderToSymbols
 , ImportSummary(..)
 , renderToImports
-, renderToTags
 , renderTreeGraph
 , Summaries(..)
 , TOCSummary(..)
@@ -21,7 +20,6 @@ module Rendering.Renderer
 , parseSymbolFields
 ) where
 
-import Data.Aeson (Value)
 import Data.ByteString.Builder
 import Data.Graph
 import Rendering.Graph as R
@@ -52,8 +50,6 @@ data TermRenderer output where
   JSONTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
-  -- | Render to a list of tags (deprecated).
-  TagsTermRenderer :: TermRenderer [Value]
   -- | Render to a list of symbols.
   SymbolsTermRenderer :: SymbolFields -> TermRenderer (JSON "files" SomeJSON)
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
