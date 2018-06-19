@@ -5,8 +5,8 @@
 
 # Blacklist some functions by default.
 - functions:
-  - {name: unsafePerformIO, within: []} # unsafePerformIO has to be explicitly whitelisted
-  - {name: unsafeCoerce, within: []} # unsafeCoerce has to be explicitly whitelisted
+  - {name: unsafePerformIO, within: []}
+  - {name: unsafeCoerce, within: []}
   - {name: head, within: []}
   - {name: tail, within: []}
   - {name: init, within: []}
