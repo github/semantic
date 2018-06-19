@@ -94,12 +94,15 @@ evaluate (modules : rest)
     traverse (evalModule preludeEnv) modules
   where evalModule preludeEnv m
           = fmap (<$ m)
-          . runReader (moduleInfo m)
+          . runInModule preludeEnv m
+          $ foldSubterms eval (moduleBody m) >>= address
+
+        runInModule preludeEnv m
+          = runReader (moduleInfo m)
           . runAllocator
           . runEnv preludeEnv
           . runReturn
           . runLoopControl
-          $ foldSubterms eval (moduleBody m) >>= address
 
         withPrelude f = do
           f lowerBound
