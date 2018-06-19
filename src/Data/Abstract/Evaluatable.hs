@@ -32,6 +32,7 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
 import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
+import Data.Coerce
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
@@ -64,7 +65,7 @@ class Show1 constr => Evaluatable constr where
   eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
-evaluate :: ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address ': effects)
+evaluate :: ( AbstractValue address value inner
             , Addressable address (Reader ModuleInfo ': Modules address ': effects)
             , Declarations term
             , Evaluatable (Base term)
@@ -85,20 +86,26 @@ evaluate :: ( AbstractValue address value (LoopControl address ': Return address
             , Recursive term
             , Reducer value (Cell address value)
             , ValueRoots address value
+            , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address ': effects)
             )
          => proxy lang
+         -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
+         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
          -> [NonEmpty (Module term)]
-         -> Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
-evaluate _ [] = ask
-evaluate lang (modules : rest)
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
+evaluate _ _ _ [] = ask
+evaluate lang analyzeModule analyzeTerm (modules : rest)
   = runRest lang rest
-  . runModules'
+  . raiseHandler runModules'
   . withPrelude $ \ preludeEnv ->
     traverse (evalModule preludeEnv) modules
   where evalModule preludeEnv m
           = fmap (<$ m)
-          . runInModule preludeEnv (moduleInfo m)
-          $ foldSubterms eval (moduleBody m) >>= address
+          . coerce (runInModule preludeEnv (moduleInfo m))
+          . analyzeModule (subtermRef . moduleBody)
+          $ evalTerm <$> m
+
+        evalTerm term = Subterm term (TermEvaluator (address =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
 
         runInModule preludeEnv info
           = runReader info
@@ -108,7 +115,7 @@ evaluate lang (modules : rest)
           . runLoopControl
 
         withPrelude f = do
-          (_, preludeEnv) <- runInModule lowerBound moduleInfoFromCallStack $ do
+          (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
             defineBuiltins
             definePrelude lang
             box unit
@@ -116,7 +123,7 @@ evaluate lang (modules : rest)
 
         runRest lang rest action = do
           results <- action
-          local (<> ModuleTable.fromModules (toList results)) (evaluate lang rest)
+          local (<> ModuleTable.fromModules (toList results)) (evaluate lang analyzeModule analyzeTerm rest)
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( AbstractValue address value inner
