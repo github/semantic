@@ -95,7 +95,11 @@ evaluate :: ( AbstractValue address value inner
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
 evaluate lang analyzeModule analyzeTerm = foldr run ask
   where run modules rest = do
-          evaluated <- raiseHandler runModules' . withPrelude $ \ preludeEnv ->
+          evaluated <- raiseHandler runModules' $ do
+            (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
+              defineBuiltins
+              definePrelude lang
+              box unit
             traverse (evalModule preludeEnv) modules
           local (<> ModuleTable.fromModules (toList evaluated)) rest
 
@@ -113,13 +117,6 @@ evaluate lang analyzeModule analyzeTerm = foldr run ask
           . runEnv preludeEnv
           . runReturn
           . runLoopControl
-
-        withPrelude f = do
-          (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
-            defineBuiltins
-            definePrelude lang
-            box unit
-          f preludeEnv
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( AbstractValue address value inner
