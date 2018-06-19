@@ -2,6 +2,7 @@
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
+, evaluate
 , evaluatePackageWith
 , traceResolve
 -- * Preludes
