@@ -42,4 +42,4 @@
 - warning: {lhs: termFOut . unTerm, rhs: termOut, name: Use termOut}
 
 # Conveniences
-- warning: {lhs: maybe a pure, rhs: maybeM a}
+- warning: {lhs: maybe a pure, rhs: maybeM a, name: Use maybeM}
