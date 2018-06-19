@@ -171,7 +171,7 @@ instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable FunctionType
 
-data TypeSignature a = TypeSignature { typeSignatureName :: a, typeSignatureContext :: [a], typeSignatureContent :: a }
+data TypeSignature a = TypeSignature { typeSignatureName :: [a], typeSignatureContext :: [a], typeSignatureContent :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 TypeSignature where liftEq = genericLiftEq
@@ -561,3 +561,196 @@ instance Ord1 PrefixNegation where liftCompare = genericLiftCompare
 instance Show1 PrefixNegation where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable PrefixNegation
+
+newtype CPPDirective a = CPPDirective Text
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 CPPDirective where liftEq = genericLiftEq
+instance Ord1 CPPDirective where liftCompare = genericLiftCompare
+instance Show1 CPPDirective where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable CPPDirective
+
+data QuasiQuotation a = QuasiQuotation { quasiQuotationHead :: a, quasiQuotationBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotation where liftEq = genericLiftEq
+instance Ord1 QuasiQuotation where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotation where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotation
+
+newtype QuasiQuotationExpressionBody a = QuasiQuotationExpressionBody Name
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationExpressionBody where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationExpressionBody where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationExpressionBody where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationExpressionBody
+
+data QuasiQuotationPattern a = QuasiQuotationPattern
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationPattern where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationPattern where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationPattern
+
+data QuasiQuotationType a = QuasiQuotationType
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationType where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationType where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationType
+
+data QuasiQuotationDeclaration a = QuasiQuotationDeclaration
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationDeclaration where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationDeclaration where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationDeclaration
+
+newtype QuasiQuotationQuoter a = QuasiQuotationQuoter Name
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationQuoter where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationQuoter where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationQuoter where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationQuoter
+
+data QuasiQuotationExpression a = QuasiQuotationExpression
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationExpression where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationExpression where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationExpression where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationExpression
+
+newtype Splice a = Splice a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Splice where liftEq = genericLiftEq
+instance Ord1 Splice where liftCompare = genericLiftCompare
+instance Show1 Splice where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Splice
+
+data TypeClass a = TypeClass { typeClassContext :: a, typeClassIdentifier :: a, typeClassParameters :: [a], typeClassBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeClass where liftEq = genericLiftEq
+instance Ord1 TypeClass where liftCompare = genericLiftCompare
+instance Show1 TypeClass where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeClass
+
+data Fixity' a = Fixity' { fixityPrecedence :: a, fixityIdentifier :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Fixity' where liftEq = genericLiftEq
+instance Ord1 Fixity' where liftCompare = genericLiftCompare
+instance Show1 Fixity' where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Fixity'
+
+-- The default signature of a type class. The default signature has the same shape as a TypeSignature Assignment.
+data DefaultSignature a = DefaultSignature { defaultSignatureName :: [a], defaultSignatureContext :: [a], defaultSignatureContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DefaultSignature where liftEq = genericLiftEq
+instance Ord1 DefaultSignature where liftCompare = genericLiftCompare
+instance Show1 DefaultSignature where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultSignature
+
+data TypeFamily a = TypeFamily { typeFamilyIdentifier :: a, typeFamilyParameters :: [a], typeFamilySignature :: a, typeFamilyBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeFamily where liftEq = genericLiftEq
+instance Ord1 TypeFamily where liftCompare = genericLiftCompare
+instance Show1 TypeFamily where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeFamily
+
+newtype FunctionalDependency a = FunctionalDependency { functionalDependencyContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FunctionalDependency where liftEq = genericLiftEq
+instance Ord1 FunctionalDependency where liftCompare = genericLiftCompare
+instance Show1 FunctionalDependency where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FunctionalDependency
+
+data TypeClassInstance a = TypeClassInstance { typeClassInstanceContext :: [a], typeClassInstanceIdentifier :: a, typeClassInstanceInstance :: a, typeClassInstanceBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeClassInstance where liftEq = genericLiftEq
+instance Ord1 TypeClassInstance where liftCompare = genericLiftCompare
+instance Show1 TypeClassInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeClassInstance
+
+newtype Instance a = Instance a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Instance where liftEq = genericLiftEq
+instance Ord1 Instance where liftCompare = genericLiftCompare
+instance Show1 Instance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Instance
+
+-- e.g. The `Bar{..}` in `foo Bar{..} = baz`.
+newtype LabeledPattern a = LabeledPattern a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 LabeledPattern where liftEq = genericLiftEq
+instance Ord1 LabeledPattern where liftCompare = genericLiftCompare
+instance Show1 LabeledPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LabeledPattern
+
+-- e.g. The `{..}` in `foo Bar{..} = baz`
+data RecordWildCards a = RecordWildCards
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 RecordWildCards where liftEq = genericLiftEq
+instance Ord1 RecordWildCards where liftCompare = genericLiftCompare
+instance Show1 RecordWildCards where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable RecordWildCards
+
+-- e.g. `type instance F [Int] = Int` where `F` is an open type family.
+data TypeInstance a = TypeInstance { typeInstanceType :: a, typeInstanceBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeInstance where liftEq = genericLiftEq
+instance Ord1 TypeInstance where liftCompare = genericLiftCompare
+instance Show1 TypeInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeInstance
+
+newtype KindParenthesizedConstructor a = KindParenthesizedConstructor { kindParenthesizedConstructorContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindParenthesizedConstructor where liftEq = genericLiftEq
+instance Ord1 KindParenthesizedConstructor where liftCompare = genericLiftCompare
+instance Show1 KindParenthesizedConstructor where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindParenthesizedConstructor
+
+newtype KindTupleType a = KindTupleType { kindTupleType :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindTupleType where liftEq = genericLiftEq
+instance Ord1 KindTupleType where liftCompare = genericLiftCompare
+instance Show1 KindTupleType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindTupleType
