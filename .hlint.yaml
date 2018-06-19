@@ -20,3 +20,6 @@
 # TODO: investigate whether cost-center analysis is better with lambda-case than it was
 - ignore: {name: Use lambda-case}
 - ignore: {name: Use fmap}
+
+# Our customized warnings
+- warning: {lhs: return, rhs: pure, name: Avoid return}
