@@ -93,14 +93,14 @@ evaluate :: ( AbstractValue address value inner
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
          -> [NonEmpty (Module term)]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
-evaluate lang analyzeModule analyzeTerm = foldr run ask
-  where run modules rest = do
-          evaluated <- raiseHandler runModules' $ do
-            (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
-              defineBuiltins
-              definePrelude lang
-              box unit
-            traverse (evalModule preludeEnv) modules
+evaluate lang analyzeModule analyzeTerm modules = do
+  (_, preludeEnv) <- TermEvaluator . runModules' . runInModule lowerBound moduleInfoFromCallStack $ do
+    defineBuiltins
+    definePrelude lang
+    box unit
+  foldr (run preludeEnv) ask modules
+  where run preludeEnv modules rest = do
+          evaluated <- raiseHandler runModules' $ traverse (evalModule preludeEnv) modules
           local (<> ModuleTable.fromModules (toList evaluated)) rest
 
         evalModule preludeEnv m
