@@ -312,9 +312,8 @@ functionConstructor = makeTerm <$> token FunctionConstructor  <*> pure Syntax.Fu
 functionDeclaration :: Assignment
 functionDeclaration = makeTerm
                    <$> symbol FunctionDeclaration
-                   <*> children (Declaration.Function
-                               <$> pure []
-                               <*> variableIdentifier
+                   <*> children (Declaration.Function []
+                               <$> variableIdentifier
                                <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
 
