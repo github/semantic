@@ -43,3 +43,7 @@
 
 # Conveniences
 - warning: {lhs: maybe a pure, rhs: maybeM a, name: Use maybeM}
+
+# Applicative style
+- warning: {lhs: f <$> pure a <*> b, rhs: f a <$> b, name: Avoid redundant pure}
+- warning: {lhs: f <$> pure a <* b, rhs: f a <$ b, name: Avoid redundant pure}
