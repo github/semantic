@@ -42,7 +42,7 @@ labelWithInEdgeCounts
     ((,) . flip Monoidal.singleton 0 <*> Class.vertex)
     (<>)
     (\ (outM, outG) (inM, inG) ->
-      ( outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outG))) (allVertices inG)
+      ( outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outG))) (Monoidal.keys inM)
       , outG `Class.connect` inG
       ))
   where mapGraph edgeCountsByVertex g = pairWithCountIn edgeCountsByVertex <$> g
