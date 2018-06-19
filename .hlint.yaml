@@ -10,3 +10,6 @@
 
 # Replace a $ b $ c with a . b $ c
 - group: {name: dollar, enabled: true}
+
+# Generalise map to fmap, ++ to <>
+- group: {name: generalise, enabled: true}
