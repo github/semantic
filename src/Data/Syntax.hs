@@ -24,6 +24,7 @@ import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import Data.Char (toLower)
+
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
@@ -114,7 +115,9 @@ instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => 
           let
             num = fromInteger (succ i)
           in
-            [(num, fromJust <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage subMessageNum))])
+            [(num, trustMe <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage subMessageNum))])
+      trustMe (Just a) = a
+      trustMe Nothing = error "liftDecodeMessage (Sum): embedded parser returned Nothing"
   liftDotProto _ =
     [Proto.DotProtoMessageOneOf (Proto.Single "syntax") (generate @Named1 @fs @fs (\ (_ :: proxy f) i ->
       let

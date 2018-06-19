@@ -420,8 +420,8 @@ methodDeclaration :: Assignment
 methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts)) <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
   where
     functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
-    makeMethod1 modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers ++ [returnType]) receiver name params compoundStatement
-    makeMethod2 modifiers receiver name params returnType compoundStatement = Declaration.Method (modifiers ++ [returnType]) receiver name params compoundStatement
+    makeMethod1 modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement
+    makeMethod2 modifiers receiver name params returnType compoundStatement = Declaration.Method (modifiers <> [returnType]) receiver name params compoundStatement
 
 classBaseClause :: Assignment
 classBaseClause = makeTerm <$> symbol ClassBaseClause <*> children (Syntax.ClassBaseClause <$> term qualifiedName)
@@ -505,7 +505,7 @@ selectionStatement :: Assignment
 selectionStatement = ifStatement <|> switchStatement
 
 ifStatement :: Assignment
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term expression <*> (makeTerm <$> location <*> manyTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as ++ [b]) <$> manyTerm elseIfClause <*> (term elseClause <|> emptyTerm))))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term expression <*> (makeTerm <$> location <*> manyTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as <> [b]) <$> manyTerm elseIfClause <*> (term elseClause <|> emptyTerm))))
 
 switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term expression <*> (makeTerm <$> location <*> manyTerm (caseStatement <|> defaultStatement)))
@@ -575,7 +575,7 @@ throwStatement = makeTerm <$> symbol ThrowStatement <*> children (Statement.Thro
 
 
 tryStatement :: Assignment
-tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term compoundStatement <*> (((\as b -> as ++ [b]) <$> someTerm catchClause <*> term finallyClause) <|>  someTerm catchClause <|> someTerm finallyClause))
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term compoundStatement <*> (((\as b -> as <> [b]) <$> someTerm catchClause <*> term finallyClause) <|>  someTerm catchClause <|> someTerm finallyClause))
 
 catchClause :: Assignment
 catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (makeTerm <$> location <*> ((\a b -> [a, b]) <$> term qualifiedName <*> term variableName)) <*> term compoundStatement)
@@ -766,10 +766,10 @@ string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.Te
 -- Helpers
 
 append :: a -> [a] -> [a]
-append x xs = xs ++ [x]
+append x xs = xs <> [x]
 
 bookend :: a -> [a] -> a -> [a]
-bookend head list last = head : append last list
+bookend head_ list last_ = head_ : append last_ list
 
 term :: Assignment -> Assignment
 term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
