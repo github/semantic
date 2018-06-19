@@ -61,7 +61,7 @@ class Show1 constr => Evaluatable constr where
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
-  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 evaluate :: ( AbstractValue address value (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address ': effects)

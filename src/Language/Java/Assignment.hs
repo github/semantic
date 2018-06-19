@@ -252,7 +252,7 @@ superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *
 class' :: Assignment
 class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> (superInterfaces <|> pure []) <*> classBody)
   where
-    makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass ++ superInterfaces) -- not doing an assignment, just straight up function
+    makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers <> typeParams) identifier (maybeToList superClass <> superInterfaces) -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
     superClass = symbol Superclass *> children type'
 -- TODO: superclass
@@ -269,7 +269,7 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
-    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params
+    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver name params
 -- methodHeader needs to include typeParameters (it does)
 
 generic :: Assignment
@@ -299,7 +299,7 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
   where
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
-    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
+    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers <> typeParams) identifier
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
