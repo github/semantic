@@ -39,7 +39,7 @@ labelWithInEdgeCounts
   = uncurry mapGraph
   . Class.foldg
     (lowerBound, lowerBound)
-    ((,) lowerBound . Class.vertex)
+    ((,) . flip Monoidal.singleton 0 <*> Class.vertex)
     (<>)
     (\ (outM, outG) (inM, inG) ->
       ( outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outG))) (allVertices inG)
