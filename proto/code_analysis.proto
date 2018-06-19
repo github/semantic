@@ -1,5 +1,7 @@
 syntax = "proto3";
 import "types.proto";
+option java_package = "github.semantic.analysis";
+option go_package = "github.com/semantic/analysis;analysis";
 package github.semantic.v1alpha1;
 
 // Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and
@@ -8,7 +10,7 @@ service CodeAnalysis {
   // Parsing
   //
   // Parse source code blobs and return abstract syntax trees.
-  rpc Parse (ParseTreeRequest) returns (ParseTreeResponse);
+  rpc ParseTree(ParseTreeRequest) returns (ParseTreeResponse);
 
   // Diffing
   //
