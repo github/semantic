@@ -90,7 +90,8 @@ evaluate [] = ask
 evaluate (modules : rest)
   = runRest rest
   . runModules'
-  $ traverse (evalModule lowerBound) modules
+  . withPrelude $ \ preludeEnv ->
+    traverse (evalModule preludeEnv) modules
   where evalModule preludeEnv m
           = fmap (<$ m)
           . runReader (moduleInfo m)
@@ -99,6 +100,9 @@ evaluate (modules : rest)
           . runReturn
           . runLoopControl
           $ foldSubterms eval (moduleBody m) >>= address
+
+        withPrelude f = do
+          f lowerBound
 
         runRest rest action = do
           results <- action
