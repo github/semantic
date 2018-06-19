@@ -769,7 +769,7 @@ append :: a -> [a] -> [a]
 append x xs = xs ++ [x]
 
 bookend :: a -> [a] -> a -> [a]
-bookend head list last = head : append last list
+bookend head_ list last_ = head_ : append last_ list
 
 term :: Assignment -> Assignment
 term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)

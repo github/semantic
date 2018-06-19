@@ -17,11 +17,11 @@ infixr 0 :.
 
 -- | Get the first element of a non-empty record.
 rhead :: Record (head ': tail) -> head
-rhead (head :. _) = head
+rhead (head_ :. _) = head_
 
 -- | Get the first element of a non-empty record.
 rtail :: Record (head ': tail) -> Record tail
-rtail (_ :. tail) = tail
+rtail (_ :. tail_) = tail_
 
 
 -- Classes
