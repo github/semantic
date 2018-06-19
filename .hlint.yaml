@@ -22,5 +22,9 @@
 - ignore: {name: Use fmap}
 
 # Our customized warnings
+
+# AMP fallout
 - warning: {lhs: return, rhs: pure, name: Avoid return}
+
+# Terms
 - warning: {lhs: termFAnnotation . unTerm, rhs: termAnnotation}
