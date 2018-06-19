@@ -12,7 +12,7 @@ module Data.Graph
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Class as Class
 import Data.Aeson
-import Data.List (groupBy, nub, sortBy)
+import Data.List (groupBy, sortBy)
 import qualified Data.List.NonEmpty as NonEmpty (fromList)
 import qualified Data.Map.Monoidal as Monoidal
 import qualified Data.Monoid as Monoid
@@ -31,28 +31,18 @@ simplify (Graph graph) = Graph (G.simplify graph)
 topologicalSort :: Ord v => Graph v -> [NonEmpty v]
 topologicalSort
   = groupByInEdgeCount
-  . allVertices
-  . labelWithInEdgeCounts
+  . Monoidal.pairs
+  . edgeCountsByVertex
 
-labelWithInEdgeCounts :: Ord v => Graph v -> Graph (Monoid.Sum Int, v)
-labelWithInEdgeCounts
-  = uncurry mapGraph
-  . Class.foldg
-    (lowerBound, lowerBound)
-    ((,) . flip Monoidal.singleton 0 <*> Class.vertex)
-    (<>)
-    (\ (outM, outG) (inM, inG) ->
-      ( outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outG))) (Monoidal.keys inM)
-      , outG `Class.connect` inG
-      ))
-  where mapGraph edgeCountsByVertex g = pairWithCountIn edgeCountsByVertex <$> g
-        pairWithCountIn edgeCountsByVertex vertex = (fromMaybe 0 (Monoidal.lookup vertex edgeCountsByVertex), vertex)
+edgeCountsByVertex :: Ord v => Graph v -> Monoidal.Map v (Monoid.Sum Int)
+edgeCountsByVertex = Class.foldg
+  lowerBound
+  (flip Monoidal.singleton 0)
+  (<>)
+  (\ outM inM -> outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outM))) (Monoidal.keys inM))
 
-allVertices :: Eq v => Graph v -> [v]
-allVertices = nub . toList
-
-groupByInEdgeCount :: Ord sum => [(sum, v)] -> [NonEmpty v]
-groupByInEdgeCount = map (NonEmpty.fromList . map snd) . groupBy ((==) `on` fst) . sortBy (comparing fst)
+groupByInEdgeCount :: Ord sum => [(v, sum)] -> [NonEmpty v]
+groupByInEdgeCount = map (NonEmpty.fromList . map fst) . groupBy ((==) `on` snd) . sortBy (comparing snd)
 
 
 instance Lower (Graph vertex) where
