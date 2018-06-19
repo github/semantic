@@ -369,14 +369,13 @@ functionBody :: Assignment
 functionBody = makeTerm <$> symbol FunctionBody <*> children (manyTerm expression)
 
 functionConstructor :: Assignment
-functionConstructor = makeTerm <$> token FunctionConstructor  <*> pure Syntax.FunctionConstructor
+functionConstructor = makeTerm <$> token FunctionConstructor <*> pure Syntax.FunctionConstructor
 
 functionDeclaration :: Assignment
 functionDeclaration = makeTerm
                    <$> symbol FunctionDeclaration
-                   <*> children (Declaration.Function
-                               <$> pure []
-                               <*> expression
+                   <*> children (Declaration.Function []
+                               <$> expression
                                <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
 
