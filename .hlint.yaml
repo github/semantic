@@ -13,3 +13,10 @@
 
 # Generalise map to fmap, ++ to <>
 - group: {name: generalise, enabled: true}
+
+# Ignore some builtin hints
+- ignore: {name: Use mappend}
+- ignore: {name: Redundant do}
+# TODO: investigate whether cost-center analysis is better with lambda-case than it was
+- ignore: {name: Use lambda-case}
+- ignore: {name: Use fmap}
