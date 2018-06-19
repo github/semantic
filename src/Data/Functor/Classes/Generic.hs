@@ -163,7 +163,7 @@ instance (GShow1Body f, GShow1Body g) => GShow1Body (f :*: g) where
       else foldr (.) id (intersperse (showString " ") (gliftShowsPrecAll opts conIsRecord sp sl 11 (a :*: b)))
     Infix _ prec -> showParen (d > prec) $ gliftShowsPrec opts sp sl (succ prec) a . showChar ' ' . showString conName . showChar ' ' . gliftShowsPrec opts sp sl (succ prec) b
 
-  gliftShowsPrecAll opts conIsRecord sp sl d (a :*: b) = gliftShowsPrecAll opts conIsRecord sp sl d a ++ gliftShowsPrecAll opts conIsRecord sp sl d b
+  gliftShowsPrecAll opts conIsRecord sp sl d (a :*: b) = gliftShowsPrecAll opts conIsRecord sp sl d a <> gliftShowsPrecAll opts conIsRecord sp sl d b
 
 instance GShow1 f => GShow1 (M1 S c f) where
   gliftShowsPrec opts sp sl d (M1 a) = gliftShowsPrec opts sp sl d a
