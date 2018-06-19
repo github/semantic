@@ -33,4 +33,4 @@
 - warning: {lhs: return, rhs: pure, name: Avoid return}
 
 # Terms
-- warning: {lhs: termFAnnotation . unTerm, rhs: termAnnotation}
+- warning: {lhs: termFAnnotation . unTerm, rhs: termAnnotation, name: "Use termAnnotation"}
