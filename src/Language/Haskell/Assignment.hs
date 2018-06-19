@@ -492,15 +492,16 @@ listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> manyTerm type')
 
 module' :: Assignment
-module' = makeTerm
+module' =  makeTerm
        <$> symbol Module
        <*> children (Syntax.Module
-                   <$> (term moduleIdentifier <|> emptyTerm)
+                   <$> manyTerm (comment <|> pragma)
+                   <*> (moduleIdentifier <|> qualifiedModuleIdentifier <|> emptyTerm)
                    <*> moduleExports
                    <*> (where' <|> expressions <|> emptyTerm))
   where
-    moduleExports = symbol ModuleExports *> children (manyTerm export)
-                 <|> pure []
+    moduleExports = (symbol ModuleExports *> children (manyTerm export))
+                 <|> (pure [])
 
 moduleExport :: Assignment
 moduleExport = makeTerm <$> symbol ModuleExport <*> children (Syntax.ModuleExport <$> expressions)
