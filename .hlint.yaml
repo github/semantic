@@ -23,7 +23,7 @@
 - ignore: {name: Use mappend}
 - ignore: {name: Redundant do}
 - ignore: {name: Use lambda-case} # TODO: investigate whether cost-center analysis is better with lambda-case than it was
-- ignore: {name: Use fmap}
+- ignore: {name: Use fmap} # Ignored because map has better type inference.
 
 # Our customized warnings
 
