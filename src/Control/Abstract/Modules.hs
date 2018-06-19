@@ -7,7 +7,7 @@ module Control.Abstract.Modules
 , load
 , Modules(..)
 , runModules
-, runModules'
+, handleModules
 , LoadError(..)
 , moduleNotFound
 , resumeLoadError
@@ -91,10 +91,10 @@ runModules evaluateModule = go
             pure (find isMember names)
           List dir -> modulePathsInDir dir <$> askModuleTable @term)
 
-runModules' :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
-            => Evaluator address value (Modules address ': effects) a
-            -> Evaluator address value effects a
-runModules' = interpret $ \case
+handleModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+              => Modules address a
+              -> Evaluator address value effects a
+handleModules = \case
   Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable'
   Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable'
   Resolve names -> do
