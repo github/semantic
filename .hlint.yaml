@@ -40,3 +40,6 @@
 # Terms
 - warning: {lhs: termFAnnotation . unTerm, rhs: termAnnotation, name: "Use termAnnotation"}
 - warning: {lhs: termFOut . unTerm, rhs: termOut, name: "Use termOut"}
+
+# Conveniences
+- warning: {lhs: maybe a pure, rhs: maybeM a}
