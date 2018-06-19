@@ -22,8 +22,7 @@
 # Ignore some builtin hints
 - ignore: {name: Use mappend}
 - ignore: {name: Redundant do}
-# TODO: investigate whether cost-center analysis is better with lambda-case than it was
-- ignore: {name: Use lambda-case}
+- ignore: {name: Use lambda-case} # TODO: investigate whether cost-center analysis is better with lambda-case than it was
 - ignore: {name: Use fmap}
 
 # Our customized warnings
