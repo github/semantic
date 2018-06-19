@@ -139,7 +139,7 @@ evaluatePackageWith lang analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
   . runReader (packageModules (packageBody package))
-  . withPrelude package
+  . withPrelude
   $ \ preludeEnv
   ->  raiseHandler (runModules (runTermEvaluator . evalModule preludeEnv))
     . traverse (uncurry (evaluateEntryPoint preludeEnv))
@@ -165,7 +165,7 @@ evaluatePackageWith lang analyzeModule analyzeTerm package
           bindAll env
           maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
-        withPrelude _ f = do
+        withPrelude f = do
           (_, preludeEnv) <- raiseHandler (runModules (runTermEvaluator . evalModule lowerBound)) . runInModule lowerBound moduleInfoFromCallStack . TermEvaluator $ do
             defineBuiltins
             definePrelude lang
