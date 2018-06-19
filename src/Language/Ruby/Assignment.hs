@@ -271,12 +271,12 @@ parameter = postContextualize comment (term uncontextualizedParameter)
     optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> methodSelector <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> expression <*> methodSelector <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method [] <$> expression <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
@@ -289,18 +289,18 @@ block :: Assignment
 block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
      <|> makeTerm <$> symbol Block <*> scopedBlockChildren
   where scopedBlockChildren = withExtendedScope blockChildren
-        blockChildren = children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
+        blockChildren = children (Declaration.Function [] <$> emptyTerm <*> params <*> expressions)
         params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
-alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
+alias = makeTerm <$> symbol Alias <*> children (Expression.Call [] <$> name' <*> some expression <*> emptyTerm)
   where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
 
 undef :: Assignment
-undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
+undef = makeTerm <$> symbol Undef <*> children (Expression.Call [] <$> name' <*> some expression <*> emptyTerm)
   where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
 
 if' :: Assignment
@@ -445,7 +445,7 @@ unary = symbol Unary >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
-  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> source)) <*> some expression <*> emptyTerm)
+  <|> makeTerm location <$> children (Expression.Call [] <$> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> source)) <*> some expression <*> emptyTerm)
   <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
 
