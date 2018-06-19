@@ -90,12 +90,12 @@ evaluate [] = ask
 evaluate (modules : rest)
   = runRest rest
   . runModules'
-  $ traverse evalModule modules
-  where evalModule m
+  $ traverse (evalModule lowerBound) modules
+  where evalModule preludeEnv m
           = fmap (<$ m)
           . runReader (moduleInfo m)
           . runAllocator
-          . runEnv lowerBound
+          . runEnv preludeEnv
           . runReturn
           . runLoopControl
           $ foldSubterms eval (moduleBody m) >>= address
