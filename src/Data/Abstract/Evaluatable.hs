@@ -66,13 +66,14 @@ class Show1 constr => Evaluatable constr where
 
 
 evaluate :: ( AbstractValue address value inner
-            , Addressable address (Reader ModuleInfo ': Modules address ': effects)
+            , Addressable address (Reader ModuleInfo ': effects)
             , Declarations term
             , Evaluatable (Base term)
             , Foldable (Cell address)
             , FreeVariables term
             , HasPrelude lang
             , Member Fresh effects
+            , Member (Modules address) effects
             , Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
@@ -86,14 +87,14 @@ evaluate :: ( AbstractValue address value inner
             , Recursive term
             , Reducer value (Cell address value)
             , ValueRoots address value
-            , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': Modules address ': effects)
+            , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
          -> [NonEmpty (Module term)]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
-evaluate lang analyzeModule analyzeTerm modules = raiseHandler runModules' $ do
+evaluate lang analyzeModule analyzeTerm modules = do
   (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
     defineBuiltins
     definePrelude lang
