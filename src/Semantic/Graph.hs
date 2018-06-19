@@ -38,14 +38,15 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
+type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Functor, Ord1, Show1 ]
+
 runGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
          -> Eff effs (Graph Vertex)
 runGraph graphType includePackages project
-  | SomeAnalysisParser parser lang <- someAnalysisParser
-    (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
+  | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
     let analyzeTerm = withTermSpans . case graphType of
           ImportGraph -> id
