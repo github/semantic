@@ -110,7 +110,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
           . analyzeModule (subtermRef . moduleBody)
           $ evalTerm <$> m
 
-        evalTerm term = Subterm term (TermEvaluator (address =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
+        evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
 
         runInModule preludeEnv info
           = runReader info
