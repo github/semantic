@@ -7,3 +7,6 @@
 - functions:
   - {name: unsafePerformIO, within: [Data.Scientific.Exts]} # unsafePerformIO has to be explicitly whitelisted
   - {name: unsafeCoerce, within: []} # unsafeCoerce has to be explicitly whitelisted
+
+# Replace a $ b $ c with a . b $ c
+- group: {name: dollar, enabled: true}
