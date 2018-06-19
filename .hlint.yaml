@@ -24,6 +24,12 @@
 # Our customized warnings
 
 # AMP fallout
+- warning: {lhs: mapM, rhs: traverse, name: Generalize mapM}
+- warning: {lhs: mapM_, rhs: traverse_, name: Generalize mapM_}
+- warning: {lhs: forM, rhs: for, name: Generalize forM}
+- warning: {lhs: forM_, rhs: for_, name: Generalize forM_}
+- warning: {lhs: sequence, rhs: sequenceA, name: Generalize sequence}
+- warning: {lhs: sequence_, rhs: sequenceA_, name: Generalize sequence_}
 - warning: {lhs: return, rhs: pure, name: Avoid return}
 
 # Terms
