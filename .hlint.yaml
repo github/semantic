@@ -11,6 +11,7 @@
   - {name: tail, within: []}
   - {name: init, within: []}
   - {name: last, within: []}
+  - {name: fromJust, within: []}
 
 # Replace a $ b $ c with a . b $ c
 - group: {name: dollar, enabled: true}
