@@ -33,3 +33,6 @@ error "avoid last" = last
   where note = "last is partial; consider pattern-matching"
 
 error "use maybeM" = maybe a pure ==> maybeM a
+
+error "avoid redundant pure" = f <$> pure a <*> b ==> f a <$> b
+error "avoid redundant pure" = f <$> pure a <* b ==> f a <$ b
