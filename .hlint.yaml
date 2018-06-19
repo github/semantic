@@ -25,6 +25,9 @@
 - ignore: {name: Use lambda-case} # TODO: investigate whether cost-center analysis is better with lambda-case than it was
 - ignore: {name: Use fmap} # Ignored because map has better type inference.
 
+# Change the severity of hints we don’t want to fail CI for
+- suggest: {name: Eta reduce}
+
 # Our customized warnings
 
 # AMP fallout
