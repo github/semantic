@@ -96,7 +96,7 @@ evaluate :: ( AbstractValue address value inner
 evaluate lang analyzeModule analyzeTerm = go
   where go [] = ask
         go (modules : rest)
-          = runRest lang rest
+          = runRest rest
           . raiseHandler runModules'
           . withPrelude $ \ preludeEnv ->
             traverse (evalModule preludeEnv) modules
@@ -123,7 +123,7 @@ evaluate lang analyzeModule analyzeTerm = go
             box unit
           f preludeEnv
 
-        runRest lang rest action = do
+        runRest rest action = do
           results <- action
           local (<> ModuleTable.fromModules (toList results)) (go rest)
 
