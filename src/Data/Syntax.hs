@@ -23,6 +23,7 @@ import GHC.Types (Constraint)
 import GHC.TypeLits
 import qualified Proto3.Suite.DotProto as Proto
 import Data.Char (toLower)
+
 -- Combinators
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
