@@ -52,9 +52,8 @@ runGraph graphType includePackages project
           ImportGraph -> id
           CallGraph   -> graphingTerms
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
-    analyze runGraphAnalysis (evaluatePackageWith lang analyzeModule analyzeTerm package) >>= extractGraph
-    where extractGraph result = case result of
-            (((_, graph), _), _) -> pure (simplify graph)
+    extractGraph <$> analyze runGraphAnalysis (evaluatePackageWith lang analyzeModule analyzeTerm package)
+    where extractGraph (((_, graph), _), _) = simplify graph
           runGraphAnalysis
             = run
             . evaluating
