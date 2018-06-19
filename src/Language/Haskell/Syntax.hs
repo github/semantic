@@ -7,9 +7,10 @@ import           Diffing.Algorithm
 import           Prelude
 import           Prologue
 
-data Module a = Module { moduleIdentifier :: !a
-                       , moduleExports    :: ![a]
-                       , moduleStatements :: !a
+data Module a = Module { moduleContext    :: [a]
+                       , moduleIdentifier :: a
+                       , moduleExports    :: [a]
+                       , moduleStatements :: a
                        }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
