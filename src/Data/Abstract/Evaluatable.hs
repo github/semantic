@@ -70,6 +70,8 @@ evaluate :: ( AbstractValue address value (LoopControl address ': Return address
             , Evaluatable (Base term)
             , Foldable (Cell address)
             , FreeVariables term
+            , HasPrelude lang
+            , Member Fresh effects
             , Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
@@ -84,32 +86,37 @@ evaluate :: ( AbstractValue address value (LoopControl address ': Return address
             , Reducer value (Cell address value)
             , ValueRoots address value
             )
-         => [NonEmpty (Module term)]
+         => proxy lang
+         -> [NonEmpty (Module term)]
          -> Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
-evaluate [] = ask
-evaluate (modules : rest)
-  = runRest rest
+evaluate _ [] = ask
+evaluate lang (modules : rest)
+  = runRest lang rest
   . runModules'
   . withPrelude $ \ preludeEnv ->
     traverse (evalModule preludeEnv) modules
   where evalModule preludeEnv m
           = fmap (<$ m)
-          . runInModule preludeEnv m
+          . runInModule preludeEnv (moduleInfo m)
           $ foldSubterms eval (moduleBody m) >>= address
 
-        runInModule preludeEnv m
-          = runReader (moduleInfo m)
+        runInModule preludeEnv info
+          = runReader info
           . runAllocator
           . runEnv preludeEnv
           . runReturn
           . runLoopControl
 
         withPrelude f = do
-          f lowerBound
+          (_, preludeEnv) <- runInModule lowerBound moduleInfoFromCallStack $ do
+            defineBuiltins
+            definePrelude lang
+            box unit
+          f preludeEnv
 
-        runRest rest action = do
+        runRest lang rest action = do
           results <- action
-          local (<> ModuleTable.fromModules (toList results)) (evaluate rest)
+          local (<> ModuleTable.fromModules (toList results)) (evaluate lang rest)
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( AbstractValue address value inner
