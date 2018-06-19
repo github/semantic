@@ -121,6 +121,7 @@ type Syntax = '[
   , Syntax.TypeSynonym
   , Syntax.UnitConstructor
   , Syntax.VariableSymbol
+  , Syntax.Wildcard
   , Type.TypeParameters
   , []
   ]
@@ -341,6 +342,7 @@ expressionChoices = [
                     , variableOperator
                     , variableSymbol
                     , where'
+                    , wildcard
                     ]
 
 fields :: Assignment
@@ -749,6 +751,9 @@ variableIdentifiers = makeTerm <$> location <*> many variableIdentifier
 
 where' :: Assignment
 where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (manyTerm expression)
+
+wildcard :: Assignment
+wildcard = makeTerm <$> token Wildcard <*> pure Syntax.Wildcard
 
 -- | Helpers
 

@@ -755,3 +755,12 @@ instance Ord1 KindTupleType where liftCompare = genericLiftCompare
 instance Show1 KindTupleType where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable KindTupleType
+
+data Wildcard a = Wildcard
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Wildcard where liftEq = genericLiftEq
+instance Ord1 Wildcard where liftCompare = genericLiftCompare
+instance Show1 Wildcard where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Wildcard
