@@ -200,7 +200,7 @@ contextPattern :: Assignment
 contextPattern = symbol ContextPattern *> children expressions
 
 cppDirective :: Assignment
-cppDirective = makeTerm <$> symbol CppDirective <*> (Syntax.CPPDirective . Name.name <$> source)
+cppDirective = makeTerm <$> symbol CppDirective <*> (Syntax.CPPDirective <$> source)
 
 defaultDeclaration :: Assignment
 defaultDeclaration = makeTerm <$> symbol DefaultDeclaration <*> children (Syntax.DefaultDeclaration <$> manyTerm expression)

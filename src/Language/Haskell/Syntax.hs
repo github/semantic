@@ -562,7 +562,7 @@ instance Show1 PrefixNegation where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable PrefixNegation
 
-newtype CPPDirective a = CPPDirective Name
+newtype CPPDirective a = CPPDirective Text
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 CPPDirective where liftEq = genericLiftEq
