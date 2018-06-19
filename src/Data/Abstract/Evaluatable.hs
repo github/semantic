@@ -93,13 +93,15 @@ evaluate :: ( AbstractValue address value inner
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
          -> [NonEmpty (Module term)]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
-evaluate _ _ _ [] = ask
-evaluate lang analyzeModule analyzeTerm (modules : rest)
-  = runRest lang rest
-  . raiseHandler runModules'
-  . withPrelude $ \ preludeEnv ->
-    traverse (evalModule preludeEnv) modules
-  where evalModule preludeEnv m
+evaluate lang analyzeModule analyzeTerm = go
+  where go [] = ask
+        go (modules : rest)
+          = runRest lang rest
+          . raiseHandler runModules'
+          . withPrelude $ \ preludeEnv ->
+            traverse (evalModule preludeEnv) modules
+
+        evalModule preludeEnv m
           = fmap (<$ m)
           . coerce (runInModule preludeEnv (moduleInfo m))
           . analyzeModule (subtermRef . moduleBody)
@@ -123,7 +125,7 @@ evaluate lang analyzeModule analyzeTerm (modules : rest)
 
         runRest lang rest action = do
           results <- action
-          local (<> ModuleTable.fromModules (toList results)) (evaluate lang analyzeModule analyzeTerm rest)
+          local (<> ModuleTable.fromModules (toList results)) (go rest)
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( AbstractValue address value inner
