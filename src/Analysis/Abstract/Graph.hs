@@ -67,6 +67,7 @@ graphingTerms recur term@(In _ syntax) = do
     _ -> pure ()
   recur term
 
+-- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph Vertex)) effects
                     )
@@ -74,7 +75,7 @@ graphingPackages :: ( Member (Reader PackageInfo) effects
                  -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
 
--- | Add vertices to the graph for evaluated modules and the packages containing them.
+-- | Add vertices to the graph for imported modules.
 graphingModules :: forall term address value effects a
                 .  ( Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
