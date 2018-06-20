@@ -120,8 +120,7 @@ type Syntax = '[
   , Syntax.Splice
   , Syntax.StandaloneDerivingInstance
   , Syntax.Star
-  , Syntax.StrictType
-  , Syntax.StrictTypeVariable
+  , Syntax.Strict
   , Syntax.Tuple
   , Syntax.TupleConstructor
   , Syntax.TuplePattern
@@ -366,6 +365,7 @@ expressionChoices = [
                     , splice
                     , standaloneDerivingInstance
                     , star
+                    , strictPattern
                     , strictType
                     , string
                     , tuple
@@ -719,6 +719,9 @@ standaloneDerivingInstance = makeTerm <$> symbol StandaloneDerivingDeclaration <
 
 star :: Assignment
 star = makeTerm <$> token Star <*> pure Syntax.Star
+
+strictPattern :: Assignment
+strictPattern = makeTerm <$> symbol StrictPattern <*> children (Syntax.StrictPattern <$> expression)
 
 strictType :: Assignment
 strictType = makeTerm'
