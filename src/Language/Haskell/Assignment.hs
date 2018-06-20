@@ -274,6 +274,7 @@ expressionChoices = [
                     , case'
                     , caseGuardPattern
                     , character
+                    , class'
                     , comment
                     , conditionalExpression
                     , context'
@@ -289,6 +290,7 @@ expressionChoices = [
                     , do'
                     , equalityConstraint
                     , expression'
+                    , fields
                     , fieldBind
                     , fieldPattern
                     , fixityDeclaration
@@ -374,6 +376,7 @@ expressionChoices = [
                     , typeClass
                     , typeClassIdentifier
                     , typeClassInstance
+                    , typeConstructor
                     , typeFamily
                     , typeInstance
                     , typePattern
@@ -729,7 +732,7 @@ tuplePattern :: Assignment
 tuplePattern = makeTerm <$> symbol TuplePattern <*> children (Syntax.TuplePattern <$> manyTerm expression)
 
 tupleType :: Assignment
-tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm type')
+tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm expression)
 
 tuplingConstructor :: Assignment
 tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> rawSource)
