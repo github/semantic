@@ -29,7 +29,8 @@ simplify (Graph graph) = Graph (G.simplify graph)
 
 topologicalSort :: Ord v => Graph v -> [NonEmpty v]
 topologicalSort
-  = groupByInEdgeCount
+  = map (fmap fst)
+  . sortAndGroupBy (inEdgeCount . snd)
   . Monoidal.pairs
   . edgeCountsByVertex
 
@@ -57,8 +58,8 @@ instance Monoid EdgeCounts where
   mempty = EdgeCounts 0 0
   mappend = (<>)
 
-groupByInEdgeCount :: Ord sum => [(v, sum)] -> [NonEmpty v]
-groupByInEdgeCount = map (NonEmpty.fromList . map fst) . groupBy ((==) `on` snd) . sortBy (comparing snd)
+sortAndGroupBy :: Ord b => (a -> b) -> [a] -> [NonEmpty a]
+sortAndGroupBy by = map NonEmpty.fromList . groupBy ((==) `on` by) . sortBy (comparing by)
 
 
 instance Lower (Graph vertex) where
