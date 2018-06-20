@@ -26,6 +26,7 @@ import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
+import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.AST (Location)
@@ -124,7 +125,7 @@ runImportGraph project
           . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff (Term (Sum syntaxes) (Record Location)) (Hole Precise)))
           . runReader packageInfo
           . runReader lowerBound
-    extractGraph <$> analyze (runImportGraphAnalysis (packageInfo package)) (evaluate @_ @_ @_ @_ @(Term (Sum syntaxes) (Record Location)) lang analyzeModule analyzeTerm [])
+    extractGraph <$> analyze (runImportGraphAnalysis (packageInfo package)) (evaluate @_ @_ @_ @_ @(Term (Sum syntaxes) (Record Location)) lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
 
 newtype ImportGraphEff term address a = ImportGraphEff
   { runImportGraphEff :: Eff '[ LoopControl address
