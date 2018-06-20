@@ -2,6 +2,8 @@
 module Data.Language where
 
 import           Data.Aeson
+import           Data.Char (toUpper)
+import           Data.String
 import qualified Data.Text as T
 import           Prologue
 import           Proto3.Suite
@@ -23,7 +25,12 @@ data Language
     | Ruby
     | TypeScript
     | PHP
-    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, Finite, MessageField)
+    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField)
+
+-- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
+instance Finite Language where
+  enumerate _ = fmap go [Unknown ..] where
+    go x = (fromString (fmap toUpper (show x)), fromEnum x)
 
 instance FromJSON Language where
   parseJSON = withText "Language" $ \l -> pure $ case T.toLower l of
