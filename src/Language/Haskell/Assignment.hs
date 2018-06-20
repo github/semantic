@@ -307,6 +307,7 @@ expressionChoices = [
                     , implicitParameterIdentifier
                     , importAlias
                     , importDeclaration
+                    , infixConstructorIdentifier
                     , infixOperatorApp
                     , infixOperatorPattern
                     , infixVariableIdentifier
@@ -497,6 +498,9 @@ importSpec = symbol ImportSpec *> children (manyTerm import')
 
 inClause :: Assignment
 inClause = symbol InClause *> children expressions
+
+infixConstructorIdentifier :: Assignment
+infixConstructorIdentifier = makeTerm <$> symbol InfixConstructorIdentifier <*> children (Syntax.InfixConstructorIdentifier . Name.name <$> source)
 
 infixOperatorApp :: Assignment
 infixOperatorApp = makeTerm <$> symbol InfixOperatorApplication <*> children (Syntax.InfixOperatorApp <$> expression <*> (typeApp <|> emptyTerm) <*> expression <*> (expression <|> emptyTerm))
