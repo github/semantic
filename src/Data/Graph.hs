@@ -47,6 +47,9 @@ data EdgeCounts = EdgeCounts
   }
   deriving (Eq, Ord, Show)
 
+instance Semigroup EdgeCounts where
+  EdgeCounts in1 out1 <> EdgeCounts in2 out2 = EdgeCounts (in1 + in2) (out1 + out2)
+
 groupByInEdgeCount :: Ord sum => [(v, sum)] -> [NonEmpty v]
 groupByInEdgeCount = map (NonEmpty.fromList . map fst) . groupBy ((==) `on` snd) . sortBy (comparing snd)
 
