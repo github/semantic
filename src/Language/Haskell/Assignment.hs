@@ -449,9 +449,9 @@ gadtConstructor = makeTerm
                <$> symbol GadtConstructor
                <*> children (Syntax.GADTConstructor
                            <$> (context' <|> emptyTerm)
-                           <*> typeConstructor
+                           <*> expression
                            <* token Annotation
-                           <*> term type')
+                           <*> expressions)
 
 gadtDeclaration :: Assignment
 gadtDeclaration = makeTerm
