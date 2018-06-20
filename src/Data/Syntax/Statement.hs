@@ -16,7 +16,7 @@ import Proto3.Suite.Class
 --   1. Each statement’s effects on the store are accumulated;
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
-newtype Statements a = Statements [a]
+newtype Statements a = Statements { statements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 Statements where liftEq = genericLiftEq
