@@ -53,11 +53,14 @@ message Null {
              }
 message TextElement { string textElementContent = 1;
                     }
+message Statements { repeated Term statements = 1;
+                   }
 message Term { oneof syntax {Null null = 1;
                              Array array = 2;
                              Boolean boolean = 3;
                              Hash hash = 4;
                              Float float = 5;
                              KeyValue keyValue = 6;
-                             TextElement textElement = 7;}
+                             TextElement textElement = 7;
+                             Statements statements = 8;}
              }

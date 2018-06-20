@@ -268,6 +268,9 @@ instance Listable1 Literal.Null where
 instance Listable1 Literal.TextElement where
   liftTiers tiers = cons1 Literal.TextElement
 
+instance Listable1 Statement.Statements where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Statement.Statements
+
 instance Listable1 Syntax.Error where
   liftTiers tiers = liftCons4 mempty mempty mempty (liftTiers tiers) Syntax.Error
 
