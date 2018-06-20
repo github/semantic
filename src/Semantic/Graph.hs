@@ -107,7 +107,11 @@ runImportGraph project
     package <- parsePackage parser project
     let analyzeTerm = id
         analyzeModule = id
-        extractGraph (((_, graph), _), _) = fmap SomeTerm <$> graph
+        extractGraph (((_, graph), _), _) = do
+          info <- graph
+          case ModuleTable.lookup (modulePath info) (packageModules (packageBody package)) of
+            Nothing -> lowerBound
+            Just m -> foldMapA pure (fmap SomeTerm <$> m)
         runImportGraphAnalysis packageInfo
           = run
           . runState lowerBound
@@ -138,7 +142,7 @@ newtype ImportGraphEff term address a = ImportGraphEff
                               , Reader PackageInfo
                               , Modules address
                               , Reader (ModuleTable (NonEmpty (Module (address, Environment address))))
-                              , State (Graph (Module term))
+                              , State (Graph ModuleInfo)
                               , Resumable (ValueError address (ImportGraphEff term address))
                               , Resumable (AddressError address (Value address (ImportGraphEff term address)))
                               , Resumable ResolutionError
