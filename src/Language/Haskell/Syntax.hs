@@ -352,6 +352,7 @@ data EntityIdentifier a = TypeVariableIdentifier Name
                         | TypeConstructorIdentifier Name
                         | ModuleIdentifier Name
                         | ConstructorIdentifier Name
+                        | ImplicitParameterIdentifier Name
                         | InfixVariableIdentifier Name
                         | TypeClassIdentifier Name
                         | VariableIdentifier Name
@@ -368,6 +369,7 @@ instance Evaluatable EntityIdentifier
 data Operator a = VariableOperator a
                 | ConstructorOperator a
                 | TypeOperator Name
+                | PromotedTypeOperator a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Operator where liftEq = genericLiftEq
@@ -448,8 +450,9 @@ instance Show1 ImportAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ImportAlias
 
-data App a = App { appLeft :: a, appRight :: a }
-           | InfixOperatorApp { appLeft :: a, infixOperator :: a, appRight :: a }
+data App a = App { appLeft :: a, appLeftTypeApp :: a, appRight :: a }
+           | InfixOperatorApp { appLeft :: a, appLeftTypeApp :: a, infixOperator :: a, appRight :: a }
+           | TypeApp { typeAppType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 App where liftEq = genericLiftEq
@@ -764,3 +767,138 @@ instance Ord1 Wildcard where liftCompare = genericLiftCompare
 instance Show1 Wildcard where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Wildcard
+
+data Let a = Let { letStatements :: [a], letInClause :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Let where liftEq = genericLiftEq
+instance Ord1 Let where liftCompare = genericLiftCompare
+instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Let
+
+newtype ListPattern a = ListPattern a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ListPattern where liftEq = genericLiftEq
+instance Ord1 ListPattern where liftCompare = genericLiftCompare
+instance Show1 ListPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ListPattern
+
+-- e.g. The `n@num1` in `f n@num1 x@num2 = x`
+data AsPattern a = AsPattern { asPatternLeft :: a, asPatternRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AsPattern where liftEq = genericLiftEq
+instance Ord1 AsPattern where liftCompare = genericLiftCompare
+instance Show1 AsPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable AsPattern
+
+-- e.g. The `a = 1` in `foo Bar{ a = 1 } = baz`.
+data FieldPattern a = FieldPattern { fieldPatternLeft :: a, fieldPatternRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FieldPattern where liftEq = genericLiftEq
+instance Ord1 FieldPattern where liftCompare = genericLiftCompare
+instance Show1 FieldPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FieldPattern
+
+-- e.g. The `start` or `end` in `f Blob{start, end} = [start, end]`.
+newtype NamedFieldPun a = NamedFieldPun a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 NamedFieldPun where liftEq = genericLiftEq
+instance Ord1 NamedFieldPun where liftCompare = genericLiftCompare
+instance Show1 NamedFieldPun where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable NamedFieldPun
+
+-- e.g. The `-(1)` in `f (-(1)) = 1`.
+newtype NegativeLiteral a = NegativeLiteral a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 NegativeLiteral where liftEq = genericLiftEq
+instance Ord1 NegativeLiteral where liftCompare = genericLiftCompare
+instance Show1 NegativeLiteral where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable NegativeLiteral
+
+-- e.g. The `~a` in `f ~a = 1`
+newtype IrrefutablePattern a = IrrefutablePattern a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 IrrefutablePattern where liftEq = genericLiftEq
+instance Ord1 IrrefutablePattern where liftCompare = genericLiftCompare
+instance Show1 IrrefutablePattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable IrrefutablePattern
+
+-- For handling guards in case alternative expressions.
+newtype CaseGuardPattern a = CaseGuardPattern [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 CaseGuardPattern where liftEq = genericLiftEq
+instance Ord1 CaseGuardPattern where liftCompare = genericLiftCompare
+instance Show1 CaseGuardPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable CaseGuardPattern
+
+newtype Guard a = Guard a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Guard where liftEq = genericLiftEq
+instance Ord1 Guard where liftCompare = genericLiftCompare
+instance Show1 Guard where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Guard
+
+newtype LambdaCase a = LambdaCase [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 LambdaCase where liftEq = genericLiftEq
+instance Ord1 LambdaCase where liftCompare = genericLiftCompare
+instance Show1 LambdaCase where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LambdaCase
+
+-- For handling guards in function declarations.
+newtype FunctionGuardPattern a = FunctionGuardPattern [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FunctionGuardPattern where liftEq = genericLiftEq
+instance Ord1 FunctionGuardPattern where liftCompare = genericLiftCompare
+instance Show1 FunctionGuardPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FunctionGuardPattern
+
+-- The `y { a = 1, b = 2} in `f y@Example = y { a = 1, b = 2 }`.
+newtype LabeledUpdate a = LabeledUpdate [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 LabeledUpdate where liftEq = genericLiftEq
+instance Ord1 LabeledUpdate where liftCompare = genericLiftCompare
+instance Show1 LabeledUpdate where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LabeledUpdate
+
+-- The `a = 1` in `f y@Example = y { a = 1, b = 2 }`.
+data FieldBind a = FieldBind { fieldBindLeft :: a, fieldBindRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FieldBind where liftEq = genericLiftEq
+instance Ord1 FieldBind where liftCompare = genericLiftCompare
+instance Show1 FieldBind where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FieldBind
+
+data ViewPattern a = ViewPattern { viewPatternLeft :: a, viewPatternRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ViewPattern where liftEq = genericLiftEq
+instance Ord1 ViewPattern where liftCompare = genericLiftCompare
+instance Show1 ViewPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ViewPattern
