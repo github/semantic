@@ -21,7 +21,7 @@ import Prologue
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph (G.Graph vertex)
-  deriving (Applicative, Eq, Foldable, Functor, Class.Graph, Show, Class.ToGraph, Traversable)
+  deriving (Alternative, Applicative, Eq, Foldable, Functor, Class.Graph, Show, Class.ToGraph, Traversable)
 
 
 simplify :: Ord vertex => Graph vertex -> Graph vertex
