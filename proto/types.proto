@@ -1,18 +1,16 @@
 syntax = "proto3";
 package github.semantic.v1alpha1;
-option java_package = "com.github.semantic";
-option go_package = "github.com/semantic/types;types";
-enum Language {Unknown = 0;
-               Go = 1;
-               Haskell = 2;
-               Java = 3;
-               JavaScript = 4;
+enum Language {UNKNOWN = 0;
+               GO = 1;
+               HASKELL = 2;
+               JAVA = 3;
+               JAVASCRIPT = 4;
                JSON = 5;
                JSX = 6;
-               Markdown = 7;
-               Python = 8;
-               Ruby = 9;
-               TypeScript = 10;
+               MARKDOWN = 7;
+               PYTHON = 8;
+               RUBY = 9;
+               TYPESCRIPT = 10;
                PHP = 11;}
 enum VertexType {PACKAGE = 0;
                  MODULE = 1;
