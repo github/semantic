@@ -6,6 +6,7 @@
       (Statements
         (App
           (VariableIdentifier)
+          (Empty)
           (VariableIdentifier))))
     (Function
       (VariableIdentifier)
@@ -13,7 +14,9 @@
         (App
           (App
             (VariableIdentifier)
+            (Empty)
             (VariableIdentifier))
+          (Empty)
           (VariableIdentifier))))
     (Function
       (VariableIdentifier)
@@ -22,20 +25,25 @@
           (App
             (App
               (VariableIdentifier)
+              (Empty)
               (VariableIdentifier))
+            (Empty)
             (VariableIdentifier))
+          (Empty)
           (VariableIdentifier))))
     (Function
       (VariableIdentifier)
       (Statements
         (App
           (ConstructorIdentifier)
+          (Empty)
           (VariableIdentifier))))
     (Function
       (VariableIdentifier)
       (Statements
         (App
           (ConstructorIdentifier)
+          (Empty)
           (VariableIdentifier))))
     (Function
       (VariableIdentifier)
@@ -44,8 +52,11 @@
           (App
             (App
               (ConstructorIdentifier)
+              (Empty)
               (VariableIdentifier))
+            (Empty)
             (VariableIdentifier))
+          (Empty)
           (VariableIdentifier))))
     (Function
       (VariableIdentifier)
@@ -163,7 +174,9 @@
         (App
           (App
             (VariableIdentifier)
+            (Empty)
             (Integer))
+          (Empty)
           (ListComprehension
             (ListComprehension
               (Tuple
@@ -211,6 +224,7 @@
       (Statements
         (InfixOperatorApp
           (VariableIdentifier)
+          (Empty)
           (VariableOperator
             (InfixVariableIdentifier))
           (VariableIdentifier))))
@@ -231,34 +245,42 @@
       (Statements
         (InfixOperatorApp
           (ConstructorIdentifier)
+          (Empty)
           (VariableOperator
             (VariableSymbol))
           (InfixOperatorApp
             (VariableIdentifier)
+            (Empty)
             (VariableOperator
               (VariableSymbol))
             (InfixOperatorApp
               (TextElement)
+              (Empty)
               (VariableOperator
                 (VariableSymbol))
               (InfixOperatorApp
                 (VariableIdentifier)
+                (Empty)
                 (VariableOperator
                   (VariableSymbol))
                 (InfixOperatorApp
                   (TextElement)
+                  (Empty)
                   (VariableOperator
                     (VariableSymbol))
                   (InfixOperatorApp
                     (VariableIdentifier)
+                    (Empty)
                     (VariableOperator
                       (VariableSymbol))
                     (InfixOperatorApp
                       (TextElement)
+                      (Empty)
                       (VariableOperator
                         (VariableSymbol))
                       (InfixOperatorApp
                         (VariableIdentifier)
+                        (Empty)
                         (VariableOperator
                           (VariableSymbol))
                         (TextElement)))))))))))
@@ -270,6 +292,7 @@
             (VariableIdentifier)
             (InfixOperatorApp
               (VariableIdentifier)
+              (Empty)
               (VariableOperator
                 (VariableSymbol))
               (VariableIdentifier)))
@@ -277,6 +300,7 @@
             (VariableIdentifier)
             (InfixOperatorApp
               (VariableIdentifier)
+              (Empty)
               (VariableOperator
                 (VariableSymbol))
               (VariableIdentifier))))))
@@ -302,10 +326,12 @@
           (VariableIdentifier)
           (InfixOperatorApp
             (VariableIdentifier)
+            (Empty)
             (ConstructorOperator
               (ConstructorSymbol))
             (InfixOperatorApp
               (VariableIdentifier)
+              (Empty)
               (ConstructorOperator
                 (ConstructorSymbol))
               (VariableIdentifier))))))
@@ -319,10 +345,12 @@
             (VariableIdentifier))
           (InfixOperatorApp
             (VariableIdentifier)
+            (Empty)
             (VariableOperator
               (VariableSymbol))
             (InfixOperatorApp
               (VariableIdentifier)
+              (Empty)
               (VariableOperator
                 (VariableSymbol))
               (VariableIdentifier))))))
@@ -336,6 +364,7 @@
       (Statements
         (InfixOperatorApp
           (Integer)
+          (Empty)
           (VariableOperator
             (VariableSymbol))
           (Integer))))
@@ -359,23 +388,29 @@
       (Statements
         (InfixOperatorApp
           (VariableIdentifier)
+          (Empty)
           (VariableOperator
             (VariableSymbol))
           (App
             (App
               (VariableIdentifier)
+              (Empty)
               (Lambda
                 (VariableIdentifier)
                 (InfixOperatorApp
                   (Tuple
                     (VariableIdentifier))
+                  (Empty)
                   (VariableOperator
                     (VariableSymbol))
                   (InfixOperatorApp
                     (ConstructorIdentifier)
+                    (Empty)
                     (VariableOperator
                       (VariableSymbol))
                     (App
                       (VariableIdentifier)
+                      (Empty)
                       (VariableIdentifier))))))
+            (Empty)
             (VariableIdentifier)))))))

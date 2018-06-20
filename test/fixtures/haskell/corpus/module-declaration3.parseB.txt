@@ -1,7 +1,5 @@
 (Module
-  (Empty)
-  (Statements
-    (QualifiedModuleIdentifier
-      (ModuleIdentifier)
-      (ModuleIdentifier))
-    (Statements)))
+  (QualifiedModuleIdentifier
+    (ModuleIdentifier)
+    (ModuleIdentifier))
+  (Statements))
