@@ -289,6 +289,7 @@ expressionChoices = [
                     , do'
                     , equalityConstraint
                     , expression'
+                    , expressionTypeSignature
                     , fields
                     , fieldBind
                     , fieldPattern
@@ -396,6 +397,9 @@ expressionChoices = [
                     , where'
                     , wildcard
                     ]
+
+expressionTypeSignature :: Assignment
+expressionTypeSignature = makeTerm <$> symbol ExpressionTypeSignature <*> children (Syntax.ExpressionTypeSignature <$> manyTermsTill expression (symbol Annotation) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
 
 fields :: Assignment
 fields = makeTerm <$> symbol Fields <*> children (manyTerm field)
