@@ -61,7 +61,7 @@ spec = parallel $ do
 
   describe "statements" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Statement.Statements @(Term (Sum Syntax) ()) (unListableF sp)
+      \sp -> shouldRoundtrip @(Term (Sum '[Statement.Statements, Literal.Null]) ()) (unListableF sp)
 
   describe "blobs" $ do
     it "should roundtrip given a Message instance" $ do
