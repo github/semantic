@@ -30,6 +30,7 @@ import           Text.Show.Pretty (ppShow)
 justEvaluating
   = runM
   . evaluating
+  . runFresh 0
   . runPrintingTrace
   . fmap reassociate
   . runLoadError
@@ -68,6 +69,7 @@ newtype UtilEff address a = UtilEff
 checking
   = runM @_ @IO
   . evaluating
+  . runFresh 0
   . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
   . caching @[]

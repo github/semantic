@@ -61,6 +61,7 @@ runGraph graphType includePackages project
           runGraphAnalysis
             = run
             . evaluating
+            . runFresh 0
             . runIgnoringTrace
             . resumingLoadError
             . resumingUnspecialized
