@@ -118,10 +118,10 @@ runImportGraph project
           . resumingResolutionError
           . resumingAddressError
           . resumingValueError
+          . runState lowerBound
           . runReader lowerBound
           . interpret handleModules
           . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff (Term (Sum syntaxes) (Record Location)) (Hole Precise)))
-          . runState lowerBound
           . runReader packageInfo
           . runReader lowerBound
     extractGraph <$> analyze (runImportGraphAnalysis (packageInfo package)) (evaluate @_ @_ @_ @_ @(Term (Sum syntaxes) (Record Location)) lang analyzeModule analyzeTerm [])
@@ -134,9 +134,9 @@ newtype ImportGraphEff term address a = ImportGraphEff
                               , Reader ModuleInfo
                               , Reader Span
                               , Reader PackageInfo
-                              , State (Graph (Module term))
                               , Modules address
                               , Reader (ModuleTable (NonEmpty (Module (address, Environment address))))
+                              , State (Graph (Module term))
                               , Resumable (ValueError address (ImportGraphEff term address))
                               , Resumable (AddressError address (Value address (ImportGraphEff term address)))
                               , Resumable ResolutionError
