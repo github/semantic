@@ -151,7 +151,6 @@ newtype ImportGraphEff term address a = ImportGraphEff
   }
 
 
-
 -- | Parse a list of files into a 'Package'.
 parsePackage :: (Member (Distribute WrappedTask) effs, Member Resolution effs, Member Trace effs)
              => Parser term -- ^ A parser.
