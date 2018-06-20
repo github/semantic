@@ -50,6 +50,10 @@ data EdgeCounts = EdgeCounts
 instance Semigroup EdgeCounts where
   EdgeCounts in1 out1 <> EdgeCounts in2 out2 = EdgeCounts (in1 + in2) (out1 + out2)
 
+instance Monoid EdgeCounts where
+  mempty = EdgeCounts 0 0
+  mappend = (<>)
+
 groupByInEdgeCount :: Ord sum => [(v, sum)] -> [NonEmpty v]
 groupByInEdgeCount = map (NonEmpty.fromList . map fst) . groupBy ((==) `on` snd) . sortBy (comparing snd)
 
