@@ -47,7 +47,10 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Syntax.Expression as Expression
+import qualified Language.Ruby.Syntax as Ruby.Syntax
 import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
@@ -273,6 +276,124 @@ instance Listable1 Statement.Statements where
 
 instance Listable1 Syntax.Error where
   liftTiers tiers = liftCons4 mempty mempty mempty (liftTiers tiers) Syntax.Error
+
+instance Listable1 Directive.File where
+  liftTiers tiers = cons0 Directive.File
+
+instance Listable1 Directive.Line where
+  liftTiers tiers = cons0 Directive.Line
+
+instance Listable1 Expression.Arithmetic where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Plus \/ liftCons2 tiers tiers Expression.Minus \/ liftCons2 tiers tiers Expression.Times \/ liftCons2 tiers tiers Expression.DividedBy \/ liftCons2 tiers tiers Expression.FloorDivision \/ liftCons2 tiers tiers Expression.Modulo \/ liftCons2 tiers tiers Expression.Power \/ liftCons1 tiers Expression.Negate
+
+instance Listable1 Expression.Bitwise where
+  liftTiers tiers = liftCons2 tiers tiers Expression.BOr \/ liftCons2 tiers tiers Expression.BAnd \/ liftCons2 tiers tiers Expression.BXOr \/ liftCons2 tiers tiers Expression.LShift \/ liftCons2 tiers tiers Expression.RShift \/ liftCons2 tiers tiers Expression.UnsignedRShift \/ liftCons1 tiers Expression.Complement
+
+instance Listable1 Expression.Boolean where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Or \/ liftCons2 tiers tiers Expression.And \/ liftCons1 tiers Expression.Not \/ liftCons2 tiers tiers Expression.XOr
+
+instance Listable1 Expression.Call where
+  liftTiers tiers = liftCons4 (liftTiers tiers) tiers (liftTiers tiers) tiers Expression.Call
+
+instance Listable1 Expression.Comparison where
+  liftTiers tiers = liftCons2 tiers tiers Expression.LessThan \/ liftCons2 tiers tiers Expression.LessThanEqual \/ liftCons2 tiers tiers Expression.GreaterThan \/ liftCons2 tiers tiers Expression.GreaterThanEqual \/ liftCons2 tiers tiers Expression.Equal \/ liftCons2 tiers tiers Expression.StrictEqual \/ liftCons2 tiers tiers Expression.Comparison
+
+instance Listable1 Expression.Enumeration where
+  liftTiers tiers = liftCons3 tiers tiers tiers Expression.Enumeration
+
+instance Listable1 Expression.Match where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Matches \/ liftCons2 tiers tiers Expression.NotMatches
+
+instance Listable1 Expression.MemberAccess where
+  liftTiers tiers = liftCons2 tiers mempty Expression.MemberAccess
+
+instance Listable1 Expression.ScopeResolution where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Expression.ScopeResolution
+
+instance Listable1 Expression.Subscript where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Expression.Subscript \/ liftCons2 tiers tiers Expression.Member
+
+instance Listable1 Literal.Complex where
+  liftTiers tiers = cons1 Literal.Complex
+
+instance Listable1 Literal.Integer where
+  liftTiers tiers = cons1 Literal.Integer
+
+instance Listable1 Literal.Rational where
+  liftTiers tiers = cons1 Literal.Rational
+
+instance Listable1 Literal.Regex where
+  liftTiers tiers = cons1 Literal.Regex
+
+instance Listable1 Literal.String where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.String
+
+instance Listable1 Literal.Symbol where
+  liftTiers tiers = cons1 Literal.Symbol
+
+instance Listable1 Statement.Assignment where
+  liftTiers tiers = liftCons3 (liftTiers tiers) tiers tiers Statement.Assignment
+
+instance Listable1 Statement.Break where
+  liftTiers tiers = liftCons1 tiers Statement.Break
+
+instance Listable1 Statement.Catch where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Catch
+
+instance Listable1 Statement.Continue where
+  liftTiers tiers = liftCons1 tiers Statement.Continue
+
+instance Listable1 Statement.Else where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Else
+
+instance Listable1 Statement.Finally where
+  liftTiers tiers = liftCons1 tiers Statement.Finally
+
+instance Listable1 Statement.ForEach where
+  liftTiers tiers = liftCons3 tiers tiers tiers Statement.ForEach
+
+instance Listable1 Statement.Match where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Match
+
+instance Listable1 Statement.Pattern where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Pattern
+
+instance Listable1 Statement.Retry where
+  liftTiers tiers = liftCons1 tiers Statement.Retry
+
+instance Listable1 Statement.ScopeEntry where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Statement.ScopeEntry
+
+instance Listable1 Statement.ScopeExit where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Statement.ScopeExit
+
+instance Listable1 Statement.Try where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Statement.Try
+
+instance Listable1 Statement.While where
+  liftTiers tiers = liftCons2 tiers tiers Statement.While
+
+instance Listable1 Statement.Yield where
+  liftTiers tiers = liftCons1 tiers Statement.Yield
+
+instance Listable1 Ruby.Syntax.Class where
+  liftTiers tiers = liftCons3 tiers (liftTiers tiers) tiers Ruby.Syntax.Class
+
+instance Listable1 Ruby.Syntax.Load where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Ruby.Syntax.Load
+
+instance Listable1 Ruby.Syntax.LowPrecedenceBoolean where
+  liftTiers tiers = liftCons2 tiers tiers Ruby.Syntax.LowAnd \/ liftCons2 tiers tiers Ruby.Syntax.LowOr
+
+instance Listable1 Ruby.Syntax.Module where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Ruby.Syntax.Module
+
+instance Listable1 Ruby.Syntax.Require where
+  liftTiers tiers' = liftCons2 tiers tiers' Ruby.Syntax.Require
+
+instance Listable1 Ruby.Syntax.Send where
+  liftTiers tiers = liftCons4 (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) Ruby.Syntax.Send
+
 
 type ListableSyntax = Sum
   '[ Comment.Comment
