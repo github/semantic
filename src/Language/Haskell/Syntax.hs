@@ -20,23 +20,16 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module
 
-data StrictType a = StrictType { strictTypeIdentifier :: !a, strictTypeParameters :: !a }
+data Strict a = StrictPattern a
+              | StrictType { strictTypeIdentifier :: a, strictTypeParameters :: a }
+              | StrictTypeVariable a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
-instance Eq1 StrictType where liftEq = genericLiftEq
-instance Ord1 StrictType where liftCompare = genericLiftCompare
-instance Show1 StrictType where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Strict where liftEq = genericLiftEq
+instance Ord1 Strict where liftCompare = genericLiftCompare
+instance Show1 Strict where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable StrictType
-
-newtype StrictTypeVariable a = StrictTypeVariable { strictTypeVariableIdentifier :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 StrictTypeVariable where liftEq = genericLiftEq
-instance Ord1 StrictTypeVariable where liftCompare = genericLiftCompare
-instance Show1 StrictTypeVariable where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable StrictTypeVariable
+instance Evaluatable Strict
 
 data Type a = Type { typeIdentifier :: a, typeParameters :: a, typeKindSignature :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
