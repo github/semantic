@@ -106,7 +106,7 @@ runImportGraph project
   | SomeAnalysisParser (parser :: Parser (Term (Sum syntaxes) (Record Location))) lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
     let analyzeTerm = id
-        analyzeModule = id
+        analyzeModule = graphingModuleInfo
         extractGraph (((_, graph), _), _) = do
           info <- graph
           case ModuleTable.lookup (modulePath info) (packageModules (packageBody package)) of
