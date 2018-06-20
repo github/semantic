@@ -10,7 +10,7 @@ module Analysis.Abstract.Graph
 , graphingTerms
 , graphingPackages
 , graphingModules
-, graphingModulePaths
+, graphingModuleInfo
 , graphing
 ) where
 
@@ -91,14 +91,14 @@ graphingModules recur m = interpose @(Modules address) pure (\ m yield -> case m
   (recur m)
 
 -- | Add vertices to the graph for imported modules.
-graphingModulePaths :: forall term address value effects a
-                    .  ( Member (Modules address) effects
-                       , Member (Reader ModuleInfo) effects
-                       , Member (State (Graph ModuleInfo)) effects
-                       )
-                    => SubtermAlgebra Module term (TermEvaluator term address value effects a)
-                    -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
-graphingModulePaths recur m = interpose @(Modules address) pure (\ eff yield -> case eff of
+graphingModuleInfo :: forall term address value effects a
+                   .  ( Member (Modules address) effects
+                      , Member (Reader ModuleInfo) effects
+                      , Member (State (Graph ModuleInfo)) effects
+                      )
+                   => SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                   -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+graphingModuleInfo recur m = interpose @(Modules address) pure (\ eff yield -> case eff of
   Load path -> do
     moduleInfo <- ask
     appendGraph (vertex moduleInfo `connect` vertex (ModuleInfo path))
