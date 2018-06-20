@@ -19,8 +19,7 @@ deriving instance (Show (Cell address value), Show address, Show value) => Show 
 
 
 evaluating :: Evaluator address value
-                (  Fresh
-                ': State (Heap address (Cell address) value)
+                (  State (Heap address (Cell address) value)
                 ': State (ModuleTable (Maybe (address, Environment address)))
                 ': effects) result
            -> Evaluator address value effects (result, EvaluatingState address value)
@@ -28,4 +27,3 @@ evaluating
   = fmap (\ ((result, heap), modules) -> (result, EvaluatingState heap modules))
   . runState lowerBound -- State (ModuleTable (Maybe (address, Environment address)))
   . runState lowerBound -- State (Heap address (Cell address) value)
-  . runFresh 0

@@ -31,6 +31,7 @@ spec = parallel $ do
 evaluate
   = runM
   . evaluating @Precise @Val
+  . runFresh 0
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . fmap reassociate

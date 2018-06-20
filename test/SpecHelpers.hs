@@ -113,6 +113,7 @@ testEvaluating
   = run
   . runReturningTrace
   . evaluating
+  . runFresh 0
   . fmap reassociate
   . runLoadError
   . runUnspecialized
