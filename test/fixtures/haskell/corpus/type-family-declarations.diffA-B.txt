@@ -1,0 +1,107 @@
+(Module
+  (Empty)
+  (Statements
+    (TypeFamily
+    { (TypeConstructorIdentifier)
+    ->(TypeConstructorIdentifier) }
+      (TypeVariableIdentifier)
+      (Empty)
+      (Statements
+      {-(Function
+        {-(ConstructorIdentifier)-}
+        {-(Statements
+          {-(ConstructorIdentifier)-})-})-}
+        (Function
+          (ConstructorIdentifier)
+          (Statements
+          {+(ConstructorIdentifier)+}
+          {-(QuotedName
+            {-(TypeConstructorIdentifier)-})-}))
+      {+(Function
+        {+(ConstructorIdentifier)+}
+        {+(Statements
+          {+(QuotedName
+            {+(TypeConstructorIdentifier)+})+})+})+}
+        (Function
+          (ConstructorPattern
+            (Statements
+              (QualifiedConstructorIdentifier
+              { (ModuleIdentifier)
+              ->(ModuleIdentifier) }
+              { (ConstructorIdentifier)
+              ->(ConstructorIdentifier) })
+              (VariableIdentifier)))
+          (Statements
+            (QuotedName
+              (TypeConstructorIdentifier))))
+        (Function
+          (ConstructorPattern
+            (Statements
+              (QualifiedConstructorIdentifier
+              { (ModuleIdentifier)
+              ->(ModuleIdentifier) }
+              { (ConstructorIdentifier)
+              ->(ConstructorIdentifier) })
+              (ConstructorPattern
+                (Statements
+                { (ConstructorIdentifier)
+                ->(ConstructorIdentifier) }
+                { (VariableIdentifier)
+                ->(VariableIdentifier) }))))
+          (Statements
+            (QuotedName
+              (TypeConstructorIdentifier))))))
+    (TypeFamily
+      (TypeConstructorIdentifier)
+    { (TypeVariableIdentifier)
+    ->(TypeVariableIdentifier) }
+      (KindSignature
+        (Star))
+      (Empty))
+    (TypeInstance
+      (Statements
+        (TypeConstructorIdentifier)
+        (Array
+          (Type
+          { (TypeConstructorIdentifier)
+          ->(TypeConstructorIdentifier) }
+            (TypeParameters)
+            (Empty))))
+      (TypePattern
+        (TypeConstructorIdentifier)))
+    (TypeInstance
+      (Statements
+        (TypeConstructorIdentifier)
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (TypePattern
+        (TypeConstructorIdentifier)))
+    (TypeFamily
+    { (TypeConstructorIdentifier)
+    ->(TypeConstructorIdentifier) }
+      (AnnotatedTypeVariable
+      { (TypeVariableIdentifier)
+      ->(TypeVariableIdentifier) }
+        (KindListType
+          (KindFunctionType
+            (Kind
+              (KindParenthesizedConstructor
+                (KindFunctionType
+                  (Kind
+                    (Star))
+                  (Kind
+                    (Star)))))
+          { (TypeConstructorIdentifier)
+          ->(TypeConstructorIdentifier) })))
+      (AnnotatedTypeVariable
+      { (TypeVariableIdentifier)
+      ->(TypeVariableIdentifier) }
+        (KindFunctionType
+          (Kind
+            (Star))
+          (Kind
+            (Star))))
+      (TypeSignature
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Statements))))
