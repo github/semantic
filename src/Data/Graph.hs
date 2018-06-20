@@ -15,7 +15,6 @@ import Data.Aeson
 import Data.List (groupBy, sortBy)
 import qualified Data.List.NonEmpty as NonEmpty (fromList)
 import qualified Data.Map.Monoidal as Monoidal
-import qualified Data.Monoid as Monoid
 import Data.Ord (comparing)
 import Prologue
 
@@ -34,12 +33,16 @@ topologicalSort
   . Monoidal.pairs
   . edgeCountsByVertex
 
-edgeCountsByVertex :: Ord v => Graph v -> Monoidal.Map v (Monoid.Sum Int)
+edgeCountsByVertex :: Ord v => Graph v -> Monoidal.Map v EdgeCounts
 edgeCountsByVertex = Class.foldg
   lowerBound
-  (flip Monoidal.singleton 0)
+  (flip Monoidal.singleton mempty)
   (<>)
-  (\ outM inM -> outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outM))) (Monoidal.keys inM))
+  (\ outM inM
+    -> outM
+    <> inM
+    <> foldMap (flip Monoidal.singleton (EdgeCounts 0 (length outM))) (Monoidal.keys inM)
+    <> foldMap (flip Monoidal.singleton (EdgeCounts (length inM) 0))  (Monoidal.keys outM))
 
 data EdgeCounts = EdgeCounts
   { inEdgeCount  :: {-# UNPACK #-} !Int
