@@ -14,6 +14,7 @@ import qualified Data.Syntax.Statement as Statement
 import Data.Term (Term)
 import Data.Sum
 import Language.JSON.Assignment (Syntax)
+import qualified Language.Ruby.Assignment as Ruby
 import Data.Functor.Classes
 
 shouldRoundtrip :: (Eq a, Show a, Message a) => a -> Expectation
