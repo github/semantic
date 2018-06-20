@@ -41,6 +41,12 @@ edgeCountsByVertex = Class.foldg
   (<>)
   (\ outM inM -> outM <> inM <> foldMap (flip Monoidal.singleton (Monoid.Sum (length outM))) (Monoidal.keys inM))
 
+data EdgeCounts = EdgeCounts
+  { inEdgeCount  :: {-# UNPACK #-} !Int
+  , outEdgeCount :: {-# UNPACK #-} !Int
+  }
+  deriving (Eq, Ord, Show)
+
 groupByInEdgeCount :: Ord sum => [(v, sum)] -> [NonEmpty v]
 groupByInEdgeCount = map (NonEmpty.fromList . map fst) . groupBy ((==) `on` snd) . sortBy (comparing snd)
 
