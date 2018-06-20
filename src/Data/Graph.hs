@@ -7,6 +7,7 @@ module Data.Graph
 , Lower(..)
 , simplify
 , topologicalSort
+, EdgeCounts(..)
 ) where
 
 import qualified Algebra.Graph as G
