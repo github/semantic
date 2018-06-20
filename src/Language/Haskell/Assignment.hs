@@ -442,7 +442,7 @@ functionGuardPattern :: Assignment
 functionGuardPattern = makeTerm <$> symbol FunctionGuardPattern <*> children (Syntax.FunctionGuardPattern <$> manyTerm expression)
 
 functionType :: Assignment
-functionType = makeTerm <$> symbol FunctionType <*> children (Syntax.FunctionType <$> type' <*> type')
+functionType = makeTerm <$> symbol FunctionType <*> children (Syntax.FunctionType <$> expression <*> expression)
 
 gadtConstructor :: Assignment
 gadtConstructor = makeTerm
