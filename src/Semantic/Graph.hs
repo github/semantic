@@ -1,10 +1,12 @@
-{-# LANGUAGE GADTs, TypeOperators #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Graph
 ( runGraph
+, runImportGraph
 , GraphType(..)
 , Graph
 , Vertex
 , GraphEff(..)
+, ImportGraphEff(..)
 , style
 , parsePackage
 , withTermSpans
@@ -26,6 +28,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
+import           Data.AST (Location)
 import           Data.Graph
 import           Data.Project
 import           Data.Record
@@ -92,6 +95,62 @@ newtype GraphEff address a = GraphEff
                         , State (ModuleTable (Maybe (address, Environment address)))
                         ] a
   }
+
+
+runImportGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+               => Project
+               -> Eff effs (Graph (Module (SomeTerm AnalysisClasses (Record Location))))
+runImportGraph project
+  | SomeAnalysisParser (parser :: Parser (Term (Sum syntaxes) (Record Location))) lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
+    package <- parsePackage parser project
+    let analyzeTerm = id
+        analyzeModule = id
+        extractGraph (((_, graph), _), _) = fmap SomeTerm <$> graph
+        runImportGraphAnalysis packageInfo
+          = run
+          . runState lowerBound
+          . runFresh 0
+          . runIgnoringTrace
+          . resumingLoadError
+          . resumingUnspecialized
+          . resumingEnvironmentError
+          . resumingEvalError
+          . resumingResolutionError
+          . resumingAddressError
+          . resumingValueError
+          . runReader lowerBound
+          . interpret handleModules
+          . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff (Term (Sum syntaxes) (Record Location)) (Hole Precise)))
+          . runState lowerBound
+          . runReader packageInfo
+          . runReader lowerBound
+    extractGraph <$> analyze (runImportGraphAnalysis (packageInfo package)) (evaluate @_ @_ @_ @_ @(Term (Sum syntaxes) (Record Location)) lang analyzeModule analyzeTerm [])
+
+newtype ImportGraphEff term address a = ImportGraphEff
+  { runImportGraphEff :: Eff '[ LoopControl address
+                              , Return address
+                              , Env address
+                              , Allocator address (Value address (ImportGraphEff term address))
+                              , Reader ModuleInfo
+                              , Reader Span
+                              , Reader PackageInfo
+                              , State (Graph (Module term))
+                              , Modules address
+                              , Reader (ModuleTable (NonEmpty (Module (address, Environment address))))
+                              , Resumable (ValueError address (ImportGraphEff term address))
+                              , Resumable (AddressError address (Value address (ImportGraphEff term address)))
+                              , Resumable ResolutionError
+                              , Resumable EvalError
+                              , Resumable (EnvironmentError address)
+                              , Resumable (Unspecialized (Value address (ImportGraphEff term address)))
+                              , Resumable (LoadError address)
+                              , Trace
+                              , Fresh
+                              , State (Heap address Latest (Value address (ImportGraphEff term address)))
+                              ] a
+  }
+
+
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: (Member (Distribute WrappedTask) effs, Member Resolution effs, Member Trace effs)
