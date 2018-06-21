@@ -56,6 +56,12 @@ type Syntax = '[
   , Expression.Or
   , Expression.XOr
   , Expression.Call
+  , Expression.LessThan
+  , Expression.LessThanEqual
+  , Expression.GreaterThan
+  , Expression.GreaterThanEqual
+  , Expression.Equal
+  , Expression.StrictEqual
   , Expression.Comparison
   , Expression.Enumeration
   , Expression.Matches

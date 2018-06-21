@@ -42,6 +42,12 @@ type Syntax =
    , Expression.UnsignedRShift
    , Expression.Complement
    , Expression.Call
+   , Expression.LessThan
+   , Expression.LessThanEqual
+   , Expression.GreaterThan
+   , Expression.GreaterThanEqual
+   , Expression.Equal
+   , Expression.StrictEqual
    , Expression.Comparison
    , Expression.Subscript
    , Statement.PostDecrement
