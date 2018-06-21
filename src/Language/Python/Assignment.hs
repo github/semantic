@@ -60,6 +60,12 @@ type Syntax =
    , Expression.RShift
    , Expression.Complement
    , Expression.Call
+   , Expression.LessThan
+   , Expression.LessThanEqual
+   , Expression.GreaterThan
+   , Expression.GreaterThanEqual
+   , Expression.Equal
+   , Expression.StrictEqual
    , Expression.Comparison
    , Expression.Enumeration
    , Expression.ScopeResolution

@@ -53,6 +53,12 @@ type Syntax = '[
   , Expression.XOr
   , Expression.Call
   , Expression.Cast
+  , Expression.LessThan
+  , Expression.LessThanEqual
+  , Expression.GreaterThan
+  , Expression.GreaterThanEqual
+  , Expression.Equal
+  , Expression.StrictEqual
   , Expression.Comparison
   , Expression.InstanceOf
   , Expression.MemberAccess

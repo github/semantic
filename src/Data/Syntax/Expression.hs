@@ -22,14 +22,83 @@ instance Evaluatable Call where
     op <- subtermValue callFunction
     Rval <$> call op (map subtermAddress callParams)
 
-data Comparison a
-  = LessThan !a !a
-  | LessThanEqual !a !a
-  | GreaterThan !a !a
-  | GreaterThanEqual !a !a
-  | Equal !a !a
-  | StrictEqual !a !a
-  | Comparison !a !a
+data LessThan a = LessThan { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 LessThan where liftEq = genericLiftEq
+instance Ord1 LessThan where liftCompare = genericLiftCompare
+instance Show1 LessThan where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LessThan where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
+    go x = case x of
+      (LessThan a b)         -> liftComparison (Concrete (<)) a b
+
+data LessThanEqual a = LessThanEqual { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 LessThanEqual where liftEq = genericLiftEq
+instance Ord1 LessThanEqual where liftCompare = genericLiftCompare
+instance Show1 LessThanEqual where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LessThanEqual where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
+    go x = case x of
+      (LessThanEqual a b)         -> liftComparison (Concrete (<=)) a b
+
+data GreaterThan a = GreaterThan { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 GreaterThan where liftEq = genericLiftEq
+instance Ord1 GreaterThan where liftCompare = genericLiftCompare
+instance Show1 GreaterThan where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable GreaterThan where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
+    go x = case x of
+      (GreaterThan a b)         -> liftComparison (Concrete (>)) a b
+
+data GreaterThanEqual a = GreaterThanEqual { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 GreaterThanEqual where liftEq = genericLiftEq
+instance Ord1 GreaterThanEqual where liftCompare = genericLiftCompare
+instance Show1 GreaterThanEqual where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable GreaterThanEqual where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
+    go x = case x of
+      (GreaterThanEqual a b)         -> liftComparison (Concrete (>=)) a b
+
+data Equal a = Equal { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Equal where liftEq = genericLiftEq
+instance Ord1 Equal where liftCompare = genericLiftCompare
+instance Show1 Equal where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Equal where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
+    go x = case x of
+      -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
+      -- We need some mechanism to customize this behavior per-language.
+      (Equal a b)         -> liftComparison (Concrete (==)) a b
+
+data StrictEqual a = StrictEqual { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 StrictEqual where liftEq = genericLiftEq
+instance Ord1 StrictEqual where liftCompare = genericLiftCompare
+instance Show1 StrictEqual where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable StrictEqual where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
+    go x = case x of
+      -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
+      -- We need some mechanism to customize this behavior per-language.
+      (StrictEqual a b)         -> liftComparison (Concrete (==)) a b
+
+data Comparison a = Comparison { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Comparison where liftEq = genericLiftEq
@@ -39,15 +108,7 @@ instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Comparison where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go x = case x of
-      (LessThan a b)         -> liftComparison (Concrete (<)) a b
-      (LessThanEqual a b)    -> liftComparison (Concrete (<=)) a b
-      (GreaterThan a b)      -> liftComparison (Concrete (>)) a b
-      (GreaterThanEqual a b) -> liftComparison (Concrete (>=)) a b
-      -- TODO: in PHP and JavaScript, the equals operator performs type coercion.
-      -- We need some mechanism to customize this behavior per-language.
-      (Equal a b)            -> liftComparison (Concrete (==)) a b
-      (StrictEqual a b)      -> liftComparison (Concrete (==)) a b
-      (Comparison a b)       -> liftComparison Generalized a b
+      (Comparison a b)         -> liftComparison (Concrete (==)) a b
 
 -- | Binary arithmetic operators.
 data Arithmetic a
