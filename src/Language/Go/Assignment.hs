@@ -34,8 +34,21 @@ type Syntax =
    , Declaration.Type
    , Declaration.TypeAlias
    , Expression.Arithmetic
-   , Expression.Bitwise
-   , Expression.Boolean
+   , Expression.BOr
+   , Expression.BAnd
+   , Expression.BXOr
+   , Expression.LShift
+   , Expression.RShift
+   , Expression.UnsignedRShift
+   , Expression.Complement
+   , Expression.BooleanOperator
+   , Expression.Call
+   , Expression.Comparison
+   , Expression.Subscript
+   , Statement.PostDecrement
+   , Statement.PostIncrement
+   , Expression.MemberAccess
+   , Expression.BooleanOperator
    , Expression.Call
    , Expression.Comparison
    , Expression.Subscript
