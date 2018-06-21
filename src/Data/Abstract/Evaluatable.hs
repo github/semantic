@@ -93,7 +93,7 @@ evaluatePackageWith :: forall proxy lang address term value inner inner' inner''
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => proxy lang
-                    -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
+                    -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
                     -> Package term
                     -> TermEvaluator term address value outer [(Environment address, address)]
