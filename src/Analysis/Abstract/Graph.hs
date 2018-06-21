@@ -105,6 +105,7 @@ graphingModuleInfo recur m = interpose @(Modules address) pure (\ eff yield -> c
     appendGraph (vertex moduleInfo `connect` vertex (ModuleInfo path))
     result <- send eff
     yield result
+  Lookup path -> ask >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex >> send eff >>= yield
   _ -> send eff >>= yield)
   (recur m)
 
