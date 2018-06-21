@@ -146,3 +146,14 @@ ifte :: ( IvoryStore a
           -> Ivory eff a
           -> Ivory eff a
           -> Ivory eff a
+
+haystackClient maybeURL managerSettings appName
+  | Just url <- maybeURL = do
+      manager  <- newManager managerSettings
+      request' <- parseRequest url
+      let request = request'
+            { method = "POST"
+            , requestHeaders = ("Content-Type", "application/json; charset=utf-8") : requestHeaders request'
+            }
+      pure $ HaystackClient request manager appName
+  | otherwise = pure NullHaystackClient
