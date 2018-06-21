@@ -50,12 +50,10 @@ runGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Memb
          -> Project
          -> Eff effs (Graph Vertex)
 runGraph ImportGraph _ project = fmap (Graph.moduleVertex . moduleInfo) <$> runImportGraph project
-runGraph graphType includePackages project
+runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
-    let analyzeTerm = withTermSpans . case graphType of
-          ImportGraph -> id
-          CallGraph   -> graphingTerms
+    let analyzeTerm = withTermSpans . graphingTerms
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
     extractGraph <$> analyze runGraphAnalysis (evaluatePackageWith lang analyzeModule analyzeTerm package)
     where extractGraph (((_, graph), _), _) = simplify graph
