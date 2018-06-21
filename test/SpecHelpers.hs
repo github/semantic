@@ -13,8 +13,6 @@ module SpecHelpers
 , Verbatim(..)
 ) where
 
-import Analysis.Abstract.Evaluating
-import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract
 import Control.Arrow ((&&&))
 import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)

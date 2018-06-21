@@ -20,7 +20,7 @@ spec :: Spec
 spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      ((Right [(res, env)], state), _) <- evaluate "main.rb"
+      ((Right [(res, env)], heap), _) <- evaluate "main.rb"
       res `shouldBe` Value.Integer (Number.Integer 1)
       Env.names env `shouldContain` ["foo"]
 
@@ -29,18 +29,18 @@ spec = parallel $ do
       Env.names env `shouldContain` ["foo"]
 
     it "evaluates load with wrapper" $ do
-      ((res, state), _) <- evaluate "load-wrap.rb"
+      ((res, heap), _) <- evaluate "load-wrap.rb"
       res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
 
     it "evaluates subclass" $ do
-      ((Right [(res, env)], state), _) <- evaluate "subclass.rb"
+      ((Right [(res, env)], heap), _) <- evaluate "subclass.rb"
       res `shouldBe` String "\"<bar>\""
       Env.names env `shouldContain` [ "Bar", "Foo" ]
 
-      (derefQName (heap state) ("Bar" :| []) env >>= deNamespace) `shouldBe` Just ("Bar",  ["baz", "foo", "inspect"])
+      (derefQName heap ("Bar" :| []) env >>= deNamespace) `shouldBe` Just ("Bar",  ["baz", "foo", "inspect"])
 
     it "evaluates modules" $ do
-      ((Right [(res, env)], state), _) <- evaluate "modules.rb"
+      ((Right [(res, env)], heap), _) <- evaluate "modules.rb"
       res `shouldBe` String "\"<hello>\""
       Env.names env `shouldContain` [ "Bar" ]
 

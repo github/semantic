@@ -4,7 +4,6 @@ module Control.Abstract.Evaluator.Spec
 , SpecEff(..)
 ) where
 
-import Analysis.Abstract.Evaluating (evaluating)
 import Control.Abstract
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
@@ -30,7 +29,7 @@ spec = parallel $ do
 
 evaluate
   = runM
-  . evaluating @Precise @Val
+  . runState (lowerBound @(Heap Precise Latest Val))
   . runFresh 0
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
