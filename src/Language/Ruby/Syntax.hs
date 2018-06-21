@@ -80,7 +80,7 @@ doRequire :: ( AbstractValue address value effects
 doRequire path = do
   result <- join <$> lookupModule path
   case result of
-    Nothing       -> flip (,) (boolean True) . maybe emptyEnv fst <$> load path
+    Nothing       -> flip (,) (boolean True) . maybe lowerBound fst <$> load path
     Just (env, _) -> pure (env, boolean False)
 
 
@@ -112,7 +112,7 @@ doLoad :: ( AbstractValue address value effects
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- maybe emptyEnv fst <$> load path'
+  importedEnv <- maybe lowerBound fst <$> load path'
   unless shouldWrap $ bindAll importedEnv
   pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 

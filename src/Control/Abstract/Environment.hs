@@ -23,7 +23,6 @@ import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports
 import Data.Abstract.Name
-import Data.Semilattice.Lower
 import Prologue
 
 -- | Retrieve the environment.

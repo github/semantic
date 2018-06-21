@@ -4,7 +4,6 @@ module Data.Record where
 import Data.Aeson
 import Data.JSON.Fields
 import Data.Kind
-import Data.Semilattice.Lower
 import Prologue
 
 -- | A type-safe, extensible record structure.
@@ -18,11 +17,11 @@ infixr 0 :.
 
 -- | Get the first element of a non-empty record.
 rhead :: Record (head ': tail) -> head
-rhead (head :. _) = head
+rhead (head_ :. _) = head_
 
 -- | Get the first element of a non-empty record.
 rtail :: Record (head ': tail) -> Record tail
-rtail (_ :. tail) = tail
+rtail (_ :. tail_) = tail_
 
 
 -- Classes

@@ -11,7 +11,6 @@ module Data.Graph
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Class as Class
 import Data.Aeson
-import Data.Semilattice.Lower
 import Prologue
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.

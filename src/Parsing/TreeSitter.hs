@@ -4,25 +4,26 @@ module Parsing.TreeSitter
 , parseToAST
 ) where
 
-import Prologue
+import Prologue hiding (bracket)
 
-import Control.Concurrent.Async
-import Control.Exception (throwIO)
-import Control.Monad.Effect
-import Control.Monad.Effect.Trace
-import Control.Monad.IO.Class
+import           Control.Concurrent.Async
+import qualified Control.Exception as Exc (bracket)
+import           Control.Monad.Effect
+import           Control.Monad.Effect.Exception
+import           Control.Monad.Effect.Trace
+import           Control.Monad.IO.Class
+import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
+import           Foreign
+import           Foreign.C.Types (CBool (..))
+import           Foreign.Marshal.Array (allocaArray)
+import           System.Timeout
+
 import Data.AST (AST, Node (Node))
 import Data.Blob
-import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Range
 import Data.Source
 import Data.Span
 import Data.Term
-import Foreign
-import Foreign.C.Types (CBool (..))
-import Foreign.Marshal.Array (allocaArray)
-import Semantic.IO hiding (Source)
-import System.Timeout
 
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
@@ -53,24 +54,12 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
                 TS.ts_tree_root_node_p treePtr rootPtr
                 ptr <- peek rootPtr
                 Succeeded <$> anaM toAST ptr
-      bracket acquire release go)
-
--- | The semantics of @bracket before after handler@ are as follows:
--- * Exceptions in @before@ and @after@ are thrown in IO.
--- * @after@ is called on IO exceptions in @handler@, and then rethrown in IO.
--- * If @handler@ completes successfully, @after@ is called
--- Call 'catchException' at the call site if you want to recover.
-bracket' :: (Member (Lift IO) r) => IO a -> (a -> IO b) -> (a -> Eff r c) -> Eff r c
-bracket' before after action = do
-  a <- liftIO before
-  let cleanup = liftIO (after a)
-  res <- action a `catchException` (\(e :: SomeException) -> cleanup >> liftIO (throwIO e))
-  res <$ cleanup
+      Exc.bracket acquire release go)
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
 parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Trace effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
-parseToAST (Milliseconds s) language Blob{..} = bracket' TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   let parserTimeout = s * 1000
 
   liftIO $ do

@@ -66,7 +66,7 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      importedEnv <- maybe emptyEnv fst <$> require path
+      importedEnv <- maybe lowerBound fst <$> require path
       bindAll importedEnv
     rvalBox unit
 
@@ -85,10 +85,10 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    void $ letrec' alias $ \addr -> do
+    void . letrec' alias $ \addr -> do
       for_ paths $ \p -> do
         traceResolve (unPath importPath) p
-        importedEnv <- maybe emptyEnv fst <$> require p
+        importedEnv <- maybe lowerBound fst <$> require p
         bindAll importedEnv
       makeNamespace alias addr Nothing
     rvalBox unit

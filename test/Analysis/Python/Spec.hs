@@ -46,4 +46,4 @@ spec = parallel $ do
     ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)
-    evalPythonProject path = testEvaluating <$> evaluateProject pythonParser Language.Python pythonPrelude path
+    evalPythonProject path = testEvaluating <$> evaluateProject (Proxy :: Proxy 'Language.Python) pythonParser Language.Python path

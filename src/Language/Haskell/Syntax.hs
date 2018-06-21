@@ -126,7 +126,7 @@ instance Ord1 Deriving where liftCompare = genericLiftCompare
 instance Show1 Deriving where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Deriving
-newtype Context' a = Context' [a]
+newtype Context' a = Context' a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Context' where liftEq = genericLiftEq
@@ -135,7 +135,7 @@ instance Show1 Context' where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context'
 
-data Class a = Class { classType :: a, classTypeParameters :: a }
+newtype Class a = Class { classContent :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Class where liftEq = genericLiftEq
@@ -171,7 +171,7 @@ instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable FunctionType
 
-data TypeSignature a = TypeSignature { typeSignatureName :: a, typeSignatureContext :: [a], typeSignatureContent :: a }
+data TypeSignature a = TypeSignature { typeSignatureName :: [a], typeSignatureContext :: [a], typeSignatureContent :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 TypeSignature where liftEq = genericLiftEq
@@ -225,15 +225,19 @@ instance Show1 Star where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Star
 
-newtype QualifiedTypeConstructorIdentifier a = QualifiedTypeConstructorIdentifier { qualifiedTypeConstructorIdentifierName :: NonEmpty a }
+data QualifiedEntityIdentifier a = QualifiedTypeConstructorIdentifier (NonEmpty a)
+                                 | QualifiedConstructorIdentifier (NonEmpty a)
+                                 | QualifiedInfixVariableIdentifier (NonEmpty a)
+                                 | QualifiedModuleIdentifier (NonEmpty a)
+                                 | QualifiedVariableIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
-instance Eq1 QualifiedTypeConstructorIdentifier where liftEq = genericLiftEq
-instance Ord1 QualifiedTypeConstructorIdentifier where liftCompare = genericLiftCompare
-instance Show1 QualifiedTypeConstructorIdentifier where liftShowsPrec = genericLiftShowsPrec
-instance Hashable1 QualifiedTypeConstructorIdentifier where liftHashWithSalt = foldl
+instance Eq1 QualifiedEntityIdentifier where liftEq = genericLiftEq
+instance Ord1 QualifiedEntityIdentifier where liftCompare = genericLiftCompare
+instance Show1 QualifiedEntityIdentifier where liftShowsPrec = genericLiftShowsPrec
+instance Hashable1 QualifiedEntityIdentifier where liftHashWithSalt = foldl
 
-instance Evaluatable QualifiedTypeConstructorIdentifier
+instance Evaluatable QualifiedEntityIdentifier
 
 data AnnotatedTypeVariable a = AnnotatedTypeVariable { annotatedTypeVariableIdentifier :: a, annotatedTypeVariableannotation :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -243,16 +247,6 @@ instance Ord1 AnnotatedTypeVariable where liftCompare = genericLiftCompare
 instance Show1 AnnotatedTypeVariable where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AnnotatedTypeVariable
-
-newtype QualifiedModuleIdentifier a = QualifiedModuleIdentifier { qualifiedModuleIdentifierName :: NonEmpty a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 QualifiedModuleIdentifier where liftEq = genericLiftEq
-instance Ord1 QualifiedModuleIdentifier where liftCompare = genericLiftCompare
-instance Show1 QualifiedModuleIdentifier where liftShowsPrec = genericLiftShowsPrec
-instance Hashable1 QualifiedModuleIdentifier where liftHashWithSalt = foldl
-
-instance Evaluatable QualifiedModuleIdentifier
 
 newtype Export a = Export { exportContent :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -357,9 +351,11 @@ data EntityIdentifier a = TypeVariableIdentifier Name
                         | TypeConstructorIdentifier Name
                         | ModuleIdentifier Name
                         | ConstructorIdentifier Name
+                        | InfixVariableIdentifier Name
                         | TypeClassIdentifier Name
                         | VariableIdentifier Name
                         | PrimitiveConstructorIdentifier Name
+                        | PrimitiveVariableIdentifier Name
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 EntityIdentifier where liftEq = genericLiftEq
@@ -396,3 +392,365 @@ instance Ord1 VariableSymbol where liftCompare = genericLiftCompare
 instance Show1 VariableSymbol where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableSymbol
+
+data StandaloneDerivingInstance a = StandaloneDerivingInstance { standaloneDerivingInstanceContext :: [a], standaloneDerivingInstanceClass :: a, standaloneDerivingInstanceInstance :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 StandaloneDerivingInstance where liftEq = genericLiftEq
+instance Ord1 StandaloneDerivingInstance where liftCompare = genericLiftCompare
+instance Show1 StandaloneDerivingInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable StandaloneDerivingInstance
+
+data ImportDeclaration a = ImportDeclaration { importPackageQualifiedContent :: a, importModule :: a, importSpec :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ImportDeclaration where liftEq = genericLiftEq
+instance Ord1 ImportDeclaration where liftCompare = genericLiftCompare
+instance Show1 ImportDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ImportDeclaration
+
+data QualifiedImportDeclaration a = QualifiedImportDeclaration { qualifiedImportPackageQualifiedContent :: a, qualifiedImportModule :: a, qualifiedImportSpec :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QualifiedImportDeclaration where liftEq = genericLiftEq
+instance Ord1 QualifiedImportDeclaration where liftCompare = genericLiftCompare
+instance Show1 QualifiedImportDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedImportDeclaration
+
+newtype Import a = Import { importContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Ord1 Import where liftCompare = genericLiftCompare
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Import
+
+newtype HiddenImport a = HiddenImport { hiddenimportContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 HiddenImport where liftEq = genericLiftEq
+instance Ord1 HiddenImport where liftCompare = genericLiftCompare
+instance Show1 HiddenImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable HiddenImport
+
+data ImportAlias a = ImportAlias { importAliasSource :: a, importAliasName :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ImportAlias where liftEq = genericLiftEq
+instance Ord1 ImportAlias where liftCompare = genericLiftCompare
+instance Show1 ImportAlias where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ImportAlias
+
+data App a = App { appLeft :: a, appRight :: a }
+           | InfixOperatorApp { appLeft :: a, infixOperator :: a, appRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 App where liftEq = genericLiftEq
+instance Ord1 App where liftCompare = genericLiftCompare
+instance Show1 App where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable App
+
+data ListComprehension a = ListComprehension { comprehensionValue :: a, comprehensionSource :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ListComprehension where liftEq = genericLiftEq
+instance Ord1 ListComprehension where liftCompare = genericLiftCompare
+instance Show1 ListComprehension where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ListComprehension
+
+data Generator a = Generator { generatorValue :: a, generatorSource :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Generator where liftEq = genericLiftEq
+instance Ord1 Generator where liftCompare = genericLiftCompare
+instance Show1 Generator where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Generator
+
+newtype Tuple a = Tuple [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Tuple where liftEq = genericLiftEq
+instance Ord1 Tuple where liftCompare = genericLiftCompare
+instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Tuple
+
+newtype TuplePattern a = TuplePattern [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TuplePattern where liftEq = genericLiftEq
+instance Ord1 TuplePattern where liftCompare = genericLiftCompare
+instance Show1 TuplePattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TuplePattern
+
+data ArithmeticSequence a = EnumFrom a            -- e.g. [1..]
+                          | EnumFromThen a a      -- e.g. [1,2..]
+                          | EnumFromTo a a        -- e.g. [1..2]
+                          | EnumFromThenTo a a a  -- e.g. [1,2..10]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ArithmeticSequence where liftEq = genericLiftEq
+instance Ord1 ArithmeticSequence where liftCompare = genericLiftCompare
+instance Show1 ArithmeticSequence where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ArithmeticSequence
+
+data OperatorSection a = RightOperatorSection a a
+                       | LeftOperatorSection a a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 OperatorSection where liftEq = genericLiftEq
+instance Ord1 OperatorSection where liftCompare = genericLiftCompare
+instance Show1 OperatorSection where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable OperatorSection
+
+newtype ConstructorPattern a = ConstructorPattern a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ConstructorPattern where liftEq = genericLiftEq
+instance Ord1 ConstructorPattern where liftCompare = genericLiftCompare
+instance Show1 ConstructorPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ConstructorPattern
+
+-- e.g. `a <- b` in a Haskell do block.
+data BindPattern a = BindPattern { bindPatternLeft :: a, bindPatternRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 BindPattern where liftEq = genericLiftEq
+instance Ord1 BindPattern where liftCompare = genericLiftCompare
+instance Show1 BindPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable BindPattern
+
+newtype Do a = Do [a]
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Do where liftEq = genericLiftEq
+instance Ord1 Do where liftCompare = genericLiftCompare
+instance Show1 Do where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Do
+
+data Lambda a = Lambda { lambdaHead :: a, lambdaBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Lambda where liftEq = genericLiftEq
+instance Ord1 Lambda where liftCompare = genericLiftCompare
+instance Show1 Lambda where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Lambda
+
+-- e.g. -1 or (-a) as an expression and not `-` as a variable operator.
+newtype PrefixNegation a = PrefixNegation a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 PrefixNegation where liftEq = genericLiftEq
+instance Ord1 PrefixNegation where liftCompare = genericLiftCompare
+instance Show1 PrefixNegation where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable PrefixNegation
+
+newtype CPPDirective a = CPPDirective Text
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 CPPDirective where liftEq = genericLiftEq
+instance Ord1 CPPDirective where liftCompare = genericLiftCompare
+instance Show1 CPPDirective where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable CPPDirective
+
+data QuasiQuotation a = QuasiQuotation { quasiQuotationHead :: a, quasiQuotationBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotation where liftEq = genericLiftEq
+instance Ord1 QuasiQuotation where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotation where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotation
+
+newtype QuasiQuotationExpressionBody a = QuasiQuotationExpressionBody Name
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationExpressionBody where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationExpressionBody where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationExpressionBody where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationExpressionBody
+
+data QuasiQuotationPattern a = QuasiQuotationPattern
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationPattern where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationPattern where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationPattern
+
+data QuasiQuotationType a = QuasiQuotationType
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationType where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationType where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationType
+
+data QuasiQuotationDeclaration a = QuasiQuotationDeclaration
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationDeclaration where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationDeclaration where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationDeclaration
+
+newtype QuasiQuotationQuoter a = QuasiQuotationQuoter Name
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationQuoter where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationQuoter where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationQuoter where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationQuoter
+
+data QuasiQuotationExpression a = QuasiQuotationExpression
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 QuasiQuotationExpression where liftEq = genericLiftEq
+instance Ord1 QuasiQuotationExpression where liftCompare = genericLiftCompare
+instance Show1 QuasiQuotationExpression where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QuasiQuotationExpression
+
+newtype Splice a = Splice a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Splice where liftEq = genericLiftEq
+instance Ord1 Splice where liftCompare = genericLiftCompare
+instance Show1 Splice where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Splice
+
+data TypeClass a = TypeClass { typeClassContext :: a, typeClassIdentifier :: a, typeClassParameters :: [a], typeClassBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeClass where liftEq = genericLiftEq
+instance Ord1 TypeClass where liftCompare = genericLiftCompare
+instance Show1 TypeClass where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeClass
+
+data Fixity' a = Fixity' { fixityPrecedence :: a, fixityIdentifier :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Fixity' where liftEq = genericLiftEq
+instance Ord1 Fixity' where liftCompare = genericLiftCompare
+instance Show1 Fixity' where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Fixity'
+
+-- The default signature of a type class. The default signature has the same shape as a TypeSignature Assignment.
+data DefaultSignature a = DefaultSignature { defaultSignatureName :: [a], defaultSignatureContext :: [a], defaultSignatureContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DefaultSignature where liftEq = genericLiftEq
+instance Ord1 DefaultSignature where liftCompare = genericLiftCompare
+instance Show1 DefaultSignature where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultSignature
+
+data TypeFamily a = TypeFamily { typeFamilyIdentifier :: a, typeFamilyParameters :: [a], typeFamilySignature :: a, typeFamilyBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeFamily where liftEq = genericLiftEq
+instance Ord1 TypeFamily where liftCompare = genericLiftCompare
+instance Show1 TypeFamily where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeFamily
+
+newtype FunctionalDependency a = FunctionalDependency { functionalDependencyContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FunctionalDependency where liftEq = genericLiftEq
+instance Ord1 FunctionalDependency where liftCompare = genericLiftCompare
+instance Show1 FunctionalDependency where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FunctionalDependency
+
+data TypeClassInstance a = TypeClassInstance { typeClassInstanceContext :: [a], typeClassInstanceIdentifier :: a, typeClassInstanceInstance :: a, typeClassInstanceBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeClassInstance where liftEq = genericLiftEq
+instance Ord1 TypeClassInstance where liftCompare = genericLiftCompare
+instance Show1 TypeClassInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeClassInstance
+
+newtype Instance a = Instance a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Instance where liftEq = genericLiftEq
+instance Ord1 Instance where liftCompare = genericLiftCompare
+instance Show1 Instance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Instance
+
+-- e.g. The `Bar{..}` in `foo Bar{..} = baz`.
+newtype LabeledPattern a = LabeledPattern a
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 LabeledPattern where liftEq = genericLiftEq
+instance Ord1 LabeledPattern where liftCompare = genericLiftCompare
+instance Show1 LabeledPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LabeledPattern
+
+-- e.g. The `{..}` in `foo Bar{..} = baz`
+data RecordWildCards a = RecordWildCards
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 RecordWildCards where liftEq = genericLiftEq
+instance Ord1 RecordWildCards where liftCompare = genericLiftCompare
+instance Show1 RecordWildCards where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable RecordWildCards
+
+-- e.g. `type instance F [Int] = Int` where `F` is an open type family.
+data TypeInstance a = TypeInstance { typeInstanceType :: a, typeInstanceBody :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TypeInstance where liftEq = genericLiftEq
+instance Ord1 TypeInstance where liftCompare = genericLiftCompare
+instance Show1 TypeInstance where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable TypeInstance
+
+newtype KindParenthesizedConstructor a = KindParenthesizedConstructor { kindParenthesizedConstructorContent :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindParenthesizedConstructor where liftEq = genericLiftEq
+instance Ord1 KindParenthesizedConstructor where liftCompare = genericLiftCompare
+instance Show1 KindParenthesizedConstructor where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindParenthesizedConstructor
+
+newtype KindTupleType a = KindTupleType { kindTupleType :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 KindTupleType where liftEq = genericLiftEq
+instance Ord1 KindTupleType where liftCompare = genericLiftCompare
+instance Show1 KindTupleType where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable KindTupleType

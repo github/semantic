@@ -1,10 +1,12 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , evaluatePackageWith
 , traceResolve
--- | Effects
+-- * Preludes
+, HasPrelude(..)
+-- * Effects
 , EvalError(..)
 , throwEvalError
 , runEvalError
@@ -30,11 +32,11 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
 import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
+import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Data.Semigroup.Reducer hiding (unit)
-import Data.Semilattice.Lower
 import Data.Sum
 import Data.Term
 import Prologue
@@ -59,11 +61,11 @@ class Show1 constr => Evaluatable constr where
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
-  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: forall address term value inner inner' inner'' outer
+evaluatePackageWith :: forall proxy lang address term value inner inner' inner'' outer
                     .  ( AbstractValue address value inner
                        -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
                        , Addressable address inner'
@@ -72,6 +74,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Evaluatable (Base term)
                        , Foldable (Cell address)
                        , FreeVariables term
+                       , HasPrelude lang
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (EnvironmentError address)) outer
@@ -89,15 +92,16 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
+                    => proxy lang
+                    -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
                     -> Package term
-                    -> TermEvaluator term address value outer [(Environment address, address)]
-evaluatePackageWith analyzeModule analyzeTerm package
+                    -> TermEvaluator term address value outer [(address, Environment address)]
+evaluatePackageWith lang analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
   . runReader (packageModules (packageBody package))
-  . withPrelude (packagePrelude (packageBody package))
+  . withPrelude package
   $ \ preludeEnv
   ->  raiseHandler (runModules (runTermEvaluator . evalModule preludeEnv))
     . traverse (uncurry (evaluateEntryPoint preludeEnv))
@@ -119,22 +123,69 @@ evaluatePackageWith analyzeModule analyzeTerm package
         evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (Environment address, address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
           addr <- box unit -- TODO don't *always* allocate - use maybeM instead
-          (env, ptr) <- fromMaybe (emptyEnv, addr) <$> require m
+          (env, ptr) <- fromMaybe (lowerBound, addr) <$> require m
           bindAll env
           maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
-        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          (builtinsEnv, _) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
-          first (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
-
-        withPrelude Nothing f = f emptyEnv
-        withPrelude (Just prelude) f = do
-          (preludeEnv, _) <- evalPrelude prelude
+        withPrelude _ f = do
+          (preludeEnv, _) <- raiseHandler (runModules (runTermEvaluator . evalModule lowerBound)) . runInModule lowerBound moduleInfoFromCallStack . TermEvaluator $ do
+            defineBuiltins
+            definePrelude lang
+            box unit
           f preludeEnv
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
+
+
+-- Preludes
+
+class HasPrelude (language :: Language) where
+  definePrelude :: ( AbstractValue address value effects
+                   , HasCallStack
+                   , Member (Allocator address value) effects
+                   , Member (Env address) effects
+                   , Member Fresh effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (EnvironmentError address)) effects
+                   , Member Trace effects
+                   )
+                => proxy language
+                -> Evaluator address value effects ()
+  definePrelude _ = pure ()
+
+instance HasPrelude 'Go
+instance HasPrelude 'Haskell
+instance HasPrelude 'Java
+instance HasPrelude 'JavaScript
+instance HasPrelude 'PHP
+
+builtInPrint :: ( AbstractIntro value
+                , AbstractFunction address value effects
+                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Env address) effects, Member (Allocator address value) effects)
+             => Name
+             -> Evaluator address value effects address
+builtInPrint v = do
+  print <- variable "__semantic_print" >>= deref
+  void $ call print [variable v]
+  box unit
+
+instance HasPrelude 'Python where
+  definePrelude _ =
+    define "print" (lambda builtInPrint)
+
+instance HasPrelude 'Ruby where
+  definePrelude _ = do
+    define "puts" (lambda builtInPrint)
+
+    defineClass "Object" [] $ do
+      define "inspect" (lambda (const (box (string "<object>"))))
+
+instance HasPrelude 'TypeScript
+  -- FIXME: define console.log using __semantic_print
 
 
 -- Effects

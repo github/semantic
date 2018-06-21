@@ -9,7 +9,6 @@ module Analysis.Abstract.Dead
 import Control.Abstract
 import Data.Abstract.Module
 import Data.Semigroup.Reducer as Reducer
-import Data.Semilattice.Lower
 import Data.Set (delete)
 import Prologue
 
