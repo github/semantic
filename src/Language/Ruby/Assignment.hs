@@ -40,21 +40,26 @@ import Prologue hiding (for)
 type Syntax = '[
     Comment.Comment
   , Declaration.Function
+  , Literal.Boolean
   , Declaration.Method
   , Directive.File
   , Directive.Line
   , Expression.Arithmetic
-  , Expression.Bitwise
-  , Expression.Boolean
+  , Expression.BAnd
+  , Expression.BOr
+  , Expression.BXOr
+  , Expression.LShift
+  , Expression.RShift
+  , Expression.Complement
+  , Expression.BooleanOperator
   , Expression.Call
   , Expression.Comparison
   , Expression.Enumeration
-  , Expression.Match
+  , Expression.RegexMatch
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
   , Literal.Array
-  , Literal.Boolean
   , Literal.Complex
   , Literal.Float
   , Literal.Hash

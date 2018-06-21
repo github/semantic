@@ -48,8 +48,14 @@ type Syntax = '[
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
   , Expression.Arithmetic
-  , Expression.Bitwise
-  , Expression.Boolean
+  , Expression.BAnd
+  , Expression.BOr
+  , Expression.BXOr
+  , Expression.LShift
+  , Expression.RShift
+  , Expression.UnsignedRShift
+  , Expression.Complement
+  , Expression.BooleanOperator
   , Expression.Call
   , Expression.Cast
   , Expression.Comparison

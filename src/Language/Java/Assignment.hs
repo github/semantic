@@ -37,8 +37,14 @@ type Syntax =
    , Expression.Arithmetic
    , Expression.Call
    , Expression.Comparison
-   , Expression.Bitwise
-   , Expression.Boolean
+   , Expression.BOr
+   , Expression.BXOr
+   , Expression.BAnd
+   , Expression.LShift
+   , Expression.RShift
+   , Expression.UnsignedRShift
+   , Expression.Complement
+   , Expression.BooleanOperator
    , Expression.InstanceOf
    , Expression.MemberAccess
    , Expression.Subscript

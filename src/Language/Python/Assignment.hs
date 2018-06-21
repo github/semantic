@@ -49,8 +49,13 @@ type Syntax =
    , Declaration.Function
    , Declaration.Variable
    , Expression.Arithmetic
-   , Expression.Boolean
-   , Expression.Bitwise
+   , Expression.BooleanOperator
+   , Expression.BAnd
+   , Expression.BOr
+   , Expression.BXOr
+   , Expression.LShift
+   , Expression.RShift
+   , Expression.Complement
    , Expression.Call
    , Expression.Comparison
    , Expression.Enumeration

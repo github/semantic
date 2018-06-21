@@ -42,8 +42,12 @@ type Syntax = '[
   , Declaration.Method
   , Declaration.VariableDeclaration
   , Expression.Arithmetic
-  , Expression.Bitwise
-  , Expression.Boolean
+  , Expression.BAnd
+  , Expression.BOr
+  , Expression.BXOr
+  , Expression.LShift
+  , Expression.RShift
+  , Expression.BooleanOperator
   , Expression.Call
   , Expression.Cast
   , Expression.Comparison
