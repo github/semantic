@@ -19,7 +19,6 @@ module Semantic.Graph
 , resumingEnvironmentError
 ) where
 
-import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Control.Monad.Effect (reinterpret)
@@ -61,7 +60,7 @@ runGraph CallGraph includePackages project
         extractGraph (((_, graph), _), _) = simplify graph
         runGraphAnalysis
           = run
-          . evaluating
+          . runState lowerBound
           . runFresh 0
           . runIgnoringTrace
           . resumingLoadError
@@ -101,7 +100,6 @@ newtype GraphEff address a = GraphEff
                         , Trace
                         , Fresh
                         , State (Heap address Latest (Value address (GraphEff address)))
-                        , State (ModuleTable (Maybe (address, Environment address)))
                         ] a
   }
 
