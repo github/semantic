@@ -38,7 +38,7 @@ import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
-runGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: (Member Distribute effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -94,7 +94,7 @@ newtype GraphEff address a = GraphEff
   }
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member (Distribute WrappedTask) effs, Member Resolution effs, Member Trace effs)
+parsePackage :: (Member Distribute effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
@@ -108,8 +108,8 @@ parsePackage parser project@Project{..} = do
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
-    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
+    parseModules :: (Member Distribute effs, Member Files effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
+    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (parseModule parser (Just projectRootDir))
 
 -- | Parse a file into a 'Module'.
 parseModule :: (Member Files effs, Member Task effs) => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
