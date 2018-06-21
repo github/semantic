@@ -77,4 +77,4 @@ spec = parallel $ do
     ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)
-    evalRubyProject path = testEvaluating <$> evaluateProject (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby path
+    evalRubyProject path = testEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby path

@@ -25,4 +25,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/go/analysis/"
     evaluate entry = evalGoProject (fixtures <> entry)
-    evalGoProject path = testEvaluating <$> evaluateProject (Proxy :: Proxy 'Language.Go) goParser Language.Go path
+    evalGoProject path = testEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Go) goParser Language.Go path
