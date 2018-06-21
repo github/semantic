@@ -77,40 +77,68 @@ instance Evaluatable Arithmetic where
     go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
 -- | Regex matching operators (Ruby's =~ and ~!)
-data RegexMatch a
-  = Matches !a !a
-  | NotMatches !a !a
+data Matches a = Matches { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
-instance Eq1 RegexMatch where liftEq = genericLiftEq
-instance Ord1 RegexMatch where liftCompare = genericLiftCompare
-instance Show1 RegexMatch where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Matches where liftEq = genericLiftEq
+instance Ord1 Matches where liftCompare = genericLiftCompare
+instance Show1 Matches where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable Matches
 
--- TODO: Implement Eval instance for Match
-instance Evaluatable RegexMatch
-
--- | Boolean operators.
-data BooleanOperator a
-  = Or !a !a
-  | And !a !a
-  | Not !a
-  | XOr !a !a
+data NotMatches a = NotMatches { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
-instance Eq1 BooleanOperator where liftEq = genericLiftEq
-instance Ord1 BooleanOperator where liftCompare = genericLiftCompare
-instance Show1 BooleanOperator where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 NotMatches where liftEq = genericLiftEq
+instance Ord1 NotMatches where liftCompare = genericLiftCompare
+instance Show1 NotMatches where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable NotMatches
 
-instance Evaluatable BooleanOperator where
-  -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
+data Or a = Or { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Or where liftEq = genericLiftEq
+instance Ord1 Or where liftCompare = genericLiftCompare
+instance Show1 Or where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Or where
+  eval t = rvalBox =<< go (fmap subtermValue t) where
+    go (Or a b) = do
+      cond <- a
+      ifthenelse cond (pure cond) b
+
+data And a = And { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 And where liftEq = genericLiftEq
+instance Ord1 And where liftCompare = genericLiftCompare
+instance Show1 And where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable And where
   eval t = rvalBox =<< go (fmap subtermValue t) where
     go (And a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
-    go (Or a b) = do
-      cond <- a
-      ifthenelse cond (pure cond) b
+
+data Not a = Not { term :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Not where liftEq = genericLiftEq
+instance Ord1 Not where liftCompare = genericLiftCompare
+instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Not where
+  eval t = rvalBox =<< go (fmap subtermValue t) where
     go (Not a) = a >>= fmap (boolean . not) . asBool
+
+data XOr a = XOr { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 XOr where liftEq = genericLiftEq
+instance Ord1 XOr where liftCompare = genericLiftCompare
+instance Show1 XOr where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable XOr where
+  -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
+  eval t = rvalBox =<< go (fmap subtermValue t) where
     go (XOr a b) = boolean <$> liftA2 (/=) (a >>= asBool) (b >>= asBool)
 
 -- | Javascript delete operator

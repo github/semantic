@@ -55,7 +55,10 @@ type Syntax = '[
   , Expression.RShift
   , Expression.UnsignedRShift
   , Expression.Complement
-  , Expression.BooleanOperator
+  , Expression.And
+  , Expression.Not
+  , Expression.Or
+  , Expression.XOr
   , Expression.Call
   , Expression.Cast
   , Expression.Comparison

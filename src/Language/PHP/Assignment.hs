@@ -47,7 +47,10 @@ type Syntax = '[
   , Expression.BXOr
   , Expression.LShift
   , Expression.RShift
-  , Expression.BooleanOperator
+  , Expression.And
+  , Expression.Not
+  , Expression.Or
+  , Expression.XOr
   , Expression.Call
   , Expression.Cast
   , Expression.Comparison

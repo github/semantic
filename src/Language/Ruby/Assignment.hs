@@ -51,11 +51,15 @@ type Syntax = '[
   , Expression.LShift
   , Expression.RShift
   , Expression.Complement
-  , Expression.BooleanOperator
+  , Expression.And
+  , Expression.Not
+  , Expression.Or
+  , Expression.XOr
   , Expression.Call
   , Expression.Comparison
   , Expression.Enumeration
-  , Expression.RegexMatch
+  , Expression.Matches
+  , Expression.NotMatches
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
