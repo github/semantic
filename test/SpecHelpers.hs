@@ -89,7 +89,6 @@ testEvaluating :: TermEvaluator term Precise
                      , Resumable (LoadError Precise)
                      , Fresh
                      , State (Heap Precise Latest Val)
-                     , State (ModuleTable (Maybe (Precise, Environment Precise)))
                      , Trace
                      ]
                    [(Precise, Environment Precise)]
@@ -142,7 +141,6 @@ newtype TestEff a = TestEff
                        , Resumable (LoadError Precise)
                        , Fresh
                        , State (Heap Precise Latest Val)
-                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
                        , Trace
                        ] a
   }
