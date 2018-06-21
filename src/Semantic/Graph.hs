@@ -127,7 +127,7 @@ runImportGraph project
           . resumingValueError
           . runState lowerBound
           . runReader lowerBound
-          . interpret handleModules
+          . interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package))))
           . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff (Term (Sum syntaxes) (Record Location)) (Hole Precise)))
           . runReader packageInfo
           . runReader lowerBound

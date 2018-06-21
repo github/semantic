@@ -92,9 +92,10 @@ runModules evaluateModule = go
           List dir -> modulePathsInDir dir <$> askModuleTable @term)
 
 handleModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
-              => Modules address a
+              => Set ModulePath
+              -> Modules address a
               -> Evaluator address value effects a
-handleModules = \case
+handleModules _ = \case
   Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable'
   Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable'
   Resolve names -> do
