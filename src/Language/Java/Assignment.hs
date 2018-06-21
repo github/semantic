@@ -36,6 +36,12 @@ type Syntax =
    , Declaration.VariableDeclaration
    , Expression.Arithmetic
    , Expression.Call
+   , Expression.LessThan
+   , Expression.LessThanEqual
+   , Expression.GreaterThan
+   , Expression.GreaterThanEqual
+   , Expression.Equal
+   , Expression.StrictEqual
    , Expression.Comparison
    , Expression.BOr
    , Expression.BXOr
