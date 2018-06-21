@@ -19,11 +19,11 @@ spec = parallel $ do
       Env.names env `shouldBe` [ "bar", "quz" ]
 
     it "imports with qualified names" $ do
-      ((Right [(_, env)], state), _) <- evaluate "main1.ts"
+      ((Right [(_, env)], heap), _) <- evaluate "main1.ts"
       Env.names env `shouldBe` [ "b", "z" ]
 
-      (derefQName (heap state) ("b" :| []) env >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
-      (derefQName (heap state) ("z" :| []) env >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
+      (derefQName heap ("b" :| []) env >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
+      (derefQName heap ("z" :| []) env >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
 
     it "side effect only imports" $ do
       ((res, _), _) <- evaluate "main2.ts"
