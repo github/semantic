@@ -74,6 +74,7 @@ type Syntax = '[
   , Expression.ScopeResolution
   , Expression.SequenceExpression
   , Expression.Subscript
+  , Expression.Member
   , Expression.Delete
   , Expression.Void
   , Expression.Typeof

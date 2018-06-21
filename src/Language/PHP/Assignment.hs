@@ -65,6 +65,7 @@ type Syntax = '[
   , Expression.New
   , Expression.SequenceExpression
   , Expression.Subscript
+  , Expression.Member
   , Literal.Array
   , Literal.Float
   , Literal.Integer

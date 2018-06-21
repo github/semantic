@@ -69,6 +69,7 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
+  , Expression.Member
   , Literal.Array
   , Literal.Complex
   , Literal.Float

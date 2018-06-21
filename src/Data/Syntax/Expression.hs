@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, DuplicateRecordFields #-}
 module Data.Syntax.Expression where
 
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prologue hiding (index)
+import Prologue hiding (index, Member)
 import Proto3.Suite.Class
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -322,9 +322,7 @@ instance Evaluatable MemberAccess where
     pure $! LvalMember ptr propName
 
 -- | Subscript (e.g a[1])
-data Subscript a
-  = Subscript !a ![a]
-  | Member !a !a
+data Subscript a = Subscript { lhs :: a, rhs :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Subscript where liftEq = genericLiftEq
@@ -336,8 +334,15 @@ instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Subscript where
   eval (Subscript l [r]) = Rval <$> join (index <$> subtermValue l <*> subtermValue r)
   eval (Subscript _ _)   = rvalBox =<< throwResumable (Unspecialized "Eval unspecialized for subscript with slices")
-  eval (Member _ _)      = rvalBox =<< throwResumable (Unspecialized "Eval unspecialized for member access")
 
+data Member a = Member { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Member where liftEq = genericLiftEq
+instance Ord1 Member where liftCompare = genericLiftCompare
+instance Show1 Member where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Member where
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
 data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a, enumerationStep :: !a }
