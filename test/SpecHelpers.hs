@@ -79,7 +79,7 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-testEvaluating :: TermEvaluator term Precise
+testEvaluating :: Evaluator Precise
                     Val
                     '[ Resumable (ValueError Precise TestEff)
                      , Resumable (AddressError Precise Val)
@@ -118,9 +118,8 @@ testEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runValueError
+  . runValueError @_ @Precise @TestEff
   . (>>= traverse deref1)
-  . runTermEvaluator @_ @_ @Val
 
 type Val = Value Precise TestEff
 newtype TestEff a = TestEff
