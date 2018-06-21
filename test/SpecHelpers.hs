@@ -10,6 +10,7 @@ module SpecHelpers
 , verbatim
 , TermEvaluator(..)
 , Verbatim(..)
+, toList
 ) where
 
 import Control.Abstract
@@ -21,6 +22,7 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
+import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
 import Data.Abstract.Value (Value(..), ValueError, runValueError)
@@ -30,6 +32,7 @@ import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
+import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
@@ -86,12 +89,13 @@ testEvaluating :: Evaluator Precise
                      , Resumable ResolutionError
                      , Resumable (Unspecialized Val)
                      , Resumable (LoadError Precise)
+                     , Trace
                      , Fresh
                      , State (Heap Precise Latest Val)
-                     , Trace
+                     , IO
                      ]
-                   [(Precise, Environment Precise)]
-               -> ((Either
+                   (ModuleTable (NonEmpty (Module (Precise, Environment Precise))))
+               -> IO ((Either
                       (SomeExc
                          (Data.Sum.Sum
                           '[ ValueError Precise (UtilEff Precise)
@@ -106,10 +110,11 @@ testEvaluating :: Evaluator Precise
                     Heap Precise Latest Val),
                    [String])
 testEvaluating
-  = run
-  . runReturningTrace
+  = runM
+  . fmap (\ ((res, traces), heap) -> ((res, heap), traces))
   . runState lowerBound
   . runFresh 0
+  . runReturningTrace
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -119,6 +124,7 @@ testEvaluating
   . runAddressError
   . runValueError @_ @Precise @(UtilEff Precise)
   . (>>= traverse deref1)
+  . fmap ((>>= map moduleBody . toList . snd) . toPairs)
 
 type Val = Value Precise (UtilEff Precise)
 

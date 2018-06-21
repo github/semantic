@@ -40,4 +40,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
-    evalTypeScriptProject path = testEvaluating <$> evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript path
+    evalTypeScriptProject path = testEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript path
