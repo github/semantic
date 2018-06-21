@@ -27,6 +27,7 @@ import Data.Language
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Set as Set
 import Prologue
+import System.FilePath.Posix (takeDirectory)
 
 -- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
 lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (Maybe (address, Environment address)))
@@ -100,7 +101,7 @@ handleModules paths = \case
   Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable'
   Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable'
   Resolve names -> pure (find (flip Set.member paths) names)
-  List dir -> modulePathsInDir dir <$> askModuleTable'
+  List dir -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
 getModuleTable :: Member (State (ModuleTable (Maybe (address, Environment address)))) effects => Evaluator address value effects (ModuleTable (Maybe (address, Environment address)))
 getModuleTable = get
