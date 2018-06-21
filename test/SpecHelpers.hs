@@ -9,7 +9,6 @@ module SpecHelpers
 , derefQName
 , verbatim
 , TermEvaluator(..)
-, TestEff(..)
 , Verbatim(..)
 ) where
 
@@ -81,7 +80,7 @@ readFilePair paths = let paths' = fmap file paths in
 
 testEvaluating :: Evaluator Precise
                     Val
-                    '[ Resumable (ValueError Precise TestEff)
+                    '[ Resumable (ValueError Precise (UtilEff Precise))
                      , Resumable (AddressError Precise Val)
                      , Resumable EvalError, Resumable (EnvironmentError Precise)
                      , Resumable ResolutionError
@@ -95,7 +94,7 @@ testEvaluating :: Evaluator Precise
                -> ((Either
                       (SomeExc
                          (Data.Sum.Sum
-                          '[ ValueError Precise TestEff
+                          '[ ValueError Precise (UtilEff Precise)
                            , AddressError Precise Val
                            , EvalError
                            , EnvironmentError Precise
@@ -103,7 +102,7 @@ testEvaluating :: Evaluator Precise
                            , Unspecialized Val
                            , LoadError Precise
                            ]))
-                      [(Value Precise TestEff, Environment Precise)],
+                      [(Value Precise (UtilEff Precise), Environment Precise)],
                     Heap Precise Latest Val),
                    [String])
 testEvaluating
@@ -118,31 +117,10 @@ testEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runValueError @_ @Precise @TestEff
+  . runValueError @_ @Precise @(UtilEff Precise)
   . (>>= traverse deref1)
 
-type Val = Value Precise TestEff
-newtype TestEff a = TestEff
-  { runTestEff :: Eff '[ LoopControl Precise
-                       , Return Precise
-                       , Env Precise
-                       , Allocator Precise Val
-                       , Reader ModuleInfo
-                       , Modules Precise
-                       , Reader Span
-                       , Reader PackageInfo
-                       , Resumable (ValueError Precise TestEff)
-                       , Resumable (AddressError Precise Val)
-                       , Resumable EvalError
-                       , Resumable (EnvironmentError Precise)
-                       , Resumable ResolutionError
-                       , Resumable (Unspecialized Val)
-                       , Resumable (LoadError Precise)
-                       , Fresh
-                       , State (Heap Precise Latest Val)
-                       , Trace
-                       ] a
-  }
+type Val = Value Precise (UtilEff Precise)
 
 deref1 (ptr, env) = runAllocator $ do
   val <- deref ptr
