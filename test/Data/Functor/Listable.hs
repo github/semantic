@@ -289,7 +289,7 @@ instance Listable1 Expression.Arithmetic where
 instance Listable1 Expression.Bitwise where
   liftTiers tiers = liftCons2 tiers tiers Expression.BOr \/ liftCons2 tiers tiers Expression.BAnd \/ liftCons2 tiers tiers Expression.BXOr \/ liftCons2 tiers tiers Expression.LShift \/ liftCons2 tiers tiers Expression.RShift \/ liftCons2 tiers tiers Expression.UnsignedRShift \/ liftCons1 tiers Expression.Complement
 
-instance Listable1 Expression.Boolean where
+instance Listable1 Expression.BooleanOperator where
   liftTiers tiers = liftCons2 tiers tiers Expression.Or \/ liftCons2 tiers tiers Expression.And \/ liftCons1 tiers Expression.Not \/ liftCons2 tiers tiers Expression.XOr
 
 instance Listable1 Expression.Call where
@@ -301,8 +301,8 @@ instance Listable1 Expression.Comparison where
 instance Listable1 Expression.Enumeration where
   liftTiers tiers = liftCons3 tiers tiers tiers Expression.Enumeration
 
-instance Listable1 Expression.Match where
-  liftTiers tiers = liftCons2 tiers tiers Expression.Matches \/ liftCons2 tiers tiers Expression.NotMatches
+instance Listable1 Expression.RegexMatch where
+  liftTiers tiers = liftCons2 tiers tiers Expression.RegexMatches \/ liftCons2 tiers tiers Expression.NotMatches
 
 instance Listable1 Expression.MemberAccess where
   liftTiers tiers = liftCons2 tiers mempty Expression.MemberAccess
