@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, DuplicateRecordFields #-}
 module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable
@@ -77,31 +77,31 @@ instance Evaluatable Arithmetic where
     go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
 -- | Regex matching operators (Ruby's =~ and ~!)
-data Match a
+data RegexMatch a
   = Matches !a !a
   | NotMatches !a !a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
-instance Eq1 Match where liftEq = genericLiftEq
-instance Ord1 Match where liftCompare = genericLiftCompare
-instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 RegexMatch where liftEq = genericLiftEq
+instance Ord1 RegexMatch where liftCompare = genericLiftCompare
+instance Show1 RegexMatch where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Match
-instance Evaluatable Match
+instance Evaluatable RegexMatch
 
 -- | Boolean operators.
-data Boolean a
+data BooleanOperator a
   = Or !a !a
   | And !a !a
   | Not !a
   | XOr !a !a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
-instance Eq1 Boolean where liftEq = genericLiftEq
-instance Ord1 Boolean where liftCompare = genericLiftCompare
-instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 BooleanOperator where liftEq = genericLiftEq
+instance Ord1 BooleanOperator where liftCompare = genericLiftCompare
+instance Show1 BooleanOperator where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Boolean where
+instance Evaluatable BooleanOperator where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
   eval t = rvalBox =<< go (fmap subtermValue t) where
     go (And a b) = do
@@ -160,34 +160,63 @@ instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Typeof
 instance Evaluatable Typeof
 
-
 -- | Bitwise operators.
-data Bitwise a
-  = BOr !a !a
-  | BAnd !a !a
-  | BXOr !a !a
-  | LShift !a !a
-  | RShift !a !a
-  | UnsignedRShift !a !a
-  | Complement a
+data BOr a = BOr { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
-instance Eq1 Bitwise where liftEq = genericLiftEq
-instance Ord1 Bitwise where liftCompare = genericLiftCompare
-instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 BOr where liftEq = genericLiftEq
+instance Ord1 BOr where liftCompare = genericLiftCompare
+instance Show1 BOr where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable BOr where
 
-instance Evaluatable Bitwise where
-  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
-    genLShift x y = shiftL x (fromIntegral y)
-    genRShift x y = shiftR x (fromIntegral y)
-    go x = case x of
-      (BOr a b)            -> liftBitwise2 (.|.) a b
-      (BAnd a b)           -> liftBitwise2 (.&.) a b
-      (BXOr a b)           -> liftBitwise2 xor a b
-      (LShift a b)         -> liftBitwise2 genLShift a b
-      (RShift a b)         -> liftBitwise2 genRShift a b
-      (UnsignedRShift a b) -> liftBitwise2 genRShift a b
-      (Complement a)       -> liftBitwise complement a
+data BAnd a = BAnd { left :: a, right :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 BAnd where liftEq = genericLiftEq
+instance Ord1 BAnd where liftCompare = genericLiftCompare
+instance Show1 BAnd where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable BAnd where
+
+data BXOr a = BXOr { left :: a, right :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 BXOr where liftEq = genericLiftEq
+instance Ord1 BXOr where liftCompare = genericLiftCompare
+instance Show1 BXOr where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable BXOr where
+
+data LShift a = LShift { left :: a, right :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 LShift where liftEq = genericLiftEq
+instance Ord1 LShift where liftCompare = genericLiftCompare
+instance Show1 LShift where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable LShift where
+
+data RShift a = RShift { left :: a, right :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 RShift where liftEq = genericLiftEq
+instance Ord1 RShift where liftCompare = genericLiftCompare
+instance Show1 RShift where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable RShift where
+
+data UnsignedRShift a = UnsignedRShift { left :: a, right :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 UnsignedRShift where liftEq = genericLiftEq
+instance Ord1 UnsignedRShift where liftCompare = genericLiftCompare
+instance Show1 UnsignedRShift where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable UnsignedRShift where
+
+newtype Complement a = Complement { value :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Complement where liftEq = genericLiftEq
+instance Ord1 Complement where liftCompare = genericLiftCompare
+instance Show1 Complement where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Complement where
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a
