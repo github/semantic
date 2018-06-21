@@ -96,7 +96,7 @@ evaluatePackageWith :: forall proxy lang address term value inner inner' inner''
                     -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
                     -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
                     -> Package term
-                    -> TermEvaluator term address value outer [(address, Environment address)]
+                    -> TermEvaluator term address value outer [(Environment address, address)]
 evaluatePackageWith lang analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
