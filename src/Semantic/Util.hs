@@ -61,7 +61,7 @@ newtype UtilEff address a = UtilEff
                        , Fresh
                        , State (Heap address Latest (Value address (UtilEff address)))
                        , State (ModuleTable (Maybe (Environment address, address)))
-                       , IO
+                       , Lift IO
                        ] a
   }
 
