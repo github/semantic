@@ -4,14 +4,17 @@ module Semantic.Util where
 
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Analysis.Abstract.Evaluating
 import           Control.Abstract
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
+import           Data.Abstract.Module
+import qualified Data.Abstract.ModuleTable as ModuleTable
+import           Data.Abstract.Package
 import           Data.Abstract.Type
 import           Data.Blob
+import           Data.Graph (topologicalSort)
 import           Data.Project
 import           Data.Functor.Foldable
 import qualified Data.Language as Language
@@ -29,7 +32,7 @@ import           Text.Show.Pretty (ppShow)
 
 justEvaluating
   = runM
-  . evaluating
+  . runState lowerBound
   . runFresh 0
   . runPrintingTrace
   . fmap reassociate
@@ -39,7 +42,6 @@ justEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTermEvaluator @_ @Precise @(Value Precise (UtilEff _))
   . runValueError
 
 newtype UtilEff address a = UtilEff
@@ -49,6 +51,7 @@ newtype UtilEff address a = UtilEff
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo
                        , Modules address
+                       , Reader (ModuleTable (NonEmpty (Module (address, Environment address))))
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (ValueError address (UtilEff address))
@@ -61,14 +64,13 @@ newtype UtilEff address a = UtilEff
                        , Trace
                        , Fresh
                        , State (Heap address Latest (Value address (UtilEff address)))
-                       , State (ModuleTable (Maybe (address, Environment address)))
                        , IO
                        ] a
   }
 
 checking
   = runM @_ @IO
-  . evaluating
+  . runState (lowerBound @(Heap Monovariant All Type))
   . runFresh 0
   . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
@@ -93,8 +95,26 @@ evalTypeScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go path
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject proxy parser lang path = evaluatePackageWith proxy id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser)
-evaluateProjectWithCaching proxy parser lang path = evaluatePackageWith proxy convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser)
+evaluateProject proxy parser lang path = runTask $ do
+  project <- readProject Nothing path lang []
+  package <- fmap quieterm <$> parsePackage parser project
+  modules <- runImportGraph proxy package
+  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
+       (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Precise, Environment Precise)))))
+       (raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package)))))
+       (evaluate proxy id withTermSpans (topologicalSort modules)))))))
+
+evaluateProjectWithCaching proxy parser lang path = runTask $ do
+  project <- readProject Nothing path lang []
+  package <- fmap quieterm <$> parsePackage parser project
+  modules <- runImportGraph proxy package
+  pure (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Monovariant, Environment Monovariant)))))
+       (raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package)))))
+       (evaluate proxy id withTermSpans (topologicalSort modules))))))
 
 
 parseFile :: Parser term -> FilePath -> IO term

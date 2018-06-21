@@ -112,7 +112,7 @@ testEvaluating :: TermEvaluator term Precise
 testEvaluating
   = run
   . runReturningTrace
-  . evaluating
+  . runState lowerBound
   . runFresh 0
   . fmap reassociate
   . runLoadError

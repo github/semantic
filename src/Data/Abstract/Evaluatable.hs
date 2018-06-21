@@ -3,7 +3,6 @@ module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , evaluate
-, evaluatePackageWith
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
@@ -31,7 +30,6 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
-import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
 import Data.Coerce
 import Data.Language
@@ -119,74 +117,6 @@ evaluate lang analyzeModule analyzeTerm modules = do
           . runEnv preludeEnv
           . runReturn
           . runLoopControl
-
--- | Evaluate a given package.
-evaluatePackageWith :: ( AbstractValue address value inner
-                       -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
-                       , Addressable address inner'
-                       , Declarations term
-                       , Evaluatable (Base term)
-                       , Foldable (Cell address)
-                       , FreeVariables term
-                       , HasPrelude lang
-                       , Member Fresh outer
-                       , Member (Resumable (AddressError address value)) outer
-                       , Member (Resumable (EnvironmentError address)) outer
-                       , Member (Resumable EvalError) outer
-                       , Member (Resumable (LoadError address)) outer
-                       , Member (Resumable ResolutionError) outer
-                       , Member (Resumable (Unspecialized value)) outer
-                       , Member (State (Heap address (Cell address) value)) outer
-                       , Member (State (ModuleTable (Maybe (address, Environment address)))) outer
-                       , Member Trace outer
-                       , Recursive term
-                       , Reducer value (Cell address value)
-                       , ValueRoots address value
-                       , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': inner')
-                       , inner' ~ (Reader ModuleInfo ': inner'')
-                       , inner'' ~ (Modules address ': Reader Span ': Reader PackageInfo ': outer)
-                       )
-                    => proxy lang
-                    -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
-                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
-                    -> Package term
-                    -> TermEvaluator term address value outer [(address, Environment address)]
-evaluatePackageWith lang analyzeModule analyzeTerm package
-  = runReader (packageInfo package)
-  . runReader lowerBound
-  . runReader (packageModules (packageBody package))
-  . withPrelude
-  $ \ preludeEnv
-  ->  raiseHandler (runModules (runTermEvaluator . evalModule preludeEnv))
-    . traverse (uncurry (evaluateEntryPoint preludeEnv))
-    $ ModuleTable.toPairs (packageEntryPoints (packageBody package))
-  where
-        evalModule preludeEnv m
-          = fmap (<$ m)
-          . runInModule preludeEnv (moduleInfo m)
-          . analyzeModule (subtermRef . moduleBody)
-          $ evalTerm <$> m
-        evalTerm term = Subterm term (TermEvaluator (address =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
-
-        runInModule preludeEnv info
-          = runReader info
-          . raiseHandler runAllocator
-          . raiseHandler (runEnv preludeEnv)
-          . raiseHandler runReturn
-          . raiseHandler runLoopControl
-
-        evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
-          addr <- box unit -- TODO don't *always* allocate - use maybeM instead
-          (ptr, env) <- fromMaybe (addr, lowerBound) <$> require m
-          bindAll env
-          maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
-
-        withPrelude f = do
-          (_, preludeEnv) <- raiseHandler (runModules (runTermEvaluator . evalModule lowerBound)) . runInModule lowerBound moduleInfoFromCallStack . TermEvaluator $ do
-            defineBuiltins
-            definePrelude lang
-            box unit
-          f preludeEnv
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
