@@ -105,7 +105,7 @@ testEvaluating :: TermEvaluator term Precise
                            , LoadError Precise
                            ]))
                       [(Value Precise TestEff, Environment Precise)],
-                    EvaluatingState Precise Val),
+                    Heap Precise Latest Val),
                    [String])
 testEvaluating
   = run
