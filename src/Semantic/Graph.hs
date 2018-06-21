@@ -20,7 +20,7 @@ module Semantic.Graph
 ) where
 
 import           Analysis.Abstract.Evaluating
-import           Analysis.Abstract.Graph
+import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
@@ -49,6 +49,7 @@ runGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Memb
          -> Bool
          -> Project
          -> Eff effs (Graph Vertex)
+runGraph ImportGraph _ project = fmap (Graph.moduleVertex . moduleInfo) <$> runImportGraph project
 runGraph graphType includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
