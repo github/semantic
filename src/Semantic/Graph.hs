@@ -124,7 +124,7 @@ runImportGraph lang (package :: Package term) = do
         case ModuleTable.lookup (modulePath info) (packageModules (packageBody package)) of
           Nothing -> lowerBound
           Just m -> foldMapA pure m
-      runImportGraphAnalysis packageInfo
+      runImportGraphAnalysis
         = run
         . runState lowerBound
         . runFresh 0
@@ -140,9 +140,9 @@ runImportGraph lang (package :: Package term) = do
         . runReader lowerBound
         . interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package))))
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
-        . runReader packageInfo
+        . runReader (packageInfo package)
         . runReader lowerBound
-  extractGraph <$> analyze (runImportGraphAnalysis (packageInfo package)) (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
+  extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
 
 newtype ImportGraphEff term address a = ImportGraphEff
   { runImportGraphEff :: Eff '[ LoopControl address
