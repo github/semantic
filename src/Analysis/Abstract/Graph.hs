@@ -2,6 +2,7 @@
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
+, moduleVertex
 , style
 , appendGraph
 , variableDefinition
