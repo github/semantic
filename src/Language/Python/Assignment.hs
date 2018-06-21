@@ -48,7 +48,14 @@ type Syntax =
    , Declaration.Decorator
    , Declaration.Function
    , Declaration.Variable
-   , Expression.Arithmetic
+   , Expression.Plus
+   , Expression.Minus
+   , Expression.Times
+   , Expression.DividedBy
+   , Expression.Modulo
+   , Expression.Power
+   , Expression.Negate
+   , Expression.FloorDivision
    , Expression.And
    , Expression.Not
    , Expression.Or

@@ -33,7 +33,14 @@ type Syntax =
    , Declaration.MethodSignature
    , Declaration.Type
    , Declaration.TypeAlias
-   , Expression.Arithmetic
+   , Expression.Plus
+   , Expression.Minus
+   , Expression.Times
+   , Expression.DividedBy
+   , Expression.Modulo
+   , Expression.Power
+   , Expression.Negate
+   , Expression.FloorDivision
    , Expression.BOr
    , Expression.BAnd
    , Expression.BXOr

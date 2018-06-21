@@ -34,7 +34,14 @@ type Syntax =
    , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
-   , Expression.Arithmetic
+   , Expression.Plus
+   , Expression.Minus
+   , Expression.Times
+   , Expression.DividedBy
+   , Expression.Modulo
+   , Expression.Power
+   , Expression.Negate
+   , Expression.FloorDivision
    , Expression.Call
    , Expression.LessThan
    , Expression.LessThanEqual
