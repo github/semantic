@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph
 ( runGraph
-, GraphEff(..)
 , GraphType(..)
 , Graph
 , Vertex
