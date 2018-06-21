@@ -183,7 +183,7 @@ parsePackage parser project@Project{..} = do
 
     -- | Parse all files in a project into 'Module's.
     parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
+    parseModules parser Project{..} = distributeFor projectFiles (WrapTask . parseModule parser (Just projectRootDir))
 
 -- | Parse a file into a 'Module'.
 parseModule :: (Member Files effs, Member Task effs) => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
