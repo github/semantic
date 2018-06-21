@@ -55,11 +55,12 @@ runGraph ImportGraph _ project
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
+    modules <- runImportGraph lang package
     let analyzeTerm = withTermSpans . graphingTerms
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
-    extractGraph <$> analyze runGraphAnalysis (evaluatePackageWith lang analyzeModule analyzeTerm package)
+    extractGraph <$> analyze (runGraphAnalysis package) (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
     where extractGraph (((_, graph), _), _) = simplify graph
-          runGraphAnalysis
+          runGraphAnalysis package
             = run
             . evaluating
             . runFresh 0
@@ -73,6 +74,10 @@ runGraph CallGraph includePackages project
             . resumingValueError
             . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _))
             . graphing
+            . runReader (packageInfo package)
+            . runReader lowerBound
+            . runReader lowerBound
+            . raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package)))))
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
 newtype GraphEff address a = GraphEff
@@ -82,6 +87,7 @@ newtype GraphEff address a = GraphEff
                         , Allocator address (Value address (GraphEff address))
                         , Reader ModuleInfo
                         , Modules address
+                        , Reader (ModuleTable (NonEmpty (Module (address, Environment address))))
                         , Reader Span
                         , Reader PackageInfo
                         , State (Graph Vertex)
