@@ -52,9 +52,9 @@ newtype UtilEff address a = UtilEff
                        , Reader PackageInfo
                        , Resumable (ValueError address (UtilEff address))
                        , Resumable (AddressError address (Value address (UtilEff address)))
+                       , Resumable ResolutionError
                        , Resumable EvalError
                        , Resumable (EnvironmentError address)
-                       , Resumable ResolutionError
                        , Resumable (Unspecialized (Value address (UtilEff address)))
                        , Resumable (LoadError address (Value address (UtilEff address)))
                        , Trace
