@@ -37,7 +37,7 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . runAllocator
+  . runAllocator @Precise @_ @Val
   . (>>= deref . fst)
   . runEnv lowerBound
   . runReturn
