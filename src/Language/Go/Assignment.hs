@@ -50,6 +50,7 @@ type Syntax =
    , Expression.StrictEqual
    , Expression.Comparison
    , Expression.Subscript
+   , Expression.Member
    , Statement.PostDecrement
    , Statement.PostIncrement
    , Expression.MemberAccess

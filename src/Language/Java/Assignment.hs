@@ -57,6 +57,7 @@ type Syntax =
    , Expression.InstanceOf
    , Expression.MemberAccess
    , Expression.Subscript
+   , Expression.Member
    , Expression.Super
    , Expression.This
    , Java.Syntax.Annotation

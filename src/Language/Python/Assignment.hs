@@ -71,6 +71,7 @@ type Syntax =
    , Expression.ScopeResolution
    , Expression.MemberAccess
    , Expression.Subscript
+   , Expression.Member
    , Literal.Array
    , Literal.Boolean
    , Literal.Float
