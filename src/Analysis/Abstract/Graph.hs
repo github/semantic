@@ -100,11 +100,7 @@ graphingModuleInfo :: forall term address value effects a
                    => SubtermAlgebra Module term (TermEvaluator term address value effects a)
                    -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingModuleInfo recur m = interpose @(Modules address) pure (\ eff yield -> case eff of
-  Load path -> do
-    moduleInfo <- ask
-    appendGraph (vertex moduleInfo `connect` vertex (ModuleInfo path))
-    result <- send eff
-    yield result
+  Load   path -> ask >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex >> send eff >>= yield
   Lookup path -> ask >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex >> send eff >>= yield
   _ -> send eff >>= yield)
   (recur m)
