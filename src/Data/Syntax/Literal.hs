@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, ViewPatterns, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, ViewPatterns, ScopedTypeVariables, DuplicateRecordFields #-}
 module Data.Syntax.Literal where
 
 import           Data.Abstract.Evaluatable
@@ -58,7 +58,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 -- Rational literals e.g. `2/3r`
-newtype Rational a = Rational Text
+newtype Rational a = Rational { value :: Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Data.Syntax.Literal.Rational where liftEq = genericLiftEq
@@ -73,7 +73,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     in rvalBox =<< (rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
 
 -- Complex literals e.g. `3 + 2i`
-newtype Complex a = Complex Text
+newtype Complex a = Complex { value :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 Data.Syntax.Literal.Complex where liftEq = genericLiftEq

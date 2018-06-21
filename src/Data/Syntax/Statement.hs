@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, UndecidableInstances, ViewPatterns, DuplicateRecordFields #-}
 module Data.Syntax.Statement where
 
 import Data.Abstract.Evaluatable
@@ -182,7 +182,7 @@ instance Evaluatable PreDecrement
 
 -- Returns
 
-newtype Return a = Return a
+newtype Return a = Return { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Return where liftEq = genericLiftEq
@@ -192,7 +192,7 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Return where
   eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
 
-newtype Yield a = Yield a
+newtype Yield a = Yield { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Yield where liftEq = genericLiftEq
@@ -203,7 +203,7 @@ instance Show1 Yield where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Yield
 
 
-newtype Break a = Break a
+newtype Break a = Break { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Break where liftEq = genericLiftEq
@@ -213,7 +213,7 @@ instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Break where
   eval (Break x) = Rval <$> (subtermAddress x >>= throwBreak)
 
-newtype Continue a = Continue a
+newtype Continue a = Continue { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Continue where liftEq = genericLiftEq
@@ -223,7 +223,7 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Continue where
   eval (Continue x) = Rval <$> (subtermAddress x >>= throwContinue)
 
-newtype Retry a = Retry a
+newtype Retry a = Retry { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Retry where liftEq = genericLiftEq
@@ -323,7 +323,7 @@ instance Show1 Catch where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Catch
 
 
-newtype Finally a = Finally a
+newtype Finally a = Finally { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Finally where liftEq = genericLiftEq
@@ -337,7 +337,7 @@ instance Evaluatable Finally
 -- Scoping
 
 -- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
-newtype ScopeEntry a = ScopeEntry [a]
+newtype ScopeEntry a = ScopeEntry { terms :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 ScopeEntry where liftEq = genericLiftEq
@@ -349,7 +349,7 @@ instance Evaluatable ScopeEntry
 
 
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
-newtype ScopeExit a = ScopeExit [a]
+newtype ScopeExit a = ScopeExit { terms :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 ScopeExit where liftEq = genericLiftEq

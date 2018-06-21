@@ -41,7 +41,14 @@ type Syntax = '[
   , Declaration.Function
   , Declaration.Method
   , Declaration.VariableDeclaration
-  , Expression.Arithmetic
+  , Expression.Plus
+  , Expression.Minus
+  , Expression.Times
+  , Expression.DividedBy
+  , Expression.Modulo
+  , Expression.Power
+  , Expression.Negate
+  , Expression.FloorDivision
   , Expression.BAnd
   , Expression.BOr
   , Expression.BXOr

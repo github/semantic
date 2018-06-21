@@ -110,31 +110,92 @@ instance Evaluatable Comparison where
     go x = case x of
       (Comparison a b)         -> liftComparison (Concrete (==)) a b
 
--- | Binary arithmetic operators.
-data Arithmetic a
-  = Plus !a !a
-  | Minus !a !a
-  | Times !a !a
-  | DividedBy !a !a
-  | FloorDivision !a !a
-  | Modulo !a !a
-  | Power !a !a
-  | Negate !a
+data Plus a = Plus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
-instance Eq1 Arithmetic where liftEq = genericLiftEq
-instance Ord1 Arithmetic where liftCompare = genericLiftCompare
-instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Plus where liftEq = genericLiftEq
+instance Ord1 Plus where liftCompare = genericLiftCompare
+instance Show1 Plus where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Arithmetic where
+instance Evaluatable Plus where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
+
+data Minus a = Minus { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Minus where liftEq = genericLiftEq
+instance Ord1 Minus where liftCompare = genericLiftCompare
+instance Show1 Minus where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Minus where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
+
+data Times a = Times { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Times where liftEq = genericLiftEq
+instance Ord1 Times where liftCompare = genericLiftCompare
+instance Show1 Times where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Times where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
+
+data DividedBy a = DividedBy { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 DividedBy where liftEq = genericLiftEq
+instance Ord1 DividedBy where liftCompare = genericLiftCompare
+instance Show1 DividedBy where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DividedBy where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (DividedBy a b)     = liftNumeric2 div' a b where div'   = liftIntegralFrac div (/)
+
+data Modulo a = Modulo { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Modulo where liftEq = genericLiftEq
+instance Ord1 Modulo where liftCompare = genericLiftCompare
+instance Show1 Modulo where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Modulo where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Modulo a b)        = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
+
+data Power a = Power { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Power where liftEq = genericLiftEq
+instance Ord1 Power where liftCompare = genericLiftCompare
+instance Show1 Power where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Power where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Power a b)         = liftNumeric2 liftedExponent a b
+
+data Negate a = Negate { term :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 Negate where liftEq = genericLiftEq
+instance Ord1 Negate where liftCompare = genericLiftCompare
+instance Show1 Negate where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Negate where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Negate a)          = liftNumeric negate a
+
+data FloorDivision a = FloorDivision { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 FloorDivision where liftEq = genericLiftEq
+instance Ord1 FloorDivision where liftCompare = genericLiftCompare
+instance Show1 FloorDivision where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FloorDivision where
+  eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
 -- | Regex matching operators (Ruby's =~ and ~!)
@@ -308,8 +369,7 @@ instance Show1 Complement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Complement where
 
 -- | Member Access (e.g. a.b)
-data MemberAccess a
-  = MemberAccess !a !Name
+data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 MemberAccess where liftEq = genericLiftEq
@@ -369,7 +429,7 @@ instance Evaluatable InstanceOf
 
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
-newtype ScopeResolution a = ScopeResolution [a]
+newtype ScopeResolution a = ScopeResolution { scopes :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 ScopeResolution where liftEq = genericLiftEq

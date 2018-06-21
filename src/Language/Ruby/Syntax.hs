@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
@@ -149,21 +149,30 @@ instance Evaluatable Module where
     rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
-data LowPrecedenceBoolean a
-  = LowAnd !a !a
-  | LowOr !a !a
+data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
-instance Evaluatable LowPrecedenceBoolean where
+instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
   eval t = rvalBox =<< go (fmap subtermValue t) where
-    go (LowAnd a b) = do
+    go (LowPrecedenceAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
-    go (LowOr a b) = do
+
+instance Eq1 LowPrecedenceAnd where liftEq = genericLiftEq
+instance Ord1 LowPrecedenceAnd where liftCompare = genericLiftCompare
+instance Show1 LowPrecedenceAnd where liftShowsPrec = genericLiftShowsPrec
+
+data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Evaluatable LowPrecedenceOr where
+  -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
+  eval t = rvalBox =<< go (fmap subtermValue t) where
+    go (LowPrecedenceOr a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
 
-instance Eq1 LowPrecedenceBoolean where liftEq = genericLiftEq
-instance Ord1 LowPrecedenceBoolean where liftCompare = genericLiftCompare
-instance Show1 LowPrecedenceBoolean where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 LowPrecedenceOr where liftEq = genericLiftEq
+instance Ord1 LowPrecedenceOr where liftCompare = genericLiftCompare
+instance Show1 LowPrecedenceOr where liftShowsPrec = genericLiftShowsPrec

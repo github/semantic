@@ -44,7 +44,14 @@ type Syntax = '[
   , Declaration.Method
   , Directive.File
   , Directive.Line
-  , Expression.Arithmetic
+  , Expression.Plus
+  , Expression.Minus
+  , Expression.Times
+  , Expression.DividedBy
+  , Expression.Modulo
+  , Expression.Power
+  , Expression.Negate
+  , Expression.FloorDivision
   , Expression.BAnd
   , Expression.BOr
   , Expression.BXOr
@@ -106,7 +113,8 @@ type Syntax = '[
   , Syntax.Identifier
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
-  , Ruby.Syntax.LowPrecedenceBoolean
+  , Ruby.Syntax.LowPrecedenceAnd
+  , Ruby.Syntax.LowPrecedenceOr
   , Ruby.Syntax.Module
   , Ruby.Syntax.Require
   , Ruby.Syntax.Send
@@ -468,19 +476,19 @@ unary = symbol Unary >>= \ location ->
 -- TODO: Distinguish `===` from `==` ?
 binary :: Assignment
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
-  [ (inject .) . Expression.Plus             <$ symbol AnonPlus
-  , (inject .) . Expression.Minus            <$ symbol AnonMinus'
-  , (inject .) . Expression.Times            <$ symbol AnonStar'
-  , (inject .) . Expression.Power            <$ symbol AnonStarStar
-  , (inject .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (inject .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inject .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (inject .) . Ruby.Syntax.LowAnd          <$ symbol AnonAnd
-  , (inject .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inject .) . Expression.Or               <$ symbol AnonPipePipe
-  , (inject .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
-  , (inject .) . Expression.BOr              <$ symbol AnonPipe
-  , (inject .) . Expression.BXOr             <$ symbol AnonCaret
+  [ (inject .) . Expression.Plus              <$ symbol AnonPlus
+  , (inject .) . Expression.Minus             <$ symbol AnonMinus'
+  , (inject .) . Expression.Times             <$ symbol AnonStar'
+  , (inject .) . Expression.Power             <$ symbol AnonStarStar
+  , (inject .) . Expression.DividedBy         <$ symbol AnonSlash
+  , (inject .) . Expression.Modulo            <$ symbol AnonPercent
+  , (inject .) . Expression.And               <$ symbol AnonAmpersandAmpersand
+  , (inject .) . Ruby.Syntax.LowPrecedenceAnd <$ symbol AnonAnd
+  , (inject .) . Expression.BAnd              <$ symbol AnonAmpersand
+  , (inject .) . Expression.Or                <$ symbol AnonPipePipe
+  , (inject .) . Ruby.Syntax.LowPrecedenceOr  <$ symbol AnonOr
+  , (inject .) . Expression.BOr               <$ symbol AnonPipe
+  , (inject .) . Expression.BXOr              <$ symbol AnonCaret
   -- TODO: AnonEqualEqualEqual corresponds to Ruby's "case equality"
   -- function, which (unless overridden) is true if b is an instance
   -- of or inherits from a. We need a custom equality operator
