@@ -17,7 +17,7 @@ import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
 import Serializing.Format
 
-runParse :: (Member (Distribute WrappedTask) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
+runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm) >=> serialize JSON
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
@@ -25,8 +25,8 @@ runParse ImportsTermRenderer          = withParsedBlobs (\ blob -> decorate (dec
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
-withParsedBlobs :: (Member (Distribute WrappedTask) effs, Monoid output) => (forall syntax . (ConstructorName syntax, Foldable syntax, Functor syntax, HasDeclaration syntax, HasPackageDef syntax, Show1 syntax, ToJSONFields1 syntax) => Blob -> Term syntax (Record Location) -> TaskEff output) -> [Blob] -> Eff effs output
-withParsedBlobs render = distributeFoldMap (\ blob -> WrapTask (parseSomeBlob blob >>= withSomeTerm (render blob)))
+withParsedBlobs :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs, Monoid output) => (forall syntax . (ConstructorName syntax, Foldable syntax, Functor syntax, HasDeclaration syntax, HasPackageDef syntax, Show1 syntax, ToJSONFields1 syntax) => Blob -> Term syntax (Record Location) -> Eff effs output) -> [Blob] -> Eff effs output
+withParsedBlobs render = distributeFoldMap (\ blob -> parseSomeBlob blob >>= withSomeTerm (render blob))
 
 parseSomeBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1] (Record Location))
 parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (`parse` blob) (someParser blobLanguage)

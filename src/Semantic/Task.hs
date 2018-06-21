@@ -2,7 +2,6 @@
 module Semantic.Task
 ( Task
 , TaskEff
-, WrappedTask(..)
 , Level(..)
 , RAlgebra
 -- * I/O
@@ -80,20 +79,16 @@ import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type TaskEff = Eff '[ Distribute WrappedTask
-                    , Task
+type TaskEff = Eff '[ Task
                     , Resolution
                     , IO.Files
                     , Reader Config
                     , Trace
                     , Telemetry
                     , Exc SomeException
+                    , Distribute
                     , Lift IO
                     ]
-
--- | A wrapper for a 'Task', to embed in other effects.
-newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
-  deriving (Applicative, Functor, Monad)
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -140,14 +135,16 @@ runTaskWithConfig :: Config -> LogQueue -> StatQueue -> TaskEff a -> IO (Either 
 runTaskWithConfig options logger statter task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
-        run = runM . runError
-                   . runTelemetry logger statter
-                   . runTraceInTelemetry
-                   . runReader options
-                   . IO.runFiles
-                   . runResolution
-                   . runTaskF
-                   . runDistribute (run . unwrapTask)
+        run
+          = runM
+          . runDistribute
+          . runError
+          . runTelemetry logger statter
+          . runTraceInTelemetry
+          . runReader options
+          . IO.runFiles
+          . runResolution
+          . runTaskF
     run task
   queueStat statter stat
   pure result
