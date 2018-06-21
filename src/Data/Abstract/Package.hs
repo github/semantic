@@ -20,9 +20,8 @@ data PackageInfo = PackageInfo
 newtype Version = Version { versionString :: String }
   deriving (Eq, Ord, Show)
 
-data PackageBody term = PackageBody
-  { packageModules     :: ModuleTable (NonEmpty (Module term))
-  , packageEntryPoints :: ModuleTable (Maybe Name)
+newtype PackageBody term = PackageBody
+  { packageModules :: ModuleTable (NonEmpty (Module term))
   }
   deriving (Eq, Functor, Ord, Show)
 
@@ -34,8 +33,5 @@ data Package term = Package
   }
   deriving (Eq, Functor, Ord, Show)
 
-fromModules :: PackageName -> Maybe Version -> Int -> [Module term] -> Map.Map FilePath FilePath -> Package term
-fromModules name version entryPoints modules resolutions =
-  Package (PackageInfo name version resolutions) (PackageBody (ModuleTable.fromModules modules) entryPoints')
-  where
-    entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else take entryPoints modules
+fromModules :: PackageName -> Maybe Version -> [Module term] -> Map.Map FilePath FilePath -> Package term
+fromModules name version modules resolutions = Package (PackageInfo name version resolutions) (PackageBody (ModuleTable.fromModules modules))

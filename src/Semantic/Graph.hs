@@ -175,7 +175,7 @@ parsePackage :: (Member (Distribute WrappedTask) effs, Member Resolution effs, M
 parsePackage parser project@Project{..} = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
-  let pkg = Package.fromModules n Nothing (length projectEntryPoints) p resMap
+  let pkg = Package.fromModules n Nothing p resMap
   pkg <$ trace ("project: " <> show pkg)
 
   where
