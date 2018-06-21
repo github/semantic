@@ -59,7 +59,6 @@ newtype SpecEff a = SpecEff
                        , Reader PackageInfo
                        , Fresh
                        , State (Heap Precise Latest Val)
-                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
                        , IO
                        ] a
   }
