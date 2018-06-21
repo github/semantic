@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeOperators #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
+, SpecEff(..)
 ) where
 
 import Analysis.Abstract.Evaluating (evaluating)
@@ -12,7 +13,6 @@ import Data.Abstract.Value as Value
 import Data.Algebra
 import Data.Bifunctor (first)
 import Data.Functor.Const
-import Data.Semilattice.Lower
 import Data.Sum
 import SpecHelpers hiding (reassociate)
 
@@ -30,7 +30,7 @@ spec = parallel $ do
 
 evaluate
   = runM
-  . evaluating @Precise @(Value Precise (Eff _))
+  . evaluating @Precise @Val
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . fmap reassociate
@@ -45,3 +45,21 @@ evaluate
 
 reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
 reassociate = mergeExcs . mergeExcs . mergeExcs . Right
+
+type Val = Value Precise SpecEff
+newtype SpecEff a = SpecEff
+  { runSpecEff :: Eff '[ LoopControl Precise
+                       , Return Precise
+                       , Env Precise
+                       , Allocator Precise Val
+                       , Resumable (AddressError Precise Val)
+                       , Resumable (EnvironmentError Precise)
+                       , Resumable (ValueError Precise SpecEff)
+                       , Reader ModuleInfo
+                       , Reader PackageInfo
+                       , Fresh
+                       , State (Heap Precise Latest Val)
+                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                       , IO
+                       ] a
+  }

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package semantic;
+package github.semantic.v1alpha1;
 enum Language {Unknown = 0;
                Go = 1;
                Haskell = 2;
@@ -28,14 +28,14 @@ message Boolean { bool booleanContent = 1;
                 }
 message Hash { repeated Term hashElements = 1;
              }
-message Float { bytes floatContent = 1;
+message Float { string floatContent = 1;
               }
 message KeyValue { Term key = 1;
                    Term value = 2;
                  }
 message Null {
              }
-message TextElement { bytes textElementContent = 1;
+message TextElement { string textElementContent = 1;
                     }
 message Term { oneof syntax {Array array = 1;
                              Boolean boolean = 2;

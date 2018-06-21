@@ -37,7 +37,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
-    rvalBox =<< ifthenelse bool (subtermValue if') (subtermValue else')
+    Rval <$> ifthenelse bool (subtermAddress if') (subtermAddress else')
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -100,7 +100,7 @@ instance Evaluatable Let where
   eval Let{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
-    rvalBox =<< locally (bind name addr *> subtermValue letBody)
+    Rval <$> locally (bind name addr *> subtermAddress letBody)
 
 
 -- Assignment
