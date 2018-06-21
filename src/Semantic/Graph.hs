@@ -29,7 +29,6 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
-import           Data.AST (Location)
 import           Data.Graph
 import           Data.Project
 import           Data.Record
@@ -49,7 +48,10 @@ runGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Memb
          -> Bool
          -> Project
          -> Eff effs (Graph Vertex)
-runGraph ImportGraph _ project = fmap (Graph.moduleVertex . moduleInfo) <$> runImportGraph project
+runGraph ImportGraph _ project
+  | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
+    package <- parsePackage parser project
+    fmap (Graph.moduleVertex . moduleInfo) <$> runImportGraph lang package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
@@ -98,38 +100,43 @@ newtype GraphEff address a = GraphEff
   }
 
 
-runImportGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
-               => Project
-               -> Eff effs (Graph (Module (SomeTerm AnalysisClasses (Record Location))))
-runImportGraph project
-  | SomeAnalysisParser (parser :: Parser (Term (Sum syntaxes) (Record Location))) lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- parsePackage parser project
-    let analyzeTerm = id
-        analyzeModule = graphingModuleInfo
-        extractGraph (((_, graph), _), _) = do
-          info <- graph
-          case ModuleTable.lookup (modulePath info) (packageModules (packageBody package)) of
-            Nothing -> lowerBound
-            Just m -> foldMapA pure (fmap SomeTerm <$> m)
-        runImportGraphAnalysis packageInfo
-          = run
-          . runState lowerBound
-          . runFresh 0
-          . runIgnoringTrace
-          . resumingLoadError
-          . resumingUnspecialized
-          . resumingEnvironmentError
-          . resumingEvalError
-          . resumingResolutionError
-          . resumingAddressError
-          . resumingValueError
-          . runState lowerBound
-          . runReader lowerBound
-          . interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package))))
-          . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff (Term (Sum syntaxes) (Record Location)) (Hole Precise)))
-          . runReader packageInfo
-          . runReader lowerBound
-    extractGraph <$> analyze (runImportGraphAnalysis (packageInfo package)) (evaluate @_ @_ @_ @_ @(Term (Sum syntaxes) (Record Location)) lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
+runImportGraph :: ( Declarations term
+                  , Evaluatable (Base term)
+                  , FreeVariables term
+                  , HasPrelude lang
+                  , Member Task effs
+                  , Recursive term
+                  )
+               => Proxy lang
+               -> Package term
+               -> Eff effs (Graph (Module term))
+runImportGraph lang (package :: Package term) = do
+  let analyzeTerm = id
+      analyzeModule = graphingModuleInfo
+      extractGraph (((_, graph), _), _) = do
+        info <- graph
+        case ModuleTable.lookup (modulePath info) (packageModules (packageBody package)) of
+          Nothing -> lowerBound
+          Just m -> foldMapA pure m
+      runImportGraphAnalysis packageInfo
+        = run
+        . runState lowerBound
+        . runFresh 0
+        . runIgnoringTrace
+        . resumingLoadError
+        . resumingUnspecialized
+        . resumingEnvironmentError
+        . resumingEvalError
+        . resumingResolutionError
+        . resumingAddressError
+        . resumingValueError
+        . runState lowerBound
+        . runReader lowerBound
+        . interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package))))
+        . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
+        . runReader packageInfo
+        . runReader lowerBound
+  extractGraph <$> analyze (runImportGraphAnalysis (packageInfo package)) (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
 
 newtype ImportGraphEff term address a = ImportGraphEff
   { runImportGraphEff :: Eff '[ LoopControl address
