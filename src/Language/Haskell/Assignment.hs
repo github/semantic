@@ -472,7 +472,7 @@ generator :: Assignment
 generator = makeTerm <$> symbol Generator <*> children (Syntax.Generator <$> expression <*> expression)
 
 guard' :: Assignment
-guard' = makeTerm <$> symbol Guard <*> children (Syntax.Guard <$> expression)
+guard' = makeTerm <$> symbol Guard <*> children (Syntax.Guard <$> expressions)
 
 hiddenImport :: Assignment
 hiddenImport = makeTerm <$> symbol Import <*> children (Syntax.HiddenImport <$> expressions)
