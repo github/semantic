@@ -41,14 +41,16 @@ type Syntax =
    , Expression.RShift
    , Expression.UnsignedRShift
    , Expression.Complement
-   , Expression.BooleanOperator
    , Expression.Call
    , Expression.Comparison
    , Expression.Subscript
    , Statement.PostDecrement
    , Statement.PostIncrement
    , Expression.MemberAccess
-   , Expression.BooleanOperator
+   , Expression.And
+   , Expression.Not
+   , Expression.Or
+   , Expression.XOr
    , Expression.Call
    , Expression.Comparison
    , Expression.Subscript

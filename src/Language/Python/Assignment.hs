@@ -49,7 +49,10 @@ type Syntax =
    , Declaration.Function
    , Declaration.Variable
    , Expression.Arithmetic
-   , Expression.BooleanOperator
+   , Expression.And
+   , Expression.Not
+   , Expression.Or
+   , Expression.XOr
    , Expression.BAnd
    , Expression.BOr
    , Expression.BXOr

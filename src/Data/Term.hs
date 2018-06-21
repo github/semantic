@@ -17,6 +17,7 @@ import Data.JSON.Fields
 import Data.Record
 import Text.Show
 import Proto3.Suite.Class
+import Proto3.Suite.DotProto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 
