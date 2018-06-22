@@ -15,29 +15,29 @@ spec :: Spec
 spec = parallel $ do
   describe "evaluates TypeScript" $ do
     it "imports with aliased symbols" $ do
-      ((Right [(_, env)], _), _) <- evaluate "main.ts"
+      ((Right [(_, env)], _), _) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
       Env.names env `shouldBe` [ "bar", "quz" ]
 
     it "imports with qualified names" $ do
-      ((Right [(_, env)], heap), _) <- evaluate "main1.ts"
+      ((Right [(_, env)], heap), _) <- evaluate ["main1.ts", "foo.ts", "a.ts"]
       Env.names env `shouldBe` [ "b", "z" ]
 
       (derefQName heap ("b" :| []) env >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
       (derefQName heap ("z" :| []) env >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
 
     it "side effect only imports" $ do
-      ((res, _), _) <- evaluate "main2.ts"
+      ((res, _), _) <- evaluate ["main2.ts", "a.ts", "foo.ts"]
       fmap snd <$> res `shouldBe` Right [lowerBound]
 
     it "fails exporting symbols not defined in the module" $ do
-      ((res, _), _) <- evaluate "bad-export.ts"
+      ((res, _), _) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
       res `shouldBe` Left (SomeExc (inject @EvalError (ExportError "foo.ts" (name "pip"))))
 
     it "evaluates early return statements" $ do
-      ((res, _), _) <- evaluate "early-return.ts"
+      ((res, _), _) <- evaluate ["early-return.ts"]
       fmap fst <$> res `shouldBe` Right [Value.Float (Number.Decimal 123.0)]
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
-    evaluate entry = evalTypeScriptProject (fixtures <> entry)
-    evalTypeScriptProject path = testEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript path
+    evaluate = evalTypeScriptProject . map (fixtures <>)
+    evalTypeScriptProject = testEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
