@@ -109,12 +109,16 @@ runImportGraph :: ( Declarations term
                   , FreeVariables term
                   , HasPrelude lang
                   , Member Task effs
+                  , Member Trace effs
                   , Recursive term
                   )
                => Proxy lang
                -> Package term
                -> Eff effs (Graph (Module term))
-runImportGraph lang (package :: Package term) =
+runImportGraph lang (package :: Package term)
+  -- Optimization for the common (when debugging) case of one-and-only-one module.
+  | [m :| []] <- toList (packageModules package) = vertex m <$ trace ("single module, skipping import graph computation for " <> modulePath (moduleInfo m))
+  | otherwise =
   let analyzeTerm = id
       analyzeModule = graphingModuleInfo
       extractGraph (((_, graph), _), _) = do
