@@ -6,7 +6,7 @@ module Control.Abstract.Modules
 , require
 , load
 , Modules(..)
-, handleModules
+, runModules
 , LoadError(..)
 , moduleNotFound
 , resumeLoadError
@@ -62,11 +62,11 @@ data Modules address return where
 sendModules :: Member (Modules address) effects => Modules address return -> Evaluator address value effects return
 sendModules = send
 
-handleModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
-              => Set ModulePath
-              -> Modules address a
-              -> Evaluator address value effects a
-handleModules paths = \case
+runModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+           => Set ModulePath
+           -> Evaluator address value (Modules address ': effects) a
+           -> Evaluator address value effects a
+runModules paths = interpret $ \case
   Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable'
   Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable'
   Resolve names -> pure (find (flip Set.member paths) names)

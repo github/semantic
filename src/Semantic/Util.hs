@@ -103,7 +103,7 @@ evaluateProject proxy parser lang path = runTaskWithOptions debugOptions $ do
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Precise, Environment Precise)))))
-       (raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules package))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (evaluate proxy id withTermSpans (topologicalSort modules)))))))
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
@@ -113,7 +113,7 @@ evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOpti
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Monovariant, Environment Monovariant)))))
-       (raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules package))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (evaluate proxy id withTermSpans (topologicalSort modules))))))
 
 
