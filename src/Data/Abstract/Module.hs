@@ -16,7 +16,7 @@ data Module body = Module { moduleInfo :: ModuleInfo, moduleBody :: body }
   deriving (Eq, Foldable, Functor, Ord, Traversable)
 
 instance Show body => Show (Module body) where
-  showsPrec d Module{..} = showsBinaryWith showsPrec showsPrec "Module" d moduleInfo moduleBody
+  showsPrec d Module{..} = showsBinaryWith showsPrec showsPrec "Module" d (modulePath moduleInfo) moduleBody
 
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
