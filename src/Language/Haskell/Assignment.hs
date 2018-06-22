@@ -238,7 +238,7 @@ defaultSignature :: Assignment
 defaultSignature = makeTerm <$> symbol DefaultSignature <*> children (Syntax.DefaultSignature <$> manyTermsTill expression (symbol Annotation) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
 
 derivingClause :: Assignment
-derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
+derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm expression)
 
 do' :: Assignment
 do' = makeTerm <$> symbol Do <*> children (Syntax.Do <$> manyTerm expression)
