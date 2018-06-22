@@ -591,7 +591,7 @@ listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array 
   where listElement = symbol Expression *> children expression
 
 listPattern :: Assignment
-listPattern = makeTerm <$> symbol ListPattern <*> children (Syntax.ListPattern <$> expression)
+listPattern = makeTerm <$> symbol ListPattern <*> children (Syntax.ListPattern <$> expressions)
 
 listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> manyTerm type')
