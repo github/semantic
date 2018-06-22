@@ -1,5 +1,4 @@
-{-# OPTIONS_GHC -fforce-recomp #-} -- So that gitHash is correct.
-{-# LANGUAGE ApplicativeDo, RankNTypes, TemplateHaskell #-}
+{-# LANGUAGE ApplicativeDo, RankNTypes #-}
 module Semantic.CLI
 ( main
 -- Testing
@@ -7,24 +6,23 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
-import           Data.Project
 import           Data.Language (ensureLanguage)
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
-import           Data.Version (showVersion)
-import           Development.GitRev
+import           Data.Project
 import           Options.Applicative hiding (style)
-import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.AST as AST
+import           Semantic.Config
 import qualified Semantic.Diff as Diff
 import qualified Semantic.Graph as Graph
 import           Semantic.IO as IO
-import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
-import           Serializing.Format
+import qualified Semantic.Telemetry.Log as Log
+import           Semantic.Version
+import           Serializing.Format hiding (Options)
 import           Text.Read
 
 main :: IO ()
@@ -33,20 +31,19 @@ main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTa
 -- | A parser for the application's command-line arguments.
 --
 --   Returns a 'Task' to read the input, run the requested operation, and write the output to the specified output path or stdout.
-arguments :: ParserInfo (Log.Options, Task.TaskEff ())
+arguments :: ParserInfo (Options, Task.TaskEff ())
 arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsParser)) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
-    versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
+    versionString = "semantic version " <> buildVersion <> " (" <> buildSHA <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
     optionsParser = do
-      disableColour <- not <$> switch (long "disable-colour" <> long "disable-color" <> help "Disable ANSI colors in log messages even if the terminal is a TTY.")
       logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
                           (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
       requestId <- optional (strOption $ long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id")
       failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
-      pure $ Log.Options disableColour logLevel requestId False False Log.logfmtFormatter 0 failOnWarning
+      pure $ Options logLevel requestId failOnWarning
 
     argumentsParser = do
       subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
@@ -67,7 +64,6 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     parseArgumentsParser = do
       renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
-              <|> flag'                                          (Parse.runParse TagsTermRenderer)        (long "tags"        <> help "Output JSON tags")
               <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
@@ -115,13 +111,4 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     findOption options value = maybe "" fst (find ((== value) . snd) options)
 
     -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
-    symbolFieldsReader = eitherReader parseSymbolFields
-    parseSymbolFields arg = let fields = splitWhen (== ',') arg in
-                      Right SymbolFields
-                        { symbolFieldsName = "symbol" `elem` fields
-                        , symbolFieldsPath = "path" `elem` fields
-                        , symbolFieldsLang = "language" `elem` fields
-                        , symbolFieldsKind = "kind" `elem` fields
-                        , symbolFieldsLine = "line" `elem` fields
-                        , symbolFieldsSpan = "span" `elem` fields
-                        }
+    symbolFieldsReader = eitherReader (Right . parseSymbolFields)

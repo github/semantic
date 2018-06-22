@@ -1,10 +1,12 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , evaluatePackageWith
 , traceResolve
--- | Effects
+-- * Preludes
+, HasPrelude(..)
+-- * Effects
 , EvalError(..)
 , throwEvalError
 , runEvalError
@@ -30,11 +32,11 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
 import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
+import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Data.Semigroup.Reducer hiding (unit)
-import Data.Semilattice.Lower
 import Data.Sum
 import Data.Term
 import Prologue
@@ -46,7 +48,7 @@ class Show1 constr => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address value) effects
           , Member (Env address) effects
-          , Member (LoopControl value) effects
+          , Member (LoopControl address) effects
           , Member (Modules address value) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
@@ -55,15 +57,15 @@ class Show1 constr => Evaluatable constr where
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
           , Member (Resumable (Unspecialized value)) effects
-          , Member (Return value) effects
+          , Member (Return address) effects
           , Member Trace effects
           )
-       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef value))
-  eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
+  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: forall address term value inner inner' inner'' outer
+evaluatePackageWith :: forall proxy lang address term value inner inner' inner'' outer
                     .  ( AbstractValue address value inner
                        -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
                        , Addressable address inner'
@@ -71,6 +73,7 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Evaluatable (Base term)
                        , Foldable (Cell address)
                        , FreeVariables term
+                       , HasPrelude lang
                        , Member Fresh outer
                        , Member (Resumable (AddressError address value)) outer
                        , Member (Resumable (EnvironmentError address)) outer
@@ -79,24 +82,25 @@ evaluatePackageWith :: forall address term value inner inner' inner'' outer
                        , Member (Resumable ResolutionError) outer
                        , Member (Resumable (Unspecialized value)) outer
                        , Member (State (Heap address (Cell address) value)) outer
-                       , Member (State (ModuleTable (Maybe (value, Environment address)))) outer
+                       , Member (State (ModuleTable (Maybe (address, Environment address)))) outer
                        , Member Trace outer
                        , Recursive term
                        , Reducer value (Cell address value)
                        , ValueRoots address value
-                       , inner ~ (LoopControl value ': Return value ': Env address ': Allocator address value ': inner')
+                       , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': inner')
                        , inner' ~ (Reader ModuleInfo ': inner'')
                        , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner value)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner value))
-                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef value)))
+                    => proxy lang
+                    -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
+                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
                     -> Package term
-                    -> TermEvaluator term address value outer [(value, Environment address)]
-evaluatePackageWith analyzeModule analyzeTerm package
+                    -> TermEvaluator term address value outer [(address, Environment address)]
+evaluatePackageWith lang analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
   . runReader (packageModules (packageBody package))
-  . withPrelude (packagePrelude (packageBody package))
+  . withPrelude package
   $ \ preludeEnv
   ->  raiseHandler (runModules (runTermEvaluator . evalModule preludeEnv))
     . traverse (uncurry (evaluateEntryPoint preludeEnv))
@@ -106,7 +110,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
           = runInModule preludeEnv (moduleInfo m)
           . analyzeModule (subtermRef . moduleBody)
           $ evalTerm <$> m
-        evalTerm term = Subterm term (TermEvaluator (value =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
+        evalTerm term = Subterm term (TermEvaluator (address =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
 
         runInModule preludeEnv info
           = runReader info
@@ -115,24 +119,75 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . raiseHandler runReturn
           . raiseHandler runLoopControl
 
-        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (value, Environment address)
+        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (address, Environment address)
         evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
-          (value, env) <- fromMaybe (unit, emptyEnv) <$> require m
+          addr <- box unit -- TODO don't *always* allocate - use maybeM instead
+          (ptr, env) <- fromMaybe (addr, lowerBound) <$> require m
           bindAll env
-          maybe (pure value) ((`call` []) <=< variable) sym
+          maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
 
-        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins $> unit))
-          second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
-
-        withPrelude Nothing f = f emptyEnv
-        withPrelude (Just prelude) f = do
-          (_, preludeEnv) <- evalPrelude prelude
+        withPrelude :: Package term
+                    -> (Environment address -> TermEvaluator term address value (Reader (ModuleTable (NonEmpty (Module term))) ': Reader Span ': Reader PackageInfo ': outer) a)
+                    -> TermEvaluator term address value (Reader (ModuleTable (NonEmpty (Module term))) ': Reader Span ': Reader PackageInfo ': outer) a
+        withPrelude _ f = do
+          (_, preludeEnv) <- raiseHandler (runModules (runTermEvaluator . evalModule lowerBound)) . runInModule lowerBound moduleInfoFromCallStack . TermEvaluator $ do
+            defineBuiltins
+            definePrelude lang
+            box unit
           f preludeEnv
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
+
+
+-- Preludes
+
+class HasPrelude (language :: Language) where
+  definePrelude :: ( AbstractValue address value effects
+                   , HasCallStack
+                   , Member (Allocator address value) effects
+                   , Member (Env address) effects
+                   , Member Fresh effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (EnvironmentError address)) effects
+                   , Member Trace effects
+                   )
+                => proxy language
+                -> Evaluator address value effects ()
+  definePrelude _ = pure ()
+
+instance HasPrelude 'Go
+instance HasPrelude 'Haskell
+instance HasPrelude 'Java
+instance HasPrelude 'JavaScript
+instance HasPrelude 'PHP
+
+builtInPrint :: ( AbstractIntro value
+                , AbstractFunction address value effects
+                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Env address) effects, Member (Allocator address value) effects)
+             => Name
+             -> Evaluator address value effects address
+builtInPrint v = do
+  print <- variable "__semantic_print" >>= deref
+  void $ call print [variable v]
+  box unit
+
+instance HasPrelude 'Python where
+  definePrelude _ =
+    define "print" (lambda builtInPrint)
+
+instance HasPrelude 'Ruby where
+  definePrelude _ = do
+    define "puts" (lambda builtInPrint)
+
+    defineClass "Object" [] $ do
+      define "inspect" (lambda (const (box (string "<object>"))))
+
+instance HasPrelude 'TypeScript
+  -- FIXME: define console.log using __semantic_print
 
 
 -- Effects
@@ -173,7 +228,7 @@ runEvalErrorWith = runResumableWith
 
 
 data Unspecialized a b where
-  Unspecialized :: String -> Unspecialized value (ValueRef value)
+  Unspecialized :: String -> Unspecialized value value
 
 deriving instance Eq (Unspecialized a b)
 deriving instance Show (Unspecialized a b)
@@ -211,4 +266,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (pure (Rval unit)) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
+  eval = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

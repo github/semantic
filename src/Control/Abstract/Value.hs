@@ -10,8 +10,11 @@ module Control.Abstract.Value
 , forLoop
 , makeNamespace
 , evaluateInScopedEnv
+, address
 , value
+, rvalBox
 , subtermValue
+, subtermAddress
 ) where
 
 import Control.Abstract.Environment
@@ -22,8 +25,6 @@ import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
-import Data.Semilattice.Lower
-import Prelude
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
@@ -40,10 +41,10 @@ class Show value => AbstractFunction address value effects where
   -- | Build a closure (a binder like a lambda or method definition).
   closure :: [Name]                                 -- ^ The parameter names.
           -> Set Name                               -- ^ The set of free variables to close over.
-          -> Evaluator address value effects value -- ^ The evaluator for the body of the closure.
+          -> Evaluator address value effects address -- ^ The evaluator for the body of the closure.
           -> Evaluator address value effects value
   -- | Evaluate an application (like a function call).
-  call :: value -> [Evaluator address value effects value] -> Evaluator address value effects value
+  call :: value -> [Evaluator address value effects address] -> Evaluator address value effects address
 
 
 class Show value => AbstractIntro value where
@@ -69,9 +70,6 @@ class Show value => AbstractIntro value where
 
   -- | Construct a rational value.
   rational :: Rational -> value
-
-  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> value
 
   -- | Construct a key-value pair for use in a hash.
   kvPair :: value -> value -> value
@@ -111,8 +109,11 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
                -> (value -> value -> Evaluator address value effects value)
 
+  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
+  tuple :: [address] -> Evaluator address value effects value
+
   -- | Construct an array of zero or more values.
-  array :: [value] -> Evaluator address value effects value
+  array :: [address] -> Evaluator address value effects value
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator address value effects (value, value)
@@ -124,7 +125,7 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   ifthenelse :: value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
-  index :: value -> value -> Evaluator address value effects value
+  index :: value -> value -> Evaluator address value effects address
 
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
@@ -203,8 +204,8 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
                        , Member (Env address) effects
                        )
                     => Evaluator address value effects value
-                    -> Evaluator address value effects value
-                    -> Evaluator address value effects value
+                    -> Evaluator address value effects a
+                    -> Evaluator address value effects a
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvTerm >>= scopedEnvironment
   maybe term (\ env -> locally (bindAll env *> term)) scopedEnv
@@ -216,11 +217,9 @@ value :: ( AbstractValue address value effects
          , Member (Env address) effects
          , Member (Resumable (EnvironmentError address)) effects
          )
-      => ValueRef value
+      => ValueRef address
       -> Evaluator address value effects value
-value (LvalLocal var) = variable var
-value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
-value (Rval val) = pure val
+value = deref <=< address
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
@@ -228,6 +227,34 @@ subtermValue :: ( AbstractValue address value effects
                 , Member (Env address) effects
                 , Member (Resumable (EnvironmentError address)) effects
                 )
-             => Subterm term (Evaluator address value effects (ValueRef value))
+             => Subterm term (Evaluator address value effects (ValueRef address))
              -> Evaluator address value effects value
 subtermValue = value <=< subtermRef
+
+-- | Returns the address of a value referenced by a 'ValueRef'
+address :: ( AbstractValue address value effects
+           , Member (Allocator address value) effects
+           , Member (Env address) effects
+           , Member (Resumable (EnvironmentError address)) effects
+           )
+        => ValueRef address
+        -> Evaluator address value effects address
+address (LvalLocal var) = variable var
+address (LvalMember obj prop) = evaluateInScopedEnv (deref obj) (variable prop)
+address (Rval addr) = pure addr
+
+-- | Evaluates a 'Subterm' to the address of its rval
+subtermAddress :: ( AbstractValue address value effects
+                  , Member (Allocator address value) effects
+                  , Member (Env address) effects
+                  , Member (Resumable (EnvironmentError address)) effects
+                  )
+               => Subterm term (Evaluator address value effects (ValueRef address))
+               -> Evaluator address value effects address
+subtermAddress = address <=< subtermRef
+
+-- | Convenience function for boxing a raw value and wrapping it in an Rval
+rvalBox :: Member (Allocator address value) effects
+        => value
+        -> Evaluator address value effects (ValueRef address)
+rvalBox val = Rval <$> box val

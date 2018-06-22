@@ -11,13 +11,11 @@
           (Identifier)
           (Constructor
             (Empty)
-            (Empty)
             (Statements))))
       (Statements
         (Type
           (Identifier)
           (Constructor
-            (Empty)
             (Empty)
             (Field
               (Identifier)
@@ -26,7 +24,6 @@
         (Type
           (Identifier)
           (Constructor
-            (Empty)
             (Empty)
             (Field
               (Identifier)
@@ -37,7 +34,6 @@
         (Type
           (Identifier)
           (Constructor
-            (Empty)
             (Empty)
             (Statements
               (Field

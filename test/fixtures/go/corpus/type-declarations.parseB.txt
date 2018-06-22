@@ -24,7 +24,6 @@
             (Identifier)
             (Constructor
               (Empty)
-              (Empty)
               (Statements
                 (Field
                   (Identifier)

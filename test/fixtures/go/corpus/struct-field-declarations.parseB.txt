@@ -10,7 +10,6 @@
         (Identifier)
         (Constructor
           (Empty)
-          (Empty)
           (Field
             (Identifier)
             (Statements

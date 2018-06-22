@@ -32,4 +32,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/php/analysis/"
     evaluate entry = evalPHPProject (fixtures <> entry)
-    evalPHPProject path = testEvaluating <$> evaluateProject phpParser Language.PHP Nothing path
+    evalPHPProject path = testEvaluating <$> evaluateProject (Proxy :: Proxy 'Language.PHP) phpParser Language.PHP path

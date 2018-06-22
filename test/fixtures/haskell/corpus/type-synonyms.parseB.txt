@@ -3,83 +3,83 @@
   (Statements
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
-        (Identifier)))
+        (TypeConstructorIdentifier)))
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
         (ListConstructor)))
     (TypeSynonym
       (Statements
-        (Identifier)
-        (Identifier)
-        (Identifier))
+        (TypeConstructorIdentifier)
+        (TypeVariableIdentifier)
+        (TypeVariableIdentifier))
       (TypePattern
         (Statements
-          (Identifier)
-          (Identifier)
-          (Identifier))))
+          (TypeConstructorIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))))
     (TypeSynonym
       (Statements
-        (Identifier)
-        (Identifier))
+        (TypeConstructorIdentifier)
+        (TypeVariableIdentifier))
       (TypePattern
         (Array
           (Type
-            (Identifier)
+            (TypeConstructorIdentifier)
             (TypeParameters
-              (Identifier))
+              (TypeVariableIdentifier))
             (Empty)))))
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
         (UnitConstructor)))
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
         (TupleConstructor)))
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
         (TupleConstructor)))
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
         (FunctionConstructor)))
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
         (InfixOperatorPattern
           (Type
-            (Identifier)
+            (TypeConstructorIdentifier)
             (TypeParameters
               (Statements
-                (Identifier)
-                (Identifier)))
+                (TypeConstructorIdentifier)
+                (TypeConstructorIdentifier)))
             (Empty))
-          (Identifier)
+          (TypeOperator)
           (Type
             (InfixOperatorPattern
               (Type
-                (Identifier)
+                (TypeConstructorIdentifier)
                 (TypeParameters
-                  (Identifier))
+                  (TypeConstructorIdentifier))
                 (Empty))
-              (Identifier)
+              (TypeOperator)
               (Type
                 (InfixOperatorPattern
                   (Type
-                    (Identifier)
+                    (TypeConstructorIdentifier)
                     (TypeParameters)
                     (Empty))
-                  (Identifier)
+                  (TypeOperator)
                   (Type
                     (QuotedName
                       (ListConstructor))
@@ -91,74 +91,74 @@
             (Empty)))))
     (TypeSynonym
       (Statements
-        (Identifier)
-        (Identifier)
-        (Identifier)
-        (Identifier))
+        (TypeConstructorIdentifier)
+        (TypeVariableIdentifier)
+        (TypeVariableIdentifier)
+        (TypeVariableIdentifier))
       (TypePattern
         (QuotedName
           (Array
             (Type
-              (Identifier)
+              (TypeConstructorIdentifier)
               (TypeParameters)
               (Empty))
             (Type
-              (Identifier)
+              (TypeConstructorIdentifier)
               (TypeParameters
                 (Statements
-                  (Identifier)
-                  (Identifier)))
+                  (TypeConstructorIdentifier)
+                  (TypeVariableIdentifier)))
               (Empty))))))
     (TypeSynonym
       (Statements
-        (Identifier)
-        (Identifier))
+        (TypeConstructorIdentifier)
+        (TypeConstructorIdentifier))
       (TextElement))
     (TypeSynonym
       (Statements
-        (Identifier)
+        (TypeConstructorIdentifier)
         (Statements
-          (Identifier)
-          (Identifier)
-          (Identifier)))
+          (TypeConstructorIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
       (TypePattern
         (Statements
-          (Identifier)
-          (Identifier)
-          (Identifier))))
+          (TypeConstructorIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))))
     (TypeSynonym
       (Statements
-        (Identifier))
+        (TypeConstructorIdentifier))
       (Context'
-        (Identifier))
+        (TypeConstructorIdentifier))
       (TypePattern
         (Statements
-          (Identifier)
+          (TypeConstructorIdentifier)
           (ListConstructor))))
     (TypeSynonym
       (Statements
-        (Identifier)
-        (Identifier)
-        (Identifier))
+        (TypeConstructorIdentifier)
+        (TypeVariableIdentifier)
+        (TypeVariableIdentifier))
       (ScopedTypeVariables
         (Statements
-          (Identifier)
-          (Identifier)))
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
       (TypePattern
         (Statements
-          (Identifier)
-          (Identifier)
-          (Identifier))))
+          (TypeConstructorIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))))
     (TypeSynonym
       (Statements
         (Statements
-          (Identifier)
-          (Identifier)
-          (Identifier)))
+          (TypeConstructorIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
       (TypePattern
         (Statements
-          (Identifier)
+          (TypeConstructorIdentifier)
           (Statements
-            (Identifier)
-            (Identifier)
-            (Identifier)))))))
+            (TypeConstructorIdentifier)
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier)))))))

@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 module Data.Abstract.Live where
 
-import Data.Semilattice.Lower
 import Data.Set as Set
 import Prologue
 
