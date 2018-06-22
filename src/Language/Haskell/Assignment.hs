@@ -253,7 +253,7 @@ export :: Assignment
 export = makeTerm <$> symbol Export <*> children (Syntax.Export <$> expressions)
 
 expression' :: Assignment
-expression' = symbol Expression *> children (expression <|> emptyTerm)
+expression' = symbol Expression *> children expressions
 
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> manyTerm expression
@@ -645,7 +645,7 @@ parenthesizedTypePattern :: Assignment
 parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressions
 
 pattern' :: Assignment
-pattern' = symbol Pattern *> children expression
+pattern' = symbol Pattern *> children expressions
 
 patternGuard :: Assignment
 patternGuard = makeTerm <$> symbol PatternGuard <*> children (Syntax.PatternGuard <$> expression <*> expression)
