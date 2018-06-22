@@ -75,7 +75,7 @@ runGraph CallGraph includePackages project
           . runReader (packageInfo package)
           . runReader lowerBound
           . runReader lowerBound
-          . raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules package))))
+          . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
     extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
@@ -138,7 +138,7 @@ runImportGraph lang (package :: Package term)
         . resumingValueError
         . runState lowerBound
         . runReader lowerBound
-        . interpret (handleModules (ModuleTable.modulePaths (packageModules package)))
+        . runModules (ModuleTable.modulePaths (packageModules package))
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
         . runReader (packageInfo package)
         . runReader lowerBound
