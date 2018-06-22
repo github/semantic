@@ -1,14 +1,9 @@
 (Statements
-{ (Equal
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(Comparison
+{+(Comparison
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) }
+    {+(Identifier)+})+})+}
 {+(Matches
   {+(Send
     {+(Identifier)+})+}
@@ -19,6 +14,11 @@
   {+(Not
     {+(Send
       {+(Identifier)+})+})+})+}
+{-(Equal
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(Not
   {-(Equal
     {-(Send

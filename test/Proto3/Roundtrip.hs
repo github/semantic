@@ -63,6 +63,10 @@ spec = parallel $ do
     prop "roundtrips" $
       \sp -> shouldRoundtrip @(Term (Sum '[Statement.Statements, Literal.Null]) ()) (unListableF sp)
 
+  describe "statements1" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip' @Statement.Statements @(Term (Sum '[Statement.Statements, Literal.Null]) ()) (unListableF sp)
+
   describe "blobs" $ do
     it "should roundtrip given a Message instance" $ do
       let bl = Blob (fromUTF8 "puts 'hi'") "example.rb" Ruby

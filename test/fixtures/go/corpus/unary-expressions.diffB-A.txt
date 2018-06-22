@@ -8,35 +8,25 @@
     (Statements
     { (Identifier)
     ->(Identifier) }
-    {+(Negate
-      {+(Identifier)+})+}
-    {+(Not
-      {+(ReceiveOperator
-        {+(Identifier)+})+})+}
-    {+(Pointer
-      {+(Call
-        {+(Identifier)+}
-        {+(Statements)+}
-        {+(Empty)+})+})+}
-    {+(Complement
-      {+(Identifier)+})+}
-    {+(Reference
-      {+(Identifier)+})+}
-    {+(ReceiveOperator
-      {+(Identifier)+})+}
-    {-(Negate
-      {-(Identifier)-})-}
-    {-(Not
-      {-(ReceiveOperator
-        {-(Identifier)-})-})-}
-    {-(Pointer
-      {-(Call
-        {-(Identifier)-}
-        {-(Statements)-}
-        {-(Empty)-})-})-}
-    {-(Complement
-      {-(Identifier)-})-}
-    {-(Reference
-      {-(Identifier)-})-}
-    {-(ReceiveOperator
-      {-(Identifier)-})-})))
+      (Negate
+      { (Identifier)
+      ->(Identifier) })
+      (Not
+        (ReceiveOperator
+        { (Identifier)
+        ->(Identifier) }))
+      (Pointer
+        (Call
+        { (Identifier)
+        ->(Identifier) }
+          (Statements)
+          (Empty)))
+      (Complement
+      { (Identifier)
+      ->(Identifier) })
+      (Reference
+      { (Identifier)
+      ->(Identifier) })
+      (ReceiveOperator
+      { (Identifier)
+      ->(Identifier) }))))
