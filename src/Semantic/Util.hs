@@ -85,12 +85,12 @@ checking
   . runAddressError
   . runTypeError
 
-evalGoProject         path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go         path
-evalRubyProject       path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby       path
-evalPHPProject        path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser        Language.PHP        path
-evalPythonProject     path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser     Language.Python     path
-evalJavaScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript path
-evalTypeScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript path
+evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby
+evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser        Language.PHP
+evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser     Language.Python
+evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript
+evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go path
 
