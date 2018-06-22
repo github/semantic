@@ -91,11 +91,13 @@ testEvaluating :: TermEvaluator term Precise
                      , Resumable (LoadError Precise Val)
                      , Fresh
                      , State (Heap Precise Latest Val)
-                     , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                     , State (ModuleTable (Maybe (Environment Precise, Precise)))
                      , Trace
                      ]
-                   [(Precise, Environment Precise)]
-               -> ((Either
+                   [(Environment Precise, Precise)]
+               -> ( [String]
+                  , ( EvaluatingState Precise Val
+                    , Either
                       (SomeExc
                          (Data.Sum.Sum
                           '[ ValueError Precise TestEff
@@ -106,9 +108,7 @@ testEvaluating :: TermEvaluator term Precise
                            , Unspecialized Val
                            , LoadError Precise Val
                            ]))
-                      [(Value Precise TestEff, Environment Precise)],
-                    EvaluatingState Precise Val),
-                   [String])
+                      [(Environment Precise, Value Precise TestEff)]))
 testEvaluating
   = run
   . runReturningTrace
@@ -143,14 +143,14 @@ newtype TestEff a = TestEff
                        , Resumable (LoadError Precise Val)
                        , Fresh
                        , State (Heap Precise Latest Val)
-                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
+                       , State (ModuleTable (Maybe (Environment Precise, Precise)))
                        , Trace
                        ] a
   }
 
-deref1 (ptr, env) = runAllocator $ do
+deref1 (env, ptr) = runAllocator $ do
   val <- deref ptr
-  pure (val, env)
+  pure (env, val)
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)
