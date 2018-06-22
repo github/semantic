@@ -67,13 +67,13 @@ runModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environmen
            -> Evaluator address value (Modules address ': effects) a
            -> Evaluator address value effects a
 runModules paths = interpret $ \case
-  Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable'
-  Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable'
+  Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable
+  Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
   Resolve names -> pure (find (flip Set.member paths) names)
   List dir -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
-askModuleTable' :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
-askModuleTable' = ask
+askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
+askModuleTable = ask
 
 
 newtype Merging' address = Merging' { runMerging' :: (address, Environment address) }
