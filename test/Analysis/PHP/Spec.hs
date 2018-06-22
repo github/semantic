@@ -12,12 +12,12 @@ spec :: Spec
 spec = parallel $ do
   describe "PHP" $ do
     it "evaluates include and require" $ do
-      ((Right [(res, env)], heap), _) <- evaluate ["main.php"]
+      ((Right [(res, env)], _), _) <- evaluate ["main.php"]
       res `shouldBe` unit
       Env.names env `shouldBe` [ "bar", "foo" ]
 
     it "evaluates include_once and require_once" $ do
-      ((Right [(res, env)], heap), _) <- evaluate ["main_once.php"]
+      ((Right [(res, env)], _), _) <- evaluate ["main_once.php"]
       res `shouldBe` unit
       Env.names env `shouldBe` [ "bar", "foo" ]
 
