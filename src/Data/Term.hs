@@ -83,9 +83,9 @@ instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
 instance Message1 f => Message (Term f ()) where
-  encodeMessage num (Term (In _ f)) = Encode.embedded num (liftEncodeMessage encodeMessage (fromInteger 1) f)
-  decodeMessage num = termIn () . fromMaybe undefined <$> Decode.at (Decode.embedded (liftDecodeMessage decodeMessage (fromInteger 1))) num
-  dotProto _ = [ DotProtoMessageField (DotProtoField (fromInteger 1) (Prim (Named (Single "Syntax"))) (Single "syntax") [] Nothing) ]
+  encodeMessage num (Term (In _ f)) = Encode.embedded num (liftEncodeMessage encodeMessage 1 f)
+  decodeMessage num = termIn () . fromMaybe undefined <$> Decode.at (Decode.embedded (liftDecodeMessage decodeMessage 1)) num
+  dotProto _ = [ DotProtoMessageField (DotProtoField 1 (Prim (Named (Single "Syntax"))) (Single "syntax") [] Nothing) ]
 
 instance Named (Term f a) where
   nameOf _ = "Term"
