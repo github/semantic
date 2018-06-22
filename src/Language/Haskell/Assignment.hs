@@ -596,9 +596,9 @@ module' =  makeTerm
        <$> symbol Module
        <*> children (Syntax.Module
                    <$> manyTerm (comment <|> pragma)
-                   <*> (moduleIdentifier <|> qualifiedModuleIdentifier <|> emptyTerm)
+                   <*> term (moduleIdentifier <|> qualifiedModuleIdentifier <|> emptyTerm)
                    <*> moduleExports
-                   <*> (where' <|> expressions <|> emptyTerm))
+                   <*> term (where' <|> expressions <|> emptyTerm))
   where
     moduleExports = (symbol ModuleExports *> children (manyTerm export))
                  <|> (pure [])
