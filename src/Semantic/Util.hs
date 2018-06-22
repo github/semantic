@@ -99,23 +99,23 @@ typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Langu
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) (flip File lang <$> paths) lang [])
-  modules <- runImportGraph proxy package
+  modules <- topologicalSort <$> runImportGraph proxy package
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Precise, Environment Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (topologicalSort modules)))))))
+       (evaluate proxy id withTermSpans modules))))))
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePackage parser project
-  modules <- runImportGraph proxy package
+  modules <- topologicalSort <$> runImportGraph proxy package
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Monovariant, Environment Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (topologicalSort modules))))))
+       (evaluate proxy id withTermSpans modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
