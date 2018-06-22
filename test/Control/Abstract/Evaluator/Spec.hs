@@ -31,7 +31,7 @@ evaluate
   = runM
   . runState (lowerBound @(Heap Precise Latest Val))
   . runFresh 0
-  . runReader (PackageInfo (name "test") Nothing mempty)
+  . runReader (PackageInfo (name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . fmap reassociate
   . runValueError
