@@ -148,7 +148,7 @@ instance Message1 [] where
   --     oneMsg = decodeMessage (fieldNumber 1)
   -- liftDotProto (_ :: Proxy [a]) = messageField (NestedRepeated (Named (Single (nameOf (Proxy @a))))) Nothing
   liftDotProto (_ :: Proxy [a]) =  [ Proto.DotProtoMessageField $ Proto.DotProtoField (fieldNumber 1) ty (Proto.Single "listContent") [] Nothing ]
-    where ty = (Proto.NestedRepeated (Proto.Named (Proto.Single (nameOf (Proxy @a)))))
+    where ty = Proto.NestedRepeated (Proto.Named (Proto.Single (nameOf (Proxy @a))))
 
 
 -- Common

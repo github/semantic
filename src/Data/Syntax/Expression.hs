@@ -176,7 +176,7 @@ instance Evaluatable Power where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Power a b)         = liftNumeric2 liftedExponent a b
 
-data Negate a = Negate { term :: a }
+newtype Negate a = Negate { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Negate where liftEq = genericLiftEq
@@ -240,7 +240,7 @@ instance Evaluatable And where
       cond <- a
       ifthenelse cond b (pure cond)
 
-data Not a = Not { term :: a }
+newtype Not a = Not { term :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Not where liftEq = genericLiftEq
