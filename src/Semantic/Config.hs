@@ -44,6 +44,9 @@ data Options
 defaultOptions :: Options
 defaultOptions = Options (Just Warning) Nothing False
 
+debugOptions :: Options
+debugOptions = Options (Just Debug) Nothing False
+
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
   pid <- getProcessID
