@@ -18,16 +18,16 @@ spec :: Spec
 spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      ((Right [(res, env)], heap), _) <- evaluate ["main.rb"]
+      ((Right [(res, env)], heap), _) <- evaluate ["main.rb", "foo.rb"]
       res `shouldBe` Value.Integer (Number.Integer 1)
       Env.names env `shouldContain` ["foo"]
 
     it "evaluates load" $ do
-      ((Right [(_, env)], _), _) <- evaluate ["load.rb"]
+      ((Right [(_, env)], _), _) <- evaluate ["load.rb", "foo.rb"]
       Env.names env `shouldContain` ["foo"]
 
     it "evaluates load with wrapper" $ do
-      ((res, heap), _) <- evaluate ["load-wrap.rb"]
+      ((res, heap), _) <- evaluate ["load-wrap.rb", "foo.rb"]
       res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
 
     it "evaluates subclass" $ do
