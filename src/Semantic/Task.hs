@@ -31,9 +31,8 @@ module Semantic.Task
 , distributeFor
 , distributeFoldMap
 -- * Configuration
+, debugOptions
 , defaultConfig
-, defaultOptions
-, Options(..)
 , terminalFormatter
 , logfmtFormatter
 -- * Interpreting
