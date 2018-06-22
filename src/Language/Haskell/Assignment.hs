@@ -421,7 +421,7 @@ fieldBind :: Assignment
 fieldBind = makeTerm <$> symbol FieldBind <*> children (Syntax.FieldBind <$> expression <*> expression)
 
 fieldPattern :: Assignment
-fieldPattern = makeTerm <$> symbol FieldPattern <*> children (Syntax.FieldPattern <$> expression <*> expression)
+fieldPattern = makeTerm <$> symbol FieldPattern <*> children (Syntax.FieldPattern <$> expression <*> expressions)
 
 fixityDeclaration :: Assignment
 fixityDeclaration = makeTerm <$> symbol FixityDeclaration <*> children (Syntax.Fixity' <$> (integer <|> emptyTerm) <*> manyTerm expression)
