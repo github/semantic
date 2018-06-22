@@ -683,6 +683,9 @@ qualifiedInfixVariableIdentifier = makeTerm <$> symbol QualifiedInfixVariableIde
 qualifiedModuleIdentifier :: Assignment
 qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> someTerm' expression)
 
+qualifiedTypeClassIdentifier :: Assignment
+qualifiedTypeClassIdentifier = makeTerm <$> symbol QualifiedTypeClassIdentifier <*> children (Syntax.QualifiedTypeClassIdentifier <$> someTerm' expression)
+
 qualifiedTypeConstructorIdentifier :: Assignment
 qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> someTerm' expression)
 
@@ -797,6 +800,7 @@ typeConstructor =  constructorIdentifier
                <|> listConstructor
                <|> listType
                <|> qualifiedModuleIdentifier
+               <|> qualifiedTypeClassIdentifier
                <|> qualifiedTypeConstructorIdentifier
                <|> quotedName
                <|> tupleType
