@@ -114,7 +114,7 @@ runImportGraph :: ( Declarations term
                => Proxy lang
                -> Package term
                -> Eff effs (Graph (Module term))
-runImportGraph lang (package :: Package term) = do
+runImportGraph lang (package :: Package term) =
   let analyzeTerm = id
       analyzeModule = graphingModuleInfo
       extractGraph (((_, graph), _), _) = do
@@ -140,7 +140,7 @@ runImportGraph lang (package :: Package term) = do
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
         . runReader (packageInfo package)
         . runReader lowerBound
-  extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
+  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
 
 newtype ImportGraphEff term address a = ImportGraphEff
   { runImportGraphEff :: Eff '[ LoopControl address
