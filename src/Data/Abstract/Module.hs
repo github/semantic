@@ -12,10 +12,10 @@ import GHC.Stack
 import Prologue
 import System.FilePath.Posix
 
-data Module term = Module { moduleInfo :: ModuleInfo, moduleBody :: term }
+data Module body = Module { moduleInfo :: ModuleInfo, moduleBody :: body }
   deriving (Eq, Foldable, Functor, Ord, Traversable)
 
-instance Show (Module term) where
+instance Show (Module body) where
   showsPrec _ Module{..} = shows moduleInfo
 
 
