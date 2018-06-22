@@ -138,8 +138,18 @@ instance Generate c all '[] where
 instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) where
   generate each = each (Proxy @f) (natVal (Proxy @(ElemIndex f all))) `mappend` generate @c @all @fs each
 
-instance Named1 []
-instance Message1 []
+instance Named1 [] where
+  nameOf1 _ = "List"
+
+instance Message1 [] where
+  liftEncodeMessage encodeMessage num = foldMap (Encode.embedded num . encodeMessage (fieldNumber 1))
+  -- liftDecodeMessage decodeMessage = fmap toList (Decode.repeated (Decode.embedded' oneMsg))
+  --   where
+  --     oneMsg = decodeMessage (fieldNumber 1)
+  -- liftDotProto (_ :: Proxy [a]) = messageField (NestedRepeated (Named (Single (nameOf (Proxy @a))))) Nothing
+  liftDotProto (_ :: Proxy [a]) =  [ Proto.DotProtoMessageField $ Proto.DotProtoField (fieldNumber 1) ty (Proto.Single "listContent") [] Nothing ]
+    where ty = (Proto.NestedRepeated (Proto.Named (Proto.Single (nameOf (Proxy @a)))))
+
 
 -- Common
 
