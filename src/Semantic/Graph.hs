@@ -75,7 +75,7 @@ runGraph CallGraph includePackages project
           . runReader (packageInfo package)
           . runReader lowerBound
           . runReader lowerBound
-          . raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package)))))
+          . raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules package))))
     extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
@@ -119,7 +119,7 @@ runImportGraph lang (package :: Package term) =
       analyzeModule = graphingModuleInfo
       extractGraph (((_, graph), _), _) = do
         info <- graph
-        case ModuleTable.lookup (modulePath info) (packageModules (packageBody package)) of
+        case ModuleTable.lookup (modulePath info) (packageModules package) of
           Nothing -> lowerBound
           Just m -> foldMapA pure m
       runImportGraphAnalysis
@@ -136,11 +136,11 @@ runImportGraph lang (package :: Package term) =
         . resumingValueError
         . runState lowerBound
         . runReader lowerBound
-        . interpret (handleModules (ModuleTable.modulePaths (packageModules (packageBody package))))
+        . interpret (handleModules (ModuleTable.modulePaths (packageModules package)))
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules (packageBody package)))))
+  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules package))))
 
 newtype ImportGraphEff term address a = ImportGraphEff
   { runImportGraphEff :: Eff '[ LoopControl address
