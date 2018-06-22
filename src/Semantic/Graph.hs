@@ -125,7 +125,7 @@ runImportGraph lang (package :: Package term)
         info <- graph
         case ModuleTable.lookup (modulePath info) (packageModules package) of
           Nothing -> lowerBound
-          Just m -> foldMapA pure m
+          Just m -> foldMap vertex m
       runImportGraphAnalysis
         = run
         . runState lowerBound
