@@ -14,10 +14,11 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Type
 import           Data.Blob
-import           Data.Graph (topologicalSort)
-import           Data.Project
 import           Data.Functor.Foldable
+import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
+import           Data.List (uncons)
+import           Data.Project
 import           Data.Sum (weaken)
 import           Data.Term
 import           Language.Haskell.HsColour
@@ -27,6 +28,7 @@ import           Prologue hiding (weaken)
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
+import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
 import           Text.Show.Pretty (ppShow)
 
@@ -94,10 +96,9 @@ evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
--- Evaluate a project, starting at a single entrypoint.
-evaluateProject proxy parser lang path = runTaskWithOptions debugOptions $ do
-  project <- readProject Nothing path lang []
-  package <- fmap quieterm <$> parsePackage parser project
+-- Evaluate a project consisting of the listed paths.
+evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
+  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) (flip File lang <$> paths) lang [])
   modules <- runImportGraph proxy package
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
        (runReader (packageInfo package)
