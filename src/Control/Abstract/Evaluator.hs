@@ -85,8 +85,8 @@ throwContinue :: Member (LoopControl address) effects
               -> Evaluator address value effects address
 throwContinue = send . Continue
 
-catchLoopControl :: Member (LoopControl address) effects => Evaluator address value effects a -> (forall x . LoopControl address (Eff effects) x -> Evaluator address value effects a) -> Evaluator address value effects a
-catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
+catchLoopControl :: (Member (LoopControl address) effects, Effectful (m address value)) => m address value effects a -> (forall x . LoopControl address (Eff effects) x -> m address value effects a) -> m address value effects a
+catchLoopControl action handler = Eff.raiseHandler (interpose pure (\ control _ -> Eff.lowerEff (handler control))) action
 
 runLoopControl :: (Effectful (m address value), Effects effects) => m address value (LoopControl address ': effects) address -> m address value effects address
 runLoopControl = Eff.raiseHandler (fmap (either id id) . Exc.runError . reinterpret (\ eff -> case eff of
