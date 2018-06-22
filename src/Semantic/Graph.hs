@@ -42,7 +42,7 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Functor, Ord1, Show1 ]
 
-runGraph :: ( Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: (Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
