@@ -18,6 +18,7 @@ import Control.Monad.Effect           as X
 import Control.Monad.Effect.Exception as Exc
 import Control.Monad.Effect.Fresh     as X
 import Control.Monad.Effect.Internal hiding (Return)
+import qualified Control.Monad.Effect.Internal as Eff
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
@@ -52,8 +53,8 @@ earlyReturn :: Member (Return address) effects
             -> Evaluator address value effects address
 earlyReturn = send . Return
 
-catchReturn :: Member (Return address) effects => Evaluator address value effects a -> (forall x . Return address (Eff effects) x -> Evaluator address value effects a) -> Evaluator address value effects a
-catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
+catchReturn :: forall m address value effects . (Member (Return address) effects, Effectful (m address value)) => m address value effects address -> m address value effects address
+catchReturn = Eff.raiseHandler (interpose @(Return address) pure (\ (Return ret) _ -> pure ret))
 
 runReturn :: (Effectful (m address value), Effects effects) => m address value (Return address ': effects) address -> m address value effects address
 runReturn = raiseHandler (fmap (either id id) . Exc.runError . reinterpret (\ (Return value) -> Exc.throwError value))

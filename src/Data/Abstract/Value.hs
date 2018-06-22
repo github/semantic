@@ -79,7 +79,7 @@ instance ( Coercible body (Eff effects)
           bindings <- foldr (\ (name, param) rest -> do
             addr <- param
             Env.insert name addr <$> rest) (pure env) (zip names params)
-          locally (bindAll bindings *> raiseEff (coerce body) `catchReturn` \ (Return ptr) -> pure ptr)
+          locally (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> box =<< throwValueError (CallError op)
 
 
