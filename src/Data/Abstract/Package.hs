@@ -12,12 +12,8 @@ type PackageName = Name
 -- | Metadata for a package (name and version).
 data PackageInfo = PackageInfo
   { packageName        :: PackageName
-  , packageVersion     :: Maybe Version
   , packageResolutions :: Map.Map FilePath FilePath
   }
-  deriving (Eq, Ord, Show)
-
-newtype Version = Version { versionString :: String }
   deriving (Eq, Ord, Show)
 
 newtype PackageBody term = PackageBody
@@ -33,5 +29,5 @@ data Package term = Package
   }
   deriving (Eq, Functor, Ord, Show)
 
-fromModules :: PackageName -> Maybe Version -> [Module term] -> Map.Map FilePath FilePath -> Package term
-fromModules name version modules resolutions = Package (PackageInfo name version resolutions) (PackageBody (ModuleTable.fromModules modules))
+fromModules :: PackageName -> [Module term] -> Map.Map FilePath FilePath -> Package term
+fromModules name modules resolutions = Package (PackageInfo name resolutions) (PackageBody (ModuleTable.fromModules modules))
