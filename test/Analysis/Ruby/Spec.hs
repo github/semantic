@@ -7,8 +7,6 @@ import Data.Abstract.Number as Number
 import Data.AST
 import Control.Monad.Effect (SomeExc(..))
 import Data.List.NonEmpty (NonEmpty(..))
-import Data.Map
-import Data.Map.Monoidal as Map
 import Data.Sum
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Data.Language as Language

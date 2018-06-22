@@ -3,7 +3,6 @@ module Analysis.Python.Spec (spec) where
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
 import Data.Abstract.Value
-import Data.Map
 import qualified Language.Python.Assignment as Python
 import qualified Data.Language as Language
 
