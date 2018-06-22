@@ -353,6 +353,7 @@ expressionChoices = [
                     , qualifiedImportDeclaration
                     , qualifiedInfixVariableIdentifier
                     , qualifiedModuleIdentifier
+                    , qualifiedTypeClassIdentifier
                     , qualifiedTypeConstructorIdentifier
                     , qualifiedVariableIdentifier
                     , quasiQuotation
