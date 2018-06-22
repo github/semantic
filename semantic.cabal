@@ -86,7 +86,6 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
-                     , Data.Semilattice.Lower
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
@@ -128,7 +127,6 @@ library
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
-                     , Language.Preluded
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
@@ -150,18 +148,22 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.AST
                      , Semantic.CLI
+                     , Semantic.Config
                      , Semantic.Diff
                      , Semantic.Distribute
+                     , Semantic.Env
                      , Semantic.Graph
                      , Semantic.IO
-                     , Semantic.Log
                      , Semantic.Parse
-                     , Semantic.Queue
                      , Semantic.Resolution
-                     , Semantic.Stat
                      , Semantic.Task
                      , Semantic.Telemetry
+                     , Semantic.Telemetry.AsyncQueue
+                     , Semantic.Telemetry.Haystack
+                     , Semantic.Telemetry.Log
+                     , Semantic.Telemetry.Stat
                      , Semantic.Util
+                     , Semantic.Version
                      -- Serialization
                      , Serializing.DOT
                      , Serializing.Format
@@ -179,6 +181,7 @@ library
                      , bytestring
                      , cmark-gfm
                      , containers
+                     , cryptohash
                      , directory
                      , directory-tree
                      , effects
@@ -191,6 +194,9 @@ library
                      , Glob
                      , hashable
                      , hscolour
+                     , http-client
+                     , http-client-tls
+                     , http-types
                      , kdt
                      , mersenne-random-pure64
                      , mtl
@@ -204,16 +210,17 @@ library
                      , reducers
                      , scientific
                      , semigroupoids
+                     , semilattices
                      , split
                      , stm-chans
                      , template-haskell
                      , text >= 1.2.1.3
                      , these
                      , time
-                     , proto3-suite
-                     , proto3-wire
                      , unix
                      , unordered-containers
+                     , proto3-suite
+                     , proto3-wire
                      , haskell-tree-sitter
                      , tree-sitter-go
                      , tree-sitter-haskell
@@ -313,6 +320,7 @@ test-suite test
                      , proto3-suite
                      , proto3-wire
                      , recursion-schemes >= 4.1
+                     , semilattices
                      , semantic
                      , text >= 1.2.1.3
                      , these

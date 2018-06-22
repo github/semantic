@@ -26,3 +26,8 @@ data (Eq (f a), Applicative f) => N f a = N f a
 
 data Foo bar = HasCallStack => Wiz bar
 data Baz a = Show a => Baz a
+
+
+data Bar = Bar !Double#
+
+data SomeNumber = forall b . Show b => SomeNumber (Number b)

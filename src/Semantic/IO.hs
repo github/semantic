@@ -6,7 +6,6 @@ module Semantic.IO
 , IO.IOMode(..)
 , NoLanguageForBlob(..)
 , Source(..)
-, catchException
 , findFiles
 , findFilesInDir
 , getHandle
@@ -20,6 +19,8 @@ module Semantic.IO
 , readBlobs
 , readBlobsFromDir
 , readBlobsFromHandle
+, decodeBlobPairs
+, decodeBlobs
 , readFile
 , readFilePair
 , readProject
@@ -32,19 +33,18 @@ module Semantic.IO
 , write
 ) where
 
-import qualified Control.Exception as Exc
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
 import           Data.Aeson
-import qualified Data.Blob as Blob
+import           Data.Blob
 import           Data.Bool
 import           Data.Project
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
-import           Data.Source (fromUTF8, fromText)
+import           Data.Source (fromUTF8)
 import           Prelude hiding (readFile)
 import           Prologue hiding (MonadError (..), fail)
 import           System.Directory (doesDirectoryExist)
@@ -54,16 +54,15 @@ import           System.Exit
 import           System.FilePath
 import           System.FilePath.Glob
 import qualified System.IO as IO
-import           Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
-readFile :: forall m. MonadIO m => File -> m (Maybe Blob.Blob)
+readFile :: forall m. MonadIO m => File -> m (Maybe Blob)
 readFile (File "/dev/null" _) = pure Nothing
 readFile (File path language) = do
-  raw <- liftIO (Just <$> B.readFile path)
-  pure $ Blob.sourceBlob path language . fromUTF8 <$> raw
+  raw <- liftIO $ B.readFile path
+  pure . Just . sourceBlob path language . fromUTF8 $ raw
 
-readFilePair :: forall m. MonadIO m => File -> File -> m Blob.BlobPair
+readFilePair :: forall m. MonadIO m => File -> File -> m BlobPair
 readFilePair a b = Join <$> join (maybeThese <$> readFile a <*> readFile b)
 
 maybeThese :: Monad m => Maybe a -> Maybe b -> m (These a b)
@@ -73,27 +72,27 @@ maybeThese a b = case (a, b) of
   (Just a, Just b)  -> pure (These a b)
   _                 -> fail "expected file pair with content on at least one side"
 
+newtype Blobs a = Blobs { blobs :: [a] }
+  deriving (Generic, FromJSON)
+
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path)
 
--- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
-languageForFilePath :: FilePath -> Language
-languageForFilePath = languageForType . takeExtension
+decodeBlobPairs :: BL.ByteString -> Either String [BlobPair]
+decodeBlobPairs = fmap blobs <$> eitherDecode
 
 -- | Read JSON encoded blob pairs from a handle.
-readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.BlobPair]
-readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
-  where
-    toBlobPairs :: BlobDiff -> [Blob.BlobPair]
-    toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
-    toBlobPair blobs = toBlob <$> blobs
+readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [BlobPair]
+readBlobPairsFromHandle = fmap blobs <$> readFromHandle
+
+decodeBlobs :: BL.ByteString -> Either String [Blob]
+decodeBlobs = fmap blobs <$> eitherDecode
 
 -- | Read JSON encoded blobs from a handle.
-readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.Blob]
-readBlobsFromHandle = fmap toBlobs . readFromHandle
-  where toBlobs BlobParse{..} = fmap toBlob blobs
+readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob]
+readBlobsFromHandle = fmap blobs <$> readFromHandle
 
-readBlobFromPath :: MonadIO m => File -> m Blob.Blob
+readBlobFromPath :: MonadIO m => File -> m Blob
 readBlobFromPath file = do
   maybeFile <- readFile file
   maybeM (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) maybeFile
@@ -135,7 +134,7 @@ findFilesInDir path exts excludeDirs = do
       | otherwise = True
     notIn _ _ = True
 
-readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
+readBlobsFromDir :: MonadIO m => FilePath -> m [Blob]
 readBlobsFromDir path = do
   paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
   let paths' = fmap (\p -> File p (languageForFilePath p)) paths
@@ -149,38 +148,6 @@ readFromHandle (ReadHandle h) = do
     Left e  -> liftIO (die (e <> ". Invalid input on " <> show h <> ", expecting JSON"))
     Right d -> pure d
 
-toBlob :: Blob -> Blob.Blob
-toBlob Blob{..} = Blob.sourceBlob path language' (fromText content)
-  where language' = case language of
-          "" -> languageForFilePath path
-          _  -> fromMaybe Unknown (readMaybe language)
-
-
-newtype BlobDiff = BlobDiff { blobs :: [BlobPair] }
-  deriving (Show, Generic, FromJSON)
-
-newtype BlobParse = BlobParse { blobs :: [Blob] }
-  deriving (Show, Generic, FromJSON)
-
-type BlobPair = Join These Blob
-
-data Blob = Blob
-  { path     :: FilePath
-  , content  :: Text
-  , language :: String
-  }
-  deriving (Show, Generic, FromJSON)
-
-instance FromJSON BlobPair where
-  parseJSON = withObject "BlobPair" $ \o -> do
-    before <- o .:? "before"
-    after <- o .:? "after"
-    case (before, after) of
-      (Just b, Just a)  -> pure $ Join (These b a)
-      (Just b, Nothing) -> pure $ Join (This b)
-      (Nothing, Just a) -> pure $ Join (That a)
-      _                 -> fail "Expected object with 'before' and/or 'after' keys only"
-
 
 -- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
@@ -190,16 +157,16 @@ noLanguageForBlob :: Member (Exc SomeException) effs => FilePath -> Eff effs a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
 
-readBlob :: Member Files effs => File -> Eff effs Blob.Blob
+readBlob :: Member Files effs => File -> Eff effs Blob
 readBlob = send . Read . FromPath
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: Member Files effs => Either (Handle 'IO.ReadMode) [File] -> Eff effs [Blob.Blob]
+readBlobs :: Member Files effs => Either (Handle 'IO.ReadMode) [File] -> Eff effs [Blob]
 readBlobs (Left handle) = send (Read (FromHandle handle))
 readBlobs (Right paths) = traverse (send . Read . FromPath) paths
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Member Files effs => Either (Handle 'IO.ReadMode) [Both File] -> Eff effs [Blob.BlobPair]
+readBlobPairs :: Member Files effs => Either (Handle 'IO.ReadMode) [Both File] -> Eff effs [BlobPair]
 readBlobPairs (Left handle) = send (Read (FromPairHandle handle))
 readBlobPairs (Right paths) = traverse (send . Read . FromPathPair) paths
 
@@ -237,14 +204,14 @@ openFileForReading :: FilePath -> IO (Handle 'IO.ReadMode)
 openFileForReading path = ReadHandle <$> IO.openFile path IO.ReadMode
 
 data Source blob where
-  FromPath       :: File                -> Source Blob.Blob
-  FromHandle     :: Handle 'IO.ReadMode -> Source [Blob.Blob]
-  FromPathPair   :: Both File           -> Source Blob.BlobPair
-  FromPairHandle :: Handle 'IO.ReadMode -> Source [Blob.BlobPair]
+  FromPath       :: File                -> Source Blob
+  FromHandle     :: Handle 'IO.ReadMode -> Source [Blob]
+  FromPathPair   :: Both File           -> Source BlobPair
+  FromPairHandle :: Handle 'IO.ReadMode -> Source [BlobPair]
 
 data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
--- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
+-- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
 data Files out where
   Read        :: Source out -> Files out
   ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
@@ -262,23 +229,3 @@ runFiles = interpret $ \ files -> case files of
   FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
-
-
--- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
---
---   Note that while the type allows 'IO' to occur anywhere within the effect list, it must actually occur at the end to be able to run the computation.
-catchException :: ( Exc.Exception e
-                  , Member IO r
-                  )
-               => Eff r a
-               -> (e -> Eff r a)
-               -> Eff r a
-catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
-
--- | Lift an 'IO' action into 'Eff', catching and rethrowing any exceptions it throws into an 'Exc' effect.
-rethrowing :: ( Member (Exc SomeException) r
-              , Member IO r
-              )
-           => IO a
-           -> Eff r a
-rethrowing m = catchException (liftIO m) (throwError . toException @SomeException)
