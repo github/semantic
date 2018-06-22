@@ -6,7 +6,6 @@ module Control.Abstract.Modules
 , require
 , load
 , Modules(..)
-, runModules
 , handleModules
 , LoadError(..)
 , moduleNotFound
@@ -63,36 +62,6 @@ data Modules address return where
 sendModules :: Member (Modules address) effects => Modules address return -> Evaluator address value effects return
 sendModules = send
 
-runModules :: forall term address value effects a
-           .  ( Member (Resumable (LoadError address)) effects
-              , Member (State (ModuleTable (Maybe (address, Environment address)))) effects
-              , Member Trace effects
-              )
-           => (Module term -> Evaluator address value (Modules address ': effects) (Module (address, Environment address)))
-           -> Evaluator address value (Modules address ': effects) a
-           -> Evaluator address value (Reader (ModuleTable (NonEmpty (Module term))) ': effects) a
-runModules evaluateModule = go
-  where go :: forall a . Evaluator address value (Modules address ': effects) a -> Evaluator address value (Reader (ModuleTable (NonEmpty (Module term))) ': effects) a
-        go = reinterpret (\ m -> case m of
-          Load name -> askModuleTable @term >>= maybe (moduleNotFound name) (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
-            where
-              evalAndCache x = do
-                let mPath = modulePath (moduleInfo x)
-                loading <- loadingModule mPath
-                if loading
-                  then trace ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
-                  else do
-                    _ <- cacheModule name Nothing
-                    result <- trace ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* trace ("load done:" <> show mPath)
-                    cacheModule name (Just (moduleBody result))
-
-              loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
-          Lookup path -> ModuleTable.lookup path <$> get
-          Resolve names -> do
-            isMember <- flip ModuleTable.member <$> askModuleTable @term
-            pure (find isMember names)
-          List dir -> modulePathsInDir dir <$> askModuleTable @term)
-
 handleModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
               => Set ModulePath
               -> Modules address a
@@ -103,29 +72,8 @@ handleModules paths = \case
   Resolve names -> pure (find (flip Set.member paths) names)
   List dir -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
-getModuleTable :: Member (State (ModuleTable (Maybe (address, Environment address)))) effects => Evaluator address value effects (ModuleTable (Maybe (address, Environment address)))
-getModuleTable = get
-
-cacheModule :: Member (State (ModuleTable (Maybe (address, Environment address)))) effects => ModulePath -> Maybe (address, Environment address) -> Evaluator address value effects (Maybe (address, Environment address))
-cacheModule path result = modify' (ModuleTable.insert path result) $> result
-
-askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module term)))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module term)))
-askModuleTable = ask
-
 askModuleTable' :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
 askModuleTable' = ask
-
-
-newtype Merging m address = Merging { runMerging :: m (Maybe (address, Environment address)) }
-
-instance Applicative m => Semigroup (Merging m address) where
-  Merging a <> Merging b = Merging (merge <$> a <*> b)
-    where merge a b = mergeJusts <$> a <*> b <|> a <|> b
-          mergeJusts (_, env1) (v, env2) = (v, mergeEnvs env1 env2)
-
-instance Applicative m => Monoid (Merging m address) where
-  mappend = (<>)
-  mempty = Merging (pure Nothing)
 
 
 newtype Merging' address = Merging' { runMerging' :: (address, Environment address) }
