@@ -102,6 +102,7 @@ type Syntax = '[
   , Syntax.NewType
   , Syntax.Operator
   , Syntax.OperatorSection
+  , Syntax.PatternGuard
   , Syntax.Pragma
   , Syntax.PrefixNegation
   , Syntax.QualifiedEntityIdentifier
@@ -342,6 +343,7 @@ expressionChoices = [
                     , parenthesizedPattern
                     , parenthesizedTypePattern
                     , pattern'
+                    , patternGuard
                     , pragma
                     , prefixNegation
                     , primitiveConstructorIdentifier
@@ -644,6 +646,9 @@ parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressio
 
 pattern' :: Assignment
 pattern' = symbol Pattern *> children expression
+
+patternGuard :: Assignment
+patternGuard = makeTerm <$> symbol PatternGuard <*> children (Syntax.PatternGuard <$> expression <*> expression)
 
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
