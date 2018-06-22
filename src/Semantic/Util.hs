@@ -95,7 +95,7 @@ evalTypeScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 
 typecheckGoFile path = checking =<< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go path
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject proxy parser lang path = runTask $ do
+evaluateProject proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePackage parser project
   modules <- runImportGraph proxy package
@@ -106,7 +106,7 @@ evaluateProject proxy parser lang path = runTask $ do
        (raiseHandler (interpret (handleModules (ModuleTable.modulePaths (packageModules package))))
        (evaluate proxy id withTermSpans (topologicalSort modules)))))))
 
-evaluateProjectWithCaching proxy parser lang path = runTask $ do
+evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePackage parser project
   modules <- runImportGraph proxy package
