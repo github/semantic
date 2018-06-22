@@ -220,7 +220,8 @@ instance Show1 Star where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Star
 
-data QualifiedEntityIdentifier a = QualifiedTypeConstructorIdentifier (NonEmpty a)
+data QualifiedEntityIdentifier a = QualifiedTypeClassIdentifier (NonEmpty a)
+                                 | QualifiedTypeConstructorIdentifier (NonEmpty a)
                                  | QualifiedConstructorIdentifier (NonEmpty a)
                                  | QualifiedInfixVariableIdentifier (NonEmpty a)
                                  | QualifiedModuleIdentifier (NonEmpty a)
