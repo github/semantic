@@ -1,4 +1,3 @@
-{-# LANGUAGE TupleSections #-}
 module Data.Abstract.Package where
 
 import Data.Abstract.Module
