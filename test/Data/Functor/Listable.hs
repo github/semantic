@@ -283,26 +283,95 @@ instance Listable1 Directive.File where
 instance Listable1 Directive.Line where
   liftTiers tiers = cons0 Directive.Line
 
-instance Listable1 Expression.Arithmetic where
-  liftTiers tiers = liftCons2 tiers tiers Expression.Plus \/ liftCons2 tiers tiers Expression.Minus \/ liftCons2 tiers tiers Expression.Times \/ liftCons2 tiers tiers Expression.DividedBy \/ liftCons2 tiers tiers Expression.FloorDivision \/ liftCons2 tiers tiers Expression.Modulo \/ liftCons2 tiers tiers Expression.Power \/ liftCons1 tiers Expression.Negate
+instance Listable1 Expression.Plus where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Plus
 
-instance Listable1 Expression.Bitwise where
-  liftTiers tiers = liftCons2 tiers tiers Expression.BOr \/ liftCons2 tiers tiers Expression.BAnd \/ liftCons2 tiers tiers Expression.BXOr \/ liftCons2 tiers tiers Expression.LShift \/ liftCons2 tiers tiers Expression.RShift \/ liftCons2 tiers tiers Expression.UnsignedRShift \/ liftCons1 tiers Expression.Complement
+instance Listable1 Expression.Minus where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Minus
 
-instance Listable1 Expression.BooleanOperator where
-  liftTiers tiers = liftCons2 tiers tiers Expression.Or \/ liftCons2 tiers tiers Expression.And \/ liftCons1 tiers Expression.Not \/ liftCons2 tiers tiers Expression.XOr
+instance Listable1 Expression.Times where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Times
+
+instance Listable1 Expression.DividedBy where
+  liftTiers tiers = liftCons2 tiers tiers Expression.DividedBy
+
+instance Listable1 Expression.FloorDivision where
+  liftTiers tiers = liftCons2 tiers tiers Expression.FloorDivision
+
+instance Listable1 Expression.Modulo where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Modulo
+
+instance Listable1 Expression.Power where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Power
+
+instance Listable1 Expression.Negate where
+  liftTiers tiers = liftCons1 tiers Expression.Negate
+
+instance Listable1 Expression.BOr where
+  liftTiers tiers = liftCons2 tiers tiers Expression.BOr
+
+instance Listable1 Expression.BAnd where
+  liftTiers tiers = liftCons2 tiers tiers Expression.BAnd
+
+instance Listable1 Expression.BXOr where
+  liftTiers tiers = liftCons2 tiers tiers Expression.BXOr
+
+instance Listable1 Expression.LShift where
+  liftTiers tiers = liftCons2 tiers tiers Expression.LShift
+
+instance Listable1 Expression.RShift where
+  liftTiers tiers = liftCons2 tiers tiers Expression.RShift
+
+instance Listable1 Expression.UnsignedRShift where
+  liftTiers tiers = liftCons2 tiers tiers Expression.UnsignedRShift
+
+instance Listable1 Expression.Complement where
+  liftTiers tiers = liftCons1 tiers Expression.Complement
+
+instance Listable1 Expression.Or where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Or
+
+instance Listable1 Expression.And where
+  liftTiers tiers = liftCons2 tiers tiers Expression.And
+
+instance Listable1 Expression.Not where
+  liftTiers tiers = liftCons1 tiers Expression.Not
+
+instance Listable1 Expression.XOr where
+  liftTiers tiers = liftCons2 tiers tiers Expression.XOr
 
 instance Listable1 Expression.Call where
   liftTiers tiers = liftCons4 (liftTiers tiers) tiers (liftTiers tiers) tiers Expression.Call
 
+instance Listable1 Expression.LessThan where
+  liftTiers tiers = liftCons2 tiers tiers Expression.LessThan
+
+instance Listable1 Expression.LessThanEqual where
+  liftTiers tiers = liftCons2 tiers tiers Expression.LessThanEqual
+
+instance Listable1 Expression.GreaterThan where
+  liftTiers tiers = liftCons2 tiers tiers Expression.GreaterThan
+
+instance Listable1 Expression.GreaterThanEqual where
+  liftTiers tiers = liftCons2 tiers tiers Expression.GreaterThanEqual
+
+instance Listable1 Expression.Equal where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Equal
+
+instance Listable1 Expression.StrictEqual where
+  liftTiers tiers = liftCons2 tiers tiers Expression.StrictEqual
+
 instance Listable1 Expression.Comparison where
-  liftTiers tiers = liftCons2 tiers tiers Expression.LessThan \/ liftCons2 tiers tiers Expression.LessThanEqual \/ liftCons2 tiers tiers Expression.GreaterThan \/ liftCons2 tiers tiers Expression.GreaterThanEqual \/ liftCons2 tiers tiers Expression.Equal \/ liftCons2 tiers tiers Expression.StrictEqual \/ liftCons2 tiers tiers Expression.Comparison
+  liftTiers tiers = liftCons2 tiers tiers Expression.Comparison
 
 instance Listable1 Expression.Enumeration where
   liftTiers tiers = liftCons3 tiers tiers tiers Expression.Enumeration
 
-instance Listable1 Expression.RegexMatch where
-  liftTiers tiers = liftCons2 tiers tiers Expression.RegexMatches \/ liftCons2 tiers tiers Expression.NotMatches
+instance Listable1 Expression.Matches where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Matches
+
+instance Listable1 Expression.NotMatches where
+  liftTiers tiers = liftCons2 tiers tiers Expression.NotMatches
 
 instance Listable1 Expression.MemberAccess where
   liftTiers tiers = liftCons2 tiers mempty Expression.MemberAccess
@@ -311,7 +380,10 @@ instance Listable1 Expression.ScopeResolution where
   liftTiers tiers = liftCons1 (liftTiers tiers) Expression.ScopeResolution
 
 instance Listable1 Expression.Subscript where
-  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Expression.Subscript \/ liftCons2 tiers tiers Expression.Member
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Expression.Subscript
+
+instance Listable1 Expression.Member where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Member
 
 instance Listable1 Literal.Complex where
   liftTiers tiers = cons1 Literal.Complex
@@ -382,8 +454,11 @@ instance Listable1 Ruby.Syntax.Class where
 instance Listable1 Ruby.Syntax.Load where
   liftTiers tiers = liftCons2 tiers (liftTiers tiers) Ruby.Syntax.Load
 
-instance Listable1 Ruby.Syntax.LowPrecedenceBoolean where
-  liftTiers tiers = liftCons2 tiers tiers Ruby.Syntax.LowAnd \/ liftCons2 tiers tiers Ruby.Syntax.LowOr
+instance Listable1 Ruby.Syntax.LowPrecedenceOr where
+  liftTiers tiers = liftCons2 tiers tiers Ruby.Syntax.LowPrecedenceOr
+
+instance Listable1 Ruby.Syntax.LowPrecedenceAnd where
+  liftTiers tiers = liftCons2 tiers tiers Ruby.Syntax.LowPrecedenceAnd
 
 instance Listable1 Ruby.Syntax.Module where
   liftTiers tiers = liftCons2 tiers (liftTiers tiers) Ruby.Syntax.Module
