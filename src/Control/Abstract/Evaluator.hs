@@ -17,7 +17,6 @@ module Control.Abstract.Evaluator
 import Control.Monad.Effect           as X
 import Control.Monad.Effect.Exception as Exc
 import Control.Monad.Effect.Fresh     as X
-import Control.Monad.Effect.Internal hiding (Return)
 import qualified Control.Monad.Effect.Internal as Eff
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X
@@ -57,7 +56,11 @@ catchReturn :: forall m address value effects . (Member (Return address) effects
 catchReturn = Eff.raiseHandler (interpose @(Return address) pure (\ (Return ret) _ -> pure ret))
 
 runReturn :: (Effectful (m address value), Effects effects) => m address value (Return address ': effects) address -> m address value effects address
-runReturn = raiseHandler (fmap (either id id) . Exc.runError . reinterpret (\ (Return value) -> Exc.throwError value))
+runReturn = Eff.raiseHandler go . catchReturn
+  where go :: Effects effects => Eff (Return address ': effects) a -> Eff effects a
+        go (Eff.Return a) = pure a
+        go (Effect (Return a) k) = go (k a)
+        go (Other u k) = liftHandler go u k
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -86,6 +89,6 @@ catchLoopControl :: Member (LoopControl address) effects => Evaluator address va
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
 runLoopControl :: (Effectful (m address value), Effects effects) => m address value (LoopControl address ': effects) address -> m address value effects address
-runLoopControl = raiseHandler (fmap (either id id) . Exc.runError . reinterpret (\ eff -> case eff of
+runLoopControl = Eff.raiseHandler (fmap (either id id) . Exc.runError . reinterpret (\ eff -> case eff of
   Break    value -> Exc.throwError value
   Continue value -> Exc.throwError value))
