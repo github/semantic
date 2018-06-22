@@ -16,18 +16,12 @@ data PackageInfo = PackageInfo
   }
   deriving (Eq, Ord, Show)
 
-newtype PackageBody term = PackageBody
-  { packageModules :: ModuleTable (NonEmpty (Module term))
-  }
-  deriving (Eq, Functor, Ord, Show)
-
-
 -- | A package represents the unit of dependency, i.e. something which can depend upon, or be depended upon by, other packages. Packages have modules and may have entry points from which evaluation can proceed.
 data Package term = Package
   { packageInfo :: PackageInfo
-  , packageBody :: PackageBody term
+  , packageModules :: ModuleTable (NonEmpty (Module term))
   }
   deriving (Eq, Functor, Ord, Show)
 
 fromModules :: PackageName -> [Module term] -> Map.Map FilePath FilePath -> Package term
-fromModules name modules resolutions = Package (PackageInfo name resolutions) (PackageBody (ModuleTable.fromModules modules))
+fromModules name modules resolutions = Package (PackageInfo name resolutions) (ModuleTable.fromModules modules)
