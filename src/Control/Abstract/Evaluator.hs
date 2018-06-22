@@ -15,7 +15,6 @@ module Control.Abstract.Evaluator
   ) where
 
 import Control.Monad.Effect           as X
-import Control.Monad.Effect.Exception as Exc
 import Control.Monad.Effect.Fresh     as X
 import qualified Control.Monad.Effect.Internal as Eff
 import Control.Monad.Effect.NonDet    as X
@@ -89,6 +88,11 @@ catchLoopControl :: (Member (LoopControl address) effects, Effectful (m address 
 catchLoopControl action handler = Eff.raiseHandler (interpose pure (\ control _ -> Eff.lowerEff (handler control))) action
 
 runLoopControl :: (Effectful (m address value), Effects effects) => m address value (LoopControl address ': effects) address -> m address value effects address
-runLoopControl = Eff.raiseHandler (fmap (either id id) . Exc.runError . reinterpret (\ eff -> case eff of
-  Break    value -> Exc.throwError value
-  Continue value -> Exc.throwError value))
+runLoopControl = Eff.raiseHandler go . (`catchLoopControl` (\ control -> case control of
+  Break    address -> Eff.raiseEff (pure address)
+  Continue address -> Eff.raiseEff (pure address)))
+  where go :: Effects effects => Eff (LoopControl address ': effects) a -> Eff effects a
+        go (Eff.Return a) = pure a
+        go (Effect (Break a) k) = go (k a)
+        go (Effect (Continue a) k) = go (k a)
+        go (Other u k) = liftHandler go u k
