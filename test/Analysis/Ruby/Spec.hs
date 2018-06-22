@@ -20,57 +20,57 @@ spec :: Spec
 spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      ((Right [(res, env)], state), _) <- evaluate "main.rb"
+      (_, (_, Right [(env, res)])) <- evaluate "main.rb"
       res `shouldBe` Value.Integer (Number.Integer 1)
       Env.names env `shouldContain` ["foo"]
 
     it "evaluates load" $ do
-      ((Right [(_, env)], _), _) <- evaluate "load.rb"
+      (_, (_, Right [(env, _)])) <- evaluate "load.rb"
       Env.names env `shouldContain` ["foo"]
 
     it "evaluates load with wrapper" $ do
-      ((res, state), _) <- evaluate "load-wrap.rb"
+      (_, (_, res)) <- evaluate "load-wrap.rb"
       res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
 
     it "evaluates subclass" $ do
-      ((Right [(res, env)], state), _) <- evaluate "subclass.rb"
+      (_, (state, Right [(env, res)])) <- evaluate "subclass.rb"
       res `shouldBe` String "\"<bar>\""
       Env.names env `shouldContain` [ "Bar", "Foo" ]
 
       (derefQName (heap state) ("Bar" :| []) env >>= deNamespace) `shouldBe` Just ("Bar",  ["baz", "foo", "inspect"])
 
     it "evaluates modules" $ do
-      ((Right [(res, env)], state), _) <- evaluate "modules.rb"
+      (_, (state, Right [(env, res)])) <- evaluate "modules.rb"
       res `shouldBe` String "\"<hello>\""
       Env.names env `shouldContain` [ "Bar" ]
 
     it "handles break correctly" $ do
-      ((res, _), _) <- evaluate "break.rb"
-      fmap fst <$> res `shouldBe` Right [Value.Integer (Number.Integer 3)]
+      (_, (_, res)) <- evaluate "break.rb"
+      fmap snd <$> res `shouldBe` Right [Value.Integer (Number.Integer 3)]
 
     it "handles break correctly" $ do
-      ((res, _), _) <- evaluate "next.rb"
-      fmap fst <$> res `shouldBe` Right [Value.Integer (Number.Integer 8)]
+      (_, (_, res)) <- evaluate "next.rb"
+      fmap snd <$> res `shouldBe` Right [Value.Integer (Number.Integer 8)]
 
     it "calls functions with arguments" $ do
-      ((res, _), _) <- evaluate "call.rb"
-      fmap fst <$> res `shouldBe` Right [Value.Integer (Number.Integer 579)]
+      (_, (_, res)) <- evaluate "call.rb"
+      fmap snd <$> res `shouldBe` Right [Value.Integer (Number.Integer 579)]
 
     it "evaluates early return statements" $ do
-      ((res, _), _) <- evaluate "early-return.rb"
-      fmap fst <$> res `shouldBe` Right [Value.Integer (Number.Integer 123)]
+      (_, (_, res)) <- evaluate "early-return.rb"
+      fmap snd <$> res `shouldBe` Right [Value.Integer (Number.Integer 123)]
 
     it "has prelude" $ do
-      ((res, _), _) <- evaluate "preluded.rb"
-      fmap fst <$> res `shouldBe` Right [String "\"<foo>\""]
+      (_, (_, res)) <- evaluate "preluded.rb"
+      fmap snd <$> res `shouldBe` Right [String "\"<foo>\""]
 
     it "evaluates __LINE__" $ do
-      ((res, _), _) <- evaluate "line.rb"
-      fmap fst <$> res `shouldBe` Right [Value.Integer (Number.Integer 4)]
+      (_, (_, res)) <- evaluate "line.rb"
+      fmap snd <$> res `shouldBe` Right [Value.Integer (Number.Integer 4)]
 
     it "resolves builtins used in the prelude" $ do
-      ((res, _), traces) <- evaluate "puts.rb"
-      fmap fst <$> res `shouldBe` Right [Unit]
+      (traces, (_, res)) <- evaluate "puts.rb"
+      fmap snd <$> res `shouldBe` Right [Unit]
       traces `shouldContain` [ "\"hello\"" ]
 
   where

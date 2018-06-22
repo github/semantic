@@ -19,18 +19,18 @@ import SpecHelpers hiding (reassociate)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (expected, _) <- evaluate (box (integer 123))
+    (_, expected) <- evaluate (box (integer 123))
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
   it "calls functions" $ do
-    (expected, _) <- evaluate $ do
+    (_, expected) <- evaluate $ do
       identity <- closure [name "x"] lowerBound (variable (name "x"))
       call identity [box (integer 123)]
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
 evaluate
   = runM
-  . evaluating @Precise @Val
+  . evaluating @_ @Precise @Val
   . runReader (PackageInfo (name "test") Nothing mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . fmap reassociate
@@ -38,7 +38,7 @@ evaluate
   . runEnvironmentError
   . runAddressError
   . runAllocator
-  . (>>= deref . fst)
+  . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
   . runLoopControl
@@ -59,7 +59,7 @@ newtype SpecEff a = SpecEff
                        , Reader PackageInfo
                        , Fresh
                        , State (Heap Precise Latest Val)
-                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
-                       , IO
+                       , State (ModuleTable (Maybe (Environment Precise, Precise)))
+                       , Lift IO
                        ] a
   }
