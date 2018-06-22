@@ -31,7 +31,7 @@ simplify (Graph graph) = Graph (G.simplify graph)
 topologicalSort :: Ord v => Graph v -> [NonEmpty v]
 topologicalSort
   = map (fmap fst)
-  . sortAndGroupBy (outEdgeCount . snd)
+  . sortAndGroupBy (inEdgeCount . snd)
   . Monoidal.pairs
   . edgeCountsByVertex
 
