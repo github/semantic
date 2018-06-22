@@ -897,3 +897,13 @@ instance Ord1 ViewPattern where liftCompare = genericLiftCompare
 instance Show1 ViewPattern where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ViewPattern
+
+-- The `a <- b` in `f a | a <- b = c` of a function declaration.
+data PatternGuard a = PatternGuard { patternGuardPattern :: a, patternGuardExpression :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 PatternGuard where liftEq = genericLiftEq
+instance Ord1 PatternGuard where liftCompare = genericLiftCompare
+instance Show1 PatternGuard where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable PatternGuard
