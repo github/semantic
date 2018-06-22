@@ -654,7 +654,7 @@ pattern' :: Assignment
 pattern' = symbol Pattern *> children expressions
 
 patternGuard :: Assignment
-patternGuard = makeTerm <$> symbol PatternGuard <*> children (Syntax.PatternGuard <$> expression <*> expression)
+patternGuard = makeTerm <$> symbol PatternGuard <*> children (Syntax.PatternGuard <$> expression <*> (expression <|> emptyTerm))
 
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
