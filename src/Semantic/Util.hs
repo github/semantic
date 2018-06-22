@@ -92,7 +92,7 @@ evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
 
-typecheckGoFile path = checking =<< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go path
+typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject proxy parser lang path = runTaskWithOptions debugOptions $ do
