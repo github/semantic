@@ -67,8 +67,8 @@ runModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environmen
            -> Evaluator address value (Modules address ': effects) a
            -> Evaluator address value effects a
 runModules paths = interpret $ \case
-  Load name -> fmap (runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup name <$> askModuleTable
-  Lookup path -> fmap (Just . runMerging' . foldMap1 (Merging' . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
+  Load name -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable
+  Lookup path -> fmap (Just . runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
   Resolve names -> pure (find (flip Set.member paths) names)
   List dir -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
@@ -76,10 +76,10 @@ askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module (address, Enviro
 askModuleTable = ask
 
 
-newtype Merging' address = Merging' { runMerging' :: (address, Environment address) }
+newtype Merging address = Merging { runMerging :: (address, Environment address) }
 
-instance Semigroup (Merging' address) where
-  Merging' (_, env1) <> Merging' (addr, env2) = Merging' (addr, mergeEnvs env1 env2)
+instance Semigroup (Merging address) where
+  Merging (_, env1) <> Merging (addr, env2) = Merging (addr, mergeEnvs env1 env2)
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
