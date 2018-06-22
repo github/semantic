@@ -33,6 +33,8 @@ message SrcLoc { string srcLocPackage = 1;
 message ErrorSite { string errorMessage = 1;
                     SrcLoc errorLocation = 2;
                   }
+message List { repeated Term listContent = 1;
+             }
 message Error { repeated ErrorSite errorCallStack = 1;
                 repeated string errorExpected = 2;
                 string errorActual = 3;
@@ -338,7 +340,8 @@ message Syntax { oneof syntax {Comment comment = 1;
                                LowPrecedenceOr lowPrecedenceOr = 77;
                                Module module = 78;
                                Require require = 79;
-                               Send send = 80;}
+                               Send send = 80;
+                               List list = 81;}
                }
 message Term { Syntax syntax = 1;
              }
