@@ -87,6 +87,7 @@ type Syntax = '[
   , Syntax.KindParenthesizedConstructor
   , Syntax.KindSignature
   , Syntax.KindTupleType
+  , Syntax.LabeledConstruction
   , Syntax.LabeledPattern
   , Syntax.LabeledUpdate
   , Syntax.Lambda
@@ -321,6 +322,7 @@ expressionChoices = [
                     , kindParenthesizedConstructor
                     , kindSignature
                     , kindTupleType
+                    , labeledConstruction
                     , labeledPattern
                     , labeledUpdate
                     , lambda
@@ -553,6 +555,9 @@ kindSignature = makeTerm <$> symbol KindSignature <*> children (Syntax.KindSigna
 
 kindTupleType :: Assignment
 kindTupleType = makeTerm <$> symbol KindTupleType <*> children (Syntax.KindTupleType <$> manyTerm expression)
+
+labeledConstruction :: Assignment
+labeledConstruction = makeTerm <$> symbol LabeledConstruction <*> children (Syntax.LabeledConstruction <$> expression <*> manyTerm expression)
 
 labeledPattern :: Assignment
 labeledPattern = makeTerm <$> symbol LabeledPattern <*> children (Syntax.LabeledPattern <$> expressions)
