@@ -616,7 +616,7 @@ negativeLiteral :: Assignment
 negativeLiteral = makeTerm <$> symbol NegativeLiteral <*> children (Syntax.NegativeLiteral <$> expression)
 
 newConstructor :: Assignment
-newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters)
+newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> expressions)
 
 newType :: Assignment
 newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$> manyTerm (context' <|> scopedTypeVariables) <*> typeLeft <*> newConstructor <*> (derivingClause <|> emptyTerm))
