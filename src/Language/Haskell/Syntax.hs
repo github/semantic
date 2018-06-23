@@ -20,8 +20,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module
 
-
-data StrictPattern a = StrictPattern a
+newtype StrictPattern a = StrictPattern a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 StrictPattern where liftEq = genericLiftEq
@@ -39,7 +38,7 @@ instance Show1 StrictType where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable StrictType
 
-data StrictTypeVariable a = StrictTypeVariable a
+newtype StrictTypeVariable a = StrictTypeVariable a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 StrictTypeVariable where liftEq = genericLiftEq
@@ -255,7 +254,7 @@ instance Hashable1 QualifiedTypeClassIdentifier where liftHashWithSalt = foldl
 
 instance Evaluatable QualifiedTypeClassIdentifier
 
-data QualifiedTypeConstructorIdentifier a = QualifiedTypeConstructorIdentifier (NonEmpty a)
+newtype QualifiedTypeConstructorIdentifier a = QualifiedTypeConstructorIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedTypeConstructorIdentifier where liftEq = genericLiftEq
@@ -265,7 +264,7 @@ instance Hashable1 QualifiedTypeConstructorIdentifier where liftHashWithSalt = f
 
 instance Evaluatable QualifiedTypeConstructorIdentifier
 
-data QualifiedConstructorIdentifier a = QualifiedConstructorIdentifier (NonEmpty a)
+newtype QualifiedConstructorIdentifier a = QualifiedConstructorIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedConstructorIdentifier where liftEq = genericLiftEq
@@ -275,7 +274,7 @@ instance Hashable1 QualifiedConstructorIdentifier where liftHashWithSalt = foldl
 
 instance Evaluatable QualifiedConstructorIdentifier
 
-data QualifiedInfixVariableIdentifier a = QualifiedInfixVariableIdentifier (NonEmpty a)
+newtype QualifiedInfixVariableIdentifier a = QualifiedInfixVariableIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedInfixVariableIdentifier where liftEq = genericLiftEq
@@ -285,7 +284,7 @@ instance Hashable1 QualifiedInfixVariableIdentifier where liftHashWithSalt = fol
 
 instance Evaluatable QualifiedInfixVariableIdentifier
 
-data QualifiedModuleIdentifier a = QualifiedModuleIdentifier (NonEmpty a)
+newtype QualifiedModuleIdentifier a = QualifiedModuleIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedModuleIdentifier where liftEq = genericLiftEq
@@ -295,7 +294,7 @@ instance Hashable1 QualifiedModuleIdentifier where liftHashWithSalt = foldl
 
 instance Evaluatable QualifiedModuleIdentifier
 
-data QualifiedVariableIdentifier a = QualifiedVariableIdentifier (NonEmpty a)
+newtype QualifiedVariableIdentifier a = QualifiedVariableIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedVariableIdentifier where liftEq = genericLiftEq
