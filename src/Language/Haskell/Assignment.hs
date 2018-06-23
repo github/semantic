@@ -645,7 +645,7 @@ packageQualifiedImport :: Assignment
 packageQualifiedImport = makeTerm <$> symbol PackageQualifiedImport <*> (Literal.TextElement <$> source)
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = symbol ParenthesizedExpression *> children expression
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 parenthesizedPattern :: Assignment
 parenthesizedPattern = symbol ParenthesizedPattern *> children expressions
