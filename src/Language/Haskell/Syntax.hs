@@ -525,7 +525,7 @@ instance Show1 ConstructorPattern where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ConstructorPattern
 
 -- e.g. `a <- b` in a Haskell do block.
-data BindPattern a = BindPattern { bindPatternLeft :: a, bindPatternRight :: a }
+data BindPattern a = BindPattern { bindPatternLeft :: [a], bindPatternRight :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 BindPattern where liftEq = genericLiftEq
