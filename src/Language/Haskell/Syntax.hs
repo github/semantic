@@ -85,7 +85,7 @@ instance Show1 FunctionConstructor where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable FunctionConstructor
 
-data RecordDataConstructor a = RecordDataConstructor { recordDataConstructorName :: !a, recordDataConstructorFields :: !a }
+data RecordDataConstructor a = RecordDataConstructor { recordDataConstructorContext :: [a], recordDataConstructorName :: !a, recordDataConstructorFields :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 RecordDataConstructor where liftEq = genericLiftEq
@@ -918,7 +918,7 @@ instance Show1 LabeledConstruction where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LabeledConstruction
 
-data InfixDataConstructor a = InfixDataConstructor { infixDataConstructorLeft :: a, infixDataConstructorOperator :: a, infixDataConstructorRight :: a }
+data InfixDataConstructor a = InfixDataConstructor { infixDataConstructorContext :: [a], infixDataConstructorLeft :: a, infixDataConstructorOperator :: a, infixDataConstructorRight :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 InfixDataConstructor where liftEq = genericLiftEq

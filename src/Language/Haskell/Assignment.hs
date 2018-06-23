@@ -211,8 +211,8 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 constructor :: Assignment
 constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters))
-           <|> term (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> (term fields)))
-           <|> term (makeTerm <$> symbol InfixDataConstructor <*> children (Syntax.InfixDataConstructor <$> expression <*> expression <*> expression))
+           <|> term (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> manyTerm (context' <|> scopedTypeVariables)  <*> constructorIdentifier <*> (term fields)))
+           <|> term (makeTerm <$> symbol InfixDataConstructor <*> children (Syntax.InfixDataConstructor <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> expression <*> expression))
 
 constructorIdentifier :: Assignment
 constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.ConstructorIdentifier . Name.name <$> source)
