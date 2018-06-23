@@ -156,9 +156,10 @@ algebraicDatatypeDeclaration = makeTerm
                             <*> children (Declaration.Datatype
                                         <$> (context' <|> emptyTerm)
                                         <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters <*> (kindSignature <|> emptyTerm)))
-                                        <*> ((symbol Constructors *> children (manyTerm constructor))
-                                            <|> pure [])
-                                        <*> (derivingClause <|> emptyTerm))
+                                        <*> constructors
+                                        <*> (term derivingClause <|> emptyTerm))
+  where
+    constructors = symbol Constructors *> children (manyTerm constructor)
 
 allConstructors :: Assignment
 allConstructors = makeTerm <$> token AllConstructors <*> pure Syntax.AllConstructors
@@ -209,7 +210,7 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 constructor :: Assignment
 constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters))
-           <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
+           <|> term (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> (term fields)))
 
 constructorIdentifier :: Assignment
 constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.ConstructorIdentifier . Name.name <$> source)
@@ -444,7 +445,7 @@ functionDeclaration :: Assignment
 functionDeclaration = makeTerm
                    <$> symbol FunctionDeclaration
                    <*> children (Declaration.Function []
-                               <$> expression
+                               <$> term expression
                                <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
 
