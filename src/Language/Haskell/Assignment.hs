@@ -42,11 +42,12 @@ type Syntax = '[
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.App
-  , Syntax.ArithmeticSequence
   , Syntax.AsPattern
   , Syntax.BindPattern
   , Syntax.CaseGuardPattern
   , Syntax.Class
+  , Syntax.ConstructorIdentifier
+  , Syntax.ConstructorOperator
   , Syntax.ConstructorPattern
   , Syntax.ConstructorSymbol
   , Syntax.Context
@@ -57,10 +58,14 @@ type Syntax = '[
   , Syntax.Deriving
   , Syntax.Do
   , Syntax.Empty
-  , Syntax.EntityIdentifier
+  , Syntax.EnumFrom
+  , Syntax.EnumFromThen
+  , Syntax.EnumFromTo
+  , Syntax.EnumFromThenTo
   , Syntax.Error
   , Syntax.EqualityConstraint
   , Syntax.Export
+  , Syntax.ExpressionTypeSignature
   , Syntax.Field
   , Syntax.FieldBind
   , Syntax.FieldPattern
@@ -75,6 +80,10 @@ type Syntax = '[
   , Syntax.Guard
   , Syntax.HiddenImport
   , Syntax.Identifier
+  , Syntax.InfixConstructorIdentifier
+  , Syntax.InfixOperatorApp
+  , Syntax.InfixVariableIdentifier
+  , Syntax.ImplicitParameterIdentifier
   , Syntax.Import
   , Syntax.ImportAlias
   , Syntax.ImportDeclaration
@@ -93,22 +102,30 @@ type Syntax = '[
   , Syntax.LabeledUpdate
   , Syntax.Lambda
   , Syntax.LambdaCase
+  , Syntax.LeftOperatorSection
   , Syntax.Let
   , Syntax.ListComprehension
   , Syntax.ListConstructor
   , Syntax.ListPattern
   , Syntax.Module
   , Syntax.ModuleExport
+  , Syntax.ModuleIdentifier
   , Syntax.NamedFieldPun
   , Syntax.NegativeLiteral
   , Syntax.NewType
-  , Syntax.Operator
-  , Syntax.OperatorSection
   , Syntax.PatternGuard
   , Syntax.Pragma
   , Syntax.PrefixNegation
-  , Syntax.QualifiedEntityIdentifier
+  , Syntax.PrimitiveConstructorIdentifier
+  , Syntax.PrimitiveVariableIdentifier
+  , Syntax.PromotedTypeOperator
+  , Syntax.QualifiedConstructorIdentifier
+  , Syntax.QualifiedInfixVariableIdentifier
+  , Syntax.QualifiedModuleIdentifier
   , Syntax.QualifiedImportDeclaration
+  , Syntax.QualifiedTypeClassIdentifier
+  , Syntax.QualifiedTypeConstructorIdentifier
+  , Syntax.QualifiedVariableIdentifier
   , Syntax.QuasiQuotation
   , Syntax.QuasiQuotationDeclaration
   , Syntax.QuasiQuotationExpression
@@ -119,24 +136,34 @@ type Syntax = '[
   , Syntax.QuotedName
   , Syntax.RecordDataConstructor
   , Syntax.RecordWildCards
+  , Syntax.RightOperatorSection
   , Syntax.ScopedTypeVariables
   , Syntax.Splice
   , Syntax.StandaloneDerivingInstance
   , Syntax.Star
-  , Syntax.Strict
+  , Syntax.StrictPattern
+  , Syntax.StrictType
+  , Syntax.StrictTypeVariable
   , Syntax.Tuple
   , Syntax.TupleConstructor
   , Syntax.TuplePattern
   , Syntax.Type
+  , Syntax.TypeApp
   , Syntax.TypeClass
+  , Syntax.TypeClassIdentifier
   , Syntax.TypeClassInstance
   , Syntax.TypeConstructorExport
+  , Syntax.TypeConstructorIdentifier
   , Syntax.TypeFamily
   , Syntax.TypeInstance
+  , Syntax.TypeOperator
   , Syntax.TypePattern
   , Syntax.TypeSignature
   , Syntax.TypeSynonym
+  , Syntax.TypeVariableIdentifier
   , Syntax.UnitConstructor
+  , Syntax.VariableIdentifier
+  , Syntax.VariableOperator
   , Syntax.VariableSymbol
   , Syntax.ViewPattern
   , Syntax.Wildcard
