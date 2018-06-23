@@ -188,7 +188,7 @@ asPattern :: Assignment
 asPattern = makeTerm <$> symbol AsPattern <*> children (Syntax.AsPattern <$> expression <*> expression)
 
 bindPattern :: Assignment
-bindPattern = makeTerm <$> symbol BindPattern <*> children (Syntax.BindPattern <$> expression <*> expression)
+bindPattern = makeTerm <$> symbol BindPattern <*> children (Syntax.BindPattern <$> (manyTermsTill expression (symbol AnonLAngleMinus)) <*> expression)
 
 case' :: Assignment
 case' = makeTerm <$> symbol CaseExpression <*> children (Statement.Match <$> expression <*> expressions)
