@@ -516,7 +516,7 @@ infixConstructorIdentifier :: Assignment
 infixConstructorIdentifier = makeTerm <$> symbol InfixConstructorIdentifier <*> children (Syntax.InfixConstructorIdentifier . Name.name <$> source)
 
 infixOperatorApp :: Assignment
-infixOperatorApp = makeTerm <$> symbol InfixOperatorApplication <*> children (Syntax.InfixOperatorApp <$> expression <*> (typeApp <|> emptyTerm) <*> expression <*> (expression <|> emptyTerm))
+infixOperatorApp = makeTerm <$> symbol InfixOperatorApplication <*> children (Syntax.InfixOperatorApp <$> expression <*> (typeApp <|> emptyTerm) <*> expression <*> (expressions <|> emptyTerm))
 
 infixOperatorPattern :: Assignment
 infixOperatorPattern = makeTerm <$> symbol InfixOperatorPattern <*> children (Syntax.InfixOperatorPattern <$> expression <*> operator <*> expression)
