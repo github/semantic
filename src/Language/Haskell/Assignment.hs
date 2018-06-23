@@ -344,6 +344,7 @@ expressionChoices = [
                     , newType
                     , operator
                     , operatorSection
+                    , parenthesizedConstructorOperator
                     , parenthesizedExpression
                     , parenthesizedPattern
                     , parenthesizedTypePattern
@@ -643,6 +644,9 @@ operatorSection = (makeTerm <$> symbol RightOperatorSection <*> children (Syntax
 
 packageQualifiedImport :: Assignment
 packageQualifiedImport = makeTerm <$> symbol PackageQualifiedImport <*> (Literal.TextElement <$> source)
+
+parenthesizedConstructorOperator :: Assignment
+parenthesizedConstructorOperator = symbol ParenthesizedConstructorOperator *> children expression
 
 parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
