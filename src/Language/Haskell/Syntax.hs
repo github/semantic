@@ -917,3 +917,12 @@ instance Ord1 LabeledConstruction where liftCompare = genericLiftCompare
 instance Show1 LabeledConstruction where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LabeledConstruction
+
+data InfixDataConstructor a = InfixDataConstructor { infixDataConstructorLeft :: a, infixDataConstructorOperator :: a, infixDataConstructorRight :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 InfixDataConstructor where liftEq = genericLiftEq
+instance Ord1 InfixDataConstructor where liftCompare = genericLiftCompare
+instance Show1 InfixDataConstructor where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable InfixDataConstructor
