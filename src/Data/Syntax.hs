@@ -213,7 +213,7 @@ instance Named String where
 instance Message String where
   encodeMessage = encodeMessageField
   decodeMessage = Decode.at decodeMessageField
-  dotProto _ = [Proto.DotProtoMessageField $ protoType (Proxy @String)]
+  dotProto _ = [ Proto.DotProtoMessageField $ protoType (Proxy @String) ]
 
 
 errorSyntax :: Error.Error String -> [a] -> Error a
