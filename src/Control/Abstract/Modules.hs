@@ -18,8 +18,8 @@ module Control.Abstract.Modules
 , ModuleTable
 ) where
 
-import Control.Abstract.Evaluator
-import Data.Abstract.Environment
+import Control.Abstract.Evaluator hiding (trace)
+import Data.Abstract.Environment as Env
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
@@ -27,9 +27,10 @@ import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Set as Set
 import Prologue
 import System.FilePath.Posix (takeDirectory)
+import Debug.Trace (trace)
 
 -- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
-lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (Maybe (address, Environment address)))
+lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
 lookupModule = sendModules . Lookup
 
 -- | Resolve a list of module paths to a possible module table entry.
@@ -43,34 +44,36 @@ listModulesInDir = sendModules . List
 -- | Require/import another module by name and return its environment and value.
 --
 -- Looks up the module's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
+require :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (address, Environment address)
 require path = lookupModule path >>= maybeM (load path)
 
 -- | Load another module by name and return its environment and value.
 --
 -- Always loads/evaluates.
-load :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
+load :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (address, Environment address)
 load path = sendModules (Load path)
 
 
 data Modules address return where
-  Load    :: ModulePath -> Modules address (Maybe (address, Environment address))
-  Lookup  :: ModulePath -> Modules address (Maybe (Maybe (address, Environment address)))
+  Load    :: ModulePath -> Modules address (address, Environment address)
+  Lookup  :: ModulePath -> Modules address (Maybe (address, Environment address))
   Resolve :: [FilePath] -> Modules address (Maybe ModulePath)
   List    :: FilePath   -> Modules address [ModulePath]
 
 sendModules :: Member (Modules address) effects => Modules address return -> Evaluator address value effects return
 sendModules = send
 
-runModules :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+              , Member (Resumable (LoadError address)) effects
+              )
            => Set ModulePath
            -> Evaluator address value (Modules address ': effects) a
            -> Evaluator address value effects a
 runModules paths = interpret $ \case
-  Load name -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable
-  Lookup path -> fmap (Just . runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
+  Load   name   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable >>= maybeM (moduleNotFound name)
+  Lookup path   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
   Resolve names -> pure (find (flip Set.member paths) names)
-  List dir -> pure (filter ((dir ==) . takeDirectory) (toList paths))
+  List dir      -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
 askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
 askModuleTable = ask
@@ -79,12 +82,12 @@ askModuleTable = ask
 newtype Merging address = Merging { runMerging :: (address, Environment address) }
 
 instance Semigroup (Merging address) where
-  Merging (_, env1) <> Merging (addr, env2) = Merging (addr, mergeEnvs env1 env2)
+  Merging (_, env1) <> Merging (addr, env2) = trace ("env1: " <> show (Env.names env1) <> ", env2: " <> show (Env.names env2)) $ Merging (addr, mergeEnvs env1 env2)
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError address resume where
-  ModuleNotFound :: ModulePath -> LoadError address (Maybe (address, Environment address))
+  ModuleNotFound :: ModulePath -> LoadError address (address, Environment address)
 
 deriving instance Eq (LoadError address resume)
 deriving instance Show (LoadError address resume)
@@ -93,7 +96,7 @@ instance Show1 (LoadError address) where
 instance Eq1 (LoadError address) where
   liftEq _ (ModuleNotFound a) (ModuleNotFound b) = a == b
 
-moduleNotFound :: Member (Resumable (LoadError address)) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
+moduleNotFound :: Member (Resumable (LoadError address)) effects => ModulePath -> Evaluator address value effects (address, Environment address)
 moduleNotFound = throwResumable . ModuleNotFound
 
 resumeLoadError :: Member (Resumable (LoadError address)) effects => Evaluator address value effects a -> (forall resume . LoadError address resume -> Evaluator address value effects resume) -> Evaluator address value effects a
