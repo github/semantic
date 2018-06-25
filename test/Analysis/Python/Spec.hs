@@ -13,7 +13,8 @@ spec :: Spec
 spec = parallel $ do
   describe "Python" $ do
     it "imports" $ do
-      ((Right [(_, env)], heap), _) <- evaluate ["main.py"]
+      ((res@(~(Right [(_, env)])), heap), _) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
+      fmap (() <$) res `shouldBe` Right [()]
       Env.names env `shouldContain` [ "a", "b" ]
 
       (derefQName heap ("a" :| [])    env >>= deNamespace) `shouldBe` Just ("a", ["foo"])
@@ -21,15 +22,18 @@ spec = parallel $ do
       (derefQName heap ("b" :| ["c"]) env >>= deNamespace) `shouldBe` Just ("c", ["baz"])
 
     it "imports with aliases" $ do
-      ((Right [(_, env)], _), _) <- evaluate ["main1.py"]
+      ((res@(~(Right [(_, env)])), _), _) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
+      fmap (() <$) res `shouldBe` Right [()]
       Env.names env `shouldContain` [ "b", "e" ]
 
     it "imports using 'from' syntax" $ do
-      ((Right [(_, env)], _), _) <- evaluate ["main2.py"]
+      ((res@(~(Right [(_, env)])), _), _) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
+      fmap (() <$) res `shouldBe` Right [()]
       Env.names env `shouldContain` [ "bar", "foo" ]
 
     it "imports with relative syntax" $ do
-      ((Right [(_, env)], heap), _) <- evaluate ["main3.py"]
+      ((res@(~(Right [(_, env)])), heap), _) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
+      fmap (() <$) res `shouldBe` Right [()]
       Env.names env `shouldContain` [ "utils" ]
       (derefQName heap ("utils" :| []) env >>= deNamespace) `shouldBe` Just ("utils", ["to_s"])
 
