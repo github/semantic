@@ -142,7 +142,7 @@ instance (Show1 syntax, Show ann1, Show ann2) => Show (Diff syntax ann1 ann2) wh
 instance Show1 syntax => Show3 (DiffF syntax) where
   liftShowsPrec3 sp1 sl1 sp2 sl2 spRecur slRecur d diff = case diff of
     Patch patch -> showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 sp1 sl1 spRecur slRecur) (liftShowList2 sp1 sl1 spRecur slRecur) (liftShowsPrec2 sp2 sl2 spRecur slRecur) (liftShowList2 sp2 sl2 spRecur slRecur)) "Patch" d patch
-    Merge term  -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spRecur slRecur) "Merge" d term
+    Merge term -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spRecur slRecur) "Merge" d term
     where spBoth = liftShowsPrec2 sp1 sl1 sp2 sl2
           slBoth = liftShowList2 sp1 sl1 sp2 sl2
 

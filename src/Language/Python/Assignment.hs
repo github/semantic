@@ -300,7 +300,7 @@ comparisonOperator = symbol ComparisonOperator *> children (expression `chainl1T
   , (makeTerm1 .) . Expression.Member           <$ symbol AnonIn
   , token AnonIs *> ((makeTerm1 .) . invert Expression.Equal <$ symbol AnonNot <|> pure ((makeTerm1 .) . Expression.Equal))
   ])
-  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
+  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 notOperator :: Assignment
 notOperator = makeTerm <$> symbol NotOperator <*> children (Expression.Not <$> term expression)
