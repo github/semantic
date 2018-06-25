@@ -236,10 +236,6 @@ newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
   deriving anyclass (Named, Message)
   deriving newtype (MessageField)
 
--- instance Show ErrorStack where
---   showsPrec _ = shows . map showPair . unErrorStack
---     where showPair (sym, loc) = sym <> " " <> srcLocFile loc <> ":" <> show (srcLocStartLine loc) <> ":" <> show (srcLocStartCol loc)
-
 instance HasDefault ErrorStack where
   def = ErrorStack mempty
 
