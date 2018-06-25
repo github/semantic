@@ -37,12 +37,18 @@ type Syntax = '[
   , Literal.TextElement
   , Literal.Tuple
   , Statement.If
+  , Statement.Match
+  , Statement.Pattern
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.App
   , Syntax.ArithmeticSequence
+  , Syntax.AsPattern
   , Syntax.BindPattern
+  , Syntax.CaseGuardPattern
   , Syntax.Class
+  , Syntax.ConstructorIdentifier
+  , Syntax.ConstructorOperator
   , Syntax.ConstructorPattern
   , Syntax.ConstructorSymbol
   , Syntax.Context
@@ -53,44 +59,70 @@ type Syntax = '[
   , Syntax.Deriving
   , Syntax.Do
   , Syntax.Empty
-  , Syntax.EntityIdentifier
   , Syntax.Error
   , Syntax.EqualityConstraint
   , Syntax.Export
+  , Syntax.ExpressionTypeSignature
   , Syntax.Field
+  , Syntax.FieldBind
+  , Syntax.FieldPattern
   , Syntax.Fixity'
   , Syntax.FunctionalDependency
   , Syntax.FunctionConstructor
+  , Syntax.FunctionGuardPattern
   , Syntax.FunctionType
   , Syntax.GADT
   , Syntax.GADTConstructor
   , Syntax.Generator
+  , Syntax.Guard
   , Syntax.HiddenImport
   , Syntax.Identifier
+  , Syntax.InfixConstructorIdentifier
+  , Syntax.InfixOperatorApp
+  , Syntax.InfixVariableIdentifier
+  , Syntax.ImplicitParameterIdentifier
   , Syntax.Import
   , Syntax.ImportAlias
   , Syntax.ImportDeclaration
+  , Syntax.InfixDataConstructor
   , Syntax.InfixOperatorPattern
   , Syntax.Instance
+  , Syntax.IrrefutablePattern
   , Syntax.Kind
   , Syntax.KindFunctionType
   , Syntax.KindListType
   , Syntax.KindParenthesizedConstructor
   , Syntax.KindSignature
   , Syntax.KindTupleType
+  , Syntax.LabeledConstruction
   , Syntax.LabeledPattern
+  , Syntax.LabeledUpdate
   , Syntax.Lambda
+  , Syntax.LambdaCase
+  , Syntax.LeftOperatorSection
+  , Syntax.Let
   , Syntax.ListComprehension
   , Syntax.ListConstructor
+  , Syntax.ListPattern
   , Syntax.Module
   , Syntax.ModuleExport
+  , Syntax.ModuleIdentifier
+  , Syntax.NamedFieldPun
+  , Syntax.NegativeLiteral
   , Syntax.NewType
-  , Syntax.Operator
-  , Syntax.OperatorSection
+  , Syntax.PatternGuard
   , Syntax.Pragma
   , Syntax.PrefixNegation
-  , Syntax.QualifiedEntityIdentifier
+  , Syntax.PrimitiveConstructorIdentifier
+  , Syntax.PrimitiveVariableIdentifier
+  , Syntax.PromotedTypeOperator
+  , Syntax.QualifiedConstructorIdentifier
+  , Syntax.QualifiedInfixVariableIdentifier
+  , Syntax.QualifiedModuleIdentifier
   , Syntax.QualifiedImportDeclaration
+  , Syntax.QualifiedTypeClassIdentifier
+  , Syntax.QualifiedTypeConstructorIdentifier
+  , Syntax.QualifiedVariableIdentifier
   , Syntax.QuasiQuotation
   , Syntax.QuasiQuotationDeclaration
   , Syntax.QuasiQuotationExpression
@@ -101,26 +133,37 @@ type Syntax = '[
   , Syntax.QuotedName
   , Syntax.RecordDataConstructor
   , Syntax.RecordWildCards
+  , Syntax.RightOperatorSection
   , Syntax.ScopedTypeVariables
   , Syntax.Splice
   , Syntax.StandaloneDerivingInstance
   , Syntax.Star
+  , Syntax.StrictPattern
   , Syntax.StrictType
   , Syntax.StrictTypeVariable
   , Syntax.Tuple
   , Syntax.TupleConstructor
   , Syntax.TuplePattern
   , Syntax.Type
+  , Syntax.TypeApp
   , Syntax.TypeClass
+  , Syntax.TypeClassIdentifier
   , Syntax.TypeClassInstance
   , Syntax.TypeConstructorExport
+  , Syntax.TypeConstructorIdentifier
   , Syntax.TypeFamily
   , Syntax.TypeInstance
+  , Syntax.TypeOperator
   , Syntax.TypePattern
   , Syntax.TypeSignature
   , Syntax.TypeSynonym
+  , Syntax.TypeVariableIdentifier
   , Syntax.UnitConstructor
+  , Syntax.VariableIdentifier
+  , Syntax.VariableOperator
   , Syntax.VariableSymbol
+  , Syntax.ViewPattern
+  , Syntax.Wildcard
   , Type.TypeParameters
   , []
   ]
@@ -138,18 +181,22 @@ algebraicDatatypeDeclaration = makeTerm
                             <*> children (Declaration.Datatype
                                         <$> (context' <|> emptyTerm)
                                         <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters <*> (kindSignature <|> emptyTerm)))
-                                        <*> ((symbol Constructors *> children (manyTerm constructor))
-                                            <|> pure [])
-                                        <*> (derivingClause <|> emptyTerm))
+                                        <*> (constructors <|> pure [])
+                                        <*> (term derivingClause <|> emptyTerm))
+  where
+    constructors = symbol Constructors *> children (manyTerm constructor)
 
 allConstructors :: Assignment
 allConstructors = makeTerm <$> token AllConstructors <*> pure Syntax.AllConstructors
 
+alternative :: Assignment
+alternative = makeTerm <$> symbol Alternative <*> children (Statement.Pattern <$> expression <*> expressions)
+
 annotatedTypeVariable :: Assignment
-annotatedTypeVariable = makeTerm <$> symbol AnnotatedTypeVariable <*> children (Syntax.AnnotatedTypeVariable <$> typeVariableIdentifier <* token Annotation <*> (kind <|> type'))
+annotatedTypeVariable = makeTerm <$> symbol AnnotatedTypeVariable <*> children (Syntax.AnnotatedTypeVariable <$> typeVariableIdentifier <* token Annotation <*> expression)
 
 app :: Assignment
-app = makeTerm <$> symbol FunctionApplication <*> children (Syntax.App <$> expression <*> expression)
+app = makeTerm <$> symbol FunctionApplication <*> children (Syntax.App <$> expression <*> (typeApp <|> emptyTerm) <*> expression)
 
 arithmeticSequence :: Assignment
 arithmeticSequence = symbol ArithmeticSequence *> children (  enumFrom
@@ -157,13 +204,22 @@ arithmeticSequence = symbol ArithmeticSequence *> children (  enumFrom
                                                           <|> enumFromTo
                                                           <|> enumFromThenTo)
   where
-    enumFrom = makeTerm <$> symbol EnumFrom <*> children (Syntax.EnumFrom <$> expression)
-    enumFromThen = makeTerm <$> symbol EnumFromThen <*> children (Syntax.EnumFromThen <$> expression <*> expression)
-    enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.EnumFromTo <$> expression <*> expression)
-    enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.EnumFromThenTo <$> expression <*> expression <*> expression)
+    enumFrom = makeTerm <$> symbol EnumFrom <*> children (Syntax.ArithmeticSequence <$> expression <*> pure Nothing <*> pure Nothing)
+    enumFromThen = makeTerm <$> symbol EnumFromThen <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> pure Nothing)
+    enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> pure Nothing)
+    enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> (fmap Just expression))
+
+asPattern :: Assignment
+asPattern = makeTerm <$> symbol AsPattern <*> children (Syntax.AsPattern <$> expression <*> expression)
 
 bindPattern :: Assignment
-bindPattern = makeTerm <$> symbol BindPattern <*> children (Syntax.BindPattern <$> expression <*> expression)
+bindPattern = makeTerm <$> symbol BindPattern <*> children (Syntax.BindPattern <$> (manyTermsTill expression (symbol AnonLAngleMinus)) <*> expression)
+
+case' :: Assignment
+case' = makeTerm <$> symbol CaseExpression <*> children (Statement.Match <$> expression <*> expressions)
+
+caseGuardPattern :: Assignment
+caseGuardPattern = makeTerm <$> symbol CaseGuardPattern <*> children (Syntax.CaseGuardPattern <$> manyTerm expression)
 
 character :: Assignment
 character = makeTerm <$> symbol Char <*> (Literal.Character <$> source)
@@ -179,7 +235,8 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 constructor :: Assignment
 constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters))
-           <|> (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> constructorIdentifier <*> fields))
+           <|> term (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> manyTerm (context' <|> scopedTypeVariables)  <*> constructorIdentifier <*> (term fields)))
+           <|> term (makeTerm <$> symbol InfixDataConstructor <*> children (Syntax.InfixDataConstructor <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> expression <*> expression))
 
 constructorIdentifier :: Assignment
 constructorIdentifier = makeTerm <$> symbol ConstructorIdentifier <*> (Syntax.ConstructorIdentifier . Name.name <$> source)
@@ -209,7 +266,7 @@ defaultSignature :: Assignment
 defaultSignature = makeTerm <$> symbol DefaultSignature <*> children (Syntax.DefaultSignature <$> manyTermsTill expression (symbol Annotation) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
 
 derivingClause :: Assignment
-derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm typeConstructor)
+derivingClause = makeTerm <$> symbol Deriving <*> children (Syntax.Deriving <$> manyTerm expression)
 
 do' :: Assignment
 do' = makeTerm <$> symbol Do <*> children (Syntax.Do <$> manyTerm expression)
@@ -224,7 +281,7 @@ export :: Assignment
 export = makeTerm <$> symbol Export <*> children (Syntax.Export <$> expressions)
 
 expression' :: Assignment
-expression' = symbol Expression *> children (expression <|> emptyTerm)
+expression' = symbol Expression *> children expressions
 
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> manyTerm expression
@@ -236,11 +293,16 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices = [
                       algebraicDatatypeDeclaration
                     , allConstructors
+                    , alternative
                     , annotatedTypeVariable
                     , app
                     , arithmeticSequence
+                    , asPattern
                     , bindPattern
+                    , case'
+                    , caseGuardPattern
                     , character
+                    , class'
                     , comment
                     , conditionalExpression
                     , context'
@@ -256,51 +318,72 @@ expressionChoices = [
                     , do'
                     , equalityConstraint
                     , expression'
+                    , expressionTypeSignature
+                    , fields
+                    , fieldBind
+                    , fieldPattern
                     , fixityDeclaration
                     , float
                     , functionalDependency
                     , functionConstructor
                     , functionDeclaration
+                    , functionGuardPattern
                     , functionType
                     , gadtConstructor
                     , gadtDeclaration
                     , generator
+                    , guard'
+                    , implicitParameterIdentifier
                     , importAlias
                     , importDeclaration
+                    , infixConstructorIdentifier
                     , infixOperatorApp
                     , infixOperatorPattern
                     , infixVariableIdentifier
                     , instance'
                     , integer
+                    , irrefutablePattern
                     , kind
                     , kindListType
                     , kindFunctionType
                     , kindParenthesizedConstructor
                     , kindSignature
                     , kindTupleType
+                    , labeledConstruction
                     , labeledPattern
+                    , labeledUpdate
                     , lambda
+                    , lambdaCase
+                    , letExpression
+                    , letStatement
                     , listConstructor
                     , listComprehension
                     , listExpression
+                    , listPattern
                     , listType
                     , moduleExport
                     , moduleIdentifier
+                    , namedFieldPun
+                    , negativeLiteral
                     , newType
                     , operator
                     , operatorSection
+                    , parenthesizedConstructorOperator
                     , parenthesizedExpression
                     , parenthesizedPattern
                     , parenthesizedTypePattern
                     , pattern'
+                    , patternGuard
                     , pragma
                     , prefixNegation
                     , primitiveConstructorIdentifier
                     , primitiveVariableIdentifier
+                    , promotedTypeOperator
                     , qualifiedConstructorIdentifier
                     , qualifiedImportDeclaration
                     , qualifiedInfixVariableIdentifier
                     , qualifiedModuleIdentifier
+                    , qualifiedTypeClassIdentifier
                     , qualifiedTypeConstructorIdentifier
                     , qualifiedVariableIdentifier
                     , quasiQuotation
@@ -316,6 +399,7 @@ expressionChoices = [
                     , splice
                     , standaloneDerivingInstance
                     , star
+                    , strictPattern
                     , strictType
                     , string
                     , tuple
@@ -323,9 +407,11 @@ expressionChoices = [
                     , tupleType
                     , type'
                     , type''
+                    , typeApp
                     , typeClass
                     , typeClassIdentifier
                     , typeClassInstance
+                    , typeConstructor
                     , typeFamily
                     , typeInstance
                     , typePattern
@@ -340,8 +426,13 @@ expressionChoices = [
                     , variableIdentifier
                     , variableOperator
                     , variableSymbol
+                    , viewPattern
                     , where'
+                    , wildcard
                     ]
+
+expressionTypeSignature :: Assignment
+expressionTypeSignature = makeTerm <$> symbol ExpressionTypeSignature <*> children (Syntax.ExpressionTypeSignature <$> manyTermsTill expression (symbol Annotation) <* token Annotation <*> manyTerm (context' <|> scopedTypeVariables) <*> expressions)
 
 fields :: Assignment
 fields = makeTerm <$> symbol Fields <*> children (manyTerm field)
@@ -355,6 +446,12 @@ field = makeTerm
                  <*> fieldType)
   where
     fieldType = makeTerm <$> location <*> (Syntax.Type <$> term (type' <|> typeVariableIdentifier) <*> typeParameters <*> (kindSignature <|> emptyTerm))
+
+fieldBind :: Assignment
+fieldBind = makeTerm <$> symbol FieldBind <*> children (Syntax.FieldBind <$> expression <*> expression)
+
+fieldPattern :: Assignment
+fieldPattern = makeTerm <$> symbol FieldPattern <*> children (Syntax.FieldPattern <$> expression <*> expressions)
 
 fixityDeclaration :: Assignment
 fixityDeclaration = makeTerm <$> symbol FixityDeclaration <*> children (Syntax.Fixity' <$> (integer <|> emptyTerm) <*> manyTerm expression)
@@ -375,21 +472,24 @@ functionDeclaration :: Assignment
 functionDeclaration = makeTerm
                    <$> symbol FunctionDeclaration
                    <*> children (Declaration.Function []
-                               <$> expression
+                               <$> term expression
                                <*> (manyTermsTill expression (symbol FunctionBody) <|> pure [])
                                <*> functionBody)
 
+functionGuardPattern :: Assignment
+functionGuardPattern = makeTerm <$> symbol FunctionGuardPattern <*> children (Syntax.FunctionGuardPattern <$> manyTerm expression)
+
 functionType :: Assignment
-functionType = makeTerm <$> symbol FunctionType <*> children (Syntax.FunctionType <$> type' <*> type')
+functionType = makeTerm <$> symbol FunctionType <*> children (Syntax.FunctionType <$> expression <*> expression)
 
 gadtConstructor :: Assignment
 gadtConstructor = makeTerm
                <$> symbol GadtConstructor
                <*> children (Syntax.GADTConstructor
                            <$> (context' <|> emptyTerm)
-                           <*> typeConstructor
+                           <*> expression
                            <* token Annotation
-                           <*> term type')
+                           <*> expressions)
 
 gadtDeclaration :: Assignment
 gadtDeclaration = makeTerm
@@ -404,11 +504,17 @@ gadtDeclaration = makeTerm
 generator :: Assignment
 generator = makeTerm <$> symbol Generator <*> children (Syntax.Generator <$> expression <*> expression)
 
+guard' :: Assignment
+guard' = makeTerm <$> symbol Guard <*> children (Syntax.Guard <$> expressions)
+
 hiddenImport :: Assignment
 hiddenImport = makeTerm <$> symbol Import <*> children (Syntax.HiddenImport <$> expressions)
 
 hiddenImportSpec :: Assignment.Assignment [] Grammar [Term]
 hiddenImportSpec = symbol HiddenImportSpec *> children (manyTerm hiddenImport)
+
+implicitParameterIdentifier :: Assignment
+implicitParameterIdentifier = makeTerm <$> symbol ImplicitParameterIdentifier <*> (Syntax.ImplicitParameterIdentifier . Name.name <$> source)
 
 import' :: Assignment
 import' = makeTerm <$> symbol Import <*> children (Syntax.Import <$> expressions)
@@ -427,8 +533,14 @@ importDeclaration = makeTerm
 importSpec :: Assignment.Assignment [] Grammar [Term]
 importSpec = symbol ImportSpec *> children (manyTerm import')
 
+inClause :: Assignment
+inClause = symbol InClause *> children expressions
+
+infixConstructorIdentifier :: Assignment
+infixConstructorIdentifier = makeTerm <$> symbol InfixConstructorIdentifier <*> children (Syntax.InfixConstructorIdentifier . Name.name <$> source)
+
 infixOperatorApp :: Assignment
-infixOperatorApp = makeTerm <$> symbol InfixOperatorApplication <*> children (Syntax.InfixOperatorApp <$> expression <*> expression <*> expression)
+infixOperatorApp = makeTerm <$> symbol InfixOperatorApplication <*> children (Syntax.InfixOperatorApp <$> expression <*> (typeApp <|> emptyTerm) <*> expression <*> (expressions <|> emptyTerm))
 
 infixOperatorPattern :: Assignment
 infixOperatorPattern = makeTerm <$> symbol InfixOperatorPattern <*> children (Syntax.InfixOperatorPattern <$> expression <*> operator <*> expression)
@@ -441,6 +553,9 @@ instance' = makeTerm <$> symbol Instance <*> children (Syntax.Instance <$> expre
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+
+irrefutablePattern :: Assignment
+irrefutablePattern = makeTerm <$> symbol IrrefutablePattern <*> children (Syntax.IrrefutablePattern <$> expression)
 
 kind :: Assignment
 kind = kind'
@@ -469,14 +584,29 @@ kindSignature = makeTerm <$> symbol KindSignature <*> children (Syntax.KindSigna
 kindTupleType :: Assignment
 kindTupleType = makeTerm <$> symbol KindTupleType <*> children (Syntax.KindTupleType <$> manyTerm expression)
 
+labeledConstruction :: Assignment
+labeledConstruction = makeTerm <$> symbol LabeledConstruction <*> children (Syntax.LabeledConstruction <$> expression <*> manyTerm expression)
+
 labeledPattern :: Assignment
 labeledPattern = makeTerm <$> symbol LabeledPattern <*> children (Syntax.LabeledPattern <$> expressions)
+
+labeledUpdate :: Assignment
+labeledUpdate = makeTerm <$> symbol LabeledUpdate <*> children (Syntax.LabeledUpdate <$> manyTerm expression)
 
 lambda :: Assignment
 lambda = makeTerm <$> symbol Lambda <*> children (Syntax.Lambda <$> lambdaHead <*> lambdaBody)
   where
     lambdaHead = symbol LambdaHead *> children expressions
     lambdaBody = symbol LambdaBody *> children expressions
+
+lambdaCase :: Assignment
+lambdaCase = makeTerm <$> symbol LambdaCase <*> children (Syntax.LambdaCase <$> manyTerm expression)
+
+letExpression :: Assignment
+letExpression = makeTerm <$> symbol LetExpression <*> children (Syntax.Let <$> manyTermsTill expression (symbol InClause) <*> inClause)
+
+letStatement :: Assignment
+letStatement = makeTerm <$> symbol LetStatement <*> children (Syntax.Let <$> manyTerm expression <*> emptyTerm)
 
 listComprehension :: Assignment
 listComprehension = makeTerm <$> symbol ListComprehension <*> children (Syntax.ListComprehension <$> expression <*> manyTerm expression)
@@ -488,19 +618,23 @@ listExpression :: Assignment
 listExpression = makeTerm <$> symbol ListExpression <*> children (Literal.Array <$> manyTerm listElement)
   where listElement = symbol Expression *> children expression
 
+listPattern :: Assignment
+listPattern = makeTerm <$> symbol ListPattern <*> children (Syntax.ListPattern <$> expressions)
+
 listType :: Assignment
 listType = makeTerm <$> symbol ListType <*> children (Literal.Array <$> manyTerm type')
 
 module' :: Assignment
-module' = makeTerm
+module' =  makeTerm
        <$> symbol Module
        <*> children (Syntax.Module
-                   <$> (term moduleIdentifier <|> emptyTerm)
+                   <$> manyTerm (comment <|> pragma)
+                   <*> term (moduleIdentifier <|> qualifiedModuleIdentifier <|> emptyTerm)
                    <*> moduleExports
-                   <*> (where' <|> expressions <|> emptyTerm))
+                   <*> term (where' <|> expressions <|> emptyTerm))
   where
-    moduleExports = symbol ModuleExports *> children (manyTerm export)
-                 <|> pure []
+    moduleExports = (symbol ModuleExports *> children (manyTerm export))
+                 <|> (pure [])
 
 moduleExport :: Assignment
 moduleExport = makeTerm <$> symbol ModuleExport <*> children (Syntax.ModuleExport <$> expressions)
@@ -508,8 +642,14 @@ moduleExport = makeTerm <$> symbol ModuleExport <*> children (Syntax.ModuleExpor
 moduleIdentifier :: Assignment
 moduleIdentifier = makeTerm <$> symbol ModuleIdentifier <*> (Syntax.ModuleIdentifier . Name.name <$> source)
 
+namedFieldPun :: Assignment
+namedFieldPun = makeTerm <$> symbol NamedFieldPun <*> children (Syntax.NamedFieldPun <$> expression)
+
+negativeLiteral :: Assignment
+negativeLiteral = makeTerm <$> symbol NegativeLiteral <*> children (Syntax.NegativeLiteral <$> expression)
+
 newConstructor :: Assignment
-newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters)
+newConstructor = makeTerm <$> symbol NewConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> expressions)
 
 newType :: Assignment
 newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$> manyTerm (context' <|> scopedTypeVariables) <*> typeLeft <*> newConstructor <*> (derivingClause <|> emptyTerm))
@@ -517,7 +657,10 @@ newType = makeTerm <$> symbol NewtypeDeclaration <*> children (Syntax.NewType <$
     typeLeft = makeTerm <$> location <*> manyTermsTill expression (symbol NewConstructor)
 
 operator :: Assignment
-operator = typeOperator <|> constructorOperator <|> variableOperator
+operator =  constructorOperator
+        <|> typeOperator
+        <|> promotedTypeOperator
+        <|> variableOperator
 
 operatorSection :: Assignment
 operatorSection = (makeTerm <$> symbol RightOperatorSection <*> children (Syntax.RightOperatorSection <$> expression <*> expression))
@@ -526,8 +669,11 @@ operatorSection = (makeTerm <$> symbol RightOperatorSection <*> children (Syntax
 packageQualifiedImport :: Assignment
 packageQualifiedImport = makeTerm <$> symbol PackageQualifiedImport <*> (Literal.TextElement <$> source)
 
+parenthesizedConstructorOperator :: Assignment
+parenthesizedConstructorOperator = symbol ParenthesizedConstructorOperator *> children expression
+
 parenthesizedExpression :: Assignment
-parenthesizedExpression = symbol ParenthesizedExpression *> children expression
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 parenthesizedPattern :: Assignment
 parenthesizedPattern = symbol ParenthesizedPattern *> children expressions
@@ -536,7 +682,10 @@ parenthesizedTypePattern :: Assignment
 parenthesizedTypePattern = symbol ParenthesizedTypePattern *> children expressions
 
 pattern' :: Assignment
-pattern' = symbol Pattern *> children expression
+pattern' = symbol Pattern *> children expressions
+
+patternGuard :: Assignment
+patternGuard = makeTerm <$> symbol PatternGuard <*> children (Syntax.PatternGuard <$> expression <*> (expression <|> emptyTerm))
 
 pragma :: Assignment
 pragma = makeTerm <$> symbol Pragma <*> (Syntax.Pragma <$> source)
@@ -549,6 +698,9 @@ primitiveConstructorIdentifier = makeTerm <$> symbol PrimitiveConstructorIdentif
 
 primitiveVariableIdentifier :: Assignment
 primitiveVariableIdentifier = makeTerm <$> symbol PrimitiveVariableIdentifier <*> (Syntax.PrimitiveVariableIdentifier . Name.name <$> source)
+
+promotedTypeOperator :: Assignment
+promotedTypeOperator = makeTerm <$> symbol PromotedTypeOperator <*> children (Syntax.PromotedTypeOperator <$> expression)
 
 qualifiedConstructorIdentifier :: Assignment
 qualifiedConstructorIdentifier = makeTerm <$> symbol QualifiedConstructorIdentifier <*> children (Syntax.QualifiedConstructorIdentifier <$> someTerm' expression)
@@ -566,6 +718,9 @@ qualifiedInfixVariableIdentifier = makeTerm <$> symbol QualifiedInfixVariableIde
 
 qualifiedModuleIdentifier :: Assignment
 qualifiedModuleIdentifier = makeTerm <$> symbol QualifiedModuleIdentifier <*> children (Syntax.QualifiedModuleIdentifier <$> someTerm' expression)
+
+qualifiedTypeClassIdentifier :: Assignment
+qualifiedTypeClassIdentifier = makeTerm <$> symbol QualifiedTypeClassIdentifier <*> children (Syntax.QualifiedTypeClassIdentifier <$> someTerm' expression)
 
 qualifiedTypeConstructorIdentifier :: Assignment
 qualifiedTypeConstructorIdentifier = makeTerm <$> symbol QualifiedTypeConstructorIdentifier <*> children (Syntax.QualifiedTypeConstructorIdentifier <$> someTerm' expression)
@@ -614,6 +769,9 @@ standaloneDerivingInstance = makeTerm <$> symbol StandaloneDerivingDeclaration <
 star :: Assignment
 star = makeTerm <$> token Star <*> pure Syntax.Star
 
+strictPattern :: Assignment
+strictPattern = makeTerm <$> symbol StrictPattern <*> children (Syntax.StrictPattern <$> expression)
+
 strictType :: Assignment
 strictType = makeTerm'
           <$> symbol StrictType
@@ -630,7 +788,7 @@ tuplePattern :: Assignment
 tuplePattern = makeTerm <$> symbol TuplePattern <*> children (Syntax.TuplePattern <$> manyTerm expression)
 
 tupleType :: Assignment
-tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm type')
+tupleType = makeTerm <$> symbol TupleType <*> children (Literal.Tuple <$> manyTerm expression)
 
 tuplingConstructor :: Assignment
 tuplingConstructor = makeTerm <$> symbol TuplingConstructor <*> (tupleWithArity <$> rawSource)
@@ -651,6 +809,9 @@ type'' :: Assignment
 type'' = makeTerm
       <$> symbol Type
       <*> children (Syntax.Type <$> expression <*> typeParameters <*> (kindSignature <|> emptyTerm))
+
+typeApp :: Assignment
+typeApp = makeTerm <$> symbol TypeApplication <*> children (Syntax.TypeApp <$> expression)
 
 typeClass :: Assignment
 typeClass = makeTerm <$> symbol TypeClassDeclaration <*> children (Syntax.TypeClass
@@ -675,6 +836,7 @@ typeConstructor =  constructorIdentifier
                <|> listConstructor
                <|> listType
                <|> qualifiedModuleIdentifier
+               <|> qualifiedTypeClassIdentifier
                <|> qualifiedTypeConstructorIdentifier
                <|> quotedName
                <|> tupleType
@@ -746,8 +908,14 @@ variableSymbol = makeTerm <$> (symbol VariableSymbol <|> symbol VariableSymbol')
 variableIdentifiers :: Assignment
 variableIdentifiers = makeTerm <$> location <*> many variableIdentifier
 
+viewPattern :: Assignment
+viewPattern = makeTerm <$> symbol ViewPattern <*> children (Syntax.ViewPattern <$> expression <*> expression)
+
 where' :: Assignment
 where' = makeTerm <$> (symbol Where <|> symbol Where') <*> children (manyTerm expression)
+
+wildcard :: Assignment
+wildcard = makeTerm <$> token Wildcard <*> pure Syntax.Wildcard
 
 -- | Helpers
 
