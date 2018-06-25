@@ -101,7 +101,8 @@ evaluate lang analyzeModule analyzeTerm modules = do
   foldr (run preludeEnv) get modules
   where run preludeEnv modules rest = do
           evaluated <- traverse (evalModule preludeEnv) modules
-          localState (<> ModuleTable.fromModules (toList evaluated)) rest
+          modify' (<> ModuleTable.fromModules (toList evaluated))
+          rest
 
         evalModule preludeEnv m
           = fmap (<$ m)
