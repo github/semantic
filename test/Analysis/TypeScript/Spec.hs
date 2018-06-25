@@ -15,12 +15,12 @@ spec :: Spec
 spec = parallel $ do
   describe "evaluates TypeScript" $ do
     it "imports with aliased symbols" $ do
-      ((Right [(_, env)], _), _) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
-      Env.names env `shouldBe` [ "bar", "quz" ]
+      ((res, _), _) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
+      (>>= Env.names . snd) <$> res `shouldBe` Right [ "bar", "quz" ]
 
     it "imports with qualified names" $ do
-      ((Right [(_, env)], heap), _) <- evaluate ["main1.ts", "foo.ts", "a.ts"]
-      Env.names env `shouldBe` [ "b", "z" ]
+      ((res@(~(Right [(_, env)])), heap), _) <- evaluate ["main1.ts", "foo.ts", "a.ts"]
+      (>>= Env.names . snd) <$> res `shouldBe` Right [ "b", "z" ]
 
       (derefQName heap ("b" :| []) env >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
       (derefQName heap ("z" :| []) env >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
