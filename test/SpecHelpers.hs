@@ -81,34 +81,33 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-testEvaluating :: Evaluator Precise
-                    Val
-                    '[ Resumable (ValueError Precise (UtilEff Precise))
-                     , Resumable (AddressError Precise Val)
-                     , Resumable EvalError, Resumable (EnvironmentError Precise)
-                     , Resumable ResolutionError
-                     , Resumable (Unspecialized Val)
-                     , Resumable (LoadError Precise)
-                     , Trace
-                     , Fresh
-                     , State (Heap Precise Latest Val)
-                     , IO
-                     ]
-                   (ModuleTable (NonEmpty (Module (Precise, Environment Precise))))
-               -> IO ((Either
-                      (SomeExc
-                         (Data.Sum.Sum
-                          '[ ValueError Precise (UtilEff Precise)
-                           , AddressError Precise Val
-                           , EvalError
-                           , EnvironmentError Precise
-                           , ResolutionError
-                           , Unspecialized Val
-                           , LoadError Precise
-                           ]))
-                      [(Value Precise (UtilEff Precise), Environment Precise)],
-                    Heap Precise Latest Val),
-                   [String])
+type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
+                              , Resumable (AddressError Precise Val)
+                              , Resumable EvalError, Resumable (EnvironmentError Precise)
+                              , Resumable ResolutionError
+                              , Resumable (Unspecialized Val)
+                              , Resumable (LoadError Precise)
+                              , Trace
+                              , Fresh
+                              , State (Heap Precise Latest Val)
+                              , IO
+                              ]
+type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
+                             , AddressError Precise Val
+                             , EvalError
+                             , EnvironmentError Precise
+                             , ResolutionError
+                             , Unspecialized Val
+                             , LoadError Precise
+                             ]
+testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (Precise, Environment Precise))))
+               -> IO
+                 ( ( Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
+                            (ModuleTable (NonEmpty (Module (Precise, Environment Precise))))
+                   , Heap Precise Latest Val
+                   )
+                 , [String]
+                 )
 testEvaluating
   = runM
   . fmap (\ ((res, traces), heap) -> ((res, heap), traces))
@@ -123,14 +122,9 @@ testEvaluating
   . runEvalError
   . runAddressError
   . runValueError @_ @Precise @(UtilEff Precise)
-  . (>>= traverse deref1)
-  . fmap ((>>= map moduleBody . toList . snd) . toPairs)
 
 type Val = Value Precise (UtilEff Precise)
 
-deref1 (ptr, env) = runAllocator $ do
-  val <- deref ptr
-  pure (val, env)
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)
