@@ -9,7 +9,7 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "evaluates Go" $ do
+  describe "Go" $ do
     it "imports and wildcard imports" $ do
       ((Right [(_, env)], heap), _) <- evaluate ["main.go"]
       Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
