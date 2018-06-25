@@ -682,45 +682,15 @@ instance Show1 TuplePattern where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TuplePattern
 
--- e.g. [1..]
-newtype EnumFrom a = EnumFrom a
+-- e.g. [1..], [1,2..], [1,2..10]
+data ArithmeticSequence a = ArithmeticSequence { from :: a, next :: Maybe a, to :: Maybe a  }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
-instance Eq1 EnumFrom where liftEq = genericLiftEq
-instance Ord1 EnumFrom where liftCompare = genericLiftCompare
-instance Show1 EnumFrom where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 ArithmeticSequence where liftEq = genericLiftEq
+instance Ord1 ArithmeticSequence where liftCompare = genericLiftCompare
+instance Show1 ArithmeticSequence where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable EnumFrom
-
--- e.g. [1,2..]
-data EnumFromThen a = EnumFromThen a a
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 EnumFromThen where liftEq = genericLiftEq
-instance Ord1 EnumFromThen where liftCompare = genericLiftCompare
-instance Show1 EnumFromThen where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable EnumFromThen
-
--- e.g. [1..2]
-data EnumFromTo a = EnumFromTo a a
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 EnumFromTo where liftEq = genericLiftEq
-instance Ord1 EnumFromTo where liftCompare = genericLiftCompare
-instance Show1 EnumFromTo where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable EnumFromTo
-
--- e.g. [1,2..10]
-data EnumFromThenTo a = EnumFromThenTo a a a
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 EnumFromThenTo where liftEq = genericLiftEq
-instance Ord1 EnumFromThenTo where liftCompare = genericLiftCompare
-instance Show1 EnumFromThenTo where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable EnumFromThenTo
+instance Evaluatable ArithmeticSequence
 
 data RightOperatorSection a = RightOperatorSection a a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)

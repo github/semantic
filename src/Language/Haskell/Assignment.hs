@@ -42,6 +42,7 @@ type Syntax = '[
   , Syntax.AllConstructors
   , Syntax.AnnotatedTypeVariable
   , Syntax.App
+  , Syntax.ArithmeticSequence
   , Syntax.AsPattern
   , Syntax.BindPattern
   , Syntax.CaseGuardPattern
@@ -58,10 +59,6 @@ type Syntax = '[
   , Syntax.Deriving
   , Syntax.Do
   , Syntax.Empty
-  , Syntax.EnumFrom
-  , Syntax.EnumFromThen
-  , Syntax.EnumFromTo
-  , Syntax.EnumFromThenTo
   , Syntax.Error
   , Syntax.EqualityConstraint
   , Syntax.Export
@@ -207,10 +204,10 @@ arithmeticSequence = symbol ArithmeticSequence *> children (  enumFrom
                                                           <|> enumFromTo
                                                           <|> enumFromThenTo)
   where
-    enumFrom = makeTerm <$> symbol EnumFrom <*> children (Syntax.EnumFrom <$> expression)
-    enumFromThen = makeTerm <$> symbol EnumFromThen <*> children (Syntax.EnumFromThen <$> expression <*> expression)
-    enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.EnumFromTo <$> expression <*> expression)
-    enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.EnumFromThenTo <$> expression <*> expression <*> expression)
+    enumFrom = makeTerm <$> symbol EnumFrom <*> children (Syntax.ArithmeticSequence <$> expression <*> pure Nothing <*> pure Nothing)
+    enumFromThen = makeTerm <$> symbol EnumFromThen <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> pure Nothing)
+    enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> pure Nothing)
+    enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> (fmap Just expression))
 
 asPattern :: Assignment
 asPattern = makeTerm <$> symbol AsPattern <*> children (Syntax.AsPattern <$> expression <*> expression)
