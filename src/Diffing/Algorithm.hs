@@ -8,7 +8,7 @@ import Data.Term
 import Prologue
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
-data AlgorithmF term1 term2 result partial where
+data AlgorithmF term1 term2 result partial where
   -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
   Diff :: term1 -> term2 -> AlgorithmF term1 term2 result result
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
