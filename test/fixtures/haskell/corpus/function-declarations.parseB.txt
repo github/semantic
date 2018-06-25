@@ -934,7 +934,7 @@
           (Empty)
           (VariableOperator
             (VariableSymbol))
-          (Empty))))
+          (Statements))))
     (Function
       (VariableIdentifier)
       (Statements
@@ -1095,4 +1095,76 @@
               (TypeParameters
                 (TypeVariableIdentifier)
                 (TypeVariableIdentifier))
-              (Empty))))))))
+              (Empty))))))
+    (Function
+      (VariableIdentifier)
+      (VariableIdentifier)
+      (VariableIdentifier)
+      (VariableIdentifier)
+      (Statements
+        (FunctionGuardPattern
+          (Guard
+            (PatternGuard
+              (ConstructorPattern
+                (Statements
+                  (ConstructorIdentifier)
+                  (VariableIdentifier)))
+              (VariableIdentifier)))
+          (Do
+            (BindPattern
+              (VariableIdentifier)
+              (App
+                (VariableIdentifier)
+                (Empty)
+                (VariableIdentifier)))
+            (BindPattern
+              (VariableIdentifier)
+              (App
+                (VariableIdentifier)
+                (Empty)
+                (VariableIdentifier)))
+            (Let
+              (Function
+                (VariableIdentifier)
+                (Statements
+                  (LabeledUpdate
+                    (VariableIdentifier)
+                    (FieldBind
+                      (VariableIdentifier)
+                      (TextElement))
+                    (FieldBind
+                      (VariableIdentifier)
+                      (InfixOperatorApp
+                        (Tuple
+                          (TextElement)
+                          (TextElement))
+                        (Empty)
+                        (ConstructorOperator
+                          (ConstructorSymbol))
+                        (App
+                          (VariableIdentifier)
+                          (Empty)
+                          (VariableIdentifier)))))))
+              (Empty))
+            (InfixOperatorApp
+              (VariableIdentifier)
+              (Empty)
+              (VariableOperator
+                (VariableSymbol))
+              (App
+                (App
+                  (App
+                    (ConstructorIdentifier)
+                    (Empty)
+                    (VariableIdentifier))
+                  (Empty)
+                  (VariableIdentifier))
+                (Empty)
+                (VariableIdentifier)))))
+        (FunctionGuardPattern
+          (Guard
+            (VariableIdentifier))
+          (App
+            (VariableIdentifier)
+            (Empty)
+            (ConstructorIdentifier)))))))

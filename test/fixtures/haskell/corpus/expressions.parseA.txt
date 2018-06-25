@@ -65,24 +65,24 @@
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFrom
+        (ArithmeticSequence
           (Integer))))
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFromThen
+        (ArithmeticSequence
           (Integer)
           (Integer))))
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFromTo
+        (ArithmeticSequence
           (Integer)
           (Integer))))
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFromThenTo
+        (ArithmeticSequence
           (Integer)
           (Integer)
           (Integer))))
@@ -148,7 +148,7 @@
               (Integer)))
           (Generator
             (VariableIdentifier)
-            (EnumFromTo
+            (ArithmeticSequence
               (Integer)
               (Integer))))))
     (Function
@@ -166,7 +166,7 @@
                 (Integer))))
           (Generator
             (VariableIdentifier)
-            (EnumFrom
+            (ArithmeticSequence
               (Integer))))))
     (Function
       (VariableIdentifier)
@@ -189,7 +189,7 @@
                   (Integer))))
             (Generator
               (VariableIdentifier)
-              (EnumFrom
+              (ArithmeticSequence
                 (Integer)))))))
     (Function
       (VariableIdentifier)
