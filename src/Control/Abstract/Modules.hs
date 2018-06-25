@@ -18,8 +18,8 @@ module Control.Abstract.Modules
 , ModuleTable
 ) where
 
-import Control.Abstract.Evaluator hiding (trace)
-import Data.Abstract.Environment as Env
+import Control.Abstract.Evaluator
+import Data.Abstract.Environment
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
@@ -27,7 +27,6 @@ import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Set as Set
 import Prologue
 import System.FilePath.Posix (takeDirectory)
-import Debug.Trace (trace)
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
@@ -82,7 +81,7 @@ askModuleTable = ask
 newtype Merging address = Merging { runMerging :: (address, Environment address) }
 
 instance Semigroup (Merging address) where
-  Merging (_, env1) <> Merging (addr, env2) = trace ("env1: " <> show (Env.names env1) <> ", env2: " <> show (Env.names env2)) $ Merging (addr, mergeEnvs env1 env2)
+  Merging (_, env1) <> Merging (addr, env2) = Merging (addr, mergeEnvs env1 env2)
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
