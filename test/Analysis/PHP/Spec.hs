@@ -12,7 +12,6 @@ import SpecHelpers
 spec :: Spec
 spec = parallel $ do
   describe "PHP" $ do
-    pure ()
     it "evaluates include and require" $ do
       ((res, heap), _) <- evaluate ["main.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main.php" <$> res of

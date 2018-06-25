@@ -13,7 +13,6 @@ import SpecHelpers
 spec :: Spec
 spec = parallel $ do
   describe "Python" $ do
-    pure ()
     it "imports" $ do
       ((res, heap), _) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main.py" <$> res of
