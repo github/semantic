@@ -72,13 +72,13 @@
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFrom
+        (ArithmeticSequence
         { (Integer)
         ->(Integer) })))
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFromThen
+        (ArithmeticSequence
         { (Integer)
         ->(Integer) }
         { (Integer)
@@ -86,7 +86,7 @@
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFromTo
+        (ArithmeticSequence
         { (Integer)
         ->(Integer) }
         { (Integer)
@@ -94,7 +94,7 @@
     (Function
       (VariableIdentifier)
       (Statements
-        (EnumFromThenTo
+        (ArithmeticSequence
         { (Integer)
         ->(Integer) }
         { (Integer)
@@ -178,7 +178,7 @@
             {-(Integer)-}))
           (Generator
             (VariableIdentifier)
-            (EnumFromTo
+            (ArithmeticSequence
               (Integer)
             { (Integer)
             ->(Integer) })))))
@@ -199,7 +199,7 @@
               {-(Integer)-})))
           (Generator
             (VariableIdentifier)
-            (EnumFrom
+            (ArithmeticSequence
             { (Integer)
             ->(Integer) })))))
     (Function
@@ -225,7 +225,7 @@
                   (Integer))))
             (Generator
               (VariableIdentifier)
-              (EnumFrom
+              (ArithmeticSequence
                 (Integer)))))))
     (Function
     { (VariableIdentifier)
@@ -362,16 +362,12 @@
             {-(VariableOperator
               {-(VariableSymbol)-})-}
             {-(VariableIdentifier)-})-})-})-}))
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
       {+(QualifiedConstructorIdentifier
         {+(ModuleIdentifier)+}
-        {+(ConstructorIdentifier)+})+}
-      {-(Lambda
-        {-(VariableIdentifier)-}
-        {-(VariableIdentifier)-})-}))
+        {+(ConstructorIdentifier)+})+})+})+}
   {+(Function
     {+(VariableIdentifier)+}
     {+(ConstructorPattern
@@ -442,12 +438,13 @@
             {+(VariableOperator
               {+(VariableSymbol)+})+}
             {+(VariableIdentifier)+})+})+})+})+})+}
-  {+(Function
-    {+(VariableIdentifier)+}
-    {+(Statements
-      {+(Lambda
-        {+(VariableIdentifier)+}
-        {+(VariableIdentifier)+})+})+})+}
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Lambda
+          (VariableIdentifier)
+          (VariableIdentifier))))
     (Function
     { (VariableIdentifier)
     ->(VariableIdentifier) }

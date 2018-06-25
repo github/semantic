@@ -130,33 +130,26 @@
               (Statements
               { (VariableIdentifier)
               ->(VariableIdentifier) }))))))
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
-        (Do
-        { (VariableIdentifier)
-        ->(VariableIdentifier) }
-          (Statements
-            (Function
-              (VariableIdentifier)
-              (Statements
-              { (VariableIdentifier)
-              ->(VariableIdentifier) }))))))
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
-        (Do
-        { (VariableIdentifier)
-        ->(VariableIdentifier) }
-          (Statements
-            (Function
-            { (VariableIdentifier)
-            ->(VariableIdentifier) }
-              (Statements
-              { (VariableIdentifier)
-              ->(VariableIdentifier) }))))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Do
+        {+(VariableIdentifier)+}
+        {+(Statements
+          {+(Function
+            {+(VariableIdentifier)+}
+            {+(Statements
+              {+(VariableIdentifier)+})+})+})+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Do
+        {+(VariableIdentifier)+}
+        {+(Statements
+          {+(Function
+            {+(VariableIdentifier)+}
+            {+(Statements
+              {+(VariableIdentifier)+})+})+})+})+})+})+}
   {+(TypeClass
     {+(Empty)+}
     {+(TypeClassIdentifier)+}
@@ -203,4 +196,24 @@
           {+(App
             {+(ConstructorIdentifier)+}
             {+(Empty)+}
-            {+(VariableIdentifier)+})+})+})+})+})+}))
+            {+(VariableIdentifier)+})+})+})+})+})+}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(Do
+        {-(VariableIdentifier)-}
+        {-(Statements
+          {-(Function
+            {-(VariableIdentifier)-}
+            {-(Statements
+              {-(VariableIdentifier)-})-})-})-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(Do
+        {-(VariableIdentifier)-}
+        {-(Statements
+          {-(Function
+            {-(VariableIdentifier)-}
+            {-(Statements
+              {-(VariableIdentifier)-})-})-})-})-})-})-}))

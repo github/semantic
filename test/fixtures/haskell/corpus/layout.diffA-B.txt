@@ -101,17 +101,18 @@
           (VariableIdentifier)
         {+(VariableIdentifier)+}
           (Do
+          {+(VariableIdentifier)+}
+          {+(VariableIdentifier)+}
+          {+(Do
+            {+(VariableIdentifier)+}
+            {+(VariableIdentifier)+})+}
           { (VariableIdentifier)
           ->(VariableIdentifier) }
-          { (VariableIdentifier)
-          ->(VariableIdentifier) }
-            (Do
-            { (VariableIdentifier)
-            ->(VariableIdentifier) }
-            { (VariableIdentifier)
-            ->(VariableIdentifier) })
-          { (VariableIdentifier)
-          ->(VariableIdentifier) })
+          {-(VariableIdentifier)-}
+          {-(Do
+            {-(VariableIdentifier)-}
+            {-(VariableIdentifier)-})-}
+          {-(VariableIdentifier)-})
         { (VariableIdentifier)
         ->(VariableIdentifier) })))
     (Function
@@ -128,19 +129,16 @@
               (Statements
               { (VariableIdentifier)
               ->(VariableIdentifier) }))))))
-    (Function
-    { (VariableIdentifier)
-    ->(VariableIdentifier) }
-      (Statements
-        (Do
-        { (VariableIdentifier)
-        ->(VariableIdentifier) }
-          (Statements
-            (Function
-              (VariableIdentifier)
-              (Statements
-              { (VariableIdentifier)
-              ->(VariableIdentifier) }))))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Do
+        {+(VariableIdentifier)+}
+        {+(Statements
+          {+(Function
+            {+(VariableIdentifier)+}
+            {+(Statements
+              {+(VariableIdentifier)+})+})+})+})+})+})+}
     (Function
     { (VariableIdentifier)
     ->(VariableIdentifier) }
@@ -155,6 +153,16 @@
               (Statements
               { (VariableIdentifier)
               ->(VariableIdentifier) }))))))
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(Do
+        {-(VariableIdentifier)-}
+        {-(Statements
+          {-(Function
+            {-(VariableIdentifier)-}
+            {-(Statements
+              {-(VariableIdentifier)-})-})-})-})-})-})-}
   {-(TypeClass
     {-(Empty)-}
     {-(TypeClassIdentifier)-}
