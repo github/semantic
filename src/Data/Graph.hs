@@ -44,6 +44,9 @@ simplify (Graph graph) = Graph (G.simplify graph)
 --
 -- >>> topologicalSort ((vertex 'a' `connect` vertex 'b') <> (vertex 'a' `connect` vertex 'c'))
 -- "cba"
+--
+-- >>> topologicalSort (Class.path "abd" <> Class.path "acd")
+-- "dcba"
 topologicalSort :: forall v . Ord v => Graph v -> [v]
 topologicalSort = go . toAdjacencyMap . G.transpose . unGraph
   where go :: A.AdjacencyMap v -> [v]
