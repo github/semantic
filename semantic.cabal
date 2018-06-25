@@ -133,6 +133,7 @@ library
                      , Language.Java.Assignment
                      , Language.Java.Grammar
                      , Language.Java.Syntax
+                     , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
                      , Parsing.Parser
@@ -287,6 +288,7 @@ test-suite test
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
                      , Matching.Go.Spec
+                     , Numeric.Spec
                      , Proto3.Roundtrip
                      , Rendering.TOC.Spec
                      , Semantic.Spec
