@@ -100,16 +100,13 @@ evaluate lang analyzeModule analyzeTerm modules = do
     box unit
   foldr (run preludeEnv) get modules
   where run preludeEnv m rest = do
-          evaluated <- evalModule preludeEnv m
+          evaluated <- coerce
+            (runInModule preludeEnv (moduleInfo m))
+            (analyzeModule (subtermRef . moduleBody)
+            (evalTerm <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          modify' (ModuleTable.insert (modulePath (moduleInfo evaluated)) (evaluated :| []))
+          modify' (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| []))
           rest
-
-        evalModule preludeEnv m
-          = fmap (<$ m)
-          . coerce (runInModule preludeEnv (moduleInfo m))
-          . analyzeModule (subtermRef . moduleBody)
-          $ evalTerm <$> m
 
         evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
 
