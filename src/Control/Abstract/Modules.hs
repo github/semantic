@@ -71,7 +71,7 @@ runModules :: ( Member (State (ModuleTable (NonEmpty (Module (address, Environme
 runModules paths = interpret $ \case
   Load   name   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable >>= maybeM (moduleNotFound name)
   Lookup path   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
-  Resolve names -> pure (find (flip Set.member paths) names)
+  Resolve names -> pure (find (`Set.member` paths) names)
   List dir      -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
 askModuleTable :: Member (State (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
