@@ -8,8 +8,7 @@
       (Constructor
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
-        (TypeParameters
-          (TypeConstructorIdentifier)))
+        (TypeConstructorIdentifier))
       (Empty))
     (NewType
       (Context'
@@ -22,8 +21,7 @@
       (Constructor
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
-        (TypeParameters
-          (TypeVariableIdentifier)))
+        (TypeVariableIdentifier))
       (Empty))
     (NewType
       (Statements
@@ -32,17 +30,16 @@
       (Constructor
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
-        (TypeParameters
-          (Statements
-            (Field
-              (Statements
-              { (VariableIdentifier)
-              ->(VariableIdentifier) })
-              (Type
-                (TypeConstructorIdentifier)
-                (TypeParameters
-                  (TypeConstructorIdentifier))
-                (Empty))))))
+        (Statements
+          (Field
+            (Statements
+            { (VariableIdentifier)
+            ->(VariableIdentifier) })
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters
+                (TypeConstructorIdentifier))
+              (Empty)))))
       (Empty))
     (NewType
       (Statements
@@ -61,11 +58,10 @@
       (Constructor
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
-        (TypeParameters
-          (Statements
-            (TypeVariableIdentifier)
-            (TypeVariableIdentifier)
-            (TypeVariableIdentifier))))
+        (Statements
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
       (Empty))
     (NewType
       (Statements
@@ -74,8 +70,7 @@
       (Constructor
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
-        (TypeParameters
-          (TypeConstructorIdentifier)))
+        (TypeConstructorIdentifier))
       (Deriving
         (TypeClassIdentifier)))
     (NewType
@@ -85,8 +80,7 @@
       (Constructor
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
-        (TypeParameters
-          (TypeVariableIdentifier)))
+        (TypeVariableIdentifier))
       (Deriving
         (TypeClassIdentifier)
         (TypeClassIdentifier)
