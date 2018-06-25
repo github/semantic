@@ -181,7 +181,7 @@ algebraicDatatypeDeclaration = makeTerm
                             <*> children (Declaration.Datatype
                                         <$> (context' <|> emptyTerm)
                                         <*> (makeTerm <$> location <*> (Syntax.Type <$> typeConstructor <*> typeParameters <*> (kindSignature <|> emptyTerm)))
-                                        <*> constructors
+                                        <*> (constructors <|> pure [])
                                         <*> (term derivingClause <|> emptyTerm))
   where
     constructors = symbol Constructors *> children (manyTerm constructor)
