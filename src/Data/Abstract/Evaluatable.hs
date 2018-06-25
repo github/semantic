@@ -101,6 +101,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
   foldr (run preludeEnv) get modules
   where run preludeEnv m rest = do
           evaluated <- evalModule preludeEnv m
+          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           modify' (ModuleTable.insert (modulePath (moduleInfo evaluated)) (evaluated :| []))
           rest
 
