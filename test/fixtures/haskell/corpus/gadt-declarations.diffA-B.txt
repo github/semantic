@@ -183,7 +183,7 @@
         (GADTConstructor
           (Empty)
           (TypeConstructorIdentifier)
-          (Context
+          (Statements
             (Pragma)
             (FunctionType
               (Type
