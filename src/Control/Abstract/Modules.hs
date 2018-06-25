@@ -29,7 +29,7 @@ import Prologue
 import System.FilePath.Posix (takeDirectory)
 import Debug.Trace (trace)
 
--- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
+-- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (address, Environment address))
 lookupModule = sendModules . Lookup
 
