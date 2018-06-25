@@ -36,7 +36,7 @@ assignment :: Assignment
 assignment = Syntax.handleError (value <|> parseError)
 
 value :: Assignment
-value = symbol Value *> children (object <|> array <|> number <|> string <|> boolean <|> none)
+value = symbol Value *> children (object <|> array)
 
 jsonValue :: Assignment
 jsonValue = object <|> array <|> number <|> string <|> boolean <|> none
