@@ -28,7 +28,7 @@ simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
 
 
--- | Sort a graph’s vertices by the number of in-edges.
+-- | Sort a graph’s vertices topologically.
 --
 -- >>> topologicalSort (Class.path "ab")
 -- ['b' :| "",'a' :| ""]
