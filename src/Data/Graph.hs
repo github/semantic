@@ -32,6 +32,9 @@ simplify (Graph graph) = Graph (G.simplify graph)
 --
 -- >>> topologicalSort (Class.path "ab")
 -- ['b' :| "",'a' :| ""]
+--
+-- >>> topologicalSort (Class.path "abc")
+-- ['c' :| "",'b' :| "",'a' :| ""]
 topologicalSort :: Ord v => Graph v -> [NonEmpty v]
 topologicalSort
   = map (fmap fst)
