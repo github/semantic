@@ -100,7 +100,7 @@ typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Langu
 evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) (flip File lang <$> paths) lang [])
   modules <- topologicalSort <$> runImportGraph proxy package
-  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) . toList <$> modules)
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)

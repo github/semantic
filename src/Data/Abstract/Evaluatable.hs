@@ -91,7 +91,7 @@ evaluate :: ( AbstractValue address value inner
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
-         -> [NonEmpty (Module term)]
+         -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
 evaluate lang analyzeModule analyzeTerm modules = do
   (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
@@ -99,9 +99,9 @@ evaluate lang analyzeModule analyzeTerm modules = do
     definePrelude lang
     box unit
   foldr (run preludeEnv) get modules
-  where run preludeEnv modules rest = do
-          evaluated <- traverse (evalModule preludeEnv) modules
-          modify' (<> ModuleTable.fromModules (toList evaluated))
+  where run preludeEnv m rest = do
+          evaluated <- evalModule preludeEnv m
+          modify' (ModuleTable.insert (modulePath (moduleInfo evaluated)) (evaluated :| []))
           rest
 
         evalModule preludeEnv m
