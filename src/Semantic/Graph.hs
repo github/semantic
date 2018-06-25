@@ -145,7 +145,7 @@ runImportGraph lang (package :: Package term)
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (map snd (ModuleTable.toPairs (packageModules package))))
+  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (ModuleTable.toPairs (packageModules package) >>= toList . snd))
 
 newtype ImportGraphEff term address a = ImportGraphEff
   { runImportGraphEff :: Eff '[ LoopControl address
