@@ -1,9 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Data.Graph
 ( Graph(..)
-, Class.overlay
-, Class.connect
-, Class.vertex
+, overlay
+, connect
+, vertex
 , Lower(..)
 , simplify
 , topologicalSort
@@ -11,6 +11,7 @@ module Data.Graph
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.AdjacencyMap as A
+import Algebra.Graph.Class (connect, overlay, vertex)
 import qualified Algebra.Graph.Class as Class
 import Control.Monad.Effect
 import Control.Monad.Effect.State
@@ -74,7 +75,7 @@ instance Lower (Graph vertex) where
   lowerBound = Class.empty
 
 instance Semigroup (Graph vertex) where
-  (<>) = Class.overlay
+  (<>) = overlay
 
 instance Monoid (Graph vertex) where
   mempty = Class.empty
