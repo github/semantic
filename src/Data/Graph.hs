@@ -40,18 +40,15 @@ topologicalSort
   = map (fmap fst)
   . sortAndGroupBy (inEdgeCount . snd)
   . Monoidal.pairs
-  . edgeCountsByVertex
-
-edgeCountsByVertex :: Ord v => Graph v -> Monoidal.Map v EdgeCounts
-edgeCountsByVertex = Class.foldg
-  lowerBound
-  (flip Monoidal.singleton mempty)
-  (<>)
-  (\ outM inM
-    -> outM
-    <> inM
-    <> foldMap (flip Monoidal.singleton (EdgeCounts 0 (length outM))) (Monoidal.keys inM)
-    <> foldMap (flip Monoidal.singleton (EdgeCounts (length inM) 0))  (Monoidal.keys outM))
+  . Class.foldg
+    lowerBound
+    (flip Monoidal.singleton mempty)
+    (<>)
+    (\ outM inM
+      -> outM
+      <> inM
+      <> foldMap (flip Monoidal.singleton (EdgeCounts 0 (length outM))) (Monoidal.keys inM)
+      <> foldMap (flip Monoidal.singleton (EdgeCounts (length inM) 0))  (Monoidal.keys outM))
 
 data EdgeCounts = EdgeCounts
   { inEdgeCount  :: {-# UNPACK #-} !Int
