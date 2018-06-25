@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Data.Graph
 ( Graph(..)
 , Class.overlay
@@ -7,20 +7,19 @@ module Data.Graph
 , Lower(..)
 , simplify
 , topologicalSort
-, EdgeCounts(..)
 ) where
 
 import qualified Algebra.Graph as G
+import qualified Algebra.Graph.AdjacencyMap as A
 import qualified Algebra.Graph.Class as Class
+import Control.Monad.Effect
+import Control.Monad.Effect.State
 import Data.Aeson
-import Data.List (groupBy, sortBy)
-import qualified Data.List.NonEmpty as NonEmpty (fromList)
-import qualified Data.Map.Monoidal as Monoidal
-import Data.Ord (comparing)
+import qualified Data.Set as Set
 import Prologue
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
-newtype Graph vertex = Graph (G.Graph vertex)
+newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
   deriving (Alternative, Applicative, Eq, Foldable, Functor, Class.Graph, Monad, Show, Class.ToGraph, Traversable)
 
 
@@ -31,40 +30,44 @@ simplify (Graph graph) = Graph (G.simplify graph)
 -- | Sort a graph’s vertices topologically.
 --
 -- >>> topologicalSort (Class.path "ab")
--- ['b' :| "",'a' :| ""]
+-- "ba"
 --
 -- >>> topologicalSort (Class.path "abc")
--- ['c' :| "",'b' :| "",'a' :| ""]
-topologicalSort :: Ord v => Graph v -> [NonEmpty v]
-topologicalSort
-  = map (fmap fst)
-  . sortAndGroupBy (inEdgeCount . snd)
-  . Monoidal.pairs
-  . Class.foldg
-    lowerBound
-    (flip Monoidal.singleton mempty)
-    (<>)
-    (\ outM inM
-      -> outM
-      <> inM
-      <> foldMap (flip Monoidal.singleton (EdgeCounts 0 (length outM))) (Monoidal.keys inM)
-      <> foldMap (flip Monoidal.singleton (EdgeCounts (length inM) 0))  (Monoidal.keys outM))
+-- "cba"
+--
+-- >>> topologicalSort (Class.path "abc")
+-- "cba"
+topologicalSort :: forall v . Ord v => Graph v -> [v]
+topologicalSort = go . toAdjacencyMap . G.transpose . unGraph
+  where go :: A.AdjacencyMap v -> [v]
+        go graph
+          = visitedOrder . snd
+          . run
+          . runState (Visited lowerBound [])
+          . traverse_ visit
+          . A.vertexList
+          $ graph
+          where visit :: v -> Eff '[State (Visited v)] ()
+                visit v = do
+                  isMarked <- Set.member v . visitedVertices <$> get
+                  if isMarked then
+                    pure ()
+                  else do
+                    modify' (extendVisited (Set.insert v))
+                    traverse_ visit (Set.toList (A.postSet v graph))
+                    modify' (extendOrder (v :))
 
-data EdgeCounts = EdgeCounts
-  { inEdgeCount  :: {-# UNPACK #-} !Int
-  , outEdgeCount :: {-# UNPACK #-} !Int
-  }
-  deriving (Eq, Ord, Show)
+data Visited v = Visited { visitedVertices :: !(Set v), visitedOrder :: [v] }
 
-instance Semigroup EdgeCounts where
-  EdgeCounts in1 out1 <> EdgeCounts in2 out2 = EdgeCounts (in1 + in2) (out1 + out2)
+extendVisited :: (Set v -> Set v) -> Visited v -> Visited v
+extendVisited f (Visited a b) = Visited (f a) b
 
-instance Monoid EdgeCounts where
-  mempty = EdgeCounts 0 0
-  mappend = (<>)
+extendOrder :: ([v] -> [v]) -> Visited v -> Visited v
+extendOrder f (Visited a b) = Visited a (f b)
 
-sortAndGroupBy :: Ord b => (a -> b) -> [a] -> [NonEmpty a]
-sortAndGroupBy by = map NonEmpty.fromList . groupBy ((==) `on` by) . sortBy (comparing by)
+
+toAdjacencyMap :: Ord v => G.Graph v -> A.AdjacencyMap v
+toAdjacencyMap = Class.toGraph
 
 
 instance Lower (Graph vertex) where
