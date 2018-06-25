@@ -206,8 +206,8 @@ resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionErr
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: Member Trace effects => Evaluator address value (Resumable (LoadError address) ': effects) a -> Evaluator address value effects a
-resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
+resumingLoadError :: (Member Trace effects, AbstractHole address) => Evaluator address value (Resumable (LoadError address) ': effects) a -> Evaluator address value effects a
+resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> (hole, lowerBound))
 
 resumingEvalError :: Member Trace effects => Evaluator address value (Resumable EvalError ': effects) a -> Evaluator address value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
