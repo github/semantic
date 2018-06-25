@@ -11,7 +11,7 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "evaluates Python" $ do
+  describe "Python" $ do
     it "imports" $ do
       ((Right [(_, env)], heap), _) <- evaluate ["main.py"]
       Env.names env `shouldContain` [ "a", "b" ]
