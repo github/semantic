@@ -11,13 +11,15 @@ spec :: Spec
 spec = parallel $ do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
-      ((Right [(_, env)], heap), _) <- evaluate ["main.go"]
+      ((res@(~(Right [(_, env)])), heap), _) <- evaluate ["main.go"]
+      fmap (() <$) res `shouldBe` Right [()]
       Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
 
       (derefQName heap ("foo" :| []) env >>= deNamespace) `shouldBe` Just ("foo",  ["New"])
 
     it "imports with aliases (and side effects only)" $ do
-      ((Right [(_, env)], heap), _) <- evaluate ["main1.go"]
+      ((res@(~(Right [(_, env)])), heap), _) <- evaluate ["main1.go"]
+      fmap (() <$) res `shouldBe` Right [()]
       Env.names env `shouldBe` [ "f", "main" ]
 
       (derefQName heap ("f" :| []) env >>= deNamespace) `shouldBe` Just ("f",  ["New"])
