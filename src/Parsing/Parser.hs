@@ -126,7 +126,7 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum TypeScript.Syntax)
               , ApplyAll typeclasses (Sum PHP.Syntax)
               )
-           => Language                                        -- ^ The 'Language' to select.
+           => Language                                                -- ^ The 'Language' to select.
            -> Maybe (Parser (SomeTerm typeclasses (Record Location))) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
 someParser Go         = Just (SomeParser goParser)
 someParser Java       = Just (SomeParser javaParser)
