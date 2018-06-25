@@ -28,6 +28,7 @@ simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
 
 
+-- | Sort a graph’s vertices by the number of in-edges.
 topologicalSort :: Ord v => Graph v -> [NonEmpty v]
 topologicalSort
   = map (fmap fst)
