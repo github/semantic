@@ -73,7 +73,7 @@ evaluate :: ( AbstractValue address value inner
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
-            , Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+            , Member (State (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (AddressError address value)) effects
@@ -98,10 +98,10 @@ evaluate lang analyzeModule analyzeTerm modules = do
     defineBuiltins
     definePrelude lang
     box unit
-  foldr (run preludeEnv) ask modules
+  foldr (run preludeEnv) get modules
   where run preludeEnv modules rest = do
           evaluated <- traverse (evalModule preludeEnv) modules
-          local (<> ModuleTable.fromModules (toList evaluated)) rest
+          localState (<> ModuleTable.fromModules (toList evaluated)) rest
 
         evalModule preludeEnv m
           = fmap (<$ m)

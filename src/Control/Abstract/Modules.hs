@@ -62,7 +62,7 @@ data Modules address return where
 sendModules :: Member (Modules address) effects => Modules address return -> Evaluator address value effects return
 sendModules = send
 
-runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+runModules :: ( Member (State (ModuleTable (NonEmpty (Module (address, Environment address))))) effects -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
               , Member (Resumable (LoadError address)) effects
               )
            => Set ModulePath
@@ -74,8 +74,8 @@ runModules paths = interpret $ \case
   Resolve names -> pure (find (flip Set.member paths) names)
   List dir      -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
-askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
-askModuleTable = ask
+askModuleTable :: Member (State (ModuleTable (NonEmpty (Module (address, Environment address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
+askModuleTable = get
 
 
 newtype Merging address = Merging { runMerging :: (address, Environment address) }
