@@ -13,7 +13,7 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "evaluates TypeScript" $ do
+  describe "TypeScript" $ do
     it "imports with aliased symbols" $ do
       ((res, _), _) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
       (>>= Env.names . snd) <$> res `shouldBe` Right [ "bar", "quz" ]
