@@ -2,6 +2,7 @@ module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
+import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
 import qualified Language.Go.Assignment as Go
 import SpecHelpers
@@ -10,20 +11,21 @@ import SpecHelpers
 spec :: Spec
 spec = parallel $ do
   describe "Go" $ do
-    pure ()
-    -- it "imports and wildcard imports" $ do
-    --   ((res@(~(Right [(_, env)])), heap), _) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
-    --   fmap (() <$) res `shouldBe` Right [()]
-    --   Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
-    --
-    --   (derefQName heap ("foo" :| []) env >>= deNamespace) `shouldBe` Just ("foo",  ["New"])
-    --
-    -- it "imports with aliases (and side effects only)" $ do
-    --   ((res@(~(Right [(_, env)])), heap), _) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
-    --   fmap (() <$) res `shouldBe` Right [()]
-    --   Env.names env `shouldBe` [ "f", "main" ]
-    --
-    --   (derefQName heap ("f" :| []) env >>= deNamespace) `shouldBe` Just ("f",  ["New"])
+    it "imports and wildcard imports" $ do
+      ((res, heap), _) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      case ModuleTable.lookup "main.go" <$> res of
+        Right (Just (Module _ (addr, env) :| [])) -> do
+          Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
+          (derefQName heap ("foo" :| []) env >>= deNamespace) `shouldBe` Just ("foo",  ["New"])
+        other -> expectationFailure (show other)
+
+    it "imports with aliases (and side effects only)" $ do
+      ((res, heap), _) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      case ModuleTable.lookup "main1.go" <$> res of
+        Right (Just (Module _ (addr, env) :| [])) -> do
+          Env.names env `shouldBe` [ "f", "main" ]
+          (derefQName heap ("f" :| []) env >>= deNamespace) `shouldBe` Just ("f",  ["New"])
+        other -> expectationFailure (show other)
 
   where
     fixtures = "test/fixtures/go/analysis/"
