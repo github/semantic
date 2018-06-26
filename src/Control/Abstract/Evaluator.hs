@@ -52,7 +52,7 @@ earlyReturn :: Member (Return address) effects
 earlyReturn = send . Return
 
 catchReturn :: forall m address value effects . (Member (Return address) effects, Effectful (m address value)) => m address value effects address -> m address value effects address
-catchReturn = Eff.raiseHandler (interpose @(Return address) pure (\ (Return ret) _ -> pure ret))
+catchReturn = Eff.raiseHandler (interpose @(Return address) (\ (Return ret) _ -> pure ret))
 
 runReturn :: (Effectful (m address value), Effects effects) => m address value (Return address ': effects) address -> m address value effects address
 runReturn = Eff.raiseHandler go . catchReturn
@@ -85,7 +85,7 @@ throwContinue :: Member (LoopControl address) effects
 throwContinue = send . Continue
 
 catchLoopControl :: (Member (LoopControl address) effects, Effectful (m address value)) => m address value effects a -> (forall x . LoopControl address (Eff effects) x -> m address value effects a) -> m address value effects a
-catchLoopControl action handler = Eff.raiseHandler (interpose pure (\ control _ -> Eff.lowerEff (handler control))) action
+catchLoopControl action handler = Eff.raiseHandler (interpose (\ control _ -> Eff.lowerEff (handler control))) action
 
 runLoopControl :: (Effectful (m address value), Effects effects) => m address value (LoopControl address ': effects) address -> m address value effects address
 runLoopControl = Eff.raiseHandler go . (`catchLoopControl` (\ control -> case control of
