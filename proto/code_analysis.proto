@@ -2,9 +2,9 @@ syntax = "proto3";
 import "types.proto";
 import "error_details.proto";
 
-option java_package = "com.github.semantic.v1alpha1.analysis";
-option go_package = "github.com/semantic/v1alpha1/analysis/;analysis";
-package github.semantic.v1alpha1;
+option java_package = "com.github.semantic.analysis";
+option go_package = "github.com/semantic/analysis/;analysis";
+package github.semantic;
 
 // Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and
 // comparing source code.

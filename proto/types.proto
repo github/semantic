@@ -1,5 +1,5 @@
 syntax = "proto3";
-package github.semantic.v1alpha1;
+package github.semantic;
 enum Language {UNKNOWN = 0;
                GO = 1;
                HASKELL = 2;
