@@ -5,7 +5,7 @@ module Semantic.Graph
 , GraphType(..)
 , Graph
 , Vertex
-, GraphEff(..)
+, CallGraphEff(..)
 , ImportGraphEff(..)
 , style
 , parsePackage
@@ -31,6 +31,7 @@ import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
 import           Data.Record
+import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text (pack)
 import           Parsing.Parser
@@ -55,36 +56,14 @@ runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
     modules <- runImportGraph lang package
-    let analyzeTerm = withTermSpans . graphingTerms
-        analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
-        extractGraph (((_, graph), _), _) = simplify graph
-        runGraphAnalysis
-          = run
-          . runState lowerBound
-          . runFresh 0
-          . runIgnoringTrace
-          . resumingLoadError
-          . resumingUnspecialized
-          . resumingEnvironmentError
-          . resumingEvalError
-          . resumingResolutionError
-          . resumingAddressError
-          . resumingValueError
-          . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _))
-          . graphing
-          . runReader (packageInfo package)
-          . runReader lowerBound
-          . fmap fst
-          . runState lowerBound
-          . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-    extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
+    runCallGraph lang includePackages modules package
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
-newtype GraphEff address a = GraphEff
+newtype CallGraphEff address a = CallGraphEff
   { runGraphEff :: Eff '[ LoopControl address
                         , Return address
                         , Env address
-                        , Allocator address (Value address (GraphEff address))
+                        , Allocator address (Value address (CallGraphEff address))
                         , Reader ModuleInfo
                         , Modules address
                         -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
@@ -92,18 +71,61 @@ newtype GraphEff address a = GraphEff
                         , Reader Span
                         , Reader PackageInfo
                         , State (Graph Vertex)
-                        , Resumable (ValueError address (GraphEff address))
-                        , Resumable (AddressError address (Value address (GraphEff address)))
+                        , Resumable (ValueError address (CallGraphEff address))
+                        , Resumable (AddressError address (Value address (CallGraphEff address)))
                         , Resumable ResolutionError
                         , Resumable EvalError
                         , Resumable (EnvironmentError address)
-                        , Resumable (Unspecialized (Value address (GraphEff address)))
+                        , Resumable (Unspecialized (Value address (CallGraphEff address)))
                         , Resumable (LoadError address)
                         , Trace
                         , Fresh
-                        , State (Heap address Latest (Value address (GraphEff address)))
+                        , State (Heap address Latest (Value address (CallGraphEff address)))
                         ] a
   }
+
+runCallGraph :: ( HasField ann Span
+                , Element Syntax.Identifier syntax
+                , Apply Eq1 syntax
+                , Apply Ord1 syntax
+                , Ord (Record ann)
+                , term ~ Term (Sum syntax) (Record ann)
+                , Declarations term
+                , Evaluatable (Base term)
+                , FreeVariables term
+                , HasPrelude lang
+                , Member Task effs
+                , Recursive term
+                )
+             => Proxy lang
+             -> Bool
+             -> Graph (Module term)
+             -> Package term
+             -> Eff effs (Graph Vertex)
+runCallGraph lang includePackages modules package = do
+  let analyzeTerm = withTermSpans . graphingTerms
+      analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
+      extractGraph (((_, graph), _), _) = simplify graph
+      runGraphAnalysis
+        = run
+        . runState lowerBound
+        . runFresh 0
+        . runIgnoringTrace
+        . resumingLoadError
+        . resumingUnspecialized
+        . resumingEnvironmentError
+        . resumingEvalError
+        . resumingResolutionError
+        . resumingAddressError
+        . resumingValueError
+        . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (CallGraphEff _))
+        . graphing
+        . runReader (packageInfo package)
+        . runReader lowerBound
+        . fmap fst
+        . runState lowerBound
+        . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+  extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
 
 
 runImportGraph :: ( Declarations term
