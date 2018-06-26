@@ -103,7 +103,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Java's grammar onto a program in Java's syntax.
 assignment :: Assignment
@@ -215,9 +215,9 @@ variableDeclaratorId = symbol VariableDeclaratorId *> children identifier
 
 -- Literals
 boolean :: Assignment
-boolean =  makeTerm <$> symbol BooleanLiteral <*> children
-          (token Grammar.True $> Literal.true
-          <|> token Grammar.False $> Literal.false)
+boolean = toTerm (branchNode BooleanLiteral
+  (   leafNode Grammar.True  $> Literal.true
+  <|> leafNode Grammar.False $> Literal.false))
 
 null' :: Assignment
 null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
@@ -253,7 +253,7 @@ superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *
 class' :: Assignment
 class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> (superInterfaces <|> pure []) <*> classBody)
   where
-    makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass ++ superInterfaces) -- not doing an assignment, just straight up function
+    makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers <> typeParams) identifier (maybeToList superClass <> superInterfaces) -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
     superClass = symbol Superclass *> children type'
 -- TODO: superclass
@@ -270,7 +270,7 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
-    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params
+    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver name params
 -- methodHeader needs to include typeParameters (it does)
 
 generic :: Assignment
@@ -290,7 +290,7 @@ explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocatio
     callFunction a Nothing = ([], a)
 
 module' :: Assignment
-module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
+module' = toTerm (branchNode ModuleDeclaration (Java.Syntax.Module <$> expression <*> many expression))
 
 import' :: Assignment
 import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> someTerm (expression <|> asterisk))
@@ -300,9 +300,19 @@ interface :: Assignment
 interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> annotationType)
   where
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
+<<<<<<< HEAD
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> (extends <|> pure []) <*> interfaceBody)
     makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> pure [] <*> annotationTypeBody)
+||||||| merged common ancestors
+    normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
+    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
+    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
+=======
+    normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
+    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers <> typeParams) identifier
+    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
+>>>>>>> master
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
     extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))

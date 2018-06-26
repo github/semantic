@@ -62,20 +62,18 @@
       ->(TypeConstructorIdentifier) }
         (TypeParameters)
         (Empty))
-      (Constructor
-      { (ConstructorIdentifier)
-      ->(ConstructorIdentifier) }
-        (TypeParameters))
     {+(Constructor
       {+(ConstructorIdentifier)+}
       {+(TypeParameters)+})+}
     {+(Constructor
       {+(ConstructorIdentifier)+}
       {+(TypeParameters)+})+}
-      (Constructor
-      { (ConstructorIdentifier)
-      ->(ConstructorIdentifier) }
-        (TypeParameters))
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
     {+(Constructor
       {+(ConstructorIdentifier)+}
       {+(TypeParameters)+})+}
@@ -83,6 +81,12 @@
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
         (TypeParameters))
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
     {-(Constructor
       {-(ConstructorIdentifier)-}
       {-(TypeParameters)-})-}
@@ -302,12 +306,10 @@
         (TypeClassIdentifier)))
     (Datatype
       (Context'
-        (Statements
-          (Class
-          { (TypeClassIdentifier)
-          ->(TypeClassIdentifier) }
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (TypeVariableIdentifier)))
       (Type
         (TypeConstructorIdentifier)
         (TypeParameters
@@ -324,18 +326,13 @@
           (Class
           { (TypeClassIdentifier)
           ->(TypeClassIdentifier) }
-            (TypeParameters
-              (TypeVariableIdentifier))))
-        (Statements
+            (TypeVariableIdentifier))
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier))))
-        (Statements
+            (TypeVariableIdentifier))
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+            (TypeVariableIdentifier))))
       (Type
         (TypeConstructorIdentifier)
         (TypeParameters
@@ -353,16 +350,13 @@
         (Statements
           (Class
             (TypeClassIdentifier)
-            (TypeParameters
-              (Statements
-                (TypeVariableIdentifier)
-                (TypeVariableIdentifier)))))
-        (Statements
+            (Statements
+              (TypeVariableIdentifier)
+              (TypeVariableIdentifier)))
           (Class
           { (TypeClassIdentifier)
           ->(TypeClassIdentifier) }
-            (TypeParameters
-              (TypeVariableIdentifier)))))
+            (TypeVariableIdentifier))))
       (Type
         (TypeConstructorIdentifier)
         (TypeParameters
@@ -384,8 +378,7 @@
         (Empty))
       (Constructor
         (Context'
-          (Statements
-            (TypeConstructorIdentifier)))
+          (TypeConstructorIdentifier))
       { (ConstructorIdentifier)
       ->(ConstructorIdentifier) }
         (TypeParameters
@@ -401,12 +394,10 @@
         (Empty))
       (Constructor
         (Context'
-          (Statements
-            (Class
-              (TypeClassIdentifier)
-              (TypeParameters
-              { (TypeVariableIdentifier)
-              ->(TypeVariableIdentifier) }))))
+          (Class
+            (TypeClassIdentifier)
+          { (TypeVariableIdentifier)
+          ->(TypeVariableIdentifier) }))
         (ConstructorIdentifier)
         (TypeParameters
         { (TypeVariableIdentifier)
@@ -437,12 +428,10 @@
         { (TypeVariableIdentifier)
         ->(TypeVariableIdentifier) })
         (Context'
-          (Statements
-            (Class
-              (TypeClassIdentifier)
-              (TypeParameters
-              { (TypeVariableIdentifier)
-              ->(TypeVariableIdentifier) }))))
+          (Class
+            (TypeClassIdentifier)
+          { (TypeVariableIdentifier)
+          ->(TypeVariableIdentifier) }))
         (ConstructorIdentifier)
         (TypeParameters
           (Statements

@@ -1,0 +1,90 @@
+(Module
+  (Empty)
+  (Statements
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (If
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (Integer)
+          (Integer))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (If
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+        { (VariableIdentifier)
+        ->(VariableIdentifier) })))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (If
+          (If
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+          { (VariableIdentifier)
+          ->(VariableIdentifier) })
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+        { (VariableIdentifier)
+        ->(VariableIdentifier) })))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (If
+          (If
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+          { (VariableIdentifier)
+          ->(VariableIdentifier) })
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+        { (VariableIdentifier)
+        ->(VariableIdentifier) })))
+    (TypeSignature
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (FunctionType
+        (Type
+          (Array
+            (Type
+              (TypeVariableIdentifier)
+              (TypeParameters)
+              (Empty)))
+          (TypeParameters)
+          (Empty))
+        (Type
+          (TypeVariableIdentifier)
+          (TypeParameters)
+          (Empty))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (ListConstructor)
+      (Statements
+        (App
+          (VariableIdentifier)
+          (Empty)
+          (TextElement))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (VariableIdentifier)
+        (ConstructorOperator
+          (ConstructorSymbol))
+        (Wildcard))
+      (Statements
+        (VariableIdentifier)))))

@@ -1,0 +1,72 @@
+(Module
+  (Empty)
+  (Statements
+    (StandaloneDerivingInstance
+      (Context'
+        (Class
+          (TypeClassIdentifier)
+        { (TypeVariableIdentifier)
+        ->(TypeVariableIdentifier) }))
+      (TypeClassIdentifier)
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+      { (TypeVariableIdentifier)
+      ->(TypeVariableIdentifier) }))
+    (StandaloneDerivingInstance
+      (Context'
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (TypeVariableIdentifier)
+          (Statements
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier))))
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (Statements
+        (TypeVariableIdentifier)
+        (Statements
+        { (TypeConstructorIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))))
+    (StandaloneDerivingInstance
+      (Context'
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (TypeConstructorIdentifier)
+          (TypeVariableIdentifier)))
+      (TypeClassIdentifier)
+      (Statements
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeVariableIdentifier)
+        (TypeVariableIdentifier)
+        (TypeVariableIdentifier)))
+    (StandaloneDerivingInstance
+      (Context'
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (Statements
+          { (TypeConstructorIdentifier)
+          ->(TypeConstructorIdentifier) }
+            (Statements
+              (TypeConstructorIdentifier)
+              (TypeVariableIdentifier)))
+          (TypeVariableIdentifier)))
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (Statements
+        (TypeVariableIdentifier)
+        (Statements
+        { (TypeConstructorIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))))))

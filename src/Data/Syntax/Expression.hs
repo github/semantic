@@ -215,7 +215,7 @@ instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Finish Eval instance for Subscript
 -- TODO return a special LvalSubscript instance here
 instance Evaluatable Subscript where
-  eval (Subscript l [r]) = rvalBox =<< join (index <$> subtermValue l <*> subtermValue r)
+  eval (Subscript l [r]) = Rval <$> join (index <$> subtermValue l <*> subtermValue r)
   eval (Subscript _ _)   = rvalBox =<< throwResumable (Unspecialized "Eval unspecialized for subscript with slices")
   eval (Member _ _)      = rvalBox =<< throwResumable (Unspecialized "Eval unspecialized for member access")
 

@@ -2,7 +2,7 @@
 module Rendering.TOC.Spec (spec) where
 
 import Analysis.Declaration
-import Data.Aeson
+import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Diff
@@ -23,6 +23,7 @@ import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
+import Semantic.Config
 
 import SpecHelpers
 
@@ -102,7 +103,7 @@ spec = parallel $ do
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (both "javascript/toc/starts-with-newline.js" "javascript/toc/starts-with-newline.js")
-      diff <- runTask $ diffWithParser rubyParser sourceBlobs
+      diff <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe` []
 
     prop "inserts of methods and functions are summarized" . forAll ((not . isMethodOrFunction . Prelude.snd) `filterT` tiers) $
@@ -150,7 +151,7 @@ spec = parallel $ do
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
-      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      output <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) (runDiff ToCDiffRenderer [blobs])
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do

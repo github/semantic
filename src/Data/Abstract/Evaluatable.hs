@@ -1,10 +1,12 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
-, evaluatePackageWith
+, evaluate
 , traceResolve
--- | Effects
+-- * Preludes
+, HasPrelude(..)
+-- * Effects
 , EvalError(..)
 , throwEvalError
 , runEvalError
@@ -15,7 +17,7 @@ module Data.Abstract.Evaluatable
 , Cell
 ) where
 
-import Control.Abstract
+import Control.Abstract hiding (Load)
 import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
@@ -28,13 +30,13 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
-import Data.Abstract.Package as Package
 import Data.Abstract.Ref as X
+import Data.Coerce
+import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Data.Semigroup.Reducer hiding (unit)
-import Data.Semilattice.Lower
 import Data.Sum
 import Data.Term
 import Prologue
@@ -46,8 +48,8 @@ class Show1 constr => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address value) effects
           , Member (Env address) effects
-          , Member (LoopControl address value) effects
-          , Member (Modules address value) effects
+          , Member (LoopControl address) effects
+          , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
@@ -55,85 +57,118 @@ class Show1 constr => Evaluatable constr where
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
           , Member (Resumable (Unspecialized value)) effects
-          , Member (Return address value) effects
+          , Member (Return address) effects
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
-  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+  eval expr = rvalBox =<< throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
--- | Evaluate a given package.
-evaluatePackageWith :: forall address term value inner inner' inner'' outer
-                    .  ( AbstractValue address value inner
-                       -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that?
-                       , Addressable address inner'
-                       , Declarations term
-                       , Evaluatable (Base term)
-                       , Foldable (Cell address)
-                       , FreeVariables term
-                       , Member Fresh outer
-                       , Member (Resumable (AddressError address value)) outer
-                       , Member (Resumable (EnvironmentError address)) outer
-                       , Member (Resumable EvalError) outer
-                       , Member (Resumable (LoadError address value)) outer
-                       , Member (Resumable ResolutionError) outer
-                       , Member (Resumable (Unspecialized value)) outer
-                       , Member (State (Heap address (Cell address) value)) outer
-                       , Member (State (ModuleTable (Maybe (address, Environment address)))) outer
-                       , Member Trace outer
-                       , Recursive term
-                       , Reducer value (Cell address value)
-                       , ValueRoots address value
-                       , inner ~ (LoopControl address value ': Return address value ': Env address ': Allocator address value ': inner')
-                       , inner' ~ (Reader ModuleInfo ': inner'')
-                       , inner'' ~ (Modules address value ': Reader Span ': Reader PackageInfo ': outer)
-                       )
-                    => (SubtermAlgebra Module      term (TermEvaluator term address value inner address)                  -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
-                    -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
-                    -> Package term
-                    -> TermEvaluator term address value outer [(address, Environment address)]
-evaluatePackageWith analyzeModule analyzeTerm package
-  = runReader (packageInfo package)
-  . runReader lowerBound
-  . runReader (packageModules (packageBody package))
-  . withPrelude (packagePrelude (packageBody package))
-  $ \ preludeEnv
-  ->  raiseHandler (runModules (runTermEvaluator . evalModule preludeEnv))
-    . traverse (uncurry (evaluateEntryPoint preludeEnv))
-    $ ModuleTable.toPairs (packageEntryPoints (packageBody package))
-  where
-        evalModule preludeEnv m
-          = runInModule preludeEnv (moduleInfo m)
-          . analyzeModule (subtermRef . moduleBody)
-          $ evalTerm <$> m
-        evalTerm term = Subterm term (TermEvaluator (address =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
+evaluate :: ( AbstractValue address value inner
+            , Addressable address (Reader ModuleInfo ': effects)
+            , Declarations term
+            , Evaluatable (Base term)
+            , Foldable (Cell address)
+            , FreeVariables term
+            , HasPrelude lang
+            , Member Fresh effects
+            , Member (Modules address) effects
+            , Member (State (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+            , Member (Reader PackageInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (AddressError address value)) effects
+            , Member (Resumable (EnvironmentError address)) effects
+            , Member (Resumable EvalError) effects
+            , Member (Resumable ResolutionError) effects
+            , Member (Resumable (Unspecialized value)) effects
+            , Member (State (Heap address (Cell address) value)) effects
+            , Member Trace effects
+            , Recursive term
+            , Reducer value (Cell address value)
+            , ValueRoots address value
+            , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
+            )
+         => proxy lang
+         -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
+         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
+         -> [Module term]
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
+evaluate lang analyzeModule analyzeTerm modules = do
+  (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
+    defineBuiltins
+    definePrelude lang
+    box unit
+  foldr (run preludeEnv) get modules
+  where run preludeEnv m rest = do
+          evaluated <- coerce
+            (runInModule preludeEnv (moduleInfo m))
+            (analyzeModule (subtermRef . moduleBody)
+            (evalTerm <$> m))
+          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
+          modify' (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| []))
+          rest
+
+        evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
 
         runInModule preludeEnv info
           = runReader info
-          . raiseHandler runAllocator
-          . raiseHandler (runEnv preludeEnv)
-          . raiseHandler runReturn
-          . raiseHandler runLoopControl
-
-        evaluateEntryPoint :: Environment address -> ModulePath -> Maybe Name -> TermEvaluator term address value inner'' (address, Environment address)
-        evaluateEntryPoint preludeEnv m sym = runInModule preludeEnv (ModuleInfo m) . TermEvaluator $ do
-          addr <- box unit -- TODO don't *always* allocate - use maybeM instead
-          (ptr, env) <- fromMaybe (addr, emptyEnv) <$> require m
-          bindAll env
-          maybe (pure ptr) ((`call` []) <=< deref <=< variable) sym
-
-        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule emptyEnv)) $ do
-          (_, builtinsEnv) <- runInModule emptyEnv moduleInfoFromCallStack (TermEvaluator (defineBuiltins *> box unit))
-          second (mergeEnvs builtinsEnv) <$> evalModule builtinsEnv prelude
-
-        withPrelude Nothing f = f emptyEnv
-        withPrelude (Just prelude) f = do
-          (_, preludeEnv) <- evalPrelude prelude
-          f preludeEnv
+          . runAllocator
+          . runEnv preludeEnv
+          . runReturn
+          . runLoopControl
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
+
+
+-- Preludes
+
+class HasPrelude (language :: Language) where
+  definePrelude :: ( AbstractValue address value effects
+                   , HasCallStack
+                   , Member (Allocator address value) effects
+                   , Member (Env address) effects
+                   , Member Fresh effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (EnvironmentError address)) effects
+                   , Member Trace effects
+                   )
+                => proxy language
+                -> Evaluator address value effects ()
+  definePrelude _ = pure ()
+
+instance HasPrelude 'Go
+instance HasPrelude 'Haskell
+instance HasPrelude 'Java
+instance HasPrelude 'JavaScript
+instance HasPrelude 'PHP
+
+builtInPrint :: ( AbstractIntro value
+                , AbstractFunction address value effects
+                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Env address) effects, Member (Allocator address value) effects)
+             => Name
+             -> Evaluator address value effects address
+builtInPrint v = do
+  print <- variable "__semantic_print" >>= deref
+  void $ call print [variable v]
+  box unit
+
+instance HasPrelude 'Python where
+  definePrelude _ =
+    define "print" (lambda builtInPrint)
+
+instance HasPrelude 'Ruby where
+  definePrelude _ = do
+    define "puts" (lambda builtInPrint)
+
+    defineClass "Object" [] $ do
+      define "inspect" (lambda (const (box (string "<object>"))))
+
+instance HasPrelude 'TypeScript
+  -- FIXME: define console.log using __semantic_print
 
 
 -- Effects
