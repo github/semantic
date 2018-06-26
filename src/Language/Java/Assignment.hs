@@ -333,6 +333,7 @@ type' =  choice [
      , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
+     , makeTerm <$> symbol ScopedTypeIdentifier <*> children (Expression.MemberAccess <$> term type' <*> identifier')
      , wildcard
      , identifier
      , generic
