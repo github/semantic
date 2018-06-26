@@ -177,3 +177,13 @@ instance Show1 SpreadParameter where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for SpreadParameter
 instance Evaluatable SpreadParameter
+
+data StaticInitializer a = StaticInitializer { staticInitializerBlock :: !a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+
+instance Eq1 StaticInitializer where liftEq = genericLiftEq
+instance Ord1 StaticInitializer where liftCompare = genericLiftCompare
+instance Show1 StaticInitializer where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable StaticInitializer

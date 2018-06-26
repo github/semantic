@@ -55,6 +55,7 @@ type Syntax =
    , Java.Syntax.New
    , Java.Syntax.Package
    , Java.Syntax.SpreadParameter
+   , Java.Syntax.StaticInitializer
    , Java.Syntax.Synchronized
    , Java.Syntax.TypeParameter
    , Java.Syntax.TypeWithModifiers
@@ -172,6 +173,7 @@ expressionChoices =
   , string
   , super
   , switch
+  , staticInitializer
   , synchronized
   , ternary
   , this
@@ -256,10 +258,9 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many m
     makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers <> typeParams) identifier (maybeToList superClass <> superInterfaces) -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
     superClass = symbol Superclass *> children type'
--- TODO: superclass
---       need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
---       optional, when we have a single term
---       superInterfaces is also optional but since it produces a list, lists already have an empty value so we don't need to wrap it up in a maybe to get an empty value
+
+staticInitializer :: Assignment
+staticInitializer = makeTerm <$> symbol Grammar.StaticInitializer <*> children (Java.Syntax.StaticInitializer <$> block)
 
 fieldDeclaration :: Assignment
 fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
@@ -300,19 +301,9 @@ interface :: Assignment
 interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> annotationType)
   where
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
-<<<<<<< HEAD
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> (extends <|> pure []) <*> interfaceBody)
     makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> pure [] <*> annotationTypeBody)
-||||||| merged common ancestors
-    normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
-    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
-    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
-=======
-    normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
-    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers <> typeParams) identifier
-    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
->>>>>>> master
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
     extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))
