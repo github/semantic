@@ -4,7 +4,6 @@ module Control.Abstract.Evaluator.Spec
 , SpecEff(..)
 ) where
 
-import Analysis.Abstract.Evaluating (evaluating)
 import Control.Abstract
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
@@ -30,14 +29,15 @@ spec = parallel $ do
 
 evaluate
   = runM
-  . evaluating @Precise @Val
-  . runReader (PackageInfo (name "test") Nothing mempty)
+  . runState (lowerBound @(Heap Precise Latest Val))
+  . runFresh 0
+  . runReader (PackageInfo (name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . fmap reassociate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . runAllocator
+  . runAllocator @Precise @_ @Val
   . (>>= deref . fst)
   . runEnv lowerBound
   . runReturn
@@ -59,7 +59,6 @@ newtype SpecEff a = SpecEff
                        , Reader PackageInfo
                        , Fresh
                        , State (Heap Precise Latest Val)
-                       , State (ModuleTable (Maybe (Precise, Environment Precise)))
                        , IO
                        ] a
   }

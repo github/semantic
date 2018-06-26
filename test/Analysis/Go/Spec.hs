@@ -2,6 +2,7 @@ module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
+import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
 import qualified Language.Go.Assignment as Go
 import SpecHelpers
@@ -9,20 +10,24 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "evaluates Go" $ do
+  describe "Go" $ do
     it "imports and wildcard imports" $ do
-      ((Right [(_, env)], state), _) <- evaluate "main.go"
-      Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
-
-      (derefQName (heap state) ("foo" :| []) env >>= deNamespace) `shouldBe` Just ("foo",  ["New"])
+      ((res, heap), _) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      case ModuleTable.lookup "main.go" <$> res of
+        Right (Just (Module _ (addr, env) :| [])) -> do
+          Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
+          (derefQName heap ("foo" :| []) env >>= deNamespace) `shouldBe` Just ("foo",  ["New"])
+        other -> expectationFailure (show other)
 
     it "imports with aliases (and side effects only)" $ do
-      ((Right [(_, env)], state), _) <- evaluate "main1.go"
-      Env.names env `shouldBe` [ "f", "main" ]
-
-      (derefQName (heap state) ("f" :| []) env >>= deNamespace) `shouldBe` Just ("f",  ["New"])
+      ((res, heap), _) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      case ModuleTable.lookup "main1.go" <$> res of
+        Right (Just (Module _ (addr, env) :| [])) -> do
+          Env.names env `shouldBe` [ "f", "main" ]
+          (derefQName heap ("f" :| []) env >>= deNamespace) `shouldBe` Just ("f",  ["New"])
+        other -> expectationFailure (show other)
 
   where
     fixtures = "test/fixtures/go/analysis/"
-    evaluate entry = evalGoProject (fixtures <> entry)
-    evalGoProject path = testEvaluating <$> evaluateProject (Proxy :: Proxy 'Language.Go) goParser Language.Go path
+    evaluate = evalGoProject . map (fixtures <>)
+    evalGoProject = testEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go) goParser Language.Go

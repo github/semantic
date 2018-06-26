@@ -9,7 +9,6 @@ data Project = Project
   { projectRootDir     :: FilePath
   , projectFiles       :: [File]
   , projectLanguage    :: Language
-  , projectEntryPoints :: [File]
   , projectExcludeDirs :: [FilePath]
   }
   deriving (Eq, Ord, Show)
