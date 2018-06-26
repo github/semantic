@@ -19,6 +19,8 @@ module Semantic.Graph
 , resumingEnvironmentError
 ) where
 
+import Prelude hiding (readFile)
+
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Control.Monad.Effect (reinterpret)
@@ -177,7 +179,7 @@ parsePackage :: (Member (Distribute WrappedTask) effs, Member Resolution effs, M
              -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
 parsePackage parser project@Project{..} = do
-  p <- parseModules parser
+  p <- parseModules parser project
   resMap <- Task.resolutionMap project
   let pkg = Package.fromModules n p resMap
   pkg <$ trace ("project: " <> show (() <$ pkg))
@@ -187,7 +189,7 @@ parsePackage parser project@Project{..} = do
 
     -- | Parse all files in a project into 'Module's.
     parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser Project{..} = distributeFor projectFiles (WrapTask . parseModule parser (Just projectRootDir))
+    parseModules parser p@Project{..} = distributeFor (projectFiles p) (WrapTask . parseModule p parser)
 
 -- | Parse a file into a 'Module'.
 parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)

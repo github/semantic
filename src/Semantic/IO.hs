@@ -106,7 +106,8 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
       else fromMaybe (takeDirectory path) maybeRoot
 
   paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
-  pure $ Project rootDir (toFile <$> paths) lang excludeDirs
+  blobs <- liftIO $ traverse (readBlobFromPath . toFile) paths
+  pure $ Project rootDir blobs lang excludeDirs
   where
     toFile path = File path lang
     exts = extensionsForLanguage lang
