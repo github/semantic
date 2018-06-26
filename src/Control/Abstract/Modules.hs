@@ -9,7 +9,6 @@ module Control.Abstract.Modules
 , runModules
 , LoadError(..)
 , moduleNotFound
-, resumeLoadError
 , runLoadError
 , runLoadErrorWith
 , ResolutionError(..)
@@ -132,9 +131,6 @@ instance Eq1 (LoadError address value) where
 
 moduleNotFound :: forall address value effects . Member (Resumable (LoadError address value)) effects => ModulePath -> Evaluator address value effects (Maybe (Environment address, address))
 moduleNotFound = throwResumable . ModuleNotFound @address @value
-
-resumeLoadError :: Member (Resumable (LoadError address value)) effects => Evaluator address value effects a -> (forall resume . LoadError address value resume -> Evaluator address value effects resume) -> Evaluator address value effects a
-resumeLoadError = catchResumable
 
 runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (LoadError address value) ': effects) a -> m address value effects (Either (SomeExc (LoadError address value)) a)
 runLoadError = runResumable
