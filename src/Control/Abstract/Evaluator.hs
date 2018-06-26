@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, LambdaCase, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
