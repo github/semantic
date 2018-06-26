@@ -121,8 +121,7 @@ runImportGraph lang (package :: Package term)
   -- Optimization for the common (when debugging) case of one-and-only-one module.
   | [m :| []] <- toList (packageModules package) = vertex m <$ trace ("single module, skipping import graph computation for " <> modulePath (moduleInfo m))
   | otherwise =
-  let analyzeTerm = id
-      analyzeModule = graphingModuleInfo
+  let analyzeModule = graphingModuleInfo
       extractGraph (((_, graph), _), _) = do
         info <- graph
         maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
@@ -145,7 +144,7 @@ runImportGraph lang (package :: Package term)
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule analyzeTerm (ModuleTable.toPairs (packageModules package) >>= toList . snd))
+  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd))
 
 newtype ImportGraphEff term address a = ImportGraphEff
   { runImportGraphEff :: Eff '[ LoopControl address
