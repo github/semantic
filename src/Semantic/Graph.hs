@@ -169,4 +169,4 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err
 resumingEnvironmentError :: (AbstractHole address, Effects effects) => Evaluator address value (Resumable (EnvironmentError address) ': effects) a -> Evaluator address value effects ([Name], a)
 resumingEnvironmentError
   = runState []
-  . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)
+  . reinterpret (\ (Throw (FreeVariable name)) -> modify' (name :) $> hole)
