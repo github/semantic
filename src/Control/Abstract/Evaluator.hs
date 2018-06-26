@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, LambdaCase, KindSignatures, RankNTypes, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
@@ -16,6 +16,7 @@ module Control.Abstract.Evaluator
 
 import Control.Monad.Effect           as X
 import Control.Monad.Effect.Fresh     as X
+import qualified Control.Monad.Effect.Exception as Exc
 import qualified Control.Monad.Effect.Internal as Eff
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X
@@ -54,16 +55,12 @@ catchReturn :: (Member (Return address) effects, Effectful (m address value)) =>
 catchReturn m = send (CatchReturn (lowerEff m) (\ ret -> pure ret))
 
 runReturn :: (Effectful (m address value), Effects effects) => m address value (Return address ': effects) address -> m address value effects address
-runReturn = Eff.raiseHandler (fmap (either id id) . go)
-  where go :: Effects effects => Eff (Return address ': effects) a -> Eff effects (Either address a)
-        go (Eff.Return a) = pure (Right a)
-        go (Effect (Return a) k) = go (k a)
-        go (Effect (CatchReturn a h) k) = do
-          a' <- go a
-          case a' of
-            Left e    -> go (h e >>= k)
-            Right a'' -> go (k a'')
-        go (Other u k) = liftStatefulHandler (Right ()) (either (pure . Left) go) u k
+runReturn = Eff.raiseHandler (fmap (either id id) . Exc.runError . handleReturn)
+
+handleReturn :: Effects effects => Eff (Return address ': effects) a -> Eff (Exc address ': effects) a
+handleReturn = reinterpret $ \case
+  Return a -> Exc.throwError a
+  CatchReturn a h -> Exc.catchError (handleReturn a) (handleReturn . h)
 
 
 -- | Effects for control flow around loops (breaking and continuing).
