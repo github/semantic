@@ -9,12 +9,10 @@ module SpecHelpers
 , derefQName
 , verbatim
 , TermEvaluator(..)
-, TestEff(..)
 , Verbatim(..)
+, toList
 ) where
 
-import Analysis.Abstract.Evaluating
-import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract
 import Control.Arrow ((&&&))
 import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
@@ -24,6 +22,7 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
+import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
 import Data.Abstract.Value (Value(..), ValueError, runValueError)
@@ -33,6 +32,7 @@ import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
+import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
@@ -81,76 +81,51 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-testEvaluating :: TermEvaluator term Precise
-                    Val
-                    '[ Resumable (ValueError Precise TestEff)
-                     , Resumable (AddressError Precise Val)
-                     , Resumable EvalError, Resumable (EnvironmentError Precise)
-                     , Resumable ResolutionError
-                     , Resumable (Unspecialized Val)
-                     , Resumable (LoadError Precise Val)
-                     , Fresh
-                     , State (Heap Precise Latest Val)
-                     , State (ModuleTable (Maybe (Environment Precise, Precise)))
-                     , Trace
-                     ]
-                   [(Environment Precise, Precise)]
-               -> ( [String]
-                  , ( EvaluatingState Precise Val
-                    , Either
-                      (SomeExc
-                         (Data.Sum.Sum
-                          '[ ValueError Precise TestEff
-                           , AddressError Precise Val
-                           , EvalError
-                           , EnvironmentError Precise
-                           , ResolutionError
-                           , Unspecialized Val
-                           , LoadError Precise Val
-                           ]))
-                      [(Environment Precise, Value Precise TestEff)]))
+type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
+                              , Resumable (AddressError Precise Val)
+                              , Resumable ResolutionError
+                              , Resumable EvalError
+                              , Resumable (EnvironmentError Precise)
+                              , Resumable (Unspecialized Val)
+                              , Resumable (LoadError Precise)
+                              , Trace
+                              , Fresh
+                              , State (Heap Precise Latest Val)
+                              , Lift IO
+                              ]
+type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
+                             , AddressError Precise Val
+                             , ResolutionError
+                             , EvalError
+                             , EnvironmentError Precise
+                             , Unspecialized Val
+                             , LoadError Precise
+                             ]
+testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
+               -> IO
+                 ( [String]
+                 , ( Heap Precise Latest Val
+                   , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
+                            (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
+                   )
+                 )
 testEvaluating
-  = run
+  = runM
+  . fmap (\ (heap, (traces, res)) -> (traces, (heap, res)))
+  . runState lowerBound
+  . runFresh 0
   . runReturningTrace
-  . evaluating
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runResolutionError
   . runEnvironmentError
   . runEvalError
+  . runResolutionError
   . runAddressError
-  . runValueError
-  . (>>= traverse deref1)
-  . runTermEvaluator @_ @_ @Val
+  . runValueError @_ @Precise @(UtilEff Precise)
 
-type Val = Value Precise TestEff
-newtype TestEff a = TestEff
-  { runTestEff :: Eff '[ Exc (LoopControl Precise)
-                       , Exc (Return Precise)
-                       , Env Precise
-                       , Allocator Precise Val
-                       , Reader ModuleInfo
-                       , Modules Precise Val
-                       , Reader Span
-                       , Reader PackageInfo
-                       , Resumable (ValueError Precise TestEff)
-                       , Resumable (AddressError Precise Val)
-                       , Resumable EvalError
-                       , Resumable (EnvironmentError Precise)
-                       , Resumable ResolutionError
-                       , Resumable (Unspecialized Val)
-                       , Resumable (LoadError Precise Val)
-                       , Fresh
-                       , State (Heap Precise Latest Val)
-                       , State (ModuleTable (Maybe (Environment Precise, Precise)))
-                       , Trace
-                       ] a
-  }
+type Val = Value Precise (UtilEff Precise)
 
-deref1 (env, ptr) = runAllocator $ do
-  val <- deref ptr
-  pure (env, val)
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
 deNamespace (Namespace name scope) = Just (name, Env.names scope)

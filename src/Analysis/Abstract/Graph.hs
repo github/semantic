@@ -2,6 +2,7 @@
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
+, moduleVertex
 , style
 , appendGraph
 , variableDefinition
@@ -10,6 +11,7 @@ module Analysis.Abstract.Graph
 , graphingTerms
 , graphingPackages
 , graphingModules
+, graphingModuleInfo
 , graphing
 ) where
 
@@ -67,6 +69,7 @@ graphingTerms recur term@(In _ syntax) = do
     _ -> pure ()
   recur term
 
+-- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph Vertex)) effects
                     )
@@ -74,20 +77,39 @@ graphingPackages :: ( Member (Reader PackageInfo) effects
                  -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
 
--- | Add vertices to the graph for evaluated modules and the packages containing them.
+-- | Add vertices to the graph for imported modules.
 graphingModules :: forall term address value effects a
                 .  ( Effects effects
-                   , Member (Modules address value) effects
+                   , Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph Vertex)) effects
                    )
-               => SubtermAlgebra Module term (TermEvaluator term address value effects a)
-               -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
-graphingModules recur m = eavesdrop @(Modules address value) (\ m -> case m of
-  Load   path -> moduleInclusion (moduleVertex (ModuleInfo path))
-  Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path))
-  _ -> pure ())
-  (recur m)
+                => SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+graphingModules recur m = do
+  appendGraph (vertex (moduleVertex (moduleInfo m)))
+  eavesdrop @(Modules address) (\ m -> case m of
+    Load   path -> moduleInclusion (moduleVertex (ModuleInfo path))
+    Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path))
+    _ -> pure ())
+    (recur m)
+
+-- | Add vertices to the graph for imported modules.
+graphingModuleInfo :: forall term address value effects a
+                   .  ( Effects effects
+                      , Member (Modules address) effects
+                      , Member (Reader ModuleInfo) effects
+                      , Member (State (Graph ModuleInfo)) effects
+                      )
+                   => SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                   -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+graphingModuleInfo recur m = do
+  appendGraph (vertex (moduleInfo m))
+  eavesdrop @(Modules address) (\ eff -> case eff of
+    Load   path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Lookup path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    _ -> pure ())
+    (recur m)
 
 
 packageVertex :: PackageInfo -> Vertex
@@ -130,7 +152,7 @@ variableDefinition name = do
   graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
   appendGraph (vertex (Variable (formatName name)) `connect` graph)
 
-appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
+appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m effects ()
 appendGraph = modify' . (<>)
 
 
