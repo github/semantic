@@ -57,6 +57,7 @@ graphingTerms :: ( Element Syntax.Identifier syntax
                  , Member (Reader ModuleInfo) effects
                  , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
+                 , Member Trace effects
                  , term ~ Term (Sum syntax) ann
                  )
               => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
@@ -64,6 +65,7 @@ graphingTerms :: ( Element Syntax.Identifier syntax
 graphingTerms recur term@(In _ syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
+      trace ("Examining identifier " <> show name)
       moduleInclusion (Variable (formatName name))
       variableDefinition name
     _ -> pure ()
