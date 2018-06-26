@@ -2,6 +2,8 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
+import Prelude hiding (readFile)
+
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
@@ -18,7 +20,7 @@ import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
-import           Data.Project
+import           Data.Project hiding (readFile)
 import           Data.Sum (weaken)
 import           Data.Term
 import           Language.Haskell.HsColour
@@ -98,7 +100,8 @@ typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Langu
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
-  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) (flip File lang <$> paths) lang [])
+  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
+  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraph proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
