@@ -75,7 +75,7 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
-                     , Data.Graph.AdjList
+                     , Data.Graph.Adjacency.Import
                      , Data.Graph.Vertex
                      , Data.JSON.Fields
                      , Data.Language

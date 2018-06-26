@@ -55,7 +55,7 @@ message ImportGraphRequest {
 }
 
 message ImportGraphResponse {
-  AdjList graph = 1;
+  ImportGraph graph = 1;
   DebugInfo error_info = 2;
 }
 
