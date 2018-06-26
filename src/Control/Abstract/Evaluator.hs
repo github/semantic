@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, LambdaCase, KindSignatures, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, LambdaCase, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
@@ -54,33 +54,23 @@ runReturn = Eff.raiseHandler (fmap (either unReturn id) . runError)
 
 
 -- | Effects for control flow around loops (breaking and continuing).
-data LoopControl address (m :: * -> *) resume where
-  Break    :: address -> LoopControl address m address
-  Continue :: address -> LoopControl address m address
+data LoopControl address
+  = Break    { unLoopControl :: address }
+  | Continue { unLoopControl :: address }
+  deriving (Eq, Ord, Show)
 
-instance Effect (LoopControl address) where
-  handleState c dist (Request (Break value) k) = Request (Break value) (dist . (<$ c) . k)
-  handleState c dist (Request (Continue value) k) = Request (Continue value) (dist . (<$ c) . k)
-
-throwBreak :: Member (LoopControl address) effects
+throwBreak :: Member (Exc (LoopControl address)) effects
            => address
            -> Evaluator address value effects address
-throwBreak = send . Break
+throwBreak = throwError . Break
 
-throwContinue :: Member (LoopControl address) effects
+throwContinue :: Member (Exc (LoopControl address)) effects
               => address
               -> Evaluator address value effects address
-throwContinue = send . Continue
+throwContinue = throwError . Continue
 
-catchLoopControl :: (Member (LoopControl address) effects, Effectful (m address value)) => m address value effects a -> (forall x . LoopControl address (Eff effects) x -> m address value effects a) -> m address value effects a
-catchLoopControl action handler = Eff.raiseHandler (interpose (\ control _ -> Eff.lowerEff (handler control))) action
+catchLoopControl :: (Member (Exc (LoopControl address)) effects, Effectful (m address value)) => m address value effects a -> (LoopControl address -> m address value effects a) -> m address value effects a
+catchLoopControl = catchError
 
-runLoopControl :: (Effectful (m address value), Effects effects) => m address value (LoopControl address ': effects) address -> m address value effects address
-runLoopControl = Eff.raiseHandler go . (`catchLoopControl` (\ control -> case control of
-  Break    address -> Eff.raiseEff (pure address)
-  Continue address -> Eff.raiseEff (pure address)))
-  where go :: Effects effects => Eff (LoopControl address ': effects) a -> Eff effects a
-        go (Eff.Return a) = pure a
-        go (Effect (Break a) k) = go (k a)
-        go (Effect (Continue a) k) = go (k a)
-        go (Other u k) = liftHandler go u k
+runLoopControl :: (Effectful (m address value), Effects effects) => m address value (Exc (LoopControl address) ': effects) address -> m address value effects address
+runLoopControl = Eff.raiseHandler (fmap (either unLoopControl id) . runError)

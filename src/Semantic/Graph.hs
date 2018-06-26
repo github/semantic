@@ -70,7 +70,7 @@ runGraph graphType includePackages project
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
 newtype GraphEff address a = GraphEff
-  { runGraphEff :: Eff '[ LoopControl address
+  { runGraphEff :: Eff '[ Exc (LoopControl address)
                         , Exc (Return address)
                         , Env address
                         , Allocator address (Value address (GraphEff address))

@@ -126,7 +126,7 @@ testEvaluating
 
 type Val = Value Precise TestEff
 newtype TestEff a = TestEff
-  { runTestEff :: Eff '[ LoopControl Precise
+  { runTestEff :: Eff '[ Exc (LoopControl Precise)
                        , Exc (Return Precise)
                        , Env Precise
                        , Allocator Precise Val
