@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
@@ -38,28 +38,32 @@ deriving instance Member NonDet effects => Alternative (Evaluator address value 
 
 -- | An effect for explicitly returning out of a function/method body.
 data Return address (m :: * -> *) resume where
-  Return :: address -> Return address m address
-
-deriving instance Eq address   => Eq   (Return address m a)
-deriving instance Show address => Show (Return address m a)
+  Return      :: address -> Return address m address
+  CatchReturn :: m a -> (address -> m a) -> Return address m a
 
 instance Effect (Return address) where
   handleState c dist (Request (Return value) k) = Request (Return value) (dist . (<$ c) . k)
+  handleState c dist (Request (CatchReturn a h) k) = Request (CatchReturn (dist (a <$ c)) (dist . (<$ c) . h)) (dist . fmap k)
 
 earlyReturn :: Member (Return address) effects
             => address
             -> Evaluator address value effects address
 earlyReturn = send . Return
 
-catchReturn :: forall m address value effects . (Member (Return address) effects, Effectful (m address value)) => m address value effects address -> m address value effects address
-catchReturn = Eff.raiseHandler (interpose @(Return address) (\ (Return ret) _ -> pure ret))
+catchReturn :: (Member (Return address) effects, Effectful (m address value)) => m address value effects address -> m address value effects address
+catchReturn m = send (CatchReturn (lowerEff m) (\ ret -> pure ret))
 
 runReturn :: (Effectful (m address value), Effects effects) => m address value (Return address ': effects) address -> m address value effects address
-runReturn = Eff.raiseHandler go . catchReturn
-  where go :: Effects effects => Eff (Return address ': effects) a -> Eff effects a
-        go (Eff.Return a) = pure a
+runReturn = Eff.raiseHandler (fmap (either id id) . go)
+  where go :: Effects effects => Eff (Return address ': effects) a -> Eff effects (Either address a)
+        go (Eff.Return a) = pure (Right a)
         go (Effect (Return a) k) = go (k a)
-        go (Other u k) = liftHandler go u k
+        go (Effect (CatchReturn a h) k) = do
+          a' <- go a
+          case a' of
+            Left e    -> go (h e >>= k)
+            Right a'' -> go (k a'')
+        go (Other u k) = liftStatefulHandler (Right ()) (either (pure . Left) go) u k
 
 
 -- | Effects for control flow around loops (breaking and continuing).
