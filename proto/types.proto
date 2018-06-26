@@ -38,8 +38,7 @@ message Edge { uint64 edgeFrom = 1;
 message Project { string projectRootDir = 1;
                   repeated Blob projectBlobs = 2;
                   Language projectLanguage = 3;
-                  repeated string projectEntryPaths = 4 [packed = false];
-                  repeated string projectExcludeDirs = 5 [packed = false];
+                  repeated string projectExcludeDirs = 4 [packed = false];
                 }
 message Array { repeated Term arrayElements = 1;
               }

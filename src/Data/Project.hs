@@ -9,7 +9,6 @@ module Data.Project (
   , fromPB
   , projectExtensions
   , projectName
-  , projectEntryPoints
   , projectFiles
   , readFile
   -- * Files
@@ -70,13 +69,6 @@ projectName = T.pack . dropExtensions . takeFileName . projectRootDir
 
 projectExtensions :: Project -> [String]
 projectExtensions = extensionsForLanguage . projectLanguage
-
-projectEntryPoints :: Project -> [File]
-projectEntryPoints Project {..} = foldr go [] projectBlobs
-  where go b acc =
-          if blobPath b `elem` projectEntryPaths
-          then toFile b : acc
-          else acc
 
 projectFiles :: Project -> [File]
 projectFiles = fmap toFile . projectBlobs
