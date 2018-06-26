@@ -16,9 +16,6 @@
 [submodule "vendor/fastsum"]
 	path = vendor/fastsum
 	url = git@github.com:patrickt/fastsum.git
-[submodule "vendor/proto3-wire"]
-	path = vendor/proto3-wire
-	url = https://github.com/joshvera/proto3-wire
-[submodule "vendor/proto3-suite"]
-	path = vendor/proto3-suite
-	url = https://github.com/joshvera/proto3-suite
+[submodule "vendor/semilattices"]
+	path = vendor/semilattices
+	url = https://github.com/robrix/semilattices.git

@@ -63,6 +63,9 @@ module Assigning.Assignment
 ( Assignment
 , Location
 -- Combinators
+, branchNode
+, leafNode
+, toTerm
 , Alternative(..)
 , MonadError(..)
 , MonadFail(..)
@@ -109,6 +112,21 @@ import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
+
+-- | Match a branch node, matching its children with the supplied 'Assignment' & returning the result.
+branchNode :: (Enum grammar, Ix grammar) => grammar -> Assignment ast grammar a -> Assignment ast grammar a
+branchNode sym child = symbol sym *> children child
+
+-- | Match a leaf node, returning the corresponding 'Text'.
+leafNode :: (Enum grammar, Ix grammar) => grammar -> Assignment ast grammar Text
+leafNode sym = symbol sym *> source
+
+-- | Wrap an 'Assignment' producing @syntax@ up into an 'Assignment' producing 'Term's.
+toTerm :: Element syntax syntaxes
+       => Assignment ast grammar (syntax (Term (Sum syntaxes) (Record Location)))
+       -> Assignment ast grammar         (Term (Sum syntaxes) (Record Location))
+toTerm syntax = termIn <$> location <*> (inject <$> syntax)
+
 
 -- | Assignment from an AST with some set of 'symbol's onto some other value.
 --
@@ -225,7 +243,7 @@ nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ _ (Tracing _ assignment) -> case assignment of
-  Choose table _ _ -> Table.tableAddresses table
+  Choose table _ _ -> Table.tableAddresses table
   Label child _ -> firstSet child
   _ -> []) . ([] <$)
 

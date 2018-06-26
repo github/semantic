@@ -9,7 +9,6 @@ import Control.Abstract
 import Data.Abstract.Cache
 import Data.Abstract.Module
 import Data.Abstract.Ref
-import Data.Semilattice.Lower
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
@@ -93,7 +92,7 @@ convergingModules :: ( AbstractValue address value effects
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
-  cache <- converge lowerBound (\ prevCache -> isolateCache $ raiseHandler locally $ do
+  cache <- converge lowerBound (\ prevCache -> isolateCache . raiseHandler locally $ do
     TermEvaluator (putHeap (configurationHeap        c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $

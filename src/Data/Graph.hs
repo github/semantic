@@ -1,33 +1,93 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Data.Graph
 ( Graph(..)
-, Class.overlay
-, Class.connect
-, Class.vertex
+, overlay
+, connect
+, vertex
 , Lower(..)
 , simplify
+, topologicalSort
 ) where
 
 import qualified Algebra.Graph as G
+import qualified Algebra.Graph.AdjacencyMap as A
+import Algebra.Graph.Class (connect, overlay, vertex)
 import qualified Algebra.Graph.Class as Class
+import Control.Monad.Effect
+import Control.Monad.Effect.State
 import Data.Aeson
-import Data.Semilattice.Lower
+import qualified Data.Set as Set
 import Prologue
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
-newtype Graph vertex = Graph (G.Graph vertex)
-  deriving (Eq, Foldable, Functor, Class.Graph, Show, Class.ToGraph, Traversable)
+newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
+  deriving (Alternative, Applicative, Eq, Foldable, Functor, Class.Graph, Monad, Show, Class.ToGraph, Traversable)
 
 
 simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
 
 
+-- | Sort a graph’s vertices topologically.
+--
+-- >>> topologicalSort (Class.path "ab")
+-- "ba"
+--
+-- >>> topologicalSort (Class.path "abc")
+-- "cba"
+--
+-- >>> topologicalSort ((vertex 'a' `connect` vertex 'b') `connect` vertex 'c')
+-- "cba"
+--
+-- >>> topologicalSort (vertex 'a' `connect` (vertex 'b' `connect` vertex 'c'))
+-- "cba"
+--
+-- >>> topologicalSort ((vertex 'a' `connect` vertex 'b') <> (vertex 'a' `connect` vertex 'c'))
+-- "cba"
+--
+-- >>> topologicalSort (Class.path "abd" <> Class.path "acd")
+-- "dcba"
+--
+-- >>> topologicalSort (Class.path "aba")
+-- "ab"
+topologicalSort :: forall v . Ord v => Graph v -> [v]
+topologicalSort = go . toAdjacencyMap . G.transpose . unGraph
+  where go :: A.AdjacencyMap v -> [v]
+        go graph
+          = visitedOrder . snd
+          . run
+          . runState (Visited lowerBound [])
+          . traverse_ visit
+          . A.vertexList
+          $ graph
+          where visit :: v -> Eff '[State (Visited v)] ()
+                visit v = do
+                  isMarked <- Set.member v . visitedVertices <$> get
+                  if isMarked then
+                    pure ()
+                  else do
+                    modify' (extendVisited (Set.insert v))
+                    traverse_ visit (Set.toList (A.postSet v graph))
+                    modify' (extendOrder (v :))
+
+data Visited v = Visited { visitedVertices :: !(Set v), visitedOrder :: [v] }
+
+extendVisited :: (Set v -> Set v) -> Visited v -> Visited v
+extendVisited f (Visited a b) = Visited (f a) b
+
+extendOrder :: ([v] -> [v]) -> Visited v -> Visited v
+extendOrder f (Visited a b) = Visited a (f b)
+
+
+toAdjacencyMap :: Ord v => G.Graph v -> A.AdjacencyMap v
+toAdjacencyMap = Class.toGraph
+
+
 instance Lower (Graph vertex) where
   lowerBound = Class.empty
 
 instance Semigroup (Graph vertex) where
-  (<>) = Class.overlay
+  (<>) = overlay
 
 instance Monoid (Graph vertex) where
   mempty = Class.empty

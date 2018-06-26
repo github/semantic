@@ -16,7 +16,7 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: ( Member (Modules address value) effects
+resolveRubyName :: ( Member (Modules address) effects
                    , Member (Resumable ResolutionError) effects
                    )
                 => Text
@@ -28,7 +28,7 @@ resolveRubyName name = do
   maybeM (throwResumable $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: ( Member (Modules address value) effects
+resolveRubyPath :: ( Member (Modules address) effects
                    , Member (Resumable ResolutionError) effects
                    )
                 => Text
@@ -73,14 +73,14 @@ instance Evaluatable Require where
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( AbstractValue address value effects
-             , Member (Modules address value) effects
+             , Member (Modules address) effects
              )
           => M.ModulePath
           -> Evaluator address value effects (value, Environment address)
 doRequire path = do
-  result <- join <$> lookupModule path
+  result <- lookupModule path
   case result of
-    Nothing       -> (,) (boolean True) . maybe emptyEnv snd <$> load path
+    Nothing       -> (,) (boolean True) . snd <$> load path
     Just (_, env) -> pure (boolean False, env)
 
 
@@ -102,7 +102,7 @@ instance Evaluatable Load where
 
 doLoad :: ( AbstractValue address value effects
           , Member (Env address) effects
-          , Member (Modules address value) effects
+          , Member (Modules address) effects
           , Member (Resumable ResolutionError) effects
           , Member Trace effects
           )
@@ -112,7 +112,7 @@ doLoad :: ( AbstractValue address value effects
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- maybe emptyEnv snd <$> load path'
+  importedEnv <- snd <$> load path'
   unless shouldWrap $ bindAll importedEnv
   pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 

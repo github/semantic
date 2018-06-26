@@ -31,14 +31,14 @@ module Semantic.Task
 , distributeFor
 , distributeFoldMap
 -- * Configuration
-, defaultOptions
-, configureOptionsForHandle
+, debugOptions
+, defaultConfig
 , terminalFormatter
 , logfmtFormatter
 -- * Interpreting
 , runTask
 , runTaskWithOptions
-, runTaskWithOptions'
+, runTaskWithConfig
 -- * Re-exports
 , Distribute
 , Eff
@@ -71,23 +71,20 @@ import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Prologue hiding (MonadError (..), project)
+import           Semantic.Config
 import           Semantic.Distribute
 import qualified Semantic.IO as IO
 import           Semantic.Resolution
-import           Semantic.Log
-import           Semantic.Queue
-import           Semantic.Stat as Stat
 import           Semantic.Telemetry
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
-import           System.IO (stderr)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff = Eff '[Distribute WrappedTask
                     , Task
                     , Resolution
                     , IO.Files
-                    , Reader Options
+                    , Reader Config
                     , Trace
                     , Telemetry
                     , Exc SomeException
@@ -131,20 +128,15 @@ runTask = runTaskWithOptions defaultOptions
 
 -- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> TaskEff a -> IO a
-runTaskWithOptions options task = do
-  options <- configureOptionsForHandle stderr options
-  statter <- defaultStatsClient >>= newQueue sendStat
-  logger <- newQueue logMessage options
-
-  result <- runTaskWithOptions' options logger statter task
-
-  closeQueue statter
-  closeStatClient (asyncQueueExtra statter)
-  closeQueue logger
+runTaskWithOptions opts task = do
+  config <- defaultConfig opts
+  result <- withTelemetry config $ \(TelemetryQueues logger statter _) ->
+    runTaskWithConfig config logger statter task
   either (die . displayException) pure result
 
-runTaskWithOptions' :: Options -> LogQueue -> AsyncQueue Stat StatsClient -> TaskEff a -> IO (Either SomeException a)
-runTaskWithOptions' options logger statter task = do
+-- | Execute a 'TaskEff' yielding its result value in 'IO'.
+runTaskWithConfig :: Config -> LogQueue -> StatQueue -> TaskEff a -> IO (Either SomeException a)
+runTaskWithConfig options logger statter task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
         run = runM . runError
@@ -156,7 +148,7 @@ runTaskWithOptions' options logger statter task = do
                    . runTaskF
                    . runDistribute (run . unwrapTask)
     run task
-  queue statter stat
+  queueStat statter stat
   pure result
 
 runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
@@ -173,7 +165,7 @@ data Task output where
   Serialize :: Format input -> input -> Task Builder
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
@@ -181,51 +173,49 @@ runTaskF = interpret $ \ task -> case task of
   Semantic.Task.Diff terms -> pure (diffTermPair terms)
   Render renderer input -> pure (renderer input)
   Serialize format input -> do
-    formatStyle <- asks (bool Colourful Plain . optionsEnableColour)
+    formatStyle <- asks (bool Colourful Plain . configIsTerminal)
     pure (runSerialize formatStyle format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
-logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
-logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
+logError :: Member Telemetry effs => Config -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
+logError Config{..} level blob err = writeLog level (Error.formatError configLogPrintSource configIsTerminal blob err)
 
 data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
 
 instance Exception ParserCancelled
 
-defaultTimeout :: Timeout
-defaultTimeout = Milliseconds 5000
-
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Options) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
-    time "parse.tree_sitter_ast_parse" languageTag $
-      parseToAST defaultTimeout language blob
+    time "parse.tree_sitter_ast_parse" languageTag $ do
+      config <- ask
+      parseToAST (configTreeSitterParseTimeout config) language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
   AssignmentParser parser assignment -> do
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
-      writeStat (Stat.increment "parse.parse_failures" languageTag)
+      writeStat (increment "parse.parse_failures" languageTag)
       writeLog Error "failed parsing" (("task", "parse") : blobFields)
       throwError (toException err)
-    options <- ask
+    config <- ask
     time "parse.assign" languageTag $
       case Assignment.assign blobSource assignment ast of
         Left err -> do
-          writeStat (Stat.increment "parse.assign_errors" languageTag)
-          logError options Error blob err (("task", "assign") : blobFields)
+          writeStat (increment "parse.assign_errors" languageTag)
+          logError config Error blob err (("task", "assign") : blobFields)
           throwError (toException err)
         Right term -> do
           for_ (errors term) $ \ err -> case Error.errorActual err of
               Just "ParseError" -> do
-                writeStat (Stat.increment "parse.parse_errors" languageTag)
-                logError options Warning blob err (("task", "parse") : blobFields)
+                writeStat (increment "parse.parse_errors" languageTag)
+                logError config Warning blob err (("task", "parse") : blobFields)
               _ -> do
-                writeStat (Stat.increment "parse.assign_warnings" languageTag)
-                logError options Warning blob err (("task", "assign") : blobFields)
-                when (optionsFailOnWarning options) $ throwError (toException err)
-          writeStat (Stat.count "parse.nodes" (length term) languageTag)
+                writeStat (increment "parse.assign_warnings" languageTag)
+                logError config Warning blob err (("task", "assign") : blobFields)
+                when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
+          writeStat (count "parse.nodes" (length term) languageTag)
           pure term
   MarkdownParser ->
     time "parse.cmark_parse" languageTag $

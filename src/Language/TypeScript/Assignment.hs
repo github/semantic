@@ -291,7 +291,7 @@ null' :: Assignment
 null' = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
 
 anonymousClass :: Assignment
-anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class [] <$> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractClass :: Assignment
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TypeScript.Syntax.AbstractClass <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
@@ -350,7 +350,7 @@ identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax
 
 class' :: Assignment
 class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term identifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
-  where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators ++ typeParams) expression classHeritage statements)
+  where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators <> typeParams) expression classHeritage statements)
 
 object :: Assignment
 object = makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Literal.Hash <$> manyTerm (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
@@ -460,13 +460,13 @@ methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> chi
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Declaration.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
-formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
+formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as <> [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
   where
     contextualize' (cs, formalParams) = case nonEmpty cs of
-      Just cs -> toList cs ++ formalParams
+      Just cs -> toList cs <> formalParams
       Nothing -> formalParams
     postContextualize' formalParams cs = case nonEmpty cs of
-      Just cs -> formalParams ++ toList cs
+      Just cs -> formalParams <> toList cs
       Nothing -> formalParams
 
 
@@ -573,13 +573,13 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
 classBodyStatements :: Assignment
-classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
+classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as <> [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
   where
     contextualize' (cs, formalParams) = case nonEmpty cs of
-      Just cs -> toList cs ++ formalParams
+      Just cs -> toList cs <> formalParams
       Nothing -> formalParams
     postContextualize' formalParams cs = case nonEmpty cs of
-      Just cs -> formalParams ++ toList cs
+      Just cs -> formalParams <> toList cs
       Nothing -> formalParams
 
 publicFieldDefinition :: Assignment
