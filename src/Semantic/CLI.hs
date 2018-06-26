@@ -69,7 +69,6 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
                                                  <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
-              <|> flag'                                          (Parse.runParse ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
               <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
               <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
@@ -83,7 +82,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
-    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
+    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
     graphArgumentsParser = do
       graphType <- flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
                <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")

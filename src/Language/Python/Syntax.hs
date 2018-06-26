@@ -50,7 +50,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: ( Member (Modules address value) effects
+resolvePythonModules :: ( Member (Modules address) effects
                         , Member (Reader ModuleInfo) effects
                         , Member (Resumable ResolutionError) effects
                         , Member Trace effects
@@ -113,7 +113,7 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedEnv <- maybe lowerBound snd <$> require path
+    importedEnv <- snd <$> require path
     bindAll (select importedEnv)
     rvalBox unit
     where
@@ -126,11 +126,11 @@ instance Evaluatable Import where
 evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (Allocator address value) effects
                        , Member (Env address) effects
-                       , Member (Modules address value) effects
+                       , Member (Modules address) effects
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
-  importedEnv <- maybe lowerBound snd <$> require path
+  importedEnv <- snd <$> require path
   bindAll importedEnv
   unit <$ makeNamespace name addr Nothing
 
@@ -174,7 +174,7 @@ instance Evaluatable QualifiedAliasedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
-      importedEnv <- maybe lowerBound snd <$> require path
+      importedEnv <- snd <$> require path
       bindAll importedEnv
       unit <$ makeNamespace alias addr Nothing)
 

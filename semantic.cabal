@@ -22,7 +22,6 @@ library
                        Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
@@ -76,6 +75,8 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
+                     , Data.Graph.Adjacency.Import
+                     , Data.Graph.Vertex
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
@@ -220,6 +221,7 @@ library
                      , time
                      , unix
                      , unordered-containers
+                     , vector
                      , proto3-suite
                      , proto3-wire
                      , haskell-tree-sitter

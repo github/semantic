@@ -12,11 +12,11 @@ import GHC.Stack
 import Prologue
 import System.FilePath.Posix
 
-data Module term = Module { moduleInfo :: ModuleInfo, moduleBody :: term }
+data Module body = Module { moduleInfo :: ModuleInfo, moduleBody :: body }
   deriving (Eq, Foldable, Functor, Ord, Traversable)
 
-instance Show (Module term) where
-  showsPrec _ Module{..} = shows moduleInfo
+instance Show body => Show (Module body) where
+  showsPrec d Module{..} = showsBinaryWith showsPrec showsPrec "Module" d (modulePath moduleInfo) moduleBody
 
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
@@ -32,7 +32,10 @@ moduleForBlob rootDir Blob{..} = Module info
 type ModulePath = FilePath
 
 newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
+
+instance Show ModuleInfo where
+  showsPrec d = showsUnaryWith showsPrec "ModuleInfo" d . modulePath
 
 moduleInfoFromSrcLoc :: SrcLoc -> ModuleInfo
 moduleInfoFromSrcLoc = ModuleInfo . srcLocModule
