@@ -19,14 +19,17 @@ module Semantic.Graph
 , resumingEnvironmentError
 ) where
 
+import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
+import           Data.Abstract.Cache
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
+import           Data.Abstract.Type
 import           Data.Abstract.Value (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
@@ -35,7 +38,7 @@ import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text (pack)
 import           Parsing.Parser
-import           Prologue hiding (MonadError (..))
+import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.IO (Files)
 import           Semantic.Task as Task
 
@@ -59,28 +62,31 @@ runGraph CallGraph includePackages project
     runCallGraph lang includePackages modules package
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
-newtype CallGraphEff address a = CallGraphEff
+newtype CallGraphEff term address a = CallGraphEff
   { runGraphEff :: Eff '[ LoopControl address
                         , Return address
                         , Env address
-                        , Allocator address (Value address (CallGraphEff address))
+                        , Allocator address (Value address (CallGraphEff term address))
                         , Reader ModuleInfo
                         , Modules address
                         -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
                         , State (ModuleTable (NonEmpty (Module (address, Environment address))))
                         , Reader Span
                         , Reader PackageInfo
+                        , NonDet
+                        , Reader (Cache term address (Cell address) (Value address (CallGraphEff term address)))
+                        , State (Cache term address (Cell address) (Value address (CallGraphEff term address)))
                         , State (Graph Vertex)
-                        , Resumable (ValueError address (CallGraphEff address))
-                        , Resumable (AddressError address (Value address (CallGraphEff address)))
+                        , Resumable (ValueError address (CallGraphEff term address))
+                        , Resumable (AddressError address (Value address (CallGraphEff term address)))
                         , Resumable ResolutionError
                         , Resumable EvalError
                         , Resumable (EnvironmentError address)
-                        , Resumable (Unspecialized (Value address (CallGraphEff address)))
+                        , Resumable (Unspecialized (Value address (CallGraphEff term address)))
                         , Resumable (LoadError address)
                         , Trace
                         , Fresh
-                        , State (Heap address Latest (Value address (CallGraphEff address)))
+                        , State (Heap address All (Value address (CallGraphEff term address)))
                         ] a
   }
 
@@ -105,6 +111,7 @@ runCallGraph :: ( HasField ann Span
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms
       analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
+      extractGraph :: (((a, Graph Vertex), b), c) -> Graph Vertex
       extractGraph (((_, graph), _), _) = simplify graph
       runGraphAnalysis
         = run
@@ -118,8 +125,9 @@ runCallGraph lang includePackages modules package = do
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (CallGraphEff _))
+        . runTermEvaluator @_ @_ @(Value (Hole (Located Monovariant)) (CallGraphEff _ _))
         . graphing
+        . caching @[]
         . runReader (packageInfo package)
         . runReader lowerBound
         . fmap fst
@@ -271,3 +279,9 @@ resumingEnvironmentError :: AbstractHole address => Evaluator address value (Res
 resumingEnvironmentError
   = runState []
   . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)
+
+resumingTypeError :: (Alternative (m address Type effects), Effectful (m address Type), Member Trace effects)
+                  => m address Type (Resumable TypeError ': effects) a
+                  -> m address Type effects a
+resumingTypeError = runTypeErrorWith (\err -> trace ("TypeError " <> show err) *> case err of
+  UnificationError l r -> pure l <|> pure r)
