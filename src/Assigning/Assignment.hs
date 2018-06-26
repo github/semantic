@@ -243,7 +243,7 @@ nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
 firstSet = iterFreer (\ _ (Tracing _ assignment) -> case assignment of
-  Choose table _ _ -> Table.tableAddresses table
+  Choose table _ _ -> Table.tableAddresses table
   Label child _ -> firstSet child
   _ -> []) . ([] <$)
 

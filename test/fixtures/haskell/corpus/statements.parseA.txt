@@ -34,4 +34,36 @@
             (VariableIdentifier)
             (VariableIdentifier))
           (VariableIdentifier)
-          (VariableIdentifier))))))
+          (VariableIdentifier))))
+    (TypeSignature
+      (VariableIdentifier)
+      (FunctionType
+        (Type
+          (Array
+            (Type
+              (TypeVariableIdentifier)
+              (TypeParameters)
+              (Empty)))
+          (TypeParameters)
+          (Empty))
+        (Type
+          (TypeVariableIdentifier)
+          (TypeParameters)
+          (Empty))))
+    (Function
+      (VariableIdentifier)
+      (ListConstructor)
+      (Statements
+        (App
+          (VariableIdentifier)
+          (Empty)
+          (TextElement))))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (VariableIdentifier)
+        (ConstructorOperator
+          (ConstructorSymbol))
+        (Wildcard))
+      (Statements
+        (VariableIdentifier)))))
