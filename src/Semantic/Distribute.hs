@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeOperators #-}
 module Semantic.Distribute
 ( distribute
 , distributeFor
@@ -32,8 +32,7 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 
 -- | Distribute effects run tasks concurrently.
-data Distribute task output where
-  Distribute :: task output -> Distribute task output
+newtype Distribute task output = Distribute (task output)
 
 instance Effect Distribute where
   handleState c dist (Request (Distribute task) k) = Request (Distribute (dist (task <$ c))) (dist . fmap k)
