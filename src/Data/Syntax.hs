@@ -57,7 +57,7 @@ emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
 
 -- | Catch assignment errors into an error term.
 handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location)) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
-handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
+handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))

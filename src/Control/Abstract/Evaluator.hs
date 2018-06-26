@@ -16,14 +16,14 @@ module Control.Abstract.Evaluator
 
 import Control.Monad.Effect           as X
 import Control.Monad.Effect.Fresh     as X
-import qualified Control.Monad.Effect.Exception as Exc
+import Control.Monad.Effect.Exception as X
 import qualified Control.Monad.Effect.Internal as Eff
 import Control.Monad.Effect.NonDet    as X
 import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
 import Control.Monad.Effect.State     as X
 import Control.Monad.Effect.Trace     as X
-import Prologue
+import Prologue hiding (MonadError(..))
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
 --
@@ -38,29 +38,19 @@ deriving instance Member NonDet effects => Alternative (Evaluator address value 
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-data Return address (m :: * -> *) resume where
-  Return      :: address -> Return address m address
-  CatchReturn :: m a -> (address -> m a) -> Return address m a
+newtype Return address = Return { unReturn :: address }
+  deriving (Eq, Ord, Show)
 
-instance Effect (Return address) where
-  handleState c dist (Request (Return value) k) = Request (Return value) (dist . (<$ c) . k)
-  handleState c dist (Request (CatchReturn a h) k) = Request (CatchReturn (dist (a <$ c)) (dist . (<$ c) . h)) (dist . fmap k)
-
-earlyReturn :: Member (Return address) effects
+earlyReturn :: Member (Exc (Return address)) effects
             => address
             -> Evaluator address value effects address
-earlyReturn = send . Return
+earlyReturn = throwError . Return
 
-catchReturn :: (Member (Return address) effects, Effectful (m address value)) => m address value effects address -> m address value effects address
-catchReturn m = send (CatchReturn (lowerEff m) (\ ret -> pure ret))
+catchReturn :: (Member (Exc (Return address)) effects, Effectful (m address value)) => m address value effects address -> m address value effects address
+catchReturn = Eff.raiseHandler (handleError (\ (Return addr) -> pure addr))
 
-runReturn :: (Effectful (m address value), Effects effects) => m address value (Return address ': effects) address -> m address value effects address
-runReturn = Eff.raiseHandler (fmap (either id id) . Exc.runError . handleReturn)
-
-handleReturn :: Effects effects => Eff (Return address ': effects) a -> Eff (Exc address ': effects) a
-handleReturn = reinterpret $ \case
-  Return a -> Exc.throwError a
-  CatchReturn a h -> Exc.catchError (handleReturn a) (handleReturn . h)
+runReturn :: (Effectful (m address value), Effects effects) => m address value (Exc (Return address) ': effects) address -> m address value effects address
+runReturn = Eff.raiseHandler (fmap (either unReturn id) . runError)
 
 
 -- | Effects for control flow around loops (breaking and continuing).

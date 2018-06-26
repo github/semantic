@@ -43,7 +43,7 @@ justEvaluating
 
 newtype UtilEff address a = UtilEff
   { runUtilEff :: Eff '[ LoopControl address
-                       , Return address
+                       , Exc (Return address)
                        , Env address
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo

@@ -60,7 +60,7 @@ instance ( Coercible body (Eff effects)
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return address) effects
+         , Member (Exc (Return address)) effects
          , Show address
          )
       => AbstractFunction address (Value address body) effects where
@@ -107,7 +107,7 @@ instance ( Coercible body (Eff effects)
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Return address) effects
+         , Member (Exc (Return address)) effects
          , Show address
          )
       => AbstractValue address (Value address body) effects where
