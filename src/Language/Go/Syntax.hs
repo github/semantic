@@ -27,7 +27,7 @@ importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathT
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . T.pack . takeFileName . unPath
 
-resolveGoImport :: ( Member (Modules address value) effects
+resolveGoImport :: ( Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Package.PackageInfo) effects
                    , Member (Resumable ResolutionError) effects
@@ -66,7 +66,7 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      importedEnv <- maybe lowerBound snd <$> require path
+      importedEnv <- snd <$> require path
       bindAll importedEnv
     rvalBox unit
 
@@ -88,7 +88,7 @@ instance Evaluatable QualifiedImport where
     void . letrec' alias $ \addr -> do
       for_ paths $ \p -> do
         traceResolve (unPath importPath) p
-        importedEnv <- maybe lowerBound snd <$> require p
+        importedEnv <- snd <$> require p
         bindAll importedEnv
       makeNamespace alias addr Nothing
     rvalBox unit
