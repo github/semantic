@@ -5,6 +5,7 @@ module Data.Abstract.ModuleTable
 , singleton
 , lookup
 , member
+, modulePaths
 , modulePathsInDir
 , insert
 , keys
@@ -25,6 +26,9 @@ newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
 
 singleton :: ModulePath -> a -> ModuleTable a
 singleton name = ModuleTable . Map.singleton name
+
+modulePaths :: ModuleTable a -> Set ModulePath
+modulePaths = Map.keysSet . unModuleTable
 
 modulePathsInDir :: FilePath -> ModuleTable a -> [ModulePath]
 modulePathsInDir k = filter (\e -> k == takeDirectory e) . Map.keys . unModuleTable

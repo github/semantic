@@ -4,17 +4,21 @@ module Semantic.Util where
 
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Analysis.Abstract.Evaluating
 import           Control.Abstract
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
+import           Data.Abstract.Module
+import qualified Data.Abstract.ModuleTable as ModuleTable
+import           Data.Abstract.Package
 import           Data.Abstract.Type
 import           Data.Blob
-import           Data.Project
 import           Data.Functor.Foldable
+import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
+import           Data.List (uncons)
+import           Data.Project
 import           Data.Sum (weaken)
 import           Data.Term
 import           Language.Haskell.HsColour
@@ -24,12 +28,14 @@ import           Prologue hiding (weaken)
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
+import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
 import           Text.Show.Pretty (ppShow)
 
 justEvaluating
   = runM
-  . evaluating
+  . runState lowerBound
+  . runFresh 0
   . runPrintingTrace
   . fmap reassociate
   . runLoadError
@@ -38,7 +44,6 @@ justEvaluating
   . runEvalError
   . runResolutionError
   . runAddressError
-  . runTermEvaluator @_ @Precise @(Value Precise (UtilEff _))
   . runValueError
 
 newtype UtilEff address a = UtilEff
@@ -47,7 +52,8 @@ newtype UtilEff address a = UtilEff
                        , Env address
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo
-                       , Modules address (Value address (UtilEff address))
+                       , Modules address
+                       , State (ModuleTable (NonEmpty (Module (Environment address, address))))
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (ValueError address (UtilEff address))
@@ -56,18 +62,18 @@ newtype UtilEff address a = UtilEff
                        , Resumable EvalError
                        , Resumable (EnvironmentError address)
                        , Resumable (Unspecialized (Value address (UtilEff address)))
-                       , Resumable (LoadError address (Value address (UtilEff address)))
+                       , Resumable (LoadError address)
                        , Trace
                        , Fresh
                        , State (Heap address Latest (Value address (UtilEff address)))
-                       , State (ModuleTable (Maybe (Environment address, address)))
                        , Lift IO
                        ] a
   }
 
 checking
   = runM @_ @IO
-  . evaluating
+  . runState (lowerBound @(Heap Monovariant All Type))
+  . runFresh 0
   . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
   . caching @[]
@@ -81,18 +87,40 @@ checking
   . runAddressError
   . runTypeError
 
-evalGoProject path         = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go         path
-evalRubyProject path       = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby       path
-evalPHPProject path        = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser        Language.PHP        path
-evalPythonProject path     = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser     Language.Python     path
-evalJavaScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript path
-evalTypeScriptProject path = justEvaluating =<< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript path
+evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby
+evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser        Language.PHP
+evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser     Language.Python
+evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript
+evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
 
-typecheckGoFile path = checking =<< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go path
+typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
--- Evaluate a project, starting at a single entrypoint.
-evaluateProject proxy parser lang path = evaluatePackageWith proxy id withTermSpans . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser)
-evaluateProjectWithCaching proxy parser lang path = evaluatePackageWith proxy convergingModules (withTermSpans . cachingTerms) . fmap quieterm <$> runTask (readProject Nothing path lang [] >>= parsePackage parser)
+-- Evaluate a project consisting of the listed paths.
+evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
+  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) (flip File lang <$> paths) lang [])
+  modules <- topologicalSort <$> runImportGraph proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
+       (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
+       (fmap fst
+       (runState (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (evaluate proxy id withTermSpans modules)))))))
+
+evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
+  project <- readProject Nothing path lang []
+  package <- fmap quieterm <$> parsePackage parser project
+  modules <- topologicalSort <$> runImportGraph proxy package
+  pure (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
+       (fmap fst
+       (runState (lowerBound @(ModuleTable (NonEmpty (Module (Environment Monovariant, Monovariant)))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (evaluate proxy id withTermSpans modules))))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
