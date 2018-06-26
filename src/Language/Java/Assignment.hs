@@ -217,9 +217,9 @@ variableDeclaratorId = symbol VariableDeclaratorId *> children identifier
 
 -- Literals
 boolean :: Assignment
-boolean = toTerm (branchNode BooleanLiteral
-  (   leafNode Grammar.True  $> Literal.true
-  <|> leafNode Grammar.False $> Literal.false))
+boolean =  makeTerm <$> symbol BooleanLiteral <*> children
+          (token Grammar.True $> Literal.true
+          <|> token Grammar.False $> Literal.false)
 
 null' :: Assignment
 null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
