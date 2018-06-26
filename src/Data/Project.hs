@@ -38,7 +38,6 @@ data ProjectF (blobs :: * -> *) (paths :: * -> *) path = Project
   { projectRootDir     :: path
   , projectBlobs       :: blobs Blob
   , projectLanguage    :: Language
-  , projectEntryPaths  :: paths path
   , projectExcludeDirs :: paths path
   } deriving (Functor, Generic)
 
@@ -63,7 +62,6 @@ fromPB Project {..} = Project
   { projectRootDir     = T.unpack projectRootDir
   , projectBlobs       = toList projectBlobs
   , projectLanguage    = projectLanguage
-  , projectEntryPaths  = T.unpack <$> toList projectEntryPaths
   , projectExcludeDirs = T.unpack <$> toList projectExcludeDirs
   }
 
