@@ -6,8 +6,7 @@
         (TypeConstructorIdentifier))
       (Constructor
         (ConstructorIdentifier)
-        (TypeParameters
-          (TypeConstructorIdentifier)))
+        (TypeConstructorIdentifier))
       (Empty))
     (NewType
       (Context'
@@ -18,24 +17,22 @@
         (TypeConstructorIdentifier))
       (Constructor
         (ConstructorIdentifier)
-        (TypeParameters
-          (TypeVariableIdentifier)))
+        (TypeVariableIdentifier))
       (Empty))
     (NewType
       (Statements
         (TypeConstructorIdentifier))
       (Constructor
         (ConstructorIdentifier)
-        (TypeParameters
-          (Statements
-            (Field
-              (Statements
-                (VariableIdentifier))
-              (Type
-                (TypeConstructorIdentifier)
-                (TypeParameters
-                  (TypeConstructorIdentifier))
-                (Empty))))))
+        (Statements
+          (Field
+            (Statements
+              (VariableIdentifier))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters
+                (TypeConstructorIdentifier))
+              (Empty)))))
       (Empty))
     (NewType
       (Statements
@@ -52,19 +49,17 @@
         (TypeVariableIdentifier))
       (Constructor
         (ConstructorIdentifier)
-        (TypeParameters
-          (Statements
-            (TypeVariableIdentifier)
-            (TypeVariableIdentifier)
-            (TypeVariableIdentifier))))
+        (Statements
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
       (Empty))
     (NewType
       (Statements
         (TypeConstructorIdentifier))
       (Constructor
         (ConstructorIdentifier)
-        (TypeParameters
-          (TypeConstructorIdentifier)))
+        (TypeConstructorIdentifier))
       (Deriving
         (TypeClassIdentifier)))
     (NewType
@@ -72,8 +67,7 @@
         (TypeConstructorIdentifier))
       (Constructor
         (ConstructorIdentifier)
-        (TypeParameters
-          (TypeVariableIdentifier)))
+        (TypeVariableIdentifier))
       (Deriving
         (TypeClassIdentifier)
         (TypeClassIdentifier)
