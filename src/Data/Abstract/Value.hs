@@ -102,12 +102,12 @@ instance Show address => AbstractIntro (Value address body) where
 instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
          , Member (Env address) effects
+         , Member (Exc (LoopControl address)) effects
+         , Member (Exc (Return address)) effects
          , Member Fresh effects
-         , Member (LoopControl address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
          , Member (Resumable (ValueError address body)) effects
-         , Member (Exc (Return address)) effects
          , Show address
          )
       => AbstractValue address (Value address body) effects where

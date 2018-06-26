@@ -48,7 +48,7 @@ reassociate = mergeExcs . mergeExcs . mergeExcs . Right
 
 type Val = Value Precise SpecEff
 newtype SpecEff a = SpecEff
-  { runSpecEff :: Eff '[ LoopControl Precise
+  { runSpecEff :: Eff '[ Exc (LoopControl Precise)
                        , Exc (Return Precise)
                        , Env Precise
                        , Allocator Precise Val

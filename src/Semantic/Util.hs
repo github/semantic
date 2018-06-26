@@ -42,7 +42,7 @@ justEvaluating
   . runValueError
 
 newtype UtilEff address a = UtilEff
-  { runUtilEff :: Eff '[ LoopControl address
+  { runUtilEff :: Eff '[ Exc (LoopControl address)
                        , Exc (Return address)
                        , Env address
                        , Allocator address (Value address (UtilEff address))
