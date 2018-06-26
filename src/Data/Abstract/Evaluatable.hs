@@ -74,7 +74,7 @@ evaluate :: ( AbstractValue address value inner
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
-            , Member (State (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
+            , Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (AddressError address value)) effects
@@ -99,15 +99,14 @@ evaluate lang analyzeModule analyzeTerm modules = do
     defineBuiltins
     definePrelude lang
     box unit
-  foldr (run preludeEnv) get modules
+  foldr (run preludeEnv) ask modules
   where run preludeEnv m rest = do
           evaluated <- coerce
             (runInModule preludeEnv (moduleInfo m))
             (analyzeModule (subtermRef . moduleBody)
             (evalTerm <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          modify' (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| []))
-          rest
+          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
         evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
 

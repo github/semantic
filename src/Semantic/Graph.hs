@@ -74,8 +74,7 @@ runGraph CallGraph includePackages project
           . graphing
           . runReader (packageInfo package)
           . runReader lowerBound
-          . fmap fst
-          . runState lowerBound
+          . runReader lowerBound
           . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
     extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
 
@@ -87,8 +86,7 @@ newtype GraphEff address a = GraphEff
                         , Allocator address (Value address (GraphEff address))
                         , Reader ModuleInfo
                         , Modules address
-                        -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-                        , State (ModuleTable (NonEmpty (Module (Environment address, address))))
+                        , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
                         , Reader Span
                         , Reader PackageInfo
                         , State (Graph Vertex)
@@ -138,8 +136,7 @@ runImportGraph lang (package :: Package term)
         . resumingAddressError
         . resumingValueError
         . runState lowerBound
-        . fmap fst
-        . runState lowerBound
+        . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
         . runReader (packageInfo package)
@@ -155,8 +152,7 @@ newtype ImportGraphEff term address a = ImportGraphEff
                               , Reader Span
                               , Reader PackageInfo
                               , Modules address
-                              -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-                              , State (ModuleTable (NonEmpty (Module (Environment address, address))))
+                              , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
                               , State (Graph ModuleInfo)
                               , Resumable (ValueError address (ImportGraphEff term address))
                               , Resumable (AddressError address (Value address (ImportGraphEff term address)))

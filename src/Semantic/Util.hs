@@ -53,7 +53,7 @@ newtype UtilEff address a = UtilEff
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo
                        , Modules address
-                       , State (ModuleTable (NonEmpty (Module (Environment address, address))))
+                       , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (ValueError address (UtilEff address))
@@ -104,11 +104,9 @@ evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
-       -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-       (fmap fst
-       (runState (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules)))))))
+       (evaluate proxy id withTermSpans modules))))))
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
@@ -116,11 +114,9 @@ evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOpti
   modules <- topologicalSort <$> runImportGraph proxy package
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)
-       -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-       (fmap fst
-       (runState (lowerBound @(ModuleTable (NonEmpty (Module (Environment Monovariant, Monovariant)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Monovariant, Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules))))))
+       (evaluate proxy id withTermSpans modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
