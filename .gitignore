@@ -1,6 +1,7 @@
 .DS_Store
 
 .stack-work
+.stack-work-profiling
 profiles
 tags
 
