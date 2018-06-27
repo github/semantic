@@ -43,38 +43,38 @@ instance Semigroup Delta where
 type Table s a = [(s, a)]
 
 data DetPar s a = DetPar
-  { isNullable :: Bool
-  , firstSet   :: Set s
-  , match      :: State s -> Set s -> Either (Error s) (State s, a)
+  { assignEmpty :: Maybe a
+  , firstSet    :: Set s
+  , match       :: State s -> Set s -> Either (Error s) (State s, a)
   }
   deriving (Functor)
 
 instance Ord s => Applicative (DetPar s) where
-  pure a = DetPar True lowerBound (\ inp _ -> Right (inp, a))
-  DetPar n1 f1 p1 <*> ~(DetPar n2 f2 p2) = DetPar (n1 && n2) (combine n1 f1 f2) (p1 `pseq` p2)
+  pure a = DetPar (Just a) lowerBound (\ inp _ -> Right (inp, a))
+  DetPar n1 f1 p1 <*> ~(DetPar n2 f2 p2) = DetPar (n1 <*> n2) (combine (isJust n1) f1 f2) (p1 `pseq` p2)
     where p1 `pseq` p2 = \ inp follow -> do
-            (inp1, v1) <- p1 inp (combine n2 f2 follow)
+            (inp1, v1) <- p1 inp (combine (isJust n2) f2 follow)
             (inp2, v2) <- p2 inp1 follow
             let res = v1 v2
             res `seq` pure (inp2, res)
 
 instance (Measured Delta s, Ord s) => Alternative (DetPar s) where
-  empty = DetPar False lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
-  DetPar n1 f1 p1 <|> DetPar n2 f2 p2 = DetPar (n1 || n2) (f1 <> f2) (p1 `palt` p2)
+  empty = DetPar Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
+  DetPar n1 f1 p1 <|> DetPar n2 f2 p2 = DetPar (n1 <|> n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
             where p state@(State _ []) follow =
-                    if      n1 then p1 state follow
-                    else if n2 then p2 state follow
+                    if      isJust n1 then p1 state follow
+                    else if isJust n2 then p2 state follow
                     else Left (Error (stateSpan state) (toList (f1 <> f2)) Nothing)
                   p state@(State _ (s:_)) follow =
                     if      s `Set.member` f1 then p1 (advanceState state) follow
                     else if s `Set.member` f2 then p2 (advanceState state) follow
-                    else if n1 && s `Set.member` follow then p1 (advanceState state) follow
-                    else if n2 && s `Set.member` follow then p2 (advanceState state) follow
-                    else Left (Error (stateSpan state) (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
+                    else if isJust n1 && s `Set.member` follow then p1 (advanceState state) follow
+                    else if isJust n2 && s `Set.member` follow then p2 (advanceState state) follow
+                    else Left (Error (stateSpan state) (toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just s))
 
 instance (Measured Delta s, Ord s, Show s) => Assigning s (DetPar s) where
-  sym s = DetPar False (Set.singleton s) (\ state _ -> case stateInput state of
+  sym s = DetPar Nothing (Set.singleton s) (\ state _ -> case stateInput state of
     []  -> Left (Error (stateSpan state) [s] Nothing)
     _:_ -> Right (advanceState state, s))
 
