@@ -12,6 +12,8 @@ combine e s1 s2 = if e then s1 <> s2 else lowerBound
 
 type Input s = [s]
 
+type Table s a = [(s, a)]
+
 data DetPar s a = DetPar
   { isNullable :: Bool
   , firstSet   :: Set s
