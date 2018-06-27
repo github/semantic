@@ -69,3 +69,7 @@ instance (Ord s, Show s) => Assigning DetPar s where
 
 invokeDet :: DetPar s a -> State s -> Either (Error s) a
 invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
+
+
+class Measured s where
+  measure :: s -> Offset
