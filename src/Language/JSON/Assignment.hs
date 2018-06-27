@@ -15,7 +15,6 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Language.JSON.Grammar as Grammar
-import Prologue
 
 type Syntax =
   [ Literal.Array
@@ -29,7 +28,7 @@ type Syntax =
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment = Assignment.Assignment [] Grammar Term
 
 
 assignment :: Assignment
