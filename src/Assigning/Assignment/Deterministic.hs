@@ -32,7 +32,7 @@ data DetPar s a = DetPar
   deriving (Functor)
 
 instance Ord s => Applicative (DetPar s) where
-  pure a = DetPar Prelude.True lowerBound (\ inp _ -> Right (inp, a))
+  pure a = DetPar True lowerBound (\ inp _ -> Right (inp, a))
   DetPar n1 f1 p1 <*> ~(DetPar n2 f2 p2) = DetPar (n1 && n2) (combine n1 f1 f2) (p1 `pseq` p2)
     where p1 `pseq` p2 = \ inp follow -> do
             (inp1, v1) <- p1 inp (combine n2 f2 follow)
@@ -56,7 +56,7 @@ instance Ord s => Alternative (DetPar s) where
                     else Left (Error lowerBound (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
 instance (Ord s, Show s) => Assigning DetPar s where
-  sym s = DetPar Prelude.False (Set.singleton s) (\ ss _ -> case ss of
+  sym s = DetPar False (Set.singleton s) (\ ss _ -> case ss of
     []    -> Left (Error lowerBound [s] Nothing)
     _:inp -> Right (inp, s))
 
