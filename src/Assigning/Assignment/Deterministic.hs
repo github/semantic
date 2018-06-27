@@ -14,32 +14,32 @@ combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
 
 data State s = State
-  { stateOffset :: {-# UNPACK #-} !Offset
-  , stateInput  :: ![s]
+  { stateDelta :: {-# UNPACK #-} !Delta
+  , stateInput :: ![s]
   }
   deriving (Eq, Ord, Show)
 
 stateSpan :: State s -> Span
-stateSpan = Span . offsetPos . stateOffset <*> offsetPos . stateOffset
+stateSpan = Span . deltaPos . stateDelta <*> deltaPos . stateDelta
 
-advanceState :: Measured Offset s => State s -> State s
+advanceState :: Measured Delta s => State s -> State s
 advanceState state@(State _ []) = state
 advanceState (State o (s : ss)) = State (o <> measure s) ss
 
-data Offset = Offset
-  { offsetBytes :: {-# UNPACK #-} !Int
-  , offsetPos   :: {-# UNPACK #-} !Pos
+data Delta = Delta
+  { deltaBytes :: {-# UNPACK #-} !Int
+  , deltaPos   :: {-# UNPACK #-} !Pos
   }
   deriving (Eq, Ord, Show)
 
-instance Lower Offset where
-  lowerBound = Offset 0 lowerBound
+instance Lower Delta where
+  lowerBound = Delta 0 lowerBound
 
-instance Join Offset where
-  Offset b1 p1 \/ Offset b2 p2 = Offset (b1 `max` b2) (p1 `max` p2)
+instance Join Delta where
+  Delta b1 p1 \/ Delta b2 p2 = Delta (b1 `max` b2) (p1 `max` p2)
 
-instance Semigroup Offset where
-  Offset b1 (Pos l1 c1) <> Offset b2 (Pos l2 c2) = Offset (b1 + b2) (Pos (l1 + l2) (c1 + c2))
+instance Semigroup Delta where
+  Delta b1 (Pos l1 c1) <> Delta b2 (Pos l2 c2) = Delta (b1 + b2) (Pos (l1 + l2) (c1 + c2))
 
 type Table s a = [(s, a)]
 
