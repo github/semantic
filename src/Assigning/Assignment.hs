@@ -337,13 +337,6 @@ makeState ns = State 0 (Pos 1 1) [] ns []
 
 -- Instances
 
-instance (Enum grammar, Eq1 ast, Ix grammar) => Semigroup (Assignment ast grammar a) where
-  (<>) = (<|>)
-
-instance (Enum grammar, Eq1 ast, Ix grammar) => Monoid (Assignment ast grammar a) where
-  mempty = empty
-  mappend = (<>)
-
 instance (Enum grammar, Eq1 ast, Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
   empty = tracing (Alt []) `Then` return
