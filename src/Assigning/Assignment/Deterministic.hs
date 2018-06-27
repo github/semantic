@@ -2,6 +2,7 @@ module Assigning.Assignment.Deterministic where
 
 import Data.Error
 import qualified Data.Set as Set
+import Data.Span
 import Prologue
 
 class (Alternative (f s), Ord s, Show s) => Assigning f s where
@@ -11,6 +12,11 @@ combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
 
 type State s = [s]
+
+data Offset = Offset
+  { offsetBytes :: {-# UNPACK #-} !Int
+  , offsetPos   :: {-# UNPACK #-} !Pos
+  }
 
 type Table s a = [(s, a)]
 
