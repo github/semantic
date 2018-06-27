@@ -48,7 +48,7 @@ array :: Assignment Term
 array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
 
 number :: Assignment Term
-number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
+number = toTerm (Literal.Float <$> leafNode Number)
 
 string :: Assignment Term
 string = toTerm (Literal.TextElement <$> leafNode String)
