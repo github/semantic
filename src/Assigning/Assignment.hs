@@ -79,7 +79,6 @@ module Assigning.Assignment
 , choice
 , token
 , while
-, until
 , manyThrough
 , getRubyLocals
 , putRubyLocals
@@ -226,10 +225,6 @@ while predicate step = many $ do
   result <- step
   guard (predicate result)
   pure result
-
--- | Collect a list of values failing a predicate.
-until :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
-until = while . (not .)
 
 -- | Match the first operand until the second operand matches, returning both results. Like 'manyTill', but returning the terminal value.
 manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
