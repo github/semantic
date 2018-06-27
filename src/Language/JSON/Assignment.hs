@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeOperators #-}
 module Language.JSON.Assignment
 ( assignment
 , Syntax
