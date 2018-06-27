@@ -1,5 +1,6 @@
 module Assigning.Assignment.Deterministic where
 
+import Data.Error
 import qualified Data.Set as Set
 import Prologue
 
@@ -17,7 +18,7 @@ type Input s = [s]
 data DetPar s a = DetPar
   { isNullable :: Bool
   , firstSet   :: Set s
-  , match      :: Input s -> Set s -> Either String (Input s, a)
+  , match      :: Input s -> Set s -> Either (Error s) (Input s, a)
   }
   deriving (Functor)
 
@@ -36,15 +37,15 @@ instance (Ord s, Show s) => Assigning DetPar s where
             where p [] follow =
                     if      n1 then p1 [] follow
                     else if n2 then p2 [] follow
-                    else Left "unexpected eof"
+                    else Left (Error lowerBound (toList (f1 <> f2)) Nothing)
                   p inp@(s:_) follow =
                     if      s `Set.member` f1 then p1 inp follow
                     else if s `Set.member` f2 then p2 inp follow
                     else if n1 && s `Set.member` follow then p1 inp follow
                     else if n2 && s `Set.member` follow then p2 inp follow
-                    else Left ("illegal input symbol: " <> show s)
+                    else Left (Error lowerBound (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
   sym s = DetPar Prelude.False (Set.singleton s) (\ (_:inp) _ -> Right (inp, s))
 
-invokeDet :: DetPar s a -> Input s -> Either String a
+invokeDet :: DetPar s a -> Input s -> Either (Error s) a
 invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
