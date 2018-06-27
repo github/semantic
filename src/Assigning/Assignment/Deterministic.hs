@@ -42,25 +42,25 @@ instance Semigroup Delta where
 
 type Table s a = [(s, a)]
 
-data DetPar s a = DetPar
+data Assignment s a = Assignment
   { assignEmpty :: Maybe a
   , firstSet    :: Set s
   , match       :: State s -> Set s -> Either (Error s) (State s, a)
   }
   deriving (Functor)
 
-instance Ord s => Applicative (DetPar s) where
-  pure a = DetPar (Just a) lowerBound (\ inp _ -> Right (inp, a))
-  DetPar n1 f1 p1 <*> ~(DetPar n2 f2 p2) = DetPar (n1 <*> n2) (combine (isJust n1) f1 f2) (p1 `pseq` p2)
+instance Ord s => Applicative (Assignment s) where
+  pure a = Assignment (Just a) lowerBound (\ inp _ -> Right (inp, a))
+  Assignment n1 f1 p1 <*> ~(Assignment n2 f2 p2) = Assignment (n1 <*> n2) (combine (isJust n1) f1 f2) (p1 `pseq` p2)
     where p1 `pseq` p2 = \ inp follow -> do
             (inp1, v1) <- p1 inp (combine (isJust n2) f2 follow)
             (inp2, v2) <- p2 inp1 follow
             let res = v1 v2
             res `seq` pure (inp2, res)
 
-instance (Measured Delta s, Ord s) => Alternative (DetPar s) where
-  empty = DetPar Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
-  DetPar n1 f1 p1 <|> DetPar n2 f2 p2 = DetPar (n1 <|> n2) (f1 <> f2) (p1 `palt` p2)
+instance (Measured Delta s, Ord s) => Alternative (Assignment s) where
+  empty = Assignment Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
+  Assignment n1 f1 p1 <|> Assignment n2 f2 p2 = Assignment (n1 <|> n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
             where p state@(State _ []) follow =
                     if      isJust n1 then p1 state follow
@@ -73,13 +73,13 @@ instance (Measured Delta s, Ord s) => Alternative (DetPar s) where
                     else if isJust n2 && s `Set.member` follow then p2 (advanceState state) follow
                     else Left (Error (stateSpan state) (toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just s))
 
-instance (Measured Delta s, Ord s, Show s) => Assigning s (DetPar s) where
-  sym s = DetPar Nothing (Set.singleton s) (\ state _ -> case stateInput state of
+instance (Measured Delta s, Ord s, Show s) => Assigning s (Assignment s) where
+  sym s = Assignment Nothing (Set.singleton s) (\ state _ -> case stateInput state of
     []  -> Left (Error (stateSpan state) [s] Nothing)
     _:_ -> Right (advanceState state, s))
 
-invokeDet :: DetPar s a -> State s -> Either (Error s) a
-invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
+invokeDet :: Assignment s a -> State s -> Either (Error s) a
+invokeDet (Assignment _ _ p) inp = snd <$> p inp lowerBound
 
 
 class Measured v a | a -> v where
