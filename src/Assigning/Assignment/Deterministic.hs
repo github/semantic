@@ -17,18 +17,18 @@ type Input s = [s]
 data DetPar s a = DetPar
   { isNullable :: Bool
   , firstSet   :: Set s
-  , match      :: Input s -> Set s -> (Input s, a)
+  , match      :: Input s -> Set s -> Either String (Input s, a)
   }
   deriving (Functor)
 
 instance Ord s => Applicative (DetPar s) where
-  pure a = DetPar Prelude.True lowerBound (\ inp _ -> (inp, a))
+  pure a = DetPar Prelude.True lowerBound (\ inp _ -> Right (inp, a))
   DetPar n1 f1 p1 <*> ~(DetPar n2 f2 p2) = DetPar (n1 && n2) (combine n1 f1 f2) (p1 `pseq` p2)
-    where p1 `pseq` p2 = \ inp follow ->
-            let (inp1, v1) = p1 inp (combine n2 f2 follow)
-                (inp2, v2) = p2 inp1 follow
-                res = v1 v2
-            in  res `seq` (inp2, res)
+    where p1 `pseq` p2 = \ inp follow -> do
+            (inp1, v1) <- p1 inp (combine n2 f2 follow)
+            (inp2, v2) <- p2 inp1 follow
+            let res = v1 v2
+            res `seq` pure (inp2, res)
 
 instance (Ord s, Show s) => Assigning DetPar s where
   DetPar n1 f1 p1 <!> DetPar n2 f2 p2 = DetPar (n1 || n2) (f1 <> f2) (p1 `palt` p2)
@@ -36,15 +36,15 @@ instance (Ord s, Show s) => Assigning DetPar s where
             where p [] follow =
                     if      n1 then p1 [] follow
                     else if n2 then p2 [] follow
-                    else error "unexpected eof"
+                    else Left "unexpected eof"
                   p inp@(s:_) follow =
                     if      s `Set.member` f1 then p1 inp follow
                     else if s `Set.member` f2 then p2 inp follow
                     else if n1 && s `Set.member` follow then p1 inp follow
                     else if n2 && s `Set.member` follow then p2 inp follow
-                    else error ("illegal input symbol: " <> show s)
+                    else Left ("illegal input symbol: " <> show s)
 
-  sym s = DetPar Prelude.False (Set.singleton s) (\ (_:inp) _ -> (inp, s))
+  sym s = DetPar Prelude.False (Set.singleton s) (\ (_:inp) _ -> Right (inp, s))
 
-invokeDet :: DetPar s a -> Input s -> a
-invokeDet (DetPar _ _ p) inp = snd (p inp lowerBound)
+invokeDet :: DetPar s a -> Input s -> Either String a
+invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
