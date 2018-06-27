@@ -38,11 +38,11 @@ value :: Assignment Term
 value = branchNode Value (object <|> array)
 
 jsonValue :: Assignment Term
-jsonValue = object <|> array <|> number <|> string <|> boolean <|> none
+jsonValue = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
 
 object :: Assignment Term
 object = toTerm (branchNode Object (Literal.Hash <$> many pairs))
-  where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string) <*> jsonValue))
+  where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string <|> parseError) <*> jsonValue)) <|> parseError
 
 array :: Assignment Term
 array = toTerm (branchNode Array (Literal.Array <$> many jsonValue))
