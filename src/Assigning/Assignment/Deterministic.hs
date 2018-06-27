@@ -4,10 +4,7 @@ import Data.Error
 import qualified Data.Set as Set
 import Prologue
 
-class (Applicative (f s), Ord s, Show s) => Assigning f s where
-  (<!>) :: f s a -> f s a -> f s a
-  infixl 3 <!>
-
+class (Alternative (f s), Ord s, Show s) => Assigning f s where
   sym :: s -> f s s
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
@@ -31,8 +28,9 @@ instance Ord s => Applicative (DetPar s) where
             let res = v1 v2
             res `seq` pure (inp2, res)
 
-instance (Ord s, Show s) => Assigning DetPar s where
-  DetPar n1 f1 p1 <!> DetPar n2 f2 p2 = DetPar (n1 || n2) (f1 <> f2) (p1 `palt` p2)
+instance Ord s => Alternative (DetPar s) where
+  empty = DetPar False lowerBound (\ s _ -> Left (Error lowerBound [] (listToMaybe s)))
+  DetPar n1 f1 p1 <|> DetPar n2 f2 p2 = DetPar (n1 || n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
             where p [] follow =
                     if      n1 then p1 [] follow
@@ -45,6 +43,7 @@ instance (Ord s, Show s) => Assigning DetPar s where
                     else if n2 && s `Set.member` follow then p2 inp follow
                     else Left (Error lowerBound (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
+instance (Ord s, Show s) => Assigning DetPar s where
   sym s = DetPar Prelude.False (Set.singleton s) (\ ss _ -> case ss of
     []    -> Left (Error lowerBound [s] Nothing)
     _:inp -> Right (inp, s))
