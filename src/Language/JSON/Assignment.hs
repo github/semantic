@@ -14,6 +14,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Language.JSON.Grammar as Grammar
+import Prologue
 
 type Syntax =
   [ Literal.Array
@@ -57,4 +58,4 @@ boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ rawSource)
        <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
 
 none :: Assignment Term
-none = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
+none = toTerm (leafNode Null $> Literal.Null)
