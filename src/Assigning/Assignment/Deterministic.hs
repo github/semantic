@@ -22,6 +22,10 @@ data State s = State
 stateSpan :: State s -> Span
 stateSpan = Span . offsetPos . stateOffset <*> offsetPos . stateOffset
 
+advanceState :: Measured Offset s => State s -> State s
+advanceState state@(State _ []) = state
+advanceState (State o (s : ss)) = State (o <> measure s) ss
+
 data Offset = Offset
   { offsetBytes :: {-# UNPACK #-} !Int
   , offsetPos   :: {-# UNPACK #-} !Pos
