@@ -75,6 +75,8 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
+                     , Data.Graph.Adjacency.Import
+                     , Data.Graph.Vertex
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
@@ -132,6 +134,7 @@ library
                      , Language.Java.Assignment
                      , Language.Java.Grammar
                      , Language.Java.Syntax
+                     , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
                      , Parsing.Parser
@@ -218,6 +221,7 @@ library
                      , time
                      , unix
                      , unordered-containers
+                     , vector
                      , proto3-suite
                      , proto3-wire
                      , haskell-tree-sitter
@@ -286,6 +290,7 @@ test-suite test
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
                      , Matching.Go.Spec
+                     , Numeric.Spec
                      , Proto3.Roundtrip
                      , Rendering.TOC.Spec
                      , Semantic.Spec
