@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FunctionalDependencies, UndecidableInstances #-}
 module Assigning.Assignment.Deterministic where
 
 import Data.Error
@@ -18,8 +18,10 @@ data State s = State
   }
   deriving (Eq, Ord, Show)
 
-stateSpan :: State s -> Span
-stateSpan (State (Delta _ ls cs) _) = Span (Pos ls cs) (Pos ls cs)
+stateSpan :: Measured Delta s => State s -> Span
+stateSpan (State   (Delta _ ls cs) [])    = Span (Pos ls cs) (Pos ls cs)
+stateSpan (State d@(Delta _ ls cs) (s:_)) = Span (Pos ls cs) (Pos ls' cs')
+  where Delta _ ls' cs' = d <> measure s
 
 advanceState :: Measured Delta s => State s -> State s
 advanceState state@(State _ []) = state
@@ -56,7 +58,7 @@ instance Ord s => Applicative (DetPar s) where
             let res = v1 v2
             res `seq` pure (inp2, res)
 
-instance Ord s => Alternative (DetPar s) where
+instance (Measured Delta s, Ord s) => Alternative (DetPar s) where
   empty = DetPar False lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
   DetPar n1 f1 p1 <|> DetPar n2 f2 p2 = DetPar (n1 || n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
@@ -71,7 +73,7 @@ instance Ord s => Alternative (DetPar s) where
                     else if n2 && s `Set.member` follow then p2 state { stateInput = inp } follow
                     else Left (Error (stateSpan state) (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
-instance (Ord s, Show s) => Assigning s (DetPar s) where
+instance (Measured Delta s, Ord s, Show s) => Assigning s (DetPar s) where
   sym s = DetPar False (Set.singleton s) (\ ss _ -> case stateInput ss of
     []    -> Left (Error (stateSpan ss) [s] Nothing)
     _:inp -> Right (ss { stateInput = inp }, s))
