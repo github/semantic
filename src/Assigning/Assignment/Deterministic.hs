@@ -45,7 +45,9 @@ instance (Ord s, Show s) => Assigning DetPar s where
                     else if n2 && s `Set.member` follow then p2 inp follow
                     else Left (Error lowerBound (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
-  sym s = DetPar Prelude.False (Set.singleton s) (\ (_:inp) _ -> Right (inp, s))
+  sym s = DetPar Prelude.False (Set.singleton s) (\ ss _ -> case ss of
+    []    -> Left (Error lowerBound [s] Nothing)
+    _:inp -> Right (inp, s))
 
 invokeDet :: DetPar s a -> Input s -> Either (Error s) a
 invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
