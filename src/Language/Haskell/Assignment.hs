@@ -170,7 +170,7 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment' Term
-type Assignment' a = Assignment.Assignment [] Grammar a
+type Assignment' = Assignment.Assignment [] Grammar
 
 assignment :: Assignment
 assignment = handleError $ module' <|> parseError
