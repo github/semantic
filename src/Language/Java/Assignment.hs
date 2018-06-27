@@ -6,14 +6,13 @@ module Language.Java.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error, while, try)
+import Assigning.Assignment hiding (Assignment, Error, try)
 import Data.Abstract.Name
 import Data.Functor (($>))
 import Data.List.NonEmpty (some1)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import Data.Sum
-import GHC.Stack
 import Language.Java.Grammar as Grammar
 import Language.Java.Syntax as Java.Syntax
 import qualified Assigning.Assignment as Assignment
@@ -444,8 +443,7 @@ binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expressio
     -- altering the TreeSitter Java grammar is a better longer term goal.
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: HasCallStack
-          => Assignment
+infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
           -> Assignment.Assignment [] Grammar (Sum Syntax Term)
