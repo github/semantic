@@ -6,7 +6,7 @@ module Language.Java.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error, while, try)
+import Assigning.Assignment hiding (Assignment, Error, try)
 import Data.Abstract.Name
 import Data.Functor (($>))
 import Data.List.NonEmpty (some1)
