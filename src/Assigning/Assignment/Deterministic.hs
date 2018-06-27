@@ -2,9 +2,10 @@
 module Assigning.Assignment.Deterministic where
 
 import Data.Error
+import Data.Semilattice.Join
 import qualified Data.Set as Set
 import Data.Span
-import Prologue
+import Prologue hiding (Join)
 
 class (Alternative (f s), Ord s, Show s) => Assigning f s where
   sym :: s -> f s s
@@ -29,6 +30,9 @@ data Offset = Offset
 
 instance Lower Offset where
   lowerBound = Offset 0 lowerBound
+
+instance Join Offset where
+  Offset b1 p1 \/ Offset b2 p2 = Offset (b1 `max` b2) (p1 `max` p2)
 
 type Table s a = [(s, a)]
 
