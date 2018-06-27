@@ -78,7 +78,6 @@ module Assigning.Assignment
 , advance
 , choice
 , token
-, while
 , manyThrough
 , getRubyLocals
 , putRubyLocals
@@ -218,13 +217,6 @@ choice alternatives
 token :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
 token s = symbol s <* advance
 
-
--- | Collect a list of values passing a predicate.
-while :: (Alternative m, Monad m, HasCallStack) => (a -> Bool) -> m a -> m [a]
-while predicate step = many $ do
-  result <- step
-  guard (predicate result)
-  pure result
 
 -- | Match the first operand until the second operand matches, returning both results. Like 'manyTill', but returning the terminal value.
 manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
