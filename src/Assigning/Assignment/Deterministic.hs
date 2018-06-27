@@ -7,8 +7,8 @@ import qualified Data.Set as Set
 import Data.Span
 import Prologue hiding (Join)
 
-class (Alternative (f s), Ord s, Show s) => Assigning s f where
-  sym :: s -> f s s
+class (Alternative f, Ord s, Show s) => Assigning s f | f -> s where
+  sym :: s -> f s
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
@@ -67,7 +67,7 @@ instance Ord s => Alternative (DetPar s) where
                     else if n2 && s `Set.member` follow then p2 state { stateInput = inp } follow
                     else Left (Error (stateSpan state) (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
-instance (Ord s, Show s) => Assigning s DetPar where
+instance (Ord s, Show s) => Assigning s (DetPar s) where
   sym s = DetPar False (Set.singleton s) (\ ss _ -> case stateInput ss of
     []    -> Left (Error (stateSpan ss) [s] Nothing)
     _:inp -> Right (ss { stateInput = inp }, s))
