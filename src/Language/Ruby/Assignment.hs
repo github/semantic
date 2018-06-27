@@ -98,7 +98,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment' a = HasCallStack => Assignment.Assignment [] Grammar a
+type Assignment' a = Assignment.Assignment [] Grammar a
 type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
@@ -505,8 +505,7 @@ manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment 
 manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: HasCallStack
-          => Assignment
+infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
           -> Assignment.Assignment [] Grammar (Sum Syntax Term)
