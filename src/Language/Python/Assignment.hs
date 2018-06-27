@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Language.Python.Assignment
 ( assignment
 , Syntax
@@ -22,7 +21,6 @@ import Data.Syntax
     , parseError
     , postContextualize
     )
-import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
 import qualified Assigning.Assignment as Assignment
@@ -98,7 +96,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment
@@ -510,8 +508,7 @@ manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment 
 manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: HasCallStack
-          => Assignment
+infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
           -> Assignment.Assignment [] Grammar (Sum Syntax Term)
