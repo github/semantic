@@ -9,7 +9,7 @@ import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Sum
-import Data.Syntax (makeTerm, parseError)
+import Data.Syntax (parseError)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
@@ -41,7 +41,7 @@ jsonValue :: Assignment Term
 jsonValue = object <|> array <|> number <|> string <|> boolean <|> none
 
 object :: Assignment Term
-object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
+object = toTerm (branchNode Object (Literal.Hash <$> many pairs))
   where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string) <*> jsonValue))
 
 array :: Assignment Term
