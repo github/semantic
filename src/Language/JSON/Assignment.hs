@@ -32,7 +32,7 @@ type Assignment = Assignment.Assignment [] Grammar
 
 
 assignment :: Assignment Term
-assignment = Syntax.handleError (value <|> parseError)
+assignment = value <|> parseError
 
 value :: Assignment Term
 value = branchNode Value (object <|> array <|> parseError)
