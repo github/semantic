@@ -54,8 +54,9 @@ string :: Assignment Term
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 boolean :: Assignment Term
-boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ rawSource)
-       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
+boolean =  toTerm
+  (   leafNode Grammar.True  $> Literal.true
+  <|> leafNode Grammar.False $> Literal.false)
 
 none :: Assignment Term
 none = toTerm (leafNode Null $> Literal.Null)
