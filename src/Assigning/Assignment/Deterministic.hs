@@ -1,3 +1,4 @@
+{-# LANGUAGE FunctionalDependencies #-}
 module Assigning.Assignment.Deterministic where
 
 import Data.Error
@@ -71,5 +72,5 @@ invokeDet :: DetPar s a -> State s -> Either (Error s) a
 invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
 
 
-class Measured s where
-  measure :: s -> Offset
+class Measured v a | a -> v where
+  measure :: a -> v
