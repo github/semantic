@@ -42,7 +42,7 @@ jsonValue = object <|> array <|> number <|> string <|> boolean <|> none
 
 object :: Assignment Term
 object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
-  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> (number <|> string) <*> jsonValue)
+  where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string) <*> jsonValue))
 
 array :: Assignment Term
 array = toTerm (branchNode Array (Literal.Array <$> many jsonValue))
