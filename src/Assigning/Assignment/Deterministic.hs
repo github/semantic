@@ -34,6 +34,9 @@ instance Lower Offset where
 instance Join Offset where
   Offset b1 p1 \/ Offset b2 p2 = Offset (b1 `max` b2) (p1 `max` p2)
 
+instance Semigroup Offset where
+  Offset b1 (Pos l1 c1) <> Offset b2 (Pos l2 c2) = Offset (b1 + b2) (Pos (l1 + l2) (c1 + c2))
+
 type Table s a = [(s, a)]
 
 data DetPar s a = DetPar
