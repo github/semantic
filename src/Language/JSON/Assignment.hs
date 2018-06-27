@@ -35,7 +35,7 @@ assignment :: Assignment Term
 assignment = Syntax.handleError (value <|> parseError)
 
 value :: Assignment Term
-value = symbol Value *> children (object <|> array)
+value = branchNode Value (object <|> array)
 
 jsonValue :: Assignment Term
 jsonValue = object <|> array <|> number <|> string <|> boolean <|> none
