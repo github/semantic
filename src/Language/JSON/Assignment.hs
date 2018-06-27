@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE RankNTypes, TypeOperators #-}
 module Language.JSON.Assignment
 ( assignment
 , Syntax
