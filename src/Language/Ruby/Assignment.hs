@@ -98,7 +98,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment' a = Assignment.Assignment [] Grammar a
+type Assignment' = Assignment.Assignment [] Grammar
 type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
