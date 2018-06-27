@@ -10,14 +10,14 @@ class (Alternative (f s), Ord s, Show s) => Assigning f s where
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
 
-type Input s = [s]
+type State s = [s]
 
 type Table s a = [(s, a)]
 
 data DetPar s a = DetPar
   { isNullable :: Bool
   , firstSet   :: Set s
-  , match      :: Input s -> Set s -> Either (Error s) (Input s, a)
+  , match      :: State s -> Set s -> Either (Error s) (State s, a)
   }
   deriving (Functor)
 
@@ -50,5 +50,5 @@ instance (Ord s, Show s) => Assigning DetPar s where
     []    -> Left (Error lowerBound [s] Nothing)
     _:inp -> Right (inp, s))
 
-invokeDet :: DetPar s a -> Input s -> Either (Error s) a
+invokeDet :: DetPar s a -> State s -> Either (Error s) a
 invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
