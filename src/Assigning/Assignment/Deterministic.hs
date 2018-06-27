@@ -17,6 +17,9 @@ data State s = State
   }
   deriving (Eq, Ord, Show)
 
+stateSpan :: State s -> Span
+stateSpan = Span . offsetPos . stateOffset <*> offsetPos . stateOffset
+
 data Offset = Offset
   { offsetBytes :: {-# UNPACK #-} !Int
   , offsetPos   :: {-# UNPACK #-} !Pos
@@ -45,23 +48,23 @@ instance Ord s => Applicative (DetPar s) where
             res `seq` pure (inp2, res)
 
 instance Ord s => Alternative (DetPar s) where
-  empty = DetPar False lowerBound (\ s _ -> Left (Error lowerBound [] (listToMaybe (stateInput s))))
+  empty = DetPar False lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
   DetPar n1 f1 p1 <|> DetPar n2 f2 p2 = DetPar (n1 || n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
             where p state@(State _ []) follow =
                     if      n1 then p1 state follow
                     else if n2 then p2 state follow
-                    else Left (Error lowerBound (toList (f1 <> f2)) Nothing)
+                    else Left (Error (stateSpan state) (toList (f1 <> f2)) Nothing)
                   p state@(State _ inp@(s:_)) follow =
                     if      s `Set.member` f1 then p1 state { stateInput = inp } follow
                     else if s `Set.member` f2 then p2 state { stateInput = inp } follow
                     else if n1 && s `Set.member` follow then p1 state { stateInput = inp } follow
                     else if n2 && s `Set.member` follow then p2 state { stateInput = inp } follow
-                    else Left (Error lowerBound (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
+                    else Left (Error (stateSpan state) (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
 instance (Ord s, Show s) => Assigning DetPar s where
   sym s = DetPar False (Set.singleton s) (\ ss _ -> case stateInput ss of
-    []    -> Left (Error lowerBound [s] Nothing)
+    []    -> Left (Error (stateSpan ss) [s] Nothing)
     _:inp -> Right (ss { stateInput = inp }, s))
 
 invokeDet :: DetPar s a -> State s -> Either (Error s) a
