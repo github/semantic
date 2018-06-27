@@ -18,6 +18,9 @@ data Offset = Offset
   , offsetPos   :: {-# UNPACK #-} !Pos
   }
 
+instance Lower Offset where
+  lowerBound = Offset 0 lowerBound
+
 type Table s a = [(s, a)]
 
 data DetPar s a = DetPar
