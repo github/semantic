@@ -51,8 +51,10 @@ type Syntax =
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.GenericType
    , Java.Syntax.Import
+   , Java.Syntax.MethodReference
    , Java.Syntax.Module
    , Java.Syntax.New
+   , Java.Syntax.NewKeyword
    , Java.Syntax.Package
    , Java.Syntax.SpreadParameter
    , Java.Syntax.StaticInitializer
@@ -165,6 +167,7 @@ expressionChoices =
   , integer
   , method
   , methodInvocation
+  , methodReference
   , module'
   , null'
   , package
@@ -283,6 +286,13 @@ methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Ex
     callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
     callFunction a Nothing = ([], a)
     -- optional produces a Maybe type (takes a Maybe a and returns a rule that produces a Maybe a)
+
+methodReference :: Assignment
+methodReference = makeTerm <$> symbol Grammar.MethodReference <*> children (Java.Syntax.MethodReference <$> term type' <* token AnonColonColon <*> manyTerm type' <*> (new <|> term identifier))
+  where new = makeTerm <$> token AnonNew <*> pure NewKeyword
+-- can't do term identifier' because identifier' returns a name, not a term, and we want a term
+-- <*> - left assoc
+-- manyTerm or alternation with pure
 
 explicitConstructorInvocation :: Assignment
 explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
@@ -499,6 +509,9 @@ classInstance = makeTerm <$> symbol ClassInstanceCreationExpression <*> children
 
 argumentList :: Assignment.Assignment [] Grammar [Term]
 argumentList = symbol ArgumentList *> children (manyTerm expression)
+-- this takes care of expression, expression, ..., expression
+-- but does this take care of parenthesized argumentList (it's a separate rule in TS)
+-- I think methodReference being a top-level expression now will make manyTerm expression recognize this
 
 super :: Assignment
 super = makeTerm <$> token Super <*> pure Expression.Super

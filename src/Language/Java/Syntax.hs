@@ -187,3 +187,24 @@ instance Ord1 StaticInitializer where liftCompare = genericLiftCompare
 instance Show1 StaticInitializer where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable StaticInitializer
+
+-- I think this is wrong because it doesn't acknowledge double colon.
+data MethodReference a = MethodReference { methodReferenceType :: !a, methodReferenceTypeArgs :: ![a], methodReferenceIdentifier :: !a}
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 MethodReference where liftEq = genericLiftEq
+instance Ord1 MethodReference where liftCompare = genericLiftCompare
+instance Show1 MethodReference where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeWithModifiers
+instance Evaluatable MethodReference
+
+data NewKeyword a = NewKeyword
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 NewKeyword where liftEq = genericLiftEq
+instance Ord1 NewKeyword where liftCompare = genericLiftCompare
+instance Show1 NewKeyword where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeWithModifiers
+instance Evaluatable NewKeyword
