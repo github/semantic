@@ -66,17 +66,17 @@ instance (Measured Delta s, Ord s) => Alternative (DetPar s) where
                     if      n1 then p1 state follow
                     else if n2 then p2 state follow
                     else Left (Error (stateSpan state) (toList (f1 <> f2)) Nothing)
-                  p state@(State _ inp@(s:_)) follow =
-                    if      s `Set.member` f1 then p1 state { stateInput = inp } follow
-                    else if s `Set.member` f2 then p2 state { stateInput = inp } follow
-                    else if n1 && s `Set.member` follow then p1 state { stateInput = inp } follow
-                    else if n2 && s `Set.member` follow then p2 state { stateInput = inp } follow
+                  p state@(State _ (s:_)) follow =
+                    if      s `Set.member` f1 then p1 (advanceState state) follow
+                    else if s `Set.member` f2 then p2 (advanceState state) follow
+                    else if n1 && s `Set.member` follow then p1 (advanceState state) follow
+                    else if n2 && s `Set.member` follow then p2 (advanceState state) follow
                     else Left (Error (stateSpan state) (toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just s))
 
 instance (Measured Delta s, Ord s, Show s) => Assigning s (DetPar s) where
-  sym s = DetPar False (Set.singleton s) (\ ss _ -> case stateInput ss of
-    []    -> Left (Error (stateSpan ss) [s] Nothing)
-    _:inp -> Right (ss { stateInput = inp }, s))
+  sym s = DetPar False (Set.singleton s) (\ state _ -> case stateInput state of
+    []  -> Left (Error (stateSpan state) [s] Nothing)
+    _:_ -> Right (advanceState state, s))
 
 invokeDet :: DetPar s a -> State s -> Either (Error s) a
 invokeDet (DetPar _ _ p) inp = snd <$> p inp lowerBound
