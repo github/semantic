@@ -45,7 +45,7 @@ object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
   where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> (number <|> string) <*> jsonValue)
 
 array :: Assignment Term
-array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
+array = toTerm (branchNode Array (Literal.Array <$> many jsonValue))
 
 number :: Assignment Term
 number = toTerm (Literal.Float <$> leafNode Number)
