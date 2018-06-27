@@ -51,7 +51,7 @@ number :: Assignment Term
 number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
 
 string :: Assignment Term
-string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+string = toTerm (Literal.TextElement <$> leafNode String)
 
 boolean :: Assignment Term
 boolean =  toTerm
