@@ -17,6 +17,7 @@ data Offset = Offset
   { offsetBytes :: {-# UNPACK #-} !Int
   , offsetPos   :: {-# UNPACK #-} !Pos
   }
+  deriving (Eq, Ord, Show)
 
 instance Lower Offset where
   lowerBound = Offset 0 lowerBound
