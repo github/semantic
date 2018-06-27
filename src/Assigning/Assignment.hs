@@ -79,8 +79,8 @@ module Assigning.Assignment
 , choice
 , token
 , manyThrough
-, getRubyLocals
-, putRubyLocals
+, getLocals
+, putLocals
 -- Results
 , Error(..)
 , errorCallStack
@@ -142,8 +142,8 @@ data AssignmentF ast grammar a where
   Alt :: [a] -> AssignmentF ast grammar a
   Label :: Assignment ast grammar a -> String -> AssignmentF ast grammar a
   Fail :: String -> AssignmentF ast grammar a
-  GetRubyLocals :: AssignmentF ast grammar [Text]
-  PutRubyLocals :: [Text] -> AssignmentF ast grammar ()
+  GetLocals :: AssignmentF ast grammar [Text]
+  PutLocals :: [Text] -> AssignmentF ast grammar ()
 
 data Tracing f a where
   Tracing :: { tracingCallSite :: Maybe (String, SrcLoc), runTracing :: f a } -> Tracing f a
@@ -163,12 +163,12 @@ tracing f = case getCallStack callStack of
 location :: Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
 
-getRubyLocals :: HasCallStack => Assignment ast grammar [Text]
-getRubyLocals = tracing GetRubyLocals `Then` return
+getLocals :: HasCallStack => Assignment ast grammar [Text]
+getLocals = tracing GetLocals `Then` return
 
-putRubyLocals :: (HasCallStack, Enum grammar, Eq1 ast, Ix grammar) => [Text] -> Assignment ast grammar ()
-putRubyLocals l = (tracing (PutRubyLocals l) `Then` return)
-              <|> (tracing End `Then` return)
+putLocals :: (HasCallStack, Enum grammar, Eq1 ast, Ix grammar) => [Text] -> Assignment ast grammar ()
+putLocals l = (tracing (PutLocals l) `Then` return)
+          <|> (tracing End `Then` return)
 
 -- | Zero-width production of the current node.
 currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) ())
@@ -263,8 +263,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
         run yield t initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (Term (In node f)) = case runTracing t of
                   Location -> yield (nodeLocation node) state
-                  GetRubyLocals -> yield stateRubyLocals state
-                  PutRubyLocals l -> yield () (state { stateRubyLocals = l })
+                  GetLocals -> yield stateLocals state
+                  PutLocals l -> yield () (state { stateLocals = l })
                   CurrentNode -> yield (In node (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
@@ -303,7 +303,7 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | Term (In Node{..} _) : rest <- stateNodes = State (end nodeByteRange) (spanEnd nodeSpan) stateCallSites rest stateRubyLocals
+  | Term (In Node{..} _) : rest <- stateNodes = State (end nodeByteRange) (spanEnd nodeSpan) stateCallSites rest stateLocals
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -312,7 +312,7 @@ data State ast grammar = State
   , statePos :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
   , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
-  , stateRubyLocals :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment
+  , stateLocals :: ![Text]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment.
   }
 
 deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)
@@ -393,8 +393,8 @@ instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (Assignmen
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
     Fail s -> showsUnaryWith showsPrec "Fail" d s
-    GetRubyLocals -> showString "GetRubyLocals"
-    PutRubyLocals _ -> showString "PutRubyLocals _"
+    GetLocals -> showString "GetLocals"
+    PutLocals locals -> showsUnaryWith showsPrec "PutLocals" d locals
     where showChild = liftShowsPrec sp sl
           showChildren = liftShowList sp sl
 

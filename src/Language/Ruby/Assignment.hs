@@ -161,14 +161,14 @@ parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> chi
 
 withExtendedScope :: Assignment a -> Assignment a
 withExtendedScope inner = do
-  locals <- getRubyLocals
+  locals <- getLocals
   result <- inner
-  putRubyLocals locals
+  putLocals locals
   pure result
 
 withNewScope :: Assignment a -> Assignment a
 withNewScope inner = withExtendedScope $ do
-  putRubyLocals []
+  putLocals []
   inner
 
 -- Looks up identifiers in the list of locals to determine vcall vs. local identifier.
@@ -428,15 +428,15 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
 identWithLocals :: Assignment (Record Location, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
-  -- source advances, so it's important we call getRubyLocals first
-  locals <- getRubyLocals
+  -- source advances, so it's important we call getLocals first
+  locals <- getLocals
   ident <- source
   pure (loc, ident, locals)
 
 lhsIdent :: Assignment Term
 lhsIdent = do
   (loc, ident, locals) <- identWithLocals
-  putRubyLocals (ident : locals)
+  putLocals (ident : locals)
   pure $ makeTerm loc (Syntax.Identifier (name ident))
 
 unary :: Assignment Term
