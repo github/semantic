@@ -2,10 +2,9 @@
 module Assigning.Assignment.Deterministic where
 
 import Data.Error
-import Data.Semilattice.Join
 import qualified Data.Set as Set
 import Data.Span
-import Prologue hiding (Join)
+import Prologue
 
 class (Alternative f, Ord s, Show s) => Assigning s f | f -> s where
   sym :: s -> f s
@@ -20,7 +19,7 @@ data State s = State
   deriving (Eq, Ord, Show)
 
 stateSpan :: State s -> Span
-stateSpan = Span . deltaPos . stateDelta <*> deltaPos . stateDelta
+stateSpan (State (Delta _ ls cs) _) = Span (Pos ls cs) (Pos ls cs)
 
 advanceState :: Measured Delta s => State s -> State s
 advanceState state@(State _ []) = state
@@ -28,18 +27,16 @@ advanceState (State o (s : ss)) = State (o <> measure s) ss
 
 data Delta = Delta
   { deltaBytes :: {-# UNPACK #-} !Int
-  , deltaPos   :: {-# UNPACK #-} !Pos
+  , deltaLines :: {-# UNPACK #-} !Int
+  , deltaCols  :: {-# UNPACK #-} !Int
   }
   deriving (Eq, Ord, Show)
 
 instance Lower Delta where
-  lowerBound = Delta 0 lowerBound
-
-instance Join Delta where
-  Delta b1 p1 \/ Delta b2 p2 = Delta (b1 `max` b2) (p1 `max` p2)
+  lowerBound = Delta 0 0 0
 
 instance Semigroup Delta where
-  Delta b1 (Pos l1 c1) <> Delta b2 (Pos l2 c2) = Delta (b1 + b2) (Pos (l1 + l2) (c1 + c2))
+  Delta b1 l1 c1 <> Delta b2 l2 c2 = Delta (b1 + b2) (l1 + l2) (c1 + c2)
 
 type Table s a = [(s, a)]
 
