@@ -47,7 +47,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment (TermF [] CMarkGFM.NodeType) Grammar Language.Markdown.Assignment.Term
+type Assignment = Assignment.Assignment (TermF [] CMarkGFM.NodeType) Grammar Language.Markdown.Assignment.Term
 
 
 assignment :: Assignment
