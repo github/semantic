@@ -162,7 +162,7 @@ tracing f = case getCallStack callStack of
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the location will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
-location :: HasCallStack => Assignment ast grammar (Record Location)
+location :: Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
 
 getRubyLocals :: HasCallStack => Assignment ast grammar [Text]
@@ -367,7 +367,6 @@ instance MonadFail (Assignment ast grammar) where
   fail s = tracing (Fail s) `Then` return
 
 instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar, Show1 ast) => Parsing (Assignment ast grammar) where
-  try :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
