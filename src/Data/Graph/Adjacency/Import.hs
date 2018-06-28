@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, LambdaCase, TupleSections, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, LambdaCase, ScopedTypeVariables #-}
 
 module Data.Graph.Adjacency.Import
   ( ImportGraph (..)
