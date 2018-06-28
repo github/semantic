@@ -4,13 +4,14 @@ module Assigning.Assignment.Deterministic where
 import Data.Error
 import qualified Data.Set as Set
 import Data.Range
-import Data.Source
+import Data.Source as Source
 import Data.Span
+import Data.Text.Encoding (decodeUtf8')
 import Prologue
 
 class (Alternative f, Ord s, Show s) => Assigning s f | f -> s where
   sym :: s -> f s
-  -- TODO: leafNode
+  leafNode :: s -> f Text
   -- TODO: branchNode
   -- TODO: toTerm
 
@@ -78,6 +79,12 @@ instance (Ord s, Show s) => Assigning s (Assignment s) where
   sym s = Assignment Nothing (Set.singleton s) (\ _ state _ -> case stateInput state of
     []  -> Left (Error (stateSpan state) [Right s] Nothing)
     _:_ -> Right (advanceState state, s))
+
+  leafNode s = Assignment Nothing (Set.singleton s) (\ src state _ -> case stateInput state of
+    []  -> Left (Error (stateSpan state) [Right s] Nothing)
+    s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
+      Left err   -> Left (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
+      Right text -> Right (advanceState state, text))
 
 invokeDet :: Assignment s a -> Source -> State s -> Either (Error (Either String s)) a
 invokeDet (Assignment _ _ p) src inp = snd <$> p src inp lowerBound
