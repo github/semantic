@@ -64,8 +64,6 @@ advanceState state
   | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
   | otherwise                = state
 
-type Table s a = [(s, a)]
-
 data Assignment s a = Assignment
   { nullable :: Maybe (State s -> a)
   , firstSet :: Set s
