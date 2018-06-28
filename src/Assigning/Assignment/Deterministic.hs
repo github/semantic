@@ -1,14 +1,14 @@
 {-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures #-}
 module Assigning.Assignment.Deterministic where
 
-import Data.AST (Location)
+import Data.AST
 import Data.Error
 import qualified Data.Set as Set
 import Data.Range
 import Data.Record
 import Data.Source as Source
 import Data.Span
-import Data.Term (Term, termIn)
+import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
 
@@ -24,18 +24,22 @@ class Assigning grammar f => TermAssigning syntaxes grammar f | f -> grammar, f 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
 
-data AST grammar = AST
-  { astSymbol   :: !grammar
-  , astRange    :: {-# UNPACK #-} !Range
-  , astSpan     :: {-# UNPACK #-} !Span
-  , astChildren :: ![AST grammar]
-  }
-  deriving (Eq, Ord, Show)
+astSymbol :: AST [] grammar -> grammar
+astSymbol = nodeSymbol . termAnnotation
+
+astRange :: AST [] grammar -> Range
+astRange = nodeByteRange . termAnnotation
+
+astSpan :: AST [] grammar -> Span
+astSpan = nodeSpan . termAnnotation
+
+astChildren :: AST [] grammar -> [AST [] grammar]
+astChildren = termOut
 
 data State s = State
   { stateBytes :: {-# UNPACK #-} !Int
   , statePos   :: {-# UNPACK #-} !Pos
-  , stateInput :: ![AST s]
+  , stateInput :: ![AST [] s]
   }
   deriving (Eq, Ord, Show)
 
