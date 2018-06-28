@@ -39,16 +39,15 @@ parseError :: ( Bounded grammar
 parseError = toTerm (leafNode maxBound $> (Syntax.Error (Syntax.ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") []))
 
 
-combine :: Ord s => Maybe a -> Set s -> Set s -> Set s
-combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
-
-
 data Assignment s a = Assignment
   { nullable :: Maybe (State s -> a)
   , firstSet :: Set s
   , match    :: Source -> State s -> Set s -> Either (Error (Either String s)) (State s, a)
   }
   deriving (Functor)
+
+combine :: Ord s => Maybe a -> Set s -> Set s -> Set s
+combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
 
 instance Ord s => Applicative (Assignment s) where
   pure a = Assignment (Just (const a)) lowerBound (\ _ state _ -> Right (state, a))
