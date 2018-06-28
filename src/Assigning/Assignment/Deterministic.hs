@@ -11,8 +11,8 @@ import Prologue
 
 class (Alternative f, Ord s, Show s) => Assigning s f | f -> s where
   sym :: s -> f s
-  leafNode :: s -> f Text
-  -- TODO: branchNode
+  leafNode   :: s -> f Text
+  branchNode :: s -> f a -> f a
   -- TODO: toTerm
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
@@ -85,6 +85,14 @@ instance (Ord s, Show s) => Assigning s (Assignment s) where
     s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
       Left err   -> Left (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
       Right text -> Right (advanceState state, text))
+
+  branchNode s a = Assignment Nothing (Set.singleton s) (\ src state _ -> case stateInput state of
+    []  -> Left (Error (stateSpan state) [Right s] Nothing)
+    s:_ -> case runAssignment a src state { stateInput = astChildren s } of
+      Left err -> Left err
+      Right (state', a') -> case stateInput state' of
+        []   -> Right (advanceState state, a')
+        s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s')))))
 
 runAssignment :: Assignment s a -> Source -> State s -> Either (Error (Either String s)) (State s, a)
 runAssignment (Assignment _ _ p) src inp = p src inp lowerBound
