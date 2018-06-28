@@ -2,6 +2,7 @@
 module Assigning.Assignment.Deterministic
 ( Assigning(..)
 , TermAssigning(..)
+, parseError
 , Assignment(..)
 , TermAssignment(..)
 ) where
@@ -13,6 +14,7 @@ import Data.Range
 import Data.Record
 import Data.Source as Source
 import Data.Span
+import qualified Data.Syntax as Syntax
 import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
@@ -25,6 +27,15 @@ class Assigning grammar f => TermAssigning syntaxes grammar f | f -> grammar, f 
   toTerm :: Element syntax syntaxes
          => f (syntax (Term (Sum syntaxes) (Record Location)))
          -> f         (Term (Sum syntaxes) (Record Location))
+
+parseError :: ( Bounded grammar
+              , Element Syntax.Error syntaxes
+              , HasCallStack
+              , TermAssigning syntaxes grammar f
+              )
+           => f (Term (Sum syntaxes) (Record Location))
+parseError = toTerm (leafNode maxBound $> (Syntax.Error (Syntax.ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") []))
+
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
