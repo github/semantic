@@ -1,5 +1,10 @@
 {-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures #-}
-module Assigning.Assignment.Deterministic where
+module Assigning.Assignment.Deterministic
+( Assigning(..)
+, TermAssigning(..)
+, Assignment(..)
+, TermAssignment(..)
+) where
 
 import Data.AST
 import Data.Error
