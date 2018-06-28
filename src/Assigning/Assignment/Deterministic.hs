@@ -3,10 +3,10 @@ module Assigning.Assignment.Deterministic
 ( Assigning(..)
 , TermAssigning(..)
 , parseError
-, State(..)
 , Assignment(..)
 , runAssignment
 , TermAssignment(..)
+, State(..)
 ) where
 
 import Data.AST
@@ -54,28 +54,6 @@ astSpan = nodeSpan . termAnnotation
 astChildren :: AST [] grammar -> [AST [] grammar]
 astChildren = termOut
 
-data State s = State
-  { stateBytes :: {-# UNPACK #-} !Int
-  , statePos   :: {-# UNPACK #-} !Pos
-  , stateInput :: ![AST [] s]
-  }
-  deriving (Eq, Ord, Show)
-
-stateRange :: State s -> Range
-stateRange state@(State _ _ [])    = Range (stateBytes state) (stateBytes state)
-stateRange       (State _ _ (s:_)) = astRange s
-
-stateSpan :: State s -> Span
-stateSpan state@(State _ _ [])    = Span (statePos state) (statePos state)
-stateSpan       (State _ _ (s:_)) = astSpan s
-
-stateLocation :: State s -> Record Location
-stateLocation state = stateRange state :. stateSpan state :. Nil
-
-advanceState :: State s -> State s
-advanceState state
-  | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
-  | otherwise                = state
 
 data Assignment s a = Assignment
   { nullable :: Maybe (State s -> a)
@@ -139,3 +117,27 @@ instance (Ord grammar, Show grammar) => TermAssigning syntaxes grammar (TermAssi
     (\ src state follow -> case match a src state follow of
       Left err -> Left err
       Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax))))
+
+
+data State s = State
+  { stateBytes :: {-# UNPACK #-} !Int
+  , statePos   :: {-# UNPACK #-} !Pos
+  , stateInput :: ![AST [] s]
+  }
+  deriving (Eq, Ord, Show)
+
+stateRange :: State s -> Range
+stateRange state@(State _ _ [])    = Range (stateBytes state) (stateBytes state)
+stateRange       (State _ _ (s:_)) = astRange s
+
+stateSpan :: State s -> Span
+stateSpan state@(State _ _ [])    = Span (statePos state) (statePos state)
+stateSpan       (State _ _ (s:_)) = astSpan s
+
+stateLocation :: State s -> Record Location
+stateLocation state = stateRange state :. stateSpan state :. Nil
+
+advanceState :: State s -> State s
+advanceState state
+  | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
+  | otherwise                = state
