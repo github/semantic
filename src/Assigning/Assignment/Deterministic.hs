@@ -58,15 +58,15 @@ advanceState state
 type Table s a = [(s, a)]
 
 data Assignment s a = Assignment
-  { assignEmpty :: Maybe a
+  { assignEmpty :: Maybe (State s -> a)
   , firstSet    :: Set s
   , match       :: Source -> State s -> Set s -> Either (Error (Either String s)) (State s, a)
   }
   deriving (Functor)
 
 instance Ord s => Applicative (Assignment s) where
-  pure a = Assignment (Just a) lowerBound (\ _ state _ -> Right (state, a))
-  Assignment n1 f1 p1 <*> ~(Assignment n2 f2 p2) = Assignment (n1 <*> n2) (combine (isJust n1) f1 f2) (p1 `pseq` p2)
+  pure a = Assignment (Just (const a)) lowerBound (\ _ state _ -> Right (state, a))
+  Assignment n1 f1 p1 <*> ~(Assignment n2 f2 p2) = Assignment (liftA2 (<*>) n1 n2) (combine (isJust n1) f1 f2) (p1 `pseq` p2)
     where p1 `pseq` p2 = \ src inp follow -> do
             (inp1, v1) <- p1 src inp (combine (isJust n2) f2 follow)
             (inp2, v2) <- p2 src inp1 follow
