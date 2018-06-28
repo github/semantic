@@ -39,6 +39,10 @@ data State s = State
   }
   deriving (Eq, Ord, Show)
 
+stateRange :: State s -> Range
+stateRange (State b _ [])    = Range b b
+stateRange (State _ _ (s:_)) = astRange s
+
 stateSpan :: State s -> Span
 stateSpan (State _ (Pos l c) [])    = Span (Pos l c) (Pos l c)
 stateSpan (State _ _         (s:_)) = astSpan s
