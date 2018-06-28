@@ -47,6 +47,9 @@ stateSpan :: State s -> Span
 stateSpan (State _ (Pos l c) [])    = Span (Pos l c) (Pos l c)
 stateSpan (State _ _         (s:_)) = astSpan s
 
+stateLocation :: State s -> Record Location
+stateLocation state = stateRange state :. stateSpan state :. Nil
+
 advanceState :: State s -> State s
 advanceState state
   | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
