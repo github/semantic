@@ -16,7 +16,7 @@ import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
 
-import SpecHelpers
+import SpecHelpers hiding (readFile)
 
 
 spec :: Spec

@@ -1,6 +1,10 @@
 syntax = "proto3";
 import "types.proto";
-package github.semantic.v1alpha1;
+import "error_details.proto";
+
+option java_package = "com.github.semantic.analysis";
+option go_package = "github.com/semantic/analysis/;analysis";
+package github.semantic;
 
 // Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and
 // comparing source code.
@@ -8,7 +12,7 @@ service CodeAnalysis {
   // Parsing
   //
   // Parse source code blobs and return abstract syntax trees.
-  rpc Parse (ParseTreeRequest) returns (ParseTreeResponse);
+  rpc ParseTree(ParseTreeRequest) returns (ParseTreeResponse);
   rpc ParseRaw (ParseTreeRequest) returns (RawParseTreeResponse);
 
   // Diffing
@@ -21,7 +25,8 @@ service CodeAnalysis {
   // Analyzing
   //
   // Calculate an import graph for a project.
-  // rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
+  rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
+
   // rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
 
   // Check health & status of the service.
@@ -48,6 +53,15 @@ message SummarizeDiffRequest  {
 message SummarizeDiffResponse {
   repeated DiffSummary changes = 1;
   repeated ParseError errors = 2;
+}
+
+message ImportGraphRequest {
+  Project project = 1;
+}
+
+message ImportGraphResponse {
+  ImportGraph graph = 1;
+  DebugInfo error_info = 2;
 }
 
 message BlobPair {

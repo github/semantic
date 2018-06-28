@@ -3,7 +3,7 @@ module Semantic.Parse where
 
 import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
+import Analysis.PackageDef (HasPackageDef)
 import Data.AST
 import Data.Blob
 import Data.JSON.Fields
@@ -22,7 +22,6 @@ runParse :: (Member (Distribute WrappedTask) effs, Member Task effs) => TermRend
 runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm) >=> serialize JSON
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
-runParse ImportsTermRenderer          = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)) >=> serialize JSON
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 

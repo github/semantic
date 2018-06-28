@@ -6,6 +6,7 @@ import           Data.JSON.Fields
 import           Data.Scientific.Exts
 import qualified Data.Text as T
 import           Diffing.Algorithm
+import           Numeric.Exts
 import           Prelude hiding (Float, null)
 import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
@@ -42,7 +43,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: We should use something more robust than shelling out to readMaybe.
   eval (Data.Syntax.Literal.Integer x) =
-    rvalBox =<< integer <$> maybeM (throwEvalError (IntegerFormatError x)) (readMaybe (T.unpack x))
+    rvalBox =<< (integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x))
 
 -- | A literal float of unspecified width.
 

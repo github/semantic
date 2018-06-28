@@ -143,7 +143,7 @@ instance Named1 [] where
 
 instance Message1 [] where
   liftEncodeMessage encodeMessage num = foldMap (Encode.embedded num . encodeMessage (fieldNumber 1))
-  liftDecodeMessage decodeMessage num = fmap toList  ((Decode.repeated (Decode.embedded' oneMsg)) `Decode.at` num)
+  liftDecodeMessage decodeMessage num = toList <$> Decode.repeated (Decode.embedded' oneMsg) `Decode.at` num
     where
       oneMsg = decodeMessage (fieldNumber 1)
   liftDotProto (_ :: Proxy [a]) =  [ Proto.DotProtoMessageField $ Proto.DotProtoField (fieldNumber 1) ty (Proto.Single "listContent") [] Nothing ]
