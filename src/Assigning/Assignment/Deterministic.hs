@@ -13,32 +13,32 @@ combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
 
 data State s = State
-  { stateDelta :: {-# UNPACK #-} !Delta
+  { stateOffset :: {-# UNPACK #-} !Offset
   , stateInput :: ![s]
   }
   deriving (Eq, Ord, Show)
 
-stateSpan :: Measured Delta s => State s -> Span
-stateSpan (State   (Delta _ ls cs) [])    = Span (Pos ls cs) (Pos ls cs)
-stateSpan (State d@(Delta _ ls cs) (s:_)) = Span (Pos ls cs) (Pos ls' cs')
-  where Delta _ ls' cs' = d <> measure s
+stateSpan :: Measured Offset s => State s -> Span
+stateSpan (State   (Offset _ ls cs) [])    = Span (Pos ls cs) (Pos ls cs)
+stateSpan (State d@(Offset _ ls cs) (s:_)) = Span (Pos ls cs) (Pos ls' cs')
+  where Offset _ ls' cs' = d <> measure s
 
-advanceState :: Measured Delta s => State s -> State s
+advanceState :: Measured Offset s => State s -> State s
 advanceState state@(State _ []) = state
 advanceState (State o (s : ss)) = State (o <> measure s) ss
 
-data Delta = Delta
-  { deltaBytes :: {-# UNPACK #-} !Int
-  , deltaLines :: {-# UNPACK #-} !Int
-  , deltaCols  :: {-# UNPACK #-} !Int
+data Offset = Offset
+  { offsetBytes :: {-# UNPACK #-} !Int
+  , offsetLines :: {-# UNPACK #-} !Int
+  , offsetCols  :: {-# UNPACK #-} !Int
   }
   deriving (Eq, Ord, Show)
 
-instance Lower Delta where
-  lowerBound = Delta 0 0 0
+instance Lower Offset where
+  lowerBound = Offset 0 0 0
 
-instance Semigroup Delta where
-  Delta b1 l1 c1 <> Delta b2 l2 c2 = Delta (b1 + b2) (l1 + l2) (c1 + c2)
+instance Semigroup Offset where
+  Offset b1 l1 c1 <> Offset b2 l2 c2 = Offset (b1 + b2) (l1 + l2) (c1 + c2)
 
 type Table s a = [(s, a)]
 
@@ -58,7 +58,7 @@ instance Ord s => Applicative (Assignment s) where
             let res = v1 v2
             res `seq` pure (inp2, res)
 
-instance (Measured Delta s, Ord s) => Alternative (Assignment s) where
+instance (Measured Offset s, Ord s) => Alternative (Assignment s) where
   empty = Assignment Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
   Assignment n1 f1 p1 <|> Assignment n2 f2 p2 = Assignment (n1 <|> n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
@@ -73,7 +73,7 @@ instance (Measured Delta s, Ord s) => Alternative (Assignment s) where
                     else if isJust n2 && s `Set.member` follow then p2 (advanceState state) follow
                     else Left (Error (stateSpan state) (toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just s))
 
-instance (Measured Delta s, Ord s, Show s) => Assigning s (Assignment s) where
+instance (Measured Offset s, Ord s, Show s) => Assigning s (Assignment s) where
   sym s = Assignment Nothing (Set.singleton s) (\ state _ -> case stateInput state of
     []  -> Left (Error (stateSpan state) [s] Nothing)
     _:_ -> Right (advanceState state, s))
