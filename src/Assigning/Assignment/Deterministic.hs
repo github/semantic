@@ -22,41 +22,41 @@ import Data.Term (Term, termIn, termAnnotation, termOut)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
 
-class (Alternative f, Ord grammar, Show grammar) => Assigning grammar f | f -> grammar where
-  leafNode   :: grammar -> f Text
-  branchNode :: grammar -> f a -> f a
+class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symbol where
+  leafNode   :: symbol -> f Text
+  branchNode :: symbol -> f a -> f a
 
-class Assigning grammar f => TermAssigning syntaxes grammar f | f -> grammar, f -> syntaxes where
+class Assigning symbol f => TermAssigning syntaxes symbol f | f -> symbol, f -> syntaxes where
   toTerm :: Element syntax syntaxes
          => f (syntax (Term (Sum syntaxes) (Record Location)))
          -> f         (Term (Sum syntaxes) (Record Location))
 
-parseError :: ( Bounded grammar
+parseError :: ( Bounded symbol
               , Element Syntax.Error syntaxes
               , HasCallStack
-              , TermAssigning syntaxes grammar f
+              , TermAssigning syntaxes symbol f
               )
            => f (Term (Sum syntaxes) (Record Location))
 parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
-data Assignment s a = Assignment
-  { nullable :: Maybe (State s -> a)
-  , firstSet :: Set s
-  , choices  :: [(s, Cont s a)]
+data Assignment symbol a = Assignment
+  { nullable :: Maybe (State symbol -> a)
+  , firstSet :: Set symbol
+  , choices  :: [(symbol, Cont symbol a)]
   }
   deriving (Functor)
 
-type Cont s a = Source -> State s -> [Set s] -> Either (Error (Either String s)) (State s, a)
+type Cont symbol a = Source -> State symbol -> [Set symbol] -> Either (Error (Either String symbol)) (State symbol, a)
 
-combine :: Ord s => Maybe a -> Set s -> Set s -> Set s
+combine :: Ord symbol => Maybe a -> Set symbol -> Set symbol -> Set symbol
 combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
 
-choose :: Ord s
-       => Maybe (State s -> a)
-       -> Set s
-       -> Map s (Cont s a)
-       -> Cont s a
+choose :: Ord symbol
+       => Maybe (State symbol -> a)
+       -> Set symbol
+       -> Map symbol (Cont symbol a)
+       -> Cont symbol a
 choose nullable firstSet table src state follow = case stateInput state of
   []  -> case nullable of
     Just f -> Right (state, f state)
@@ -68,7 +68,7 @@ choose nullable firstSet table src state follow = case stateInput state of
           Just f | any (s `Set.member`) follow -> Right (state, f state)
           _                                    -> Left (Error (stateSpan state) (Right <$> toList firstSet) (Just (Right s)))
 
-instance Ord s => Applicative (Assignment s) where
+instance Ord symbol => Applicative (Assignment symbol) where
   pure a = Assignment (Just (const a)) lowerBound []
   Assignment n1 f1 t1 <*> ~(Assignment n2 f2 t2) = Assignment (liftA2 (<*>) n1 n2) (combine n1 f1 f2) (t1 `tseq` t2)
     where table2 = Map.fromList t2
@@ -86,11 +86,11 @@ instance Ord s => Applicative (Assignment s) where
                 pq `seq` pure (state', pq))) t2
               _ -> []
 
-instance Ord s => Alternative (Assignment s) where
+instance Ord symbol => Alternative (Assignment symbol) where
   empty = Assignment Nothing lowerBound []
   Assignment n1 f1 t1 <|> Assignment n2 f2 t2 = Assignment (n1 <|> n2) (f1 <> f2) (t1 <> t2)
 
-instance (Ord s, Show s) => Assigning s (Assignment s) where
+instance (Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
   leafNode s = Assignment Nothing (Set.singleton s)
     [ (s, \ src state _ -> case stateInput state of
       []  -> Left (Error (stateSpan state) [Right s] Nothing)
@@ -105,7 +105,7 @@ instance (Ord s, Show s) => Assigning s (Assignment s) where
       s:_ -> first (const (advanceState state)) <$> runAssignment a src state { stateInput = astChildren s })
     ]
 
-runAssignment :: Ord s => Assignment s a -> Source -> State s -> Either (Error (Either String s)) (State s, a)
+runAssignment :: Ord symbol => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
 runAssignment (Assignment nullable firstSet table) src input
   = case choose nullable firstSet (Map.fromList table) src input lowerBound of
     Left err -> Left err
@@ -114,10 +114,10 @@ runAssignment (Assignment nullable firstSet table) src input
       s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s'))))
 
 
-newtype TermAssignment (syntaxes :: [* -> *]) grammar a = TermAssignment { runTermAssignment :: Assignment grammar a }
-  deriving (Alternative, Applicative, Functor, Assigning grammar)
+newtype TermAssignment (syntaxes :: [* -> *]) symbol a = TermAssignment { runTermAssignment :: Assignment symbol a }
+  deriving (Alternative, Applicative, Functor, Assigning symbol)
 
-instance (Ord grammar, Show grammar) => TermAssigning syntaxes grammar (TermAssignment syntaxes grammar) where
+instance (Ord symbol, Show symbol) => TermAssigning syntaxes symbol (TermAssignment syntaxes symbol) where
   toTerm (TermAssignment a) = TermAssignment (Assignment
     (case nullable a of
       Just f  -> Just (\ state -> termIn (stateLocation state) (inject (f state)))
@@ -152,14 +152,14 @@ advanceState state
   | otherwise                = state
 
 
-astSymbol :: AST [] grammar -> grammar
+astSymbol :: AST [] symbol -> symbol
 astSymbol = nodeSymbol . termAnnotation
 
-astRange :: AST [] grammar -> Range
+astRange :: AST [] symbol -> Range
 astRange = nodeByteRange . termAnnotation
 
-astSpan :: AST [] grammar -> Span
+astSpan :: AST [] symbol -> Span
 astSpan = nodeSpan . termAnnotation
 
-astChildren :: AST [] grammar -> [AST [] grammar]
+astChildren :: AST [] symbol -> [AST [] symbol]
 astChildren = termOut
