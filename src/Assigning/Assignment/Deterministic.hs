@@ -9,9 +9,9 @@ import Data.Span
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
 
-class (Alternative f, Ord s, Show s) => Assigning s f | f -> s where
-  leafNode   :: s -> f Text
-  branchNode :: s -> f a -> f a
+class (Alternative f, Ord grammar, Show grammar) => Assigning grammar f | f -> grammar where
+  leafNode   :: grammar -> f Text
+  branchNode :: grammar -> f a -> f a
   -- TODO: toTerm
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
