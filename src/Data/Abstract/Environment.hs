@@ -3,19 +3,21 @@ module Data.Abstract.Environment
   , Bindings(..)
   , addresses
   , delete
+  , flatPairs
   , head
+  , insert
+  , intersect
+  , lookup
   , mergeEnvs
   , mergeNewer
-  , insert
-  , lookup
   , names
-  , intersect
+  , newEnv
   , overwrite
   , pairs
-  , unpairs
   , pop
   , push
   , roots
+  , unpairs
   ) where
 
 import           Data.Abstract.Live
@@ -82,11 +84,17 @@ mergeNewer (Environment a) (Environment b) =
 --
 -- >>> pairs shadowed
 -- [("foo",Precise 1)]
-pairs :: Environment address -> [(Name, address)]
-pairs = Map.toList . fold . fmap unBindings . unEnvironment
+pairs :: Bindings address -> [(Name, address)]
+pairs = Map.toList . unBindings
 
-unpairs :: [(Name, address)] -> Environment address
-unpairs = Environment . fmap Bindings . pure . Map.fromList
+unpairs :: [(Name, address)] -> Bindings address
+unpairs = Bindings . Map.fromList
+
+flatPairs :: Environment address -> [(Name, address)]
+flatPairs = (>>= pairs) . toList . unEnvironment
+
+newEnv :: Bindings address -> Environment address
+newEnv = Environment . pure
 
 -- | Lookup a 'Name' in the environment.
 --
@@ -111,17 +119,17 @@ trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null . unBindings) as
 
 intersect :: Foldable t => t Name -> Environment address -> Environment address
-intersect names env = unpairs (mapMaybe lookupName (toList names))
+intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
   where
     lookupName name = (,) name <$> lookup name env
 
 -- | Get all bound 'Name's in an environment.
 names :: Environment address -> [Name]
-names = fmap fst . pairs
+names = fmap fst . flatPairs
 
 -- | Lookup and alias name-value bindings from an environment.
 overwrite :: [(Name, Name)] -> Environment address -> Environment address
-overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
+overwrite pairs env = newEnv . unpairs $ mapMaybe lookupAndAlias pairs
   where
     lookupAndAlias (oldName, newName) = (,) newName <$> lookup oldName env
 
@@ -132,10 +140,10 @@ roots :: (Ord address, Foldable t) => Environment address -> t Name -> Live addr
 roots env names = addresses (names `intersect` env)
 
 addresses :: Ord address => Environment address -> Live address
-addresses = fromAddresses . map snd . pairs
+addresses = fromAddresses . map snd . flatPairs
 
 
 instance Lower (Environment address) where lowerBound = Environment (lowerBound :| [])
 
 instance Show address => Show (Environment address) where
-  showsPrec d = showsUnaryWith showsPrec "Environment" d . pairs
+  showsPrec d = showsUnaryWith showsPrec "Environment" d . flatPairs
