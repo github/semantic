@@ -1,5 +1,6 @@
 module Data.Abstract.Environment
   ( Environment(..)
+  , Bindings(..)
   , addresses
   , delete
   , head
@@ -30,10 +31,24 @@ import           Prologue
 -- >>> let bright = push (insert (name "foo") (Precise 0) lowerBound)
 -- >>> let shadowed = insert (name "foo") (Precise 1) bright
 
+-- | A map of names to values. Represents a single scope level of an environment chain.
+newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
+  deriving (Eq, Ord)
+
+instance Semigroup (Bindings address) where
+  (<>) (Bindings a) (Bindings b) = Bindings (a <> b)
+
+instance Monoid (Bindings address) where
+  mempty = Bindings mempty
+  mappend = (<>)
+
+instance Lower (Bindings address) where
+  lowerBound = mempty
+
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
-newtype Environment address = Environment { unEnvironment :: NonEmpty (Map.Map Name address) }
+newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings address) }
   deriving (Eq, Ord)
 
 mergeEnvs :: Environment address -> Environment address -> Environment address
@@ -57,43 +72,43 @@ head (Environment (a :| _)) = Environment (a :| [])
 --   name to address map, the second definition wins.
 mergeNewer :: Environment address -> Environment address -> Environment address
 mergeNewer (Environment a) (Environment b) =
-    Environment (NonEmpty.fromList . reverse $ alignWith (mergeThese combine) (reverse as) (reverse bs))
+    Environment (NonEmpty.fromList . reverse . fmap Bindings $ alignWith (mergeThese combine) (reverse as) (reverse bs))
     where
       combine = Map.unionWith (flip const)
-      as = toList a
-      bs = toList b
+      as = unBindings <$> toList a
+      bs = unBindings <$> toList b
 
 -- | Extract an association list of bindings from an 'Environment'.
 --
 -- >>> pairs shadowed
 -- [("foo",Precise 1)]
 pairs :: Environment address -> [(Name, address)]
-pairs = Map.toList . fold . unEnvironment
+pairs = Map.toList . fold . fmap unBindings . unEnvironment
 
 unpairs :: [(Name, address)] -> Environment address
-unpairs = Environment . pure . Map.fromList
+unpairs = Environment . fmap Bindings . pure . Map.fromList
 
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
 -- Just (Precise 1)
 lookup :: Name -> Environment address -> Maybe address
-lookup name = foldMapA (Map.lookup name) . unEnvironment
+lookup name = foldMapA (Map.lookup name) . fmap unBindings . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 insert :: Name -> address -> Environment address -> Environment address
-insert name addr (Environment (a :| as)) = Environment (Map.insert name addr a :| as)
+insert name addr (Environment ((Bindings a) :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
 
 -- | Remove a 'Name' from the environment.
 --
 -- >>> delete (name "foo") shadowed
 -- Environment []
 delete :: Name -> Environment address -> Environment address
-delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
+delete name = trim . Environment . fmap (Bindings . Map.delete name) . fmap unBindings . unEnvironment
 
 trim :: Environment address -> Environment address
 trim (Environment (a :| as)) = Environment (a :| filtered)
-  where filtered = filter (not . Map.null) as
+  where filtered = filter (not . Map.null . unBindings) as
 
 intersect :: Foldable t => t Name -> Environment address -> Environment address
 intersect names env = unpairs (mapMaybe lookupName (toList names))
