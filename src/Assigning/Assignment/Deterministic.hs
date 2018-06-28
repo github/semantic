@@ -1,9 +1,11 @@
 {-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures #-}
 module Assigning.Assignment.Deterministic where
 
+import Data.AST (Location)
 import Data.Error
 import qualified Data.Set as Set
 import Data.Range
+import Data.Record
 import Data.Source as Source
 import Data.Span
 import Data.Term (Term)
@@ -16,8 +18,8 @@ class (Alternative f, Ord grammar, Show grammar) => Assigning grammar f | f -> g
 
 class Assigning grammar f => TermAssigning syntaxes grammar f | f -> grammar, f -> syntaxes where
   toTerm :: Element syntax syntaxes
-         => f (syntax (Term (Sum syntaxes) ann))
-         -> f         (Term (Sum syntaxes) ann)
+         => f (syntax (Term (Sum syntaxes) (Record Location)))
+         -> f         (Term (Sum syntaxes) (Record Location))
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
