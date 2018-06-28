@@ -6,13 +6,18 @@ import qualified Data.Set as Set
 import Data.Range
 import Data.Source as Source
 import Data.Span
+import Data.Term (Term)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
 
 class (Alternative f, Ord grammar, Show grammar) => Assigning grammar f | f -> grammar where
   leafNode   :: grammar -> f Text
   branchNode :: grammar -> f a -> f a
-  -- TODO: toTerm
+
+class Assigning grammar f => TermAssigning syntaxes grammar f | f -> grammar, f -> syntaxes where
+  toTerm :: Element syntax syntaxes
+         => f (syntax (Term (Sum syntaxes) ann))
+         -> f         (Term (Sum syntaxes) ann)
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
