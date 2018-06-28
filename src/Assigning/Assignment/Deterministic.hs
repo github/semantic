@@ -8,6 +8,9 @@ import Prologue
 
 class (Alternative f, Ord s, Show s) => Assigning s f | f -> s where
   sym :: s -> f s
+  -- TODO: leafNode
+  -- TODO: branchNode
+  -- TODO: toTerm
 
 combine :: Ord s => Bool -> Set s -> Set s -> Set s
 combine e s1 s2 = if e then s1 <> s2 else lowerBound
