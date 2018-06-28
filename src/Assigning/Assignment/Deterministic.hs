@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving #-}
 module Assigning.Assignment.Deterministic where
 
 import Data.Error
@@ -96,3 +96,7 @@ instance (Ord s, Show s) => Assigning s (Assignment s) where
 
 runAssignment :: Assignment s a -> Source -> State s -> Either (Error (Either String s)) (State s, a)
 runAssignment (Assignment _ _ p) src inp = p src inp lowerBound
+
+
+newtype TermAssignment syntaxes grammar a = TermAssignment { runTermAssignment :: Assignment grammar a }
+  deriving (Alternative, Applicative, Functor, Assigning grammar)
