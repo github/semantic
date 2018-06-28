@@ -119,7 +119,7 @@ taggedGraphToImportGraph = accumToAdj . adjMapToAccum . adjacencyMap . toGraph .
             V.Variable{} -> VARIABLE
 
 -- Annotate all vertices of a 'Graph' with a 'Tag', starting from 1.
--- Two vertices @a@ and @b@ will share a 'Tag' iff @hash a == hash b@.
+-- Two vertices @a@ and @b@ will share a 'Tag' iff @a == b@.
 tagGraph :: forall a . (Eq a, Hashable a) => Graph a -> Graph (a, Tag)
 tagGraph = unwrap . traverse go where
 
