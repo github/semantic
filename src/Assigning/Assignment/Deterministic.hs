@@ -11,6 +11,7 @@ module Assigning.Assignment.Deterministic
 
 import Data.AST
 import Data.Error
+import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Data.Range
 import Data.Record
@@ -42,54 +43,74 @@ parseError = toTerm (leafNode maxBound $> (Syntax.Error (Syntax.ErrorStack (getC
 data Assignment s a = Assignment
   { nullable :: Maybe (State s -> a)
   , firstSet :: Set s
-  , match    :: Source -> State s -> Set s -> Either (Error (Either String s)) (State s, a)
+  , choices  :: [(s, Cont s a)]
   }
   deriving (Functor)
+
+type Cont s a = Source -> State s -> [Set s] -> Either (Error (Either String s)) (State s, a)
 
 combine :: Ord s => Maybe a -> Set s -> Set s -> Set s
 combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
 
+choose :: Ord s
+       => Maybe (State s -> a)
+       -> Set s
+       -> Map s (Cont s a)
+       -> Cont s a
+choose nullable firstSet table src state follow = case stateInput state of
+  []  -> case nullable of
+    Just f -> Right (state, f state)
+    _      -> Left (Error (stateSpan state) (Right <$> toList firstSet) Nothing)
+  s:_ -> case astSymbol s `Map.lookup` table of
+    Just k -> k src state follow
+    _      -> notFound (astSymbol s) state follow
+  where notFound s state follow = case nullable of
+          Just f | any (s `Set.member`) follow -> Right (state, f state)
+          _                                    -> Left (Error (stateSpan state) (Right <$> toList firstSet) (Just (Right s)))
+
 instance Ord s => Applicative (Assignment s) where
-  pure a = Assignment (Just (const a)) lowerBound (\ _ state _ -> Right (state, a))
-  Assignment n1 f1 p1 <*> ~(Assignment n2 f2 p2) = Assignment (liftA2 (<*>) n1 n2) (combine n1 f1 f2) (p1 `pseq` p2)
-    where p1 `pseq` p2 = \ src inp follow -> do
-            (inp1, v1) <- p1 src inp (combine n2 f2 follow)
-            (inp2, v2) <- p2 src inp1 follow
-            let res = v1 v2
-            res `seq` pure (inp2, res)
+  pure a = Assignment (Just (const a)) lowerBound []
+  Assignment n1 f1 t1 <*> ~(Assignment n2 f2 t2) = Assignment (liftA2 (<*>) n1 n2) (combine n1 f1 f2) (t1 `tseq` t2)
+    where table2 = Map.fromList t2
+          t1 `tseq` t2
+            = map (fmap (\ p src state follow -> do
+              (state', p') <- p src state (f2 : follow)
+              (state'', q') <- choose n2 f2 table2 src state' follow
+              let pq = p' q'
+              pq `seq` pure (state'', pq))) t1
+            <> case n1 of
+              Just p -> map (fmap (\ q src state follow -> do
+                let p' = p state
+                (state', q') <- p' `seq` q src state follow
+                let pq = p' q'
+                pq `seq` pure (state', pq))) t2
+              _ -> []
 
 instance Ord s => Alternative (Assignment s) where
-  empty = Assignment Nothing lowerBound (\ _ s _ -> Left (Error (stateSpan s) [] (Right . astSymbol <$> listToMaybe (stateInput s))))
-  Assignment n1 f1 p1 <|> Assignment n2 f2 p2 = Assignment (n1 <|> n2) (f1 <> f2) (p1 `palt` p2)
-    where p1 `palt` p2 = p
-            where p src state@(State _ _ []) follow =
-                    if      isJust n1 then p1 src state follow
-                    else if isJust n2 then p2 src state follow
-                    else Left (Error (stateSpan state) (Right <$> toList (f1 <> f2)) Nothing)
-                  p src state@(State _ _ (s:_)) follow =
-                    if      astSymbol s `Set.member` f1 then p1 src (advanceState state) follow
-                    else if astSymbol s `Set.member` f2 then p2 src (advanceState state) follow
-                    else if isJust n1 && astSymbol s `Set.member` follow then p1 src (advanceState state) follow
-                    else if isJust n2 && astSymbol s `Set.member` follow then p2 src (advanceState state) follow
-                    else Left (Error (stateSpan state) (Right <$> toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just (Right (astSymbol s))))
+  empty = Assignment Nothing lowerBound []
+  Assignment n1 f1 t1 <|> Assignment n2 f2 t2 = Assignment (n1 <|> n2) (f1 <> f2) (t1 <> t2)
 
 instance (Ord s, Show s) => Assigning s (Assignment s) where
-  leafNode s = Assignment Nothing (Set.singleton s) (\ src state _ -> case stateInput state of
-    []  -> Left (Error (stateSpan state) [Right s] Nothing)
-    s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
-      Left err   -> Left (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
-      Right text -> Right (advanceState state, text))
+  leafNode s = Assignment Nothing (Set.singleton s)
+    [ (s, \ src state _ -> case stateInput state of
+      []  -> Left (Error (stateSpan state) [Right s] Nothing)
+      s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
+        Left err   -> Left (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
+        Right text -> Right (advanceState state, text))
+    ]
 
-  branchNode s a = Assignment Nothing (Set.singleton s) (\ src state _ -> case stateInput state of
-    []  -> Left (Error (stateSpan state) [Right s] Nothing)
-    s:_ -> case runAssignment a src state { stateInput = astChildren s } of
-      Left err -> Left err
-      Right (state', a') -> case stateInput state' of
-        []   -> Right (advanceState state, a')
-        s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s')))))
+  branchNode s a = Assignment Nothing (Set.singleton s)
+    [ (s, \ src state _ -> case stateInput state of
+      []  -> Left (Error (stateSpan state) [Right s] Nothing)
+      s:_ -> case runAssignment a src state { stateInput = astChildren s } of
+        Left err -> Left err
+        Right (state', a') -> case stateInput state' of
+          []   -> Right (advanceState state, a')
+          s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s')))))
+    ]
 
-runAssignment :: Assignment s a -> Source -> State s -> Either (Error (Either String s)) (State s, a)
-runAssignment (Assignment _ _ p) src inp = p src inp lowerBound
+runAssignment :: Ord s => Assignment s a -> Source -> State s -> Either (Error (Either String s)) (State s, a)
+runAssignment (Assignment nullable firstSet table) src input = choose nullable firstSet (Map.fromList table) src input lowerBound
 
 
 newtype TermAssignment (syntaxes :: [* -> *]) grammar a = TermAssignment { runTermAssignment :: Assignment grammar a }
@@ -101,9 +122,9 @@ instance (Ord grammar, Show grammar) => TermAssigning syntaxes grammar (TermAssi
       Just f  -> Just (\ state -> termIn (stateLocation state) (inject (f state)))
       Nothing -> Nothing)
     (firstSet a)
-    (\ src state follow -> case match a src state follow of
+    (map (fmap (\ match src state follow -> case match src state follow of
       Left err -> Left err
-      Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax))))
+      Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a)))
 
 
 data State s = State
