@@ -102,7 +102,7 @@ data Parser term where
                    => Parser (Term ast (Node grammar))                           -- A parser producing AST.
                    -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
-  DeterministicParser :: (Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
+  DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
                       => Parser (AST [] grammar)
                       -> Deterministic.TermAssignment syntaxes grammar (Term (Sum syntaxes) (Record Location))
                       -> Parser (Term (Sum syntaxes) (Record Location))
