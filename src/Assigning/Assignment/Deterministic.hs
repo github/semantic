@@ -42,18 +42,6 @@ parseError = toTerm (leafNode maxBound $> (Syntax.Error (Syntax.ErrorStack (getC
 combine :: Ord s => Maybe a -> Set s -> Set s -> Set s
 combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
 
-astSymbol :: AST [] grammar -> grammar
-astSymbol = nodeSymbol . termAnnotation
-
-astRange :: AST [] grammar -> Range
-astRange = nodeByteRange . termAnnotation
-
-astSpan :: AST [] grammar -> Span
-astSpan = nodeSpan . termAnnotation
-
-astChildren :: AST [] grammar -> [AST [] grammar]
-astChildren = termOut
-
 
 data Assignment s a = Assignment
   { nullable :: Maybe (State s -> a)
@@ -141,3 +129,16 @@ advanceState :: State s -> State s
 advanceState state
   | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
   | otherwise                = state
+
+
+astSymbol :: AST [] grammar -> grammar
+astSymbol = nodeSymbol . termAnnotation
+
+astRange :: AST [] grammar -> Range
+astRange = nodeByteRange . termAnnotation
+
+astSpan :: AST [] grammar -> Span
+astSpan = nodeSpan . termAnnotation
+
+astChildren :: AST [] grammar -> [AST [] grammar]
+astChildren = termOut
