@@ -53,8 +53,8 @@ stateRange (State b _ [])    = Range b b
 stateRange (State _ _ (s:_)) = astRange s
 
 stateSpan :: State s -> Span
-stateSpan (State _ (Pos l c) [])    = Span (Pos l c) (Pos l c)
-stateSpan (State _ _         (s:_)) = astSpan s
+stateSpan state@(State _ _ [])    = Span (statePos state) (statePos state)
+stateSpan       (State _ _ (s:_)) = astSpan s
 
 stateLocation :: State s -> Record Location
 stateLocation state = stateRange state :. stateSpan state :. Nil
