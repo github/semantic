@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
 module Assigning.Assignment.Deterministic where
 
 import Data.Error
@@ -25,32 +25,20 @@ data AST grammar = AST
   deriving (Eq, Ord, Show)
 
 data State s = State
-  { stateOffset :: {-# UNPACK #-} !Offset
-  , stateInput  :: ![s]
+  { stateBytes :: {-# UNPACK #-} !Int
+  , statePos   :: {-# UNPACK #-} !Pos
+  , stateInput :: ![AST s]
   }
   deriving (Eq, Ord, Show)
 
-stateSpan :: Measured Offset s => State s -> Span
-stateSpan (State   (Offset _ ls cs) [])    = Span (Pos ls cs) (Pos ls cs)
-stateSpan (State d@(Offset _ ls cs) (s:_)) = Span (Pos ls cs) (Pos ls' cs')
-  where Offset _ ls' cs' = d <> measure s
+stateSpan :: State s -> Span
+stateSpan (State _ (Pos l c) [])    = Span (Pos l c) (Pos l c)
+stateSpan (State _ _         (s:_)) = astSpan s
 
-advanceState :: Measured Offset s => State s -> State s
-advanceState state@(State _ []) = state
-advanceState (State o (s : ss)) = State (o <> measure s) ss
-
-data Offset = Offset
-  { offsetBytes :: {-# UNPACK #-} !Int
-  , offsetLines :: {-# UNPACK #-} !Int
-  , offsetCols  :: {-# UNPACK #-} !Int
-  }
-  deriving (Eq, Ord, Show)
-
-instance Lower Offset where
-  lowerBound = Offset 0 0 0
-
-instance Semigroup Offset where
-  Offset b1 l1 c1 <> Offset b2 l2 c2 = Offset (b1 + b2) (l1 + l2) (c1 + c2)
+advanceState :: State s -> State s
+advanceState state
+  | s:ss <- stateInput state = State (end (astRange s)) (spanEnd (astSpan s)) ss
+  | otherwise                = state
 
 type Table s a = [(s, a)]
 
@@ -70,29 +58,25 @@ instance Ord s => Applicative (Assignment s) where
             let res = v1 v2
             res `seq` pure (inp2, res)
 
-instance (Measured Offset s, Ord s) => Alternative (Assignment s) where
-  empty = Assignment Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (listToMaybe (stateInput s))))
+instance Ord s => Alternative (Assignment s) where
+  empty = Assignment Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (astSymbol <$> listToMaybe (stateInput s))))
   Assignment n1 f1 p1 <|> Assignment n2 f2 p2 = Assignment (n1 <|> n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
-            where p state@(State _ []) follow =
+            where p state@(State _ _ []) follow =
                     if      isJust n1 then p1 state follow
                     else if isJust n2 then p2 state follow
                     else Left (Error (stateSpan state) (toList (f1 <> f2)) Nothing)
-                  p state@(State _ (s:_)) follow =
-                    if      s `Set.member` f1 then p1 (advanceState state) follow
-                    else if s `Set.member` f2 then p2 (advanceState state) follow
-                    else if isJust n1 && s `Set.member` follow then p1 (advanceState state) follow
-                    else if isJust n2 && s `Set.member` follow then p2 (advanceState state) follow
-                    else Left (Error (stateSpan state) (toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just s))
+                  p state@(State _ _ (s:_)) follow =
+                    if      astSymbol s `Set.member` f1 then p1 (advanceState state) follow
+                    else if astSymbol s `Set.member` f2 then p2 (advanceState state) follow
+                    else if isJust n1 && astSymbol s `Set.member` follow then p1 (advanceState state) follow
+                    else if isJust n2 && astSymbol s `Set.member` follow then p2 (advanceState state) follow
+                    else Left (Error (stateSpan state) (toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just (astSymbol s)))
 
-instance (Measured Offset s, Ord s, Show s) => Assigning s (Assignment s) where
+instance (Ord s, Show s) => Assigning s (Assignment s) where
   sym s = Assignment Nothing (Set.singleton s) (\ state _ -> case stateInput state of
     []  -> Left (Error (stateSpan state) [s] Nothing)
     _:_ -> Right (advanceState state, s))
 
 invokeDet :: Assignment s a -> State s -> Either (Error s) a
 invokeDet (Assignment _ _ p) inp = snd <$> p inp lowerBound
-
-
-class Measured v a | a -> v where
-  measure :: a -> v
