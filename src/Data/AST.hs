@@ -17,7 +17,7 @@ data Node grammar = Node
   , nodeByteRange :: {-# UNPACK #-} !Range
   , nodeSpan      :: {-# UNPACK #-} !Span
   }
-  deriving (Eq, Show)
+  deriving (Eq, Ord, Show)
 
 
 instance Show grammar => ToJSONFields (Node grammar) where
