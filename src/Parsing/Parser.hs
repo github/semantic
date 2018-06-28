@@ -166,7 +166,7 @@ javaASTParser :: Parser (AST [] Java.Grammar)
 javaASTParser = ASTParser tree_sitter_java
 
 jsonParser :: Parser JSON.Term
-jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
+jsonParser = DeterministicParser (ASTParser tree_sitter_json) JSON.assignment
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment

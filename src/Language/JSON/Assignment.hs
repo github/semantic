@@ -5,11 +5,10 @@ module Language.JSON.Assignment
 , Term)
 where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
+import Assigning.Assignment.Deterministic hiding (Assignment)
+import Data.AST
 import Data.Record
 import Data.Sum
-import Data.Syntax (parseError)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
@@ -28,7 +27,7 @@ type Syntax =
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = TermAssignment Syntax Grammar
 
 
 assignment :: Assignment Term
