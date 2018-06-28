@@ -58,9 +58,9 @@ advanceState state
 type Table s a = [(s, a)]
 
 data Assignment s a = Assignment
-  { assignEmpty :: Maybe (State s -> a)
-  , firstSet    :: Set s
-  , match       :: Source -> State s -> Set s -> Either (Error (Either String s)) (State s, a)
+  { nullable :: Maybe (State s -> a)
+  , firstSet :: Set s
+  , match    :: Source -> State s -> Set s -> Either (Error (Either String s)) (State s, a)
   }
   deriving (Functor)
 
