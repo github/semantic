@@ -4,6 +4,7 @@ module Assigning.Assignment.Deterministic
 , TermAssigning(..)
 , parseError
 , Assignment(..)
+, runAssignment
 , TermAssignment(..)
 ) where
 
