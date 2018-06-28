@@ -10,7 +10,6 @@ import Data.Text.Encoding (decodeUtf8')
 import Prologue
 
 class (Alternative f, Ord s, Show s) => Assigning s f | f -> s where
-  sym :: s -> f s
   leafNode   :: s -> f Text
   branchNode :: s -> f a -> f a
   -- TODO: toTerm
@@ -76,10 +75,6 @@ instance Ord s => Alternative (Assignment s) where
                     else Left (Error (stateSpan state) (Right <$> toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just (Right (astSymbol s))))
 
 instance (Ord s, Show s) => Assigning s (Assignment s) where
-  sym s = Assignment Nothing (Set.singleton s) (\ _ state _ -> case stateInput state of
-    []  -> Left (Error (stateSpan state) [Right s] Nothing)
-    _:_ -> Right (advanceState state, s))
-
   leafNode s = Assignment Nothing (Set.singleton s) (\ src state _ -> case stateInput state of
     []  -> Left (Error (stateSpan state) [Right s] Nothing)
     s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
