@@ -14,6 +14,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Language.JSON.Grammar as Grammar
 import Prologue
+import Text.Parser.Combinators
 
 type Syntax =
   [ Literal.Array
@@ -40,11 +41,11 @@ jsonValue :: Assignment Term
 jsonValue = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
 
 object :: Assignment Term
-object = toTerm (branchNode Object (Literal.Hash <$> many pairs))
-  where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string <|> parseError) <*> jsonValue)) <|> parseError
+object = toTerm (branchNode Object (Literal.Hash <$ leafNode AnonLBrace <*> sepBy pairs (leafNode AnonComma) <* leafNode AnonRBrace))
+  where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string <|> parseError) <* leafNode AnonColon <*> jsonValue)) <|> parseError
 
 array :: Assignment Term
-array = toTerm (branchNode Array (Literal.Array <$> many jsonValue))
+array = toTerm (branchNode Array (Literal.Array <$ leafNode AnonLBracket <*> sepBy jsonValue (leafNode AnonComma) <* leafNode AnonRBracket))
 
 number :: Assignment Term
 number = toTerm (Literal.Float <$> leafNode Number)
