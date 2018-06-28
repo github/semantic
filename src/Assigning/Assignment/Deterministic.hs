@@ -3,6 +3,7 @@ module Assigning.Assignment.Deterministic
 ( Assigning(..)
 , TermAssigning(..)
 , parseError
+, State(..)
 , Assignment(..)
 , runAssignment
 , TermAssignment(..)
