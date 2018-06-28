@@ -11,7 +11,7 @@ module Assigning.Assignment.Deterministic
 
 import Data.AST
 import Data.Error
-import qualified Data.Map as Map
+import qualified Data.IntMap as IntMap
 import qualified Data.Set as Set
 import Data.Range
 import Data.Record
@@ -52,26 +52,26 @@ type Cont symbol a = Source -> State symbol -> [Set symbol] -> Either (Error (Ei
 combine :: Ord symbol => Maybe a -> Set symbol -> Set symbol -> Set symbol
 combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
 
-choose :: Ord symbol
+choose :: (Enum symbol, Ord symbol)
        => Maybe (State symbol -> a)
        -> Set symbol
-       -> Map symbol (Cont symbol a)
+       -> IntMap (Cont symbol a)
        -> Cont symbol a
 choose nullable firstSet table src state follow = case stateInput state of
   []  -> case nullable of
     Just f -> Right (state, f state)
     _      -> Left (Error (stateSpan state) (Right <$> toList firstSet) Nothing)
-  s:_ -> case astSymbol s `Map.lookup` table of
+  s:_ -> case fromEnum (astSymbol s) `IntMap.lookup` table of
     Just k -> k src state follow
     _      -> notFound (astSymbol s) state follow
   where notFound s state follow = case nullable of
           Just f | any (s `Set.member`) follow -> Right (state, f state)
           _                                    -> Left (Error (stateSpan state) (Right <$> toList firstSet) (Just (Right s)))
 
-instance Ord symbol => Applicative (Assignment symbol) where
+instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
   pure a = Assignment (Just (const a)) lowerBound []
   Assignment n1 f1 t1 <*> ~(Assignment n2 f2 t2) = Assignment (liftA2 (<*>) n1 n2) (combine n1 f1 f2) (t1 `tseq` t2)
-    where table2 = Map.fromList t2
+    where table2 = IntMap.fromList (map (first fromEnum) t2)
           t1 `tseq` t2
             = map (fmap (\ p src state follow -> do
               (state', p') <- p src state (f2 : follow)
@@ -86,11 +86,11 @@ instance Ord symbol => Applicative (Assignment symbol) where
                 pq `seq` pure (state', pq))) t2
               _ -> []
 
-instance Ord symbol => Alternative (Assignment symbol) where
+instance (Enum symbol, Ord symbol) => Alternative (Assignment symbol) where
   empty = Assignment Nothing lowerBound []
   Assignment n1 f1 t1 <|> Assignment n2 f2 t2 = Assignment (n1 <|> n2) (f1 <> f2) (t1 <> t2)
 
-instance (Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
+instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
   leafNode s = Assignment Nothing (Set.singleton s)
     [ (s, \ src state _ -> case stateInput state of
       []  -> Left (Error (stateSpan state) [Right s] Nothing)
@@ -105,9 +105,9 @@ instance (Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
       s:_ -> first (const (advanceState state)) <$> runAssignment a src state { stateInput = astChildren s })
     ]
 
-runAssignment :: Ord symbol => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
+runAssignment :: (Enum symbol, Ord symbol) => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
 runAssignment (Assignment nullable firstSet table) src input
-  = case choose nullable firstSet (Map.fromList table) src input lowerBound of
+  = case choose nullable firstSet (IntMap.fromList (map (first fromEnum) table)) src input lowerBound of
     Left err -> Left err
     Right (state', a') -> case stateInput state' of
       []   -> Right (state', a')
@@ -117,7 +117,7 @@ runAssignment (Assignment nullable firstSet table) src input
 newtype TermAssignment (syntaxes :: [* -> *]) symbol a = TermAssignment { runTermAssignment :: Assignment symbol a }
   deriving (Alternative, Applicative, Functor, Assigning symbol)
 
-instance (Ord symbol, Show symbol) => TermAssigning syntaxes symbol (TermAssignment syntaxes symbol) where
+instance (Enum symbol, Ord symbol, Show symbol) => TermAssigning syntaxes symbol (TermAssignment syntaxes symbol) where
   toTerm (TermAssignment a) = TermAssignment (Assignment
     (case nullable a of
       Just f  -> Just (\ state -> termIn (stateLocation state) (inject (f state)))
