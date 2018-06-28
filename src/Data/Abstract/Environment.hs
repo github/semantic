@@ -2,6 +2,7 @@ module Data.Abstract.Environment
   ( Environment(..)
   , Bindings(..)
   , addresses
+  , aliasBindings
   , delete
   , flatPairs
   , head
@@ -67,8 +68,8 @@ pop (Environment (_ :| []))     = lowerBound
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
 -- | Drop all scopes save for the frontmost one.
-head :: Environment address -> Environment address
-head (Environment (a :| _)) = Environment (a :| [])
+head :: Environment address -> Bindings address
+head (Environment (a :| _)) = a
 
 -- | Take the union of two environments. When duplicate keys are found in the
 --   name to address map, the second definition wins.
@@ -126,6 +127,11 @@ intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
 -- | Get all bound 'Name's in an environment.
 names :: Environment address -> [Name]
 names = fmap fst . flatPairs
+
+aliasBindings :: [(Name, Name)] -> Bindings address -> Bindings address
+aliasBindings pairs binds = unpairs $ mapMaybe lookupAndAlias pairs
+  where
+    lookupAndAlias (oldName, newName) = (,) newName <$> Map.lookup oldName (unBindings binds)
 
 -- | Lookup and alias name-value bindings from an environment.
 overwrite :: [(Name, Name)] -> Environment address -> Environment address

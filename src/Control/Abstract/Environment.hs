@@ -90,9 +90,9 @@ runEnv initial = fmap (uncurry filterEnv . first (fmap Env.head)) . runState low
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
-        filterEnv (a, env) ports
-          | Exports.null ports = (a, env)
-          | otherwise          = (a, Exports.toEnvironment ports `Env.mergeEnvs` Env.overwrite (Exports.aliases ports) env)
+        filterEnv (a, binds) ports
+          | Exports.null ports = (a, Env.newEnv binds)
+          | otherwise          = (a, Env.newEnv (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds))
 
 
 -- | Errors involving the environment.
