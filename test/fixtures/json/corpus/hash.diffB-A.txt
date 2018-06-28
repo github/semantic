@@ -1,0 +1,18 @@
+(Hash
+{+(KeyValue
+  {+(TextElement)+}
+  {+(Float)+})+}
+  (KeyValue
+    (TextElement)
+    (Float))
+  (KeyValue
+  { (TextElement)
+  ->(TextElement)}
+    (Float))
+  (KeyValue
+    (TextElement)
+  { (Float)
+  ->(Float)})
+{-(KeyValue
+  {-(TextElement)-}
+  {-(Float)-})-})

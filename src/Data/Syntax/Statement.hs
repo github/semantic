@@ -78,7 +78,7 @@ instance Evaluatable Match
 
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
-data Pattern a = Pattern { _pattern :: !a, patternBody :: !a }
+data Pattern a = Pattern { value :: !a, patternBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Pattern where liftEq = genericLiftEq
