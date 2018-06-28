@@ -45,7 +45,7 @@ type Table s a = [(s, a)]
 data Assignment s a = Assignment
   { assignEmpty :: Maybe a
   , firstSet    :: Set s
-  , match       :: State s -> Set s -> Either (Error s) (State s, a)
+  , match       :: State s -> Set s -> Either (Error (Either String s)) (State s, a)
   }
   deriving (Functor)
 
@@ -59,24 +59,24 @@ instance Ord s => Applicative (Assignment s) where
             res `seq` pure (inp2, res)
 
 instance Ord s => Alternative (Assignment s) where
-  empty = Assignment Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (astSymbol <$> listToMaybe (stateInput s))))
+  empty = Assignment Nothing lowerBound (\ s _ -> Left (Error (stateSpan s) [] (Right . astSymbol <$> listToMaybe (stateInput s))))
   Assignment n1 f1 p1 <|> Assignment n2 f2 p2 = Assignment (n1 <|> n2) (f1 <> f2) (p1 `palt` p2)
     where p1 `palt` p2 = p
             where p state@(State _ _ []) follow =
                     if      isJust n1 then p1 state follow
                     else if isJust n2 then p2 state follow
-                    else Left (Error (stateSpan state) (toList (f1 <> f2)) Nothing)
+                    else Left (Error (stateSpan state) (Right <$> toList (f1 <> f2)) Nothing)
                   p state@(State _ _ (s:_)) follow =
                     if      astSymbol s `Set.member` f1 then p1 (advanceState state) follow
                     else if astSymbol s `Set.member` f2 then p2 (advanceState state) follow
                     else if isJust n1 && astSymbol s `Set.member` follow then p1 (advanceState state) follow
                     else if isJust n2 && astSymbol s `Set.member` follow then p2 (advanceState state) follow
-                    else Left (Error (stateSpan state) (toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just (astSymbol s)))
+                    else Left (Error (stateSpan state) (Right <$> toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just (Right (astSymbol s))))
 
 instance (Ord s, Show s) => Assigning s (Assignment s) where
   sym s = Assignment Nothing (Set.singleton s) (\ state _ -> case stateInput state of
-    []  -> Left (Error (stateSpan state) [s] Nothing)
+    []  -> Left (Error (stateSpan state) [Right s] Nothing)
     _:_ -> Right (advanceState state, s))
 
-invokeDet :: Assignment s a -> State s -> Either (Error s) a
+invokeDet :: Assignment s a -> State s -> Either (Error (Either String s)) a
 invokeDet (Assignment _ _ p) inp = snd <$> p inp lowerBound
