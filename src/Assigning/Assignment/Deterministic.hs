@@ -39,8 +39,8 @@ parseError :: ( Bounded grammar
 parseError = toTerm (leafNode maxBound $> (Syntax.Error (Syntax.ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") []))
 
 
-combine :: Ord s => Bool -> Set s -> Set s -> Set s
-combine e s1 s2 = if e then s1 <> s2 else lowerBound
+combine :: Ord s => Maybe a -> Set s -> Set s -> Set s
+combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
 
 astSymbol :: AST [] grammar -> grammar
 astSymbol = nodeSymbol . termAnnotation
@@ -86,9 +86,9 @@ data Assignment s a = Assignment
 
 instance Ord s => Applicative (Assignment s) where
   pure a = Assignment (Just (const a)) lowerBound (\ _ state _ -> Right (state, a))
-  Assignment n1 f1 p1 <*> ~(Assignment n2 f2 p2) = Assignment (liftA2 (<*>) n1 n2) (combine (isJust n1) f1 f2) (p1 `pseq` p2)
+  Assignment n1 f1 p1 <*> ~(Assignment n2 f2 p2) = Assignment (liftA2 (<*>) n1 n2) (combine n1 f1 f2) (p1 `pseq` p2)
     where p1 `pseq` p2 = \ src inp follow -> do
-            (inp1, v1) <- p1 src inp (combine (isJust n2) f2 follow)
+            (inp1, v1) <- p1 src inp (combine n2 f2 follow)
             (inp2, v2) <- p2 src inp1 follow
             let res = v1 v2
             res `seq` pure (inp2, res)
@@ -106,7 +106,7 @@ instance Ord s => Alternative (Assignment s) where
                     else if astSymbol s `Set.member` f2 then p2 src (advanceState state) follow
                     else if isJust n1 && astSymbol s `Set.member` follow then p1 src (advanceState state) follow
                     else if isJust n2 && astSymbol s `Set.member` follow then p2 src (advanceState state) follow
-                    else Left (Error (stateSpan state) (Right <$> toList (combine (isJust n1) f1 follow <> combine (isJust n2) f2 follow)) (Just (Right (astSymbol s))))
+                    else Left (Error (stateSpan state) (Right <$> toList (combine n1 f1 follow <> combine n2 f2 follow)) (Just (Right (astSymbol s))))
 
 instance (Ord s, Show s) => Assigning s (Assignment s) where
   leafNode s = Assignment Nothing (Set.singleton s) (\ src state _ -> case stateInput state of
