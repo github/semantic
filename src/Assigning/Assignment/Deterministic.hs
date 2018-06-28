@@ -86,5 +86,5 @@ instance (Ord s, Show s) => Assigning s (Assignment s) where
       Left err   -> Left (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
       Right text -> Right (advanceState state, text))
 
-runAssignment :: Assignment s a -> Source -> State s -> Either (Error (Either String s)) a
-runAssignment (Assignment _ _ p) src inp = snd <$> p src inp lowerBound
+runAssignment :: Assignment s a -> Source -> State s -> Either (Error (Either String s)) (State s, a)
+runAssignment (Assignment _ _ p) src inp = p src inp lowerBound
