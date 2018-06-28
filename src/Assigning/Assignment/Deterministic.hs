@@ -12,7 +12,7 @@ module Assigning.Assignment.Deterministic
 import Data.AST
 import Data.Error
 import qualified Data.IntMap as IntMap
-import qualified Data.Set as Set
+import qualified Data.IntSet as IntSet
 import Data.Range
 import Data.Record
 import Data.Source as Source
@@ -42,31 +42,31 @@ parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (getCa
 
 data Assignment symbol a = Assignment
   { nullable :: Maybe (State symbol -> a)
-  , firstSet :: Set symbol
+  , firstSet :: IntSet
   , choices  :: [(symbol, Cont symbol a)]
   }
   deriving (Functor)
 
-type Cont symbol a = Source -> State symbol -> [Set symbol] -> Either (Error (Either String symbol)) (State symbol, a)
+type Cont symbol a = Source -> State symbol -> [IntSet] -> Either (Error (Either String symbol)) (State symbol, a)
 
-combine :: Ord symbol => Maybe a -> Set symbol -> Set symbol -> Set symbol
+combine :: Maybe a -> IntSet -> IntSet -> IntSet
 combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
 
-choose :: (Enum symbol, Ord symbol)
+choose :: Enum symbol
        => Maybe (State symbol -> a)
-       -> Set symbol
+       -> IntSet
        -> IntMap (Cont symbol a)
        -> Cont symbol a
 choose nullable firstSet table src state follow = case stateInput state of
   []  -> case nullable of
     Just f -> Right (state, f state)
-    _      -> Left (Error (stateSpan state) (Right <$> toList firstSet) Nothing)
+    _      -> Left (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) Nothing)
   s:_ -> case fromEnum (astSymbol s) `IntMap.lookup` table of
     Just k -> k src state follow
     _      -> notFound (astSymbol s) state follow
   where notFound s state follow = case nullable of
-          Just f | any (s `Set.member`) follow -> Right (state, f state)
-          _                                    -> Left (Error (stateSpan state) (Right <$> toList firstSet) (Just (Right s)))
+          Just f | any (fromEnum s `IntSet.member`) follow -> Right (state, f state)
+          _                                                -> Left (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) (Just (Right s)))
 
 instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
   pure a = Assignment (Just (const a)) lowerBound []
@@ -91,7 +91,7 @@ instance (Enum symbol, Ord symbol) => Alternative (Assignment symbol) where
   Assignment n1 f1 t1 <|> Assignment n2 f2 t2 = Assignment (n1 <|> n2) (f1 <> f2) (t1 <> t2)
 
 instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
-  leafNode s = Assignment Nothing (Set.singleton s)
+  leafNode s = Assignment Nothing (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
       []  -> Left (Error (stateSpan state) [Right s] Nothing)
       s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
@@ -99,13 +99,13 @@ instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment 
         Right text -> Right (advanceState state, text))
     ]
 
-  branchNode s a = Assignment Nothing (Set.singleton s)
+  branchNode s a = Assignment Nothing (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
       []  -> Left (Error (stateSpan state) [Right s] Nothing)
       s:_ -> first (const (advanceState state)) <$> runAssignment a src state { stateInput = astChildren s })
     ]
 
-runAssignment :: (Enum symbol, Ord symbol) => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
+runAssignment :: Enum symbol => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
 runAssignment (Assignment nullable firstSet table) src input
   = case choose nullable firstSet (IntMap.fromList (map (first fromEnum) table)) src input lowerBound of
     Left err -> Left err
