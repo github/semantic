@@ -17,7 +17,7 @@ combine e s1 s2 = if e then s1 <> s2 else lowerBound
 
 data State s = State
   { stateOffset :: {-# UNPACK #-} !Offset
-  , stateInput :: ![s]
+  , stateInput  :: ![s]
   }
   deriving (Eq, Ord, Show)
 
