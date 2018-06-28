@@ -8,7 +8,7 @@ import Data.Range
 import Data.Record
 import Data.Source as Source
 import Data.Span
-import Data.Term (Term)
+import Data.Term (Term, termIn)
 import Data.Text.Encoding (decodeUtf8')
 import Prologue
 
@@ -109,3 +109,13 @@ runAssignment (Assignment _ _ p) src inp = p src inp lowerBound
 
 newtype TermAssignment (syntaxes :: [* -> *]) grammar a = TermAssignment { runTermAssignment :: Assignment grammar a }
   deriving (Alternative, Applicative, Functor, Assigning grammar)
+
+instance (Ord grammar, Show grammar) => TermAssigning syntaxes grammar (TermAssignment syntaxes grammar) where
+  toTerm (TermAssignment a) = TermAssignment (Assignment
+    (case nullable a of
+      Just f  -> Just (\ state -> termIn (stateLocation state) (inject (f state)))
+      Nothing -> Nothing)
+    (firstSet a)
+    (\ src state follow -> case match a src state follow of
+      Left err -> Left err
+      Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax))))
