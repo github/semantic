@@ -102,15 +102,16 @@ instance (Ord s, Show s) => Assigning s (Assignment s) where
   branchNode s a = Assignment Nothing (Set.singleton s)
     [ (s, \ src state _ -> case stateInput state of
       []  -> Left (Error (stateSpan state) [Right s] Nothing)
-      s:_ -> case runAssignment a src state { stateInput = astChildren s } of
-        Left err -> Left err
-        Right (state', a') -> case stateInput state' of
-          []   -> Right (advanceState state, a')
-          s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s')))))
+      s:_ -> first (const (advanceState state)) <$> runAssignment a src state { stateInput = astChildren s })
     ]
 
 runAssignment :: Ord s => Assignment s a -> Source -> State s -> Either (Error (Either String s)) (State s, a)
-runAssignment (Assignment nullable firstSet table) src input = choose nullable firstSet (Map.fromList table) src input lowerBound
+runAssignment (Assignment nullable firstSet table) src input
+  = case choose nullable firstSet (Map.fromList table) src input lowerBound of
+    Left err -> Left err
+    Right (state', a') -> case stateInput state' of
+      []   -> Right (state', a')
+      s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s'))))
 
 
 newtype TermAssignment (syntaxes :: [* -> *]) grammar a = TermAssignment { runTermAssignment :: Assignment grammar a }
