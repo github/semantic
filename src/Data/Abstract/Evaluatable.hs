@@ -156,20 +156,20 @@ builtInPrint :: ( AbstractIntro value
              => Name
              -> Evaluator address value effects address
 builtInPrint v = do
-  print <- variable "__semantic_print" >>= deref
+  print <- variable (name "__semantic_print") >>= deref
   void $ call print [variable v]
   box unit
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    define "print" (lambda builtInPrint)
+    define (name "print") (lambda builtInPrint)
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define "puts" (lambda builtInPrint)
+    define (name "puts") (lambda builtInPrint)
 
-    defineClass "Object" [] $ do
-      define "inspect" (lambda (const (box (string "<object>"))))
+    defineClass (name "Object") [] $ do
+      define (name "inspect") (lambda (const (box (string "<object>"))))
 
 instance HasPrelude 'TypeScript
   -- FIXME: define console.log using __semantic_print

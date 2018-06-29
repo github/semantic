@@ -60,4 +60,4 @@ defineBuiltins :: ( AbstractValue address value effects
                   )
                => Evaluator address value effects ()
 defineBuiltins =
-  define "__semantic_print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))
+  define (name "__semantic_print") (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))
