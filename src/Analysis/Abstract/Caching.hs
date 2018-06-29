@@ -32,10 +32,7 @@ lookupCache :: (Cacheable term address (Cell address) value, Member (State (Cach
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: ( Cacheable term address (Cell address) value
-                        , Member (State (Cache term address (Cell address) value)) effects
-                        , Member (State (Heap address (Cell address) value)) effects
-                        )
+cachingConfiguration :: (Cacheable term address (Cell address) value, Member (State (Cache term address (Cell address) value)) effects, Member (State (Heap address (Cell address) value)) effects)
                      => Configuration term address (Cell address) value
                      -> Set (Cached address (Cell address) value)
                      -> TermEvaluator term address value effects (ValueRef address)
@@ -96,7 +93,7 @@ convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   cache <- converge lowerBound (\ prevCache -> isolateCache . raiseHandler locally $ do
-    TermEvaluator (putHeap (configurationHeap c))
+    TermEvaluator (putHeap (configurationHeap        c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
@@ -118,7 +115,7 @@ converge :: (Eq a, Monad m)
 converge seed f = loop seed
   where loop x = do
           x' <- f x
-          if x == x' then
+          if x' == x then
             pure x
           else
             loop x'
