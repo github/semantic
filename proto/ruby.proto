@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "types.proto";
 package github.semantic;
 message RubyTerm { RubySyntax syntax = 1;
                  }

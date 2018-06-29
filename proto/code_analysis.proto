@@ -44,6 +44,12 @@ message ParseTreeResponse {
 }
 
 message RawParseTreeResponse {
+  oneof response_type {
+    RubyResponse ruby_response = 1;
+  }
+}
+
+message RubyResponse {
   repeated RubyTerm terms = 1;
 }
 
