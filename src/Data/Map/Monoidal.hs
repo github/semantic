@@ -5,7 +5,6 @@ module Data.Map.Monoidal
 , lookup
 , singleton
 , size
-, keys
 , insert
 , filterWithKey
 , pairs
@@ -41,9 +40,6 @@ filterWithKey f = Map . Map.filterWithKey f . unMap
 
 pairs :: Map key value -> [(key, value)]
 pairs = Map.toList . unMap
-
-keys :: Map key value -> [key]
-keys = fmap fst . pairs
 
 
 instance (Ord key, Semigroup value) => Semigroup (Map key value) where
