@@ -21,6 +21,7 @@ module Semantic.Graph
 
 import Prelude hiding (readFile)
 
+import           Debug.Trace (traceM)
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
@@ -76,6 +77,8 @@ runCallGraph :: ( HasField ann Span
                 , HasPrelude lang
                 , Member Task effs
                 , Recursive term
+                , Show (Record ann)
+                , Apply Show1 syntax
                 )
              => Proxy lang
              -> Bool
@@ -84,7 +87,7 @@ runCallGraph :: ( HasField ann Span
              -> Eff effs (Graph Vertex)
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
-      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
+      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules
 --      extractGraph :: (((a, Graph Vertex), b), c) -> Graph Vertex
       extractGraph (((_, graph), _), _) = simplify graph
       runGraphAnalysis
