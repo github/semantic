@@ -106,14 +106,14 @@ lookup name = foldMapA (Map.lookup name) . fmap unBindings . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 insert :: Name -> address -> Environment address -> Environment address
-insert name addr (Environment ((Bindings a) :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
+insert name addr (Environment (Bindings a :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
 
 -- | Remove a 'Name' from the environment.
 --
 -- >>> delete (name "foo") shadowed
 -- Environment []
 delete :: Name -> Environment address -> Environment address
-delete name = trim . Environment . fmap (Bindings . Map.delete name) . fmap unBindings . unEnvironment
+delete name = trim . Environment . fmap (Bindings . Map.delete name . unBindings) . unEnvironment
 
 trim :: Environment address -> Environment address
 trim (Environment (a :| as)) = Environment (a :| filtered)
