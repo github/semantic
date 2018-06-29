@@ -69,7 +69,6 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
                                                  <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
-              <|> flag'                                          (Parse.runParse ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
               <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
               <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
