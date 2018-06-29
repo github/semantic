@@ -44,7 +44,7 @@ message ParseTreeResponse {
 }
 
 message RawParseTreeResponse {
-  repeated Term terms = 1;
+  repeated RubyTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {

@@ -1,19 +1,19 @@
 syntax = "proto3";
 package github.semantic;
-message Term { Syntax syntax = 1;
-             }
+message RubyTerm { RubySyntax syntax = 1;
+                 }
 message Comment { string commentContent = 1;
                 }
-message Function { repeated Term functionContext = 1;
-                   Term functionName = 2;
-                   repeated Term functionParameters = 3;
-                   Term functionBody = 4;
+message Function { repeated RubyTerm functionContext = 1;
+                   RubyTerm functionName = 2;
+                   repeated RubyTerm functionParameters = 3;
+                   RubyTerm functionBody = 4;
                  }
-message Method { repeated Term methodContext = 1;
-                 Term methodReceiver = 2;
-                 Term methodName = 3;
-                 repeated Term methodParameters = 4;
-                 Term methodBody = 5;
+message Method { repeated RubyTerm methodContext = 1;
+                 RubyTerm methodReceiver = 2;
+                 RubyTerm methodName = 3;
+                 repeated RubyTerm methodParameters = 4;
+                 RubyTerm methodBody = 5;
                }
 message File {
              }
@@ -22,107 +22,107 @@ message Line {
 message Error { repeated ErrorSite errorCallStack = 1;
                 repeated string errorExpected = 2;
                 string errorActual = 3;
-                repeated Term errorChildren = 4;
+                repeated RubyTerm errorChildren = 4;
               }
-message And { Term lhs = 1;
-              Term rhs = 2;
+message And { RubyTerm lhs = 1;
+              RubyTerm rhs = 2;
             }
-message BAnd { Term left = 1;
-               Term right = 2;
+message BAnd { RubyTerm left = 1;
+               RubyTerm right = 2;
              }
-message BOr { Term left = 1;
-              Term right = 2;
+message BOr { RubyTerm left = 1;
+              RubyTerm right = 2;
             }
-message BXOr { Term left = 1;
-               Term right = 2;
+message BXOr { RubyTerm left = 1;
+               RubyTerm right = 2;
              }
-message Call { repeated Term callContext = 1;
-               Term callFunction = 2;
-               repeated Term callParams = 3;
-               Term callBlock = 4;
+message Call { repeated RubyTerm callContext = 1;
+               RubyTerm callFunction = 2;
+               repeated RubyTerm callParams = 3;
+               RubyTerm callBlock = 4;
              }
-message Comparison { Term lhs = 1;
-                     Term rhs = 2;
+message Comparison { RubyTerm lhs = 1;
+                     RubyTerm rhs = 2;
                    }
-message Complement { Term value = 1;
+message Complement { RubyTerm value = 1;
                    }
-message DividedBy { Term lhs = 1;
-                    Term rhs = 2;
+message DividedBy { RubyTerm lhs = 1;
+                    RubyTerm rhs = 2;
                   }
-message Enumeration { Term enumerationStart = 1;
-                      Term enumerationEnd = 2;
-                      Term enumerationStep = 3;
+message Enumeration { RubyTerm enumerationStart = 1;
+                      RubyTerm enumerationEnd = 2;
+                      RubyTerm enumerationStep = 3;
                     }
-message Equal { Term lhs = 1;
-                Term rhs = 2;
+message Equal { RubyTerm lhs = 1;
+                RubyTerm rhs = 2;
               }
-message FloorDivision { Term lhs = 1;
-                        Term rhs = 2;
+message FloorDivision { RubyTerm lhs = 1;
+                        RubyTerm rhs = 2;
                       }
-message GreaterThan { Term lhs = 1;
-                      Term rhs = 2;
+message GreaterThan { RubyTerm lhs = 1;
+                      RubyTerm rhs = 2;
                     }
-message GreaterThanEqual { Term lhs = 1;
-                           Term rhs = 2;
+message GreaterThanEqual { RubyTerm lhs = 1;
+                           RubyTerm rhs = 2;
                          }
-message LShift { Term left = 1;
-                 Term right = 2;
+message LShift { RubyTerm left = 1;
+                 RubyTerm right = 2;
                }
-message LessThan { Term lhs = 1;
-                   Term rhs = 2;
+message LessThan { RubyTerm lhs = 1;
+                   RubyTerm rhs = 2;
                  }
-message LessThanEqual { Term lhs = 1;
-                        Term rhs = 2;
+message LessThanEqual { RubyTerm lhs = 1;
+                        RubyTerm rhs = 2;
                       }
-message Matches { Term lhs = 1;
-                  Term rhs = 2;
+message Matches { RubyTerm lhs = 1;
+                  RubyTerm rhs = 2;
                 }
-message Member { Term lhs = 1;
-                 Term rhs = 2;
+message Member { RubyTerm lhs = 1;
+                 RubyTerm rhs = 2;
                }
-message MemberAccess { Term lhs = 1;
+message MemberAccess { RubyTerm lhs = 1;
                        bytes rhs = 2;
                      }
-message Minus { Term lhs = 1;
-                Term rhs = 2;
+message Minus { RubyTerm lhs = 1;
+                RubyTerm rhs = 2;
               }
-message Modulo { Term lhs = 1;
-                 Term rhs = 2;
+message Modulo { RubyTerm lhs = 1;
+                 RubyTerm rhs = 2;
                }
-message Negate { Term term = 1;
+message Negate { RubyTerm term = 1;
                }
-message Not { Term term = 1;
+message Not { RubyTerm term = 1;
             }
-message NotMatches { Term lhs = 1;
-                     Term rhs = 2;
+message NotMatches { RubyTerm lhs = 1;
+                     RubyTerm rhs = 2;
                    }
-message Or { Term lhs = 1;
-             Term rhs = 2;
+message Or { RubyTerm lhs = 1;
+             RubyTerm rhs = 2;
            }
-message Plus { Term lhs = 1;
-               Term rhs = 2;
+message Plus { RubyTerm lhs = 1;
+               RubyTerm rhs = 2;
              }
-message Power { Term lhs = 1;
-                Term rhs = 2;
+message Power { RubyTerm lhs = 1;
+                RubyTerm rhs = 2;
               }
-message RShift { Term left = 1;
-                 Term right = 2;
+message RShift { RubyTerm left = 1;
+                 RubyTerm right = 2;
                }
-message ScopeResolution { repeated Term scopes = 1;
+message ScopeResolution { repeated RubyTerm scopes = 1;
                         }
-message StrictEqual { Term lhs = 1;
-                      Term rhs = 2;
+message StrictEqual { RubyTerm lhs = 1;
+                      RubyTerm rhs = 2;
                     }
-message Subscript { Term lhs = 1;
-                    repeated Term rhs = 2;
+message Subscript { RubyTerm lhs = 1;
+                    repeated RubyTerm rhs = 2;
                   }
-message Times { Term lhs = 1;
-                Term rhs = 2;
+message Times { RubyTerm lhs = 1;
+                RubyTerm rhs = 2;
               }
-message XOr { Term lhs = 1;
-              Term rhs = 2;
+message XOr { RubyTerm lhs = 1;
+              RubyTerm rhs = 2;
             }
-message Array { repeated Term arrayElements = 1;
+message Array { repeated RubyTerm arrayElements = 1;
               }
 message Boolean { bool booleanContent = 1;
                 }
@@ -130,12 +130,12 @@ message Complex { string value = 1;
                 }
 message Float { string floatContent = 1;
               }
-message Hash { repeated Term hashElements = 1;
+message Hash { repeated RubyTerm hashElements = 1;
              }
 message Integer { string integerContent = 1;
                 }
-message KeyValue { Term key = 1;
-                   Term value = 2;
+message KeyValue { RubyTerm key = 1;
+                   RubyTerm value = 2;
                  }
 message Null {
              }
@@ -143,83 +143,83 @@ message Rational { string value = 1;
                  }
 message Regex { string regexContent = 1;
               }
-message String { repeated Term stringElements = 1;
+message String { repeated RubyTerm stringElements = 1;
                }
 message Symbol { string symbolContent = 1;
                }
 message TextElement { string textElementContent = 1;
                     }
-message Class { Term classIdentifier = 1;
-                repeated Term classSuperClass = 2;
-                Term classBody = 3;
+message Class { RubyTerm classIdentifier = 1;
+                repeated RubyTerm classSuperClass = 2;
+                RubyTerm classBody = 3;
               }
-message Load { Term loadPath = 1;
-               repeated Term loadWrap = 2;
+message Load { RubyTerm loadPath = 1;
+               repeated RubyTerm loadWrap = 2;
              }
-message LowPrecedenceAnd { Term lhs = 1;
-                           Term rhs = 2;
+message LowPrecedenceAnd { RubyTerm lhs = 1;
+                           RubyTerm rhs = 2;
                          }
-message LowPrecedenceOr { Term lhs = 1;
-                          Term rhs = 2;
+message LowPrecedenceOr { RubyTerm lhs = 1;
+                          RubyTerm rhs = 2;
                         }
-message Module { Term moduleIdentifier = 1;
-                 repeated Term moduleStatements = 2;
+message Module { RubyTerm moduleIdentifier = 1;
+                 repeated RubyTerm moduleStatements = 2;
                }
 message Require { bool requireRelative = 1;
-                  Term requirePath = 2;
+                  RubyTerm requirePath = 2;
                 }
-message Send { repeated Term sendReceiver = 1;
-               repeated Term sendSelector = 2;
-               repeated Term sendArgs = 3;
-               repeated Term sendBlock = 4;
+message Send { repeated RubyTerm sendReceiver = 1;
+               repeated RubyTerm sendSelector = 2;
+               repeated RubyTerm sendArgs = 3;
+               repeated RubyTerm sendBlock = 4;
              }
-message Assignment { repeated Term assignmentContext = 1;
-                     Term assignmentTarget = 2;
-                     Term assignmentValue = 3;
+message Assignment { repeated RubyTerm assignmentContext = 1;
+                     RubyTerm assignmentTarget = 2;
+                     RubyTerm assignmentValue = 3;
                    }
-message Break { Term term = 1;
+message Break { RubyTerm term = 1;
               }
-message Catch { Term catchException = 1;
-                Term catchBody = 2;
+message Catch { RubyTerm catchException = 1;
+                RubyTerm catchBody = 2;
               }
-message Continue { Term term = 1;
+message Continue { RubyTerm term = 1;
                  }
-message Else { Term elseCondition = 1;
-               Term elseBody = 2;
+message Else { RubyTerm elseCondition = 1;
+               RubyTerm elseBody = 2;
              }
-message Finally { Term term = 1;
+message Finally { RubyTerm term = 1;
                 }
-message ForEach { Term forEachBinding = 1;
-                  Term forEachSubject = 2;
-                  Term forEachBody = 3;
+message ForEach { RubyTerm forEachBinding = 1;
+                  RubyTerm forEachSubject = 2;
+                  RubyTerm forEachBody = 3;
                 }
-message If { Term ifCondition = 1;
-             Term ifThenBody = 2;
-             Term ifElseBody = 3;
+message If { RubyTerm ifCondition = 1;
+             RubyTerm ifThenBody = 2;
+             RubyTerm ifElseBody = 3;
            }
-message Match { Term matchSubject = 1;
-                Term matchPatterns = 2;
+message Match { RubyTerm matchSubject = 1;
+                RubyTerm matchPatterns = 2;
               }
-message Pattern { Term value = 1;
-                  Term patternBody = 2;
+message Pattern { RubyTerm value = 1;
+                  RubyTerm patternBody = 2;
                 }
-message Retry { Term term = 1;
+message Retry { RubyTerm term = 1;
               }
-message Return { Term term = 1;
+message Return { RubyTerm term = 1;
                }
-message ScopeEntry { repeated Term terms = 1;
+message ScopeEntry { repeated RubyTerm terms = 1;
                    }
-message ScopeExit { repeated Term terms = 1;
+message ScopeExit { repeated RubyTerm terms = 1;
                   }
-message Statements { repeated Term statements = 1;
+message Statements { repeated RubyTerm statements = 1;
                    }
-message Try { Term tryBody = 1;
-              repeated Term tryCatch = 2;
+message Try { RubyTerm tryBody = 1;
+              repeated RubyTerm tryCatch = 2;
             }
-message While { Term whileCondition = 1;
-                Term whileBody = 2;
+message While { RubyTerm whileCondition = 1;
+                RubyTerm whileBody = 2;
               }
-message Yield { Term term = 1;
+message Yield { RubyTerm term = 1;
               }
 message RubySyntax { oneof syntax {Comment comment = 1;
                                    Function function = 2;
@@ -303,12 +303,12 @@ message RubySyntax { oneof syntax {Comment comment = 1;
                                    Send send = 80;
                                    List list = 81;}
                    }
-message Context { repeated Term contextTerms = 1;
-                  Term contextSubject = 2;
+message Context { repeated RubyTerm contextTerms = 1;
+                  RubyTerm contextSubject = 2;
                 }
 message Empty {
               }
 message Identifier { bytes name = 1;
                    }
-message List { repeated Term listContent = 1;
+message List { repeated RubyTerm listContent = 1;
              }
