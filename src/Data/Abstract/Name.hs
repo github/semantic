@@ -39,7 +39,6 @@ formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
 
-
 -- $
 -- >>> I 0
 -- "_a"
