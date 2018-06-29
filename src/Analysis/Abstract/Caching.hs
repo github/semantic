@@ -10,8 +10,6 @@ import Data.Abstract.Cache
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Prologue
-import Debug.Trace (traceM, traceShowId, trace)
-import Text.Show.Pretty (ppShow)
 
 -- | Look up the set of values for a given configuration in the in-cache.
 consultOracle :: (Cacheable term address (Cell address) value, Member (Reader (Cache term address (Cell address) value)) effects)
@@ -37,20 +35,14 @@ lookupCache configuration = cacheLookup configuration <$> get
 cachingConfiguration :: ( Cacheable term address (Cell address) value
                         , Member (State (Cache term address (Cell address) value)) effects
                         , Member (State (Heap address (Cell address) value)) effects
-                        , Show address
-                        , Show (Cell address value)
                         )
                      => Configuration term address (Cell address) value
                      -> Set (Cached address (Cell address) value)
                      -> TermEvaluator term address value effects (ValueRef address)
                      -> TermEvaluator term address value effects (ValueRef address)
 cachingConfiguration configuration values action = do
-  traceM "modifying caching configuration"
-  -- traceM ("there are " <> ppShow values <> " values")
   modify' (cacheSet configuration values)
-  traceM "evaluating cached result"
   result <- Cached <$> action <*> TermEvaluator getHeap
-  traceM "inserting value "
   cachedValue result <$ modify' (cacheInsert configuration result)
 
 putCache :: Member (State (Cache term address (Cell address) value)) effects
@@ -74,25 +66,17 @@ cachingTerms :: ( Cacheable term address (Cell address) value
                 , Member (State (Cache term address (Cell address) value)) effects
                 , Member (Env address) effects
                 , Member (State (Heap address (Cell address) value)) effects
-                , Show address
-                , Show (Cell address value)
                 )
              => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
              -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
 cachingTerms recur term = do
-  traceM "cachingTerms: getting configuration"
   c <- getConfiguration (embedSubterm term)
-  traceM "looking up cache"
   cached <- lookupCache c
   case cached of
-    Just pairs -> traceM "scattering" *> scatter pairs
+    Just pairs -> scatter pairs
     Nothing -> do
-      traceM "consulting oracle"
       pairs <- consultOracle c
-      traceM "caching configuration"
       cachingConfiguration c pairs (recur term)
-
-tracePrettyId a = Debug.Trace.trace (ppShow a) a
 
 convergingModules :: ( AbstractValue address value effects
                      , Cacheable term address (Cell address) value
@@ -105,16 +89,13 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (State (Cache term address (Cell address) value)) effects
                      , Member (Env address) effects
                      , Member (State (Heap address (Cell address) value)) effects
-                     , Show term
-                     , Show address
-                     , Show (Cell address value)
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects address)
                   -> SubtermAlgebra Module term (TermEvaluator term address value effects address)
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
-  cache <- converge lowerBound (\ prevCache -> fmap tracePrettyId . isolateCache . raiseHandler locally $ do
+  cache <- converge lowerBound (\ prevCache -> isolateCache . raiseHandler locally $ do
     TermEvaluator (putHeap (configurationHeap c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
