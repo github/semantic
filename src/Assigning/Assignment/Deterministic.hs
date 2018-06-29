@@ -70,6 +70,7 @@ choose nullable firstSet table src state follow = case stateInput state of
 
 instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
   pure a = Assignment (Just (const a)) lowerBound []
+
   Assignment n1 f1 t1 <*> ~(Assignment n2 f2 t2) = Assignment (liftA2 (<*>) n1 n2) (combine n1 f1 f2) (t1 `tseq` t2)
     where table2 = IntMap.fromList (map (first fromEnum) t2)
           t1 `tseq` t2
@@ -88,6 +89,7 @@ instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
 
 instance (Enum symbol, Ord symbol) => Alternative (Assignment symbol) where
   empty = Assignment Nothing lowerBound []
+
   Assignment n1 f1 t1 <|> Assignment n2 f2 t2 = Assignment (n1 <|> n2) (f1 <> f2) (t1 <> t2)
 
 instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
