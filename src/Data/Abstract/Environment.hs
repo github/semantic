@@ -67,7 +67,7 @@ pop :: Environment address -> Environment address
 pop (Environment (_ :| []))     = lowerBound
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
--- | Drop all scopes save for the frontmost one.
+-- | Return the frontmost (ie. most local) frame of bindings in the environment
 head :: Environment address -> Bindings address
 head (Environment (a :| _)) = a
 
@@ -81,9 +81,9 @@ mergeNewer (Environment a) (Environment b) =
       as = unBindings <$> toList a
       bs = unBindings <$> toList b
 
--- | Extract an association list of bindings from an 'Environment'.
+-- | Extract an association list of bindings from a 'Bindings'.
 --
--- >>> pairs shadowed
+-- >>> pairs (head shadowed)
 -- [("foo",Precise 1)]
 pairs :: Bindings address -> [(Name, address)]
 pairs = Map.toList . unBindings
