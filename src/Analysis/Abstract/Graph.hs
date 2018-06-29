@@ -15,6 +15,7 @@ module Analysis.Abstract.Graph
 , graphing
 ) where
 
+import           Debug.Trace (traceM)
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract
 import           Data.Abstract.Address
@@ -29,6 +30,7 @@ import qualified Data.Syntax as Syntax
 import           Data.Term
 import qualified Data.Text.Encoding as T
 import           Prologue hiding (project)
+import Text.Show.Pretty (ppShow)
 
 style :: Style Vertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexName))
@@ -51,16 +53,20 @@ graphingTerms :: ( Element Syntax.Identifier syntax
                  , Member (State (Graph Vertex)) effects
                  , Member Trace effects
                  , term ~ Term (Sum syntax) ann
+                 , Apply Show1 syntax
+                 , Apply Functor syntax
+                 , Show ann
+                 , Show term
                  )
               => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
               -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
 graphingTerms recur term@(In _ syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
-      trace ("Examining identifier " <> show name)
+      traceM ("Examining identifier " <> show name)
       moduleInclusion (Variable (formatName name))
       variableDefinition name
-    _ -> pure ()
+    Nothing -> pure ()
   recur term
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
