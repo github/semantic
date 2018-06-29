@@ -228,7 +228,7 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   IntegerFormatError{}     -> pure 0
   FloatFormatError{}       -> pure 0
   RationalFormatError{}    -> pure 0
-  FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
+  FreeVariablesError names -> pure (fromMaybeLast (name "unknown") names))
 
 resumingUnspecialized :: (Member Trace effects, AbstractHole value) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)

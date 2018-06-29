@@ -59,8 +59,7 @@ box :: ( Member (Allocator address value) effects
     => value
     -> Evaluator address value effects address
 box val = do
-  nam <- nameI <$> fresh
-  addr <- alloc nam
+  addr <- gensym >>= alloc
   assign addr val
   pure addr
 

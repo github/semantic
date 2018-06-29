@@ -1,16 +1,18 @@
 module Data.Abstract.Name
 ( Name
 -- * Constructors
+, gensym
 , name
 , nameI
 , formatName
 ) where
 
+import           Control.Monad.Effect
+import           Control.Monad.Effect.Fresh
 import           Data.Aeson
 import qualified Data.Char as Char
 import           Data.Text (Text)
 import qualified Data.Text as Text
-import           Data.String
 import           Prologue
 
 -- | The type of variable names.
@@ -18,6 +20,9 @@ data Name
   = Name Text
   | I Int
   deriving (Eq, Ord)
+
+gensym :: (Functor (m effs), Member Fresh effs, Effectful m) => m effs Name
+gensym = I <$> fresh
 
 -- | Construct a 'Name' from a 'Text'.
 name :: Text -> Name
@@ -34,8 +39,6 @@ formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
 
-instance IsString Name where
-  fromString = Name . Text.pack
 
 -- $
 -- >>> I 0
