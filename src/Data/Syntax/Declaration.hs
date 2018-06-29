@@ -165,7 +165,7 @@ instance Evaluatable Class where
     supers <- traverse subtermValue classSuperclasses
     (_, addr) <- letrec name $ do
       void $ subtermValue classBody
-      classEnv <- Env.head <$> getEnv
+      classEnv <- newEnv . Env.head <$> getEnv
       klass name supers classEnv
     bind name addr
     pure (Rval addr)

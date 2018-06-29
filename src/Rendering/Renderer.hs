@@ -52,8 +52,6 @@ data TermRenderer output where
   SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of symbols.
   SymbolsTermRenderer :: SymbolFields -> TermRenderer (JSON "files" SomeJSON)
-  -- | Render to a list of modules that represent the import graph.
-  ImportsTermRenderer :: TermRenderer ImportSummary
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer (Graph (Vertex ()))
   -- | Render to a 'ByteString' formatted using the 'Show' instance.

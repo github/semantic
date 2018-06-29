@@ -18,6 +18,7 @@ import qualified Diffing.Algorithm.SES.Spec
 import qualified Diffing.Interpreter.Spec
 import qualified Integration.Spec
 import qualified Matching.Go.Spec
+import qualified Numeric.Spec
 import qualified Rendering.TOC.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
@@ -47,6 +48,7 @@ main = hspec $ do
     describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
     describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
     describe "Matching" Matching.Go.Spec.spec
+    describe "Numeric" Numeric.Spec.spec
     describe "Rendering.TOC" Rendering.TOC.Spec.spec
     describe "Semantic" Semantic.Spec.spec
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
