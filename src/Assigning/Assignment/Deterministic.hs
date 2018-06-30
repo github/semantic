@@ -127,10 +127,10 @@ runAssignment (Assignment nullable firstSet table) src input
       s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s'))))
 
 
-data State s = State
+data State symbol = State
   { stateBytes :: {-# UNPACK #-} !Int
   , statePos   :: {-# UNPACK #-} !Pos
-  , stateInput :: ![AST [] s]
+  , stateInput :: ![AST [] symbol]
   }
   deriving (Eq, Ord, Show)
 
