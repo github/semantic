@@ -104,7 +104,7 @@ data Parser term where
                    -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
   DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
                       => Parser (AST [] grammar)
-                      -> Deterministic.TermAssignment syntaxes grammar (Term (Sum syntaxes) (Record Location))
+                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) (Record Location))
                       -> Parser (Term (Sum syntaxes) (Record Location))
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
