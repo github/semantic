@@ -133,8 +133,8 @@ runAssignment (Assignment nullable firstSet table) src input
 
 
 data Nullable symbol a
-  = Nullable (State symbol -> a)
-  | NotNullable
+  = NotNullable
+  | Nullable (State symbol -> a)
   deriving (Functor)
 
 instance Applicative (Nullable symbol) where
