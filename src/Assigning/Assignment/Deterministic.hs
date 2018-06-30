@@ -136,6 +136,12 @@ data Nullable symbol a
   | NotNullable
   deriving (Functor)
 
+instance Applicative (Nullable symbol) where
+  pure = Nullable . const
+
+  Nullable f <*> Nullable a = Nullable (\ state -> f state (a state))
+  _          <*> _          = NotNullable
+
 
 data State symbol = State
   { stateBytes :: {-# UNPACK #-} !Int
