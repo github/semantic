@@ -1,11 +1,9 @@
 {-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures #-}
 module Assigning.Assignment.Deterministic
 ( Assigning(..)
-, TermAssigning(..)
 , parseError
 , Assignment(..)
 , runAssignment
-, TermAssignment(..)
 , State(..)
 ) where
 
@@ -26,7 +24,6 @@ class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symb
   leafNode   :: symbol -> f Text
   branchNode :: symbol -> f a -> f a
 
-class Assigning symbol f => TermAssigning syntaxes symbol f | f -> symbol, f -> syntaxes where
   toTerm :: Element syntax syntaxes
          => f (syntax (Term (Sum syntaxes) (Record Location)))
          -> f         (Term (Sum syntaxes) (Record Location))
@@ -34,7 +31,7 @@ class Assigning symbol f => TermAssigning syntaxes symbol f | f -> symbol, f -> 
 parseError :: ( Bounded symbol
               , Element Syntax.Error syntaxes
               , HasCallStack
-              , TermAssigning syntaxes symbol f
+              , Assigning symbol f
               )
            => f (Term (Sum syntaxes) (Record Location))
 parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
@@ -111,6 +108,16 @@ instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment 
       s:_ -> first (const (advanceState state)) <$> runAssignment a src state { stateInput = astChildren s })
     ]
 
+  toTerm a = Assignment
+    (case nullable a of
+      Just f  -> Just (\ state -> termIn (stateLocation state) (inject (f state)))
+      Nothing -> Nothing)
+    (firstSet a)
+    (map (fmap (\ match src state follow -> case match src state follow of
+      Left err -> Left err
+      Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a))
+
+
 runAssignment :: Enum symbol => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
 runAssignment (Assignment nullable firstSet table) src input
   = case choose nullable firstSet (IntMap.fromList (map (first fromEnum) table)) src input lowerBound of
@@ -118,20 +125,6 @@ runAssignment (Assignment nullable firstSet table) src input
     Right (state', a') -> case stateInput state' of
       []   -> Right (state', a')
       s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s'))))
-
-
-newtype TermAssignment (syntaxes :: [* -> *]) symbol a = TermAssignment { runTermAssignment :: Assignment symbol a }
-  deriving (Alternative, Applicative, Functor, Assigning symbol)
-
-instance (Enum symbol, Ord symbol, Show symbol) => TermAssigning syntaxes symbol (TermAssignment syntaxes symbol) where
-  toTerm (TermAssignment a) = TermAssignment (Assignment
-    (case nullable a of
-      Just f  -> Just (\ state -> termIn (stateLocation state) (inject (f state)))
-      Nothing -> Nothing)
-    (firstSet a)
-    (map (fmap (\ match src state follow -> case match src state follow of
-      Left err -> Left err
-      Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a)))
 
 
 data State s = State
