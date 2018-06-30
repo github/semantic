@@ -142,6 +142,12 @@ instance Applicative (Nullable symbol) where
   Nullable f <*> Nullable a = Nullable (\ state -> f state (a state))
   _          <*> _          = NotNullable
 
+instance Alternative (Nullable symbol) where
+  empty = NotNullable
+
+  Nullable a  <|> _ = Nullable a
+  NotNullable <|> b = b
+
 
 data State symbol = State
   { stateBytes :: {-# UNPACK #-} !Int
