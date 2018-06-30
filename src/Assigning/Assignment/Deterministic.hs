@@ -3,6 +3,7 @@ module Assigning.Assignment.Deterministic
 ( Assigning(..)
 , parseError
 , Assignment(..)
+, assign
 , runAssignment
 , State(..)
 ) where
@@ -117,6 +118,9 @@ instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment 
       Left err -> Left err
       Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a))
 
+
+assign :: (Enum symbol, Show symbol) => Assignment symbol a -> Source -> AST [] symbol -> Either (Error String) a
+assign assignment src = bimap (fmap (either id show)) snd . runAssignment assignment src . State 0 lowerBound . pure
 
 runAssignment :: Enum symbol => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
 runAssignment (Assignment nullable firstSet table) src input
