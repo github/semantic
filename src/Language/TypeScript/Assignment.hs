@@ -694,7 +694,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
         <|> (pure <$> defaultImport))
 
     makeImportTerm1 loc from (Just alias, _) = makeTerm loc (TypeScript.Syntax.QualifiedAliasedImport alias from)
-    makeImportTerm1 loc from (Nothing, symbols) = makeTerm loc (TypeScript.Syntax.Import symbols from)
+    makeImportTerm1 loc from (Nothing, symbols) = makeTerm loc (TypeScript.Syntax.Import (uncurry TypeScript.Syntax.Alias <$> symbols) from)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
@@ -755,8 +755,8 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
                  <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)
-    makeNameAliasPair from (Just alias) = (from, alias)
-    makeNameAliasPair from Nothing = (from, from)
+    makeNameAliasPair from (Just alias) = TypeScript.Syntax.Alias from alias
+    makeNameAliasPair from Nothing = TypeScript.Syntax.Alias from from
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
     fromClause = symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source)
