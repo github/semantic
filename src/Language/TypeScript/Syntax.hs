@@ -63,8 +63,8 @@ resolveWithNodejsStrategy :: ( Member (Modules address) effects
                           => ImportPath
                           -> [String]
                           -> Evaluator address value effects M.ModulePath
-resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
+resolveWithNodejsStrategy (ImportPath path _)    exts = resolveRelativePath path exts
 
 -- | Resolve a relative TypeScript import to a known 'ModuleName' or fail.
 --
