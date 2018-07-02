@@ -1,0 +1,13 @@
+(Hash
+  (KeyValue
+    (TextElement)
+    (Float))
+  (KeyValue
+    (TextElement)
+    (Float))
+  (KeyValue
+    (TextElement)
+    (Float))
+  (KeyValue
+    (TextElement)
+    (Float)))
