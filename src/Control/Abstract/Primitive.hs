@@ -38,7 +38,7 @@ defineClass :: ( AbstractValue address value effects
 defineClass name superclasses scope = define name $ do
   env <- locally $ do
     void scope
-    Env.head <$> getEnv
+    Env.newEnv . Env.head <$> getEnv
   klass name (map (string . formatName) superclasses) env
 
 lambda :: (AbstractFunction address value effects, Member Fresh effects)

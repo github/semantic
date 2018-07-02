@@ -609,8 +609,10 @@
           (Statements
             (App
               (ConstructorIdentifier)
+              (Empty)
               (InfixOperatorApp
                 (VariableIdentifier)
+                (Empty)
                 (VariableOperator
                   (VariableSymbol))
                 (VariableIdentifier)))))))
@@ -709,6 +711,7 @@
           (Statements
             (InfixOperatorApp
               (VariableIdentifier)
+              (Empty)
               (VariableOperator
                 (VariableSymbol))
               (ConstructorIdentifier))))))

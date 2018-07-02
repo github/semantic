@@ -52,4 +52,39 @@
         { (VariableIdentifier)
         ->(VariableIdentifier) }
         { (VariableIdentifier)
-        ->(VariableIdentifier) })))))
+        ->(VariableIdentifier) })))
+    (TypeSignature
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (FunctionType
+        (Type
+          (Array
+            (Type
+              (TypeVariableIdentifier)
+              (TypeParameters)
+              (Empty)))
+          (TypeParameters)
+          (Empty))
+        (Type
+          (TypeVariableIdentifier)
+          (TypeParameters)
+          (Empty))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (ListConstructor)
+      (Statements
+        (App
+          (VariableIdentifier)
+          (Empty)
+          (TextElement))))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (VariableIdentifier)
+        (ConstructorOperator
+          (ConstructorSymbol))
+        (Wildcard))
+      (Statements
+        (VariableIdentifier)))))
