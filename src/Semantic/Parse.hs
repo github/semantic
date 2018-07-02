@@ -10,7 +10,6 @@ import Data.JSON.Fields
 import Data.Record
 import Data.Term
 import Parsing.Parser
-import Data.Language hiding (JSON)
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
 import Rendering.Renderer
