@@ -167,7 +167,6 @@ type Syntax = '[
   , TypeScript.Syntax.Undefined
   , TypeScript.Syntax.ClassHeritage
   , TypeScript.Syntax.AbstractClass
-  , TypeScript.Syntax.ExtendsClause
   , TypeScript.Syntax.ImplementsClause
   , TypeScript.Syntax.JsxElement
   , TypeScript.Syntax.JsxSelfClosingElement
