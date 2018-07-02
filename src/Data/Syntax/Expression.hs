@@ -264,7 +264,7 @@ instance Evaluatable XOr where
     go (XOr a b) = boolean <$> liftA2 (/=) (a >>= asBool) (b >>= asBool)
 
 -- | Javascript delete operator
-newtype Delete a = Delete a
+newtype Delete a = Delete { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Delete where liftEq = genericLiftEq
@@ -276,7 +276,7 @@ instance Evaluatable Delete
 
 
 -- | A sequence expression such as Javascript or C's comma operator.
-data SequenceExpression a = SequenceExpression { _firstExpression :: !a, _secondExpression :: !a }
+data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 SequenceExpression where liftEq = genericLiftEq
@@ -288,7 +288,7 @@ instance Evaluatable SequenceExpression
 
 
 -- | Javascript void operator
-newtype Void a = Void a
+newtype Void a = Void { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Void where liftEq = genericLiftEq
@@ -300,7 +300,7 @@ instance Evaluatable Void
 
 
 -- | Javascript typeof operator
-newtype Typeof a = Typeof a
+newtype Typeof a = Typeof { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Typeof where liftEq = genericLiftEq
