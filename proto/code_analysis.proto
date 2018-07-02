@@ -47,16 +47,16 @@ message ParseTreeResponse {
 message RawParseTreeResponse {
   oneof response_type {
     RubyResponse ruby = 1;
-    JSONResponse json = 1;
+    JSONResponse json = 2;
   }
 }
 
 message RubyResponse {
-  repeated RubyTerm terms = 1;
+  repeated ruby.RubyTerm terms = 1;
 }
 
 message JSONResponse {
-  repeated JSONTerm terms = 1;
+  repeated json.JSONTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {

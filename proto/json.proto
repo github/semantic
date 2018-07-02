@@ -1,5 +1,6 @@
 syntax = "proto3";
-package github.semantic;
+import "types.proto";
+package github.semantic.json;
 message JSONTerm { JSONSyntax syntax = 1;
                  }
 message JSONSyntax { oneof syntax {Null null = 1;

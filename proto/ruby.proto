@@ -1,5 +1,6 @@
 syntax = "proto3";
-package github.semantic;
+import "types.proto";
+package github.semantic.ruby;
 message RubyTerm { RubySyntax syntax = 1;
                  }
 message Comment { string commentContent = 1;
