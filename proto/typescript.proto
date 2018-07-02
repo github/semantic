@@ -1,9 +1,8 @@
 syntax = "proto3";
-import "types.proto";
 package github.semantic.typescript;
-message TypescriptSyntax { TypescriptSyntax syntax = 1;
-                         }
-message TypescriptSyntax { oneof syntax {Comment comment = 1;
+message TypeScriptTerm { TypeScriptSyntax syntax = 1;
+                       }
+message TypeScriptSyntax { oneof syntax {Comment comment = 1;
                                          HashBang hashBang = 2;
                                          Class class = 3;
                                          Function function = 4;
@@ -171,454 +170,454 @@ message TypescriptSyntax { oneof syntax {Comment comment = 1;
                          }
 message Comment { string commentContent = 1;
                 }
-message HashBang { string = 1;
+message HashBang { string value = 1;
                  }
-message Class { repeated TypescriptSyntax classContext = 1;
-                TypescriptSyntax classIdentifier = 2;
-                repeated TypescriptSyntax classSuperclasses = 3;
-                TypescriptSyntax classBody = 4;
+message Class { repeated TypeScriptTerm classContext = 1;
+                TypeScriptTerm classIdentifier = 2;
+                repeated TypeScriptTerm classSuperclasses = 3;
+                TypeScriptTerm classBody = 4;
               }
-message Function { repeated TypescriptSyntax functionContext = 1;
-                   TypescriptSyntax functionName = 2;
-                   repeated TypescriptSyntax functionParameters = 3;
-                   TypescriptSyntax functionBody = 4;
+message Function { repeated TypeScriptTerm functionContext = 1;
+                   TypeScriptTerm functionName = 2;
+                   repeated TypeScriptTerm functionParameters = 3;
+                   TypeScriptTerm functionBody = 4;
                  }
-message Method { repeated TypescriptSyntax methodContext = 1;
-                 TypescriptSyntax methodReceiver = 2;
-                 TypescriptSyntax methodName = 3;
-                 repeated TypescriptSyntax methodParameters = 4;
-                 TypescriptSyntax methodBody = 5;
+message Method { repeated TypeScriptTerm methodContext = 1;
+                 TypeScriptTerm methodReceiver = 2;
+                 TypeScriptTerm methodName = 3;
+                 repeated TypeScriptTerm methodParameters = 4;
+                 TypeScriptTerm methodBody = 5;
                }
-message MethodSignature { repeated TypescriptSyntax _methodSignatureContext = 1;
-                          TypescriptSyntax _methodSignatureName = 2;
-                          repeated TypescriptSyntax _methodSignatureParameters = 3;
+message MethodSignature { repeated TypeScriptTerm methodSignatureContext = 1;
+                          TypeScriptTerm methodSignatureName = 2;
+                          repeated TypeScriptTerm methodSignatureParameters = 3;
                         }
-message InterfaceDeclaration { repeated TypescriptSyntax interfaceDeclarationContext = 1;
-                               TypescriptSyntax interfaceDeclarationIdentifier = 2;
-                               TypescriptSyntax interfaceDeclarationBody = 3;
+message InterfaceDeclaration { repeated TypeScriptTerm interfaceDeclarationContext = 1;
+                               TypeScriptTerm interfaceDeclarationIdentifier = 2;
+                               TypeScriptTerm interfaceDeclarationBody = 3;
                              }
-message PublicFieldDefinition { repeated TypescriptSyntax publicFieldContext = 1;
-                                TypescriptSyntax publicFieldPropertyName = 2;
-                                TypescriptSyntax publicFieldValue = 3;
+message PublicFieldDefinition { repeated TypeScriptTerm publicFieldContext = 1;
+                                TypeScriptTerm publicFieldPropertyName = 2;
+                                TypeScriptTerm publicFieldValue = 3;
                               }
-message VariableDeclaration { repeated TypescriptSyntax variableDeclarations = 1;
+message VariableDeclaration { repeated TypeScriptTerm variableDeclarations = 1;
                             }
-message TypeAlias { repeated TypescriptSyntax typeAliasContext = 1;
-                    TypescriptSyntax typeAliasIdentifier = 2;
-                    TypescriptSyntax typeAliasKind = 3;
+message TypeAlias { repeated TypeScriptTerm typeAliasContext = 1;
+                    TypeScriptTerm typeAliasIdentifier = 2;
+                    TypeScriptTerm typeAliasKind = 3;
                   }
-message Plus { TypescriptSyntax lhs = 1;
-               TypescriptSyntax rhs = 2;
+message Plus { TypeScriptTerm lhs = 1;
+               TypeScriptTerm rhs = 2;
              }
-message Minus { TypescriptSyntax lhs = 1;
-                TypescriptSyntax rhs = 2;
+message Minus { TypeScriptTerm lhs = 1;
+                TypeScriptTerm rhs = 2;
               }
-message Times { TypescriptSyntax lhs = 1;
-                TypescriptSyntax rhs = 2;
+message Times { TypeScriptTerm lhs = 1;
+                TypeScriptTerm rhs = 2;
               }
-message DividedBy { TypescriptSyntax lhs = 1;
-                    TypescriptSyntax rhs = 2;
+message DividedBy { TypeScriptTerm lhs = 1;
+                    TypeScriptTerm rhs = 2;
                   }
-message Modulo { TypescriptSyntax lhs = 1;
-                 TypescriptSyntax rhs = 2;
+message Modulo { TypeScriptTerm lhs = 1;
+                 TypeScriptTerm rhs = 2;
                }
-message Power { TypescriptSyntax lhs = 1;
-                TypescriptSyntax rhs = 2;
+message Power { TypeScriptTerm lhs = 1;
+                TypeScriptTerm rhs = 2;
               }
-message Negate { TypescriptSyntax term = 1;
+message Negate { TypeScriptTerm term = 1;
                }
-message FloorDivision { TypescriptSyntax lhs = 1;
-                        TypescriptSyntax rhs = 2;
+message FloorDivision { TypeScriptTerm lhs = 1;
+                        TypeScriptTerm rhs = 2;
                       }
-message BAnd { TypescriptSyntax left = 1;
-               TypescriptSyntax right = 2;
+message BAnd { TypeScriptTerm left = 1;
+               TypeScriptTerm right = 2;
              }
-message BOr { TypescriptSyntax left = 1;
-              TypescriptSyntax right = 2;
+message BOr { TypeScriptTerm left = 1;
+              TypeScriptTerm right = 2;
             }
-message BXOr { TypescriptSyntax left = 1;
-               TypescriptSyntax right = 2;
+message BXOr { TypeScriptTerm left = 1;
+               TypeScriptTerm right = 2;
              }
-message LShift { TypescriptSyntax left = 1;
-                 TypescriptSyntax right = 2;
+message LShift { TypeScriptTerm left = 1;
+                 TypeScriptTerm right = 2;
                }
-message RShift { TypescriptSyntax left = 1;
-                 TypescriptSyntax right = 2;
+message RShift { TypeScriptTerm left = 1;
+                 TypeScriptTerm right = 2;
                }
-message UnsignedRShift { TypescriptSyntax left = 1;
-                         TypescriptSyntax right = 2;
+message UnsignedRShift { TypeScriptTerm left = 1;
+                         TypeScriptTerm right = 2;
                        }
-message Complement { TypescriptSyntax value = 1;
+message Complement { TypeScriptTerm value = 1;
                    }
-message And { TypescriptSyntax lhs = 1;
-              TypescriptSyntax rhs = 2;
+message And { TypeScriptTerm lhs = 1;
+              TypeScriptTerm rhs = 2;
             }
-message Not { TypescriptSyntax term = 1;
+message Not { TypeScriptTerm term = 1;
             }
-message Or { TypescriptSyntax lhs = 1;
-             TypescriptSyntax rhs = 2;
+message Or { TypeScriptTerm lhs = 1;
+             TypeScriptTerm rhs = 2;
            }
-message XOr { TypescriptSyntax lhs = 1;
-              TypescriptSyntax rhs = 2;
+message XOr { TypeScriptTerm lhs = 1;
+              TypeScriptTerm rhs = 2;
             }
-message Call { repeated TypescriptSyntax callContext = 1;
-               TypescriptSyntax callFunction = 2;
-               repeated TypescriptSyntax callParams = 3;
-               TypescriptSyntax callBlock = 4;
+message Call { repeated TypeScriptTerm callContext = 1;
+               TypeScriptTerm callFunction = 2;
+               repeated TypeScriptTerm callParams = 3;
+               TypeScriptTerm callBlock = 4;
              }
-message Cast { TypescriptSyntax castSubject = 1;
-               TypescriptSyntax castType = 2;
+message Cast { TypeScriptTerm castSubject = 1;
+               TypeScriptTerm castType = 2;
              }
-message LessThan { TypescriptSyntax lhs = 1;
-                   TypescriptSyntax rhs = 2;
+message LessThan { TypeScriptTerm lhs = 1;
+                   TypeScriptTerm rhs = 2;
                  }
-message LessThanEqual { TypescriptSyntax lhs = 1;
-                        TypescriptSyntax rhs = 2;
+message LessThanEqual { TypeScriptTerm lhs = 1;
+                        TypeScriptTerm rhs = 2;
                       }
-message GreaterThan { TypescriptSyntax lhs = 1;
-                      TypescriptSyntax rhs = 2;
+message GreaterThan { TypeScriptTerm lhs = 1;
+                      TypeScriptTerm rhs = 2;
                     }
-message GreaterThanEqual { TypescriptSyntax lhs = 1;
-                           TypescriptSyntax rhs = 2;
+message GreaterThanEqual { TypeScriptTerm lhs = 1;
+                           TypeScriptTerm rhs = 2;
                          }
-message Equal { TypescriptSyntax lhs = 1;
-                TypescriptSyntax rhs = 2;
+message Equal { TypeScriptTerm lhs = 1;
+                TypeScriptTerm rhs = 2;
               }
-message StrictEqual { TypescriptSyntax lhs = 1;
-                      TypescriptSyntax rhs = 2;
+message StrictEqual { TypeScriptTerm lhs = 1;
+                      TypeScriptTerm rhs = 2;
                     }
-message Comparison { TypescriptSyntax lhs = 1;
-                     TypescriptSyntax rhs = 2;
+message Comparison { TypeScriptTerm lhs = 1;
+                     TypeScriptTerm rhs = 2;
                    }
-message Enumeration { TypescriptSyntax enumerationStart = 1;
-                      TypescriptSyntax enumerationEnd = 2;
-                      TypescriptSyntax enumerationStep = 3;
+message Enumeration { TypeScriptTerm enumerationStart = 1;
+                      TypeScriptTerm enumerationEnd = 2;
+                      TypeScriptTerm enumerationStep = 3;
                     }
-message MemberAccess { TypescriptSyntax lhs = 1;
+message MemberAccess { TypeScriptTerm lhs = 1;
                        bytes rhs = 2;
                      }
-message NonNullExpression { TypescriptSyntax nonNullExpression = 1;
+message NonNullExpression { TypeScriptTerm nonNullExpression = 1;
                           }
-message ScopeResolution { repeated TypescriptSyntax scopes = 1;
+message ScopeResolution { repeated TypeScriptTerm scopes = 1;
                         }
-message SequenceExpression { TypescriptSyntax _firstExpression = 1;
-                             TypescriptSyntax _secondExpression = 2;
+message SequenceExpression { TypeScriptTerm firstExpression = 1;
+                             TypeScriptTerm secondExpression = 2;
                            }
-message Subscript { TypescriptSyntax lhs = 1;
-                    repeated TypescriptSyntax rhs = 2;
+message Subscript { TypeScriptTerm lhs = 1;
+                    repeated TypeScriptTerm rhs = 2;
                   }
-message Member { TypescriptSyntax lhs = 1;
-                 TypescriptSyntax rhs = 2;
+message Member { TypeScriptTerm lhs = 1;
+                 TypeScriptTerm rhs = 2;
                }
-message Delete { TypescriptSyntax = 1;
+message Delete { TypeScriptTerm value = 1;
                }
-message Void { TypescriptSyntax = 1;
+message Void { TypeScriptTerm value = 1;
              }
-message Typeof { TypescriptSyntax = 1;
+message Typeof { TypeScriptTerm value = 1;
                }
-message InstanceOf { TypescriptSyntax instanceOfSubject = 1;
-                     TypescriptSyntax instanceOfObject = 2;
+message InstanceOf { TypeScriptTerm instanceOfSubject = 1;
+                     TypeScriptTerm instanceOfObject = 2;
                    }
-message New { repeated TypescriptSyntax newSubject = 1;
+message New { repeated TypeScriptTerm newSubject = 1;
             }
-message Await { TypescriptSyntax awaitSubject = 1;
+message Await { TypeScriptTerm awaitSubject = 1;
               }
-message Array { repeated TypescriptSyntax arrayElements = 1;
+message Array { repeated TypeScriptTerm arrayElements = 1;
               }
 message Boolean { bool booleanContent = 1;
                 }
 message Float { string floatContent = 1;
               }
-message Hash { repeated TypescriptSyntax hashElements = 1;
+message Hash { repeated TypeScriptTerm hashElements = 1;
              }
 message Integer { string integerContent = 1;
                 }
-message KeyValue { TypescriptSyntax key = 1;
-                   TypescriptSyntax value = 2;
+message KeyValue { TypeScriptTerm key = 1;
+                   TypeScriptTerm value = 2;
                  }
 message Null {
              }
-message String { repeated TypescriptSyntax stringElements = 1;
+message String { repeated TypeScriptTerm stringElements = 1;
                }
 message TextElement { string textElementContent = 1;
                     }
 message Regex { string regexContent = 1;
               }
-message Assignment { repeated TypescriptSyntax assignmentContext = 1;
-                     TypescriptSyntax assignmentTarget = 2;
-                     TypescriptSyntax assignmentValue = 3;
+message Assignment { repeated TypeScriptTerm assignmentContext = 1;
+                     TypeScriptTerm assignmentTarget = 2;
+                     TypeScriptTerm assignmentValue = 3;
                    }
-message Break { TypescriptSyntax term = 1;
+message Break { TypeScriptTerm term = 1;
               }
-message Catch { TypescriptSyntax catchException = 1;
-                TypescriptSyntax catchBody = 2;
+message Catch { TypeScriptTerm catchException = 1;
+                TypeScriptTerm catchBody = 2;
               }
-message Continue { TypescriptSyntax term = 1;
+message Continue { TypeScriptTerm term = 1;
                  }
-message DoWhile { TypescriptSyntax doWhileCondition = 1;
-                  TypescriptSyntax doWhileBody = 2;
+message DoWhile { TypeScriptTerm doWhileCondition = 1;
+                  TypeScriptTerm doWhileBody = 2;
                 }
-message Else { TypescriptSyntax elseCondition = 1;
-               TypescriptSyntax elseBody = 2;
+message Else { TypeScriptTerm elseCondition = 1;
+               TypeScriptTerm elseBody = 2;
              }
-message Finally { TypescriptSyntax term = 1;
+message Finally { TypeScriptTerm term = 1;
                 }
-message For { TypescriptSyntax forBefore = 1;
-              TypescriptSyntax forCondition = 2;
-              TypescriptSyntax forStep = 3;
-              TypescriptSyntax forBody = 4;
+message For { TypeScriptTerm forBefore = 1;
+              TypeScriptTerm forCondition = 2;
+              TypeScriptTerm forStep = 3;
+              TypeScriptTerm forBody = 4;
             }
-message ForEach { TypescriptSyntax forEachBinding = 1;
-                  TypescriptSyntax forEachSubject = 2;
-                  TypescriptSyntax forEachBody = 3;
+message ForEach { TypeScriptTerm forEachBinding = 1;
+                  TypeScriptTerm forEachSubject = 2;
+                  TypeScriptTerm forEachBody = 3;
                 }
-message If { TypescriptSyntax ifCondition = 1;
-             TypescriptSyntax ifThenBody = 2;
-             TypescriptSyntax ifElseBody = 3;
+message If { TypeScriptTerm ifCondition = 1;
+             TypeScriptTerm ifThenBody = 2;
+             TypeScriptTerm ifElseBody = 3;
            }
-message Match { TypescriptSyntax matchSubject = 1;
-                TypescriptSyntax matchPatterns = 2;
+message Match { TypeScriptTerm matchSubject = 1;
+                TypeScriptTerm matchPatterns = 2;
               }
-message Pattern { TypescriptSyntax value = 1;
-                  TypescriptSyntax patternBody = 2;
+message Pattern { TypeScriptTerm value = 1;
+                  TypeScriptTerm patternBody = 2;
                 }
-message Retry { TypescriptSyntax term = 1;
+message Retry { TypeScriptTerm term = 1;
               }
-message Return { TypescriptSyntax term = 1;
+message Return { TypeScriptTerm term = 1;
                }
-message ScopeEntry { repeated TypescriptSyntax terms = 1;
+message ScopeEntry { repeated TypeScriptTerm terms = 1;
                    }
-message ScopeExit { repeated TypescriptSyntax terms = 1;
+message ScopeExit { repeated TypeScriptTerm terms = 1;
                   }
-message Statements { repeated TypescriptSyntax statements = 1;
+message Statements { repeated TypeScriptTerm statements = 1;
                    }
-message Throw { TypescriptSyntax = 1;
+message Throw { TypeScriptTerm value = 1;
               }
-message Try { TypescriptSyntax tryBody = 1;
-              repeated TypescriptSyntax tryCatch = 2;
+message Try { TypeScriptTerm tryBody = 1;
+              repeated TypeScriptTerm tryCatch = 2;
             }
-message While { TypescriptSyntax whileCondition = 1;
-                TypescriptSyntax whileBody = 2;
+message While { TypeScriptTerm whileCondition = 1;
+                TypeScriptTerm whileBody = 2;
               }
-message Yield { TypescriptSyntax term = 1;
+message Yield { TypeScriptTerm term = 1;
               }
-message AccessibilityModifier { string = 1;
+message AccessibilityModifier { string contents = 1;
                               }
 message Empty {
               }
 message Error { repeated ErrorSite errorCallStack = 1;
                 repeated string errorExpected = 2;
                 string errorActual = 3;
-                repeated TypescriptSyntax errorChildren = 4;
+                repeated TypeScriptTerm errorChildren = 4;
               }
 message Identifier { bytes name = 1;
                    }
-message Context { repeated TypescriptSyntax contextTerms = 1;
-                  TypescriptSyntax contextSubject = 2;
+message Context { repeated TypeScriptTerm contextTerms = 1;
+                  TypeScriptTerm contextSubject = 2;
                 }
 message Readonly {
                  }
-message TypeParameters { repeated TypescriptSyntax = 1;
+message TypeParameters { repeated TypeScriptTerm terms = 1;
                        }
-message TypeParameter { TypescriptSyntax _typeParameter = 1;
-                        TypescriptSyntax _typeParameterConstraint = 2;
-                        TypescriptSyntax _typeParameterDefaultType = 3;
+message TypeParameter { TypeScriptTerm typeParameter = 1;
+                        TypeScriptTerm typeParameterConstraint = 2;
+                        TypeScriptTerm typeParameterDefaultType = 3;
                       }
-message Constraint { TypescriptSyntax _constraintType = 1;
+message Constraint { TypeScriptTerm constraintType = 1;
                    }
-message ParenthesizedType { TypescriptSyntax _parenthesizedType = 1;
+message ParenthesizedType { TypeScriptTerm parenthesizedType = 1;
                           }
-message DefaultType { TypescriptSyntax _defaultType = 1;
+message DefaultType { TypeScriptTerm defaultType = 1;
                     }
-message PredefinedType { string _predefinedType = 1;
+message PredefinedType { string predefinedType = 1;
                        }
-message TypeIdentifier { string = 1;
+message TypeIdentifier { string contents = 1;
                        }
-message NestedIdentifier { TypescriptSyntax = 1;
-                           TypescriptSyntax = 2;
+message NestedIdentifier { TypeScriptTerm left = 1;
+                           TypeScriptTerm right = 2;
                          }
-message NestedTypeIdentifier { TypescriptSyntax = 1;
-                               TypescriptSyntax = 2;
+message NestedTypeIdentifier { TypeScriptTerm left = 1;
+                               TypeScriptTerm right = 2;
                              }
-message GenericType { TypescriptSyntax _genericTypeIdentifier = 1;
-                      TypescriptSyntax _genericTypeArguments = 2;
+message GenericType { TypeScriptTerm genericTypeIdentifier = 1;
+                      TypeScriptTerm genericTypeArguments = 2;
                     }
-message TypeArguments { repeated TypescriptSyntax _typeArguments = 1;
+message TypeArguments { repeated TypeScriptTerm typeArguments = 1;
                       }
-message TypePredicate { TypescriptSyntax _typePredicateIdentifier = 1;
-                        TypescriptSyntax _typePredicateType = 2;
+message TypePredicate { TypeScriptTerm typePredicateIdentifier = 1;
+                        TypeScriptTerm typePredicateType = 2;
                       }
-message CallSignature { TypescriptSyntax _callSignatureTypeParameters = 1;
-                        repeated TypescriptSyntax _callSignatureParameters = 2;
-                        TypescriptSyntax _callSignatureType = 3;
+message CallSignature { TypeScriptTerm callSignatureTypeParameters = 1;
+                        repeated TypeScriptTerm callSignatureParameters = 2;
+                        TypeScriptTerm callSignatureType = 3;
                       }
-message ConstructSignature { TypescriptSyntax _constructSignatureTypeParameters = 1;
-                             repeated TypescriptSyntax _constructSignatureParameters = 2;
-                             TypescriptSyntax _constructSignatureType = 3;
+message ConstructSignature { TypeScriptTerm constructSignatureTypeParameters = 1;
+                             repeated TypeScriptTerm constructSignatureParameters = 2;
+                             TypeScriptTerm constructSignatureType = 3;
                            }
-message ArrayType { TypescriptSyntax _arrayType = 1;
+message ArrayType { TypeScriptTerm arrayType = 1;
                   }
-message LookupType { TypescriptSyntax lookupTypeIdentifier = 1;
-                     TypescriptSyntax lookupTypeKey = 2;
+message LookupType { TypeScriptTerm lookupTypeIdentifier = 1;
+                     TypeScriptTerm lookupTypeKey = 2;
                    }
-message FlowMaybeType { TypescriptSyntax _flowMaybeType = 1;
+message FlowMaybeType { TypeScriptTerm flowMaybeType = 1;
                       }
-message TypeQuery { TypescriptSyntax _typeQuerySubject = 1;
+message TypeQuery { TypeScriptTerm typeQuerySubject = 1;
                   }
-message IndexTypeQuery { TypescriptSyntax _indexTypeQuerySubject = 1;
+message IndexTypeQuery { TypeScriptTerm indexTypeQuerySubject = 1;
                        }
-message ThisType { string = 1;
+message ThisType { string contents = 1;
                  }
-message ExistentialType { string = 1;
+message ExistentialType { string contents = 1;
                         }
-message AbstractMethodSignature { repeated TypescriptSyntax _abstractMethodSignatureContext = 1;
-                                  TypescriptSyntax _abstractMethodSignatureName = 2;
-                                  repeated TypescriptSyntax _abstractMethodSignatureParameters = 3;
+message AbstractMethodSignature { repeated TypeScriptTerm abstractMethodSignatureContext = 1;
+                                  TypeScriptTerm abstractMethodSignatureName = 2;
+                                  repeated TypeScriptTerm abstractMethodSignatureParameters = 3;
                                 }
-message IndexSignature { TypescriptSyntax _indexSignatureSubject = 1;
-                         TypescriptSyntax _indexSignatureType = 2;
+message IndexSignature { TypeScriptTerm indexSignatureSubject = 1;
+                         TypeScriptTerm indexSignatureType = 2;
                        }
-message ObjectType { repeated TypescriptSyntax _objectTypeElements = 1;
+message ObjectType { repeated TypeScriptTerm objectTypeElements = 1;
                    }
-message LiteralType { TypescriptSyntax _literalTypeSubject = 1;
+message LiteralType { TypeScriptTerm literalTypeSubject = 1;
                     }
-message Union { TypescriptSyntax _unionLeft = 1;
-                TypescriptSyntax _unionRight = 2;
+message Union { TypeScriptTerm unionLeft = 1;
+                TypeScriptTerm unionRight = 2;
               }
-message Intersection { TypescriptSyntax _intersectionLeft = 1;
-                       TypescriptSyntax _intersectionRight = 2;
+message Intersection { TypeScriptTerm intersectionLeft = 1;
+                       TypeScriptTerm intersectionRight = 2;
                      }
-message Module { TypescriptSyntax moduleIdentifier = 1;
-                 repeated TypescriptSyntax moduleStatements = 2;
+message Module { TypeScriptTerm moduleIdentifier = 1;
+                 repeated TypeScriptTerm moduleStatements = 2;
                }
-message InternalModule { TypescriptSyntax internalModuleIdentifier = 1;
-                         repeated TypescriptSyntax internalModuleStatements = 2;
+message InternalModule { TypeScriptTerm internalModuleIdentifier = 1;
+                         repeated TypeScriptTerm internalModuleStatements = 2;
                        }
-message FunctionType { TypescriptSyntax _functionTypeParameters = 1;
-                       repeated TypescriptSyntax _functionFormalParameters = 2;
-                       TypescriptSyntax _functionType = 3;
+message FunctionType { TypeScriptTerm functionTypeParameters = 1;
+                       repeated TypeScriptTerm functionFormalParameters = 2;
+                       TypeScriptTerm functionType = 3;
                      }
-message Tuple { repeated TypescriptSyntax _tupleElements = 1;
+message Tuple { repeated TypeScriptTerm tupleElements = 1;
               }
-message Constructor { TypescriptSyntax _constructorTypeParameters = 1;
-                      repeated TypescriptSyntax _constructorFormalParameters = 2;
-                      TypescriptSyntax _constructorType = 3;
+message Constructor { TypeScriptTerm constructorTypeParameters = 1;
+                      repeated TypeScriptTerm constructorFormalParameters = 2;
+                      TypeScriptTerm constructorType = 3;
                     }
-message TypeAssertion { TypescriptSyntax _typeAssertionParameters = 1;
-                        TypescriptSyntax _typeAssertionExpression = 2;
+message TypeAssertion { TypeScriptTerm typeAssertionParameters = 1;
+                        TypeScriptTerm typeAssertionExpression = 2;
                       }
-message ImportAlias { TypescriptSyntax _importAliasSubject = 1;
-                      TypescriptSyntax _importAlias = 2;
+message ImportAlias { TypeScriptTerm importAliasSubject = 1;
+                      TypeScriptTerm importAlias = 2;
                     }
 message Debugger {
                  }
-message ShorthandPropertyIdentifier { string = 1;
+message ShorthandPropertyIdentifier { string contents = 1;
                                     }
 message Super {
               }
 message Undefined {
                   }
-message ClassHeritage { TypescriptSyntax _classHeritageExtendsClause = 1;
-                        TypescriptSyntax _implementsClause = 2;
+message ClassHeritage { TypeScriptTerm classHeritageExtendsClause = 1;
+                        TypeScriptTerm implementsClause = 2;
                       }
-message AbstractClass { TypescriptSyntax abstractClassIdentifier = 1;
-                        TypescriptSyntax _abstractClassTypeParameters = 2;
-                        repeated TypescriptSyntax classHeritage = 3;
-                        TypescriptSyntax classBody = 4;
+message AbstractClass { TypeScriptTerm abstractClassIdentifier = 1;
+                        TypeScriptTerm abstractClassTypeParameters = 2;
+                        repeated TypeScriptTerm classHeritage = 3;
+                        TypeScriptTerm classBody = 4;
                       }
-message ExtendsClause { repeated TypescriptSyntax _extendsClauses = 1;
+message ExtendsClause { repeated TypeScriptTerm extendsClauses = 1;
                       }
-message ImplementsClause { repeated TypescriptSyntax _implementsClauseTypes = 1;
+message ImplementsClause { repeated TypeScriptTerm implementsClauseTypes = 1;
                          }
-message JsxElement { TypescriptSyntax _jsxOpeningElement = 1;
-                     repeated TypescriptSyntax _jsxElements = 2;
-                     TypescriptSyntax _jsxClosingElement = 3;
+message JsxElement { TypeScriptTerm jsxOpeningElement = 1;
+                     repeated TypeScriptTerm jsxElements = 2;
+                     TypeScriptTerm jsxClosingElement = 3;
                    }
-message JsxSelfClosingElement { TypescriptSyntax _jsxSelfClosingElementIdentifier = 1;
-                                repeated TypescriptSyntax _jsxSelfClosingElementAttributes = 2;
+message JsxSelfClosingElement { TypeScriptTerm jsxSelfClosingElementIdentifier = 1;
+                                repeated TypeScriptTerm jsxSelfClosingElementAttributes = 2;
                               }
-message JsxOpeningElement { TypescriptSyntax _jsxOpeningElementIdentifier = 1;
-                            repeated TypescriptSyntax _jsxAttributes = 2;
+message JsxOpeningElement { TypeScriptTerm jsxOpeningElementIdentifier = 1;
+                            repeated TypeScriptTerm jsxAttributes = 2;
                           }
-message JsxText { string = 1;
+message JsxText { string contents = 1;
                 }
-message JsxClosingElement { TypescriptSyntax _jsxClosingElementIdentifier = 1;
+message JsxClosingElement { TypeScriptTerm jsxClosingElementIdentifier = 1;
                           }
-message JsxExpression { TypescriptSyntax _jsxExpression = 1;
+message JsxExpression { TypeScriptTerm jsxExpression = 1;
                       }
-message JsxAttribute { TypescriptSyntax _jsxAttributeTarget = 1;
-                       TypescriptSyntax _jsxAttributeValue = 2;
+message JsxAttribute { TypeScriptTerm jsxAttributeTarget = 1;
+                       TypeScriptTerm jsxAttributeValue = 2;
                      }
-message JsxFragment { repeated TypescriptSyntax = 1;
+message JsxFragment { repeated TypeScriptTerm terms = 1;
                     }
-message JsxNamespaceName { TypescriptSyntax = 1;
-                           TypescriptSyntax = 2;
+message JsxNamespaceName { TypeScriptTerm left = 1;
+                           TypeScriptTerm right = 2;
                          }
-message OptionalParameter { repeated TypescriptSyntax _optionalParameterContext = 1;
-                            TypescriptSyntax _optionalParameterSubject = 2;
+message OptionalParameter { repeated TypeScriptTerm optionalParameterContext = 1;
+                            TypeScriptTerm optionalParameterSubject = 2;
                           }
-message RequiredParameter { repeated TypescriptSyntax _requiredParameterContext = 1;
-                            TypescriptSyntax _requiredParameterSubject = 2;
+message RequiredParameter { repeated TypeScriptTerm requiredParameterContext = 1;
+                            TypeScriptTerm requiredParameterSubject = 2;
                           }
-message RestParameter { repeated TypescriptSyntax _restParameterContext = 1;
-                        TypescriptSyntax _restParameterSubject = 2;
+message RestParameter { repeated TypeScriptTerm restParameterContext = 1;
+                        TypeScriptTerm restParameterSubject = 2;
                       }
-message PropertySignature { repeated TypescriptSyntax _modifiers = 1;
-                            TypescriptSyntax _propertySignaturePropertyName = 2;
+message PropertySignature { repeated TypeScriptTerm modifiers = 1;
+                            TypeScriptTerm propertySignaturePropertyName = 2;
                           }
-message AmbientDeclaration { TypescriptSyntax _ambientDeclarationBody = 1;
+message AmbientDeclaration { TypeScriptTerm ambientDeclarationBody = 1;
                            }
-message EnumDeclaration { TypescriptSyntax enumDeclarationIdentifier = 1;
-                          repeated TypescriptSyntax _enumDeclarationBody = 2;
+message EnumDeclaration { TypeScriptTerm enumDeclarationIdentifier = 1;
+                          repeated TypeScriptTerm enumDeclarationBody = 2;
                         }
-message ExtendsClause { repeated TypescriptSyntax _extendsClauses = 1;
+message ExtendsClause { repeated TypeScriptTerm extendsClauses = 1;
                       }
-message AmbientFunction { repeated TypescriptSyntax _ambientFunctionContext = 1;
-                          TypescriptSyntax _ambientFunctionIdentifier = 2;
-                          repeated TypescriptSyntax _ambientFunctionParameters = 3;
+message AmbientFunction { repeated TypeScriptTerm ambientFunctionContext = 1;
+                          TypeScriptTerm ambientFunctionIdentifier = 2;
+                          repeated TypeScriptTerm ambientFunctionParameters = 3;
                         }
-message ImportRequireClause { TypescriptSyntax _importRequireIdentifier = 1;
-                              TypescriptSyntax _importRequireSubject = 2;
+message ImportRequireClause { TypeScriptTerm importRequireIdentifier = 1;
+                              TypeScriptTerm importRequireSubject = 2;
                             }
-message ImportClause { repeated TypescriptSyntax _importClauseElements = 1;
+message ImportClause { repeated TypeScriptTerm importClauseElements = 1;
                      }
-message LabeledStatement { TypescriptSyntax _labeledStatementIdentifier = 1;
-                           TypescriptSyntax _labeledStatementSubject = 2;
+message LabeledStatement { TypeScriptTerm labeledStatementIdentifier = 1;
+                           TypeScriptTerm labeledStatementSubject = 2;
                          }
-message Annotation { TypescriptSyntax _annotationType = 1;
+message Annotation { TypeScriptTerm annotationType = 1;
                    }
-message With { TypescriptSyntax _withExpression = 1;
-               TypescriptSyntax _withBody = 2;
+message With { TypeScriptTerm withExpression = 1;
+               TypeScriptTerm withBody = 2;
              }
-message ForOf { TypescriptSyntax _forOfBinding = 1;
-                TypescriptSyntax _forOfSubject = 2;
-                TypescriptSyntax _forOfBody = 3;
+message ForOf { TypeScriptTerm forOfBinding = 1;
+                TypeScriptTerm forOfSubject = 2;
+                TypeScriptTerm forOfBody = 3;
               }
 message This {
              }
-message Update { TypescriptSyntax _updateSubject = 1;
+message Update { TypeScriptTerm updateSubject = 1;
                }
-message ComputedPropertyName { TypescriptSyntax = 1;
+message ComputedPropertyName { TypeScriptTerm propertyName = 1;
                              }
-message Decorator { TypescriptSyntax _decoratorTerm = 1;
+message Decorator { TypeScriptTerm decoratorTerm = 1;
                   }
 message Import { repeated Alias importSymbols = 1;
                  ImportPath importFrom = 2;
                }
-message QualifiedAliasedImport { TypescriptSyntax qualifiedAliasedImportAlias = 1;
+message QualifiedAliasedImport { TypeScriptTerm qualifiedAliasedImportAlias = 1;
                                  ImportPath qualifiedAliasedImportFrom = 2;
                                }
 message SideEffectImport { ImportPath sideEffectImportFrom = 1;
                          }
-message DefaultExport { TypescriptSyntax defaultExport = 1;
+message DefaultExport { TypeScriptTerm defaultExport = 1;
                       }
 message QualifiedExport { repeated Alias qualifiedExportSymbols = 1;
                         }
 message QualifiedExportFrom { ImportPath qualifiedExportFrom = 1;
                               repeated Alias qualifiedExportFromSymbols = 2;
                             }
-message JavaScriptRequire { TypescriptSyntax javascriptRequireIden = 1;
+message JavaScriptRequire { TypeScriptTerm javascriptRequireIden = 1;
                             ImportPath javascriptRequireFrom = 2;
                           }
-message List { repeated TypescriptSyntax listContent = 1;
+message List { repeated TypeScriptTerm listContent = 1;
              }

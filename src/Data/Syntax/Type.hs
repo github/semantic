@@ -4,7 +4,7 @@ module Data.Syntax.Type where
 import Data.Abstract.Evaluatable
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prelude hiding (Bool, Float, Int)
+import Prelude hiding (Bool, Float, Int, Double)
 import Prologue hiding (Map)
 import Proto3.Suite.Class
 
@@ -109,7 +109,7 @@ instance Show1 Readonly where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Readonly
 
 
-newtype Slice a = Slice a
+newtype Slice a = Slice { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Slice where liftEq = genericLiftEq
@@ -120,7 +120,7 @@ instance Show1 Slice where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Slice
 
 
-newtype TypeParameters a = TypeParameters [a]
+newtype TypeParameters a = TypeParameters { terms :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 TypeParameters where liftEq = genericLiftEq
@@ -152,7 +152,7 @@ instance Show1 Int where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Int
 instance Evaluatable Int
 
-data Float a = Float | Double
+data Float a = Float
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Float where liftEq = genericLiftEq
@@ -161,6 +161,16 @@ instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Float
 instance Evaluatable Float
+
+data Double a = Double
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+
+instance Eq1 Double where liftEq = genericLiftEq
+instance Ord1 Double where liftCompare = genericLiftCompare
+instance Show1 Double where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Double
+instance Evaluatable Double
 
 data Bool a = Bool
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)

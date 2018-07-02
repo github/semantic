@@ -172,7 +172,7 @@ instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
-newtype AccessibilityModifier a = AccessibilityModifier Text
+newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
   deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Mergeable, Message1, Named1, ToJSONFields1)

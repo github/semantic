@@ -209,10 +209,10 @@ type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
 
 instance Named1 (Sum Syntax) where
-  nameOf1 _ = "TypescriptSyntax"
+  nameOf1 _ = "TypeScriptSyntax"
 
 instance Named (Term.Term (Sum Syntax) ()) where
-  nameOf _ = "TypescriptSyntax"
+  nameOf _ = "TypeScriptTerm"
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment Term
