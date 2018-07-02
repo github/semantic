@@ -15,6 +15,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Language.JSON.Grammar as Grammar
+import Proto3.Suite (Named1(..), Named(..))
 
 type Syntax =
   [ Literal.Null
@@ -29,6 +30,12 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "JSONSyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "JSONTerm"
 
 
 assignment :: Assignment Term
