@@ -34,6 +34,7 @@ import qualified Data.Term as Term
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import Prologue
+import Proto3.Suite (Named1(..), Named(..))
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -206,6 +207,12 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "TypescriptSyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "TypescriptSyntax"
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment Term
