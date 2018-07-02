@@ -570,6 +570,9 @@ message AmbientDeclaration { TypeScriptTerm ambientDeclarationBody = 1;
 message Alias { bytes aliasValue = 1;
                 bytes aliasName = 2;
               }
+message ImportPath { string unPath = 1;
+                     Relative pathIsRelative = 2;
+                   }
 message EnumDeclaration { TypeScriptTerm enumDeclarationIdentifier = 1;
                           repeated TypeScriptTerm enumDeclarationBody = 2;
                         }
