@@ -3,6 +3,15 @@ import "types.proto";
 package github.semantic.typescript;
 message TypeScriptTerm { TypeScriptSyntax syntax = 1;
                        }
+message Alias { bytes aliasValue = 1;
+                bytes aliasName = 2;
+              }
+message ImportPath { string unPath = 1;
+                     Relative pathIsRelative = 2;
+                   }
+enum Relative {Unknown = 0;
+               Relative = 1;
+               NonRelative = 2;}
 message TypeScriptSyntax { oneof syntax {Comment comment = 1;
                                          HashBang hashBang = 2;
                                          Class class = 3;
@@ -567,12 +576,6 @@ message PropertySignature { repeated TypeScriptTerm modifiers = 1;
                           }
 message AmbientDeclaration { TypeScriptTerm ambientDeclarationBody = 1;
                            }
-message Alias { bytes aliasValue = 1;
-                bytes aliasName = 2;
-              }
-message ImportPath { string unPath = 1;
-                     Relative pathIsRelative = 2;
-                   }
 message EnumDeclaration { TypeScriptTerm enumDeclarationIdentifier = 1;
                           repeated TypeScriptTerm enumDeclarationBody = 2;
                         }
