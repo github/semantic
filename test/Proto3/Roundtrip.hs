@@ -21,8 +21,8 @@ shouldRoundtrip :: (Eq a, Show a, Message a) => a -> Expectation
 shouldRoundtrip a = go a `shouldBe` Right a
   where go = fromByteString . L.toStrict . toLazyByteString
 
-shouldRoundtrip' :: forall f a. (Show (f a), Eq (f a), Show1 f, Eq1 f, Eq a, Show a, Message1 f, Message a) => f a -> Expectation
-shouldRoundtrip' a = go a `shouldBe` Right a
+shouldRoundtrip1 :: forall f a. (Show (f a), Eq (f a), Show1 f, Eq1 f, Eq a, Show a, Message1 f, Message a) => f a -> Expectation
+shouldRoundtrip1 a = go a `shouldBe` Right a
   where go = fromByteString1 . L.toStrict . toLazyByteString1
 
 spec :: Spec
@@ -33,19 +33,19 @@ spec = parallel $ do
 
   describe "nulls" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Literal.Null @(Term (Sum Syntax) ()) (unListableF sp)
+      \sp -> shouldRoundtrip1 @Literal.Null @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "text elements" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Literal.TextElement @(Term (Sum Syntax) ()) (unListableF sp)
+      \sp -> shouldRoundtrip1 @Literal.TextElement @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "floats" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Literal.Float @(Term (Sum Syntax) ()) (unListableF sp)
+      \sp -> shouldRoundtrip1 @Literal.Float @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "booleans" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Literal.Boolean @(Term (Sum Syntax) ()) (unListableF sp)
+      \sp -> shouldRoundtrip1 @Literal.Boolean @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "terms of syntax" $
     prop "roundtrips" $
@@ -53,19 +53,19 @@ spec = parallel $ do
 
   describe "arrays" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Literal.Array @(Term (Sum Syntax) ()) (unListableF sp)
+      \sp -> shouldRoundtrip1 @Literal.Array @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "key values" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Literal.KeyValue @(Term (Sum Syntax) ()) (unListableF sp)
+      \sp -> shouldRoundtrip1 @Literal.KeyValue @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "statements" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip @(Term (Sum '[Statement.Statements, Literal.Null]) ()) (unListableF sp)
+      \sp -> shouldRoundtrip @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "statements1" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip' @Statement.Statements @(Term (Sum '[Statement.Statements, Literal.Null]) ()) (unListableF sp)
+      \sp -> shouldRoundtrip1 @Statement.Statements @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "blobs" $ do
     it "should roundtrip given a Message instance" $ do
