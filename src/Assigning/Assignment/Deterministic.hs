@@ -49,7 +49,7 @@ type Cont symbol a = Source -> State symbol -> [IntSet] -> Either (Error (Either
 
 combine :: Nullable symbol a -> IntSet -> IntSet -> IntSet
 combine (Nullable _) s1 s2 = s1 <> s2
-combine NotNullable  s1 _  = s1
+combine _            s1 _  = s1
 
 choose :: Enum symbol
        => Nullable symbol a
@@ -147,7 +147,7 @@ instance Alternative (Nullable symbol) where
   empty = NotNullable
 
   Nullable a  <|> _ = Nullable a
-  NotNullable <|> b = b
+  _           <|> b = b
 
 
 data State symbol = State
