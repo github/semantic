@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "types.proto";
 package github.semantic.json;
 message JSONTerm { JSONSyntax syntax = 1;
                  }

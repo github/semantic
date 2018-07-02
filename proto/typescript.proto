@@ -1,4 +1,5 @@
 syntax = "proto3";
+import "types.proto";
 package github.semantic.typescript;
 message TypeScriptTerm { TypeScriptSyntax syntax = 1;
                        }
