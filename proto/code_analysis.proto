@@ -1,5 +1,6 @@
 syntax = "proto3";
 import "ruby.proto";
+import "json.proto";
 import "types.proto";
 import "error_details.proto";
 
@@ -45,12 +46,17 @@ message ParseTreeResponse {
 
 message RawParseTreeResponse {
   oneof response_type {
-    RubyResponse ruby_response = 1;
+    RubyResponse ruby = 1;
+    JSONResponse json = 1;
   }
 }
 
 message RubyResponse {
   repeated RubyTerm terms = 1;
+}
+
+message JSONResponse {
+  repeated JSONTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {
