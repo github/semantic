@@ -1,0 +1,623 @@
+syntax = "proto3";
+package github.semantic.typescript;
+message TypescriptSyntax { TypescriptSyntax syntax = 1;
+                         }
+message TypescriptSyntax { oneof syntax {Comment comment = 1;
+                                         HashBang hashBang = 2;
+                                         Class class = 3;
+                                         Function function = 4;
+                                         Method method = 5;
+                                         MethodSignature methodSignature = 6;
+                                         InterfaceDeclaration interfaceDeclaration = 7;
+                                         PublicFieldDefinition publicFieldDefinition = 8;
+                                         VariableDeclaration variableDeclaration = 9;
+                                         TypeAlias typeAlias = 10;
+                                         Plus plus = 11;
+                                         Minus minus = 12;
+                                         Times times = 13;
+                                         DividedBy dividedBy = 14;
+                                         Modulo modulo = 15;
+                                         Power power = 16;
+                                         Negate negate = 17;
+                                         FloorDivision floorDivision = 18;
+                                         BAnd bAnd = 19;
+                                         BOr bOr = 20;
+                                         BXOr bXOr = 21;
+                                         LShift lShift = 22;
+                                         RShift rShift = 23;
+                                         UnsignedRShift unsignedRShift = 24;
+                                         Complement complement = 25;
+                                         And and = 26;
+                                         Not not = 27;
+                                         Or or = 28;
+                                         XOr xOr = 29;
+                                         Call call = 30;
+                                         Cast cast = 31;
+                                         LessThan lessThan = 32;
+                                         LessThanEqual lessThanEqual = 33;
+                                         GreaterThan greaterThan = 34;
+                                         GreaterThanEqual greaterThanEqual = 35;
+                                         Equal equal = 36;
+                                         StrictEqual strictEqual = 37;
+                                         Comparison comparison = 38;
+                                         Enumeration enumeration = 39;
+                                         MemberAccess memberAccess = 40;
+                                         NonNullExpression nonNullExpression = 41;
+                                         ScopeResolution scopeResolution = 42;
+                                         SequenceExpression sequenceExpression = 43;
+                                         Subscript subscript = 44;
+                                         Member member = 45;
+                                         Delete delete = 46;
+                                         Void void = 47;
+                                         Typeof typeof = 48;
+                                         InstanceOf instanceOf = 49;
+                                         New new = 50;
+                                         Await await = 51;
+                                         Array array = 52;
+                                         Boolean boolean = 53;
+                                         Float float = 54;
+                                         Hash hash = 55;
+                                         Integer integer = 56;
+                                         KeyValue keyValue = 57;
+                                         Null null = 58;
+                                         String string = 59;
+                                         TextElement textElement = 60;
+                                         Regex regex = 61;
+                                         Assignment assignment = 62;
+                                         Break break = 63;
+                                         Catch catch = 64;
+                                         Continue continue = 65;
+                                         DoWhile doWhile = 66;
+                                         Else else = 67;
+                                         Finally finally = 68;
+                                         For for = 69;
+                                         ForEach forEach = 70;
+                                         If if = 71;
+                                         Match match = 72;
+                                         Pattern pattern = 73;
+                                         Retry retry = 74;
+                                         Return return = 75;
+                                         ScopeEntry scopeEntry = 76;
+                                         ScopeExit scopeExit = 77;
+                                         Statements statements = 78;
+                                         Throw throw = 79;
+                                         Try try = 80;
+                                         While while = 81;
+                                         Yield yield = 82;
+                                         AccessibilityModifier accessibilityModifier = 83;
+                                         Empty empty = 84;
+                                         Error error = 85;
+                                         Identifier identifier = 86;
+                                         Context context = 87;
+                                         Readonly readonly = 88;
+                                         TypeParameters typeParameters = 89;
+                                         TypeParameter typeParameter = 90;
+                                         Constraint constraint = 91;
+                                         ParenthesizedType parenthesizedType = 92;
+                                         DefaultType defaultType = 93;
+                                         PredefinedType predefinedType = 94;
+                                         TypeIdentifier typeIdentifier = 95;
+                                         NestedIdentifier nestedIdentifier = 96;
+                                         NestedTypeIdentifier nestedTypeIdentifier = 97;
+                                         GenericType genericType = 98;
+                                         TypeArguments typeArguments = 99;
+                                         TypePredicate typePredicate = 100;
+                                         CallSignature callSignature = 101;
+                                         ConstructSignature constructSignature = 102;
+                                         ArrayType arrayType = 103;
+                                         LookupType lookupType = 104;
+                                         FlowMaybeType flowMaybeType = 105;
+                                         TypeQuery typeQuery = 106;
+                                         IndexTypeQuery indexTypeQuery = 107;
+                                         ThisType thisType = 108;
+                                         ExistentialType existentialType = 109;
+                                         AbstractMethodSignature abstractMethodSignature = 110;
+                                         IndexSignature indexSignature = 111;
+                                         ObjectType objectType = 112;
+                                         LiteralType literalType = 113;
+                                         Union union = 114;
+                                         Intersection intersection = 115;
+                                         Module module = 116;
+                                         InternalModule internalModule = 117;
+                                         FunctionType functionType = 118;
+                                         Tuple tuple = 119;
+                                         Constructor constructor = 120;
+                                         TypeAssertion typeAssertion = 121;
+                                         ImportAlias importAlias = 122;
+                                         Debugger debugger = 123;
+                                         ShorthandPropertyIdentifier shorthandPropertyIdentifier = 124;
+                                         Super super = 125;
+                                         Undefined undefined = 126;
+                                         ClassHeritage classHeritage = 127;
+                                         AbstractClass abstractClass = 128;
+                                         ExtendsClause extendsClause = 129;
+                                         ImplementsClause implementsClause = 130;
+                                         JsxElement jsxElement = 131;
+                                         JsxSelfClosingElement jsxSelfClosingElement = 132;
+                                         JsxOpeningElement jsxOpeningElement = 133;
+                                         JsxText jsxText = 134;
+                                         JsxClosingElement jsxClosingElement = 135;
+                                         JsxExpression jsxExpression = 136;
+                                         JsxAttribute jsxAttribute = 137;
+                                         JsxFragment jsxFragment = 138;
+                                         JsxNamespaceName jsxNamespaceName = 139;
+                                         OptionalParameter optionalParameter = 140;
+                                         RequiredParameter requiredParameter = 141;
+                                         RestParameter restParameter = 142;
+                                         PropertySignature propertySignature = 143;
+                                         AmbientDeclaration ambientDeclaration = 144;
+                                         EnumDeclaration enumDeclaration = 145;
+                                         ExtendsClause extendsClause = 129;
+                                         AmbientFunction ambientFunction = 147;
+                                         ImportRequireClause importRequireClause = 148;
+                                         ImportClause importClause = 149;
+                                         LabeledStatement labeledStatement = 150;
+                                         Annotation annotation = 151;
+                                         With with = 152;
+                                         ForOf forOf = 153;
+                                         This this = 154;
+                                         Update update = 155;
+                                         ComputedPropertyName computedPropertyName = 156;
+                                         Decorator decorator = 157;
+                                         Import import = 158;
+                                         QualifiedAliasedImport qualifiedAliasedImport = 159;
+                                         SideEffectImport sideEffectImport = 160;
+                                         DefaultExport defaultExport = 161;
+                                         QualifiedExport qualifiedExport = 162;
+                                         QualifiedExportFrom qualifiedExportFrom = 163;
+                                         JavaScriptRequire javaScriptRequire = 164;
+                                         List list = 165;}
+                         }
+message Comment { string commentContent = 1;
+                }
+message HashBang { string = 1;
+                 }
+message Class { repeated TypescriptSyntax classContext = 1;
+                TypescriptSyntax classIdentifier = 2;
+                repeated TypescriptSyntax classSuperclasses = 3;
+                TypescriptSyntax classBody = 4;
+              }
+message Function { repeated TypescriptSyntax functionContext = 1;
+                   TypescriptSyntax functionName = 2;
+                   repeated TypescriptSyntax functionParameters = 3;
+                   TypescriptSyntax functionBody = 4;
+                 }
+message Method { repeated TypescriptSyntax methodContext = 1;
+                 TypescriptSyntax methodReceiver = 2;
+                 TypescriptSyntax methodName = 3;
+                 repeated TypescriptSyntax methodParameters = 4;
+                 TypescriptSyntax methodBody = 5;
+               }
+message MethodSignature { repeated TypescriptSyntax _methodSignatureContext = 1;
+                          TypescriptSyntax _methodSignatureName = 2;
+                          repeated TypescriptSyntax _methodSignatureParameters = 3;
+                        }
+message InterfaceDeclaration { repeated TypescriptSyntax interfaceDeclarationContext = 1;
+                               TypescriptSyntax interfaceDeclarationIdentifier = 2;
+                               TypescriptSyntax interfaceDeclarationBody = 3;
+                             }
+message PublicFieldDefinition { repeated TypescriptSyntax publicFieldContext = 1;
+                                TypescriptSyntax publicFieldPropertyName = 2;
+                                TypescriptSyntax publicFieldValue = 3;
+                              }
+message VariableDeclaration { repeated TypescriptSyntax variableDeclarations = 1;
+                            }
+message TypeAlias { repeated TypescriptSyntax typeAliasContext = 1;
+                    TypescriptSyntax typeAliasIdentifier = 2;
+                    TypescriptSyntax typeAliasKind = 3;
+                  }
+message Plus { TypescriptSyntax lhs = 1;
+               TypescriptSyntax rhs = 2;
+             }
+message Minus { TypescriptSyntax lhs = 1;
+                TypescriptSyntax rhs = 2;
+              }
+message Times { TypescriptSyntax lhs = 1;
+                TypescriptSyntax rhs = 2;
+              }
+message DividedBy { TypescriptSyntax lhs = 1;
+                    TypescriptSyntax rhs = 2;
+                  }
+message Modulo { TypescriptSyntax lhs = 1;
+                 TypescriptSyntax rhs = 2;
+               }
+message Power { TypescriptSyntax lhs = 1;
+                TypescriptSyntax rhs = 2;
+              }
+message Negate { TypescriptSyntax term = 1;
+               }
+message FloorDivision { TypescriptSyntax lhs = 1;
+                        TypescriptSyntax rhs = 2;
+                      }
+message BAnd { TypescriptSyntax left = 1;
+               TypescriptSyntax right = 2;
+             }
+message BOr { TypescriptSyntax left = 1;
+              TypescriptSyntax right = 2;
+            }
+message BXOr { TypescriptSyntax left = 1;
+               TypescriptSyntax right = 2;
+             }
+message LShift { TypescriptSyntax left = 1;
+                 TypescriptSyntax right = 2;
+               }
+message RShift { TypescriptSyntax left = 1;
+                 TypescriptSyntax right = 2;
+               }
+message UnsignedRShift { TypescriptSyntax left = 1;
+                         TypescriptSyntax right = 2;
+                       }
+message Complement { TypescriptSyntax value = 1;
+                   }
+message And { TypescriptSyntax lhs = 1;
+              TypescriptSyntax rhs = 2;
+            }
+message Not { TypescriptSyntax term = 1;
+            }
+message Or { TypescriptSyntax lhs = 1;
+             TypescriptSyntax rhs = 2;
+           }
+message XOr { TypescriptSyntax lhs = 1;
+              TypescriptSyntax rhs = 2;
+            }
+message Call { repeated TypescriptSyntax callContext = 1;
+               TypescriptSyntax callFunction = 2;
+               repeated TypescriptSyntax callParams = 3;
+               TypescriptSyntax callBlock = 4;
+             }
+message Cast { TypescriptSyntax castSubject = 1;
+               TypescriptSyntax castType = 2;
+             }
+message LessThan { TypescriptSyntax lhs = 1;
+                   TypescriptSyntax rhs = 2;
+                 }
+message LessThanEqual { TypescriptSyntax lhs = 1;
+                        TypescriptSyntax rhs = 2;
+                      }
+message GreaterThan { TypescriptSyntax lhs = 1;
+                      TypescriptSyntax rhs = 2;
+                    }
+message GreaterThanEqual { TypescriptSyntax lhs = 1;
+                           TypescriptSyntax rhs = 2;
+                         }
+message Equal { TypescriptSyntax lhs = 1;
+                TypescriptSyntax rhs = 2;
+              }
+message StrictEqual { TypescriptSyntax lhs = 1;
+                      TypescriptSyntax rhs = 2;
+                    }
+message Comparison { TypescriptSyntax lhs = 1;
+                     TypescriptSyntax rhs = 2;
+                   }
+message Enumeration { TypescriptSyntax enumerationStart = 1;
+                      TypescriptSyntax enumerationEnd = 2;
+                      TypescriptSyntax enumerationStep = 3;
+                    }
+message MemberAccess { TypescriptSyntax lhs = 1;
+                       bytes rhs = 2;
+                     }
+message NonNullExpression { TypescriptSyntax nonNullExpression = 1;
+                          }
+message ScopeResolution { repeated TypescriptSyntax scopes = 1;
+                        }
+message SequenceExpression { TypescriptSyntax _firstExpression = 1;
+                             TypescriptSyntax _secondExpression = 2;
+                           }
+message Subscript { TypescriptSyntax lhs = 1;
+                    repeated TypescriptSyntax rhs = 2;
+                  }
+message Member { TypescriptSyntax lhs = 1;
+                 TypescriptSyntax rhs = 2;
+               }
+message Delete { TypescriptSyntax = 1;
+               }
+message Void { TypescriptSyntax = 1;
+             }
+message Typeof { TypescriptSyntax = 1;
+               }
+message InstanceOf { TypescriptSyntax instanceOfSubject = 1;
+                     TypescriptSyntax instanceOfObject = 2;
+                   }
+message New { repeated TypescriptSyntax newSubject = 1;
+            }
+message Await { TypescriptSyntax awaitSubject = 1;
+              }
+message Array { repeated TypescriptSyntax arrayElements = 1;
+              }
+message Boolean { bool booleanContent = 1;
+                }
+message Float { string floatContent = 1;
+              }
+message Hash { repeated TypescriptSyntax hashElements = 1;
+             }
+message Integer { string integerContent = 1;
+                }
+message KeyValue { TypescriptSyntax key = 1;
+                   TypescriptSyntax value = 2;
+                 }
+message Null {
+             }
+message String { repeated TypescriptSyntax stringElements = 1;
+               }
+message TextElement { string textElementContent = 1;
+                    }
+message Regex { string regexContent = 1;
+              }
+message Assignment { repeated TypescriptSyntax assignmentContext = 1;
+                     TypescriptSyntax assignmentTarget = 2;
+                     TypescriptSyntax assignmentValue = 3;
+                   }
+message Break { TypescriptSyntax term = 1;
+              }
+message Catch { TypescriptSyntax catchException = 1;
+                TypescriptSyntax catchBody = 2;
+              }
+message Continue { TypescriptSyntax term = 1;
+                 }
+message DoWhile { TypescriptSyntax doWhileCondition = 1;
+                  TypescriptSyntax doWhileBody = 2;
+                }
+message Else { TypescriptSyntax elseCondition = 1;
+               TypescriptSyntax elseBody = 2;
+             }
+message Finally { TypescriptSyntax term = 1;
+                }
+message For { TypescriptSyntax forBefore = 1;
+              TypescriptSyntax forCondition = 2;
+              TypescriptSyntax forStep = 3;
+              TypescriptSyntax forBody = 4;
+            }
+message ForEach { TypescriptSyntax forEachBinding = 1;
+                  TypescriptSyntax forEachSubject = 2;
+                  TypescriptSyntax forEachBody = 3;
+                }
+message If { TypescriptSyntax ifCondition = 1;
+             TypescriptSyntax ifThenBody = 2;
+             TypescriptSyntax ifElseBody = 3;
+           }
+message Match { TypescriptSyntax matchSubject = 1;
+                TypescriptSyntax matchPatterns = 2;
+              }
+message Pattern { TypescriptSyntax value = 1;
+                  TypescriptSyntax patternBody = 2;
+                }
+message Retry { TypescriptSyntax term = 1;
+              }
+message Return { TypescriptSyntax term = 1;
+               }
+message ScopeEntry { repeated TypescriptSyntax terms = 1;
+                   }
+message ScopeExit { repeated TypescriptSyntax terms = 1;
+                  }
+message Statements { repeated TypescriptSyntax statements = 1;
+                   }
+message Throw { TypescriptSyntax = 1;
+              }
+message Try { TypescriptSyntax tryBody = 1;
+              repeated TypescriptSyntax tryCatch = 2;
+            }
+message While { TypescriptSyntax whileCondition = 1;
+                TypescriptSyntax whileBody = 2;
+              }
+message Yield { TypescriptSyntax term = 1;
+              }
+message AccessibilityModifier { string = 1;
+                              }
+message Empty {
+              }
+message Error { repeated ErrorSite errorCallStack = 1;
+                repeated string errorExpected = 2;
+                string errorActual = 3;
+                repeated TypescriptSyntax errorChildren = 4;
+              }
+message Identifier { bytes name = 1;
+                   }
+message Context { repeated TypescriptSyntax contextTerms = 1;
+                  TypescriptSyntax contextSubject = 2;
+                }
+message Readonly {
+                 }
+message TypeParameters { repeated TypescriptSyntax = 1;
+                       }
+message TypeParameter { TypescriptSyntax _typeParameter = 1;
+                        TypescriptSyntax _typeParameterConstraint = 2;
+                        TypescriptSyntax _typeParameterDefaultType = 3;
+                      }
+message Constraint { TypescriptSyntax _constraintType = 1;
+                   }
+message ParenthesizedType { TypescriptSyntax _parenthesizedType = 1;
+                          }
+message DefaultType { TypescriptSyntax _defaultType = 1;
+                    }
+message PredefinedType { string _predefinedType = 1;
+                       }
+message TypeIdentifier { string = 1;
+                       }
+message NestedIdentifier { TypescriptSyntax = 1;
+                           TypescriptSyntax = 2;
+                         }
+message NestedTypeIdentifier { TypescriptSyntax = 1;
+                               TypescriptSyntax = 2;
+                             }
+message GenericType { TypescriptSyntax _genericTypeIdentifier = 1;
+                      TypescriptSyntax _genericTypeArguments = 2;
+                    }
+message TypeArguments { repeated TypescriptSyntax _typeArguments = 1;
+                      }
+message TypePredicate { TypescriptSyntax _typePredicateIdentifier = 1;
+                        TypescriptSyntax _typePredicateType = 2;
+                      }
+message CallSignature { TypescriptSyntax _callSignatureTypeParameters = 1;
+                        repeated TypescriptSyntax _callSignatureParameters = 2;
+                        TypescriptSyntax _callSignatureType = 3;
+                      }
+message ConstructSignature { TypescriptSyntax _constructSignatureTypeParameters = 1;
+                             repeated TypescriptSyntax _constructSignatureParameters = 2;
+                             TypescriptSyntax _constructSignatureType = 3;
+                           }
+message ArrayType { TypescriptSyntax _arrayType = 1;
+                  }
+message LookupType { TypescriptSyntax lookupTypeIdentifier = 1;
+                     TypescriptSyntax lookupTypeKey = 2;
+                   }
+message FlowMaybeType { TypescriptSyntax _flowMaybeType = 1;
+                      }
+message TypeQuery { TypescriptSyntax _typeQuerySubject = 1;
+                  }
+message IndexTypeQuery { TypescriptSyntax _indexTypeQuerySubject = 1;
+                       }
+message ThisType { string = 1;
+                 }
+message ExistentialType { string = 1;
+                        }
+message AbstractMethodSignature { repeated TypescriptSyntax _abstractMethodSignatureContext = 1;
+                                  TypescriptSyntax _abstractMethodSignatureName = 2;
+                                  repeated TypescriptSyntax _abstractMethodSignatureParameters = 3;
+                                }
+message IndexSignature { TypescriptSyntax _indexSignatureSubject = 1;
+                         TypescriptSyntax _indexSignatureType = 2;
+                       }
+message ObjectType { repeated TypescriptSyntax _objectTypeElements = 1;
+                   }
+message LiteralType { TypescriptSyntax _literalTypeSubject = 1;
+                    }
+message Union { TypescriptSyntax _unionLeft = 1;
+                TypescriptSyntax _unionRight = 2;
+              }
+message Intersection { TypescriptSyntax _intersectionLeft = 1;
+                       TypescriptSyntax _intersectionRight = 2;
+                     }
+message Module { TypescriptSyntax moduleIdentifier = 1;
+                 repeated TypescriptSyntax moduleStatements = 2;
+               }
+message InternalModule { TypescriptSyntax internalModuleIdentifier = 1;
+                         repeated TypescriptSyntax internalModuleStatements = 2;
+                       }
+message FunctionType { TypescriptSyntax _functionTypeParameters = 1;
+                       repeated TypescriptSyntax _functionFormalParameters = 2;
+                       TypescriptSyntax _functionType = 3;
+                     }
+message Tuple { repeated TypescriptSyntax _tupleElements = 1;
+              }
+message Constructor { TypescriptSyntax _constructorTypeParameters = 1;
+                      repeated TypescriptSyntax _constructorFormalParameters = 2;
+                      TypescriptSyntax _constructorType = 3;
+                    }
+message TypeAssertion { TypescriptSyntax _typeAssertionParameters = 1;
+                        TypescriptSyntax _typeAssertionExpression = 2;
+                      }
+message ImportAlias { TypescriptSyntax _importAliasSubject = 1;
+                      TypescriptSyntax _importAlias = 2;
+                    }
+message Debugger {
+                 }
+message ShorthandPropertyIdentifier { string = 1;
+                                    }
+message Super {
+              }
+message Undefined {
+                  }
+message ClassHeritage { TypescriptSyntax _classHeritageExtendsClause = 1;
+                        TypescriptSyntax _implementsClause = 2;
+                      }
+message AbstractClass { TypescriptSyntax abstractClassIdentifier = 1;
+                        TypescriptSyntax _abstractClassTypeParameters = 2;
+                        repeated TypescriptSyntax classHeritage = 3;
+                        TypescriptSyntax classBody = 4;
+                      }
+message ExtendsClause { repeated TypescriptSyntax _extendsClauses = 1;
+                      }
+message ImplementsClause { repeated TypescriptSyntax _implementsClauseTypes = 1;
+                         }
+message JsxElement { TypescriptSyntax _jsxOpeningElement = 1;
+                     repeated TypescriptSyntax _jsxElements = 2;
+                     TypescriptSyntax _jsxClosingElement = 3;
+                   }
+message JsxSelfClosingElement { TypescriptSyntax _jsxSelfClosingElementIdentifier = 1;
+                                repeated TypescriptSyntax _jsxSelfClosingElementAttributes = 2;
+                              }
+message JsxOpeningElement { TypescriptSyntax _jsxOpeningElementIdentifier = 1;
+                            repeated TypescriptSyntax _jsxAttributes = 2;
+                          }
+message JsxText { string = 1;
+                }
+message JsxClosingElement { TypescriptSyntax _jsxClosingElementIdentifier = 1;
+                          }
+message JsxExpression { TypescriptSyntax _jsxExpression = 1;
+                      }
+message JsxAttribute { TypescriptSyntax _jsxAttributeTarget = 1;
+                       TypescriptSyntax _jsxAttributeValue = 2;
+                     }
+message JsxFragment { repeated TypescriptSyntax = 1;
+                    }
+message JsxNamespaceName { TypescriptSyntax = 1;
+                           TypescriptSyntax = 2;
+                         }
+message OptionalParameter { repeated TypescriptSyntax _optionalParameterContext = 1;
+                            TypescriptSyntax _optionalParameterSubject = 2;
+                          }
+message RequiredParameter { repeated TypescriptSyntax _requiredParameterContext = 1;
+                            TypescriptSyntax _requiredParameterSubject = 2;
+                          }
+message RestParameter { repeated TypescriptSyntax _restParameterContext = 1;
+                        TypescriptSyntax _restParameterSubject = 2;
+                      }
+message PropertySignature { repeated TypescriptSyntax _modifiers = 1;
+                            TypescriptSyntax _propertySignaturePropertyName = 2;
+                          }
+message AmbientDeclaration { TypescriptSyntax _ambientDeclarationBody = 1;
+                           }
+message EnumDeclaration { TypescriptSyntax enumDeclarationIdentifier = 1;
+                          repeated TypescriptSyntax _enumDeclarationBody = 2;
+                        }
+message ExtendsClause { repeated TypescriptSyntax _extendsClauses = 1;
+                      }
+message AmbientFunction { repeated TypescriptSyntax _ambientFunctionContext = 1;
+                          TypescriptSyntax _ambientFunctionIdentifier = 2;
+                          repeated TypescriptSyntax _ambientFunctionParameters = 3;
+                        }
+message ImportRequireClause { TypescriptSyntax _importRequireIdentifier = 1;
+                              TypescriptSyntax _importRequireSubject = 2;
+                            }
+message ImportClause { repeated TypescriptSyntax _importClauseElements = 1;
+                     }
+message LabeledStatement { TypescriptSyntax _labeledStatementIdentifier = 1;
+                           TypescriptSyntax _labeledStatementSubject = 2;
+                         }
+message Annotation { TypescriptSyntax _annotationType = 1;
+                   }
+message With { TypescriptSyntax _withExpression = 1;
+               TypescriptSyntax _withBody = 2;
+             }
+message ForOf { TypescriptSyntax _forOfBinding = 1;
+                TypescriptSyntax _forOfSubject = 2;
+                TypescriptSyntax _forOfBody = 3;
+              }
+message This {
+             }
+message Update { TypescriptSyntax _updateSubject = 1;
+               }
+message ComputedPropertyName { TypescriptSyntax = 1;
+                             }
+message Decorator { TypescriptSyntax _decoratorTerm = 1;
+                  }
+message Import { repeated Alias importSymbols = 1;
+                 ImportPath importFrom = 2;
+               }
+message QualifiedAliasedImport { TypescriptSyntax qualifiedAliasedImportAlias = 1;
+                                 ImportPath qualifiedAliasedImportFrom = 2;
+                               }
+message SideEffectImport { ImportPath sideEffectImportFrom = 1;
+                         }
+message DefaultExport { TypescriptSyntax defaultExport = 1;
+                      }
+message QualifiedExport { repeated Alias qualifiedExportSymbols = 1;
+                        }
+message QualifiedExportFrom { ImportPath qualifiedExportFrom = 1;
+                              repeated Alias qualifiedExportFromSymbols = 2;
+                            }
+message JavaScriptRequire { TypescriptSyntax javascriptRequireIden = 1;
+                            ImportPath javascriptRequireFrom = 2;
+                          }
+message List { repeated TypescriptSyntax listContent = 1;
+             }
