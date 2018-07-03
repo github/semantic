@@ -1,4 +1,5 @@
 {-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures #-}
+-- | Deterministic assignment, à la _Deterministic, Error-Correcting Combinator Parsers_, by S. Doaitse Swierstra & Luc Duponcheel.
 module Assigning.Assignment.Deterministic
 ( Assigning(..)
 , parseError
