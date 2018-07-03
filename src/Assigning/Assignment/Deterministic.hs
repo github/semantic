@@ -117,7 +117,9 @@ instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment 
       NotNullable -> NotNullable)
     (firstSet a)
     (map (fmap (\ match src state follow -> case match src state follow of
-      Left err -> Right (advanceState state, termIn (stateLocation state) (inject (Syntax.errorSyntax (either id show <$> err) [])))
+      Left err
+        | Just _ <- errorActual err -> Right (advanceState state, termIn (stateLocation state) (inject (Syntax.errorSyntax (either id show <$> err) [])))
+        | otherwise                 -> Left err
       Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a))
 
 
