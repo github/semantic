@@ -3,9 +3,9 @@ module Analysis.TypeScript.Spec (spec) where
 import Control.Arrow ((&&&))
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import Data.Abstract.Value as Value
 import Data.Abstract.Number as Number
 import qualified Data.Abstract.ModuleTable as ModuleTable
+import Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import Data.Sum
