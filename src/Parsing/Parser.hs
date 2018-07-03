@@ -170,7 +170,7 @@ jsonParser :: Parser JSON.Term
 jsonParser = DeterministicParser jsonASTParser JSON.assignment
 
 jsonASTParser :: Parser (AST [] JSON.Grammar)
-jsonASTParser = (ASTParser tree_sitter_json)
+jsonASTParser = ASTParser tree_sitter_json
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
