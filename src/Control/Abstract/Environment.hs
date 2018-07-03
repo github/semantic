@@ -3,6 +3,7 @@ module Control.Abstract.Environment
 ( Environment
 , Exports
 , getEnv
+, putEnv
 , export
 , lookupEnv
 , bind
@@ -28,6 +29,10 @@ import Prologue
 -- | Retrieve the environment.
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
+
+-- | This is only for use in Analysis.Abstract.Caching.
+putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
+putEnv = send . PutEnv
 
 -- | Add an export to the global export state.
 export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
@@ -67,6 +72,8 @@ data Env address return where
   Pop    ::                    Env address ()
   GetEnv ::                    Env address (Environment address)
   Export :: Name -> Name -> Maybe address -> Env address ()
+  PutEnv :: Environment address -> Env address ()
+
 
 handleEnv :: forall address effects value result
           .  ( Member (State (Environment address)) effects
@@ -81,6 +88,7 @@ handleEnv = \case
   Push -> modify (Env.push @address)
   Pop -> modify (Env.pop @address)
   GetEnv -> get
+  PutEnv e -> put e
   Export name alias addr -> modify (Exports.insert name alias addr)
 
 runEnv :: Environment address

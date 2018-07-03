@@ -1,0 +1,3 @@
+barf()
+
+def foo(); end
