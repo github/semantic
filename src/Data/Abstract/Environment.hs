@@ -152,4 +152,4 @@ addresses = fromAddresses . map snd . flatPairs
 instance Lower (Environment address) where lowerBound = Environment (lowerBound :| [])
 
 instance Show address => Show (Environment address) where
-  showsPrec d = showsUnaryWith showsPrec "Environment" d . flatPairs
+  showsPrec d = showsUnaryWith showsPrec "Environment" d
