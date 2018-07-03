@@ -37,7 +37,7 @@ parseError :: ( Bounded symbol
               , TermAssigning syntaxes symbol f
               )
            => f (Term (Sum syntaxes) (Record Location))
-parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
+parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (Syntax.errorSite <$> getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
 data Assignment symbol a = Assignment
