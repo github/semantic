@@ -26,7 +26,7 @@ class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symb
   leafNode   :: symbol -> f Text
   branchNode :: symbol -> f a -> f a
 
-  toTerm :: Element syntax syntaxes
+  toTerm :: (Element syntax syntaxes, Element Syntax.Error syntaxes)
          => f (syntax (Term (Sum syntaxes) (Record Location)))
          -> f         (Term (Sum syntaxes) (Record Location))
 
