@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Graph
 ( runGraph
+, runCallGraph
 , runImportGraph
 , GraphType(..)
 , Graph
@@ -59,7 +60,7 @@ runGraph ImportGraph _ project
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
-    modules <- runImportGraph lang package
+    modules <- topologicalSort <$> runImportGraph lang package
     runCallGraph lang includePackages modules package
 
 runCallGraph :: ( HasField ann Span
@@ -68,7 +69,10 @@ runCallGraph :: ( HasField ann Span
                 , Apply Ord1 syntax
                 , Apply Functor syntax
                 , Ord (Record ann)
-                , term ~ Term (Sum syntax) (Record ann)
+                , Show term
+                , Base term ~ TermF (Sum syntax) (Record ann)
+                , Ord term
+                , Corecursive term
                 , Declarations term
                 , Evaluatable (Base term)
                 , FreeVariables term
@@ -78,12 +82,12 @@ runCallGraph :: ( HasField ann Span
                 )
              => Proxy lang
              -> Bool
-             -> Graph (Module term)
+             -> [Module term]
              -> Package term
              -> Eff effs (Graph Vertex)
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
-      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules
+      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
       extractGraph (((_, graph), _), _) = simplify graph
       runGraphAnalysis
         = run
@@ -106,7 +110,7 @@ runCallGraph lang includePackages modules package = do
         . fmap fst
         . runState (lowerBound @(ModuleTable (NonEmpty (Module (Hole (Located Monovariant), Environment (Hole (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-  extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
+  extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules)
 
 
 runImportGraph :: ( Declarations term

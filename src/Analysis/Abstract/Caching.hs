@@ -92,8 +92,9 @@ convergingModules :: ( AbstractValue address value effects
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
-  cache <- converge lowerBound (\ prevCache -> isolateCache . raiseHandler locally $ do
+  cache <- converge lowerBound (\ prevCache -> isolateCache $ do
     TermEvaluator (putHeap (configurationHeap        c))
+    TermEvaluator (putEnv  (configurationEnvironment c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
@@ -102,8 +103,9 @@ convergingModules recur m = do
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
-  TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
+  -- TODO: We're hitting an infinite loop here, c.f test/fixtures/ruby/analysis/graphing/include-file-with-undefined-call
+  TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
