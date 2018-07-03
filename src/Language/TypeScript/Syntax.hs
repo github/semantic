@@ -22,7 +22,7 @@ data Relative = Unknown | Relative | NonRelative
   deriving (Bounded, Enum, Finite, MessageField, Named, Eq, Generic, Hashable, Ord, Show, ToJSON)
 
 instance Primitive Relative where
-  encodePrimitive num = Encode.enum num
+  encodePrimitive = Encode.enum
   decodePrimitive = either (const def) id <$> Decode.enum
   primType _ = Named (Single (nameOf (Proxy @Relative)))
 
