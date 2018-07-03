@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.JSON.Assignment
 ( assignment
 , Syntax
@@ -6,15 +5,16 @@ module Language.JSON.Assignment
 , Term)
 where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
+import Assigning.Assignment.Deterministic hiding (Assignment)
+import Data.AST
 import Data.Record
 import Data.Sum
-import Data.Syntax (makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Language.JSON.Grammar as Grammar
+import Prologue
+import Text.Parser.Combinators
 
 type Syntax =
   [ Literal.Null
@@ -28,34 +28,35 @@ type Syntax =
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = Assignment.Assignment [] Grammar
+type Assignment = TermAssignment Syntax Grammar
 
 
 assignment :: Assignment Term
-assignment = Syntax.handleError (value <|> parseError)
+assignment = value <|> parseError
 
 value :: Assignment Term
-value = symbol Value *> children (object <|> array)
+value = branchNode Value (object <|> array <|> parseError)
 
 jsonValue :: Assignment Term
-jsonValue = object <|> array <|> number <|> string <|> boolean <|> none
+jsonValue = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
 
 object :: Assignment Term
-object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
-  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> (number <|> string) <*> jsonValue)
+object = toTerm (branchNode Object (Literal.Hash <$ leafNode AnonLBrace <*> sepBy pairs (leafNode AnonComma) <* leafNode AnonRBrace))
+  where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string <|> parseError) <* leafNode AnonColon <*> jsonValue)) <|> parseError
 
 array :: Assignment Term
-array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
+array = toTerm (branchNode Array (Literal.Array <$ leafNode AnonLBracket <*> sepBy jsonValue (leafNode AnonComma) <* leafNode AnonRBracket))
 
 number :: Assignment Term
-number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
+number = toTerm (Literal.Float <$> leafNode Number)
 
 string :: Assignment Term
-string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+string = toTerm (Literal.TextElement <$> leafNode String)
 
 boolean :: Assignment Term
-boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ rawSource)
-       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
+boolean =  toTerm
+  (   leafNode Grammar.True  $> Literal.true
+  <|> leafNode Grammar.False $> Literal.false)
 
 none :: Assignment Term
-none = makeTerm <$> symbol Null <*> (Literal.Null <$ rawSource)
+none = toTerm (leafNode Null $> Literal.Null)
