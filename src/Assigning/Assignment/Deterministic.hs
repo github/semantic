@@ -52,7 +52,7 @@ combine :: Nullable symbol a -> IntSet -> IntSet -> IntSet
 combine (Nullable _) s1 s2 = s1 <> s2
 combine _            s1 _  = s1
 
-choose :: Enum symbol
+choose :: (Enum symbol, HasCallStack)
        => Nullable symbol a
        -> IntSet
        -> IntMap (Cont symbol a)
