@@ -65,11 +65,6 @@ runGraph CallGraph includePackages project
 
 runCallGraph :: ( HasField ann Span
                 , Element Syntax.Identifier syntax
-                , Apply Eq1 syntax
-                , Apply Ord1 syntax
-                , Apply Functor syntax
-                , Ord (Record ann)
-                , Show term
                 , Base term ~ TermF (Sum syntax) (Record ann)
                 , Ord term
                 , Corecursive term
