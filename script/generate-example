@@ -5,8 +5,8 @@
 #/ Generate expected output for a test fixture example or directory of examples.
 #/
 #/ Example:
-#/  script/generate-example test/fixtures/ruby/and-or.{A,B}.rb
-#/  script/generate-example test/fixtures/ruby
+#/  script/generate-example test/fixtures/ruby/corpus/and-or.{A,B}.rb
+#/  script/generate-example test/fixtures/ruby/corpus
 
 set -e
 [ $# -eq 0 ] && set -- --help

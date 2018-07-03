@@ -18,12 +18,12 @@ import Prologue
 import Text.Parser.Combinators
 
 type Syntax =
-  [ Literal.Array
+  [ Literal.Null
+  , Literal.Array
   , Literal.Boolean
   , Literal.Hash
   , Literal.Float
   , Literal.KeyValue
-  , Literal.Null
   , Literal.TextElement
   , Syntax.Error
   ]

@@ -1,11 +1,11 @@
 (Statements
-{ (And
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(Or
+{+(Or
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) })
+    {+(Identifier)+})+})+}
+{-(And
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-})
