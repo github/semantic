@@ -1,6 +1,6 @@
 syntax = "proto3";
-import "types.proto";
 package github.semantic.typescript;
+import "types.proto";
 message TypeScriptTerm { TypeScriptSyntax syntax = 1;
                        }
 message Alias { bytes aliasValue = 1;
