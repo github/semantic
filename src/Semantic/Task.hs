@@ -50,6 +50,7 @@ module Semantic.Task
 
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
+import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified Control.Abstract as Analysis
 import           Control.Monad
 import           Control.Monad.Effect
@@ -217,6 +218,31 @@ runParser blob@Blob{..} parser = case parser of
                 when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
           writeStat (count "parse.nodes" (length term) languageTag)
           pure term
+
+  DeterministicParser parser assignment -> do
+    ast <- runParser blob parser `catchError` \ (SomeException err) -> do
+      writeStat (increment "parse.parse_failures" languageTag)
+      writeLog Error "failed parsing" (("task", "parse") : blobFields)
+      throwError (toException err)
+    config <- ask
+    time "parse.assign_deterministic" languageTag $
+      case Deterministic.runAssignment (Deterministic.runTermAssignment assignment) blobSource (Deterministic.State 0 lowerBound [ast]) of
+        Left err -> do
+          writeStat (increment "parse.assign_errors" languageTag)
+          logError config Error blob (either id show <$> err) (("task", "assign") : blobFields)
+          throwError (toException (either id show <$> err))
+        Right (_, term) -> do
+          for_ (errors term) $ \ err -> case Error.errorActual err of
+              Just "ParseError" -> do
+                writeStat (increment "parse.parse_errors" languageTag)
+                logError config Warning blob err (("task", "parse") : blobFields)
+              _ -> do
+                writeStat (increment "parse.assign_warnings" languageTag)
+                logError config Warning blob err (("task", "assign") : blobFields)
+                when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
+          writeStat (count "parse.nodes" (length term) languageTag)
+          pure term
+
   MarkdownParser ->
     time "parse.cmark_parse" languageTag $
       let term = cmarkParser blobSource

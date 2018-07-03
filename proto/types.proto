@@ -1,5 +1,7 @@
 syntax = "proto3";
 package github.semantic;
+option java_package = "com.github.semantic.types";
+option go_package = "github.com/semantic/types;types";
 enum Language {UNKNOWN = 0;
                GO = 1;
                HASKELL = 2;
