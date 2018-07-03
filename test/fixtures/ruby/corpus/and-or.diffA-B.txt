@@ -1,13 +1,13 @@
 (Statements
-{+(LowOr
+{+(LowPrecedenceOr
   {+(Send
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+})+}
-  (LowAnd
+  (LowPrecedenceAnd
   { (Send
     {-(Identifier)-})
-  ->(LowOr
+  ->(LowPrecedenceOr
     {+(Send
       {+(Identifier)+})+}
     {+(Send
