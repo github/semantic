@@ -228,7 +228,7 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.assign_deterministic" languageTag $
       case Deterministic.assign assignment blobSource ast of
         Left err -> do
-          writeStat (increment "parse.assign_errors" languageTag)
+          writeStat (increment "parse.assign_deterministic_errors" languageTag)
           logError config Error blob err (("task", "assign") : blobFields)
           throwError (toException err)
         Right term -> do
@@ -237,7 +237,7 @@ runParser blob@Blob{..} parser = case parser of
                 writeStat (increment "parse.parse_errors" languageTag)
                 logError config Warning blob err (("task", "parse") : blobFields)
               _ -> do
-                writeStat (increment "parse.assign_warnings" languageTag)
+                writeStat (increment "parse.assign_deterministic_warnings" languageTag)
                 logError config Warning blob err (("task", "assign") : blobFields)
                 when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
           writeStat (count "parse.nodes" (length term) languageTag)
