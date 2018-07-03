@@ -24,7 +24,7 @@ instance Evaluatable Comment where
 -- TODO: Differentiate between line/block comments?
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
-newtype HashBang a = HashBang Text
+newtype HashBang a = HashBang { value :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 HashBang where liftEq = genericLiftEq

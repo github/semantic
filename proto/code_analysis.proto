@@ -1,4 +1,7 @@
 syntax = "proto3";
+import "ruby.proto";
+import "json.proto";
+import "typescript.proto";
 import "types.proto";
 import "error_details.proto";
 
@@ -12,8 +15,7 @@ service CodeAnalysis {
   // Parsing
   //
   // Parse source code blobs and return abstract syntax trees.
-  rpc ParseTree(ParseTreeRequest) returns (ParseTreeResponse);
-  rpc ParseRaw (ParseTreeRequest) returns (RawParseTreeResponse);
+  rpc ParseTree (ParseTreeRequest) returns (ParseTreeResponse);
 
   // Diffing
   //
@@ -38,12 +40,23 @@ message ParseTreeRequest {
 }
 
 message ParseTreeResponse {
-  bytes json_tree = 1;
-  repeated ParseError errors = 2;
+  oneof response_type {
+    RubyResponse ruby = 1;
+    JSONResponse json = 2;
+    TypeScriptResponse typescript = 3;
+  }
 }
 
-message RawParseTreeResponse {
-  repeated Term terms = 1;
+message RubyResponse {
+  repeated ruby.RubyTerm terms = 1;
+}
+
+message JSONResponse {
+  repeated json.JSONTerm terms = 1;
+}
+
+message TypeScriptResponse {
+  repeated typescript.TypeScriptTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {
