@@ -1,5 +1,5 @@
 {-# LANGUAGE FunctionalDependencies #-}
--- | Deterministic assignment, à la _Deterministic, Error-Correcting Combinator Parsers_, by S. Doaitse Swierstra & Luc Duponcheel.
+-- | Deterministic assignment, à la _Deterministic, Error-Correcting Combinator Parsers_, S. Doaitse Swierstra & Luc Duponcheel: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.80.9967&rep=rep1&type=pdf
 module Assigning.Assignment.Deterministic
 ( Assigning(..)
 , parseError
