@@ -79,4 +79,3 @@ message Vertex {
   string vertexContents = 2;
   uint64 vertexTag = 3;
 }
-

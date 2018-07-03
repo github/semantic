@@ -57,4 +57,3 @@ message Error {
   string errorActual = 3;
   repeated JSONTerm errorChildren = 4;
 }
-

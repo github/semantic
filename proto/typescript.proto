@@ -960,4 +960,3 @@ message JavaScriptRequire {
 message List {
   repeated TypeScriptTerm listContent = 1;
 }
-

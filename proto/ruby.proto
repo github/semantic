@@ -478,4 +478,3 @@ message Identifier {
 message List {
   repeated RubyTerm listContent = 1;
 }
-
