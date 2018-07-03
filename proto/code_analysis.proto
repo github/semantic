@@ -15,8 +15,7 @@ service CodeAnalysis {
   // Parsing
   //
   // Parse source code blobs and return abstract syntax trees.
-  rpc ParseTree(ParseTreeRequest) returns (ParseTreeResponse);
-  rpc ParseRaw (ParseTreeRequest) returns (RawParseTreeResponse);
+  rpc ParseTree (ParseTreeRequest) returns (ParseTreeResponse);
 
   // Diffing
   //
@@ -41,11 +40,6 @@ message ParseTreeRequest {
 }
 
 message ParseTreeResponse {
-  bytes json_tree = 1;
-  repeated ParseError errors = 2;
-}
-
-message RawParseTreeResponse {
   oneof response_type {
     RubyResponse ruby = 1;
     JSONResponse json = 2;
