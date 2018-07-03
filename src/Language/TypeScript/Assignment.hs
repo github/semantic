@@ -47,11 +47,33 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
-  , Expression.Arithmetic
-  , Expression.Bitwise
-  , Expression.Boolean
+  , Expression.Plus
+  , Expression.Minus
+  , Expression.Times
+  , Expression.DividedBy
+  , Expression.Modulo
+  , Expression.Power
+  , Expression.Negate
+  , Expression.FloorDivision
+  , Expression.BAnd
+  , Expression.BOr
+  , Expression.BXOr
+  , Expression.LShift
+  , Expression.RShift
+  , Expression.UnsignedRShift
+  , Expression.Complement
+  , Expression.And
+  , Expression.Not
+  , Expression.Or
+  , Expression.XOr
   , Expression.Call
   , Expression.Cast
+  , Expression.LessThan
+  , Expression.LessThanEqual
+  , Expression.GreaterThan
+  , Expression.GreaterThanEqual
+  , Expression.Equal
+  , Expression.StrictEqual
   , Expression.Comparison
   , Expression.Enumeration
   , Expression.MemberAccess
@@ -59,6 +81,7 @@ type Syntax = '[
   , Expression.ScopeResolution
   , Expression.SequenceExpression
   , Expression.Subscript
+  , Expression.Member
   , Expression.Delete
   , Expression.Void
   , Expression.Typeof

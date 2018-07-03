@@ -46,15 +46,37 @@ type Syntax =
    , Declaration.Decorator
    , Declaration.Function
    , Declaration.Variable
-   , Expression.Arithmetic
-   , Expression.Boolean
-   , Expression.Bitwise
+   , Expression.Plus
+   , Expression.Minus
+   , Expression.Times
+   , Expression.DividedBy
+   , Expression.Modulo
+   , Expression.Power
+   , Expression.Negate
+   , Expression.FloorDivision
+   , Expression.And
+   , Expression.Not
+   , Expression.Or
+   , Expression.XOr
+   , Expression.BAnd
+   , Expression.BOr
+   , Expression.BXOr
+   , Expression.LShift
+   , Expression.RShift
+   , Expression.Complement
    , Expression.Call
+   , Expression.LessThan
+   , Expression.LessThanEqual
+   , Expression.GreaterThan
+   , Expression.GreaterThanEqual
+   , Expression.Equal
+   , Expression.StrictEqual
    , Expression.Comparison
    , Expression.Enumeration
    , Expression.ScopeResolution
    , Expression.MemberAccess
    , Expression.Subscript
+   , Expression.Member
    , Literal.Array
    , Literal.Boolean
    , Literal.Float
