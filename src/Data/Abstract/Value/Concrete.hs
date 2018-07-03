@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
-module Data.Abstract.Value where
+module Data.Abstract.Value.Concrete where
 
 import Control.Abstract
 import Data.Abstract.Environment (Environment, mergeEnvs)
