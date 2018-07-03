@@ -15,6 +15,7 @@ module Parsing.Parser
 , javaParser
 , javaASTParser
 , jsonParser
+, jsonASTParser
 , markdownParser
 , pythonParser
 , rubyParser
@@ -166,7 +167,10 @@ javaASTParser :: Parser (AST [] Java.Grammar)
 javaASTParser = ASTParser tree_sitter_java
 
 jsonParser :: Parser JSON.Term
-jsonParser = DeterministicParser (ASTParser tree_sitter_json) JSON.assignment
+jsonParser = DeterministicParser jsonASTParser JSON.assignment
+
+jsonASTParser :: Parser (AST [] JSON.Grammar)
+jsonASTParser = (ASTParser tree_sitter_json)
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
