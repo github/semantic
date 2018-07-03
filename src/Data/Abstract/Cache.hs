@@ -32,7 +32,8 @@ cacheSet key value = Cache . Monoidal.insert key value . unCache
 cacheInsert :: Cacheable term address cell value => Configuration term address cell value -> Cached address cell value -> Cache term address cell value -> Cache term address cell value
 cacheInsert = curry cons
 
-cacheKeys :: Cacheable term address cell value => Cache term address cell value -> [Configuration term address cell value]
+-- | Return all 'Configuration's in the provided cache.
+cacheKeys :: Cache term address cell value -> [Configuration term address cell value]
 cacheKeys = Monoidal.keys . unCache
 
 instance (Show term, Show address, Show (cell value), Show value) => Show (Cache term address cell value) where
