@@ -13,6 +13,7 @@ service CodeAnalysis {
   //
   // Parse source code blobs and return abstract syntax trees.
   rpc ParseTree(ParseTreeRequest) returns (ParseTreeResponse);
+  rpc ParseRaw (ParseTreeRequest) returns (RawParseTreeResponse);
 
   // Diffing
   //
@@ -39,6 +40,10 @@ message ParseTreeRequest {
 message ParseTreeResponse {
   bytes json_tree = 1;
   repeated ParseError errors = 2;
+}
+
+message RawParseTreeResponse {
+  repeated Term terms = 1;
 }
 
 message SummarizeDiffRequest  {

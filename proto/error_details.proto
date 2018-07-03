@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-package google.rpc;
+package github.semantic;
 
 // import "google/protobuf/duration.proto";
 

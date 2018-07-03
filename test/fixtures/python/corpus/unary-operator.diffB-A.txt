@@ -2,10 +2,9 @@
 {+(Negate
   {+(Identifier)+})+}
 {+(Identifier)+}
-{+(Complement
-  {+(Identifier)+})+}
-{-(Complement
-  {-(Identifier)-})-}
+  (Complement
+  { (Identifier)
+  ->(Identifier) })
 {-(Negate
   {-(Identifier)-})-}
 {-(Identifier)-})

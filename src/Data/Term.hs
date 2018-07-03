@@ -17,6 +17,9 @@ import Data.JSON.Fields
 import Data.Record
 import Text.Show
 import Proto3.Suite.Class
+import Proto3.Suite.DotProto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
@@ -80,9 +83,9 @@ instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
 instance Message1 f => Message (Term f ()) where
-  encodeMessage num (Term (In _ f)) = liftEncodeMessage encodeMessage num f
-  decodeMessage num = termIn () <$> liftDecodeMessage decodeMessage num
-  dotProto _ = liftDotProto (Proxy @(f (Term f ())))
+  encodeMessage num (Term (In _ f)) = Encode.embedded num (liftEncodeMessage encodeMessage 1 f)
+  decodeMessage num = termIn () . fromMaybe undefined <$> Decode.at (Decode.embedded (liftDecodeMessage decodeMessage 1)) num
+  dotProto _ = [ DotProtoMessageField (DotProtoField 1 (Prim (Named (Single "Syntax"))) (Single "syntax") [] Nothing) ]
 
 instance Named (Term f a) where
   nameOf _ = "Term"
