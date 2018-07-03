@@ -24,6 +24,7 @@ module Parsing.Parser
 ) where
 
 import           Assigning.Assignment
+import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
@@ -101,6 +102,10 @@ data Parser term where
                    => Parser (Term ast (Node grammar))                           -- A parser producing AST.
                    -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
+  DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
+                      => Parser (AST [] grammar)
+                      -> Deterministic.TermAssignment syntaxes grammar (Term (Sum syntaxes) (Record Location))
+                      -> Parser (Term (Sum syntaxes) (Record Location))
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | An abstraction over parsers when we don’t know the details of the term type.
@@ -161,7 +166,7 @@ javaASTParser :: Parser (AST [] Java.Grammar)
 javaASTParser = ASTParser tree_sitter_java
 
 jsonParser :: Parser JSON.Term
-jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
+jsonParser = DeterministicParser (ASTParser tree_sitter_json) JSON.assignment
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
