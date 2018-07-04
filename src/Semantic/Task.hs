@@ -221,7 +221,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Apply Functor syntaxes
                          , Element Syntax.Error syntaxes
                          , Member (Exc SomeException) effs
-                         , Member IO effs
+                         , Member (Lift IO) effs
                          , Member (Reader Config) effs
                          , Member Telemetry effs
                          , Member Trace effs
