@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
 , Exports
@@ -48,10 +48,7 @@ bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.flatPairs
 
 -- | Run an action in a new local scope.
 locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
-locally a = do
-  send (Push @address)
-  a' <- a
-  a' <$ send (Pop @address)
+locally = send . Locally @address . lowerEff
 
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close
@@ -59,12 +56,11 @@ close = send . Close
 
 -- Effects
 
-data Env address (m :: * -> *) return where
+data Env address m return where
   Lookup :: Name            -> Env address m (Maybe address)
   Bind   :: Name -> address -> Env address m ()
   Close  :: Set Name        -> Env address m (Environment address)
-  Push   ::                    Env address m ()
-  Pop    ::                    Env address m ()
+  Locally :: m a            -> Env address m a
   GetEnv ::                    Env address m (Environment address)
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
@@ -72,8 +68,7 @@ instance Effect (Env address) where
   handleState c dist (Request (Lookup name) k) = Request (Lookup name) (dist . (<$ c) . k)
   handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (dist . (<$ c) . k)
   handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
-  handleState c dist (Request Push k) = Request Push (dist . (<$ c) . k)
-  handleState c dist (Request Pop k) = Request Pop (dist . (<$ c) . k)
+  handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c))) (dist . fmap k)
   handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
@@ -82,14 +77,7 @@ runEnv :: forall address value effects a
        => Environment address
        -> Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects (Environment address, a)
-runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 (\case
-  Lookup name -> Env.lookup name <$> get
-  Bind name addr -> modify (Env.insert name addr)
-  Close names -> Env.intersect names <$> get
-  Push -> modify (Env.push @address)
-  Pop -> modify (Env.pop @address)
-  GetEnv -> get
-  Export name alias addr -> modify (Exports.insert name alias addr))
+runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 handleEnv
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
@@ -97,6 +85,17 @@ runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound 
           | Exports.null ports = (Env.newEnv binds, a)
           | otherwise          = (Env.newEnv (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds), a)
 
+handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
+handleEnv = \case
+  Lookup name -> Env.lookup name <$> get
+  Bind name addr -> modify (Env.insert name addr)
+  Close names -> Env.intersect names <$> get
+  Locally action -> do
+    modify' (Env.push @address)
+    a <- reinterpret2 handleEnv (raiseEff action)
+    a <$ modify' (Env.pop @address)
+  GetEnv -> get
+  Export name alias addr -> modify (Exports.insert name alias addr)
 
 -- | Errors involving the environment.
 data EnvironmentError address return where
