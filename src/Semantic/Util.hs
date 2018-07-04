@@ -13,8 +13,8 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
-import           Data.Abstract.Type
 import           Data.Abstract.Value.Concrete
+import           Data.Abstract.Value.Type
 import           Data.Blob
 import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
