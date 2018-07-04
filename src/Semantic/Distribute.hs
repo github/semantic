@@ -8,6 +8,7 @@ module Semantic.Distribute
 ) where
 
 import qualified Control.Concurrent.Async as Async
+import           Control.Parallel.Strategies
 import           Control.Monad.Effect
 import           Control.Monad.IO.Class
 import           Prologue hiding (MonadError (..))
@@ -16,7 +17,7 @@ import           Prologue hiding (MonadError (..))
 --
 --   This is a concurrent analogue of 'sequenceA'.
 distribute :: (Member Distribute effs, Traversable t) => t (Eff effs output) -> Eff effs (t output)
-distribute = traverse (send . Distribute)
+distribute = fmap (withStrategy (parTraversable rseq)) <$> traverse (send . Distribute)
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
 --
