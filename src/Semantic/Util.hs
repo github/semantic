@@ -87,7 +87,7 @@ checking
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTypeError
+  . runTypes
 
 evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go
 evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby
