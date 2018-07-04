@@ -27,22 +27,22 @@ runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
-runRubyParse :: Member (Distribute WrappedTask) effs => [Blob] -> Eff effs [Term (Sum Ruby.Syntax) ()]
-runRubyParse = flip distributeFor (\ blob -> WrapTask (do
+runRubyParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum Ruby.Syntax) ()]
+runRubyParse = flip distributeFor (\ blob -> do
     term <- parse rubyParser blob
-    pure (() <$ term)))
+    pure (() <$ term))
 
-runTypeScriptParse :: Member (Distribute WrappedTask) effs => [Blob] -> Eff effs [Term (Sum TypeScript.Syntax) ()]
-runTypeScriptParse = flip distributeFor (\ blob -> WrapTask (do
+runTypeScriptParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum TypeScript.Syntax) ()]
+runTypeScriptParse = flip distributeFor (\ blob -> do
     term <- parse typescriptParser blob
-    pure (() <$ term)))
+    pure (() <$ term))
 
-runJSONParse :: Member (Distribute WrappedTask) effs => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
-runJSONParse = flip distributeFor (\ blob -> WrapTask (do
+runJSONParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
+runJSONParse = flip distributeFor (\ blob -> do
     term <- parse jsonParser blob
-    pure (() <$ term)))
+    pure (() <$ term))
 
-withParsedBlobs :: (Member Distribute effs, Monoid output) => (forall syntax . (ConstructorName syntax, Foldable syntax, Functor syntax, HasDeclaration syntax, HasPackageDef syntax, Show1 syntax, ToJSONFields1 syntax) => Blob -> Term syntax (Record Location) -> TaskEff output) -> [Blob] -> Eff effs output
+withParsedBlobs :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs, Monoid output) => (forall syntax . (ConstructorName syntax, Foldable syntax, Functor syntax, HasDeclaration syntax, HasPackageDef syntax, Show1 syntax, ToJSONFields1 syntax) => Blob -> Term syntax (Record Location) -> Eff effs output) -> [Blob] -> Eff effs output
 withParsedBlobs render = distributeFoldMap (\ blob -> parseSomeBlob blob >>= withSomeTerm (render blob))
 
 parseSomeBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1] (Record Location))
