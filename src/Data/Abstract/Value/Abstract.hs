@@ -8,3 +8,6 @@ data Abstract = Abstract
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
+
+instance AbstractHole Abstract where
+  hole = Abstract
