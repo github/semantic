@@ -3,6 +3,7 @@ module Data.Abstract.Type
   ( Type (..)
   , TypeError (..)
   , runTypes
+  , runTypesWith
   , unify
   ) where
 
@@ -87,6 +88,14 @@ runTypes :: ( Effectful m
          => m (Resumable TypeError ': State TypeMap ': effects) a
          -> m effects (Either (SomeExc TypeError) a)
 runTypes = runTypeMap . runTypeError
+
+runTypesWith :: ( Effectful m
+                , Monad (m effects)
+                )
+             => (forall resume . TypeError resume -> m effects resume)
+             -> m (Resumable TypeError ': State TypeMap ': effects) a
+             -> m effects (Either (SomeExc TypeError) a)
+runTypesWith with = runTypeMap . runTypeErrorWith with
 
 newtype TypeMap = TypeMap { unTypeMap :: Map.Map TName Type }
 
