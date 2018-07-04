@@ -11,3 +11,15 @@ instance Ord address => ValueRoots address Abstract where
 
 instance AbstractHole Abstract where
   hole = Abstract
+
+instance AbstractIntro Abstract where
+  unit       = Abstract
+  integer _  = Abstract
+  boolean _  = Abstract
+  string _   = Abstract
+  float _    = Abstract
+  symbol _   = Abstract
+  rational _ = Abstract
+  hash _     = Abstract
+  kvPair _ _ = Abstract
+  null       = Abstract
