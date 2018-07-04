@@ -43,3 +43,35 @@ instance ( Member (Allocator address Abstract) effects
   call Abstract params = do
     traverse_ (>>= deref) params
     box Abstract
+
+instance ( Member (Allocator address Abstract) effects
+         , Member (Env address) effects
+         , Member NonDet effects
+         , Member (Return address) effects
+         )
+      => AbstractValue address Abstract effects where
+  array _ = pure Abstract
+
+  tuple _ = pure Abstract
+
+  klass _ _ _ = pure Abstract
+  namespace _ _ = pure Abstract
+
+  scopedEnvironment _ = pure lowerBound
+
+  asString _ = pure ""
+  asPair _ = pure (Abstract, Abstract)
+
+  index _ _ = box Abstract
+
+  ifthenelse _ if' else' = if' <|> else'
+
+  liftNumeric _ _ = pure Abstract
+  liftNumeric2 _ _ _ = pure Abstract
+
+  liftBitwise _ _ = pure Abstract
+  liftBitwise2 _ _ _ = pure Abstract
+
+  liftComparison _ _ _ = pure Abstract
+
+  loop f = f empty
