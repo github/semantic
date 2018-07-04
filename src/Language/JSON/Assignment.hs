@@ -7,6 +7,7 @@ module Language.JSON.Assignment
 where
 
 import Assigning.Assignment.Deterministic hiding (Assignment)
+import qualified Assigning.Assignment.Deterministic as Deterministic
 import Data.AST
 import Data.Record
 import Data.Sum
@@ -30,7 +31,7 @@ type Syntax =
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
-type Assignment = TermAssignment Syntax Grammar
+type Assignment = Deterministic.Assignment Grammar
 
 instance Named1 (Sum Syntax) where
   nameOf1 _ = "JSONSyntax"
