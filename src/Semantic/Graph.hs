@@ -43,7 +43,7 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Functor, Ord1, Show1 ]
 
-runGraph :: (Member Distribute effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -170,7 +170,7 @@ newtype ImportGraphEff term address a = ImportGraphEff
 
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member Distribute effs, Member Files effs, Member Resolution effs, Member Task effs, Member Trace effs)
+parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
@@ -184,8 +184,8 @@ parsePackage parser project@Project{..} = do
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
-    parseModules :: (Member Distribute effs, Member Files effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser Project{..} = distributeFor projectFiles (parseModule parser (Just projectRootDir))
+    parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
+    parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
 -- | Parse a file into a 'Module'.
 parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
