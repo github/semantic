@@ -3,7 +3,6 @@ module Data.Abstract.Type
   ( Type (..)
   , TypeError (..)
   , runTypeError
-  , runTypeErrorWith
   , unify
   ) where
 
@@ -72,8 +71,6 @@ instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 runTypeError :: Effectful m => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
 runTypeError = runResumable
 
-runTypeErrorWith :: Effectful m => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
-runTypeErrorWith = runResumableWith
 
 
 -- | Unify two 'Type's.
