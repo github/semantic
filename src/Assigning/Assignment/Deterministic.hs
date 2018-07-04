@@ -1,11 +1,11 @@
-{-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures #-}
+{-# LANGUAGE FunctionalDependencies #-}
+-- | Deterministic assignment, à la _Deterministic, Error-Correcting Combinator Parsers_, S. Doaitse Swierstra & Luc Duponcheel: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.80.9967&rep=rep1&type=pdf
 module Assigning.Assignment.Deterministic
 ( Assigning(..)
-, TermAssigning(..)
 , parseError
 , Assignment(..)
+, assign
 , runAssignment
-, TermAssignment(..)
 , State(..)
 ) where
 
@@ -26,22 +26,21 @@ class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symb
   leafNode   :: symbol -> f Text
   branchNode :: symbol -> f a -> f a
 
-class Assigning symbol f => TermAssigning syntaxes symbol f | f -> symbol, f -> syntaxes where
-  toTerm :: Element syntax syntaxes
+  toTerm :: (Element syntax syntaxes, Element Syntax.Error syntaxes)
          => f (syntax (Term (Sum syntaxes) (Record Location)))
          -> f         (Term (Sum syntaxes) (Record Location))
 
 parseError :: ( Bounded symbol
               , Element Syntax.Error syntaxes
               , HasCallStack
-              , TermAssigning syntaxes symbol f
+              , Assigning symbol f
               )
            => f (Term (Sum syntaxes) (Record Location))
 parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (Syntax.errorSite <$> getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
 data Assignment symbol a = Assignment
-  { nullable :: Maybe (State symbol -> a)
+  { nullable :: Nullable symbol a
   , firstSet :: IntSet
   , choices  :: [(symbol, Cont symbol a)]
   }
@@ -49,30 +48,31 @@ data Assignment symbol a = Assignment
 
 type Cont symbol a = Source -> State symbol -> [IntSet] -> Either (Error (Either String symbol)) (State symbol, a)
 
-combine :: Maybe a -> IntSet -> IntSet -> IntSet
-combine e s1 s2 = if isJust e then s1 <> s2 else lowerBound
+combine :: Nullable symbol a -> IntSet -> IntSet -> IntSet
+combine (Nullable _) s1 s2 = s1 <> s2
+combine _            s1 _  = s1
 
-choose :: Enum symbol
-       => Maybe (State symbol -> a)
+choose :: (Enum symbol, HasCallStack)
+       => Nullable symbol a
        -> IntSet
        -> IntMap (Cont symbol a)
        -> Cont symbol a
 choose nullable firstSet table src state follow = case stateInput state of
   []  -> case nullable of
-    Just f -> Right (state, f state)
-    _      -> Left (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) Nothing)
+    Nullable f -> Right (state, f state)
+    _          -> Left (withFrozenCallStack (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) Nothing))
   s:_ -> case fromEnum (astSymbol s) `IntMap.lookup` table of
     Just k -> k src state follow
     _      -> notFound (astSymbol s) state follow
   where notFound s state follow = case nullable of
-          Just f | any (fromEnum s `IntSet.member`) follow -> Right (state, f state)
-          _                                                -> Left (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) (Just (Right s)))
+          Nullable f | any (fromEnum s `IntSet.member`) follow -> Right (state, f state)
+          _                                                    -> Left (withFrozenCallStack (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) (Just (Right s))))
 
 instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
-  pure a = Assignment (Just (const a)) lowerBound []
+  pure a = Assignment (pure a) lowerBound []
   {-# INLINABLE pure #-}
 
-  Assignment n1 f1 t1 <*> ~(Assignment n2 f2 t2) = Assignment (liftA2 (<*>) n1 n2) (combine n1 f1 f2) (t1 `tseq` t2)
+  Assignment n1 f1 t1 <*> ~(Assignment n2 f2 t2) = Assignment (n1 <*> n2) (combine n1 f1 f2) (t1 `tseq` t2)
     where table2 = IntMap.fromList (map (first fromEnum) t2)
           t1 `tseq` t2
             = map (fmap (\ p src state follow -> do
@@ -81,7 +81,7 @@ instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
               let pq = p' q'
               pq `seq` pure (state'', pq))) t1
             <> case n1 of
-              Just p -> map (fmap (\ q src state follow -> do
+              Nullable p -> map (fmap (\ q src state follow -> do
                 let p' = p state
                 (state', q') <- p' `seq` q src state follow
                 let pq = p' q'
@@ -90,26 +90,41 @@ instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
   {-# INLINABLE (<*>) #-}
 
 instance (Enum symbol, Ord symbol) => Alternative (Assignment symbol) where
-  empty = Assignment Nothing lowerBound []
+  empty = Assignment NotNullable lowerBound []
   {-# INLINABLE empty #-}
 
   Assignment n1 f1 t1 <|> Assignment n2 f2 t2 = Assignment (n1 <|> n2) (f1 <> f2) (t1 <> t2)
   {-# INLINABLE (<|>) #-}
 
 instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
-  leafNode s = Assignment Nothing (IntSet.singleton (fromEnum s))
+  leafNode s = Assignment NotNullable (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
-      []  -> Left (Error (stateSpan state) [Right s] Nothing)
+      []  -> Left (withFrozenCallStack (Error (stateSpan state) [Right s] Nothing))
       s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
-        Left err   -> Left (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
+        Left err   -> Left (withFrozenCallStack (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err)))))
         Right text -> Right (advanceState state, text))
     ]
 
-  branchNode s a = Assignment Nothing (IntSet.singleton (fromEnum s))
+  branchNode s a = Assignment NotNullable (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
-      []  -> Left (Error (stateSpan state) [Right s] Nothing)
+      []  -> Left (withFrozenCallStack (Error (stateSpan state) [Right s] Nothing))
       s:_ -> first (const (advanceState state)) <$> runAssignment a src state { stateInput = astChildren s })
     ]
+
+  toTerm a = Assignment
+    (case nullable a of
+      Nullable f  -> Nullable (\ state -> termIn (stateLocation state) (inject (f state)))
+      NotNullable -> NotNullable)
+    (firstSet a)
+    (map (fmap (\ match src state follow -> case match src state follow of
+      Left err
+        | Just _ <- errorActual err -> Right (advanceState state, termIn (stateLocation state) (inject (Syntax.errorSyntax (either id show <$> err) [])))
+        | otherwise                 -> Left err
+      Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a))
+
+
+assign :: (Enum symbol, Show symbol) => Source -> Assignment symbol a -> AST [] symbol -> Either (Error String) a
+assign src assignment = bimap (fmap (either id show)) snd . runAssignment assignment src . State 0 lowerBound . pure
 
 runAssignment :: Enum symbol => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
 runAssignment (Assignment nullable firstSet table) src input
@@ -117,27 +132,31 @@ runAssignment (Assignment nullable firstSet table) src input
     Left err -> Left err
     Right (state', a') -> case stateInput state' of
       []   -> Right (state', a')
-      s':_ -> Left (Error (stateSpan state') [] (Just (Right (astSymbol s'))))
+      s':_ -> Left (withFrozenCallStack (Error (stateSpan state') [] (Just (Right (astSymbol s')))))
 
 
-newtype TermAssignment (syntaxes :: [* -> *]) symbol a = TermAssignment { runTermAssignment :: Assignment symbol a }
-  deriving (Alternative, Applicative, Functor, Assigning symbol)
+data Nullable symbol a
+  = NotNullable
+  | Nullable (State symbol -> a)
+  deriving (Functor)
 
-instance (Enum symbol, Ord symbol, Show symbol) => TermAssigning syntaxes symbol (TermAssignment syntaxes symbol) where
-  toTerm (TermAssignment a) = TermAssignment (Assignment
-    (case nullable a of
-      Just f  -> Just (\ state -> termIn (stateLocation state) (inject (f state)))
-      Nothing -> Nothing)
-    (firstSet a)
-    (map (fmap (\ match src state follow -> case match src state follow of
-      Left err -> Left err
-      Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a)))
+instance Applicative (Nullable symbol) where
+  pure = Nullable . const
+
+  Nullable f <*> Nullable a = Nullable (\ state -> f state (a state))
+  _          <*> _          = NotNullable
+
+instance Alternative (Nullable symbol) where
+  empty = NotNullable
+
+  Nullable a  <|> _ = Nullable a
+  _           <|> b = b
 
 
-data State s = State
+data State symbol = State
   { stateBytes :: {-# UNPACK #-} !Int
   , statePos   :: {-# UNPACK #-} !Pos
-  , stateInput :: ![AST [] s]
+  , stateInput :: ![AST [] symbol]
   }
   deriving (Eq, Ord, Show)
 

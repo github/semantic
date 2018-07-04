@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Ruby.Assignment
 ( assignment
 , Syntax
@@ -35,6 +36,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import Prologue hiding (for)
+import Proto3.Suite (Named1(..), Named(..))
 
 -- | The type of Ruby syntax.
 type Syntax = '[
@@ -123,6 +125,12 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "RubySyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "RubyTerm"
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Term
