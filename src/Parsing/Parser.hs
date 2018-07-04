@@ -3,6 +3,8 @@ module Parsing.Parser
 ( Parser(..)
 , SomeTerm(..)
 , withSomeTerm
+, SomeSyntaxTerm
+, withSomeSyntaxTerm
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someParser
@@ -188,6 +190,11 @@ data SomeTerm typeclasses ann where
 withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
 withSomeTerm with (SomeTerm term) = with term
 
+data SomeSyntaxTerm syntax ann where
+  SomeSyntaxTerm :: Term syntax ann -> SomeSyntaxTerm syntax ann
+
+withSomeSyntaxTerm :: (forall syntax . Term syntax ann -> a) -> SomeSyntaxTerm syntax ann -> a
+withSomeSyntaxTerm with (SomeSyntaxTerm term) = with term
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
 data SomeASTParser where
