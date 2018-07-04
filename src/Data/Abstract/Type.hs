@@ -94,7 +94,7 @@ runTypesWith :: ( Effectful m
                 )
              => (forall resume . TypeError resume -> m effects resume)
              -> m (Resumable TypeError ': State TypeMap ': effects) a
-             -> m effects (Either (SomeExc TypeError) a)
+             -> m effects a
 runTypesWith with = runTypeMap . runTypeErrorWith with
 
 newtype TypeMap = TypeMap { unTypeMap :: Map.Map TName Type }
