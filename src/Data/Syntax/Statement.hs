@@ -290,7 +290,7 @@ instance Evaluatable DoWhile where
 
 -- Exception handling
 
-newtype Throw a = Throw a
+newtype Throw a = Throw { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Throw where liftEq = genericLiftEq
