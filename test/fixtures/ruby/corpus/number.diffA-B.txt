@@ -1,12 +1,12 @@
 (Statements
-{+(Integer)+}
+{ (Integer)
+->(Integer) }
 {+(Integer)+}
 {+(Integer)+}
 {+(Integer)+}
 {+(Integer)+}
 {+(Integer)+}
 {+(Float)+}
-{-(Integer)-}
 {-(Integer)-}
 {-(Integer)-}
 {-(Integer)-}

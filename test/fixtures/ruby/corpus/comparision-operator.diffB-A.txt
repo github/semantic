@@ -1,19 +1,19 @@
 (Statements
-{ (LessThanEqual
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(LessThan
+{+(LessThan
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) }
+    {+(Identifier)+})+})+}
 {+(GreaterThan
   {+(Send
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+})+}
+{-(LessThanEqual
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(GreaterThanEqual
   {-(Send
     {-(Identifier)-})-}

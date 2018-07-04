@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Data.Abstract.Name
 ( Name
 -- * Constructors
@@ -10,14 +11,27 @@ import           Data.Aeson
 import qualified Data.Char as Char
 import           Data.Text (Text)
 import qualified Data.Text as Text
+import qualified Data.Text.Lazy as LT
 import           Data.String
 import           Prologue
+import Proto3.Suite
+import qualified Proto3.Wire.Decode as Decode
+import qualified Proto3.Wire.Encode as Encode
 
 -- | The type of variable names.
 data Name
   = Name Text
   | I Int
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, MessageField)
+
+instance HasDefault Name where
+  def = Name mempty
+
+instance Primitive Name where
+  encodePrimitive num (Name text) = Encode.text num (LT.fromStrict text)
+  encodePrimitive num (I index) = Encode.int num index
+  decodePrimitive = Name . LT.toStrict <$> Decode.text <|> I <$> Decode.int
+  primType _ = Bytes
 
 -- | Construct a 'Name' from a 'Text'.
 name :: Text -> Name

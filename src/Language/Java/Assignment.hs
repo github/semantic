@@ -6,14 +6,13 @@ module Language.Java.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error, while, try)
+import Assigning.Assignment hiding (Assignment, Error, try)
 import Data.Abstract.Name
 import Data.Functor (($>))
 import Data.List.NonEmpty (some1)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import Data.Sum
-import GHC.Stack
 import Language.Java.Grammar as Grammar
 import Language.Java.Syntax as Java.Syntax
 import qualified Assigning.Assignment as Assignment
@@ -34,14 +33,37 @@ type Syntax =
    , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
-   , Expression.Arithmetic
+   , Expression.Plus
+   , Expression.Minus
+   , Expression.Times
+   , Expression.DividedBy
+   , Expression.Modulo
+   , Expression.Power
+   , Expression.Negate
+   , Expression.FloorDivision
    , Expression.Call
+   , Expression.LessThan
+   , Expression.LessThanEqual
+   , Expression.GreaterThan
+   , Expression.GreaterThanEqual
+   , Expression.Equal
+   , Expression.StrictEqual
    , Expression.Comparison
-   , Expression.Bitwise
-   , Expression.Boolean
+   , Expression.BOr
+   , Expression.BXOr
+   , Expression.BAnd
+   , Expression.LShift
+   , Expression.RShift
+   , Expression.UnsignedRShift
+   , Expression.Complement
+   , Expression.And
+   , Expression.Not
+   , Expression.Or
+   , Expression.XOr
    , Expression.InstanceOf
    , Expression.MemberAccess
    , Expression.Subscript
+   , Expression.Member
    , Expression.Super
    , Expression.This
    , Java.Syntax.Annotation
@@ -425,8 +447,7 @@ binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expressio
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: HasCallStack
-          => Assignment
+infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
           -> Assignment.Assignment [] Grammar (Sum Syntax Term)

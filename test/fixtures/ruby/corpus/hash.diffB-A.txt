@@ -1,25 +1,23 @@
 (Statements
   (Hash
-  {+(KeyValue
-    {+(Symbol)+}
-    {+(TextElement)+})+}
     (KeyValue
     { (Symbol)
     ->(Symbol) }
     { (TextElement)
+    ->(TextElement) })
+    (KeyValue
+    { (Symbol)
+    ->(Symbol) }
+    { (Integer)
     ->(Integer) })
-  {+(KeyValue
-    {+(TextElement)+}
-    {+(Boolean)+})+}
+    (KeyValue
+    { (Symbol)
+    ->(TextElement) }
+    { (Boolean)
+    ->(Boolean) })
   {+(KeyValue
     {+(Symbol)+}
-    {+(Integer)+})+}
-  {-(KeyValue
-    {-(Symbol)-}
-    {-(Integer)-})-}
-  {-(KeyValue
-    {-(Symbol)-}
-    {-(Boolean)-})-})
+    {+(Integer)+})+})
 {+(Hash)+}
 {+(Hash
   {+(Context

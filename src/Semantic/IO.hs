@@ -14,6 +14,7 @@ module Semantic.IO
 , noLanguageForBlob
 , openFileForReading
 , readBlob
+, readBlobFromPath
 , readBlobPairs
 , readBlobPairsFromHandle
 , readBlobs
@@ -39,7 +40,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import           Data.Blob
 import           Data.Bool
-import           Data.Project
+import           Data.Project hiding (readFile)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
@@ -105,7 +106,8 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
       else fromMaybe (takeDirectory path) maybeRoot
 
   paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
-  pure $ Project rootDir (toFile <$> paths) lang excludeDirs
+  blobs <- liftIO $ traverse (readBlobFromPath . toFile) paths
+  pure $ Project rootDir blobs lang excludeDirs
   where
     toFile path = File path lang
     exts = extensionsForLanguage lang
