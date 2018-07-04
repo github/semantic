@@ -226,18 +226,18 @@ runParser blob@Blob{..} parser = case parser of
       throwError (toException err)
     config <- ask
     time "parse.assign_deterministic" languageTag $
-      case Deterministic.runAssignment (Deterministic.runTermAssignment assignment) blobSource (Deterministic.State 0 lowerBound [ast]) of
+      case Deterministic.assign assignment blobSource ast of
         Left err -> do
-          writeStat (increment "parse.assign_errors" languageTag)
-          logError config Error blob (either id show <$> err) (("task", "assign") : blobFields)
-          throwError (toException (either id show <$> err))
-        Right (_, term) -> do
+          writeStat (increment "parse.assign_deterministic_errors" languageTag)
+          logError config Error blob err (("task", "assign") : blobFields)
+          throwError (toException err)
+        Right term -> do
           for_ (errors term) $ \ err -> case Error.errorActual err of
               Just "ParseError" -> do
                 writeStat (increment "parse.parse_errors" languageTag)
                 logError config Warning blob err (("task", "parse") : blobFields)
               _ -> do
-                writeStat (increment "parse.assign_warnings" languageTag)
+                writeStat (increment "parse.assign_deterministic_warnings" languageTag)
                 logError config Warning blob err (("task", "assign") : blobFields)
                 when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
           writeStat (count "parse.nodes" (length term) languageTag)
