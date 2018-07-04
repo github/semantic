@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.JSON.Assignment
 ( assignment
 , Syntax
@@ -14,6 +15,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Language.JSON.Grammar as Grammar
+import Proto3.Suite (Named1(..), Named(..))
 import Prologue
 import Text.Parser.Combinators
 
@@ -30,6 +32,12 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Deterministic.Assignment Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "JSONSyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "JSONTerm"
 
 
 assignment :: Assignment Term

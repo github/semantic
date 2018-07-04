@@ -123,8 +123,8 @@ instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment 
       Right (state', syntax) -> Right (state', termIn (stateLocation state) (inject syntax)))) (choices a))
 
 
-assign :: (Enum symbol, Show symbol) => Assignment symbol a -> Source -> AST [] symbol -> Either (Error String) a
-assign assignment src = bimap (fmap (either id show)) snd . runAssignment assignment src . State 0 lowerBound . pure
+assign :: (Enum symbol, Show symbol) => Source -> Assignment symbol a -> AST [] symbol -> Either (Error String) a
+assign src assignment = bimap (fmap (either id show)) snd . runAssignment assignment src . State 0 lowerBound . pure
 
 runAssignment :: Enum symbol => Assignment symbol a -> Source -> State symbol -> Either (Error (Either String symbol)) (State symbol, a)
 runAssignment (Assignment nullable firstSet table) src input
