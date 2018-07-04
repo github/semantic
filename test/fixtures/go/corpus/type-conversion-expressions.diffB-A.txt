@@ -65,17 +65,13 @@
         {-(Identifier)-})
       ->(MemberAccess
         {+(Identifier)+}) })
-      (TypeConversion
-        (Parenthesized
-          (Slice
-          { (MemberAccess
-            {-(Identifier)-})
-          ->(MemberAccess
-            {+(Identifier)+}) }))
-      { (MemberAccess
-        {-(Identifier)-})
-      ->(MemberAccess
-        {+(Identifier)+}) })
+    {+(TypeConversion
+      {+(Parenthesized
+        {+(Slice
+          {+(MemberAccess
+            {+(Identifier)+})+})+})+}
+      {+(MemberAccess
+        {+(Identifier)+})+})+}
     {+(Call
       {+(MemberAccess
         {+(Identifier)+})+}
@@ -86,6 +82,13 @@
         {+(Identifier)+})+}
       {+(Identifier)+}
       {+(Empty)+})+}
+    {-(TypeConversion
+      {-(Parenthesized
+        {-(Slice
+          {-(MemberAccess
+            {-(Identifier)-})-})-})-}
+      {-(MemberAccess
+        {-(Identifier)-})-})-}
     {-(Call
       {-(MemberAccess
         {-(Identifier)-})-}

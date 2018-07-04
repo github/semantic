@@ -3,6 +3,8 @@ module Parsing.Parser
 ( Parser(..)
 , SomeTerm(..)
 , withSomeTerm
+, SomeSyntaxTerm
+, withSomeSyntaxTerm
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someParser
@@ -15,6 +17,7 @@ module Parsing.Parser
 , javaParser
 , javaASTParser
 , jsonParser
+, jsonASTParser
 , markdownParser
 , pythonParser
 , rubyParser
@@ -24,6 +27,7 @@ module Parsing.Parser
 ) where
 
 import           Assigning.Assignment
+import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
@@ -101,6 +105,10 @@ data Parser term where
                    => Parser (Term ast (Node grammar))                           -- A parser producing AST.
                    -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- An assignment from AST onto 'Term's.
                    -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
+  DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
+                      => Parser (AST [] grammar)
+                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) (Record Location))
+                      -> Parser (Term (Sum syntaxes) (Record Location))
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | An abstraction over parsers when we don’t know the details of the term type.
@@ -161,7 +169,10 @@ javaASTParser :: Parser (AST [] Java.Grammar)
 javaASTParser = ASTParser tree_sitter_java
 
 jsonParser :: Parser JSON.Term
-jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
+jsonParser = DeterministicParser jsonASTParser JSON.assignment
+
+jsonASTParser :: Parser (AST [] JSON.Grammar)
+jsonASTParser = ASTParser tree_sitter_json
 
 typescriptParser :: Parser TypeScript.Term
 typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
@@ -179,6 +190,11 @@ data SomeTerm typeclasses ann where
 withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
 withSomeTerm with (SomeTerm term) = with term
 
+data SomeSyntaxTerm syntax ann where
+  SomeSyntaxTerm :: Term syntax ann -> SomeSyntaxTerm syntax ann
+
+withSomeSyntaxTerm :: (forall syntax . Term syntax ann -> a) -> SomeSyntaxTerm syntax ann -> a
+withSomeSyntaxTerm with (SomeSyntaxTerm term) = with term
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
 data SomeASTParser where

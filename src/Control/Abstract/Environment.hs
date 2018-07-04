@@ -44,7 +44,7 @@ bind name addr = send (Bind name addr)
 
 -- | Bind all of the names from an 'Environment' in the current scope.
 bindAll :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
-bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.pairs
+bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.flatPairs
 
 -- | Run an action in a new local scope.
 locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
@@ -93,9 +93,9 @@ runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound 
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
-        filterEnv (ports, (env, a))
-          | Exports.null ports = (env, a)
-          | otherwise          = (Exports.toEnvironment ports `Env.mergeEnvs` Env.overwrite (Exports.aliases ports) env, a)
+  filterEnv (ports, (binds, a))
+          | Exports.null ports = (Env.newEnv binds, a)
+          | otherwise          = (Env.newEnv (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds), a)
 
 
 -- | Errors involving the environment.
