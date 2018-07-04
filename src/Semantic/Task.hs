@@ -63,6 +63,7 @@ import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
 import           Data.Record
+import           Data.Source (Source)
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -195,31 +196,8 @@ runParser blob@Blob{..} parser = case parser of
       parseToAST (configTreeSitterParseTimeout config) language blob
         >>= maybeM (throwError (SomeException ParserTimedOut))
 
-  AssignmentParser parser assignment -> do
-    ast <- runParser blob parser `catchError` parseFailureHandler
-    time "parse.assign" languageTag $
-      case Assignment.assign blobSource assignment ast of
-        Left err -> do
-          writeStat (increment "parse.assign_errors" languageTag)
-          config <- ask
-          logError config Error blob err (("task", "assign") : blobFields)
-          throwError (toException err)
-        Right term -> do
-          writeErrorStats term
-          pure term
-
-  DeterministicParser parser assignment -> do
-    ast <- runParser blob parser `catchError` parseFailureHandler
-    config <- ask
-    time "parse.assign_deterministic" languageTag $
-      case Deterministic.assign assignment blobSource ast of
-        Left err -> do
-          writeStat (increment "parse.assign_deterministic_errors" languageTag)
-          logError config Error blob err (("task", "assign") : blobFields)
-          throwError (toException err)
-        Right term -> do
-          writeErrorStats term
-          pure term
+  AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser assignment
+  DeterministicParser parser assignment -> runAssignment Deterministic.assign parser assignment
 
   MarkdownParser ->
     time "parse.cmark_parse" languageTag $
@@ -232,20 +210,38 @@ runParser blob@Blob{..} parser = case parser of
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
-        parseFailureHandler :: (Member Telemetry effs, Member (Exc SomeException) effs) => SomeException -> Eff effs term
-        parseFailureHandler (SomeException err) = do
-          writeStat (increment "parse.parse_failures" languageTag)
-          writeLog Error "failed parsing" (("task", "parse") : blobFields)
-          throwError (toException err)
-        writeErrorStats :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs, Member (Reader Config) effs, Member Telemetry effs, Member (Exc SomeException) effs) => Term (Sum fs) (Record Assignment.Location) -> Eff effs ()
-        writeErrorStats term = do
+        runAssignment :: ( Apply Foldable syntaxes
+                         , Apply Functor syntaxes
+                         , Element Syntax.Error syntaxes
+                         , Member (Exc SomeException) effs
+                         , Member IO effs
+                         , Member (Reader Config) effs
+                         , Member Telemetry effs
+                         , Member Trace effs
+                         )
+                      => (Source -> assignment (Term (Sum syntaxes) (Record Assignment.Location)) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) (Record Assignment.Location)))
+                      -> Parser ast
+                      -> assignment (Term (Sum syntaxes) (Record Assignment.Location))
+                      -> Eff effs (Term (Sum syntaxes) (Record Assignment.Location))
+        runAssignment assign parser assignment = do
+          ast <- runParser blob parser `catchError` \ (SomeException err) -> do
+            writeStat (increment "parse.parse_failures" languageTag)
+            writeLog Error "failed parsing" (("task", "parse") : blobFields)
+            throwError (toException err)
           config <- ask
-          for_ (errors term) $ \ err -> case Error.errorActual err of
-            Just "ParseError" -> do
-              writeStat (increment "parse.parse_errors" languageTag)
-              logError config Warning blob err (("task", "parse") : blobFields)
-            _ -> do
-              writeStat (increment "parse.assign_warnings" languageTag)
-              logError config Warning blob err (("task", "assign") : blobFields)
-              when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
-          writeStat (count "parse.nodes" (length term) languageTag)
+          time "parse.assign" languageTag $
+            case assign blobSource assignment ast of
+              Left err -> do
+                writeStat (increment "parse.assign_errors" languageTag)
+                logError config Error blob err (("task", "assign") : blobFields)
+                throwError (toException err)
+              Right term -> do
+                for_ (errors term) $ \ err -> case Error.errorActual err of
+                  Just "ParseError" -> do
+                    writeStat (increment "parse.parse_errors" languageTag)
+                    logError config Warning blob err (("task", "parse") : blobFields)
+                  _ -> do
+                    writeStat (increment "parse.assign_warnings" languageTag)
+                    logError config Warning blob err (("task", "assign") : blobFields)
+                    when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
+                term <$ writeStat (count "parse.nodes" (length term) languageTag)
