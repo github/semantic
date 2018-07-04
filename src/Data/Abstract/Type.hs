@@ -111,6 +111,49 @@ prune (Var id) = Map.lookup id . unTypeMap <$> get >>= \case
                     Nothing -> pure (Var id)
 prune ty = pure ty
 
+exist :: ( Effectful m
+         , Monad (m effects)
+         , Member (State TypeMap) effects
+         )
+      => TName
+      -> Type
+      -> m effects Bool
+exist id = \case
+  Int -> pure False
+  Bool -> pure False
+  String -> pure False
+  Symbol -> pure False
+  Unit -> pure False
+  Float -> pure False
+  Rational -> pure False
+  Void -> pure False
+  Object -> pure False
+  Null -> pure False
+  Hole -> pure False
+  a :-> b -> eitherM (exist id) (a, b)
+  a :* b -> eitherM (exist id) (a, b)
+  a :+ b -> eitherM (exist id) (a, b)
+  Array ty -> exist id ty
+  Hash kvs -> or <$> traverse (eitherM (exist id)) kvs
+  Var vid -> pure (vid == id)
+  where
+    eitherM :: Applicative m => (a -> m Bool) -> (a, a) -> m Bool
+    eitherM f (a, b) = (||) <$> f a <*> f b
+
+substitute :: ( Effectful m
+              , Monad (m effects)
+              , Member (Resumable TypeError) effects
+              , Member (State TypeMap) effects
+              )
+           => TName
+           -> Type
+           -> m effects Type
+substitute id ty = do
+  infiniteType <- exist id ty
+  if infiniteType
+    then throwResumable (UnificationError (Var id) ty)
+    else modifyTypeMap (Map.insert id ty) $> ty
+
 -- | Unify two 'Type's.
 unify :: ( Effectful m
          , Monad (m effects)
@@ -127,12 +170,11 @@ unify a b = do
     (a1 :-> b1, a2 :-> b2) -> (:->) <$> unify a1 a2 <*> unify b1 b2
     (a, Null) -> pure a
     (Null, b) -> pure b
-    -- FIXME: this should be constructing a substitution.
-    (Var _, b) -> pure b
-    (a, Var _) -> pure a
+    (Var id, ty) -> substitute id ty
+    (ty, Var id) -> substitute id ty
     (Array t1, Array t2) -> Array <$> unify t1 t2
-  -- FIXME: unifying with sums should distribute nondeterministically.
-  -- FIXME: ordering shouldn’t be significant for undiscriminated sums.
+    -- FIXME: unifying with sums should distribute nondeterministically.
+    -- FIXME: ordering shouldn’t be significant for undiscriminated sums.
     (a1 :+ b1, a2 :+ b2) -> (:+) <$> unify a1 a2 <*> unify b1 b2
     (a1 :* b1, a2 :* b2) -> (:*) <$> unify a1 a2 <*> unify b1 b2
     (t1, t2) | t1 == t2 -> pure t2
