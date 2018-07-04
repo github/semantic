@@ -72,8 +72,7 @@ instance Effect (Env address) where
   handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
-runEnv :: forall address value effects a
-       .  Effects effects
+runEnv :: Effects effects
        => Environment address
        -> Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects (Environment address, a)
