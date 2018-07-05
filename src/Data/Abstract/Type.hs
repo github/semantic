@@ -227,10 +227,10 @@ instance AbstractIntro Type where
 
 instance ( Member (Allocator address Type) effects
          , Member (Env address) effects
+         , Member (Exc (Return address)) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
          , Member (State TypeMap) effects
-         , Member (Exc (Return address)) effects
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
@@ -254,11 +254,11 @@ instance ( Member (Allocator address Type) effects
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address Type) effects
          , Member (Env address) effects
+         , Member (Exc (Return address)) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
          , Member (State TypeMap) effects
-         , Member (Exc (Return address)) effects
          )
       => AbstractValue address Type effects where
   array fields = do
