@@ -11,6 +11,7 @@ import Proto3.Suite
 import qualified Proto3.Wire.Encode as E
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Syntax.Declaration as Declaration
 import Data.Term (Term)
 import Data.Sum
 import Language.JSON.Assignment (Syntax)
@@ -66,6 +67,10 @@ spec = parallel $ do
   describe "statements1" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip1 @Statement.Statements @(Term (Sum Syntax) ()) (unListableF sp)
+
+  describe "methods" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip1 @Declaration.Method @(Term (Sum Syntax) ()) (unListableF sp)
 
   describe "blobs" $ do
     it "should roundtrip given a Message instance" $ do
