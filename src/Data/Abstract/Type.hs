@@ -7,7 +7,8 @@ module Data.Abstract.Type
   , unify
   ) where
 
-import Control.Abstract
+import Control.Abstract hiding (raiseHandler)
+import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
@@ -87,15 +88,13 @@ runTypeErrorWith = runResumableWith
 
 runTypeMap :: ( Effectful m
               , Effects effects
-              , Monad (m effects)
               )
            => m (State TypeMap ': effects) a
            -> m effects a
-runTypeMap = runState emptyTypeMap >=> pure . snd
+runTypeMap = raiseHandler (runState emptyTypeMap >=> pure . snd)
 
 runTypes :: ( Effectful m
             , Effects effects
-            , Monad (m effects)
             )
          => m (Resumable TypeError ': State TypeMap ': effects) a
          -> m effects (Either (SomeExc TypeError) a)
@@ -103,7 +102,6 @@ runTypes = runTypeMap . runTypeError
 
 runTypesWith :: ( Effectful m
                 , Effects effects
-                , Monad (m effects)
                 )
              => (forall resume . TypeError resume -> m (State TypeMap ': effects) resume)
              -> m (Resumable TypeError ': State TypeMap ': effects) a
