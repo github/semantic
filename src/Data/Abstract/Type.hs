@@ -86,6 +86,7 @@ runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . TypeError
 runTypeErrorWith = runResumableWith
 
 runTypeMap :: ( Effectful m
+              , Effects effects
               , Monad (m effects)
               )
            => m (State TypeMap ': effects) a
@@ -93,6 +94,7 @@ runTypeMap :: ( Effectful m
 runTypeMap = runState emptyTypeMap >=> pure . fst
 
 runTypes :: ( Effectful m
+            , Effects effects
             , Monad (m effects)
             )
          => m (Resumable TypeError ': State TypeMap ': effects) a
