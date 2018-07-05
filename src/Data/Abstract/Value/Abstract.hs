@@ -29,7 +29,7 @@ instance AbstractIntro Abstract where
 
 instance ( Member (Allocator address Abstract) effects
          , Member (Env address) effects
-         , Member (Return address) effects
+         , Member (Exc (Return address)) effects
          )
       => AbstractFunction address Abstract effects where
   closure names _ body = do
@@ -37,7 +37,7 @@ instance ( Member (Allocator address Abstract) effects
       addr <- alloc name
       assign addr Abstract
       Env.insert name addr <$> rest) (pure lowerBound) names
-    addr <- locally (bindAll env *> body `catchReturn` \ (Return ptr) -> pure ptr)
+    addr <- locally (bindAll env *> catchReturn body)
     deref addr
 
   call Abstract params = do
@@ -46,8 +46,8 @@ instance ( Member (Allocator address Abstract) effects
 
 instance ( Member (Allocator address Abstract) effects
          , Member (Env address) effects
+         , Member (Exc (Return address)) effects
          , Member NonDet effects
-         , Member (Return address) effects
          )
       => AbstractValue address Abstract effects where
   array _ = pure Abstract
