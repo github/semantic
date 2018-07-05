@@ -60,13 +60,23 @@ zeroOrMoreProduct = maybe Unit oneOrMoreProduct . nonEmpty
 -- | Errors representing failures in typechecking. Note that we should in general constrain allowable types by 'unify'ing, and thus throwing 'UnificationError's when constraints aren’t met, in order to allow uniform resumption with one or the other parameter type.
 data TypeError resume where
   UnificationError :: Type -> Type -> TypeError Type
+  InfiniteType :: Type -> Type -> TypeError Type
 
 deriving instance Eq   (TypeError resume)
 deriving instance Ord  (TypeError resume)
 deriving instance Show (TypeError resume)
 
-instance Eq1   TypeError where liftEq      _ (UnificationError a1 b1) (UnificationError a2 b2) = a1 == a2 && b1 == b2
-instance Ord1  TypeError where liftCompare _ (UnificationError a1 b1) (UnificationError a2 b2) = compare a1 a2 <> compare b1 b2
+instance Eq1   TypeError where
+  liftEq      _ (UnificationError a1 b1) (UnificationError a2 b2) = a1 == a2 && b1 == b2
+  liftEq      _ (InfiniteType a1 b1) (InfiniteType a2 b2) = a1 == a2 && b1 == b2
+  liftEq      _ _ _ = False
+
+instance Ord1  TypeError where
+  liftCompare _ (UnificationError a1 b1) (UnificationError a2 b2) = compare a1 a2 <> compare b1 b2
+  liftCompare _ (InfiniteType a1 b1) (InfiniteType a2 b2) = compare a1 a2 <> compare b1 b2
+  liftCompare _ (InfiniteType _ _) (UnificationError _ _) = LT
+  liftCompare _ (UnificationError _ _) (InfiniteType _ _) = GT
+
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
 runTypeError :: Effectful m => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
@@ -123,14 +133,14 @@ prune (Var id) = Map.lookup id . unTypeMap <$> get >>= \case
                     Nothing -> pure (Var id)
 prune ty = pure ty
 
-exist :: ( Effectful m
+occur :: ( Effectful m
          , Monad (m effects)
          , Member (State TypeMap) effects
          )
       => TName
       -> Type
       -> m effects Bool
-exist id = \case
+occur id = prune >=> \case
   Int -> pure False
   Bool -> pure False
   String -> pure False
@@ -142,11 +152,11 @@ exist id = \case
   Object -> pure False
   Null -> pure False
   Hole -> pure False
-  a :-> b -> eitherM (exist id) (a, b)
-  a :* b -> eitherM (exist id) (a, b)
-  a :+ b -> eitherM (exist id) (a, b)
-  Array ty -> exist id ty
-  Hash kvs -> or <$> traverse (eitherM (exist id)) kvs
+  a :-> b -> eitherM (occur id) (a, b)
+  a :* b -> eitherM (occur id) (a, b)
+  a :+ b -> eitherM (occur id) (a, b)
+  Array ty -> occur id ty
+  Hash kvs -> or <$> traverse (eitherM (occur id)) kvs
   Var vid -> pure (vid == id)
   where
     eitherM :: Applicative m => (a -> m Bool) -> (a, a) -> m Bool
@@ -161,10 +171,12 @@ substitute :: ( Effectful m
            -> Type
            -> m effects Type
 substitute id ty = do
-  infiniteType <- exist id ty
-  if infiniteType
-    then throwResumable (UnificationError (Var id) ty)
-    else modifyTypeMap (Map.insert id ty) $> ty
+  infiniteType <- occur id ty
+  ty <- if infiniteType
+    then throwResumable (InfiniteType (Var id) ty)
+    else pure ty
+  modifyTypeMap (Map.insert id ty)
+  pure ty
 
 -- | Unify two 'Type's.
 unify :: ( Effectful m
