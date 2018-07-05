@@ -69,10 +69,10 @@ instance Ord1  TypeError where liftCompare _ (UnificationError a1 b1) (Unificati
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
 
-runTypeError :: Effectful m => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
+runTypeError :: (Effectful m, Effects effects) => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
 runTypeError = runResumable
 
-runTypeErrorWith :: Effectful m => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
+runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
 runTypeErrorWith = runResumableWith
 
 
@@ -118,7 +118,7 @@ instance ( Member (Allocator address Type) effects
          , Member (Env address) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
-         , Member (Return address) effects
+         , Member (Exc (Return address)) effects
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
@@ -127,7 +127,7 @@ instance ( Member (Allocator address Type) effects
       tvar <- Var <$> fresh
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
-    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (bindAll env *> body `catchReturn` \ (Return ptr) -> pure ptr))
+    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll env *> body)))
 
   call op params = do
     tvar <- fresh
@@ -145,7 +145,7 @@ instance ( Member (Allocator address Type) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
-         , Member (Return address) effects
+         , Member (Exc (Return address)) effects
          )
       => AbstractValue address Type effects where
   array fields = do

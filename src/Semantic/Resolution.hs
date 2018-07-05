@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GADTs, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution where
 
 import           Control.Monad.Effect
@@ -35,11 +35,15 @@ resolutionMap Project{..} = case projectLanguage of
   JavaScript -> send (NodeJSResolution projectRootDir "main" projectExcludeDirs)
   _          -> send NoResolution
 
-data Resolution output where
-  NodeJSResolution :: FilePath -> Text -> [FilePath] -> Resolution (Map FilePath FilePath)
-  NoResolution :: Resolution (Map FilePath FilePath)
+data Resolution (m :: * -> *) output where
+  NodeJSResolution :: FilePath -> Text -> [FilePath] -> Resolution m (Map FilePath FilePath)
+  NoResolution     ::                                   Resolution m (Map FilePath FilePath)
 
-runResolution :: Member Files effs => Eff (Resolution ': effs) a -> Eff effs a
+instance Effect Resolution where
+  handleState c dist (Request (NodeJSResolution path key paths) k) = Request (NodeJSResolution path key paths) (dist . (<$ c) . k)
+  handleState c dist (Request NoResolution k) = Request NoResolution (dist . (<$ c) . k)
+
+runResolution :: (Member Files effs, Effects effs) => Eff (Resolution ': effs) a -> Eff effs a
 runResolution = interpret $ \ res -> case res of
   NodeJSResolution dir prop excludeDirs -> nodeJSResolutionMap dir prop excludeDirs
-  NoResolution -> pure Map.empty
+  NoResolution                          -> pure Map.empty
