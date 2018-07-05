@@ -102,6 +102,7 @@ runTypes :: ( Effectful m
 runTypes = runTypeMap . runTypeError
 
 runTypesWith :: ( Effectful m
+                , Effects effects
                 , Monad (m effects)
                 )
              => (forall resume . TypeError resume -> m (State TypeMap ': effects) resume)
