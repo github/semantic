@@ -123,14 +123,14 @@ prune (Var id) = Map.lookup id . unTypeMap <$> get >>= \case
                     Nothing -> pure (Var id)
 prune ty = pure ty
 
-exist :: ( Effectful m
+occur :: ( Effectful m
          , Monad (m effects)
          , Member (State TypeMap) effects
          )
       => TName
       -> Type
       -> m effects Bool
-exist id = \case
+occur id = \case
   Int -> pure False
   Bool -> pure False
   String -> pure False
@@ -142,11 +142,11 @@ exist id = \case
   Object -> pure False
   Null -> pure False
   Hole -> pure False
-  a :-> b -> eitherM (exist id) (a, b)
-  a :* b -> eitherM (exist id) (a, b)
-  a :+ b -> eitherM (exist id) (a, b)
-  Array ty -> exist id ty
-  Hash kvs -> or <$> traverse (eitherM (exist id)) kvs
+  a :-> b -> eitherM (occur id) (a, b)
+  a :* b -> eitherM (occur id) (a, b)
+  a :+ b -> eitherM (occur id) (a, b)
+  Array ty -> occur id ty
+  Hash kvs -> or <$> traverse (eitherM (occur id)) kvs
   Var vid -> pure (vid == id)
   where
     eitherM :: Applicative m => (a -> m Bool) -> (a, a) -> m Bool
@@ -161,7 +161,7 @@ substitute :: ( Effectful m
            -> Type
            -> m effects Type
 substitute id ty = do
-  infiniteType <- exist id ty
+  infiniteType <- occur id ty
   if infiniteType
     then throwResumable (UnificationError (Var id) ty)
     else modifyTypeMap (Map.insert id ty) $> ty
