@@ -71,7 +71,8 @@ graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> rec
 
 -- | Add vertices to the graph for imported modules.
 graphingModules :: forall term address value effects a
-                .  ( Member (Modules address) effects
+                .  ( Effects effects
+                   , Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph Vertex)) effects
                    )
@@ -79,15 +80,16 @@ graphingModules :: forall term address value effects a
                 -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingModules recur m = do
   appendGraph (vertex (moduleVertex (moduleInfo m)))
-  interpose @(Modules address) pure (\ m yield -> case m of
-    Load   path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
-    Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path)) >> send m >>= yield
-    _ -> send m >>= yield)
+  eavesdrop @(Modules address) (\ m -> case m of
+    Load   path -> moduleInclusion (moduleVertex (ModuleInfo path))
+    Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path))
+    _ -> pure ())
     (recur m)
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: forall term address value effects a
-                   .  ( Member (Modules address) effects
+                   .  ( Effects effects
+                      , Member (Modules address) effects
                       , Member (Reader ModuleInfo) effects
                       , Member (State (Graph ModuleInfo)) effects
                       )
@@ -95,10 +97,10 @@ graphingModuleInfo :: forall term address value effects a
                    -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
-  interpose @(Modules address) pure (\ eff yield -> case eff of
-    Load   path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex >> send eff >>= yield
-    Lookup path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex >> send eff >>= yield
-    _ -> send eff >>= yield)
+  eavesdrop @(Modules address) (\ eff -> case eff of
+    Load   path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Lookup path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    _ -> pure ())
     (recur m)
 
 -- | Add an edge from the current package to the passed vertex.
@@ -139,5 +141,5 @@ appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m e
 appendGraph = modify' . (<>)
 
 
-graphing :: Effectful m => m (State (Graph Vertex) ': effects) result -> m effects (result, Graph Vertex)
+graphing :: (Effectful m, Effects effects) => m (State (Graph Vertex) ': effects) result -> m effects (Graph Vertex, result)
 graphing = runState mempty

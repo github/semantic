@@ -113,7 +113,7 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedEnv <- snd <$> require path
+    importedEnv <- fst <$> require path
     bindAll (select importedEnv)
     rvalBox unit
     where
@@ -130,7 +130,7 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
-  importedEnv <- snd <$> require path
+  importedEnv <- fst <$> require path
   bindAll importedEnv
   unit <$ makeNamespace name addr Nothing
 
@@ -174,7 +174,7 @@ instance Evaluatable QualifiedAliasedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
-      importedEnv <- snd <$> require path
+      importedEnv <- fst <$> require path
       bindAll importedEnv
       unit <$ makeNamespace alias addr Nothing)
 

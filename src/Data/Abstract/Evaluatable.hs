@@ -48,7 +48,8 @@ class Show1 constr => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address value) effects
           , Member (Env address) effects
-          , Member (LoopControl address) effects
+          , Member (Exc (LoopControl address)) effects
+          , Member (Exc (Return address)) effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
@@ -57,7 +58,6 @@ class Show1 constr => Evaluatable constr where
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
           , Member (Resumable (Unspecialized value)) effects
-          , Member (Return address) effects
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
@@ -67,13 +67,14 @@ class Show1 constr => Evaluatable constr where
 evaluate :: ( AbstractValue address value inner
             , Addressable address (Reader ModuleInfo ': effects)
             , Declarations term
+            , Effects effects
             , Evaluatable (Base term)
             , Foldable (Cell address)
             , FreeVariables term
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
-            , Member (State (ModuleTable (NonEmpty (Module (address, Environment address))))) effects
+            , Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (AddressError address value)) effects
@@ -86,27 +87,26 @@ evaluate :: ( AbstractValue address value inner
             , Recursive term
             , Reducer value (Cell address value)
             , ValueRoots address value
-            , inner ~ (LoopControl address ': Return address ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
+            , inner ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
          -> [Module term]
-         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (address, Environment address))))
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
 evaluate lang analyzeModule analyzeTerm modules = do
-  (_, preludeEnv) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
+  (preludeEnv, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
     defineBuiltins
     definePrelude lang
     box unit
-  foldr (run preludeEnv) get modules
+  foldr (run preludeEnv) ask modules
   where run preludeEnv m rest = do
           evaluated <- coerce
             (runInModule preludeEnv (moduleInfo m))
             (analyzeModule (subtermRef . moduleBody)
             (evalTerm <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          modify' (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| []))
-          rest
+          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
         evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
 
@@ -201,10 +201,10 @@ instance Show1 EvalError where
 throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
 throwEvalError = throwResumable
 
-runEvalError :: Effectful m => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
+runEvalError :: (Effectful m, Effects effects) => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: Effectful m => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
+runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
 runEvalErrorWith = runResumableWith
 
 
@@ -220,10 +220,10 @@ instance Eq1 (Unspecialized a) where
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: (Effectful (m value), Effects effects) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
+runUnspecializedWith :: (Effectful (m value), Effects effects) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 runUnspecializedWith = runResumableWith
 
 

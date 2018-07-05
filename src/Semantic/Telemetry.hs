@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -122,25 +122,29 @@ writeStat :: Member Telemetry effs => Stat -> Eff effs ()
 writeStat stat = send (WriteStat stat)
 
 -- | A task which measures and stats the timing of another task.
-time :: (Member IO effs, Member Telemetry effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
+time :: (Member (Lift IO) effs, Member Telemetry effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
 time statName tags task = do
   (a, stat) <- withTiming statName tags task
   a <$ writeStat stat
 
 
 -- | Statting and logging effects.
-data Telemetry output where
-  WriteStat :: Stat                                  -> Telemetry ()
-  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
+data Telemetry (m :: * -> *) output where
+  WriteStat :: Stat                                  -> Telemetry m ()
+  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry m ()
+
+instance Effect Telemetry where
+  handleState c dist (Request (WriteStat stat) k) = Request (WriteStat stat) (dist . (<$ c) . k)
+  handleState c dist (Request (WriteLog level message pairs) k) = Request (WriteLog level message pairs) (dist . (<$ c) . k)
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: Member IO effects => LogQueue -> StatQueue -> Eff (Telemetry ': effects) a -> Eff effects a
+runTelemetry :: (Member (Lift IO) effects, Effects effects) => LogQueue -> StatQueue -> Eff (Telemetry ': effects) a -> Eff effects a
 runTelemetry logger statter = interpret (\ t -> case t of
   WriteStat stat -> queueStat statter stat
   WriteLog level message pairs -> queueLogMessage logger level message pairs)
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
-ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
+ignoreTelemetry :: Effects effs => Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
   WriteLog{}  -> pure ())
