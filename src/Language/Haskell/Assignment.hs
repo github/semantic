@@ -632,7 +632,7 @@ module' =  makeTerm
                    <*> moduleExports
                    <*> term (where' <|> expressions <|> emptyTerm))
   where
-    moduleExports = (symbol ModuleExports *> children (manyTerm export))
+    moduleExports = symbol ModuleExports *> children (manyTerm export)
                  <|> pure []
 
 moduleExport :: Assignment Term

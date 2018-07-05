@@ -43,7 +43,7 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Functor, Ord1, Show1 ]
 
-runGraph :: (Member (Distribute WrappedTask) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
          => GraphType
          -> Bool
          -> Project
@@ -58,7 +58,7 @@ runGraph CallGraph includePackages project
     modules <- runImportGraph lang package
     let analyzeTerm = withTermSpans . graphingTerms
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
-        extractGraph (((_, graph), _), _) = simplify graph
+        extractGraph (_, (_, (graph, _))) = simplify graph
         runGraphAnalysis
           = run
           . runState lowerBound
@@ -75,21 +75,19 @@ runGraph CallGraph includePackages project
           . graphing
           . runReader (packageInfo package)
           . runReader lowerBound
-          . fmap fst
-          . runState lowerBound
+          . runReader lowerBound
           . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
     extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
 newtype GraphEff address a = GraphEff
-  { runGraphEff :: Eff '[ LoopControl address
-                        , Return address
+  { runGraphEff :: Eff '[ Exc (LoopControl address)
+                        , Exc (Return address)
                         , Env address
                         , Allocator address (Value address (GraphEff address))
                         , Reader ModuleInfo
                         , Modules address
-                        -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-                        , State (ModuleTable (NonEmpty (Module (address, Environment address))))
+                        , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
                         , Reader Span
                         , Reader PackageInfo
                         , State (Graph Vertex)
@@ -123,7 +121,7 @@ runImportGraph lang (package :: Package term)
   | [m :| []] <- toList (packageModules package) = vertex m <$ trace ("single module, skipping import graph computation for " <> modulePath (moduleInfo m))
   | otherwise =
   let analyzeModule = graphingModuleInfo
-      extractGraph (((_, graph), _), _) = do
+      extractGraph (_, (_, (graph, _))) = do
         info <- graph
         maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
       runImportGraphAnalysis
@@ -139,8 +137,7 @@ runImportGraph lang (package :: Package term)
         . resumingAddressError
         . resumingValueError
         . runState lowerBound
-        . fmap fst
-        . runState lowerBound
+        . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
         . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
         . runReader (packageInfo package)
@@ -148,16 +145,15 @@ runImportGraph lang (package :: Package term)
   in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd))
 
 newtype ImportGraphEff term address a = ImportGraphEff
-  { runImportGraphEff :: Eff '[ LoopControl address
-                              , Return address
+  { runImportGraphEff :: Eff '[ Exc (LoopControl address)
+                              , Exc (Return address)
                               , Env address
                               , Allocator address (Value address (ImportGraphEff term address))
                               , Reader ModuleInfo
                               , Reader Span
                               , Reader PackageInfo
                               , Modules address
-                              -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-                              , State (ModuleTable (NonEmpty (Module (address, Environment address))))
+                              , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
                               , State (Graph ModuleInfo)
                               , Resumable (ValueError address (ImportGraphEff term address))
                               , Resumable (AddressError address (Value address (ImportGraphEff term address)))
@@ -174,7 +170,7 @@ newtype ImportGraphEff term address a = ImportGraphEff
 
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member (Distribute WrappedTask) effs, Member Resolution effs, Member Trace effs)
+parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
@@ -188,8 +184,8 @@ parsePackage parser project@Project{..} = do
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
-    parseModules :: Member (Distribute WrappedTask) effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser p@Project{..} = distributeFor (projectFiles p) (WrapTask . parseModule p parser)
+    parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
+    parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
 -- | Parse a file into a 'Module'.
 parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
@@ -206,15 +202,15 @@ withTermSpans :: ( HasField fields Span
               -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
-resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
+resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects, Effects effects) => m (Resumable ResolutionError ': effects) a -> m effects a
 resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionError:" <> show err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: (Member Trace effects, AbstractHole address) => Evaluator address value (Resumable (LoadError address) ': effects) a -> Evaluator address value effects a
-resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> (hole, lowerBound))
+resumingLoadError :: (Member Trace effects, AbstractHole address, Effects effects) => Evaluator address value (Resumable (LoadError address) ': effects) a -> Evaluator address value effects a
+resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> (lowerBound, hole))
 
-resumingEvalError :: Member Trace effects => Evaluator address value (Resumable EvalError ': effects) a -> Evaluator address value effects a
+resumingEvalError :: (Member Trace effects, Effects effects) => Evaluator address value (Resumable EvalError ': effects) a -> Evaluator address value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
   DefaultExportError{}     -> pure ()
   ExportError{}            -> pure ()
@@ -223,15 +219,15 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   RationalFormatError{}    -> pure 0
   FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
 
-resumingUnspecialized :: (Member Trace effects, AbstractHole value) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
+resumingUnspecialized :: (Member Trace effects, AbstractHole value, Effects effects) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
 
-resumingAddressError :: (AbstractHole value, Lower (Cell address value), Member Trace effects, Show address) => Evaluator address value (Resumable (AddressError address value) ': effects) a -> Evaluator address value effects a
+resumingAddressError :: (AbstractHole value, Lower (Cell address value), Member Trace effects, Show address, Effects effects) => Evaluator address value (Resumable (AddressError address value) ': effects) a -> Evaluator address value effects a
 resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> show err) *> case err of
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (Member Trace effects, Show address) => Evaluator address (Value address body) (Resumable (ValueError address body) ': effects) a -> Evaluator address (Value address body) effects a
+resumingValueError :: (Member Trace effects, Show address, Effects effects) => Evaluator address (Value address body) (Resumable (ValueError address body) ': effects) a -> Evaluator address (Value address body) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))
@@ -247,7 +243,7 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: AbstractHole address => Evaluator address value (Resumable (EnvironmentError address) ': effects) a -> Evaluator address value effects (a, [Name])
+resumingEnvironmentError :: (AbstractHole address, Effects effects) => Evaluator address value (Resumable (EnvironmentError address) ': effects) a -> Evaluator address value effects ([Name], a)
 resumingEnvironmentError
   = runState []
   . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)

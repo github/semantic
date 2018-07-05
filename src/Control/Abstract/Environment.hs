@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
 , Exports
@@ -59,40 +59,43 @@ close = send . Close
 
 -- Effects
 
-data Env address return where
-  Lookup :: Name            -> Env address (Maybe address)
-  Bind   :: Name -> address -> Env address ()
-  Close  :: Set Name        -> Env address (Environment address)
-  Push   ::                    Env address ()
-  Pop    ::                    Env address ()
-  GetEnv ::                    Env address (Environment address)
-  Export :: Name -> Name -> Maybe address -> Env address ()
+data Env address (m :: * -> *) return where
+  Lookup :: Name            -> Env address m (Maybe address)
+  Bind   :: Name -> address -> Env address m ()
+  Close  :: Set Name        -> Env address m (Environment address)
+  Push   ::                    Env address m ()
+  Pop    ::                    Env address m ()
+  GetEnv ::                    Env address m (Environment address)
+  Export :: Name -> Name -> Maybe address -> Env address m ()
 
-handleEnv :: forall address effects value result
-          .  ( Member (State (Environment address)) effects
-             , Member (State (Exports address)) effects
-             )
-          => Env address result
-          -> Evaluator address value effects result
-handleEnv = \case
+instance Effect (Env address) where
+  handleState c dist (Request (Lookup name) k) = Request (Lookup name) (dist . (<$ c) . k)
+  handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (dist . (<$ c) . k)
+  handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
+  handleState c dist (Request Push k) = Request Push (dist . (<$ c) . k)
+  handleState c dist (Request Pop k) = Request Pop (dist . (<$ c) . k)
+  handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
+  handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
+
+runEnv :: forall address value effects a
+       .  Effects effects
+       => Environment address
+       -> Evaluator address value (Env address ': effects) a
+       -> Evaluator address value effects (Environment address, a)
+runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 (\case
   Lookup name -> Env.lookup name <$> get
   Bind name addr -> modify (Env.insert name addr)
   Close names -> Env.intersect names <$> get
   Push -> modify (Env.push @address)
   Pop -> modify (Env.pop @address)
   GetEnv -> get
-  Export name alias addr -> modify (Exports.insert name alias addr)
-
-runEnv :: Environment address
-       -> Evaluator address value (Env address ': effects) a
-       -> Evaluator address value effects (a, Environment address)
-runEnv initial = fmap (uncurry filterEnv . first (fmap Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 handleEnv
+  Export name alias addr -> modify (Exports.insert name alias addr))
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
-        filterEnv (a, binds) ports
-          | Exports.null ports = (a, Env.newEnv binds)
-          | otherwise          = (a, Env.newEnv (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds))
+  filterEnv (ports, (binds, a))
+          | Exports.null ports = (Env.newEnv binds, a)
+          | otherwise          = (Env.newEnv (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds), a)
 
 
 -- | Errors involving the environment.
@@ -107,8 +110,8 @@ instance Eq1 (EnvironmentError address) where liftEq _ (FreeVariable n1) (FreeVa
 freeVariableError :: Member (Resumable (EnvironmentError address)) effects => Name -> Evaluator address value effects address
 freeVariableError = throwResumable . FreeVariable
 
-runEnvironmentError :: Effectful (m address value) => m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects (Either (SomeExc (EnvironmentError address)) a)
+runEnvironmentError :: (Effectful (m address value), Effects effects) => m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects (Either (SomeExc (EnvironmentError address)) a)
 runEnvironmentError = runResumable
 
-runEnvironmentErrorWith :: Effectful (m address value) => (forall resume . EnvironmentError address resume -> m address value effects resume) -> m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects a
+runEnvironmentErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . EnvironmentError address resume -> m address value effects resume) -> m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects a
 runEnvironmentErrorWith = runResumableWith
