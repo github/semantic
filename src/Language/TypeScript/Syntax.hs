@@ -158,7 +158,7 @@ evalRequire :: ( AbstractValue address value effects
             -> Name
             -> Evaluator address value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
-  importedEnv <- snd <$> require modulePath
+  importedEnv <- fst <$> require modulePath
   bindAll importedEnv
   unit <$ makeNamespace alias addr Nothing
 
@@ -173,7 +173,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- snd <$> require modulePath
+    importedEnv <- fst <$> require modulePath
     bindAll (renamed importedEnv)
     rvalBox unit
     where
@@ -254,7 +254,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- snd <$> require modulePath
+    importedEnv <- fst <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \Alias{..} -> do
       let address = Env.lookup aliasValue importedEnv

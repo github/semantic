@@ -83,43 +83,44 @@ readFilePair paths = let paths' = fmap file paths in
 
 type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
                               , Resumable (AddressError Precise Val)
-                              , Resumable EvalError, Resumable (EnvironmentError Precise)
                               , Resumable ResolutionError
+                              , Resumable EvalError
+                              , Resumable (EnvironmentError Precise)
                               , Resumable (Unspecialized Val)
                               , Resumable (LoadError Precise)
                               , Trace
                               , Fresh
                               , State (Heap Precise Latest Val)
-                              , IO
+                              , Lift IO
                               ]
 type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
                              , AddressError Precise Val
+                             , ResolutionError
                              , EvalError
                              , EnvironmentError Precise
-                             , ResolutionError
                              , Unspecialized Val
                              , LoadError Precise
                              ]
-testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (Precise, Environment Precise))))
+testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
                -> IO
-                 ( ( Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
-                            (ModuleTable (NonEmpty (Module (Precise, Environment Precise))))
-                   , Heap Precise Latest Val
+                 ( [String]
+                 , ( Heap Precise Latest Val
+                   , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
+                            (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
                    )
-                 , [String]
                  )
 testEvaluating
   = runM
-  . fmap (\ ((res, traces), heap) -> ((res, heap), traces))
+  . fmap (\ (heap, (traces, res)) -> (traces, (heap, res)))
   . runState lowerBound
   . runFresh 0
   . runReturningTrace
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runResolutionError
   . runEnvironmentError
   . runEvalError
+  . runResolutionError
   . runAddressError
   . runValueError @_ @Precise @(UtilEff Precise)
 

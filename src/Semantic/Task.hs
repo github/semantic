@@ -1,8 +1,7 @@
-{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, GADTs, KindSignatures, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Task
 ( Task
 , TaskEff
-, WrappedTask(..)
 , Level(..)
 , RAlgebra
 -- * I/O
@@ -43,6 +42,7 @@ module Semantic.Task
 , Distribute
 , Eff
 , Exc
+, Lift
 , throwError
 , SomeException
 , Telemetry
@@ -82,19 +82,16 @@ import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type TaskEff = Eff '[Distribute WrappedTask
-                    , Task
+type TaskEff = Eff '[ Task
                     , Resolution
                     , IO.Files
                     , Reader Config
                     , Trace
                     , Telemetry
                     , Exc SomeException
-                    , IO]
-
--- | A wrapper for a 'Task', to embed in other effects.
-newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
-  deriving (Applicative, Functor, Monad)
+                    , Distribute
+                    , Lift IO
+                    ]
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -141,33 +138,43 @@ runTaskWithConfig :: Config -> LogQueue -> StatQueue -> TaskEff a -> IO (Either 
 runTaskWithConfig options logger statter task = do
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
-        run = runM . runError
-                   . runTelemetry logger statter
-                   . runTraceInTelemetry
-                   . runReader options
-                   . IO.runFiles
-                   . runResolution
-                   . runTaskF
-                   . runDistribute (run . unwrapTask)
+        run
+          = runM
+          . runDistribute
+          . runError
+          . runTelemetry logger statter
+          . runTraceInTelemetry
+          . runReader options
+          . IO.runFiles
+          . runResolution
+          . runTaskF
     run task
   queueStat statter stat
   pure result
 
-runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
+runTraceInTelemetry :: (Member Telemetry effects, Effects effects) => Eff (Trace ': effects) a -> Eff effects a
 runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 
 -- | An effect describing high-level tasks to be performed.
-data Task output where
-  Parse     :: Parser term -> Blob -> Task term
-  Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task result
-  Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
-  Render    :: Renderer input output -> input -> Task output
-  Serialize :: Format input -> input -> Task Builder
+data Task (m :: * -> *) output where
+  Parse     :: Parser term -> Blob -> Task m term
+  Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task m result
+  Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task m (Term f (Record (field ': fields)))
+  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task m (Diff syntax (Record fields1) (Record fields2))
+  Render    :: Renderer input output -> input -> Task m output
+  Serialize :: Format input -> input -> Task m Builder
+
+instance Effect Task where
+  handleState c dist (Request (Parse parser blob) k) = Request (Parse parser blob) (dist . (<$ c) . k)
+  handleState c dist (Request (Analyze run analysis) k) = Request (Analyze run analysis) (dist . (<$ c) . k)
+  handleState c dist (Request (Decorate decorator term) k) = Request (Decorate decorator term) (dist . (<$ c) . k)
+  handleState c dist (Request (Semantic.Task.Diff terms) k) = Request (Semantic.Task.Diff terms) (dist . (<$ c) . k)
+  handleState c dist (Request (Render renderer input) k) = Request (Render renderer input) (dist . (<$ c) . k)
+  handleState c dist (Request (Serialize format input) k) = Request (Serialize format input) (dist . (<$ c) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, Effects effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
@@ -188,7 +195,7 @@ data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Exc SomeException) effs, Member IO effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -214,7 +221,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Apply Functor syntaxes
                          , Element Syntax.Error syntaxes
                          , Member (Exc SomeException) effs
-                         , Member IO effs
+                         , Member (Lift IO) effs
                          , Member (Reader Config) effs
                          , Member Telemetry effs
                          , Member Trace effs

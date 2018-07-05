@@ -21,5 +21,5 @@ collectingTerms recur term = do
   v <$ TermEvaluator (gc (roots <> valueRoots v))
 
 
-providingLiveSet :: Effectful (m address value) => m address value (Reader (Live address) ': effects) a -> m address value effects a
+providingLiveSet :: (Effectful (m address value), Effects effects) => m address value (Reader (Live address) ': effects) a -> m address value effects a
 providingLiveSet = runReader lowerBound
