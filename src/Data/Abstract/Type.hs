@@ -130,7 +130,7 @@ occur :: ( Effectful m
       => TName
       -> Type
       -> m effects Bool
-occur id = \case
+occur id = prune >=> \case
   Int -> pure False
   Bool -> pure False
   String -> pure False
