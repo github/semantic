@@ -91,7 +91,7 @@ runTypeMap :: ( Effectful m
               )
            => m (State TypeMap ': effects) a
            -> m effects a
-runTypeMap = runState emptyTypeMap >=> pure . fst
+runTypeMap = runState emptyTypeMap >=> pure . snd
 
 runTypes :: ( Effectful m
             , Effects effects
