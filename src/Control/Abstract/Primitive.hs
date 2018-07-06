@@ -21,8 +21,8 @@ define :: ( HasCallStack
        -> Evaluator address value effects ()
 define name def = withCurrentCallStack callStack $ do
   addr <- alloc name
-  bind name addr
   def >>= assign addr
+  bind name addr
 
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
