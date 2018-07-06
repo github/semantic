@@ -7,11 +7,14 @@ module Language.Ruby.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (name)
-import Data.List (elem)
-import Data.Record
-import Data.Syntax
+import           Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
+import           Data.Abstract.Name (name)
+import           Data.List (elem)
+import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Record
+import           Data.Sum
+import           Data.Syntax
     ( contextualize
     , emptyTerm
     , handleError
@@ -23,9 +26,6 @@ import Data.Syntax
     , parseError
     , postContextualize
     )
-import Language.Ruby.Grammar as Grammar
-import qualified Assigning.Assignment as Assignment
-import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -34,9 +34,10 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
+import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
-import Prologue hiding (for)
-import Proto3.Suite (Named1(..), Named(..))
+import           Prologue hiding (for)
+import           Proto3.Suite (Named (..), Named1 (..))
 
 -- | The type of Ruby syntax.
 type Syntax = '[
@@ -275,7 +276,7 @@ module' :: Assignment Term
 module' = makeTerm <$> symbol Module <*> (withNewScope . children) (Ruby.Syntax.Module <$> expression <*> many expression)
 
 scopeResolution :: Assignment Term
-scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)
+scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> NonEmpty.some1 expression)
 
 parameter :: Assignment Term
 parameter = postContextualize comment (term uncontextualizedParameter)
