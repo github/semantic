@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package github.semantic;
+package github.semantic.typescript;
 
 import "types.proto";
 
@@ -18,10 +18,10 @@ message Alias {
 
 message ImportPath {
   string unPath = 1;
-  Relative pathIsRelative = 2;
+  IsRelative pathIsRelative = 2;
 }
 
-enum Relative {
+enum IsRelative {
   Unknown = 0;
   Relative = 1;
   NonRelative = 2;
