@@ -429,15 +429,17 @@ instance Evaluatable InstanceOf
 
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
-newtype ScopeResolution a = ScopeResolution { scopes :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+newtype ScopeResolution a = ScopeResolution { scopes :: NonEmpty a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
+instance Hashable1 ScopeResolution where liftHashWithSalt = foldl
 instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for ScopeResolution
-instance Evaluatable ScopeResolution
+instance Evaluatable ScopeResolution where
+  eval (ScopeResolution xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
+    where f ns = evaluateInScopedEnv (ns >>= deref)
 
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
