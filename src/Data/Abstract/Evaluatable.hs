@@ -142,7 +142,6 @@ class HasPrelude (language :: Language) where
 instance HasPrelude 'Go
 instance HasPrelude 'Haskell
 instance HasPrelude 'Java
-instance HasPrelude 'JavaScript
 instance HasPrelude 'PHP
 
 builtInPrint :: ( AbstractIntro value
@@ -170,6 +169,10 @@ instance HasPrelude 'Ruby where
 instance HasPrelude 'TypeScript
   -- FIXME: define console.log using __semantic_print
 
+instance HasPrelude 'JavaScript where
+  definePrelude _ = do
+    defineNamespace "console" $ do
+      define "log" (lambda builtInPrint)
 
 -- Effects
 
