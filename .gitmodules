@@ -10,9 +10,6 @@
 [submodule "vendor/freer-cofreer"]
 	path = vendor/freer-cofreer
 	url = https://github.com/robrix/freer-cofreer.git
-[submodule "vendor/grpc-haskell"]
-	path = vendor/grpc-haskell
-	url = https://github.com/joshvera/gRPC-haskell/
 [submodule "vendor/fastsum"]
 	path = vendor/fastsum
 	url = git@github.com:patrickt/fastsum.git
