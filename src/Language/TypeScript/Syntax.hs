@@ -18,18 +18,18 @@ import Proto3.Suite
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 
-data Relative = Unknown | Relative | NonRelative
+data IsRelative = Unknown | Relative | NonRelative
   deriving (Bounded, Enum, Finite, MessageField, Named, Eq, Generic, Hashable, Ord, Show, ToJSON)
 
-instance Primitive Relative where
+instance Primitive IsRelative where
   encodePrimitive = Encode.enum
   decodePrimitive = either (const def) id <$> Decode.enum
-  primType _ = Named (Single (nameOf (Proxy @Relative)))
+  primType _ = Named (Single (nameOf (Proxy @IsRelative)))
 
-instance HasDefault Relative where
+instance HasDefault IsRelative where
   def = Unknown
 
-data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
+data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
   deriving (Eq, Generic, Hashable, Message, Named, Ord, Show, ToJSON)
 
 instance MessageField ImportPath where
