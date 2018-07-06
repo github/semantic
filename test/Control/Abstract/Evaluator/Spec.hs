@@ -8,7 +8,7 @@ import Control.Abstract
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package
-import Data.Abstract.Value as Value
+import Data.Abstract.Value.Concrete as Value
 import Data.Algebra
 import Data.Bifunctor (first)
 import Data.Functor.Const
