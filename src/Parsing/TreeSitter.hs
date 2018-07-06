@@ -66,7 +66,7 @@ parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_p
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
 
-  trace "tree-sitter: beginning parsing"
+  trace $ "tree-sitter: beginning parsing " <> blobPath
 
   parsing <- liftIO . async $ runParser parser blobSource
 
@@ -74,10 +74,10 @@ parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_p
   res <- liftIO . timeout parserTimeout $ wait parsing
 
   case res of
-    Just Failed          -> Nothing  <$ trace "tree-sitter: parsing failed"
-    Just (Succeeded ast) -> Just ast <$ trace "tree-sitter: parsing succeeded"
+    Just Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
+    Just (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath)
     Nothing -> do
-      trace "tree-sitter: parsing timed out"
+      trace $ "tree-sitter: parsing timed out " <> blobPath
       Nothing <$ liftIO (TS.ts_parser_set_enabled parser (CBool 0))
 
 
