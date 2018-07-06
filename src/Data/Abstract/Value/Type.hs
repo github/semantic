@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances, LambdaCase #-}
-module Data.Abstract.Type
+module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
   , runTypes

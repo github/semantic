@@ -25,7 +25,7 @@ import Data.Abstract.Heap as X
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
-import Data.Abstract.Value (Value(..), ValueError, runValueError)
+import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.ByteString.Builder (toLazyByteString)
