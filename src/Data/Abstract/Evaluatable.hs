@@ -167,8 +167,10 @@ instance HasPrelude 'Ruby where
     defineClass "Object" [] $ do
       define "inspect" (lambda (const (box (string "<object>"))))
 
-instance HasPrelude 'TypeScript
-  -- FIXME: define console.log using __semantic_print
+instance HasPrelude 'TypeScript where
+  definePrelude _ =
+    defineNamespace "console" $ do
+      define "log" (lambda builtInPrint)
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
