@@ -144,7 +144,6 @@ library
                      , Paths_semantic
                      -- Rendering formats
                      , Rendering.Graph
-                     , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.Symbol
