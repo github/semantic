@@ -145,13 +145,13 @@ class HasPrelude (language :: Language) where
 instance HasPrelude 'Go
 instance HasPrelude 'Haskell
 instance HasPrelude 'Java
-instance HasPrelude 'JavaScript
 instance HasPrelude 'PHP
 
 builtInPrint :: ( AbstractIntro value
                 , AbstractFunction address value effects
                 , Member (Resumable (EnvironmentError address)) effects
-                , Member (Env address) effects, Member (Allocator address value) effects)
+                , Member (Env address) effects
+                , Member (Allocator address value) effects)
              => Name
              -> Evaluator address value effects address
 builtInPrint v = do
@@ -170,9 +170,15 @@ instance HasPrelude 'Ruby where
     defineClass "Object" [] $ do
       define "inspect" (lambda (const (box (string "<object>"))))
 
-instance HasPrelude 'TypeScript
-  -- FIXME: define console.log using __semantic_print
+instance HasPrelude 'TypeScript where
+  definePrelude _ =
+    defineNamespace "console" $ do
+      define "log" (lambda builtInPrint)
 
+instance HasPrelude 'JavaScript where
+  definePrelude _ = do
+    defineNamespace "console" $ do
+      define "log" (lambda builtInPrint)
 
 -- Effects
 
