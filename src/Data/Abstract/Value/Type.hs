@@ -120,6 +120,7 @@ modifyTypeMap :: ( Effectful m
               -> m effects ()
 modifyTypeMap f = modify (TypeMap . f . unTypeMap)
 
+-- | Prunes substituted type variables
 prune :: ( Effectful m
          , Monad (m effects)
          , Member (State TypeMap) effects
@@ -134,6 +135,8 @@ prune (Var id) = Map.lookup id . unTypeMap <$> get >>= \case
                     Nothing -> pure (Var id)
 prune ty = pure ty
 
+-- | Checks whether a type variable name occurs within another type. This
+--   function is used in 'substitute' to prevent unification of infinite types
 occur :: ( Effectful m
          , Monad (m effects)
          , Member (State TypeMap) effects
@@ -163,6 +166,7 @@ occur id = prune >=> \case
     eitherM :: Applicative m => (a -> m Bool) -> (a, a) -> m Bool
     eitherM f (a, b) = (||) <$> f a <*> f b
 
+-- | Substitutes a type variable name for another type
 substitute :: ( Effectful m
               , Monad (m effects)
               , Member (Resumable TypeError) effects
