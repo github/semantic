@@ -65,8 +65,9 @@ library
                      , Data.Abstract.Package
                      , Data.Abstract.Path
                      , Data.Abstract.Ref
-                     , Data.Abstract.Type
-                     , Data.Abstract.Value
+                     , Data.Abstract.Value.Abstract
+                     , Data.Abstract.Value.Concrete
+                     , Data.Abstract.Value.Type
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.AST
