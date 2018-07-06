@@ -123,10 +123,10 @@ instance ( Coercible body (Eff effects)
     product <- foldl mergeEnvs lowerBound . catMaybes <$> traverse scopedEnvironment supers
     pure $ Class n (mergeEnvs product env)
 
-  namespace n env = do
-    maybeAddr <- lookupEnv n
+  namespace name env = do
+    maybeAddr <- lookupEnv name
     env' <- maybe (pure lowerBound) (asNamespaceEnv <=< deref) maybeAddr
-    pure (Namespace n (Env.mergeNewer env' env))
+    pure (Namespace name (Env.mergeNewer env' env))
     where asNamespaceEnv v
             | Namespace _ env' <- v = pure env'
             | otherwise             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
