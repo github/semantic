@@ -43,7 +43,7 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
 
-runGraph :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs, Effects effs)
          => GraphType
          -> Bool
          -> Project
@@ -60,10 +60,8 @@ runGraph CallGraph includePackages project
         analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
         extractGraph (_, (_, (graph, _))) = simplify graph
         runGraphAnalysis
-          = run
-          . runState lowerBound
+          = runState lowerBound
           . runFresh 0
-          . runIgnoringTrace
           . resumingLoadError
           . resumingUnspecialized
           . resumingEnvironmentError
@@ -71,47 +69,48 @@ runGraph CallGraph includePackages project
           . resumingResolutionError
           . resumingAddressError
           . resumingValueError
-          . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _))
+          . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _ effs))
           . graphing
           . runReader (packageInfo package)
           . runReader lowerBound
           . runReader lowerBound
           . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-    extractGraph <$> analyze runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules))
+    extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules)))
 
 -- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
-newtype GraphEff address a = GraphEff
-  { runGraphEff :: Eff '[ Exc (LoopControl address)
-                        , Exc (Return address)
-                        , Env address
-                        , Allocator address (Value address (GraphEff address))
-                        , Reader ModuleInfo
-                        , Modules address
-                        , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
-                        , Reader Span
-                        , Reader PackageInfo
-                        , State (Graph Vertex)
-                        , Resumable (ValueError address (GraphEff address))
-                        , Resumable (AddressError address (Value address (GraphEff address)))
-                        , Resumable ResolutionError
-                        , Resumable EvalError
-                        , Resumable (EnvironmentError address)
-                        , Resumable (Unspecialized (Value address (GraphEff address)))
-                        , Resumable (LoadError address)
-                        , Trace
-                        , Fresh
-                        , State (Heap address Latest (Value address (GraphEff address)))
-                        ] a
+newtype GraphEff address outerEffects a = GraphEff
+  { runGraphEff :: Eff (  Exc (LoopControl address)
+                       ': Exc (Return address)
+                       ': Env address
+                       ': Allocator address (Value address (GraphEff address outerEffects))
+                       ': Reader ModuleInfo
+                       ': Modules address
+                       ': Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                       ': Reader Span
+                       ': Reader PackageInfo
+                       ': State (Graph Vertex)
+                       ': Resumable (ValueError address (GraphEff address outerEffects))
+                       ': Resumable (AddressError address (Value address (GraphEff address outerEffects)))
+                       ': Resumable ResolutionError
+                       ': Resumable EvalError
+                       ': Resumable (EnvironmentError address)
+                       ': Resumable (Unspecialized (Value address (GraphEff address outerEffects)))
+                       ': Resumable (LoadError address)
+                       ': Fresh
+                       ': State (Heap address Latest (Value address (GraphEff address outerEffects)))
+                       ': outerEffects
+                       ) a
   }
 
 
-runImportGraph :: ( Declarations term
+runImportGraph :: forall effs lang term.
+                  ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
-                  , Member Task effs
                   , Member Trace effs
                   , Recursive term
+                  , Effects effs
                   )
                => Proxy lang
                -> Package term
@@ -125,10 +124,8 @@ runImportGraph lang (package :: Package term)
         info <- graph
         maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
       runImportGraphAnalysis
-        = run
-        . runState lowerBound
+        = runState lowerBound
         . runFresh 0
-        . runIgnoringTrace
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -139,33 +136,33 @@ runImportGraph lang (package :: Package term)
         . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise)))
+        . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> analyze runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd))
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
-newtype ImportGraphEff term address a = ImportGraphEff
-  { runImportGraphEff :: Eff '[ Exc (LoopControl address)
-                              , Exc (Return address)
-                              , Env address
-                              , Allocator address (Value address (ImportGraphEff term address))
-                              , Reader ModuleInfo
-                              , Reader Span
-                              , Reader PackageInfo
-                              , Modules address
-                              , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
-                              , State (Graph ModuleInfo)
-                              , Resumable (ValueError address (ImportGraphEff term address))
-                              , Resumable (AddressError address (Value address (ImportGraphEff term address)))
-                              , Resumable ResolutionError
-                              , Resumable EvalError
-                              , Resumable (EnvironmentError address)
-                              , Resumable (Unspecialized (Value address (ImportGraphEff term address)))
-                              , Resumable (LoadError address)
-                              , Trace
-                              , Fresh
-                              , State (Heap address Latest (Value address (ImportGraphEff term address)))
-                              ] a
+newtype ImportGraphEff term address outerEffects a = ImportGraphEff
+  { runImportGraphEff :: Eff (  Exc (LoopControl address)
+                             ': Exc (Return address)
+                             ': Env address
+                             ': Allocator address (Value address (ImportGraphEff term address outerEffects))
+                             ': Reader ModuleInfo
+                             ': Reader Span
+                             ': Reader PackageInfo
+                             ': Modules address
+                             ': Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                             ': State (Graph ModuleInfo)
+                             ': Resumable (ValueError address (ImportGraphEff term address outerEffects))
+                             ': Resumable (AddressError address (Value address (ImportGraphEff term address outerEffects)))
+                             ': Resumable ResolutionError
+                             ': Resumable EvalError
+                             ': Resumable (EnvironmentError address)
+                             ': Resumable (Unspecialized (Value address (ImportGraphEff term address outerEffects)))
+                             ': Resumable (LoadError address)
+                             ': Fresh
+                             ': State (Heap address Latest (Value address (ImportGraphEff term address outerEffects)))
+                             ': outerEffects
+                             ) a
   }
 
 
