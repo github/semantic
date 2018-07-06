@@ -1,15 +1,17 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Data.Abstract.Type
+{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances, LambdaCase #-}
+module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
-  , runTypeError
-  , runTypeErrorWith
+  , runTypes
+  , runTypesWith
   , unify
   ) where
 
-import Control.Abstract
+import Control.Abstract hiding (raiseHandler)
+import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
+import qualified Data.Map as Map
 import Prologue hiding (TypeError)
 
 type TName = Int
@@ -59,15 +61,24 @@ zeroOrMoreProduct = maybe Unit oneOrMoreProduct . nonEmpty
 -- | Errors representing failures in typechecking. Note that we should in general constrain allowable types by 'unify'ing, and thus throwing 'UnificationError's when constraints aren’t met, in order to allow uniform resumption with one or the other parameter type.
 data TypeError resume where
   UnificationError :: Type -> Type -> TypeError Type
+  InfiniteType :: Type -> Type -> TypeError Type
 
 deriving instance Eq   (TypeError resume)
 deriving instance Ord  (TypeError resume)
 deriving instance Show (TypeError resume)
 
-instance Eq1   TypeError where liftEq      _ (UnificationError a1 b1) (UnificationError a2 b2) = a1 == a2 && b1 == b2
-instance Ord1  TypeError where liftCompare _ (UnificationError a1 b1) (UnificationError a2 b2) = compare a1 a2 <> compare b1 b2
-instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
+instance Eq1   TypeError where
+  liftEq      _ (UnificationError a1 b1) (UnificationError a2 b2) = a1 == a2 && b1 == b2
+  liftEq      _ (InfiniteType a1 b1) (InfiniteType a2 b2) = a1 == a2 && b1 == b2
+  liftEq      _ _ _ = False
 
+instance Ord1  TypeError where
+  liftCompare _ (UnificationError a1 b1) (UnificationError a2 b2) = compare a1 a2 <> compare b1 b2
+  liftCompare _ (InfiniteType a1 b1) (InfiniteType a2 b2) = compare a1 a2 <> compare b1 b2
+  liftCompare _ (InfiniteType _ _) (UnificationError _ _) = LT
+  liftCompare _ (UnificationError _ _) (InfiniteType _ _) = GT
+
+instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
 runTypeError :: (Effectful m, Effects effects) => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
 runTypeError = runResumable
@@ -75,23 +86,128 @@ runTypeError = runResumable
 runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
 runTypeErrorWith = runResumableWith
 
+runTypeMap :: ( Effectful m
+              , Effects effects
+              )
+           => m (State TypeMap ': effects) a
+           -> m effects a
+runTypeMap = raiseHandler (runState emptyTypeMap >=> pure . snd)
+
+runTypes :: ( Effectful m
+            , Effects effects
+            )
+         => m (Resumable TypeError ': State TypeMap ': effects) a
+         -> m effects (Either (SomeExc TypeError) a)
+runTypes = runTypeMap . runTypeError
+
+runTypesWith :: ( Effectful m
+                , Effects effects
+                )
+             => (forall resume . TypeError resume -> m (State TypeMap ': effects) resume)
+             -> m (Resumable TypeError ': State TypeMap ': effects) a
+             -> m effects a
+runTypesWith with = runTypeMap . runTypeErrorWith with
+
+newtype TypeMap = TypeMap { unTypeMap :: Map.Map TName Type }
+
+emptyTypeMap :: TypeMap
+emptyTypeMap = TypeMap Map.empty
+
+modifyTypeMap :: ( Effectful m
+                 , Member (State TypeMap) effects
+                 )
+              => (Map.Map TName Type -> Map.Map TName Type)
+              -> m effects ()
+modifyTypeMap f = modify (TypeMap . f . unTypeMap)
+
+-- | Prunes substituted type variables
+prune :: ( Effectful m
+         , Monad (m effects)
+         , Member (State TypeMap) effects
+         )
+      => Type
+      -> m effects Type
+prune (Var id) = Map.lookup id . unTypeMap <$> get >>= \case
+                    Just ty -> do
+                      pruned <- prune ty
+                      modifyTypeMap (Map.insert id pruned)
+                      pure pruned
+                    Nothing -> pure (Var id)
+prune ty = pure ty
+
+-- | Checks whether a type variable name occurs within another type. This
+--   function is used in 'substitute' to prevent unification of infinite types
+occur :: ( Effectful m
+         , Monad (m effects)
+         , Member (State TypeMap) effects
+         )
+      => TName
+      -> Type
+      -> m effects Bool
+occur id = prune >=> \case
+  Int -> pure False
+  Bool -> pure False
+  String -> pure False
+  Symbol -> pure False
+  Unit -> pure False
+  Float -> pure False
+  Rational -> pure False
+  Void -> pure False
+  Object -> pure False
+  Null -> pure False
+  Hole -> pure False
+  a :-> b -> eitherM (occur id) (a, b)
+  a :* b -> eitherM (occur id) (a, b)
+  a :+ b -> eitherM (occur id) (a, b)
+  Array ty -> occur id ty
+  Hash kvs -> or <$> traverse (eitherM (occur id)) kvs
+  Var vid -> pure (vid == id)
+  where
+    eitherM :: Applicative m => (a -> m Bool) -> (a, a) -> m Bool
+    eitherM f (a, b) = (||) <$> f a <*> f b
+
+-- | Substitutes a type variable name for another type
+substitute :: ( Effectful m
+              , Monad (m effects)
+              , Member (Resumable TypeError) effects
+              , Member (State TypeMap) effects
+              )
+           => TName
+           -> Type
+           -> m effects Type
+substitute id ty = do
+  infiniteType <- occur id ty
+  ty <- if infiniteType
+    then throwResumable (InfiniteType (Var id) ty)
+    else pure ty
+  modifyTypeMap (Map.insert id ty)
+  pure ty
 
 -- | Unify two 'Type's.
-unify :: (Effectful m, Applicative (m effects), Member (Resumable TypeError) effects) => Type -> Type -> m effects Type
-unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
-unify a Null = pure a
-unify Null b = pure b
--- FIXME: this should be constructing a substitution.
-unify (Var _) b = pure b
-unify a (Var _) = pure a
-unify (Array t1) (Array t2) = Array <$> unify t1 t2
--- FIXME: unifying with sums should distribute nondeterministically.
--- FIXME: ordering shouldn’t be significant for undiscriminated sums.
-unify (a1 :+ b1) (a2 :+ b2) = (:+) <$> unify a1 a2 <*> unify b1 b2
-unify (a1 :* b1) (a2 :* b2) = (:*) <$> unify a1 a2 <*> unify b1 b2
-unify t1 t2
-  | t1 == t2  = pure t2
-  | otherwise = throwResumable (UnificationError t1 t2)
+unify :: ( Effectful m
+         , Monad (m effects)
+         , Member (Resumable TypeError) effects
+         , Member (State TypeMap) effects
+         )
+      => Type
+      -> Type
+      -> m effects Type
+unify a b = do
+  a' <- prune a
+  b' <- prune b
+  case (a', b') of
+    (a1 :-> b1, a2 :-> b2) -> (:->) <$> unify a1 a2 <*> unify b1 b2
+    (a, Null) -> pure a
+    (Null, b) -> pure b
+    (Var id, ty) -> substitute id ty
+    (ty, Var id) -> substitute id ty
+    (Array t1, Array t2) -> Array <$> unify t1 t2
+    -- FIXME: unifying with sums should distribute nondeterministically.
+    -- FIXME: ordering shouldn’t be significant for undiscriminated sums.
+    (a1 :+ b1, a2 :+ b2) -> (:+) <$> unify a1 a2 <*> unify b1 b2
+    (a1 :* b1, a2 :* b2) -> (:*) <$> unify a1 a2 <*> unify b1 b2
+    (t1, t2) | t1 == t2 -> pure t2
+    _ -> throwResumable (UnificationError a b)
 
 instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
@@ -116,9 +232,10 @@ instance AbstractIntro Type where
 
 instance ( Member (Allocator address Type) effects
          , Member (Env address) effects
+         , Member (Exc (Return address)) effects
          , Member Fresh effects
          , Member (Resumable TypeError) effects
-         , Member (Exc (Return address)) effects
+         , Member (State TypeMap) effects
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
@@ -142,10 +259,11 @@ instance ( Member (Allocator address Type) effects
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address Type) effects
          , Member (Env address) effects
+         , Member (Exc (Return address)) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
-         , Member (Exc (Return address)) effects
+         , Member (State TypeMap) effects
          )
       => AbstractValue address Type effects where
   array fields = do

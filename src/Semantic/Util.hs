@@ -10,11 +10,11 @@ import           Control.Abstract
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Value
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
-import           Data.Abstract.Type
+import           Data.Abstract.Value.Concrete
+import           Data.Abstract.Value.Type
 import           Data.Blob
 import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
@@ -87,7 +87,7 @@ checking
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTypeError
+  . runTypes
 
 evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go
 evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby
