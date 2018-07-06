@@ -147,7 +147,8 @@ instance HasPrelude 'PHP
 builtInPrint :: ( AbstractIntro value
                 , AbstractFunction address value effects
                 , Member (Resumable (EnvironmentError address)) effects
-                , Member (Env address) effects, Member (Allocator address value) effects)
+                , Member (Env address) effects
+                , Member (Allocator address value) effects)
              => Name
              -> Evaluator address value effects address
 builtInPrint v = do
