@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package github.semantic;
+package github.semantic.ruby;
 
 import "types.proto";
 
