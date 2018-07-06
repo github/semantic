@@ -2,9 +2,9 @@ module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import Data.Abstract.Value as Value
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Number as Number
+import Data.Abstract.Value.Concrete as Value
 import Data.AST
 import Control.Monad.Effect (SomeExc(..))
 import Data.List.NonEmpty (NonEmpty(..))
