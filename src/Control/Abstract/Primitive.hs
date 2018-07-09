@@ -35,11 +35,9 @@ defineClass :: ( AbstractValue address value effects
             -> [address]
             -> Evaluator address value effects a
             -> Evaluator address value effects ()
-defineClass name superclasses scope = define name $ do
-  env <- locally $ do
-    void scope
-    Env.newEnv . Env.head <$> getEnv
-  klass name superclasses env
+defineClass name superclasses body = define name $ do
+  binds <- Env.head <$> locally (body >> getEnv)
+  klass name superclasses binds
 
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
