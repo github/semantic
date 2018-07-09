@@ -33,14 +33,37 @@ type Syntax =
    , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
-   , Expression.Arithmetic
+   , Expression.Plus
+   , Expression.Minus
+   , Expression.Times
+   , Expression.DividedBy
+   , Expression.Modulo
+   , Expression.Power
+   , Expression.Negate
+   , Expression.FloorDivision
    , Expression.Call
+   , Expression.LessThan
+   , Expression.LessThanEqual
+   , Expression.GreaterThan
+   , Expression.GreaterThanEqual
+   , Expression.Equal
+   , Expression.StrictEqual
    , Expression.Comparison
-   , Expression.Bitwise
-   , Expression.Boolean
+   , Expression.BOr
+   , Expression.BXOr
+   , Expression.BAnd
+   , Expression.LShift
+   , Expression.RShift
+   , Expression.UnsignedRShift
+   , Expression.Complement
+   , Expression.And
+   , Expression.Not
+   , Expression.Or
+   , Expression.XOr
    , Expression.InstanceOf
    , Expression.MemberAccess
    , Expression.Subscript
+   , Expression.Member
    , Expression.Super
    , Expression.This
    , Java.Syntax.Annotation

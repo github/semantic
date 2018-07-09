@@ -10,11 +10,11 @@ import           Control.Abstract
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Value
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
-import           Data.Abstract.Type
+import           Data.Abstract.Value.Concrete
+import           Data.Abstract.Value.Type
 import           Data.Blob
 import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
@@ -42,33 +42,33 @@ justEvaluating
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runResolutionError
   . runEnvironmentError
   . runEvalError
+  . runResolutionError
   . runAddressError
   . runValueError
 
 newtype UtilEff address a = UtilEff
-  { runUtilEff :: Eff '[ LoopControl address
-                       , Return address
+  { runUtilEff :: Eff '[ Exc (LoopControl address)
+                       , Exc (Return address)
                        , Env address
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo
                        , Modules address
-                       , State (ModuleTable (NonEmpty (Module (address, Environment address))))
+                       , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (ValueError address (UtilEff address))
                        , Resumable (AddressError address (Value address (UtilEff address)))
+                       , Resumable ResolutionError
                        , Resumable EvalError
                        , Resumable (EnvironmentError address)
-                       , Resumable ResolutionError
                        , Resumable (Unspecialized (Value address (UtilEff address)))
                        , Resumable (LoadError address)
                        , Trace
                        , Fresh
                        , State (Heap address Latest (Value address (UtilEff address)))
-                       , IO
+                       , Lift IO
                        ] a
   }
 
@@ -87,7 +87,7 @@ checking
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTypeError
+  . runTypes
 
 evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go
 evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby
@@ -107,11 +107,9 @@ evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
-       -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-       (fmap fst
-       (runState (lowerBound @(ModuleTable (NonEmpty (Module (Precise, Environment Precise)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules)))))))
+       (evaluate proxy id withTermSpans modules))))))
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
@@ -119,11 +117,9 @@ evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOpti
   modules <- topologicalSort <$> runImportGraph proxy package
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)
-       -- FIXME: This should really be a Reader effect but for https://github.com/joshvera/effects/issues/47
-       (fmap fst
-       (runState (lowerBound @(ModuleTable (NonEmpty (Module (Monovariant, Environment Monovariant)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Monovariant, Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules))))))
+       (evaluate proxy id withTermSpans modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term

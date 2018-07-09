@@ -58,7 +58,7 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Member IO effects, Member Trace effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
+parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Trace effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
 parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   let parserTimeout = s * 1000
 
@@ -66,7 +66,7 @@ parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_p
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
 
-  trace "tree-sitter: beginning parsing"
+  trace $ "tree-sitter: beginning parsing " <> blobPath
 
   parsing <- liftIO . async $ runParser parser blobSource
 
@@ -74,10 +74,10 @@ parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_p
   res <- liftIO . timeout parserTimeout $ wait parsing
 
   case res of
-    Just Failed          -> Nothing  <$ trace "tree-sitter: parsing failed"
-    Just (Succeeded ast) -> Just ast <$ trace "tree-sitter: parsing succeeded"
+    Just Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
+    Just (Succeeded ast) -> Just ast <$ trace ("tree-sitter: parsing succeeded " <> blobPath)
     Nothing -> do
-      trace "tree-sitter: parsing timed out"
+      trace $ "tree-sitter: parsing timed out " <> blobPath
       Nothing <$ liftIO (TS.ts_parser_set_enabled parser (CBool 0))
 
 

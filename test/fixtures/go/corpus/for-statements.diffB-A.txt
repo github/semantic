@@ -92,28 +92,31 @@
           {+(Identifier)+}
           {+(Identifier)+})+}
         {+(Empty)+})+})+}
-      (For
-        (Empty)
-      { (Empty)
-      ->(LessThan
+    {+(For
+      {+(Empty)+}
+      {+(LessThan
         {+(Integer)+}
-        {+(Integer)+}) }
-        (Empty)
-      { (Statements
+        {+(Integer)+})+}
+      {+(Empty)+}
+      {+(Call
+        {+(Identifier)+}
+        {+(Statements)+}
+        {+(Empty)+})+})+}
+    {+(ForEach
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Statements)+})+}
+    {-(For
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Statements
         {-(Call
           {-(Identifier)-}
           {-(Statements)-}
           {-(Empty)-})-}
         {-(Continue
-          {-(Identifier)-})-})
-      ->(Call
-        {+(Identifier)+}
-        {+(Statements)+}
-        {+(Empty)+}) })
-    {+(ForEach
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Statements)+})+}
+          {-(Identifier)-})-})-})-}
     {-(For
       {-(LessThan
         {-(Identifier)-}

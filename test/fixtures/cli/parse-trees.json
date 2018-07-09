@@ -1,229 +1,191 @@
 {
-  "trees": [
-  {
-    "tree":
-    {
+  "trees": [{
+    "tree": {
       "term": "Statements",
-      "children": [
-      {
-        "term": "LowAnd",
-        "children": [
-        {
+      "statements": [{
+        "term": "LowPrecedenceAnd",
+        "lhs": {
           "term": "Send",
           "sendArgs": [],
           "sendBlock": null,
           "sendReceiver": null,
-          "sendSelector":
-          {
+          "sendSelector": {
             "term": "Identifier",
             "name": "foo",
             "sourceRange": [0, 3],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [1, 1],
               "end": [1, 4]
             }
           },
           "sourceRange": [0, 3],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [1, 1],
             "end": [1, 4]
           }
         },
-        {
+        "rhs": {
           "term": "Send",
           "sendArgs": [],
           "sendBlock": null,
           "sendReceiver": null,
-          "sendSelector":
-          {
+          "sendSelector": {
             "term": "Identifier",
             "name": "bar",
             "sourceRange": [8, 11],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [1, 9],
               "end": [1, 12]
             }
           },
           "sourceRange": [8, 11],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [1, 9],
             "end": [1, 12]
           }
-        }],
+        },
         "sourceRange": [0, 11],
-        "sourceSpan":
-        {
+        "sourceSpan": {
           "start": [1, 1],
           "end": [1, 12]
         }
       }],
       "sourceRange": [0, 12],
-      "sourceSpan":
-      {
+      "sourceSpan": {
         "start": [1, 1],
         "end": [2, 1]
       }
     },
     "path": "test/fixtures/ruby/corpus/and-or.A.rb",
     "language": "Ruby"
-  },
-  {
-    "tree":
-    {
+  }, {
+    "tree": {
       "term": "Statements",
-      "children": [
-      {
-        "term": "LowOr",
-        "children": [
-        {
+      "statements": [{
+        "term": "LowPrecedenceOr",
+        "lhs": {
           "term": "Send",
           "sendArgs": [],
           "sendBlock": null,
           "sendReceiver": null,
-          "sendSelector":
-          {
+          "sendSelector": {
             "term": "Identifier",
             "name": "foo",
             "sourceRange": [0, 3],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [1, 1],
               "end": [1, 4]
             }
           },
           "sourceRange": [0, 3],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [1, 1],
             "end": [1, 4]
           }
         },
-        {
+        "rhs": {
           "term": "Send",
           "sendArgs": [],
           "sendBlock": null,
           "sendReceiver": null,
-          "sendSelector":
-          {
+          "sendSelector": {
             "term": "Identifier",
             "name": "bar",
             "sourceRange": [7, 10],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [1, 8],
               "end": [1, 11]
             }
           },
           "sourceRange": [7, 10],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [1, 8],
             "end": [1, 11]
           }
-        }],
+        },
         "sourceRange": [0, 10],
-        "sourceSpan":
-        {
+        "sourceSpan": {
           "start": [1, 1],
           "end": [1, 11]
         }
-      },
-      {
-        "term": "LowAnd",
-        "children": [
-        {
-          "term": "LowOr",
-          "children": [
-          {
+      }, {
+        "term": "LowPrecedenceAnd",
+        "lhs": {
+          "term": "LowPrecedenceOr",
+          "lhs": {
             "term": "Send",
             "sendArgs": [],
             "sendBlock": null,
             "sendReceiver": null,
-            "sendSelector":
-            {
+            "sendSelector": {
               "term": "Identifier",
               "name": "a",
               "sourceRange": [11, 12],
-              "sourceSpan":
-              {
+              "sourceSpan": {
                 "start": [2, 1],
                 "end": [2, 2]
               }
             },
             "sourceRange": [11, 12],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [2, 1],
               "end": [2, 2]
             }
           },
-          {
+          "rhs": {
             "term": "Send",
             "sendArgs": [],
             "sendBlock": null,
             "sendReceiver": null,
-            "sendSelector":
-            {
+            "sendSelector": {
               "term": "Identifier",
               "name": "b",
               "sourceRange": [16, 17],
-              "sourceSpan":
-              {
+              "sourceSpan": {
                 "start": [2, 6],
                 "end": [2, 7]
               }
             },
             "sourceRange": [16, 17],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [2, 6],
               "end": [2, 7]
             }
-          }],
+          },
           "sourceRange": [11, 17],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [2, 1],
             "end": [2, 7]
           }
         },
-        {
+        "rhs": {
           "term": "Send",
           "sendArgs": [],
           "sendBlock": null,
           "sendReceiver": null,
-          "sendSelector":
-          {
+          "sendSelector": {
             "term": "Identifier",
             "name": "c",
             "sourceRange": [22, 23],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [2, 12],
               "end": [2, 13]
             }
           },
           "sourceRange": [22, 23],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [2, 12],
             "end": [2, 13]
           }
-        }],
+        },
         "sourceRange": [11, 23],
-        "sourceSpan":
-        {
+        "sourceSpan": {
           "start": [2, 1],
           "end": [2, 13]
         }
       }],
       "sourceRange": [0, 24],
-      "sourceSpan":
-      {
+      "sourceSpan": {
         "start": [1, 1],
         "end": [3, 1]
       }

@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.TypeScript.Assignment
 ( assignment
 , Syntax
@@ -34,6 +35,7 @@ import qualified Data.Term as Term
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import Prologue
+import Proto3.Suite (Named1(..), Named(..))
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -47,11 +49,33 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
-  , Expression.Arithmetic
-  , Expression.Bitwise
-  , Expression.Boolean
+  , Expression.Plus
+  , Expression.Minus
+  , Expression.Times
+  , Expression.DividedBy
+  , Expression.Modulo
+  , Expression.Power
+  , Expression.Negate
+  , Expression.FloorDivision
+  , Expression.BAnd
+  , Expression.BOr
+  , Expression.BXOr
+  , Expression.LShift
+  , Expression.RShift
+  , Expression.UnsignedRShift
+  , Expression.Complement
+  , Expression.And
+  , Expression.Not
+  , Expression.Or
+  , Expression.XOr
   , Expression.Call
   , Expression.Cast
+  , Expression.LessThan
+  , Expression.LessThanEqual
+  , Expression.GreaterThan
+  , Expression.GreaterThanEqual
+  , Expression.Equal
+  , Expression.StrictEqual
   , Expression.Comparison
   , Expression.Enumeration
   , Expression.MemberAccess
@@ -59,6 +83,7 @@ type Syntax = '[
   , Expression.ScopeResolution
   , Expression.SequenceExpression
   , Expression.Subscript
+  , Expression.Member
   , Expression.Delete
   , Expression.Void
   , Expression.Typeof
@@ -142,7 +167,6 @@ type Syntax = '[
   , TypeScript.Syntax.Undefined
   , TypeScript.Syntax.ClassHeritage
   , TypeScript.Syntax.AbstractClass
-  , TypeScript.Syntax.ExtendsClause
   , TypeScript.Syntax.ImplementsClause
   , TypeScript.Syntax.JsxElement
   , TypeScript.Syntax.JsxSelfClosingElement
@@ -183,6 +207,12 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "TypeScriptSyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "TypeScriptTerm"
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment Term
@@ -671,7 +701,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
         <|> (pure <$> defaultImport))
 
     makeImportTerm1 loc from (Just alias, _) = makeTerm loc (TypeScript.Syntax.QualifiedAliasedImport alias from)
-    makeImportTerm1 loc from (Nothing, symbols) = makeTerm loc (TypeScript.Syntax.Import symbols from)
+    makeImportTerm1 loc from (Nothing, symbols) = makeTerm loc (TypeScript.Syntax.Import (uncurry TypeScript.Syntax.Alias <$> symbols) from)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
@@ -732,8 +762,8 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
                  <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)
-    makeNameAliasPair from (Just alias) = (from, alias)
-    makeNameAliasPair from Nothing = (from, from)
+    makeNameAliasPair from (Just alias) = TypeScript.Syntax.Alias from alias
+    makeNameAliasPair from Nothing = TypeScript.Syntax.Alias from from
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
     fromClause = symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source)

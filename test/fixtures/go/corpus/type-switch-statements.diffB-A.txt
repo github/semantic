@@ -61,12 +61,12 @@
               (Statements
               { (TextElement)
               ->(TextElement) }
-              { (DividedBy
-                {-(Integer)-}
-                {-(Identifier)-})
-              ->(Times
+              {+(Times
                 {+(Identifier)+}
-                {+(Integer)+}) })
+                {+(Integer)+})+}
+              {-(DividedBy
+                {-(Integer)-}
+                {-(Identifier)-})-})
               (Empty)))
           (Pattern
           { (Identifier)
@@ -77,12 +77,12 @@
               (Statements
               { (TextElement)
               ->(TextElement) }
-              { (Times
-                {-(Identifier)-}
-                {-(Integer)-})
-              ->(DividedBy
+              {+(DividedBy
                 {+(Integer)+}
-                {+(Identifier)+}) })
+                {+(Identifier)+})+}
+              {-(Times
+                {-(Identifier)-}
+                {-(Integer)-})-})
               (Empty)))
           (Pattern
             (Identifier)

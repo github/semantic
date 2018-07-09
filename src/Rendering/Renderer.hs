@@ -10,8 +10,6 @@ module Rendering.Renderer
 , renderToCTerm
 , renderSymbolTerms
 , renderToSymbols
-, ImportSummary(..)
-, renderToImports
 , renderTreeGraph
 , Summaries(..)
 , TOCSummary(..)
@@ -23,7 +21,6 @@ module Rendering.Renderer
 import Data.ByteString.Builder
 import Data.Graph
 import Rendering.Graph as R
-import Rendering.Imports as R
 import Rendering.JSON as R
 import Rendering.Symbol as R
 import Rendering.TOC as R

@@ -204,15 +204,15 @@ arithmeticSequence = symbol ArithmeticSequence *> children (  enumFrom
                                                           <|> enumFromThenTo)
   where
     enumFrom = makeTerm <$> symbol EnumFrom <*> children (Syntax.ArithmeticSequence <$> expression <*> pure Nothing <*> pure Nothing)
-    enumFromThen = makeTerm <$> symbol EnumFromThen <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> pure Nothing)
-    enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> pure Nothing)
-    enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.ArithmeticSequence <$> expression <*> (fmap Just expression) <*> (fmap Just expression))
+    enumFromThen = makeTerm <$> symbol EnumFromThen <*> children (Syntax.ArithmeticSequence <$> expression <*> fmap Just expression <*> pure Nothing)
+    enumFromTo = makeTerm <$> symbol EnumFromTo <*> children (Syntax.ArithmeticSequence <$> expression <*> fmap Just expression <*> pure Nothing)
+    enumFromThenTo = makeTerm <$> symbol EnumFromThenTo <*> children (Syntax.ArithmeticSequence <$> expression <*> fmap Just expression <*> fmap Just expression)
 
 asPattern :: Assignment Term
 asPattern = makeTerm <$> symbol AsPattern <*> children (Syntax.AsPattern <$> expression <*> expression)
 
 bindPattern :: Assignment Term
-bindPattern = makeTerm <$> symbol BindPattern <*> children (Syntax.BindPattern <$> (manyTermsTill expression (symbol AnonLAngleMinus)) <*> expression)
+bindPattern = makeTerm <$> symbol BindPattern <*> children (Syntax.BindPattern <$> manyTermsTill expression (symbol AnonLAngleMinus) <*> expression)
 
 case' :: Assignment Term
 case' = makeTerm <$> symbol CaseExpression <*> children (Statement.Match <$> expression <*> expressions)
@@ -234,7 +234,7 @@ conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (
 
 constructor :: Assignment Term
 constructor =  (makeTerm <$> symbol DataConstructor <*> children (Declaration.Constructor <$> manyTerm (context' <|> scopedTypeVariables) <*> typeConstructor <*> typeParameters))
-           <|> term (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> manyTerm (context' <|> scopedTypeVariables)  <*> constructorIdentifier <*> (term fields)))
+           <|> term (makeTerm <$> symbol RecordDataConstructor <*> children (Syntax.RecordDataConstructor <$> manyTerm (context' <|> scopedTypeVariables)  <*> constructorIdentifier <*> term fields))
            <|> term (makeTerm <$> symbol InfixDataConstructor <*> children (Syntax.InfixDataConstructor <$> manyTerm (context' <|> scopedTypeVariables) <*> expression <*> expression <*> expression))
 
 constructorIdentifier :: Assignment Term
@@ -632,8 +632,8 @@ module' =  makeTerm
                    <*> moduleExports
                    <*> term (where' <|> expressions <|> emptyTerm))
   where
-    moduleExports = (symbol ModuleExports *> children (manyTerm export))
-                 <|> (pure [])
+    moduleExports = symbol ModuleExports *> children (manyTerm export)
+                 <|> pure []
 
 moduleExport :: Assignment Term
 moduleExport = makeTerm <$> symbol ModuleExport <*> children (Syntax.ModuleExport <$> expressions)

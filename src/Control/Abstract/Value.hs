@@ -194,7 +194,7 @@ makeNamespace :: ( AbstractValue address value effects
 makeNamespace name addr super = do
   superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
   let env' = fromMaybe lowerBound superEnv
-  namespaceEnv <- Env.head <$> getEnv
+  namespaceEnv <- newEnv . Env.head <$> getEnv
   v <- namespace name (Env.mergeNewer env' namespaceEnv)
   v <$ assign addr v
 
@@ -254,7 +254,9 @@ subtermAddress :: ( AbstractValue address value effects
 subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: Member (Allocator address value) effects
+rvalBox :: ( Member (Allocator address value) effects
+           , Member Fresh effects
+           )
         => value
         -> Evaluator address value effects (ValueRef address)
 rvalBox val = Rval <$> box val
