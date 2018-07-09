@@ -61,7 +61,7 @@ lambda :: (AbstractFunction address value effects, Member Fresh effects)
        => (Name -> Evaluator address value effects address)
        -> Evaluator address value effects value
 lambda body = do
-  var <- nameI <$> fresh
+  var <- gensym
   closure [var] lowerBound (body var)
 
 defineBuiltins :: ( AbstractValue address value effects
