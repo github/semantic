@@ -1,69 +1,57 @@
 {
-  "trees": [
-  {
-    "tree":
-    {
+  "trees": [{
+    "tree": {
       "term": "Statements",
-      "children": [
-      {
-        "term": "LowAnd",
-        "children": [
-        {
+      "statements": [{
+        "term": "LowPrecedenceAnd",
+        "lhs": {
           "term": "Send",
           "sendArgs": [],
           "sendBlock": null,
           "sendReceiver": null,
-          "sendSelector":
-          {
+          "sendSelector": {
             "term": "Identifier",
             "name": "foo",
             "sourceRange": [0, 3],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [1, 1],
               "end": [1, 4]
             }
           },
           "sourceRange": [0, 3],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [1, 1],
             "end": [1, 4]
           }
         },
-        {
+        "rhs": {
           "term": "Send",
           "sendArgs": [],
           "sendBlock": null,
           "sendReceiver": null,
-          "sendSelector":
-          {
+          "sendSelector": {
             "term": "Identifier",
             "name": "bar",
             "sourceRange": [8, 11],
-            "sourceSpan":
-            {
+            "sourceSpan": {
               "start": [1, 9],
               "end": [1, 12]
             }
           },
           "sourceRange": [8, 11],
-          "sourceSpan":
-          {
+          "sourceSpan": {
             "start": [1, 9],
             "end": [1, 12]
           }
-        }],
+        },
         "sourceRange": [0, 11],
-        "sourceSpan":
-        {
+        "sourceSpan": {
           "start": [1, 1],
           "end": [1, 12]
         }
       }],
       "sourceRange": [0, 12],
-      "sourceSpan":
-      {
+      "sourceSpan": {
         "start": [1, 1],
         "end": [2, 1]
       }

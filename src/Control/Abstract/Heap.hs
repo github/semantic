@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , Configuration(..)
@@ -53,11 +53,14 @@ putHeap = put
 modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Heap address (Cell address) value -> Heap address (Cell address) value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
-box :: Member (Allocator address value) effects
+box :: ( Member (Allocator address value) effects
+       , Member Fresh effects
+       )
     => value
     -> Evaluator address value effects address
 box val = do
-  addr <- alloc "<box>"
+  name <- gensym
+  addr <- alloc name
   assign addr val
   pure addr
 
@@ -146,16 +149,17 @@ reachable roots heap = go mempty roots
 
 -- Effects
 
-sendAllocator :: Member (Allocator address value) effects => Allocator address value return -> Evaluator address value effects return
+sendAllocator :: Member (Allocator address value) effects => Allocator address value (Eff effects) return -> Evaluator address value effects return
 sendAllocator = send
 
-data Allocator address value return where
-  Alloc  :: Name             -> Allocator address value address
-  Deref  :: address          -> Allocator address value value
-  Assign :: address -> value -> Allocator address value ()
-  GC     :: Live address     -> Allocator address value ()
+data Allocator address value (m :: * -> *) return where
+  Alloc  :: Name             -> Allocator address value m address
+  Deref  :: address          -> Allocator address value m value
+  Assign :: address -> value -> Allocator address value m ()
+  GC     :: Live address     -> Allocator address value m ()
 
 runAllocator :: ( Addressable address effects
+                , Effects effects
                 , Foldable (Cell address)
                 , Member (Resumable (AddressError address value)) effects
                 , Member (State (Heap address (Cell address) value)) effects
@@ -169,6 +173,12 @@ runAllocator = interpret $ \ eff -> case eff of
   Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
   Assign addr value -> modifyHeap (heapInsert addr value)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
+
+instance Effect (Allocator address value) where
+  handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
+  handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
+  handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (dist . (<$ c) . k)
+  handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
 
 
 data AddressError address value resume where
@@ -185,8 +195,8 @@ instance Eq address => Eq1 (AddressError address value) where
   liftEq _ _                        _                        = False
 
 
-runAddressError :: Effectful (m address value) => m address value (Resumable (AddressError address value) ': effects) a -> m address value effects (Either (SomeExc (AddressError address value)) a)
+runAddressError :: (Effectful (m address value), Effects effects) => m address value (Resumable (AddressError address value) ': effects) a -> m address value effects (Either (SomeExc (AddressError address value)) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: Effectful (m address value) => (forall resume . AddressError address value resume -> m address value effects resume) -> m address value (Resumable (AddressError address value) ': effects) a -> m address value effects a
+runAddressErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . AddressError address value resume -> m address value effects resume) -> m address value (Resumable (AddressError address value) ': effects) a -> m address value effects a
 runAddressErrorWith = runResumableWith

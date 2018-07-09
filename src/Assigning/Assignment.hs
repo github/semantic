@@ -96,7 +96,7 @@ module Assigning.Assignment
 ) where
 
 import Prologue
-import Prelude hiding (fail, until)
+import Prelude hiding (fail)
 import qualified Assigning.Assignment.Table as Table
 import Control.Monad.Free.Freer
 import Data.AST

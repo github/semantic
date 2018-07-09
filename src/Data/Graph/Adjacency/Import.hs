@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, LambdaCase, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, LambdaCase, ScopedTypeVariables #-}
 
 module Data.Graph.Adjacency.Import
   ( ImportGraph (..)
@@ -17,10 +17,11 @@ import Prologue
 import           Algebra.Graph.AdjacencyMap (adjacencyMap)
 import           Algebra.Graph.Class (ToGraph (..), edges, vertices)
 import           Control.Monad.Effect
+import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Fresh
 import           Data.Aeson
 import           Data.Coerce
-import           Data.HashMap.Strict ((!))
+import           Data.HashMap.Strict (HashMap, (!))
 import qualified Data.HashMap.Strict as HashMap
 import           Data.HashSet (HashSet)
 import qualified Data.HashSet as HashSet
@@ -81,7 +82,7 @@ data ImportGraph = ImportGraph
 
 -- | Convert an algebraic graph to an adjacency list.
 graphToImportGraph :: Graph V.Vertex -> ImportGraph
-graphToImportGraph = taggedGraphToImportGraph . tagGraph
+graphToImportGraph = taggedGraphToImportGraph . tagGraph . simplify
 
 -- * Internal interface stuff
 
@@ -118,10 +119,20 @@ taggedGraphToImportGraph = accumToAdj . adjMapToAccum . adjacencyMap . toGraph .
             V.Variable{} -> VARIABLE
 
 -- Annotate all vertices of a 'Graph' with a 'Tag', starting from 1.
-tagGraph :: Graph vertex -> Graph (vertex, Tag)
-tagGraph = run . runFresh 1 . go where
-  go :: Graph vertex -> Eff '[Fresh] (Graph (vertex, Tag))
-  go = traverse (\v -> (v, ) . fromIntegral <$> fresh)
+-- Two vertices @a@ and @b@ will share a 'Tag' iff @a == b@.
+tagGraph :: forall a . (Eq a, Hashable a) => Graph a -> Graph (a, Tag)
+tagGraph = unwrap . traverse go where
+
+  unwrap :: Eff '[Fresh, State (HashMap a Tag)] (Graph (a, Tag)) -> Graph (a, Tag)
+  unwrap = run . fmap snd . runState HashMap.empty . runFresh 1
+
+  go :: a -> Eff '[Fresh, State (HashMap a Tag)] (a, Tag)
+  go v = gets (HashMap.lookup v) >>= \case
+    Just t  -> pure (v, t)
+    Nothing -> do
+      next <- fromIntegral <$> fresh
+      modify' (HashMap.insert v next)
+      pure (v, next)
 
 -- | This is the reverse of 'graphToImportGraph'. Don't use this outside of a testing context.
 -- N.B. @importGraphToGraph . graphToImportGraph@ is 'id', but @graphToImportGraph . importGraphToGraph@ is not.

@@ -4,10 +4,10 @@ module Data.Abstract.Exports
     , aliases
     , insert
     , null
-    , toEnvironment
+    , toBindings
     ) where
 
-import Data.Abstract.Environment (Environment, unpairs)
+import Data.Abstract.Environment (Bindings, unpairs)
 import Data.Abstract.Name
 import qualified Data.Map as Map
 import Prelude hiding (null)
@@ -20,8 +20,8 @@ newtype Exports address = Exports { unExports :: Map.Map Name (Name, Maybe addre
 null :: Exports address -> Bool
 null = Map.null . unExports
 
-toEnvironment :: Exports address -> Environment address
-toEnvironment exports = unpairs (mapMaybe sequenceA (toList (unExports exports)))
+toBindings :: Exports address -> Bindings address
+toBindings exports = unpairs (mapMaybe sequenceA (toList (unExports exports)))
 
 insert :: Name -> Name -> Maybe address -> Exports address -> Exports address
 insert name alias address = Exports . Map.insert name (alias, address) . unExports

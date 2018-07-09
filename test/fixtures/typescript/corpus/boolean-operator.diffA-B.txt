@@ -1,7 +1,7 @@
 (Statements
-{ (Or
-  {-(Identifier)-}
-  {-(Identifier)-})
-->(And
+{+(And
   {+(Identifier)+}
-  {+(Identifier)+}) })
+  {+(Identifier)+})+}
+{-(Or
+  {-(Identifier)-}
+  {-(Identifier)-})-})

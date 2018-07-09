@@ -244,7 +244,7 @@ instance Show1 Star where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Star
 
-data QualifiedTypeClassIdentifier a = QualifiedTypeClassIdentifier (NonEmpty a)
+newtype QualifiedTypeClassIdentifier a = QualifiedTypeClassIdentifier (NonEmpty a)
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedTypeClassIdentifier where liftEq = genericLiftEq

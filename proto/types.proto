@@ -1,65 +1,81 @@
 syntax = "proto3";
+
 package github.semantic;
-enum Language {UNKNOWN = 0;
-               GO = 1;
-               HASKELL = 2;
-               JAVA = 3;
-               JAVASCRIPT = 4;
-               JSON = 5;
-               JSX = 6;
-               MARKDOWN = 7;
-               PYTHON = 8;
-               RUBY = 9;
-               TYPESCRIPT = 10;
-               PHP = 11;}
-enum VertexType {PACKAGE = 0;
-                 MODULE = 1;
-                 VARIABLE = 2;}
-message Blob { bytes blobSource = 1;
-               string blobPath = 2;
-               Language blobLanguage = 3;
-             }
-message Pos { int64 posLine = 1;
-              int64 posColumn = 2;
-            }
-message Span { Pos spanStart = 1;
-               Pos spanEnd = 2;
-             }
-message ImportGraph { repeated Vertex graphVertices = 1;
-                      repeated Edge graphEdges = 2;
-                    }
-message Vertex { VertexType vertexType = 1;
-                 string vertexContents = 2;
-                 uint64 vertexTag = 3;
-               }
-message Edge { uint64 edgeFrom = 1;
-               uint64 edgeTo = 2;
-             }
-message Project { string projectRootDir = 1;
-                  repeated Blob projectBlobs = 2;
-                  Language projectLanguage = 3;
-                  repeated string projectExcludeDirs = 4 [packed = false];
-                }
-message Array { repeated Term arrayElements = 1;
-              }
-message Boolean { bool booleanContent = 1;
-                }
-message Hash { repeated Term hashElements = 1;
-             }
-message Float { string floatContent = 1;
-              }
-message KeyValue { Term key = 1;
-                   Term value = 2;
-                 }
-message Null {
-             }
-message TextElement { string textElementContent = 1;
-                    }
-message Term { oneof syntax {Array array = 1;
-                             Boolean boolean = 2;
-                             Hash hash = 3;
-                             Float float = 4;
-                             KeyValue keyValue = 5;
-                             Null null = 6;
-                             TextElement textElement = 7;}
-             }
+
+option java_package = "com.github.semantic.types";
+option go_package = "github.com/semantic/types;types";
+
+enum Language {
+  UNKNOWN = 0;
+  GO = 1;
+  HASKELL = 2;
+  JAVA = 3;
+  JAVASCRIPT = 4;
+  JSON = 5;
+  JSX = 6;
+  MARKDOWN = 7;
+  PYTHON = 8;
+  RUBY = 9;
+  TYPESCRIPT = 10;
+  PHP = 11;
+}
+
+enum VertexType {
+  PACKAGE = 0;
+  MODULE = 1;
+  VARIABLE = 2;
+}
+
+message Blob {
+  bytes blobSource = 1;
+  string blobPath = 2;
+  Language blobLanguage = 3;
+}
+
+message Edge {
+  uint64 edgeFrom = 1;
+  uint64 edgeTo = 2;
+}
+
+message ErrorSite {
+  string errorMessage = 1;
+  SrcLoc errorLocation = 2;
+}
+
+message ImportGraph {
+  repeated Vertex graphVertices = 1;
+  repeated Edge graphEdges = 2;
+}
+
+message Pos {
+  int64 posLine = 1;
+  int64 posColumn = 2;
+}
+
+message Project {
+  string projectRootDir = 1;
+  repeated Blob projectBlobs = 2;
+  Language projectLanguage = 3;
+  repeated string projectExcludeDirs = 4[packed = false] ;
+}
+
+message Span {
+  Pos spanStart = 1;
+  Pos spanEnd = 2;
+}
+
+message SrcLoc {
+  string srcLocPackage = 1;
+  string srcLocModule = 2;
+  string srcLocFile = 3;
+  int64 srcLocStartLine = 4;
+  int64 srcLocStartCol = 5;
+  int64 srcLocEndLine = 6;
+  int64 srcLocEndCol = 7;
+}
+
+message Vertex {
+  VertexType vertexType = 1;
+  string vertexContents = 2;
+  uint64 vertexTag = 3;
+}

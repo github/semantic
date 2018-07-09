@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds #-}
+{-# LANGUAGE AllowAmbiguousTypes, DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, KindSignatures, RankNTypes, ConstraintKinds, GeneralizedNewtypeDeriving, DerivingStrategies #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
 module Data.Syntax where
 
@@ -17,11 +17,12 @@ import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
-import Proto3.Wire.Decode
 import Proto3.Wire.Types
 import GHC.Types (Constraint)
 import GHC.TypeLits
 import qualified Proto3.Suite.DotProto as Proto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 import Data.Char (toLower)
 
 -- Combinators
@@ -57,11 +58,11 @@ emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
 
 -- | Catch assignment errors into an error term.
 handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location)) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
-handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
+handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
-parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
+parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -105,11 +106,16 @@ infixContext :: (Context :< syntaxes, Assignment.Parsing m, Semigroup ann, HasCa
 infixContext context left right operators = uncurry (&) <$> postContextualizeThrough context left (asum operators) <*> postContextualize context right
 
 instance (Apply Message1 fs, Generate Message1 fs fs, Generate Named1 fs fs) => Message1 (Sum fs) where
-  liftEncodeMessage encodeMessage num = apply @Message1 (liftEncodeMessage encodeMessage num)
-  liftDecodeMessage decodeMessage _ = oneof undefined listOfParsers
+  liftEncodeMessage encodeMessage _ fs = Encode.embedded (fromIntegral . succ $ elemIndex fs) message
+    where message = apply @Message1 (liftEncodeMessage encodeMessage 1) fs
+  liftDecodeMessage decodeMessage subMessageNum = Decode.oneof undefined listOfParsers
     where
       listOfParsers =
-        generate @Message1 @fs @fs (\ (_ :: proxy f) i -> let num = FieldNumber (fromInteger (succ i)) in [(num, trustMe <$> embedded (inject @f @fs <$> liftDecodeMessage decodeMessage num))])
+        generate @Message1 @fs @fs (\ (_ :: proxy f) i ->
+          let
+            num = fromInteger (succ i)
+          in
+            [(num, trustMe <$> Decode.embedded (inject @f @fs <$> liftDecodeMessage decodeMessage subMessageNum))])
       trustMe (Just a) = a
       trustMe Nothing = error "liftDecodeMessage (Sum): embedded parser returned Nothing"
   liftDotProto _ =
@@ -132,11 +138,25 @@ instance Generate c all '[] where
 instance (Element f all, c f, Generate c all fs) => Generate c all (f ': fs) where
   generate each = each (Proxy @f) (natVal (Proxy @(ElemIndex f all))) `mappend` generate @c @all @fs each
 
+instance Named1 [] where
+  nameOf1 _ = "List"
+
+instance Message1 [] where
+  liftEncodeMessage encodeMessage num = foldMap (Encode.embedded num . encodeMessage (fieldNumber 1))
+  liftDecodeMessage decodeMessage num = toList <$> Decode.repeated (Decode.embedded' oneMsg) `Decode.at` num
+    where
+      oneMsg = decodeMessage (fieldNumber 1)
+  liftDotProto (_ :: Proxy [a]) =  [ Proto.DotProtoMessageField $ Proto.DotProtoField (fieldNumber 1) ty (Proto.Single "listContent") [] Nothing ]
+    where ty = Proto.NestedRepeated (Proto.Named (Proto.Single (nameOf (Proxy @a))))
+
+
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier { name :: Name }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, Named1, ToJSONFields1)
+  deriving newtype (Eq, Ord, Show)
+  deriving stock (Foldable, Functor, Generic1, Traversable)
+  deriving anyclass (Diffable, Hashable1, Mergeable, Message1, Named1, ToJSONFields1)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
@@ -152,8 +172,10 @@ instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
-newtype AccessibilityModifier a = AccessibilityModifier Text
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
+  deriving newtype (Eq, Ord, Show)
+  deriving stock (Foldable, Functor, Generic1, Traversable)
+  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Mergeable, Message1, Named1, ToJSONFields1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
@@ -177,7 +199,7 @@ instance Evaluatable Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -185,23 +207,52 @@ instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
 
+instance Named String where
+  nameOf _ = "string"
+
+instance Message String where
+  encodeMessage = encodeMessageField
+  decodeMessage = Decode.at decodeMessageField
+  dotProto _ = [ Proto.DotProtoMessageField $ protoType (Proxy @String) ]
+
 
 errorSyntax :: Error.Error String -> [a] -> Error a
-errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
+errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
+unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack)) (Error.Error span errorExpected errorActual)
 
-newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
-  deriving (Eq)
+data ErrorSite = ErrorSite { errorMessage :: String, errorLocation :: SrcLoc }
+  deriving (Eq, Show, Generic, Named, Message)
 
-instance Show ErrorStack where
-  showsPrec _ = shows . map showPair . unErrorStack
-    where showPair (sym, loc) = sym <> " " <> srcLocFile loc <> ":" <> show (srcLocStartLine loc) <> ":" <> show (srcLocStartCol loc)
+errorSite :: (String, SrcLoc) -> ErrorSite
+errorSite = uncurry ErrorSite
+
+unErrorSite :: ErrorSite -> (String, SrcLoc)
+unErrorSite ErrorSite{..} = (errorMessage, errorLocation)
+
+newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass (Named, Message)
+  deriving newtype (MessageField)
+
+instance HasDefault ErrorStack where
+  def = ErrorStack mempty
+
+deriving instance Generic SrcLoc
+deriving instance Message SrcLoc
+deriving instance Named SrcLoc
+instance MessageField SrcLoc where
+  encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
+  decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
+  protoType _ = messageField (Proto.Prim (Proto.Named (Proto.Single (nameOf (Proxy @SrcLoc))))) Nothing
+
+instance HasDefault SrcLoc where
+  def = SrcLoc mempty mempty mempty 1 1 1 1
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
-    jSite (site, SrcLoc{..}) = object
+    jSite (ErrorSite site SrcLoc{..}) = object
       [ "site" .= site
       , "package" .= srcLocPackage
       , "module" .= srcLocModule
@@ -212,10 +263,10 @@ instance ToJSON ErrorStack where
       ]
 
 instance Hashable ErrorStack where
-  hashWithSalt = hashUsing (map (second ((,,,,,,) <$> srcLocPackage <*> srcLocModule <*> srcLocFile <*> srcLocStartLine <*> srcLocStartCol <*> srcLocEndLine <*> srcLocEndCol)) . unErrorStack)
+  hashWithSalt = hashUsing (map (second ((,,,,,,) <$> srcLocPackage <*> srcLocModule <*> srcLocFile <*> srcLocStartLine <*> srcLocStartCol <*> srcLocEndLine <*> srcLocEndCol) . unErrorSite) . unErrorStack)
 
 instance Ord ErrorStack where
-  compare = liftCompare (liftCompare compareSrcLoc) `on` unErrorStack
+  compare = liftCompare (liftCompare compareSrcLoc) `on` (fmap unErrorSite . unErrorStack)
     where compareSrcLoc s1 s2 = mconcat
             [ (compare `on` srcLocPackage) s1 s2
             , (compare `on` srcLocModule) s1 s2
@@ -228,7 +279,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
+  deriving (Declarations1, Eq, Foldable, FreeVariables1, Functor, Generic1, Mergeable, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s

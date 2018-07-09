@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Ruby.Assignment
 ( assignment
 , Syntax
@@ -6,11 +7,14 @@ module Language.Ruby.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (name)
-import Data.List (elem)
-import Data.Record
-import Data.Syntax
+import           Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
+import           Data.Abstract.Name (name)
+import           Data.List (elem)
+import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Record
+import           Data.Sum
+import           Data.Syntax
     ( contextualize
     , emptyTerm
     , handleError
@@ -22,9 +26,6 @@ import Data.Syntax
     , parseError
     , postContextualize
     )
-import Language.Ruby.Grammar as Grammar
-import qualified Assigning.Assignment as Assignment
-import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -33,28 +34,53 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
+import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
-import Prologue hiding (for)
+import           Prologue hiding (for)
+import           Proto3.Suite (Named (..), Named1 (..))
 
 -- | The type of Ruby syntax.
 type Syntax = '[
     Comment.Comment
   , Declaration.Function
+  , Literal.Boolean
   , Declaration.Method
   , Directive.File
   , Directive.Line
-  , Expression.Arithmetic
-  , Expression.Bitwise
-  , Expression.Boolean
+  , Expression.Plus
+  , Expression.Minus
+  , Expression.Times
+  , Expression.DividedBy
+  , Expression.Modulo
+  , Expression.Power
+  , Expression.Negate
+  , Expression.FloorDivision
+  , Expression.BAnd
+  , Expression.BOr
+  , Expression.BXOr
+  , Expression.LShift
+  , Expression.RShift
+  , Expression.Complement
+  , Expression.And
+  , Expression.Not
+  , Expression.Or
+  , Expression.XOr
   , Expression.Call
+  , Expression.LessThan
+  , Expression.LessThanEqual
+  , Expression.GreaterThan
+  , Expression.GreaterThanEqual
+  , Expression.Equal
+  , Expression.StrictEqual
   , Expression.Comparison
   , Expression.Enumeration
-  , Expression.Match
+  , Expression.Matches
+  , Expression.NotMatches
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
+  , Expression.Member
   , Literal.Array
-  , Literal.Boolean
   , Literal.Complex
   , Literal.Float
   , Literal.Hash
@@ -90,7 +116,8 @@ type Syntax = '[
   , Syntax.Identifier
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
-  , Ruby.Syntax.LowPrecedenceBoolean
+  , Ruby.Syntax.LowPrecedenceAnd
+  , Ruby.Syntax.LowPrecedenceOr
   , Ruby.Syntax.Module
   , Ruby.Syntax.Require
   , Ruby.Syntax.Send
@@ -99,6 +126,12 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "RubySyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "RubyTerm"
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Term
@@ -243,7 +276,7 @@ module' :: Assignment Term
 module' = makeTerm <$> symbol Module <*> (withNewScope . children) (Ruby.Syntax.Module <$> expression <*> many expression)
 
 scopeResolution :: Assignment Term
-scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)
+scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> NonEmpty.some1 expression)
 
 parameter :: Assignment Term
 parameter = postContextualize comment (term uncontextualizedParameter)
@@ -451,19 +484,19 @@ unary = symbol Unary >>= \ location ->
 -- TODO: Distinguish `===` from `==` ?
 binary :: Assignment Term
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
-  [ (inject .) . Expression.Plus             <$ symbol AnonPlus
-  , (inject .) . Expression.Minus            <$ symbol AnonMinus'
-  , (inject .) . Expression.Times            <$ symbol AnonStar'
-  , (inject .) . Expression.Power            <$ symbol AnonStarStar
-  , (inject .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (inject .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inject .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (inject .) . Ruby.Syntax.LowAnd          <$ symbol AnonAnd
-  , (inject .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inject .) . Expression.Or               <$ symbol AnonPipePipe
-  , (inject .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
-  , (inject .) . Expression.BOr              <$ symbol AnonPipe
-  , (inject .) . Expression.BXOr             <$ symbol AnonCaret
+  [ (inject .) . Expression.Plus              <$ symbol AnonPlus
+  , (inject .) . Expression.Minus             <$ symbol AnonMinus'
+  , (inject .) . Expression.Times             <$ symbol AnonStar'
+  , (inject .) . Expression.Power             <$ symbol AnonStarStar
+  , (inject .) . Expression.DividedBy         <$ symbol AnonSlash
+  , (inject .) . Expression.Modulo            <$ symbol AnonPercent
+  , (inject .) . Expression.And               <$ symbol AnonAmpersandAmpersand
+  , (inject .) . Ruby.Syntax.LowPrecedenceAnd <$ symbol AnonAnd
+  , (inject .) . Expression.BAnd              <$ symbol AnonAmpersand
+  , (inject .) . Expression.Or                <$ symbol AnonPipePipe
+  , (inject .) . Ruby.Syntax.LowPrecedenceOr  <$ symbol AnonOr
+  , (inject .) . Expression.BOr               <$ symbol AnonPipe
+  , (inject .) . Expression.BXOr              <$ symbol AnonCaret
   -- TODO: AnonEqualEqualEqual corresponds to Ruby's "case equality"
   -- function, which (unless overridden) is true if b is an instance
   -- of or inherits from a. We need a custom equality operator
