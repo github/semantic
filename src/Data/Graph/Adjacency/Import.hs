@@ -124,7 +124,7 @@ tagGraph :: forall a . (Eq a, Hashable a) => Graph a -> Graph (a, Tag)
 tagGraph = unwrap . traverse go where
 
   unwrap :: Eff '[Fresh, State (HashMap a Tag)] (Graph (a, Tag)) -> Graph (a, Tag)
-  unwrap = run . fmap fst . runState HashMap.empty . runFresh 1
+  unwrap = run . fmap snd . runState HashMap.empty . runFresh 1
 
   go :: a -> Eff '[Fresh, State (HashMap a Tag)] (a, Tag)
   go v = gets (HashMap.lookup v) >>= \case

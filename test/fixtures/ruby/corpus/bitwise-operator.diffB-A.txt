@@ -1,14 +1,9 @@
 (Statements
-{ (BAnd
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(BOr
+{+(BOr
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) }
+    {+(Identifier)+})+})+}
 {+(RShift
   {+(Send
     {+(Identifier)+})+}
@@ -19,6 +14,11 @@
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+})+}
+{-(BAnd
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(LShift
   {-(Send
     {-(Identifier)-})-}

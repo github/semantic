@@ -43,6 +43,9 @@ instance A.FromJSON Pos where
     [line, col] <- A.parseJSON arr
     pure $ Pos line col
 
+instance Lower Pos where
+  lowerBound = Pos 1 1
+
 data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
@@ -74,4 +77,4 @@ instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 instance Lower Span where
-  lowerBound = Span (Pos 1 1) (Pos 1 1)
+  lowerBound = Span lowerBound lowerBound

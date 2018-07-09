@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveDataTypeable, DuplicateRecordFields, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DeriveDataTypeable, DuplicateRecordFields, GADTs, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.IO
 ( Destination(..)
 , Files
@@ -214,14 +214,20 @@ data Source blob where
 data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
 -- | An effect to read/write 'Blob's from 'Handle's or 'FilePath's.
-data Files out where
-  Read        :: Source out -> Files out
-  ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
-  FindFiles   :: FilePath -> [String] -> [FilePath] -> Files [FilePath]
-  Write       :: Destination -> B.Builder -> Files ()
+data Files (m :: * -> *) out where
+  Read        :: Source out                                           -> Files m out
+  ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files m Project
+  FindFiles   :: FilePath -> [String] -> [FilePath]                   -> Files m [FilePath]
+  Write       :: Destination -> B.Builder                             -> Files m ()
+
+instance Effect Files where
+  handleState c dist (Request (Read source) k) = Request (Read source) (dist . (<$ c) . k)
+  handleState c dist (Request (ReadProject rootDir dir language excludeDirs) k) = Request (ReadProject rootDir dir language excludeDirs) (dist . (<$ c) . k)
+  handleState c dist (Request (FindFiles dir exts paths) k) = Request (FindFiles dir exts paths) (dist . (<$ c) . k)
+  handleState c dist (Request (Write destination builder) k) = Request (Write destination builder) (dist . (<$ c) . k)
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: (Member (Exc SomeException) effs, Member IO effs) => Eff (Files ': effs) a -> Eff effs a
+runFiles :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Effects effs) => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   Read (FromPath path)         -> rethrowing (readBlobFromPath path)
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)

@@ -54,7 +54,7 @@ topologicalSort :: forall v . Ord v => Graph v -> [v]
 topologicalSort = go . toAdjacencyMap . G.transpose . unGraph
   where go :: A.AdjacencyMap v -> [v]
         go graph
-          = visitedOrder . snd
+          = visitedOrder . fst
           . run
           . runState (Visited lowerBound [])
           . traverse_ visit

@@ -1,7 +1,7 @@
 (Statements
-{ (LessThanEqual
-  {-(Identifier)-}
-  {-(Identifier)-})
-->(LessThan
+{+(LessThan
   {+(Identifier)+}
-  {+(Identifier)+}) })
+  {+(Identifier)+})+}
+{-(LessThanEqual
+  {-(Identifier)-}
+  {-(Identifier)-})-})

@@ -27,5 +27,5 @@ tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace .
 trace :: Member (Writer (trace (Configuration term address (Cell address) value))) effects => trace (Configuration term address (Cell address) value) -> TermEvaluator term address value effects ()
 trace = tell
 
-tracing :: Monoid (trace (Configuration term address (Cell address) value)) => TermEvaluator term address value (Writer (trace (Configuration term address (Cell address) value)) ': effects) a -> TermEvaluator term address value effects (a, trace (Configuration term address (Cell address) value))
+tracing :: (Monoid (trace (Configuration term address (Cell address) value)), Effects effects) => TermEvaluator term address value (Writer (trace (Configuration term address (Cell address) value)) ': effects) a -> TermEvaluator term address value effects (trace (Configuration term address (Cell address) value), a)
 tracing = runWriter

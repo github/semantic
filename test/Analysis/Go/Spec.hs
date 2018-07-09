@@ -12,17 +12,17 @@ spec :: Spec
 spec = parallel $ do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
-      ((res, heap), _) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      (_, (heap, res)) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main.go" <$> res of
-        Right (Just (Module _ (addr, env) :| [])) -> do
+        Right (Just (Module _ (env, addr) :| [])) -> do
           Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
           (derefQName heap ("foo" :| []) env >>= deNamespace) `shouldBe` Just ("foo",  ["New"])
         other -> expectationFailure (show other)
 
     it "imports with aliases (and side effects only)" $ do
-      ((res, heap), _) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      (_, (heap, res)) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main1.go" <$> res of
-        Right (Just (Module _ (addr, env) :| [])) -> do
+        Right (Just (Module _ (env, addr) :| [])) -> do
           Env.names env `shouldBe` [ "f", "main" ]
           (derefQName heap ("f" :| []) env >>= deNamespace) `shouldBe` Just ("f",  ["New"])
         other -> expectationFailure (show other)

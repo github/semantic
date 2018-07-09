@@ -1,10 +1,16 @@
 syntax = "proto3";
+
+package github.semantic;
+
+import "ruby.proto";
+import "json.proto";
+import "typescript.proto";
 import "types.proto";
 import "error_details.proto";
 
 option java_package = "com.github.semantic.analysis";
 option go_package = "github.com/semantic/analysis/;analysis";
-package github.semantic;
+
 
 // Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and
 // comparing source code.
@@ -12,7 +18,7 @@ service CodeAnalysis {
   // Parsing
   //
   // Parse source code blobs and return abstract syntax trees.
-  rpc ParseTree(ParseTreeRequest) returns (ParseTreeResponse);
+  rpc ParseTree (ParseTreeRequest) returns (ParseTreeResponse);
 
   // Diffing
   //
@@ -37,8 +43,23 @@ message ParseTreeRequest {
 }
 
 message ParseTreeResponse {
-  bytes json_tree = 1;
-  repeated ParseError errors = 2;
+  oneof response_type {
+    RubyResponse ruby = 1;
+    JSONResponse json = 2;
+    TypeScriptResponse typescript = 3;
+  }
+}
+
+message RubyResponse {
+  repeated ruby.RubyTerm terms = 1;
+}
+
+message JSONResponse {
+  repeated json.JSONTerm terms = 1;
+}
+
+message TypeScriptResponse {
+  repeated typescript.TypeScriptTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {
