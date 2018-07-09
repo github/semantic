@@ -33,9 +33,38 @@ type Syntax =
    , Declaration.MethodSignature
    , Declaration.Type
    , Declaration.TypeAlias
-   , Expression.Arithmetic
-   , Expression.Bitwise
-   , Expression.Boolean
+   , Expression.Plus
+   , Expression.Minus
+   , Expression.Times
+   , Expression.DividedBy
+   , Expression.Modulo
+   , Expression.Power
+   , Expression.Negate
+   , Expression.FloorDivision
+   , Expression.BOr
+   , Expression.BAnd
+   , Expression.BXOr
+   , Expression.LShift
+   , Expression.RShift
+   , Expression.UnsignedRShift
+   , Expression.Complement
+   , Expression.Call
+   , Expression.LessThan
+   , Expression.LessThanEqual
+   , Expression.GreaterThan
+   , Expression.GreaterThanEqual
+   , Expression.Equal
+   , Expression.StrictEqual
+   , Expression.Comparison
+   , Expression.Subscript
+   , Expression.Member
+   , Statement.PostDecrement
+   , Statement.PostIncrement
+   , Expression.MemberAccess
+   , Expression.And
+   , Expression.Not
+   , Expression.Or
+   , Expression.XOr
    , Expression.Call
    , Expression.Comparison
    , Expression.Subscript

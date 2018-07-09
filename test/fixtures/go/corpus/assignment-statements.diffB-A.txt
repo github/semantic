@@ -30,25 +30,29 @@
       {+(Times
         {+(Identifier)+}
         {+(Integer)+})+})+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Plus
+        {+(Identifier)+}
+        {+(Integer)+})+})+}
       (Assignment
       { (Identifier)
       ->(Identifier) }
       { (Times
         {-(Identifier)-}
         {-(Integer)-})
-      ->(Plus
+      ->(LShift
         {+(Identifier)+}
         {+(Integer)+}) })
-    {+(Assignment
-      {+(Identifier)+}
-      {+(LShift
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Plus
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(RShift
         {+(Identifier)+}
-        {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(RShift
-        {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(DividedBy
@@ -64,16 +68,12 @@
       {+(Modulo
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Plus
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(Not
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Not
         {+(BAnd
           {+(Identifier)+}
-          {+(Integer)+})+}) })
+          {+(Integer)+})+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(Statements

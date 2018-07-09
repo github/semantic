@@ -1,21 +1,22 @@
 (Statements
-  (Call
-    (Identifier)
-  { (TextElement)
-  ->(TextElement) }
-  {-(Identifier)-}
-    (Empty))
+{+(Call
+  {+(Identifier)+}
+  {+(TextElement)+}
+  {+(Empty)+})+}
   (Call
     (Identifier)
     (TextElement)
   {+(Null)+}
   {-(Identifier)-}
-  {-(Identifier)-}
     (Empty))
   (Call
     (Identifier)
-  { (TextElement)
-  ->(TextElement) }
+    (TextElement)
   {+(Identifier)+}
-  {+(Identifier)+}
-    (Empty)))
+    (Identifier)
+  {-(Identifier)-}
+    (Empty))
+{-(Call
+  {-(Identifier)-}
+  {-(TextElement)-}
+  {-(Empty)-})-})

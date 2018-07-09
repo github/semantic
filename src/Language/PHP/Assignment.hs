@@ -41,17 +41,38 @@ type Syntax = '[
   , Declaration.Function
   , Declaration.Method
   , Declaration.VariableDeclaration
-  , Expression.Arithmetic
-  , Expression.Bitwise
-  , Expression.Boolean
+  , Expression.Plus
+  , Expression.Minus
+  , Expression.Times
+  , Expression.DividedBy
+  , Expression.Modulo
+  , Expression.Power
+  , Expression.Negate
+  , Expression.FloorDivision
+  , Expression.BAnd
+  , Expression.BOr
+  , Expression.BXOr
+  , Expression.LShift
+  , Expression.RShift
+  , Expression.And
+  , Expression.Not
+  , Expression.Or
+  , Expression.XOr
   , Expression.Call
   , Expression.Cast
+  , Expression.LessThan
+  , Expression.LessThanEqual
+  , Expression.GreaterThan
+  , Expression.GreaterThanEqual
+  , Expression.Equal
+  , Expression.StrictEqual
   , Expression.Comparison
   , Expression.InstanceOf
   , Expression.MemberAccess
   , Expression.New
   , Expression.SequenceExpression
   , Expression.Subscript
+  , Expression.Member
   , Literal.Array
   , Literal.Float
   , Literal.Integer

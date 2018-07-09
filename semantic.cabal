@@ -31,6 +31,7 @@ library
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
+                     , Assigning.Assignment.Deterministic
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
@@ -64,8 +65,9 @@ library
                      , Data.Abstract.Package
                      , Data.Abstract.Path
                      , Data.Abstract.Ref
-                     , Data.Abstract.Type
-                     , Data.Abstract.Value
+                     , Data.Abstract.Value.Abstract
+                     , Data.Abstract.Value.Concrete
+                     , Data.Abstract.Value.Type
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.AST
@@ -142,7 +144,6 @@ library
                      , Paths_semantic
                      -- Rendering formats
                      , Rendering.Graph
-                     , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.Symbol

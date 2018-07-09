@@ -26,18 +26,12 @@
   (Modulo
     (Identifier)
     (Identifier))
-{ (Power
-  {-(Identifier)-}
-  {-(Identifier)-})
-->(FloorDivision
+{+(FloorDivision
   {+(Identifier)+}
-  {+(Identifier)+}) }
-{ (FloorDivision
-  {-(Identifier)-}
-  {-(Identifier)-})
-->(Power
+  {+(Identifier)+})+}
+{+(Power
   {+(Identifier)+}
-  {+(Identifier)+}) }
+  {+(Identifier)+})+}
 {+(BOr
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -53,6 +47,12 @@
 {+(RShift
   {+(Identifier)+}
   {+(Identifier)+})+}
+{-(Power
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(FloorDivision
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Modulo
   {-(Identifier)-}
   {-(Identifier)-})-}
