@@ -73,6 +73,7 @@ type Syntax =
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.GenericType
    , Java.Syntax.Import
+   , Java.Syntax.Lambda
    , Java.Syntax.MethodReference
    , Java.Syntax.Module
    , Java.Syntax.New
@@ -187,6 +188,7 @@ expressionChoices =
   , identifier
   , import'
   , integer
+  , lambda
   , method
   , methodInvocation
   , methodReference
@@ -313,8 +315,8 @@ methodReference :: Assignment Term
 methodReference = makeTerm <$> symbol Grammar.MethodReference <*> children (Java.Syntax.MethodReference <$> term type' <* token AnonColonColon <*> manyTerm type' <*> (new <|> term identifier))
   where new = makeTerm <$> token AnonNew <*> pure NewKeyword
 -- can't do term identifier' because identifier' returns a name, not a term, and we want a term
--- <*> - left assoc
--- manyTerm or alternation with pure
+-- <*> - left assoc so when you have a token that you need to match but not retain,
+-- manyTerm or alternation with pure, but not bowf
 
 explicitConstructorInvocation :: Assignment Term
 explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
@@ -593,3 +595,8 @@ spreadParameter = makeTerm <$> symbol Grammar.SpreadParameter <*> children (Java
 
 arrayAccess :: Assignment Term
 arrayAccess = makeTerm <$> symbol ArrayAccess <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
+
+lambda :: Assignment Term
+lambda = makeTerm <$> symbol LambdaExpression <*> children (Java.Syntax.Lambda <$> term expression <* token AnonMinusRAngle <*> term expression)
+-- The current error occurs when a lambda expression is the argument in the argument for a method;
+-- If it is exposed at the top-level, lambdas will be referenced in expressionChoices
