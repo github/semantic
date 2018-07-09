@@ -53,11 +53,14 @@ putHeap = put
 modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Heap address (Cell address) value -> Heap address (Cell address) value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
-box :: Member (Allocator address value) effects
+box :: ( Member (Allocator address value) effects
+       , Member Fresh effects
+       )
     => value
     -> Evaluator address value effects address
 box val = do
-  addr <- alloc "<box>"
+  name <- gensym
+  addr <- alloc name
   assign addr val
   pure addr
 

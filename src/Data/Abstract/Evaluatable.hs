@@ -50,6 +50,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
+          , Member Fresh effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
@@ -149,9 +150,11 @@ instance HasPrelude 'PHP
 
 builtInPrint :: ( AbstractIntro value
                 , AbstractFunction address value effects
-                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Allocator address value) effects
                 , Member (Env address) effects
-                , Member (Allocator address value) effects)
+                , Member Fresh effects
+                , Member (Resumable (EnvironmentError address)) effects
+                )
              => Name
              -> Evaluator address value effects address
 builtInPrint v = do
