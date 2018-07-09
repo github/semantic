@@ -745,8 +745,8 @@ instance Evaluatable AbstractClass where
     supers <- traverse subtermAddress classHeritage
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody
-      classEnv <- newEnv . Env.head <$> getEnv
-      klass name supers classEnv
+      classBinds <- Env.head <$> getEnv
+      klass name supers classBinds
     rvalBox =<< (v <$ bind name addr)
 
 
