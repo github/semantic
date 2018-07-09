@@ -23,6 +23,7 @@ null = Map.null . unExports
 toBindings :: Exports address -> Bindings address
 toBindings exports = unpairs (mapMaybe sequenceA (toList (unExports exports)))
 
+-- TODO: Should inserts overwrite an existing value for a given name?
 insert :: Name -> Name -> Maybe address -> Exports address -> Exports address
 insert name alias address = Exports . Map.insert name (alias, address) . unExports
 
