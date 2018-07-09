@@ -208,3 +208,12 @@ instance Show1 NewKeyword where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for TypeWithModifiers
 instance Evaluatable NewKeyword
+
+data Lambda a = Lambda { lambdaHead :: !a, lambdaBody :: !a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Lambda where liftEq = genericLiftEq
+instance Ord1 Lambda where liftCompare = genericLiftCompare
+instance Show1 Lambda where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Lambda
