@@ -11,6 +11,9 @@ module SpecHelpers
 , TermEvaluator(..)
 , Verbatim(..)
 , toList
+, Config
+, LogQueue
+, StatQueue
 ) where
 
 import Control.Abstract
@@ -65,16 +68,20 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
+import Semantic.Config (Config)
+import Semantic.Telemetry (LogQueue, StatQueue)
+import System.Exit (die)
+import Control.Exception (displayException)
 
 runBuilder = toStrict . toLazyByteString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: Both FilePath -> IO ByteString
-diffFilePaths paths = readFilePair paths >>= fmap runBuilder . runTask . runDiff SExpressionDiffRenderer . pure
+diffFilePaths :: Config -> LogQueue -> StatQueue -> Both FilePath -> IO ByteString
+diffFilePaths config logger statter paths = readFilePair paths >>= runTaskWithConfig config logger statter . runDiff SExpressionDiffRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap runBuilder . runTask . runParse SExpressionTermRenderer . pure
+parseFilePath :: Config -> LogQueue -> StatQueue -> FilePath -> IO ByteString
+parseFilePath config logger statter path = (fromJust <$> IO.readFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
