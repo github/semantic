@@ -32,14 +32,14 @@ defineClass :: ( AbstractValue address value effects
                , Member (Reader Span) effects
                )
             => Name
-            -> [Name]
+            -> [address]
             -> Evaluator address value effects a
             -> Evaluator address value effects ()
 defineClass name superclasses scope = define name $ do
   env <- locally $ do
     void scope
     Env.newEnv . Env.head <$> getEnv
-  klass name (map (string . formatName) superclasses) env
+  klass name superclasses env
 
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack

@@ -128,8 +128,8 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   index :: value -> value -> Evaluator address value effects address
 
   -- | Build a class value from a name and environment.
-  klass :: Name                 -- ^ The new class's identifier
-        -> [value]              -- ^ A list of superclasses
+  klass :: Name                -- ^ The new class's identifier
+        -> [address]           -- ^ A list of superclasses
         -> Environment address -- ^ The environment to capture
         -> Evaluator address value effects value
 

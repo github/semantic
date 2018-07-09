@@ -120,7 +120,7 @@ instance ( Coercible body (Eff effects)
 
   klass n [] env = pure $ Class n env
   klass n supers env = do
-    product <- foldl mergeEnvs lowerBound . catMaybes <$> traverse scopedEnvironment supers
+    product <- foldl mergeEnvs lowerBound . catMaybes <$> traverse (deref >=> scopedEnvironment) supers
     pure $ Class n (mergeEnvs product env)
 
   namespace name env = do
