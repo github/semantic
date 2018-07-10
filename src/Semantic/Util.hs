@@ -27,9 +27,11 @@ import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (weaken)
+import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
+import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
 import           Text.Show.Pretty (ppShow)
@@ -110,6 +112,8 @@ evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (evaluate proxy id withTermSpans modules))))))
+
+data TaskConfig = TaskConfig Config LogQueue StatQueue
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []

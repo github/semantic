@@ -11,7 +11,6 @@ module SpecHelpers
 , TermEvaluator(..)
 , Verbatim(..)
 , toList
-, TaskConfig(..)
 , Config
 , LogQueue
 , StatQueue
@@ -75,8 +74,6 @@ import System.Exit (die)
 import Control.Exception (displayException)
 
 runBuilder = toStrict . toLazyByteString
-
-data TaskConfig = TaskConfig Config LogQueue StatQueue
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
