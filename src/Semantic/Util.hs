@@ -32,7 +32,7 @@ import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
-import           Semantic.Telemetry (LogQueue, StatQueue)
+import           Semantic.Telemetry (LogQueue, StatQueue, TelemetryQueues(..))
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
@@ -103,17 +103,10 @@ evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
 -- Evaluate a project consisting of the listed paths.
-evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
-  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
-  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
-  modules <- topologicalSort <$> runImportGraph proxy package
-  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
-       (runReader (packageInfo package)
-       (runReader (lowerBound @Span)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules))))))
+evaluateProject proxy parser lang paths = do
+  config <- defaultConfig debugOptions
+  withTelemetry config $ \(TelemetryQueues logger statter _) ->
+    evaluateProject' (TaskConfig config logger statter) proxy parser lang paths
 
 data TaskConfig = TaskConfig Config LogQueue StatQueue
 
