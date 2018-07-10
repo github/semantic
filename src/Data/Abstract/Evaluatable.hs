@@ -6,6 +6,8 @@ module Data.Abstract.Evaluatable
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
+-- * Postludes
+, HasPostlude(..)
 -- * Effects
 , EvalError(..)
 , throwEvalError
@@ -74,6 +76,7 @@ evaluate :: ( AbstractValue address value inner
             , Evaluatable (Base term)
             , Foldable (Cell address)
             , FreeVariables term
+            , HasPostlude lang
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
