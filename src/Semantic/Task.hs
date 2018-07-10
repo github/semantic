@@ -37,6 +37,7 @@ module Semantic.Task
 -- * Interpreting
 , runTask
 , runTaskWithOptions
+, withOptions
 , runTaskWithConfig
 -- * Re-exports
 , Distribute
