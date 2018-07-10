@@ -11,6 +11,7 @@ module SpecHelpers
 , TermEvaluator(..)
 , Verbatim(..)
 , toList
+, TaskConfig(..)
 , Config
 , LogQueue
 , StatQueue
@@ -75,13 +76,15 @@ import Control.Exception (displayException)
 
 runBuilder = toStrict . toLazyByteString
 
+data TaskConfig = TaskConfig Config LogQueue StatQueue
+
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: Config -> LogQueue -> StatQueue -> Both FilePath -> IO ByteString
-diffFilePaths config logger statter paths = readFilePair paths >>= runTaskWithConfig config logger statter . runDiff SExpressionDiffRenderer . pure >>= either (die . displayException) (pure . runBuilder)
+diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
+diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= runTaskWithConfig config logger statter . runDiff SExpressionDiffRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: Config -> LogQueue -> StatQueue -> FilePath -> IO ByteString
-parseFilePath config logger statter path = (fromJust <$> IO.readFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath :: TaskConfig -> FilePath -> IO ByteString
+parseFilePath (TaskConfig config logger statter) path = (fromJust <$> IO.readFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
