@@ -24,9 +24,9 @@ import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
-import SpecHelpers (TaskConfig(..))
 import Semantic.Config (defaultConfig, defaultOptions, withTelemetry)
 import Semantic.Telemetry (TelemetryQueues(..))
+import Semantic.Util (TaskConfig(..))
 import qualified Proto3.Roundtrip
 import Test.Hspec
 
