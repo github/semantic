@@ -107,11 +107,13 @@ evaluate lang analyzeModule analyzeTerm modules = do
           evaluated <- coerce
             (runInModule preludeEnv (moduleInfo m))
             (analyzeModule (subtermRef . moduleBody)
-            (evalTerm <$> m))
+            (evalModuleBody <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
+        evalModuleBody term = Subterm term (do
+          result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
+          result <$ TermEvaluator (postlude lang))
 
         runInModule preludeEnv info
           = runReader info
