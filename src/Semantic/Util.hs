@@ -7,6 +7,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
+import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -32,6 +33,7 @@ import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
+import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
 import           Text.Show.Pretty (ppShow)
@@ -114,6 +116,19 @@ evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
        (evaluate proxy id withTermSpans modules))))))
 
 data TaskConfig = TaskConfig Config LogQueue StatQueue
+
+evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
+  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
+  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+  modules <- topologicalSort <$> runImportGraph proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
+       (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (evaluate proxy id withTermSpans modules))))))
+
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
