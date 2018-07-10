@@ -10,8 +10,8 @@ import qualified Data.Language as Language
 import SpecHelpers
 
 
-spec :: Spec
-spec = parallel $ do
+spec :: TaskConfig -> Spec
+spec config = parallel $ do
   describe "Python" $ do
     it "imports" $ do
       (_, (heap, res)) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
@@ -60,4 +60,4 @@ spec = parallel $ do
     ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/python/analysis/"
     evaluate = evalPythonProject . map (fixtures <>)
-    evalPythonProject = testEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python) pythonParser Language.Python
+    evalPythonProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Python) pythonParser Language.Python

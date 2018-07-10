@@ -37,11 +37,11 @@ main = do
     let args = TaskConfig config logger statter
     describe "Semantic.Stat" Semantic.Stat.Spec.spec
     parallel $ do
-      describe "Analysis.Go" Analysis.Go.Spec.spec
-      describe "Analysis.PHP" Analysis.PHP.Spec.spec
-      describe "Analysis.Python" Analysis.Python.Spec.spec
-      describe "Analysis.Ruby" Analysis.Ruby.Spec.spec
-      describe "Analysis.TypeScript" Analysis.TypeScript.Spec.spec
+      describe "Analysis.Go" (Analysis.Go.Spec.spec args)
+      describe "Analysis.PHP" (Analysis.PHP.Spec.spec args)
+      describe "Analysis.Python" (Analysis.Python.Spec.spec args)
+      describe "Analysis.Ruby" (Analysis.Ruby.Spec.spec args)
+      describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
       describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
       describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
       describe "Data.Diff" Data.Diff.Spec.spec
