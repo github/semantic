@@ -32,8 +32,7 @@ import Test.Hspec
 
 main :: IO ()
 main = do
-  config <- defaultConfig defaultOptions
-  withTelemetry config $ \ (TelemetryQueues logger statter _) -> hspec $ do
+  withOptions defaultOptions $ \ config logger statter -> hspec $ do
     let args = TaskConfig config logger statter
     describe "Semantic.Stat" Semantic.Stat.Spec.spec
     parallel $ do
