@@ -197,6 +197,13 @@ class HasPostlude (language :: Language) where
            -> Evaluator address value effects ()
   postlude _ = pure ()
 
+instance HasPostlude 'Go
+instance HasPostlude 'Haskell
+instance HasPostlude 'Java
+instance HasPostlude 'PHP
+instance HasPostlude 'Python
+instance HasPostlude 'Ruby
+instance HasPostlude 'TypeScript
 
 -- Effects
 
