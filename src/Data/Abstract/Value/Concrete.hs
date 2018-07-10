@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
 module Data.Abstract.Value.Concrete where
 
 import Control.Abstract
@@ -130,9 +130,13 @@ instance ( Coercible body (Eff effects)
             | otherwise             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
-    | Class _ _ env <- o = pure . Just . Env.newEnv $ env
+    | Class _ supers binds <- o = (Just . Env.Environment . (binds :|)) <$> ancestorBinds supers
     | Namespace _ env <- o = pure (Just env)
     | otherwise = pure Nothing
+      where ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
+                Class _ supers binds -> (binds :) <$> ancestorBinds supers
+                Namespace _ env -> pure . toList . Env.unEnvironment $ env
+                _ -> pure [])
 
   asString v
     | String n <- v = pure n
