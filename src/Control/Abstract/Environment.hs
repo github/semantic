@@ -3,6 +3,7 @@ module Control.Abstract.Environment
 ( Environment
 , Exports
 , getEnv
+, putEnv
 , export
 , lookupEnv
 , bind
@@ -28,6 +29,10 @@ import Prologue
 -- | Retrieve the environment.
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
+
+-- | Replace the environment.
+putEnv :: Member (Env address) effects => (Environment address) -> Evaluator address value effects ()
+putEnv = send . PutEnv
 
 -- | Add an export to the global export state.
 export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
@@ -62,6 +67,7 @@ data Env address m return where
   Close  :: Set Name        -> Env address m (Environment address)
   Locally :: m a            -> Env address m a
   GetEnv ::                    Env address m (Environment address)
+  PutEnv :: Environment address -> Env address m ()
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
 instance Effect (Env address) where
@@ -70,6 +76,7 @@ instance Effect (Env address) where
   handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
   handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c))) (dist . fmap k)
   handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
+  handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (dist . (<$ c) . k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
 runEnv :: Effects effects
@@ -94,6 +101,7 @@ handleEnv = \case
     a <- reinterpret2 handleEnv (raiseEff action)
     a <$ modify' (Env.pop @address)
   GetEnv -> get
+  PutEnv e -> put e
   Export name alias addr -> modify (Exports.insert name alias addr)
 
 -- | Errors involving the environment.
