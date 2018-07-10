@@ -180,6 +180,24 @@ instance HasPrelude 'JavaScript where
     defineNamespace "console" $ do
       define "log" (lambda builtInPrint)
 
+-- Postludes
+
+class HasPostlude (language :: Language) where
+  postlude :: ( AbstractValue address value effects
+              , HasCallStack
+              , Member (Allocator address value) effects
+              , Member (Env address) effects
+              , Member Fresh effects
+              , Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Member (Resumable (EnvironmentError address)) effects
+              , Member Trace effects
+              )
+           => proxy language
+           -> Evaluator address value effects ()
+  postlude _ = pure ()
+
+
 -- Effects
 
 -- | The type of error thrown when failing to evaluate a term.
