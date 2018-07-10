@@ -62,7 +62,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do
-    void $ traverse_ subtermValue expr
+    traverse_ subtermValue expr
     v <- throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
     rvalBox v
 
