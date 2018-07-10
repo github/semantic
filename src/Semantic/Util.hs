@@ -32,7 +32,7 @@ import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
-import           Semantic.Telemetry (LogQueue, StatQueue, TelemetryQueues(..))
+import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
@@ -103,10 +103,8 @@ evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
 -- Evaluate a project consisting of the listed paths.
-evaluateProject proxy parser lang paths = do
-  config <- defaultConfig debugOptions
-  withTelemetry config $ \(TelemetryQueues logger statter _) ->
-    evaluateProject' (TaskConfig config logger statter) proxy parser lang paths
+evaluateProject proxy parser lang paths = withOptions debugOptions $ \ config logger statter ->
+  evaluateProject' (TaskConfig config logger statter) proxy parser lang paths
 
 data TaskConfig = TaskConfig Config LogQueue StatQueue
 
