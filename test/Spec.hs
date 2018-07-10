@@ -24,6 +24,7 @@ import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
+import SpecHelpers (TaskConfig(..))
 import Semantic.Config (defaultConfig, defaultOptions, withTelemetry)
 import Semantic.Telemetry (TelemetryQueues(..))
 import qualified Proto3.Roundtrip
@@ -33,6 +34,7 @@ main :: IO ()
 main = do
   config <- defaultConfig defaultOptions
   withTelemetry config $ \ (TelemetryQueues logger statter _) -> hspec $ do
+    let args = TaskConfig config logger statter
     describe "Semantic.Stat" Semantic.Stat.Spec.spec
     parallel $ do
       describe "Analysis.Go" Analysis.Go.Spec.spec
@@ -57,5 +59,5 @@ main = do
       describe "Semantic" Semantic.Spec.spec
       describe "Semantic.CLI" Semantic.CLI.Spec.spec
       describe "Semantic.IO" Semantic.IO.Spec.spec
-      describe "Integration" (Integration.Spec.spec config logger statter)
+      describe "Integration" (Integration.Spec.spec args)
       describe "Protobuf roundtripping" Proto3.Roundtrip.spec
