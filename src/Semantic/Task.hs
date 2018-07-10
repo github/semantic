@@ -127,11 +127,12 @@ runTask = runTaskWithOptions defaultOptions
 
 -- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> TaskEff a -> IO a
-runTaskWithOptions opts task = do
-  config <- defaultConfig opts
-  result <- withTelemetry config $ \(TelemetryQueues logger statter _) ->
-    runTaskWithConfig config logger statter task
-  either (die . displayException) pure result
+runTaskWithOptions opts task = withOptions opts (\ config logger statter -> runTaskWithConfig config logger statter task) >>= either (die . displayException) pure
+
+withOptions :: Options -> (Config -> LogQueue -> StatQueue -> IO a) -> IO a
+withOptions options with = do
+  config <- defaultConfig options
+  withTelemetry config (\ (TelemetryQueues logger statter _) -> with config logger statter)
 
 -- | Execute a 'TaskEff' yielding its result value in 'IO'.
 runTaskWithConfig :: Config -> LogQueue -> StatQueue -> TaskEff a -> IO (Either SomeException a)
