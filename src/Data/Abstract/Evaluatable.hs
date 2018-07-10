@@ -205,6 +205,10 @@ instance HasPostlude 'Python
 instance HasPostlude 'Ruby
 instance HasPostlude 'TypeScript
 
+instance HasPostlude 'JavaScript where
+  postlude _ = trace "JS postlude"
+
+
 -- Effects
 
 -- | The type of error thrown when failing to evaluate a term.
