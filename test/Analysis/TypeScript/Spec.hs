@@ -11,8 +11,8 @@ import qualified Data.List.NonEmpty as NonEmpty
 import Data.Sum
 import SpecHelpers
 
-spec :: Spec
-spec = parallel $ do
+spec :: TaskConfig -> Spec
+spec config = parallel $ do
   describe "TypeScript" $ do
     it "imports with aliased symbols" $ do
       (_, (_, res)) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
@@ -49,4 +49,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
-    evalTypeScriptProject = testEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
+    evalTypeScriptProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
