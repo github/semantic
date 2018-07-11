@@ -77,7 +77,6 @@ cachingTerms recur term = do
 
 convergingModules :: ( AbstractValue address value effects
                      , Cacheable term address (Cell address) value
-                     , Member (Allocator address value) effects
                      , Member Fresh effects
                      , Member NonDet effects
                      , Member (Reader (Cache term address (Cell address) value)) effects
