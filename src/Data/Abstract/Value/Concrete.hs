@@ -1,8 +1,8 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
 module Data.Abstract.Value.Concrete where
 
 import Control.Abstract
-import Data.Abstract.Environment (Environment, mergeEnvs)
+import Data.Abstract.Environment (Environment, Bindings)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -24,7 +24,7 @@ data Value address body
   | Symbol Text
   | Tuple [address]
   | Array [address]
-  | Class Name (Environment address)
+  | Class Name [address] (Bindings address)
   | Namespace Name (Environment address)
   | KVPair (Value address body) (Value address body)
   | Hash [Value address body]
@@ -118,10 +118,8 @@ instance ( Coercible body (Eff effects)
   tuple = pure . Tuple
   array = pure . Array
 
-  klass n [] env = pure $ Class n env
-  klass n supers env = do
-    product <- foldl mergeEnvs lowerBound . catMaybes <$> traverse scopedEnvironment supers
-    pure $ Class n (mergeEnvs product env)
+  klass n supers binds = do
+    pure $ Class n supers binds
 
   namespace name env = do
     maybeAddr <- lookupEnv name
@@ -131,10 +129,13 @@ instance ( Coercible body (Eff effects)
             | Namespace _ env' <- v = pure env'
             | otherwise             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
-  scopedEnvironment o
-    | Class _ env <- o = pure (Just env)
-    | Namespace _ env <- o = pure (Just env)
-    | otherwise = pure Nothing
+  scopedEnvironment ptr = do
+    ancestors <- ancestorBinds [ptr]
+    pure (Env.Environment <$> nonEmpty ancestors)
+      where ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
+                Class _ supers binds -> (binds :) <$> ancestorBinds (reverse supers)
+                Namespace _ env -> pure . toList . Env.unEnvironment $ env
+                _ -> pure [])
 
   asString v
     | String n <- v = pure n

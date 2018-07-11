@@ -15,8 +15,8 @@ import qualified Data.Language as Language
 import SpecHelpers
 
 
-spec :: Spec
-spec = parallel $ do
+spec :: TaskConfig -> Spec
+spec config = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
       (_, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
@@ -104,4 +104,4 @@ spec = parallel $ do
     ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate = evalRubyProject . map (fixtures <>)
-    evalRubyProject = testEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby
+    evalRubyProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby
