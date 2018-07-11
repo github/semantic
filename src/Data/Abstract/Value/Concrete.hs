@@ -129,10 +129,9 @@ instance ( Coercible body (Eff effects)
             | Namespace _ env' <- v = pure env'
             | otherwise             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
-  scopedEnvironment o
-    | Class _ supers binds <- o = (Just . Env.Environment . (binds :|)) <$> ancestorBinds supers
-    | Namespace _ env <- o = pure (Just env)
-    | otherwise = pure Nothing
+  scopedEnvironment ptr = do
+    ancestors <- ancestorBinds [ptr]
+    pure (Env.Environment <$> nonEmpty ancestors)
       where ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
                 Class _ supers binds -> (binds :) <$> ancestorBinds supers
                 Namespace _ env -> pure . toList . Env.unEnvironment $ env
