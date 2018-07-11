@@ -133,7 +133,7 @@ instance ( Coercible body (Eff effects)
     ancestors <- ancestorBinds [ptr]
     pure (Env.Environment <$> nonEmpty ancestors)
       where ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
-                Class _ supers binds -> (binds :) <$> ancestorBinds supers
+                Class _ supers binds -> (binds :) <$> ancestorBinds (reverse supers)
                 Namespace _ env -> pure . toList . Env.unEnvironment $ env
                 _ -> pure [])
 
