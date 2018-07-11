@@ -30,6 +30,7 @@ instance AbstractIntro Abstract where
 instance ( Member (Allocator address Abstract) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
+         , Member Fresh effects
          )
       => AbstractFunction address Abstract effects where
   closure names _ body = do
