@@ -40,8 +40,8 @@ data Resolution (m :: * -> *) output where
   NoResolution     ::                                   Resolution m (Map FilePath FilePath)
 
 instance Effect Resolution where
-  handleState c dist (Request (NodeJSResolution path key paths) k) = Request (NodeJSResolution path key paths) (dist . (<$ c) . k)
-  handleState c dist (Request NoResolution k) = Request NoResolution (dist . (<$ c) . k)
+  handleState c dist (Request (NodeJSResolution path key paths) k) = Request (NodeJSResolution path key paths) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request NoResolution k) = Request NoResolution (\result -> dist (pure result <$ c) k)
 
 runResolution :: (Member Files effs, Effects effs) => Eff (Resolution ': effs) a -> Eff effs a
 runResolution = interpret $ \ res -> case res of
