@@ -197,7 +197,7 @@ data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, Effects effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -227,6 +227,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Member (Reader Config) effs
                          , Member Telemetry effs
                          , Member Trace effs
+                         , Effects effs
                          )
                       => (Source -> assignment (Term (Sum syntaxes) (Record Assignment.Location)) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) (Record Assignment.Location)))
                       -> Parser ast
