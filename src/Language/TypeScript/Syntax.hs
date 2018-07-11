@@ -742,11 +742,11 @@ instance Declarations a => Declarations (AbstractClass a) where
 instance Evaluatable AbstractClass where
   eval AbstractClass{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm abstractClassIdentifier)
-    supers <- traverse subtermValue classHeritage
+    supers <- traverse subtermAddress classHeritage
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody
-      classEnv <- newEnv . Env.head <$> getEnv
-      klass name supers classEnv
+      classBinds <- Env.head <$> getEnv
+      klass name supers classBinds
     rvalBox =<< (v <$ bind name addr)
 
 
