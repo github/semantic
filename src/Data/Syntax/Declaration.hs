@@ -163,11 +163,11 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Class where
   eval Class{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
-    supers <- traverse subtermValue classSuperclasses
+    supers <- traverse subtermAddress classSuperclasses
     (_, addr) <- letrec name $ do
       void $ subtermValue classBody
-      classEnv <- newEnv . Env.head <$> getEnv
-      klass name supers classEnv
+      classBinds <- Env.head <$> getEnv
+      klass name supers classBinds
     bind name addr
     pure (Rval addr)
 

@@ -200,7 +200,9 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (QualifiedName name iden) = Rval <$> evaluateInScopedEnv (subtermValue name) (subtermAddress iden)
+  eval (QualifiedName name iden) = do
+    namePtr <- subtermAddress name
+    Rval <$> evaluateInScopedEnv namePtr (subtermAddress iden)
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, Mergeable, FreeVariables1, Declarations1, ToJSONFields1)
@@ -212,7 +214,7 @@ instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
   eval (NamespaceName xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
-    where f ns = evaluateInScopedEnv (ns >>= deref)
+    where f ns id = ns >>= flip evaluateInScopedEnv id
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
