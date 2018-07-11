@@ -233,7 +233,6 @@ subtermValue = value <=< subtermRef
 
 -- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue address value effects
-           , Member (Allocator address value) effects
            , Member (Env address) effects
            , Member (Resumable (EnvironmentError address)) effects
            )
@@ -245,7 +244,6 @@ address (Rval addr) = pure addr
 
 -- | Evaluates a 'Subterm' to the address of its rval
 subtermAddress :: ( AbstractValue address value effects
-                  , Member (Allocator address value) effects
                   , Member (Env address) effects
                   , Member (Resumable (EnvironmentError address)) effects
                   )
