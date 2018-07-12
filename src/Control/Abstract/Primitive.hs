@@ -79,3 +79,21 @@ builtInPrint :: ( AbstractValue address value effects
                 )
              => Evaluator address value effects value
 builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit)
+
+builtInExport :: ( AbstractValue address value effects
+                 , HasCallStack
+                 , Member (Allocator address value) effects
+                 , Member (Env address) effects
+                 , Member Fresh effects
+                 , Member (Reader ModuleInfo) effects
+                 , Member (Reader Span) effects
+                 , Member (Resumable (EnvironmentError address)) effects
+                 )
+              => Evaluator address value effects value
+builtInExport = lambda (\ v -> do
+  var <- variable v >>= deref
+  (k, value) <- asPair var
+  sym <- asString k
+  addr <- box value
+  export (name sym) (name sym) (Just addr)
+  box unit)
