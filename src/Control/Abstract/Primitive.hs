@@ -55,7 +55,9 @@ defineNamespace name scope = define name $ do
     Env.newEnv . Env.head <$> getEnv
   namespace name env
 
-lambda :: (AbstractFunction address value effects, Member Fresh effects)
+lambda :: ( AbstractFunction address value effects
+          , Member Fresh effects
+          )
        => (Name -> Evaluator address value effects address)
        -> Evaluator address value effects value
 lambda body = do
