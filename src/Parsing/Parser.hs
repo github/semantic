@@ -29,7 +29,7 @@ module Parsing.Parser
 import           Assigning.Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
-import           Data.Abstract.Evaluatable (HasPrelude)
+import           Data.Abstract.Evaluatable (HasPrelude, HasPostlude)
 import           Data.AST
 import           Data.Kind
 import           Data.Language
@@ -68,6 +68,7 @@ data SomeAnalysisParser typeclasses ann where
   SomeAnalysisParser :: ( ApplyAll' typeclasses fs
                         , Element Syntax.Identifier fs
                         , HasPrelude lang
+                        , HasPostlude lang
                         )
                      => Parser (Term (Sum fs) ann) -- ^ A parser.
                      -> Proxy lang
