@@ -62,20 +62,6 @@ lambda body = do
   var <- gensym
   closure [var] lowerBound (body var)
 
-defineBuiltins :: ( AbstractValue address value effects
-                  , HasCallStack
-                  , Member (Allocator address value) effects
-                  , Member (Env address) effects
-                  , Member Fresh effects
-                  , Member (Reader ModuleInfo) effects
-                  , Member (Reader Span) effects
-                  , Member (Resumable (EnvironmentError address)) effects
-                  , Member Trace effects
-                  )
-               => Evaluator address value effects ()
-defineBuiltins =
-  define "__semantic_print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))
-
 builtInPrint :: ( AbstractValue address value effects
                 , Member (Allocator address value) effects
                 , Member (Env address) effects
