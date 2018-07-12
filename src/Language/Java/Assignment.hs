@@ -74,6 +74,7 @@ type Syntax =
    , Java.Syntax.GenericType
    , Java.Syntax.Import
    , Java.Syntax.Lambda
+   , Java.Syntax.LambdaBody
    , Java.Syntax.MethodReference
    , Java.Syntax.Module
    , Java.Syntax.New
@@ -597,6 +598,6 @@ arrayAccess :: Assignment Term
 arrayAccess = makeTerm <$> symbol ArrayAccess <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
 
 lambda :: Assignment Term
-lambda = makeTerm <$> symbol LambdaExpression <*> children (Java.Syntax.Lambda <$> term expression <* token AnonMinusRAngle <*> term expression)
--- The current error occurs when a lambda expression is the argument in the argument for a method;
--- If it is exposed at the top-level, lambdas will be referenced in expressionChoices
+lambda = makeTerm <$> symbol LambdaExpression <*> children (Java.Syntax.Lambda <$> manyTerm expression <* token AnonMinusRAngle <*> lambdaBody)
+  where
+    lambdaBody = makeTerm <$> symbol Grammar.LambdaBody <*> children (Java.Syntax.LambdaBody <$> manyTerm expression)
