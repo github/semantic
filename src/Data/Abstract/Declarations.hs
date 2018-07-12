@@ -13,7 +13,7 @@ class Declarations syntax where
 
 class Declarations1 syntax where
   -- | Lift a function mapping each element to its set of free variables through a containing structure, collecting the results into a single set.
-  liftDeclaredName :: (a -> [Name]) -> syntax a -> Maybe Name
+  liftDeclaredName :: Declarations a => (a -> [Name]) -> syntax a -> Maybe Name
   liftDeclaredName _ _ = Nothing
 
 instance Declarations t => Declarations (Subterm t a) where
@@ -21,7 +21,7 @@ instance Declarations t => Declarations (Subterm t a) where
 
 deriving instance (Declarations1 syntax, FreeVariables1 syntax) => Declarations (Term syntax ann)
 
-instance (FreeVariables recur, Declarations1 syntax) => Declarations (TermF syntax ann recur) where
+instance (Declarations recur, FreeVariables recur, Declarations1 syntax) => Declarations (TermF syntax ann recur) where
   declaredName = liftDeclaredName freeVariables . termFOut
 
 instance (Apply Declarations1 fs) => Declarations1 (Sum fs) where
