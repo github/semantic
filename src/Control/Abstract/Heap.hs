@@ -175,10 +175,10 @@ runAllocator = interpret $ \ eff -> case eff of
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
 instance Effect (Allocator address value) where
-  handleState c dist (Request (Alloc name) k) = Request (Alloc name) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (Deref addr) k) = Request (Deref addr) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (GC roots) k) = Request (GC roots) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Alloc name) k = Request (Alloc name) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Deref addr) k = Request (Deref addr) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Assign addr value) k = Request (Assign addr value) (\result -> dist (pure result <$ c) k)
+  handleState c dist (GC roots) k = Request (GC roots) (\result -> dist (pure result <$ c) k)
 
 
 data AddressError address value resume where
