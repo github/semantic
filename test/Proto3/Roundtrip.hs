@@ -7,14 +7,16 @@ import SpecHelpers
 import Data.Span
 import qualified Data.ByteString.Lazy as L
 import Data.Source
+import Data.Functor.Foldable
 import Proto3.Suite
 import qualified Proto3.Wire.Encode as E
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term (Term)
+import Data.Diff (Diff)
 import Data.Sum
-import Language.JSON.Assignment (Syntax)
+import Language.Ruby.Assignment (Syntax)
 import qualified Language.Ruby.Assignment as Ruby
 import Data.Functor.Classes
 
@@ -51,6 +53,11 @@ spec = parallel $ do
   describe "terms of syntax" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip @(Term (Sum Syntax) ()) (unListableF sp)
+
+  describe "diffs of syntax" $
+    prop "roundtrips" $
+      \sp -> do
+        shouldRoundtrip @(Diff (Sum Syntax) () ()) sp
 
   describe "arrays" $
     prop "roundtrips" $
