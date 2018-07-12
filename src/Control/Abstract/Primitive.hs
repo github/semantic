@@ -73,5 +73,13 @@ defineBuiltins :: ( AbstractValue address value effects
                   , Member Trace effects
                   )
                => Evaluator address value effects ()
-defineBuiltins =
+defineBuiltins = do
   define "__semantic_print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))
+
+  define "__semantic_export" (lambda (\ v -> do
+    var <- variable v >>= deref
+    (k, value) <- asPair var
+    sym <- asString k
+    addr <- box value
+    export (name sym) (name sym) (Just addr)
+    box unit))

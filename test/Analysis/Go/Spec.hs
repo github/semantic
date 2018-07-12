@@ -8,8 +8,8 @@ import qualified Language.Go.Assignment as Go
 import SpecHelpers
 
 
-spec :: Spec
-spec = parallel $ do
+spec :: TaskConfig -> Spec
+spec config = parallel $ do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
       (_, (heap, res)) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
@@ -30,4 +30,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/go/analysis/"
     evaluate = evalGoProject . map (fixtures <>)
-    evalGoProject = testEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go) goParser Language.Go
+    evalGoProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Go) goParser Language.Go
