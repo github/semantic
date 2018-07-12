@@ -103,7 +103,6 @@ evaluate :: ( AbstractValue address value inner
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
 evaluate lang analyzeModule analyzeTerm modules = do
   (preludeEnv, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
-    defineBuiltins
     definePrelude lang
     box unit
   foldr (run preludeEnv) ask modules
@@ -153,27 +152,13 @@ instance HasPrelude 'Haskell
 instance HasPrelude 'Java
 instance HasPrelude 'PHP
 
-builtInPrint :: ( AbstractIntro value
-                , AbstractFunction address value effects
-                , Member (Allocator address value) effects
-                , Member (Env address) effects
-                , Member Fresh effects
-                , Member (Resumable (EnvironmentError address)) effects
-                )
-             => Name
-             -> Evaluator address value effects address
-builtInPrint v = do
-  print <- variable "__semantic_print" >>= deref
-  void $ call print [variable v]
-  box unit
-
 instance HasPrelude 'Python where
   definePrelude _ =
-    define "print" (lambda builtInPrint)
+    define "print" builtInPrint
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define "puts" (lambda builtInPrint)
+    define "puts" builtInPrint
 
     defineClass "Object" [] $ do
       define "inspect" (lambda (const (box (string "<object>"))))
@@ -181,12 +166,12 @@ instance HasPrelude 'Ruby where
 instance HasPrelude 'TypeScript where
   definePrelude _ =
     defineNamespace "console" $ do
-      define "log" (lambda builtInPrint)
+      define "log" builtInPrint
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineNamespace "console" $ do
-      define "log" (lambda builtInPrint)
+      define "log" builtInPrint
 
 -- Postludes
 
