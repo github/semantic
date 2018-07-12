@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Diff
 ( Diff(..)
 , DiffF(..)
@@ -31,6 +31,11 @@ import Data.Patch
 import Data.Record
 import Data.Term
 import Text.Show
+import Prologue
+import Proto3.Suite.Class
+import Proto3.Suite.DotProto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
 newtype Diff syntax ann1 ann2 = Diff { unDiff :: DiffF syntax ann1 ann2 (Diff syntax ann1 ann2) }
@@ -152,6 +157,42 @@ instance (Show1 syntax, Show ann1, Show ann2) => Show1 (DiffF syntax ann1 ann2) 
 instance (Show1 syntax, Show ann1, Show ann2, Show recur) => Show (DiffF syntax ann1 ann2 recur) where
   showsPrec = showsPrec3
 
+instance (Named1 f, Message1 f, Named (Diff f () ())) => Message (Diff f () ()) where
+  encodeMessage = undefined
+  decodeMessage = undefined
+  dotProto (x :: Proxy (Diff f () ())) =
+    [ DotProtoMessageOneOf (Single "diff")
+      [ DotProtoField 1 (Prim . Named $ Single "Merge") (Single "merge") [] Nothing
+      , DotProtoField 2 (Prim . Named $ Single "Delete") (Single "delete") [] Nothing
+      , DotProtoField 3 (Prim . Named $ Single "Insert") (Single "insert") [] Nothing
+      , DotProtoField 4 (Prim . Named $ Single "Replace") (Single "replace") [] Nothing
+      ]
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Merge" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "syntax") [] Nothing)
+          , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Delete" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
+          , DotProtoMessageField (DotProtoField 3 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Insert" )
+          [ DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
+          , DotProtoMessageField (DotProtoField 3 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Replace" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
+          , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
+          , DotProtoMessageField (DotProtoField 3 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
+          ] )
+    ]
 
 instance Functor syntax => Bifunctor (Diff syntax) where
   bimap f g = go where go = Diff . trimap f g go . unDiff
