@@ -10,7 +10,7 @@ import           Prologue
 import           Proto3.Suite.Class
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, ToJSONFields1, Named1, Message1)
 
 instance Diffable Function where
   equivalentBySubterm = Just . functionName
@@ -33,6 +33,8 @@ instance Evaluatable Function where
 instance Declarations a => Declarations (Function a) where
   declaredName Function{..} = declaredName functionName
 
+instance Declarations1 Function where
+  liftDeclaredName _ = declaredName
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
