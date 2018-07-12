@@ -76,13 +76,12 @@ defineBuiltins :: ( AbstractValue address value effects
 defineBuiltins =
   define "__semantic_print" (lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit))
 
-builtInPrint :: ( AbstractFunction address value effects
+builtInPrint :: ( AbstractValue address value effects
                 , Member (Allocator address value) effects
                 , Member (Env address) effects
                 , Member Fresh effects
                 , Member (Resumable (EnvironmentError address)) effects
+                , Member Trace effects
                 )
              => Evaluator address value effects value
-builtInPrint = lambda $ \ v -> do
-  print <- variable "__semantic_print" >>= deref
-  call print [variable v]
+builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit)
