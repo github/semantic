@@ -313,7 +313,7 @@ methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Ex
     -- optional produces a Maybe type (takes a Maybe a and returns a rule that produces a Maybe a)
 
 methodReference :: Assignment Term
-methodReference = makeTerm <$> symbol Grammar.MethodReference <*> children (Java.Syntax.MethodReference <$> term type' <* token AnonColonColon <*> manyTerm type' <*> (new <|> term identifier))
+methodReference = makeTerm <$> symbol Grammar.MethodReference <*> children (Java.Syntax.MethodReference <$> term type' <*> manyTerm typeArgument <*> (new <|> term identifier))
   where new = makeTerm <$> token AnonNew <*> pure NewKeyword
 -- can't do term identifier' because identifier' returns a name, not a term, and we want a term
 -- <*> - left assoc so when you have a token that you need to match but not retain,
