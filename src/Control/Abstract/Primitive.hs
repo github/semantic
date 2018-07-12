@@ -56,18 +56,24 @@ defineNamespace name scope = define name $ do
   namespace name env
 
 lambda :: ( AbstractFunction address value effects
+          , HasCallStack
           , Member Fresh effects
+          , Member (Reader ModuleInfo) effects
+          , Member (Reader Span) effects
           )
        => (Name -> Evaluator address value effects address)
        -> Evaluator address value effects value
-lambda body = do
+lambda body = withCurrentCallStack callStack $ do
   var <- gensym
   closure [var] lowerBound (body var)
 
 builtInPrint :: ( AbstractValue address value effects
+                , HasCallStack
                 , Member (Allocator address value) effects
                 , Member (Env address) effects
                 , Member Fresh effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
                 , Member (Resumable (EnvironmentError address)) effects
                 , Member Trace effects
                 )
