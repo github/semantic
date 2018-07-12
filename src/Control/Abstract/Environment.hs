@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
 , Exports
@@ -53,7 +53,10 @@ bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.flatPairs
 
 -- | Run an action in a new local scope.
 locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
-locally = send . Locally @address . lowerEff
+locally a = do
+  send (Push @address)
+  a' <- a
+  a' <$ send (Pop @address)
 
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close
@@ -61,11 +64,12 @@ close = send . Close
 
 -- Effects
 
-data Env address m return where
+data Env address (m :: * -> *) return where
   Lookup :: Name            -> Env address m (Maybe address)
   Bind   :: Name -> address -> Env address m ()
   Close  :: Set Name        -> Env address m (Environment address)
-  Locally :: m a            -> Env address m a
+  Push   :: Env address m ()
+  Pop    :: Env address m ()
   GetEnv ::                    Env address m (Environment address)
   PutEnv :: Environment address -> Env address m ()
   Export :: Name -> Name -> Maybe address -> Env address m ()
@@ -74,7 +78,8 @@ instance Effect (Env address) where
   handleState c dist (Request (Lookup name) k) = Request (Lookup name) (\result -> dist (pure result <$ c) k)
   handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (\result -> dist (pure result <$ c) k)
   handleState c dist (Request (Close names) k) = Request (Close names) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c) k)) pure
+  handleState c dist (Request Push k) = Request Push (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request Pop k) = Request Pop (\result -> dist (pure result <$ c) k)
   handleState c dist (Request GetEnv k) = Request GetEnv (\result -> dist (pure result <$ c) k)
   handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (\result -> dist (pure result <$ c) k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (\result -> dist (pure result <$ c) k)
@@ -91,15 +96,13 @@ runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound 
           | Exports.null ports = (Env.newEnv binds, a)
           | otherwise          = (Env.newEnv (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds), a)
 
-handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
+handleEnv :: forall address value effects a . Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
 handleEnv = \case
   Lookup name -> Env.lookup name <$> get
   Bind name addr -> modify (Env.insert name addr)
   Close names -> Env.intersect names <$> get
-  Locally action -> do
-    modify' (Env.push @address)
-    a <- reinterpret2 handleEnv (raiseEff action)
-    a <$ modify' (Env.pop @address)
+  Push -> modify' (Env.push @address)
+  Pop -> modify' (Env.pop @address)
   GetEnv -> get
   PutEnv e -> put e
   Export name alias addr -> modify (Exports.insert name alias addr)
