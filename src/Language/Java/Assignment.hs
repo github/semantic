@@ -598,6 +598,6 @@ arrayAccess :: Assignment Term
 arrayAccess = makeTerm <$> symbol ArrayAccess <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
 
 lambda :: Assignment Term
-lambda = makeTerm <$> symbol LambdaExpression <*> children (Java.Syntax.Lambda <$> manyTerm expression <* token AnonMinusRAngle <*> lambdaBody)
+lambda = makeTerm <$> symbol LambdaExpression <*> children (Java.Syntax.Lambda <$> manyTerm expression <*> lambdaBody)
   where
     lambdaBody = makeTerm <$> symbol Grammar.LambdaBody <*> children (Java.Syntax.LambdaBody <$> manyTerm expression)
