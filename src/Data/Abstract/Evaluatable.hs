@@ -6,6 +6,8 @@ module Data.Abstract.Evaluatable
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
+-- * Postludes
+, HasPostlude(..)
 -- * Effects
 , EvalError(..)
 , throwEvalError
@@ -63,7 +65,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do
-    void $ traverse_ subtermValue expr
+    traverse_ subtermValue expr
     v <- throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
     rvalBox v
 
@@ -75,6 +77,7 @@ evaluate :: ( AbstractValue address value inner
             , Evaluatable (Base term)
             , Foldable (Cell address)
             , FreeVariables term
+            , HasPostlude lang
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
@@ -107,11 +110,13 @@ evaluate lang analyzeModule analyzeTerm modules = do
           evaluated <- coerce
             (runInModule preludeEnv (moduleInfo m))
             (analyzeModule (subtermRef . moduleBody)
-            (evalTerm <$> m))
+            (evalModuleBody <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
+        evalModuleBody term = Subterm term (do
+          result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
+          result <$ TermEvaluator (postlude lang))
 
         runInModule preludeEnv info
           = runReader info
@@ -167,6 +172,35 @@ instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineNamespace "console" $ do
       define "log" builtInPrint
+
+-- Postludes
+
+class HasPostlude (language :: Language) where
+  postlude :: ( AbstractValue address value effects
+              , HasCallStack
+              , Member (Allocator address value) effects
+              , Member (Env address) effects
+              , Member Fresh effects
+              , Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Member (Resumable (EnvironmentError address)) effects
+              , Member Trace effects
+              )
+           => proxy language
+           -> Evaluator address value effects ()
+  postlude _ = pure ()
+
+instance HasPostlude 'Go
+instance HasPostlude 'Haskell
+instance HasPostlude 'Java
+instance HasPostlude 'PHP
+instance HasPostlude 'Python
+instance HasPostlude 'Ruby
+instance HasPostlude 'TypeScript
+
+instance HasPostlude 'JavaScript where
+  postlude _ = trace "JS postlude"
+
 
 -- Effects
 
