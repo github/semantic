@@ -148,20 +148,6 @@ instance HasPrelude 'Haskell
 instance HasPrelude 'Java
 instance HasPrelude 'PHP
 
-builtInPrint :: ( AbstractIntro value
-                , AbstractFunction address value effects
-                , Member (Allocator address value) effects
-                , Member (Env address) effects
-                , Member Fresh effects
-                , Member (Resumable (EnvironmentError address)) effects
-                )
-             => Name
-             -> Evaluator address value effects address
-builtInPrint v = do
-  print <- variable "__semantic_print" >>= deref
-  void $ call print [variable v]
-  box unit
-
 instance HasPrelude 'Python where
   definePrelude _ =
     define "print" (lambda builtInPrint)
