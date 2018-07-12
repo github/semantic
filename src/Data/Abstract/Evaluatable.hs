@@ -150,11 +150,11 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    define "print" (lambda builtInPrint)
+    define "print" builtInPrint
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define "puts" (lambda builtInPrint)
+    define "puts" builtInPrint
 
     defineClass "Object" [] $ do
       define "inspect" (lambda (const (box (string "<object>"))))
@@ -162,12 +162,12 @@ instance HasPrelude 'Ruby where
 instance HasPrelude 'TypeScript where
   definePrelude _ =
     defineNamespace "console" $ do
-      define "log" (lambda builtInPrint)
+      define "log" builtInPrint
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineNamespace "console" $ do
-      define "log" (lambda builtInPrint)
+      define "log" builtInPrint
 
 -- Effects
 
