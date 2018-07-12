@@ -100,7 +100,6 @@ evaluate :: ( AbstractValue address value inner
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
 evaluate lang analyzeModule analyzeTerm modules = do
   (preludeEnv, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
-    defineBuiltins
     definePrelude lang
     box unit
   foldr (run preludeEnv) ask modules
