@@ -138,7 +138,7 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   -- Namespaces model closures with monoidal environments.
   namespace :: Name                 -- ^ The namespace's identifier
             -> Maybe address        -- The ancestor of the namespace
-            -> Environment address  -- ^ The environment to mappend
+            -> Bindings address     -- ^ The environment to mappend
             -> Evaluator address value effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
@@ -194,10 +194,8 @@ makeNamespace :: ( AbstractValue address value effects
               -> Evaluator address value effects ()
               -> Evaluator address value effects value
 makeNamespace name addr super body = do
-  superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
-  let env' = fromMaybe lowerBound superEnv
-  namespaceEnv <- locally (body >> getEnv)
-  v <- namespace name super (Env.mergeNewer env' namespaceEnv)
+  namespaceBinds <- Env.head <$> locally (body >> getEnv)
+  v <- namespace name super namespaceBinds
   v <$ assign addr v
 
 

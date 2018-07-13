@@ -25,7 +25,7 @@ data Value address body
   | Tuple [address]
   | Array [address]
   | Class Name [address] (Bindings address)
-  | Namespace Name (Maybe address) (Environment address)
+  | Namespace Name (Maybe address) (Bindings address)
   | KVPair (Value address body) (Value address body)
   | Hash [Value address body]
   | Null
@@ -122,21 +122,22 @@ instance ( Coercible body (Eff effects)
   klass n supers binds = do
     pure $ Class n supers binds
 
-  namespace name super env = do
+  namespace name super binds = do
     maybeAddr <- lookupEnv name
-    env' <- maybe (pure lowerBound) (asNamespaceEnv <=< deref) maybeAddr
-    pure (Namespace name super (Env.mergeNewer env' env))
-    where asNamespaceEnv v
-            | Namespace _ _ env' <- v = pure env'
-            | otherwise               = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
+    binds' <- maybe (pure lowerBound) (asNamespaceBinds <=< deref) maybeAddr
+    pure (Namespace name super (binds' <> binds))
+    where asNamespaceBinds v
+            | Namespace _ _ binds' <- v = pure binds'
+            | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment ptr = do
     ancestors <- ancestorBinds [ptr]
     pure (Env.Environment <$> nonEmpty ancestors)
-      where ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
-                Class _ supers binds -> (binds :) <$> ancestorBinds (reverse supers)
-                Namespace _ supers env -> (Env.head env :) <$> ancestorBinds (toList supers)
-                _ -> pure [])
+      where
+        ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
+          Class _ supers binds -> (binds :) <$> ancestorBinds (reverse supers)
+          Namespace _ supers binds -> (binds :) <$> ancestorBinds (toList supers)
+          _ -> pure [])
 
   asString v
     | String n <- v = pure n
@@ -227,7 +228,7 @@ data ValueError address body resume where
   StringError            :: Value address body                       -> ValueError address body Text
   BoolError              :: Value address body                       -> ValueError address body Bool
   IndexError             :: Value address body -> Value address body -> ValueError address body (Value address body)
-  NamespaceError         :: Prelude.String                           -> ValueError address body (Environment address)
+  NamespaceError         :: Prelude.String                           -> ValueError address body (Bindings address)
   CallError              :: Value address body                       -> ValueError address body (Value address body)
   NumericError           :: Value address body                       -> ValueError address body (Value address body)
   Numeric2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)

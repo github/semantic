@@ -50,10 +50,8 @@ defineNamespace :: ( AbstractValue address value effects
                 -> Evaluator address value effects a
                 -> Evaluator address value effects ()
 defineNamespace name scope = define name $ do
-  env <- locally $ do
-    void scope
-    Env.newEnv . Env.head <$> getEnv
-  namespace name Nothing env
+  binds <- Env.head <$> locally (scope >> getEnv)
+  namespace name Nothing binds
 
 lambda :: ( AbstractFunction address value effects
           , HasCallStack
