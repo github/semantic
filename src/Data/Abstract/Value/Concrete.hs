@@ -78,7 +78,7 @@ instance ( Coercible body (Eff effects)
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
             addr <- param
-            Env.insert name addr <$> rest) (pure env) (zip names params)
+            Env.insertEnv name addr <$> rest) (pure env) (zip names params)
           locally (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> box =<< throwValueError (CallError op)
 

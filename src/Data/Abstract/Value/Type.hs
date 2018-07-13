@@ -243,7 +243,7 @@ instance ( Member (Allocator address Type) effects
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
-      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
+      bimap (Env.insertEnv name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
     (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll env *> body)))
 
   call op params = do

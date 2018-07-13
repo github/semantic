@@ -37,7 +37,7 @@ instance ( Member (Allocator address Abstract) effects
     env <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract
-      Env.insert name addr <$> rest) (pure lowerBound) names
+      Env.insertEnv name addr <$> rest) (pure lowerBound) names
     addr <- locally (bindAll env *> catchReturn body)
     deref addr
 

@@ -257,7 +257,7 @@ instance Evaluatable QualifiedExportFrom where
     importedEnv <- fst <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \Alias{..} -> do
-      let address = Env.lookup aliasValue importedEnv
+      let address = Env.lookupEnv' aliasValue importedEnv
       maybe (throwEvalError $ ExportError modulePath aliasValue) (export aliasValue aliasName . Just) address
     rvalBox unit
 
