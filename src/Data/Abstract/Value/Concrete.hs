@@ -25,7 +25,7 @@ data Value address body
   | Tuple [address]
   | Array [address]
   | Class Name [address] (Bindings address)
-  | Namespace Name (Environment address)
+  | Namespace Name (Maybe address) (Environment address)
   | KVPair (Value address body) (Value address body)
   | Hash [Value address body]
   | Null
@@ -122,20 +122,20 @@ instance ( Coercible body (Eff effects)
   klass n supers binds = do
     pure $ Class n supers binds
 
-  namespace name env = do
+  namespace name super env = do
     maybeAddr <- lookupEnv name
     env' <- maybe (pure lowerBound) (asNamespaceEnv <=< deref) maybeAddr
-    pure (Namespace name (Env.mergeNewer env' env))
+    pure (Namespace name super (Env.mergeNewer env' env))
     where asNamespaceEnv v
-            | Namespace _ env' <- v = pure env'
-            | otherwise             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
+            | Namespace _ _ env' <- v = pure env'
+            | otherwise               = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment ptr = do
     ancestors <- ancestorBinds [ptr]
     pure (Env.Environment <$> nonEmpty ancestors)
       where ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
                 Class _ supers binds -> (binds :) <$> ancestorBinds (reverse supers)
-                Namespace _ env -> pure . toList . Env.unEnvironment $ env
+                Namespace _ _ env -> pure . toList . Env.unEnvironment $ env
                 _ -> pure [])
 
   asString v

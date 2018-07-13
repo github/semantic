@@ -53,7 +53,7 @@ defineNamespace name scope = define name $ do
   env <- locally $ do
     void scope
     Env.newEnv . Env.head <$> getEnv
-  namespace name env
+  namespace name Nothing env
 
 lambda :: ( AbstractFunction address value effects
           , HasCallStack

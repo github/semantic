@@ -273,8 +273,8 @@ instance ( Member (Allocator address Type) effects
 
   tuple fields = zeroOrMoreProduct <$> traverse deref fields
 
-  klass _ _ _   = pure Object
-  namespace _ _ = pure Unit
+  klass _ _ _     = pure Object
+  namespace _ _ _ = pure Unit
 
   scopedEnvironment _ = pure (Just lowerBound)
 
