@@ -53,7 +53,7 @@ bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.flatPairs
 
 -- | Run an action in a new local scope.
 locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
-locally = send . Locally @address . lowerEff
+locally = send . Locally @_ @_ @address . lowerEff
 
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close
