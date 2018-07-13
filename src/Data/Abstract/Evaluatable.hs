@@ -81,7 +81,7 @@ evaluate :: ( AbstractValue address value inner
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
-            , Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (AddressError address value)) effects
@@ -100,7 +100,7 @@ evaluate :: ( AbstractValue address value inner
          -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
          -> [Module term]
-         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm modules = do
   (preludeEnv, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
     definePrelude lang

@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
+import           Control.Abstract.Modules
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
@@ -55,7 +56,7 @@ include :: ( AbstractValue address value effects
            , Member Trace effects
            )
         => Subterm term (Evaluator address value effects (ValueRef address))
-        -> (ModulePath -> Evaluator address value effects (Environment address, address))
+        -> (ModulePath -> Evaluator address value effects (ModuleResult address))
         -> Evaluator address value effects (ValueRef address)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
