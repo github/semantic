@@ -57,7 +57,7 @@ instance ( Member (Allocator address Abstract) effects
   tuple _ = pure Abstract
 
   klass _ _ _ = pure Abstract
-  namespace _ _ = pure Abstract
+  namespace _ _ _ = pure Abstract
 
   scopedEnvironment _ = pure lowerBound
 
