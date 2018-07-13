@@ -1,9 +1,8 @@
 ---
 type: cabal
 name: transformers-compat
-version: 0.5.1.4
-summary: A small compatibility shim exposing the new types from transformers 0.3 and
-  0.4 to older Haskell platforms.
+version: 0.6.2
+summary: A small compatibility shim for the transformers library
 homepage: https://github.com/ekmett/transformers-compat/
 license: bsd-3-clause
 ---

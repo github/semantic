@@ -13,7 +13,6 @@ module Data.Functor.Classes.Generic
 
 import Data.Functor.Classes
 import Data.List (intersperse)
-import Data.Semigroup
 import GHC.Generics
 import Text.Show (showListWith)
 
