@@ -102,13 +102,13 @@ evaluate :: ( AbstractValue address value inner
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm modules = do
-  (preludeEnv, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
+  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
     definePrelude lang
     box unit
-  foldr (run preludeEnv) ask modules
-  where run preludeEnv m rest = do
+  foldr (run preludeBinds) ask modules
+  where run preludeBinds m rest = do
           evaluated <- coerce
-            (runInModule preludeEnv (moduleInfo m))
+            (runInModule preludeBinds (moduleInfo m))
             (analyzeModule (subtermRef . moduleBody)
             (evalModuleBody <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
@@ -118,10 +118,10 @@ evaluate lang analyzeModule analyzeTerm modules = do
           result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
           result <$ TermEvaluator (postlude lang))
 
-        runInModule preludeEnv info
+        runInModule preludeBinds info
           = runReader info
           . runAllocator
-          . runEnv preludeEnv
+          . runEnv (newEnv preludeBinds)
           . runReturn
           . runLoopControl
 
