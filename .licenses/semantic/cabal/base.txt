@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: base
-version: 4.10.1.0
+version: 4.11.1.0
 summary: Basic libraries
 homepage: 
 license: bsd-3-clause

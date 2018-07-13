@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: th-abstraction
-version: 0.2.6.0
+version: 0.2.8.0
 summary: Nicer interface for reified information about data types
 homepage: https://github.com/glguy/th-abstraction
 license: isc

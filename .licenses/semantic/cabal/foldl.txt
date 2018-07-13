@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: foldl
-version: 1.3.7
+version: 1.4.2
 summary: Composable, streaming, and efficient left folds
 homepage: 
 license: bsd-3-clause
