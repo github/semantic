@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module SpecHelpers
 ( module X
 , runBuilder
@@ -11,6 +13,9 @@ module SpecHelpers
 , TermEvaluator(..)
 , Verbatim(..)
 , toList
+, Config
+, LogQueue
+, StatQueue
 ) where
 
 import Control.Abstract
@@ -41,6 +46,7 @@ import Data.Record as X
 import Data.Semilattice.Lower as X
 import Data.Source as X
 import Data.Span as X
+import Data.String
 import Data.Sum
 import Data.Term as X
 import Parsing.Parser as X
@@ -65,16 +71,25 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
+import Semantic.Config (Config)
+import Semantic.Telemetry (LogQueue, StatQueue)
+import System.Exit (die)
+import Control.Exception (displayException)
 
 runBuilder = toStrict . toLazyByteString
 
+-- | This orphan instance is so we don't have to insert @name@ calls
+-- in dozens and dozens of environment specs.
+instance IsString Name where
+  fromString = name . fromString
+
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: Both FilePath -> IO ByteString
-diffFilePaths paths = readFilePair paths >>= fmap runBuilder . runTask . runDiff SExpressionDiffRenderer . pure
+diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
+diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= runTaskWithConfig config logger statter . runDiff SExpressionDiffRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap runBuilder . runTask . runParse SExpressionTermRenderer . pure
+parseFilePath :: TaskConfig -> FilePath -> IO ByteString
+parseFilePath (TaskConfig config logger statter) path = (fromJust <$> IO.readFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair

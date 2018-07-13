@@ -151,5 +151,8 @@ addresses = fromAddresses . map snd . flatPairs
 
 instance Lower (Environment address) where lowerBound = Environment (lowerBound :| [])
 
+-- N.B. this show instance drops some information to avoid generating
+-- an infinite string in certain cases. As such, two unequal
+-- environments may produce equal outputs over Show.
 instance Show address => Show (Environment address) where
   showsPrec d = showsUnaryWith showsPrec "Environment" d . flatPairs

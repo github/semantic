@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: recursion-schemes
-version: 5.0.2
+version: 5.0.3
 summary: Generalized bananas, lenses and barbed wire
 homepage: https://github.com/ekmett/recursion-schemes/
 license: bsd-2-clause

@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc-prim
-version: 0.5.1.1
+version: 0.5.2.0
 summary: GHC primitives
 homepage: 
 license: bsd-3-clause
@@ -67,4 +67,3 @@ Haskell 98", is distributed under the following license:
   copied and distributed for any purpose, provided that the modified
   version is clearly presented as such, and that it does not claim to
   be a definition of the Haskell 98 Language.
-

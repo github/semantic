@@ -6,6 +6,8 @@ module Data.Abstract.Evaluatable
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
+-- * Postludes
+, HasPostlude(..)
 -- * Effects
 , EvalError(..)
 , throwEvalError
@@ -50,20 +52,20 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
-          , Member Fresh effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
           , Member (Resumable (EnvironmentError address)) effects
+          , Member (Resumable (Unspecialized value)) effects
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
-          , Member (Resumable (Unspecialized value)) effects
+          , Member Fresh effects
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do
-    void $ traverse_ subtermValue expr
+    traverse_ subtermValue expr
     v <- throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
     rvalBox v
 
@@ -75,6 +77,7 @@ evaluate :: ( AbstractValue address value inner
             , Evaluatable (Base term)
             , Foldable (Cell address)
             , FreeVariables term
+            , HasPostlude lang
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
@@ -100,7 +103,6 @@ evaluate :: ( AbstractValue address value inner
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
 evaluate lang analyzeModule analyzeTerm modules = do
   (preludeEnv, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
-    defineBuiltins
     definePrelude lang
     box unit
   foldr (run preludeEnv) ask modules
@@ -108,11 +110,13 @@ evaluate lang analyzeModule analyzeTerm modules = do
           evaluated <- coerce
             (runInModule preludeEnv (moduleInfo m))
             (analyzeModule (subtermRef . moduleBody)
-            (evalTerm <$> m))
+            (evalModuleBody <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalTerm term = Subterm term (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address)
+        evalModuleBody term = Subterm term (do
+          result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
+          result <$ TermEvaluator (postlude lang))
 
         runInModule preludeEnv info
           = runReader info
@@ -148,40 +152,55 @@ instance HasPrelude 'Haskell
 instance HasPrelude 'Java
 instance HasPrelude 'PHP
 
-builtInPrint :: ( AbstractIntro value
-                , AbstractFunction address value effects
-                , Member (Allocator address value) effects
-                , Member (Env address) effects
-                , Member Fresh effects
-                , Member (Resumable (EnvironmentError address)) effects
-                )
-             => Name
-             -> Evaluator address value effects address
-builtInPrint v = do
-  print <- variable "__semantic_print" >>= deref
-  void $ call print [variable v]
-  box unit
-
 instance HasPrelude 'Python where
   definePrelude _ =
-    define "print" (lambda builtInPrint)
+    define (name "print") builtInPrint
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define "puts" (lambda builtInPrint)
+    define (name "puts") builtInPrint
 
-    defineClass "Object" [] $ do
-      define "inspect" (lambda (const (box (string "<object>"))))
+    defineClass (name "Object") [] $ do
+      define (name "inspect") (lambda (const (box (string "<object>"))))
 
 instance HasPrelude 'TypeScript where
   definePrelude _ =
-    defineNamespace "console" $ do
-      define "log" (lambda builtInPrint)
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    defineNamespace "console" $ do
-      define "log" (lambda builtInPrint)
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
+
+-- Postludes
+
+class HasPostlude (language :: Language) where
+  postlude :: ( AbstractValue address value effects
+              , HasCallStack
+              , Member (Allocator address value) effects
+              , Member (Env address) effects
+              , Member Fresh effects
+              , Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Member (Resumable (EnvironmentError address)) effects
+              , Member Trace effects
+              )
+           => proxy language
+           -> Evaluator address value effects ()
+  postlude _ = pure ()
+
+instance HasPostlude 'Go
+instance HasPostlude 'Haskell
+instance HasPostlude 'Java
+instance HasPostlude 'PHP
+instance HasPostlude 'Python
+instance HasPostlude 'Ruby
+instance HasPostlude 'TypeScript
+
+instance HasPostlude 'JavaScript where
+  postlude _ = trace "JS postlude"
+
 
 -- Effects
 

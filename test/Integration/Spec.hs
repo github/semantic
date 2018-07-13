@@ -11,8 +11,8 @@ import SpecHelpers
 languages :: [FilePath]
 languages = ["go", "javascript", "json", "python", "ruby", "typescript"]
 
-spec :: Spec
-spec = parallel $ do
+spec :: TaskConfig -> Spec
+spec config = parallel $ do
   for_ languages $ \language -> do
     let dir = "test/fixtures" </> language </> "corpus"
     it (language <> " corpus exists") $ examples dir `shouldNotReturn` []
@@ -23,8 +23,8 @@ spec = parallel $ do
     runTestsIn directory pending = do
       examples <- runIO $ examples directory
       traverse_ (runTest pending) examples
-    runTest pending ParseExample{..} = it ("parses " <> file) $ maybe (testParse file parseOutput) pendingWith (lookup parseOutput pending)
-    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ maybe (testDiff (both fileA fileB) diffOutput) pendingWith (lookup diffOutput pending)
+    runTest pending ParseExample{..} = it ("parses " <> file) $ maybe (testParse config file parseOutput) pendingWith (lookup parseOutput pending)
+    runTest pending DiffExample{..} = it ("diffs " <> diffOutput) $ maybe (testDiff config (both fileA fileB) diffOutput) pendingWith (lookup diffOutput pending)
 
 data Example = DiffExample { fileA :: FilePath, fileB :: FilePath, diffOutput :: FilePath }
              | ParseExample { file :: FilePath, parseOutput :: FilePath }
@@ -81,14 +81,14 @@ examples directory = do
 normalizeName :: FilePath -> FilePath
 normalizeName path = dropExtension $ dropExtension path
 
-testParse :: FilePath -> FilePath -> Expectation
-testParse path expectedOutput = do
-  actual <- verbatim <$> parseFilePath path
+testParse :: TaskConfig -> FilePath -> FilePath -> Expectation
+testParse config path expectedOutput = do
+  actual <- verbatim <$> parseFilePath config path
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
 
-testDiff :: Both FilePath -> FilePath -> Expectation
-testDiff paths expectedOutput = do
-  actual <- verbatim <$> diffFilePaths paths
+testDiff :: TaskConfig -> Both FilePath -> FilePath -> Expectation
+testDiff config paths expectedOutput = do
+  actual <- verbatim <$> diffFilePaths config paths
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
