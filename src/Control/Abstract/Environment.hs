@@ -71,13 +71,13 @@ data Env address m return where
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
 instance Effect (Env address) where
-  handleState c dist (Request (Lookup name) k) = Request (Lookup name) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (Close names) k) = Request (Close names) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c) k)) pure
-  handleState c dist (Request GetEnv k) = Request GetEnv (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Lookup name) k) = Request (Lookup name) (dist . (<$ c) . k)
+  handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (dist . (<$ c) . k)
+  handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
+  handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c))) (dist . fmap k)
+  handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
+  handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (dist . (<$ c) . k)
+  handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
 runEnv :: Effects effects
        => Environment address
