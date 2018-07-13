@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: network
-version: 2.6.3.5
+version: 2.6.3.6
 summary: Low-level networking interface
 homepage: https://github.com/haskell/network
 license: bsd-3-clause

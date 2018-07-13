@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: QuickCheck
-version: 2.10.1
+version: 2.11.3
 summary: Automatic testing of Haskell programs
 homepage: https://github.com/nick8325/quickcheck
 license: bsd-3-clause
