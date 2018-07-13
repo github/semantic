@@ -21,20 +21,16 @@ message RubyDiff {
   }
   message Merge {
     RubySyntax syntax = 1;
-    RubyDiff diff = 2;
   }
   message Delete {
     RubySyntax before = 1;
-    RubyDiff diff = 2;
   }
   message Insert {
     RubySyntax after = 1;
-    RubyDiff diff = 2;
   }
   message Replace {
     RubySyntax before = 1;
     RubySyntax after = 2;
-    RubyDiff diff = 3;
   }
 }
 
