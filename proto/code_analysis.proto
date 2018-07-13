@@ -24,8 +24,8 @@ service CodeAnalysis {
   //
   // Summarize an AST diff of source blobs.
   rpc SummarizeDiff (SummarizeDiffRequest) returns (SummarizeDiffResponse);
-  // AST diff of source blobs
-  // rpc Diff (DiffRequest) returns (DiffResponse) {}
+  // Diff the ASTs of source blobs
+  rpc DiffTree (DiffTreeRequest) returns (DiffTreeResponse);
 
   // Analyzing
   //
@@ -69,6 +69,20 @@ message SummarizeDiffRequest  {
 message SummarizeDiffResponse {
   repeated DiffSummary changes = 1;
   repeated ParseError errors = 2;
+}
+
+message DiffTreeRequest  {
+  repeated BlobPair blobPairs = 1;
+}
+
+message DiffTreeResponse {
+  oneof response_type {
+    RubyDiffResponse ruby = 1;
+  }
+}
+
+message RubyDiffResponse {
+  repeated ruby.RubyDiff diffs = 1;
 }
 
 message ImportGraphRequest {
