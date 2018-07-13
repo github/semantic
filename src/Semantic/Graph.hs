@@ -1,11 +1,11 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Graph
 ( runGraph
+, runCallGraph
 , runImportGraph
 , GraphType(..)
 , Graph
 , Vertex
-, GraphEff(..)
 , ImportGraphEff(..)
 , style
 , parsePackage
@@ -19,8 +19,11 @@ module Semantic.Graph
 , resumingEnvironmentError
 ) where
 
+
 import Prelude hiding (readFile)
 
+import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Control.Monad.Effect (reinterpret)
@@ -29,14 +32,16 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
+import           Data.Abstract.Value.Type
 import           Data.Abstract.Value.Concrete (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
 import           Data.Record
+import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text (pack)
 import           Parsing.Parser
-import           Prologue hiding (MonadError (..))
+import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
@@ -55,52 +60,52 @@ runGraph ImportGraph _ project
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
-    modules <- runImportGraph lang package
-    let analyzeTerm = withTermSpans . graphingTerms
-        analyzeModule = (if includePackages then graphingPackages else id) . graphingModules
-        extractGraph (_, (_, (graph, _))) = simplify graph
-        runGraphAnalysis
-          = runState lowerBound
-          . runFresh 0
-          . resumingLoadError
-          . resumingUnspecialized
-          . resumingEnvironmentError
-          . resumingEvalError
-          . resumingResolutionError
-          . resumingAddressError
-          . resumingValueError
-          . runTermEvaluator @_ @_ @(Value (Hole (Located Precise)) (GraphEff _ effs))
-          . graphing
-          . runReader (packageInfo package)
-          . runReader lowerBound
-          . runReader lowerBound
-          . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-    extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (topologicalSort modules)))
+    modules <- topologicalSort <$> runImportGraph lang package
+    runCallGraph lang includePackages modules package
 
--- | The full list of effects in flight during the evaluation of terms. This, and other @newtype@s like it, are necessary to type 'Value', since the bodies of closures embed evaluators. This would otherwise require cycles in the effect list (i.e. references to @effects@ within @effects@ itself), which the typechecker forbids.
-newtype GraphEff address outerEffects a = GraphEff
-  { runGraphEff :: Eff (  Exc (LoopControl address)
-                       ': Exc (Return address)
-                       ': Env address
-                       ': Allocator address (Value address (GraphEff address outerEffects))
-                       ': Reader ModuleInfo
-                       ': Modules address
-                       ': Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
-                       ': Reader Span
-                       ': Reader PackageInfo
-                       ': State (Graph Vertex)
-                       ': Resumable (ValueError address (GraphEff address outerEffects))
-                       ': Resumable (AddressError address (Value address (GraphEff address outerEffects)))
-                       ': Resumable ResolutionError
-                       ': Resumable EvalError
-                       ': Resumable (EnvironmentError address)
-                       ': Resumable (Unspecialized (Value address (GraphEff address outerEffects)))
-                       ': Resumable (LoadError address)
-                       ': Fresh
-                       ': State (Heap address Latest (Value address (GraphEff address outerEffects)))
-                       ': outerEffects
-                       ) a
-  }
+runCallGraph :: ( HasField ann Span
+                , Element Syntax.Identifier syntax
+                , Base term ~ TermF (Sum syntax) (Record ann)
+                , Ord term
+                , Corecursive term
+                , Declarations term
+                , Evaluatable (Base term)
+                , FreeVariables term
+                , HasPrelude lang
+                , HasPostlude lang
+                , Member Trace effs
+                , Recursive term
+                , Effects effs
+                )
+             => Proxy lang
+             -> Bool
+             -> [Module term]
+             -> Package term
+             -> Eff effs (Graph Vertex)
+runCallGraph lang includePackages modules package = do
+  let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
+      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
+      extractGraph (_, (_, (graph, _))) = simplify graph
+      runGraphAnalysis
+        = runState (lowerBound @(Heap (Hole (Located Monovariant)) All Type))
+        . runFresh 0
+        . resumingLoadError
+        . resumingUnspecialized
+        . resumingEnvironmentError
+        . resumingEvalError
+        . resumingResolutionError
+        . resumingAddressError
+        . runTermEvaluator @_ @(Hole (Located Monovariant)) @Type
+        . graphing
+        . caching @[]
+        . resumingTypeError
+        . runReader (packageInfo package)
+        . runReader (lowerBound @Span)
+        . providingLiveSet
+        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment (Hole (Located Monovariant)), Hole (Located Monovariant))))))
+        . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
+
 
 
 runImportGraph :: forall effs lang term.
@@ -215,7 +220,7 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   IntegerFormatError{}     -> pure 0
   FloatFormatError{}       -> pure 0
   RationalFormatError{}    -> pure 0
-  FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
+  FreeVariablesError names -> pure (fromMaybeLast (name "unknown") names))
 
 resumingUnspecialized :: (Member Trace effects, AbstractHole value, Effects effects) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
@@ -245,3 +250,14 @@ resumingEnvironmentError :: (AbstractHole address, Effects effects) => Evaluator
 resumingEnvironmentError
   = runState []
   . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)
+
+resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
+                     , Effects effects
+                     , Effectful (m address Type)
+                     , Member Trace effects
+                     )
+                  => m address Type (Resumable TypeError ': State TypeMap ': effects) a
+                  -> m address Type effects a
+resumingTypeError = runTypesWith (\err -> trace ("TypeError " <> show err) *> case err of
+  UnificationError l r -> pure l <|> pure r
+  InfiniteType _ r -> pure r)
