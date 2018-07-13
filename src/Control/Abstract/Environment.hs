@@ -30,8 +30,8 @@ import Prologue
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
 
--- | Replace the environment.
-putEnv :: Member (Env address) effects => (Environment address) -> Evaluator address value effects ()
+-- | Replace the environment. This is only for use in Analysis.Abstract.Caching.
+putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
 putEnv = send . PutEnv
 
 -- | Add an export to the global export state.
