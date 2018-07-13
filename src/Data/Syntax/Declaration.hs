@@ -34,7 +34,9 @@ instance Declarations a => Declarations (Function a) where
   declaredName Function{..} = declaredName functionName
 
 instance Declarations1 Function where
-  liftDeclaredName _ = declaredName
+  liftDeclaredName declaredName Function{..} = case declaredName functionName of
+                                                 [] -> Nothing
+                                                 (x:_) -> Just x
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
