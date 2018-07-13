@@ -168,12 +168,12 @@ data Task (m :: * -> *) output where
   Serialize :: Format input -> input -> Task m Builder
 
 instance Effect Task where
-  handleState c dist (Parse parser blob) k = Request (Parse parser blob) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Analyze run analysis) k = Request (Analyze run analysis) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Decorate decorator term) k = Request (Decorate decorator term) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Semantic.Task.Diff terms) k = Request (Semantic.Task.Diff terms) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Render renderer input) k = Request (Render renderer input) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Serialize format input) k = Request (Serialize format input) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Parse parser blob) k) = Request (Parse parser blob) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Analyze run analysis) k) = Request (Analyze run analysis) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Decorate decorator term) k) = Request (Decorate decorator term) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Semantic.Task.Diff terms) k) = Request (Semantic.Task.Diff terms) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Render renderer input) k) = Request (Render renderer input) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Serialize format input) k) = Request (Serialize format input) (\result -> dist (pure result <$ c) k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, Effects effs) => Eff (Task ': effs) a -> Eff effs a

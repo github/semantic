@@ -59,10 +59,10 @@ data Modules address (m :: * -> *) return where
   List    :: FilePath   -> Modules address m [ModulePath]
 
 instance Effect (Modules address) where
-  handleState c dist (Load path) k = Request (Load path) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Lookup path) k = Request (Lookup path) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Resolve paths) k = Request (Resolve paths) (\result -> dist (pure result <$ c) k)
-  handleState c dist (List path) k = Request (List path) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Load path) k) = Request (Load path) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Lookup path) k) = Request (Lookup path) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Resolve paths) k) = Request (Resolve paths) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (List path) k) = Request (List path) (\result -> dist (pure result <$ c) k)
 
 sendModules :: Member (Modules address) effects => Modules address (Eff effects) return -> Evaluator address value effects return
 sendModules = send
