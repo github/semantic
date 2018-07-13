@@ -31,7 +31,7 @@ getEnv :: Member (Env address) effects => Evaluator address value effects (Envir
 getEnv = send GetEnv
 
 -- | Replace the environment.
-putEnv :: Member (Env address) effects => (Environment address) -> Evaluator address value effects ()
+putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
 putEnv = send . PutEnv
 
 -- | Add an export to the global export state.
