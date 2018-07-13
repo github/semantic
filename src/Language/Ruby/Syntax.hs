@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
@@ -81,7 +81,7 @@ doRequire :: ( AbstractValue address value effects
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> flip (,) (boolean True) . fst <$> load path
+    Nothing       -> (, boolean True) . fst <$> load path
     Just (env, _) -> pure (env, boolean False)
 
 

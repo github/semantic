@@ -85,6 +85,7 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (State (Cache term address (Cell address) value)) effects
                      , Member (Env address) effects
                      , Member (State (Heap address (Cell address) value)) effects
+                     , Effects effects
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects address)
                   -> SubtermAlgebra Module term (TermEvaluator term address value effects address)
@@ -103,7 +104,6 @@ convergingModules recur m = do
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
   TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
-
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --

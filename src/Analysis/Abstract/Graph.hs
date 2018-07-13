@@ -49,7 +49,7 @@ graphingTerms :: ( Element Syntax.Identifier syntax
                  , Member (Reader ModuleInfo) effects
                  , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
-                 , term ~ Term (Sum syntax) ann
+                 , Base term ~ TermF (Sum syntax) ann
                  )
               => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
               -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)

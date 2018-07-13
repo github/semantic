@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: reducers
-version: 3.12.2
+version: 3.12.3
 summary: Semigroups, specialized containers and a general map/reduce framework
 homepage: https://github.com/ekmett/reducers/
 license: bsd-3-clause

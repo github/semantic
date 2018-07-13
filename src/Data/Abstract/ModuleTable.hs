@@ -15,7 +15,6 @@ module Data.Abstract.ModuleTable
 
 import Data.Abstract.Module
 import qualified Data.Map as Map
-import Data.Semigroup
 import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
 import Prologue
