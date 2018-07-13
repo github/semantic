@@ -176,7 +176,7 @@ instance ((Show (f (Diff f () ()))), (Show (f (Term f ()))), Show1 f, Named1 f, 
         (\(a, b) -> replacing (termIn () a) (termIn () b))
           <$> Decode.embedded'' ((,) <$> embeddedAt (liftDecodeMessage decodeMessage 1) 1 <*> embeddedAt (liftDecodeMessage decodeMessage 1) 2)
 
-  dotProto (x :: Proxy (Diff f () ())) =
+  dotProto (_ :: Proxy (Diff f () ())) =
     [ DotProtoMessageOneOf (Single "diff")
       [ DotProtoField 1 (Prim . Named $ Single "Merge") (Single "merge") [] Nothing
       , DotProtoField 2 (Prim . Named $ Single "Delete") (Single "delete") [] Nothing
