@@ -105,7 +105,6 @@ convergingModules recur m = do
       withOracle prevCache (gatherM (const ()) (recur m)))
   TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
-
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
 --   This applies the Kleene fixed-point theorem to finitize a monotone action. cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem

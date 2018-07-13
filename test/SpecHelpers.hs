@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module SpecHelpers
 ( module X
 , runBuilder
@@ -44,6 +46,7 @@ import Data.Record as X
 import Data.Semilattice.Lower as X
 import Data.Source as X
 import Data.Span as X
+import Data.String
 import Data.Sum
 import Data.Term as X
 import Parsing.Parser as X
@@ -74,6 +77,11 @@ import System.Exit (die)
 import Control.Exception (displayException)
 
 runBuilder = toStrict . toLazyByteString
+
+-- | This orphan instance is so we don't have to insert @name@ calls
+-- in dozens and dozens of environment specs.
+instance IsString Name where
+  fromString = name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString

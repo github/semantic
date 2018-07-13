@@ -2,6 +2,7 @@
 module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
+  , TypeMap
   , runTypes
   , runTypesWith
   , unify
@@ -108,6 +109,7 @@ runTypesWith :: ( Effectful m
              -> m effects a
 runTypesWith with = runTypeMap . runTypeErrorWith with
 
+-- TODO: change my name?
 newtype TypeMap = TypeMap { unTypeMap :: Map.Map TName Type }
 
 emptyTypeMap :: TypeMap
