@@ -52,7 +52,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
-          , Member Fresh effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
@@ -155,24 +154,24 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    define "print" builtInPrint
+    define (name "print") builtInPrint
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define "puts" builtInPrint
+    define (name "puts") builtInPrint
 
     defineClass (name "Object") [] $ do
       define (name "inspect") (lambda (const (box (string "<object>"))))
 
 instance HasPrelude 'TypeScript where
   definePrelude _ =
-    defineNamespace "console" $ do
-      define "log" builtInPrint
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    defineNamespace "console" $ do
-      define "log" builtInPrint
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
 
 -- Postludes
 
