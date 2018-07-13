@@ -30,8 +30,8 @@ import Prologue
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
 
--- | This is only for use in Analysis.Abstract.Caching.
-putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
+-- | Replace the environment. This is only for use in Analysis.Abstract.Caching.
+putEnv :: Member (Env address) effects => (Environment address) -> Evaluator address value effects ()
 putEnv = send . PutEnv
 
 -- | Add an export to the global export state.
@@ -67,6 +67,7 @@ data Env address m return where
   Close  :: Set Name        -> Env address m (Environment address)
   Locally :: m a            -> Env address m a
   GetEnv ::                    Env address m (Environment address)
+  PutEnv :: Environment address -> Env address m ()
   Export :: Name -> Name -> Maybe address -> Env address m ()
   PutEnv :: Environment address -> Env address m ()
 
@@ -76,6 +77,7 @@ instance Effect (Env address) where
   handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
   handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c))) (dist . fmap k)
   handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
+  handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (dist . (<$ c) . k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
   handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (dist . (<$ c) . k)
 

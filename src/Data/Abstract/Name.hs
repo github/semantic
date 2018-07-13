@@ -35,6 +35,7 @@ instance Primitive Name where
   decodePrimitive = Name . LT.toStrict <$> Decode.text <|> I <$> Decode.int
   primType _ = Bytes
 
+-- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
 gensym :: (Functor (m effs), Member Fresh effs, Effectful m) => m effs Name
 gensym = I <$> fresh
 

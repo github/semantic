@@ -439,7 +439,7 @@ instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ScopeResolution where
   eval (ScopeResolution xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
-    where f ns = evaluateInScopedEnv (ns >>= deref)
+    where f ns id = ns >>= flip evaluateInScopedEnv id
 
 
 -- | A non-null expression such as Typescript or Swift's ! expression.

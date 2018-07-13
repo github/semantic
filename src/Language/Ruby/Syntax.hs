@@ -54,7 +54,7 @@ instance Evaluatable Send where
     let sel = case sendSelector of
           Just sel -> subtermAddress sel
           Nothing  -> variable (name "call")
-    func <- deref =<< maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
+    func <- deref =<< maybe sel (flip evaluateInScopedEnv sel <=< subtermAddress) sendReceiver
     Rval <$> call func (map subtermAddress sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
@@ -131,7 +131,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    super <- traverse subtermValue classSuperClass
+    super <- traverse subtermAddress classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     rvalBox =<< letrec' name (\addr ->
       subtermValue classBody <* makeNamespace name addr super)

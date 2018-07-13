@@ -112,6 +112,7 @@ runImportGraph :: forall effs lang term.
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
+                  , HasPostlude lang
                   , Member Trace effs
                   , Recursive term
                   , Effects effs

@@ -48,6 +48,7 @@ instance ( Member (Allocator address Abstract) effects
 instance ( Member (Allocator address Abstract) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
+         , Member Fresh effects
          , Member NonDet effects
          , Member Fresh effects
          )

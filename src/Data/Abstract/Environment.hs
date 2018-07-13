@@ -36,7 +36,7 @@ import           Prologue
 
 -- | A map of names to values. Represents a single scope level of an environment chain.
 newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 instance Semigroup (Bindings address) where
   (<>) (Bindings a) (Bindings b) = Bindings (a <> b)
