@@ -173,7 +173,7 @@ instance ((Show (f (Diff f () ()))), (Show (f (Term f ()))), Show1 f, Named1 f, 
       i = inserting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
       d = deleting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
       r =
-        (\(a, b) -> trace ("A: " <> show a <> "B:" <> show b) (replacing (termIn () a) (termIn () b)))
+        (\(a, b) -> replacing (termIn () a) (termIn () b))
           <$> Decode.embedded'' ((,) <$> embeddedAt (liftDecodeMessage decodeMessage 1) 1 <*> embeddedAt (liftDecodeMessage decodeMessage 1) 2)
 
   dotProto (x :: Proxy (Diff f () ())) =
