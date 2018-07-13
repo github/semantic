@@ -187,26 +187,22 @@ instance ((Show (f (Diff f () ()))), (Show (f (Term f ()))), Show1 f, Named1 f, 
         ( DotProtoMessage
           ( Single "Merge" )
           [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "syntax") [] Nothing)
-          , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
           ] )
     , DotProtoMessageDefinition
         ( DotProtoMessage
           ( Single "Delete" )
           [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
-          , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
           ] )
     , DotProtoMessageDefinition
         ( DotProtoMessage
           ( Single "Insert" )
           [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
-          , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
           ] )
     , DotProtoMessageDefinition
         ( DotProtoMessage
           ( Single "Replace" )
           [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
           , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
-          , DotProtoMessageField (DotProtoField 3 (Prim . Named $ Single (nameOf x)) (Single "diff") [] Nothing)
           ] )
     ]
     -- [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "syntax") [] Nothing) ]
