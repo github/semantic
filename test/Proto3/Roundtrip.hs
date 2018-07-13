@@ -19,6 +19,7 @@ import Data.Sum
 import Language.Ruby.Assignment (Syntax)
 import qualified Language.Ruby.Assignment as Ruby
 import Data.Functor.Classes
+import qualified Data.Syntax.Expression as Expression
 
 shouldRoundtrip :: (Eq a, Show a, Message a) => a -> Expectation
 shouldRoundtrip a = go a `shouldBe` Right a
@@ -27,6 +28,8 @@ shouldRoundtrip a = go a `shouldBe` Right a
 shouldRoundtrip1 :: forall f a. (Show (f a), Eq (f a), Show1 f, Eq1 f, Eq a, Show a, Message1 f, Message a) => f a -> Expectation
 shouldRoundtrip1 a = go a `shouldBe` Right a
   where go = fromByteString1 . L.toStrict . toLazyByteString1
+
+instance Named1 (Sum '[Literal.Null]) where nameOf1 _ = "NullSyntax"
 
 spec :: Spec
 spec = parallel $ do
@@ -45,6 +48,10 @@ spec = parallel $ do
   describe "floats" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip1 @Literal.Float @(Term (Sum Syntax) ()) (unListableF sp)
+
+  describe "negate" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip1 @Expression.Negate @(Term (Sum '[Literal.Null]) ()) (unListableF sp)
 
   describe "booleans" $
     prop "roundtrips" $
