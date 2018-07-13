@@ -93,8 +93,8 @@ runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound 
 
 handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
 handleEnv = \case
-  Lookup name -> Env.lookup name <$> get
-  Bind name addr -> modify (Env.insert name addr)
+  Lookup name -> Env.lookupEnv' name <$> get
+  Bind name addr -> modify (Env.insertEnv name addr)
   Close names -> Env.intersect names <$> get
   Locally action -> do
     modify' (Env.push @address)

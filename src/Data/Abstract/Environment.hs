@@ -7,8 +7,10 @@ module Data.Abstract.Environment
   , flatPairs
   , head
   , insert
+  , insertEnv
   , intersect
   , lookup
+  , lookupEnv'
   , mergeEnvs
   , mergeNewer
   , names
@@ -97,16 +99,23 @@ flatPairs = (>>= pairs) . toList . unEnvironment
 newEnv :: Bindings address -> Environment address
 newEnv = Environment . pure
 
+-- | Lookup a 'Name' in the bindings.
+lookup :: Name -> Bindings address -> Maybe address
+lookup name = Map.lookup name . unBindings
+
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
 -- Just (Precise 1)
-lookup :: Name -> Environment address -> Maybe address
-lookup name = foldMapA (Map.lookup name) . fmap unBindings . unEnvironment
+lookupEnv' :: Name -> Environment address -> Maybe address
+lookupEnv' name = foldMapA (lookup name) . unEnvironment
 
 -- | Insert a 'Name' in the environment.
-insert :: Name -> address -> Environment address -> Environment address
-insert name addr (Environment (Bindings a :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
+insert :: Name -> address -> Bindings address -> Bindings address
+insert name addr = Bindings . Map.insert name addr . unBindings
+
+insertEnv :: Name -> address -> Environment address -> Environment address
+insertEnv name addr (Environment (Bindings a :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
 
 -- | Remove a 'Name' from the environment.
 --
@@ -122,7 +131,7 @@ trim (Environment (a :| as)) = Environment (a :| filtered)
 intersect :: Foldable t => t Name -> Environment address -> Environment address
 intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
   where
-    lookupName name = (,) name <$> lookup name env
+    lookupName name = (,) name <$> lookupEnv' name env
 
 -- | Get all bound 'Name's in an environment.
 names :: Environment address -> [Name]
@@ -137,7 +146,7 @@ aliasBindings pairs binds = unpairs $ mapMaybe lookupAndAlias pairs
 overwrite :: [(Name, Name)] -> Environment address -> Environment address
 overwrite pairs env = newEnv . unpairs $ mapMaybe lookupAndAlias pairs
   where
-    lookupAndAlias (oldName, newName) = (,) newName <$> lookup oldName env
+    lookupAndAlias (oldName, newName) = (,) newName <$> lookupEnv' oldName env
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
