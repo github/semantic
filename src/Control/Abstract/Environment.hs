@@ -4,6 +4,7 @@ module Control.Abstract.Environment
 , Exports
 , getEnv
 , putEnv
+, withEnv
 , export
 , lookupEnv
 , bind
@@ -33,6 +34,18 @@ getEnv = send GetEnv
 -- | Replace the environment.
 putEnv :: Member (Env address) effects => (Environment address) -> Evaluator address value effects ()
 putEnv = send . PutEnv
+
+-- | Replace the environment for a computation
+withEnv :: Member (Env address) effects
+        => Environment address
+        -> Evaluator address value effects a
+        -> Evaluator address value effects a
+withEnv env comp = do
+  oldEnv <- getEnv
+  putEnv env
+  value <- comp
+  putEnv oldEnv
+  pure value
 
 -- | Add an export to the global export state.
 export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
