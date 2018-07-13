@@ -191,11 +191,12 @@ makeNamespace :: ( AbstractValue address value effects
               => Name
               -> address
               -> Maybe address
+              -> Evaluator address value effects ()
               -> Evaluator address value effects value
-makeNamespace name addr super = do
+makeNamespace name addr super body = do
   superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
   let env' = fromMaybe lowerBound superEnv
-  namespaceEnv <- newEnv . Env.head <$> getEnv
+  namespaceEnv <- locally (body >> getEnv)
   v <- namespace name super (Env.mergeNewer env' namespaceEnv)
   v <$ assign addr v
 

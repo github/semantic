@@ -130,9 +130,7 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
-  importedEnv <- fst <$> require path
-  bindAll importedEnv
-  unit <$ makeNamespace name addr Nothing
+  unit <$ makeNamespace name addr Nothing (bindAll . fst =<< require path)
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -152,8 +150,7 @@ instance Evaluatable QualifiedImport where
       -- Evaluate each parent module, just creating a namespace
       go ((name, path) :| xs) = letrec' name $ \addr -> do
         void $ require path
-        void $ go (NonEmpty.fromList xs)
-        makeNamespace name addr Nothing
+        makeNamespace name addr Nothing (void (require path >> go (NonEmpty.fromList xs)))
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
@@ -174,9 +171,7 @@ instance Evaluatable QualifiedAliasedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
-      importedEnv <- fst <$> require path
-      bindAll importedEnv
-      unit <$ makeNamespace alias addr Nothing)
+      unit <$ makeNamespace alias addr Nothing (void (bindAll . fst =<< require path)))
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis

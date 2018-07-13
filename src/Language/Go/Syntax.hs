@@ -86,11 +86,10 @@ instance Evaluatable QualifiedImport where
     paths <- resolveGoImport importPath
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void . letrec' alias $ \addr -> do
-      for_ paths $ \p -> do
+      makeNamespace alias addr Nothing $ for_ paths $ \p -> do
         traceResolve (unPath importPath) p
         importedEnv <- fst <$> require p
         bindAll importedEnv
-      makeNamespace alias addr Nothing
     rvalBox unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).
