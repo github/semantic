@@ -270,10 +270,10 @@ instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultExport where
   eval (DefaultExport term) = do
-    v <- subtermValue term
     case declaredName term of
       Just name -> do
         addr <- lookupOrAlloc name
+        v <- subtermValue term
         assign addr v
         export name name Nothing
         bind name addr
