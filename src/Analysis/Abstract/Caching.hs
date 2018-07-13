@@ -103,7 +103,6 @@ convergingModules recur m = do
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
-
   TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.

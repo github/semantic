@@ -1,3 +1,0 @@
-barf()
-
-def foo(); end
