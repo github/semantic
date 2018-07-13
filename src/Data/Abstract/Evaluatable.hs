@@ -57,11 +57,11 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
           , Member (Resumable (EnvironmentError address)) effects
+          , Member (Resumable (Unspecialized value)) effects
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
-          , Member (Resumable (Unspecialized value)) effects
-          , Member Trace effects
           , Member Fresh effects
+          , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do

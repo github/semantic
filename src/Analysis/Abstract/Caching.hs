@@ -104,7 +104,6 @@ convergingModules recur m = do
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
 
-  -- TODO: We're hitting an infinite loop here, c.f test/fixtures/ruby/analysis/graphing/include-file-with-undefined-call
   TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
