@@ -59,7 +59,7 @@ newtype UtilEff address a = UtilEff
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo
                        , Modules address
-                       , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (ValueError address (UtilEff address))

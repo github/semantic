@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, LambdaCase, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Modules
-( lookupModule
+( ModuleResult
+, lookupModule
 , resolve
 , listModulesInDir
 , require
@@ -27,8 +28,10 @@ import qualified Data.Set as Set
 import Prologue
 import System.FilePath.Posix (takeDirectory)
 
+type ModuleResult address = (Environment address, address)
+
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
-lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (Environment address, address))
+lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (ModuleResult address))
 lookupModule = sendModules . Lookup
 
 -- | Resolve a list of module paths to a possible module table entry.
@@ -42,19 +45,19 @@ listModulesInDir = sendModules . List
 -- | Require/import another module by name and return its environment and value.
 --
 -- Looks up the module's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Environment address, address)
+require :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (ModuleResult address)
 require path = lookupModule path >>= maybeM (load path)
 
 -- | Load another module by name and return its environment and value.
 --
 -- Always loads/evaluates.
-load :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Environment address, address)
+load :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (ModuleResult address)
 load path = sendModules (Load path)
 
 
 data Modules address (m :: * -> *) return where
-  Load    :: ModulePath -> Modules address m (Environment address, address)
-  Lookup  :: ModulePath -> Modules address m (Maybe (Environment address, address))
+  Load    :: ModulePath -> Modules address m (ModuleResult address)
+  Lookup  :: ModulePath -> Modules address m (Maybe (ModuleResult address))
   Resolve :: [FilePath] -> Modules address m (Maybe ModulePath)
   List    :: FilePath   -> Modules address m [ModulePath]
 
@@ -68,7 +71,7 @@ sendModules :: Member (Modules address) effects => Modules address (Eff effects)
 sendModules = send
 
 runModules :: ( Effects effects
-              , Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
+              , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
               , Member (Resumable (LoadError address)) effects
               )
            => Set ModulePath
@@ -80,11 +83,11 @@ runModules paths = interpret $ \case
   Resolve names -> pure (find (`Set.member` paths) names)
   List dir      -> pure (filter ((dir ==) . takeDirectory) (toList paths))
 
-askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
+askModuleTable :: Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects => Evaluator address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 askModuleTable = ask
 
 
-newtype Merging address = Merging { runMerging :: (Environment address, address) }
+newtype Merging address = Merging { runMerging :: ModuleResult address }
 
 instance Semigroup (Merging address) where
   Merging (env1, _) <> Merging (env2, addr) = Merging (mergeEnvs env1 env2, addr)
@@ -92,7 +95,7 @@ instance Semigroup (Merging address) where
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError address resume where
-  ModuleNotFound :: ModulePath -> LoadError address (Environment address, address)
+  ModuleNotFound :: ModulePath -> LoadError address (ModuleResult address)
 
 deriving instance Eq (LoadError address resume)
 deriving instance Show (LoadError address resume)
@@ -101,7 +104,7 @@ instance Show1 (LoadError address) where
 instance Eq1 (LoadError address) where
   liftEq _ (ModuleNotFound a) (ModuleNotFound b) = a == b
 
-moduleNotFound :: Member (Resumable (LoadError address)) effects => ModulePath -> Evaluator address value effects (Environment address, address)
+moduleNotFound :: Member (Resumable (LoadError address)) effects => ModulePath -> Evaluator address value effects (ModuleResult address)
 moduleNotFound = throwResumable . ModuleNotFound
 
 runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (LoadError address) ': effects) a -> m address value effects (Either (SomeExc (LoadError address)) a)

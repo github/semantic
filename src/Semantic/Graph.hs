@@ -85,7 +85,7 @@ newtype GraphEff address outerEffects a = GraphEff
                        ': Allocator address (Value address (GraphEff address outerEffects))
                        ': Reader ModuleInfo
                        ': Modules address
-                       ': Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                       ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                        ': Reader Span
                        ': Reader PackageInfo
                        ': State (Graph Vertex)
@@ -151,7 +151,7 @@ newtype ImportGraphEff term address outerEffects a = ImportGraphEff
                              ': Reader Span
                              ': Reader PackageInfo
                              ': Modules address
-                             ': Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                             ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                              ': State (Graph ModuleInfo)
                              ': Resumable (ValueError address (ImportGraphEff term address outerEffects))
                              ': Resumable (AddressError address (Value address (ImportGraphEff term address outerEffects)))
