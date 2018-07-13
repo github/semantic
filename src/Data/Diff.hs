@@ -158,9 +158,12 @@ instance (Show1 syntax, Show ann1, Show ann2, Show recur) => Show (DiffF syntax 
   showsPrec = showsPrec3
 
 instance ( Named1 f, Message1 f, Named (Diff f () ()), Foldable f, Functor f) => Message (Diff f () ()) where
-  encodeMessage num (Diff (Merge (In _ f))) = Encode.embedded num (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
-  encodeMessage num (Diff (Patch (Delete (In _ f)))) = Encode.embedded num (Encode.embedded 2 (liftEncodeMessage encodeMessage 1 f))
-  encodeMessage num (Diff (Patch (Insert (In _ f)))) = Encode.embedded num (Encode.embedded 3 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage num (Diff (Merge (In _ f))) =
+    Encode.embedded num (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage num (Diff (Patch (Delete (In _ f)))) =
+    Encode.embedded num (Encode.embedded 2 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage num (Diff (Patch (Insert (In _ f)))) =
+    Encode.embedded num (Encode.embedded 3 (liftEncodeMessage encodeMessage 1 f))
   encodeMessage num (Diff (Patch (Replace (In _ f) (In _ g)))) =
     Encode.embedded num (Encode.embedded 4 (liftEncodeMessage encodeMessage 1 f <> liftEncodeMessage encodeMessage 2 g))
   decodeMessage num = m <|> d <|> i <|> r
@@ -172,9 +175,9 @@ instance ( Named1 f, Message1 f, Named (Diff f () ()), Foldable f, Functor f) =>
       i :: Decode.Parser Decode.RawMessage (Diff f () ())
       i = inserting . termIn () <$> Decode.embedded'' (Decode.embedded'' (liftDecodeMessage decodeMessage 1) `Decode.at` 3) `Decode.at` num
       r :: Decode.Parser Decode.RawMessage (Diff f () ())
-      r = (\(a, b) -> replacing (termIn () a) (termIn () b)) <$> Decode.embedded'' (Decode.embedded'' ((,) <$> liftDecodeMessage decodeMessage 1 <*> liftDecodeMessage decodeMessage 2) `Decode.at` 4) `Decode.at` num
+      r = (\(a, b) -> replacing (termIn () a) (termIn () b)) <$>
+            Decode.embedded'' (Decode.embedded'' ((,) <$> liftDecodeMessage decodeMessage 1 <*> liftDecodeMessage decodeMessage 2) `Decode.at` 4) `Decode.at` num
 
-    -- where c (Diff (Merge _)) = merge ((), ())
   dotProto (x :: Proxy (Diff f () ())) =
     [ DotProtoMessageOneOf (Single "diff")
       [ DotProtoField 1 (Prim . Named $ Single "Merge") (Single "merge") [] Nothing
