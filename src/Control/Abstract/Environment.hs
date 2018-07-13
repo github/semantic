@@ -75,14 +75,14 @@ data Env address (m :: * -> *) return where
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
 instance Effect (Env address) where
-  handleState c dist (Lookup name) k = Request (Lookup name) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Bind name addr) k = Request (Bind name addr) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Close names) k = Request (Close names) (\result -> dist (pure result <$ c) k)
-  handleState c dist Push k = Request Push (\result -> dist (pure result <$ c) k)
-  handleState c dist Pop k = Request Pop (\result -> dist (pure result <$ c) k)
-  handleState c dist GetEnv k = Request GetEnv (\result -> dist (pure result <$ c) k)
-  handleState c dist (PutEnv e) k = Request (PutEnv e) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Export name alias addr) k = Request (Export name alias addr) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Lookup name) k) = Request (Lookup name) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Close names) k) = Request (Close names) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request Push k) = Request Push (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request Pop k) = Request Pop (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request GetEnv k) = Request GetEnv (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (\result -> dist (pure result <$ c) k)
 
 runEnv :: Effects effects
        => Environment address

@@ -221,10 +221,10 @@ data Files (m :: * -> *) out where
   Write       :: Destination -> B.Builder                             -> Files m ()
 
 instance Effect Files where
-  handleState c dist (Read source) k = Request (Read source) (\result -> dist (pure result <$ c) k)
-  handleState c dist (ReadProject rootDir dir language excludeDirs) k = Request (ReadProject rootDir dir language excludeDirs) (\result -> dist (pure result <$ c) k)
-  handleState c dist (FindFiles dir exts paths) k = Request (FindFiles dir exts paths) (\result -> dist (pure result <$ c) k)
-  handleState c dist (Write destination builder) k = Request (Write destination builder) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Read source) k) = Request (Read source) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (ReadProject rootDir dir language excludeDirs) k) = Request (ReadProject rootDir dir language excludeDirs) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (FindFiles dir exts paths) k) = Request (FindFiles dir exts paths) (\result -> dist (pure result <$ c) k)
+  handleState c dist (Request (Write destination builder) k) = Request (Write destination builder) (\result -> dist (pure result <$ c) k)
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Effects effs) => Eff (Files ': effs) a -> Eff effs a
