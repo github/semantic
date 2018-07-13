@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc-typelits-natnormalise
-version: 0.5.10
+version: 0.6.1
 summary: GHC typechecker plugin for types of kind GHC.TypeLits.Nat
 homepage: https://www.clash-lang.org/
 license: bsd-2-clause
