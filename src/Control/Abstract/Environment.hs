@@ -20,7 +20,7 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Environment (Environment)
+import Data.Abstract.Environment (Bindings, Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports
 import Data.Abstract.Name
@@ -79,17 +79,19 @@ instance Effect (Env address) where
   handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (dist . (<$ c) . k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
+-- | Runs a computation in the context of an existing environment.
+-- | New bindings created in the computation are returned.
 runEnv :: Effects effects
        => Environment address
        -> Evaluator address value (Env address ': effects) a
-       -> Evaluator address value effects (Environment address, a)
+       -> Evaluator address value effects (Bindings address, a)
 runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 handleEnv
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
   filterEnv (ports, (binds, a))
-          | Exports.null ports = (Env.newEnv binds, a)
-          | otherwise          = (Env.newEnv (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds), a)
+          | Exports.null ports = (binds, a)
+          | otherwise          = (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds, a)
 
 handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
 handleEnv = \case
