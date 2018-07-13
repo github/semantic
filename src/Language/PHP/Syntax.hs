@@ -374,12 +374,12 @@ instance Evaluatable Namespace where
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (name:x:xs) = letrec' name $ \addr ->
-        go (x:xs) <* makeNamespace name addr Nothing
+        go (x:xs) <* makeNamespace name addr Nothing (pure ())
       -- The last name creates a closure over the namespace body.
       go names = do
         name <- maybeM (throwEvalError (FreeVariablesError [])) (listToMaybe names)
         letrec' name $ \addr ->
-          subtermValue namespaceBody *> makeNamespace name addr Nothing
+          subtermValue namespaceBody *> makeNamespace name addr Nothing (pure ())
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)

@@ -157,10 +157,8 @@ evalRequire :: ( AbstractValue address value effects
             => M.ModulePath
             -> Name
             -> Evaluator address value effects value
-evalRequire modulePath alias = letrec' alias $ \addr -> do
-  importedEnv <- fst <$> require modulePath
-  bindAll importedEnv
-  unit <$ makeNamespace alias addr Nothing
+evalRequire modulePath alias = letrec' alias $ \addr ->
+  unit <$ makeNamespace alias addr Nothing (bindAll . fst =<< require modulePath)
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -678,7 +676,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     rvalBox =<< letrec' name (\addr ->
-      value =<< (eval xs <* makeNamespace name addr Nothing))
+      makeNamespace name addr Nothing (void (eval xs)))
 
 
 data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
@@ -692,7 +690,7 @@ instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     rvalBox =<< letrec' name (\addr ->
-      value =<< (eval xs <* makeNamespace name addr Nothing))
+      makeNamespace name addr Nothing (void (eval xs)))
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier

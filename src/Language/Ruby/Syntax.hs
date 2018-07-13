@@ -134,7 +134,7 @@ instance Evaluatable Class where
     super <- traverse subtermAddress classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     rvalBox =<< letrec' name (\addr ->
-      subtermValue classBody <* makeNamespace name addr super)
+      makeNamespace name addr super (void (subtermAddress classBody)))
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -147,7 +147,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     rvalBox =<< letrec' name (\addr ->
-      value =<< (eval xs <* makeNamespace name addr Nothing))
+      makeNamespace name addr Nothing (void (eval xs)))
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
