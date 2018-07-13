@@ -11,7 +11,6 @@ module Data.Abstract.Environment
   , intersect
   , lookup
   , lookupEnv'
-  , mergeNewer
   , names
   , newEnv
   , overwrite
@@ -24,8 +23,6 @@ module Data.Abstract.Environment
 
 import           Data.Abstract.Live
 import           Data.Abstract.Name
-import           Data.Align
-import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as Map
 import           Prelude hiding (head, lookup)
 import           Prologue
@@ -67,16 +64,6 @@ pop (Environment (_ :| a : as)) = Environment (a :| as)
 -- | Return the frontmost (ie. most local) frame of bindings in the environment
 head :: Environment address -> Bindings address
 head (Environment (a :| _)) = a
-
--- | Take the union of two environments. When duplicate keys are found in the
---   name to address map, the second definition wins.
-mergeNewer :: Environment address -> Environment address -> Environment address
-mergeNewer (Environment a) (Environment b) =
-    Environment (NonEmpty.fromList . reverse . fmap Bindings $ alignWith (mergeThese combine) (reverse as) (reverse bs))
-    where
-      combine = Map.unionWith (flip const)
-      as = unBindings <$> toList a
-      bs = unBindings <$> toList b
 
 -- | Extract an association list of bindings from a 'Bindings'.
 --
