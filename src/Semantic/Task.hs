@@ -37,6 +37,7 @@ module Semantic.Task
 -- * Interpreting
 , runTask
 , runTaskWithOptions
+, withOptions
 , runTaskWithConfig
 -- * Re-exports
 , Distribute
@@ -127,11 +128,12 @@ runTask = runTaskWithOptions defaultOptions
 
 -- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> TaskEff a -> IO a
-runTaskWithOptions opts task = do
-  config <- defaultConfig opts
-  result <- withTelemetry config $ \(TelemetryQueues logger statter _) ->
-    runTaskWithConfig config logger statter task
-  either (die . displayException) pure result
+runTaskWithOptions opts task = withOptions opts (\ config logger statter -> runTaskWithConfig config logger statter task) >>= either (die . displayException) pure
+
+withOptions :: Options -> (Config -> LogQueue -> StatQueue -> IO a) -> IO a
+withOptions options with = do
+  config <- defaultConfig options
+  withTelemetry config (\ (TelemetryQueues logger statter _) -> with config logger statter)
 
 -- | Execute a 'TaskEff' yielding its result value in 'IO'.
 runTaskWithConfig :: Config -> LogQueue -> StatQueue -> TaskEff a -> IO (Either SomeException a)
@@ -195,7 +197,7 @@ data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs) => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, Effects effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -225,6 +227,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Member (Reader Config) effs
                          , Member Telemetry effs
                          , Member Trace effs
+                         , Effects effs
                          )
                       => (Source -> assignment (Term (Sum syntaxes) (Record Assignment.Location)) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) (Record Assignment.Location)))
                       -> Parser ast
