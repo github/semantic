@@ -208,7 +208,8 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
                     -> Evaluator address value effects a
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvironment scopedEnvTerm
-  maybe term (\ env -> locally (bindAll env *> term)) scopedEnv
+  env <- maybe getEnv pure scopedEnv
+  withEnv env term
 
 
 -- | Evaluates a 'Value' returning the referenced value

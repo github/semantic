@@ -239,12 +239,12 @@ instance ( Member (Allocator address Type) effects
          )
       => AbstractFunction address Type effects where
   closure names _ body = do
-    (env, tvars) <- foldr (\ name rest -> do
+    (binds, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
-      bimap (Env.insertEnv name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
-    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll env *> body)))
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
+    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll binds *> body)))
 
   call op params = do
     tvar <- fresh

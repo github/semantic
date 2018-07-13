@@ -173,13 +173,13 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- fst <$> require modulePath
-    bindAll (renamed importedEnv)
+    importedBinds <- fst <$> require modulePath
+    bindAll (renamed importedBinds)
     rvalBox unit
     where
-      renamed importedEnv
-        | Prologue.null symbols = importedEnv
-        | otherwise = Env.overwrite (toTuple <$> symbols) importedEnv
+      renamed importedBinds
+        | Prologue.null symbols = importedBinds
+        | otherwise = Env.aliasBindings (toTuple <$> symbols) importedBinds
 
 data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -254,10 +254,10 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- fst <$> require modulePath
+    importedBinds <- fst <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \Alias{..} -> do
-      let address = Env.lookupEnv' aliasValue importedEnv
+      let address = Env.lookup aliasValue importedBinds
       maybe (throwEvalError $ ExportError modulePath aliasValue) (export aliasValue aliasName . Just) address
     rvalBox unit
 

@@ -113,13 +113,13 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedEnv <- fst <$> require path
-    bindAll (select importedEnv)
+    importedBinds <- fst <$> require path
+    bindAll (select importedBinds)
     rvalBox unit
     where
-      select importedEnv
-        | Prologue.null xs = importedEnv
-        | otherwise = Env.overwrite xs importedEnv
+      select importedBinds
+        | Prologue.null xs = importedBinds
+        | otherwise = Env.aliasBindings xs importedBinds
 
 
 -- Evaluate a qualified import
