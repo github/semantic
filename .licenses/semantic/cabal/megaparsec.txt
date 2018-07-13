@@ -4,7 +4,7 @@ name: megaparsec
 version: 6.5.0
 summary: Monadic parser combinators
 homepage: https://github.com/mrkkrp/megaparsec
-license: other
+license: bsd-2-clause
 ---
 Copyright © 2015–2018 Megaparsec contributors<br>
 Copyright © 2007 Paolo Martini<br>

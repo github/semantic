@@ -4,7 +4,7 @@ name: parser-combinators
 version: 1.0.0
 summary: Lightweight package providing commonly useful parser combinators
 homepage: https://github.com/mrkkrp/parser-combinators
-license: other
+license: bsd-3-clause
 ---
 Copyright © 2017–2018 Mark Karpov
 
