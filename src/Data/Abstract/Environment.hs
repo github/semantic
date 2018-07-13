@@ -11,7 +11,6 @@ module Data.Abstract.Environment
   , intersect
   , lookup
   , lookupEnv'
-  , mergeEnvs
   , mergeNewer
   , names
   , newEnv
@@ -55,10 +54,6 @@ instance Lower (Bindings address) where
 --   scope for "a", then the next, and so on.
 newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings address) }
   deriving (Eq, Ord)
-
-mergeEnvs :: Environment address -> Environment address -> Environment address
-mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
-  Environment ((<>) a b :| alignWith (mergeThese (<>)) as bs)
 
 -- | Make and enter a new empty scope in the given environment.
 push :: Environment address -> Environment address
