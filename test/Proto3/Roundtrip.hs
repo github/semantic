@@ -57,6 +57,8 @@ spec = parallel $ do
   describe "diffs of syntax" $
     prop "roundtrips" $
       \sp -> do
+        putStrLn (show sp)
+        putStrLn (show (toLazyByteString sp))
         shouldRoundtrip @(Diff (Sum Syntax) () ()) sp
 
   describe "arrays" $
