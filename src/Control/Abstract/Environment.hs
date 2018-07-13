@@ -61,8 +61,8 @@ bind :: Member (Env address) effects => Name -> address -> Evaluator address val
 bind name addr = send (Bind name addr)
 
 -- | Bind all of the names from an 'Environment' in the current scope.
-bindAll :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
-bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.flatPairs
+bindAll :: Member (Env address) effects => Bindings address -> Evaluator address value effects ()
+bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.pairs
 
 -- | Run an action in a new local scope.
 locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a

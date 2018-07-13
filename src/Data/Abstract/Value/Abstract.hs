@@ -34,11 +34,11 @@ instance ( Member (Allocator address Abstract) effects
          )
       => AbstractFunction address Abstract effects where
   closure names _ body = do
-    env <- foldr (\ name rest -> do
+    binds <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract
-      Env.insertEnv name addr <$> rest) (pure lowerBound) names
-    addr <- locally (bindAll env *> catchReturn body)
+      Env.insert name addr <$> rest) (pure lowerBound) names
+    addr <- locally (bindAll binds *> catchReturn body)
     deref addr
 
   call Abstract params = do

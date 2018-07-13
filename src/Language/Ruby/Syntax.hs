@@ -77,7 +77,7 @@ doRequire :: ( AbstractValue address value effects
              , Member (Modules address) effects
              )
           => M.ModulePath
-          -> Evaluator address value effects (Environment address, value)
+          -> Evaluator address value effects (Bindings address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
