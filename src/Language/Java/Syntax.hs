@@ -226,3 +226,21 @@ instance Ord1 LambdaBody where liftCompare = genericLiftCompare
 instance Show1 LambdaBody where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable LambdaBody
+
+data ArrayCreationExpression a = ArrayCreationExpression { arrayCreationExpressionType :: !a, arrayCreationExpressionDims :: ![a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ArrayCreationExpression where liftEq = genericLiftEq
+instance Ord1 ArrayCreationExpression where liftCompare = genericLiftCompare
+instance Show1 ArrayCreationExpression where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ArrayCreationExpression
+
+data DimsExpr a = DimsExpr { dimsExprAnnotation :: ![a], dimsExprExpression :: ![a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DimsExpr where liftEq = genericLiftEq
+instance Ord1 DimsExpr where liftCompare = genericLiftCompare
+instance Show1 DimsExpr where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DimsExpr

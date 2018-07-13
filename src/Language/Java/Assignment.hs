@@ -68,8 +68,10 @@ type Syntax =
    , Expression.This
    , Java.Syntax.Annotation
    , Java.Syntax.AnnotationField
+   , Java.Syntax.ArrayCreationExpression
    , Java.Syntax.Asterisk
    , Java.Syntax.Constructor
+   , Java.Syntax.DimsExpr
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.GenericType
    , Java.Syntax.Import
@@ -163,8 +165,9 @@ expressions = makeTerm'' <$> location <*> many expression
 expressionChoices :: [Assignment Term]
 expressionChoices =
   [
-    arrayInitializer
-  , arrayAccess
+    arrayAccess
+  , arrayCreationExpression
+  , arrayInitializer
   , assignment'
   , block
   , binary
@@ -176,6 +179,7 @@ expressionChoices =
   , classInstance
   , continue
   , constructorDeclaration
+  , dimsExpr
   , explicitConstructorInvocation
   -- , TODO: constantDeclaration
   , doWhile
@@ -236,6 +240,11 @@ variableDeclaratorList = symbol VariableDeclaratorList *> children (makeDecl <$>
     makeDecl decls (modifiers, type') = map (makeSingleDecl modifiers type') decls
     makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
     makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
+
+-- variable declarator -> variable initializer -> expression -> primary -> array creation expression
+arrayCreationExpression :: Assignment Term
+arrayCreationExpression = symbol Grammar.ArrayCreationExpression *> children (makeTerm1 <$> (Java.Syntax.ArrayCreationExpression <$> (new *> type') <*> many dimsExpr))
+  where new = token AnonNew *> pure NewKeyword
 
 localVariableDeclarationStatement :: Assignment Term
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
@@ -358,6 +367,11 @@ return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children
 -- method expressions
 dims :: Assignment [Term]
 dims = symbol Dims *> children (many (emptyTerm <* token AnonLBracket <* token AnonRBracket))
+
+-- not sure why we did <* token with the dims (possibly because it's the only thing happening?)
+-- will define with manyTerm annotation <*> manyTerm expression and then revisit whether or not I need brackets
+dimsExpr :: Assignment Term
+dimsExpr = makeTerm <$> symbol Grammar.DimsExpr <*> children (Java.Syntax.DimsExpr <$> manyTerm annotation <*> manyTerm expression)
 
 type' :: Assignment Term
 type' =  choice [
