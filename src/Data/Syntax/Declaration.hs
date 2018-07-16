@@ -47,7 +47,7 @@ instance Diffable Method where
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
+    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm methodName))
     (_, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermAddress methodBody))
     bind name addr
     pure (Rval addr)
