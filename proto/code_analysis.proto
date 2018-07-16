@@ -94,11 +94,6 @@ message ImportGraphResponse {
   DebugInfo error_info = 2;
 }
 
-message BlobPair {
-  Blob before = 1;
-  Blob after = 2;
-}
-
 message DiffSummary {
   string term = 1;
   string name = 2;
