@@ -22,6 +22,7 @@ import Data.Language
 import Data.Source as Source
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
+import Proto3.Suite
 
 -- | The source, path, and language of a blob.
 data Blob = Blob
@@ -53,11 +54,11 @@ inferringLanguage src pth lang
 type BlobPair = Join These Blob
 
 instance Message BlobPair where
-  encodeMessage num pair = case pair of
-    (Join (These a b)) -> Encode.embedded num (Encode.embedded 1 (encodeMessage 1 a) <> Encode.embedded 2 (encodeMessage 1 b))
-    (Join (This a)) -> Encode.embedded num (Encode.embedded 1 (encodeMessage 1 a))
-    (Join (That b)) -> Encode.embedded num (Encode.embedded 2 (encodeMessage 1 b))
-  decodeMessage num = embeddedAt (Join <$> (these <|> this <|> that)) num
+  encodeMessage _ pair = case pair of
+    (Join (These a b)) -> Encode.embedded 1 (encodeMessage 1 a) <> Encode.embedded 2 (encodeMessage 1 b)
+    (Join (This a)) -> Encode.embedded 1 (encodeMessage 1 a)
+    (Join (That b)) -> Encode.embedded 2 (encodeMessage 1 b)
+  decodeMessage _ = Join <$> (these <|> this <|> that)
     where
       embeddedAt parser num = Decode.at (Decode.embedded'' parser) num
       these = These <$> embeddedAt (decodeMessage 1) 1 <*> embeddedAt (decodeMessage 1) 2
