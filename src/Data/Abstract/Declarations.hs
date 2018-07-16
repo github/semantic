@@ -11,7 +11,7 @@ class Declarations syntax where
   declaredName = const Nothing
 
 class Declarations1 syntax where
-  -- | Lift a function mapping each element to its set of free variables through a containing structure, collecting the results into a single set.
+  -- | Lift a function mapping each element to its declared name (if any) through a containing structure. This can be used to define the declared name for a composite piece of syntax in terms of the declared name of one of its components.
   liftDeclaredName :: (a -> Maybe Name) -> syntax a -> Maybe Name
   liftDeclaredName _ _ = Nothing
 
