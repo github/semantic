@@ -4,12 +4,13 @@ module Data.Syntax.Declaration where
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
+import qualified Data.Set as Set
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, ToJSONFields1, Named1, Message1)
 
 instance Diffable Function where
   equivalentBySubterm = Just . functionName
@@ -31,6 +32,10 @@ instance Evaluatable Function where
 
 instance Declarations1 Function where
   liftDeclaredName declaredName = declaredName . functionName
+
+instance FreeVariables1 Function where
+  liftFreeVariables freeVariables f@Function{..} = foldMap freeVariables f `Set.difference` foldMap freeVariables functionParameters
+
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, ToJSONFields1, Named1, Message1)
