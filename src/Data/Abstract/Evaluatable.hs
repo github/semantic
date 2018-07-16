@@ -206,7 +206,7 @@ instance HasPostlude 'JavaScript where
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError return where
-  FreeVariablesError :: [Name] -> EvalError Name
+  NoNameError :: EvalError Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
   IntegerFormatError  :: Text -> EvalError Integer
   FloatFormatError    :: Text -> EvalError Scientific
@@ -218,7 +218,7 @@ deriving instance Eq (EvalError return)
 deriving instance Show (EvalError return)
 
 instance Eq1 EvalError where
-  liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
+  liftEq _ NoNameError        NoNameError                  = True
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
   liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
