@@ -40,9 +40,12 @@ import           Data.Record
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text (pack)
+import           Language.Haskell.HsColour
+import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.Task as Task
+import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
@@ -261,3 +264,6 @@ resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
 resumingTypeError = runTypesWith (\err -> trace ("TypeError " <> show err) *> case err of
   UnificationError l r -> pure l <|> pure r
   InfiniteType _ r -> pure r)
+
+prettyShow :: Show a => a -> String
+prettyShow = hscolour TTY defaultColourPrefs False False "" False . ppShow
