@@ -19,6 +19,9 @@
 # Generalise map to fmap, ++ to <>
 - group: {name: generalise, enabled: true}
 
+# Change the severity of the default group to warning
+- warn: {group: {name: default}}
+
 # Ignore some builtin hints
 - ignore: {name: Use mappend}
 - ignore: {name: Redundant do}
