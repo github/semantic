@@ -12,6 +12,8 @@ class Declarations syntax where
 
 class Declarations1 syntax where
   -- | Lift a function mapping each element to its declared name (if any) through a containing structure. This can be used to define the declared name for a composite piece of syntax in terms of the declared name of one of its components.
+  --
+  -- Note that not all syntax will have a declared name; in general it’s reserved for syntax where the user has provided a single, unambiguous name for whatever term is being introduced. Examples would be (non-anonymous) functions, methods, and classes; but not (generally) literals or blocks of imperative statements.
   liftDeclaredName :: (a -> Maybe Name) -> syntax a -> Maybe Name
   liftDeclaredName _ _ = Nothing
 
