@@ -27,6 +27,11 @@ enum VertexType {
   VARIABLE = 2;
 }
 
+message BlobPair {
+  Blob before = 1;
+  Blob after = 2;
+}
+
 message Blob {
   bytes blobSource = 1;
   string blobPath = 2;
