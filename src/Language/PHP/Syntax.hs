@@ -381,6 +381,7 @@ instance Evaluatable Namespace where
         name <- maybeM (throwResumable NoNameError) n
         letrec' name $ \addr ->
           subtermValue namespaceBody *> makeNamespace name addr Nothing
+      go [] = subtermValue namespaceBody
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
