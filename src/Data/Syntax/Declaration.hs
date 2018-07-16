@@ -38,7 +38,7 @@ instance FreeVariables1 Function where
 
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, ToJSONFields1, Named1, Message1)
 
 instance Eq1 Method where liftEq = genericLiftEq
 instance Ord1 Method where liftCompare = genericLiftCompare
@@ -59,6 +59,9 @@ instance Evaluatable Method where
 
 instance Declarations1 Method where
   liftDeclaredName declaredName = declaredName . methodName
+
+instance FreeVariables1 Method where
+  liftFreeVariables freeVariables m@Method{..} = foldMap freeVariables m `Set.difference` foldMap freeVariables methodParameters
 
 
 -- | A method signature in TypeScript or a method spec in Go.
