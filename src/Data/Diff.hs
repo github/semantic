@@ -158,15 +158,14 @@ instance (Show1 syntax, Show ann1, Show ann2, Show recur) => Show (DiffF syntax 
   showsPrec = showsPrec3
 
 instance ((Show (f (Diff f () ()))), (Show (f (Term f ()))), Show1 f, Named1 f, Message1 f, Named (Diff f () ()), Foldable f, Functor f) => Message (Diff f () ()) where
-  encodeMessage num (Diff (Merge (In _ f))) =
-    Encode.embedded num (Encode.embedded 1 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f)))
-  encodeMessage num (Diff (Patch (Delete (In _ f)))) =
-    Encode.embedded num (Encode.embedded 2 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f)))
-  encodeMessage num (Diff (Patch (Insert (In _ f)))) =
-    Encode.embedded num (Encode.embedded 3 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f)))
-  encodeMessage num (Diff (Patch (Replace (In _ f) (In _ g)))) =
-    Encode.embedded num (Encode.embedded 4 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f) <> Encode.embedded 2 (liftEncodeMessage encodeMessage 1 g)))
-  decodeMessage num = embeddedAt (Decode.oneof undefined [(1, m), (2, d), (3, i), (4, r)]) num
+  encodeMessage _ (Diff (Merge (In _ f))) = Encode.embedded 1 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Delete (In _ f)))) =
+    Encode.embedded 2 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Insert (In _ f)))) =
+    Encode.embedded 3 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Replace (In _ f) (In _ g)))) =
+    Encode.embedded 4 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f) <> Encode.embedded 2 (liftEncodeMessage encodeMessage 1 g))
+  decodeMessage _ = Decode.oneof undefined [(1, m), (2, d), (3, i), (4, r)]
     where
       embeddedAt parser num = Decode.at (Decode.embedded'' parser) num
       m = merge ((), ()) <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
