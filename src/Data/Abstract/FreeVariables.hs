@@ -25,11 +25,6 @@ class FreeVariables1 syntax where
 freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> [Name]
 freeVariables1 = liftFreeVariables freeVariables
 
-freeVariable :: FreeVariables term => term -> Either [Name] Name
-freeVariable term = case freeVariables term of
-  [n] -> Right n
-  xs -> Left xs
-
 instance (FreeVariables t) => FreeVariables (Subterm t a) where
   freeVariables = freeVariables . subterm
 
