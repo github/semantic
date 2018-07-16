@@ -246,7 +246,7 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for TypeAlias
 instance Evaluatable TypeAlias where
   eval TypeAlias{..} = do
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable (subterm typeAliasIdentifier))
+    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm typeAliasIdentifier))
     v <- subtermValue typeAliasKind
     addr <- lookupOrAlloc name
     assign addr v
