@@ -30,9 +30,6 @@ instance Evaluatable Function where
     pure (Rval addr)
     where paramNames = foldMap (freeVariables . subterm)
 
-instance Declarations a => Declarations (Function a) where
-  declaredName Function{..} = declaredName functionName
-
 instance Declarations1 Function where
   liftDeclaredName declaredName = declaredName . functionName
 
