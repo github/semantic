@@ -24,7 +24,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
+    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm functionName))
     (_, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermAddress functionBody))
     bind name addr
     pure (Rval addr)
