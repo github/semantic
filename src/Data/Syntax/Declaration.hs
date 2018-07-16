@@ -4,7 +4,6 @@ module Data.Syntax.Declaration where
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
-import qualified Data.Set as Set (fromList)
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
@@ -25,7 +24,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm functionName))
-    (_, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermAddress functionBody))
+    (_, addr) <- letrec name (closure (paramNames functionParameters) (freeVariables functionBody) (subtermAddress functionBody))
     bind name addr
     pure (Rval addr)
     where paramNames = foldMap (maybeToList . declaredName . subterm)
@@ -48,7 +47,7 @@ instance Diffable Method where
 instance Evaluatable Method where
   eval Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm methodName))
-    (_, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermAddress methodBody))
+    (_, addr) <- letrec name (closure (paramNames methodParameters) (freeVariables methodBody) (subtermAddress methodBody))
     bind name addr
     pure (Rval addr)
     where paramNames = foldMap (maybeToList . declaredName . subterm)
