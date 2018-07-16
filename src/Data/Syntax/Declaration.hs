@@ -37,7 +37,7 @@ instance Declarations1 Function where
   liftDeclaredName declaredName Function{..} = declaredName functionName
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Mergeable, FreeVariables1, ToJSONFields1, Named1, Message1)
 
 instance Eq1 Method where liftEq = genericLiftEq
 instance Ord1 Method where liftCompare = genericLiftCompare
@@ -55,6 +55,9 @@ instance Evaluatable Method where
     bind name addr
     pure (Rval addr)
     where paramNames = foldMap (freeVariables . subterm)
+
+instance Declarations1 Method where
+  liftDeclaredName declaredName = declaredName . methodName
 
 
 -- | A method signature in TypeScript or a method spec in Go.
