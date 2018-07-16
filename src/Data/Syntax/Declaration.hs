@@ -28,7 +28,7 @@ instance Evaluatable Function where
     (_, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermAddress functionBody))
     bind name addr
     pure (Rval addr)
-    where paramNames = foldMap (freeVariables . subterm)
+    where paramNames = foldMap (maybeToList . declaredName . subterm)
 
 instance Declarations1 Function where
   liftDeclaredName declaredName = declaredName . functionName
@@ -51,7 +51,7 @@ instance Evaluatable Method where
     (_, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermAddress methodBody))
     bind name addr
     pure (Rval addr)
-    where paramNames = foldMap (freeVariables . subterm)
+    where paramNames = foldMap (maybeToList . declaredName . subterm)
 
 instance Declarations1 Method where
   liftDeclaredName declaredName = declaredName . methodName
