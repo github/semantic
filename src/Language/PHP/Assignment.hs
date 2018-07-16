@@ -489,6 +489,9 @@ namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (term namespace
 namespaceName :: Assignment Term
 namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm' name)
 
+namespaceName' :: Assignment (NonEmpty Term)
+namespaceName' = symbol NamespaceName *> children (someTerm' name)
+
 updateExpression :: Assignment Term
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
 
@@ -704,7 +707,7 @@ traitAliasAsClause :: Assignment Term
 traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> term (classConstantAccessExpression <|> name) <*> (term visibilityModifier <|> emptyTerm) <*> (term name <|> emptyTerm))
 
 namespaceDefinition :: Assignment Term
-namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (term namespaceName <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
+namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (toList <$> namespaceName' <|> pure []) <*> (term compoundStatement <|> emptyTerm))
 
 namespaceUseDeclaration :: Assignment Term
 namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> children (Syntax.NamespaceUseDeclaration <$>

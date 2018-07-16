@@ -47,8 +47,8 @@ instance Example Property where
       Left e
         | Just (LeanCheckException messages e') <- fromException e -> throw (addMessages messages e')
         | otherwise -> throw e
-      Right (Just messages) -> pure $ Failure Nothing (Reason (concat messages))
-      Right Nothing -> pure Success
+      Right (Just messages) -> pure $ Result "" (Failure Nothing (Reason (concat messages)))
+      Right Nothing -> pure $ Result "" Success
     where addMessages messages (HUnit.HUnitFailure loc r) = HUnit.HUnitFailure loc $ case r of
             HUnit.Reason s -> HUnit.Reason (intercalate "\n" messages ++ "\n" ++ s)
             HUnit.ExpectedButGot Nothing expected actual -> HUnit.ExpectedButGot (Just (concat messages)) expected actual

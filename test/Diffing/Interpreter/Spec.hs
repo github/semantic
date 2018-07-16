@@ -14,6 +14,7 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck.Core
+import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do

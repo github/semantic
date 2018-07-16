@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: neat-interpolation
-version: 0.3.2.1
+version: 0.3.2.2
 summary: A quasiquoter for neat and simple multiline text interpolation
 homepage: https://github.com/nikita-volkov/neat-interpolation
 license: mit

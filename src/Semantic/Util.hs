@@ -102,6 +102,16 @@ evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
+callGraphRubyProject paths = runTaskWithOptions debugOptions $ do
+  let proxy = Proxy @'Language.Ruby
+  let lang = Language.Ruby
+  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
+  package <- parsePackage rubyParser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+  modules <- topologicalSort <$> runImportGraph proxy package
+  x <- runCallGraph proxy False modules package
+  pure (x, modules)
+
+
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser lang paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskConfig config logger statter) proxy parser lang paths

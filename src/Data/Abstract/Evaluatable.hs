@@ -52,15 +52,15 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
-          , Member Fresh effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
           , Member (Resumable (EnvironmentError address)) effects
+          , Member (Resumable (Unspecialized value)) effects
           , Member (Resumable EvalError) effects
           , Member (Resumable ResolutionError) effects
-          , Member (Resumable (Unspecialized value)) effects
+          , Member Fresh effects
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
@@ -154,24 +154,24 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    define "print" builtInPrint
+    define (name "print") builtInPrint
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define "puts" builtInPrint
+    define (name "puts") builtInPrint
 
-    defineClass "Object" [] $ do
-      define "inspect" (lambda (const (box (string "<object>"))))
+    defineClass (name "Object") [] $ do
+      define (name "inspect") (lambda (const (box (string "<object>"))))
 
 instance HasPrelude 'TypeScript where
   definePrelude _ =
-    defineNamespace "console" $ do
-      define "log" builtInPrint
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    defineNamespace "console" $ do
-      define "log" builtInPrint
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
 
 -- Postludes
 
@@ -206,7 +206,7 @@ instance HasPostlude 'JavaScript where
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError return where
-  FreeVariablesError :: [Name] -> EvalError Name
+  NoNameError :: EvalError Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
   IntegerFormatError  :: Text -> EvalError Integer
   FloatFormatError    :: Text -> EvalError Scientific
@@ -218,7 +218,7 @@ deriving instance Eq (EvalError return)
 deriving instance Show (EvalError return)
 
 instance Eq1 EvalError where
-  liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
+  liftEq _ NoNameError        NoNameError                  = True
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
   liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b

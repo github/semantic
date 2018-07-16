@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc-typelits-extra
-version: 0.2.4
+version: 0.2.5
 summary: Additional type-level operations on GHC.TypeLits.Nat
 homepage: https://www.clash-lang.org/
 license: bsd-2-clause
