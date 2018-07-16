@@ -35,3 +35,11 @@ spec = describe "call graphing" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/conditional/conditional.py"]
     unGraph res `shouldSatisfy` hasVertex (Variable "merle")
     unGraph res `shouldSatisfy` hasVertex (Variable "taako")
+
+  it "should continue even when a type error is encountered" $ do
+    res <- callGraphPythonProject ["test/fixtures/python/graphing/typeerror/typeerror.py"]
+    unGraph res `shouldSatisfy` hasVertex (Variable "lup")
+
+  it "should continue when an unbound variable is encountered" $ do
+    res <- callGraphPythonProject ["test/fixtures/python/graphing/unbound/unbound.py"]
+    unGraph res `shouldSatisfy` hasVertex (Variable "lucretia")
