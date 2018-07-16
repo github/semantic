@@ -83,11 +83,11 @@ spec = parallel $ do
         TS.ts_parser_loop_until_cancelled p nullPtr nullPtr 0
         pure True
 
-      res <- timeout 1500 (wait churn)
+      res <- timeout 2500 (wait churn)
       res `shouldBe` Nothing
 
       TS.ts_parser_set_enabled p (CBool 0)
-      done <- timeout 1500 (wait churn)
+      done <- timeout 2500 (wait churn)
 
       done `shouldBe` (Just True)
 

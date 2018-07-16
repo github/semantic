@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: exceptions
-version: 0.8.3
+version: 0.10.0
 summary: Extensible optionally-pure exceptions
 homepage: https://github.com/ekmett/exceptions/
 license: bsd-3-clause

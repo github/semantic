@@ -1,9 +1,9 @@
 ---
 type: cabal
 name: integer-gmp
-version: 1.0.1.0
+version: 1.0.2.0
 summary: Integer library based on GMP
-homepage:
+homepage: 
 license: bsd-3-clause
 ---
 Copyright (c) 2014, Herbert Valerio Riedel
