@@ -9,12 +9,12 @@ import SpecHelpers hiding (readFile)
 import Algebra.Graph
 import Data.List (uncons)
 
-import "semantic" Data.Graph (Graph (..), topologicalSort)
-import Semantic.Graph
-import Semantic.Config (defaultOptions)
+import           "semantic" Data.Graph (Graph (..), topologicalSort)
+import           Data.Graph.Vertex
 import qualified Data.Language as Language
-import Data.Graph.Vertex
-import Semantic.IO
+import           Semantic.Config (defaultOptions)
+import           Semantic.Graph
+import           Semantic.IO
 
 callGraphPythonProject paths = runTaskWithOptions defaultOptions $ do
   let proxy = Proxy @'Language.Python
@@ -30,3 +30,8 @@ spec = describe "call graphing" $ do
   it "should work for a simple example" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/simple/simple.py"]
     unGraph res `shouldSatisfy` hasVertex (Variable "magnus")
+
+  it "should evaluate both sides of an if-statement" $ do
+    res <- callGraphPythonProject ["test/fixtures/python/graphing/conditional/conditional.py"]
+    unGraph res `shouldSatisfy` hasVertex (Variable "merle")
+    unGraph res `shouldSatisfy` hasVertex (Variable "taako")
