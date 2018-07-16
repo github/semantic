@@ -21,10 +21,6 @@ class FreeVariables1 syntax where
   default liftFreeVariables :: (Foldable syntax) => (a -> [Name]) -> syntax a -> [Name]
   liftFreeVariables = foldMap
 
--- | Lift the 'freeVariables' method through a containing structure.
-freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> [Name]
-freeVariables1 = liftFreeVariables freeVariables
-
 instance (FreeVariables t) => FreeVariables (Subterm t a) where
   freeVariables = freeVariables . subterm
 
