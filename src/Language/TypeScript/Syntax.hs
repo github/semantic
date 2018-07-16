@@ -191,7 +191,7 @@ instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JavaScriptRequire where
   eval (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
-    alias <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm aliasTerm))
+    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
     rvalBox =<< evalRequire modulePath alias
 
 
@@ -205,7 +205,7 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    alias <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm aliasTerm))
+    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
     rvalBox =<< evalRequire modulePath alias
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
@@ -676,7 +676,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = do
-    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm iden))
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
@@ -690,7 +690,7 @@ instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
-    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm iden))
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
@@ -741,7 +741,7 @@ instance Declarations a => Declarations (AbstractClass a) where
 
 instance Evaluatable AbstractClass where
   eval AbstractClass{..} = do
-    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm abstractClassIdentifier))
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm abstractClassIdentifier))
     supers <- traverse subtermAddress classHeritage
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody

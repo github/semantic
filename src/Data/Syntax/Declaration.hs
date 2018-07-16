@@ -24,7 +24,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm functionName))
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm functionName))
     (_, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermAddress functionBody))
     bind name addr
     pure (Rval addr)
@@ -47,7 +47,7 @@ instance Diffable Method where
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
-    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm methodName))
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm methodName))
     (_, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermAddress methodBody))
     bind name addr
     pure (Rval addr)
@@ -164,7 +164,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm classIdentifier))
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
     supers <- traverse subtermAddress classSuperclasses
     (_, addr) <- letrec name $ do
       void $ subtermValue classBody
@@ -246,7 +246,7 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for TypeAlias
 instance Evaluatable TypeAlias where
   eval TypeAlias{..} = do
-    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm typeAliasIdentifier))
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasIdentifier))
     v <- subtermValue typeAliasKind
     addr <- lookupOrAlloc name
     assign addr v
