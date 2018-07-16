@@ -17,6 +17,7 @@ module Semantic.Graph
 , resumingAddressError
 , resumingValueError
 , resumingEnvironmentError
+, resumingTypeError
 ) where
 
 
