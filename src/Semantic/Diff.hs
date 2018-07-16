@@ -40,15 +40,27 @@ runRubyDiff = flip distributeFor (\ (blobs :: BlobPair) -> do
         diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
         where languageTag = languageTagForBlobPair blobs
 
--- runTypeScriptDiff :: (Member Distribute effs, Member Task effs) => [BlobPair] -> Eff effs [Term (Sum TypeScript.Syntax) ()]
--- runTypeScriptDiff = flip distributeFor (\ blob -> do
---     term <- parse typescriptParser blob
---     pure diffs)
---
--- runJSONDiff :: (Member Distribute effs, Member Task effs) => [BlobPair] -> Eff effs [Term (Sum JSON.Syntax) ()]
--- runJSONDiff = flip distributeFor (\ blob -> do
---     term <- parse jsonParser blob
---     pure (() <$ term))
+runTypeScriptDiff :: (Member Telemetry effs, Member (Lift IO) effs, Member Distribute effs, Member Task effs) => [BlobPair] -> Eff effs [Diff (Sum TypeScript.Syntax) () ()]
+runTypeScriptDiff = flip distributeFor (\ (blobs :: BlobPair) -> do
+    terms <- distributeFor blobs (\blob -> parse typescriptParser blob)
+    diffs <- (diffTerms blobs) terms
+    pure (bimap (const ()) (const ()) diffs))
+    where
+      diffTerms blobs terms = time "diff" languageTag $ do
+        diff <- diff (runJoin terms)
+        diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
+        where languageTag = languageTagForBlobPair blobs
+
+runJSONDiff :: (Member Telemetry effs, Member (Lift IO) effs, Member Distribute effs, Member Task effs) => [BlobPair] -> Eff effs [Diff (Sum JSON.Syntax) () ()]
+runJSONDiff = flip distributeFor (\ (blobs :: BlobPair) -> do
+    terms <- distributeFor blobs (\blob -> parse jsonParser blob)
+    diffs <- (diffTerms blobs) terms
+    pure (bimap (const ()) (const ()) diffs))
+    where
+      diffTerms blobs terms = time "diff" languageTag $ do
+        diff <- diff (runJoin terms)
+        diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
+        where languageTag = languageTagForBlobPair blobs
 
 data SomeTermPair typeclasses ann where
   SomeTermPair :: ApplyAll typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
