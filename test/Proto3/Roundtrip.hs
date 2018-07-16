@@ -4,6 +4,7 @@ module Proto3.Roundtrip (spec) where
 
 import SpecHelpers
 
+import Data.Blob
 import Data.Span
 import qualified Data.ByteString.Lazy as L
 import Data.Source
@@ -33,6 +34,12 @@ instance Named1 (Sum '[Literal.Null]) where nameOf1 _ = "NullSyntax"
 
 spec :: Spec
 spec = parallel $ do
+  describe "blobs" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip @Blob sp
+  describe "blob pairs" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip @BlobPair sp
   describe "spans" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip @Span sp
