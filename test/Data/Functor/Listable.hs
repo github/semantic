@@ -42,6 +42,7 @@ import Data.Range
 import Data.Record
 import Data.Semigroup (Semigroup(..))
 import Data.Source
+import Data.Blob
 import Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
@@ -520,6 +521,12 @@ instance Listable Pos where
 
 instance Listable Span where
   tiers = cons2 Span
+
+instance Listable Blob where
+  tiers = cons3 Blob
+
+instance Listable (Join These Blob) where
+  tiers = liftTiers tiers
 
 instance Listable Source where
   tiers = fromUTF8 `mapT` tiers
