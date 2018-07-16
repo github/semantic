@@ -22,6 +22,9 @@
 # Change the severity of the default group to warning
 - warn: {group: {name: default}}
 
+# Ignore the highly noisy module export list hint
+- ignore: {name: Use module export list}
+
 # Ignore some builtin hints
 - ignore: {name: Use mappend}
 - ignore: {name: Redundant do}
