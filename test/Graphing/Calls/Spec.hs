@@ -27,19 +27,21 @@ callGraphPythonProject paths = runTaskWithOptions defaultOptions $ do
 spec :: Spec
 spec = describe "call graphing" $ do
 
+  let needs r n = unGraph r `shouldSatisfy` hasVertex (Variable n)
+
   it "should work for a simple example" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/simple/simple.py"]
-    unGraph res `shouldSatisfy` hasVertex (Variable "magnus")
+    res `needs` "magnus"
 
   it "should evaluate both sides of an if-statement" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/conditional/conditional.py"]
-    unGraph res `shouldSatisfy` hasVertex (Variable "merle")
-    unGraph res `shouldSatisfy` hasVertex (Variable "taako")
+    res `needs` "merle"
+    res `needs` "taako"
 
   it "should continue even when a type error is encountered" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/typeerror/typeerror.py"]
-    unGraph res `shouldSatisfy` hasVertex (Variable "lup")
+    res `needs` "lup"
 
   it "should continue when an unbound variable is encountered" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/unbound/unbound.py"]
-    unGraph res `shouldSatisfy` hasVertex (Variable "lucretia")
+    res `needs` "lucretia"
