@@ -381,6 +381,7 @@ instance Evaluatable Namespace where
         name <- maybeM (throwResumable NoNameError) n
         letrec' name $ \addr ->
           subtermValue namespaceBody *> makeNamespace name addr Nothing
+      -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php
       go [] = subtermValue namespaceBody
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
