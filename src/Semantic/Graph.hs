@@ -215,12 +215,12 @@ resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadErr
 
 resumingEvalError :: (Member Trace effects, Effects effects) => Evaluator address value (Resumable EvalError ': effects) a -> Evaluator address value effects a
 resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
-  DefaultExportError{}     -> pure ()
-  ExportError{}            -> pure ()
-  IntegerFormatError{}     -> pure 0
-  FloatFormatError{}       -> pure 0
-  RationalFormatError{}    -> pure 0
-  FreeVariablesError names -> pure (fromMaybeLast (name "unknown") names))
+  DefaultExportError{}  -> pure ()
+  ExportError{}         -> pure ()
+  IntegerFormatError{}  -> pure 0
+  FloatFormatError{}    -> pure 0
+  RationalFormatError{} -> pure 0
+  NoNameError           -> pure (name "unknown"))
 
 resumingUnspecialized :: (Member Trace effects, AbstractHole value, Effects effects) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)

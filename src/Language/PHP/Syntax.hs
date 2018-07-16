@@ -376,7 +376,7 @@ instance Evaluatable Namespace where
         go (x:xs) <* makeNamespace name addr Nothing
       -- The last name creates a closure over the namespace body.
       go names = do
-        name <- maybeM (throwEvalError (FreeVariablesError [])) (listToMaybe names)
+        name <- maybeM (throwEvalError NoNameError) (listToMaybe names)
         letrec' name $ \addr ->
           subtermValue namespaceBody *> makeNamespace name addr Nothing
 
