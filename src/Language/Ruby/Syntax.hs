@@ -132,7 +132,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Class where
   eval Class{..} = do
     super <- traverse subtermAddress classSuperClass
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
+    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm classIdentifier))
     rvalBox =<< letrec' name (\addr ->
       subtermValue classBody <* makeNamespace name addr super)
 
@@ -145,7 +145,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = do
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
+    name <- maybeM (throwEvalError (FreeVariablesError [])) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
