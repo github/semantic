@@ -233,7 +233,7 @@ resumingAddressError = runAddressErrorWith $ \ err -> trace ("AddressError: " <>
   Unallocated   _ -> pure lowerBound
   Uninitialized _ -> pure hole
 
-resumingValueError :: (Member Trace effects, Show address, Effects effects) => Evaluator address (Value address body) (Resumable (ValueError address body) ': effects) a -> Evaluator address (Value address body) effects a
+resumingValueError :: (Applicative (m address (Value address body) effects), Effectful (m address (Value address body)), Effects effects, Member Trace effects, Show address) => m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError: " <> prettyShow err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (prettyShow val))
