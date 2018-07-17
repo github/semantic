@@ -27,6 +27,7 @@ data Vertex
   | Module   { moduleName :: Text }
   | Variable { variableName :: Text, variableModuleName :: Text, variableSpan :: Span }
   | Method   { methodName :: Text, methodModuleName :: Text, methodSpan :: Span }
+  | Function { functionName :: Text, functionModuleName :: Text, functionSpan :: Span }
   deriving (Eq, Ord, Show, Generic, Hashable)
 
 packageVertex :: PackageInfo -> Vertex
@@ -41,6 +42,9 @@ variableVertex name ModuleInfo{..} = Variable name (T.pack modulePath)
 methodVertex :: Text -> ModuleInfo -> Span -> Vertex
 methodVertex name ModuleInfo{..} = Method name (T.pack modulePath)
 
+functionVertex :: Text -> ModuleInfo -> Span -> Vertex
+functionVertex name ModuleInfo{..} = Function name (T.pack modulePath)
+
 instance ToJSON Vertex where
   toJSON v = object [ "name" .= vertexName v, "type" .= vertexToType v ]
 
@@ -49,6 +53,7 @@ vertexName Package{..} = packageName <> " (Package)"
 vertexName Module{..} = moduleName <> " (Module)"
 vertexName Variable{..} = "[" <> variableModuleName <> "]." <> variableName <> " (Variable" <> " " <> showSpan variableSpan <> ")"
 vertexName Method{..} = "[" <> methodModuleName <> "]." <> methodName <> " (Method" <> " " <> showSpan methodSpan <> ")"
+vertexName Function{..} = "[" <> functionModuleName <> "]." <> functionName <> " (Function" <> " " <> showSpan functionSpan <> ")"
 
 showSpan :: Span -> Text
 showSpan (Span (Pos a b) (Pos c d)) = T.pack $
@@ -61,6 +66,7 @@ vertexToType Package{}  = "package"
 vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
 vertexToType Method{}   = "method"
+vertexToType Function{} = "function"
 
 
 class VertexDeclaration syntax where
@@ -86,8 +92,9 @@ instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStra
 data Strategy = Default | Custom
 
 type family VertexDeclarationStrategy syntax where
-  VertexDeclarationStrategy Declaration.Method = 'Custom
   VertexDeclarationStrategy Syntax.Identifier = 'Custom
+  VertexDeclarationStrategy Declaration.Function = 'Custom
+  VertexDeclarationStrategy Declaration.Method = 'Custom
   VertexDeclarationStrategy (Sum _) = 'Custom
   VertexDeclarationStrategy syntax  = 'Default
 
@@ -117,8 +124,11 @@ class CustomVertexDeclaration whole syntax where
 instance Apply (VertexDeclaration' whole) fs => CustomVertexDeclaration whole (Sum fs) where
   customToVertex ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
 
-instance CustomVertexDeclaration whole Declaration.Method where
-  customToVertex ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
-
 instance CustomVertexDeclaration whole Syntax.Identifier where
   customToVertex ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (getField ann), name)
+
+instance CustomVertexDeclaration whole Declaration.Function where
+  customToVertex ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
+
+instance CustomVertexDeclaration whole Declaration.Method where
+  customToVertex ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
