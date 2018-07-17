@@ -22,6 +22,7 @@ module Data.Functor.Listable
 , liftCons4
 , liftCons5
 , ListableF(..)
+, ListableF2(..)
 , addWeight
 , ofWeight
 , ListableSyntax
@@ -126,6 +127,13 @@ liftCons5 tiers1 tiers2 tiers3 tiers4 tiers5 f = mapT (uncurry5 f) (tiers1 >< ti
 -- | Convenient wrapper for 'Listable1' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
 newtype ListableF f a = ListableF { unListableF :: f a }
   deriving Show
+
+-- | Convenient wrapper for 'Listable2' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
+newtype ListableF2 f a b = ListableF2 { unListableF2 :: f a b }
+  deriving Show
+
+instance (Listable2 f, Listable a, Listable b) => Listable (ListableF2 f a b) where
+  tiers = ListableF2 `mapT` tiers2
 
 
 -- Instances
