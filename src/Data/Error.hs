@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ImplicitParams, RankNTypes, StandaloneDeriving #-}
+{-# LANGUAGE GADTs, ImplicitParams, RankNTypes #-}
 module Data.Error
   ( Error (..)
   , formatError
@@ -37,7 +37,7 @@ instance Eq grammar => Eq (Error grammar) where
 instance Exception (Error String)
 
 makeError :: HasCallStack => Span -> [grammar] -> Maybe grammar -> Error grammar
-makeError s e a = Error s e a ?callStack
+makeError s e a = withFrozenCallStack (Error s e a ?callStack)
 
 withCallStack :: CallStack -> (HasCallStack => a) -> a
 withCallStack cs action = let ?callStack = cs in action
