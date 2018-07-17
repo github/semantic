@@ -1,3 +1,5 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Semantic.Config where
 
 import           Network.BSD
@@ -82,16 +84,18 @@ withTelemetry config action =
 
 withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c
 withLoggerFromConfig Config{..} = withLogger opts configMaxTelemetyQueueSize
-  where opts = LogOptions {
-      logOptionsLevel     = optionsLogLevel configOptions
-    , logOptionsFormatter = configLogFormatter
-    , logOptionsContext   =
-      [ ("app", configAppName)
-      , ("pid", show configProcessID)
-      , ("hostname", configHostName)
-      , ("sha", buildSHA)
-      ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
-    }
+  where opts = LogOptions { logOptionsLevel     = optionsLogLevel configOptions
+                          , logOptionsFormatter = configLogFormatter
+                          , logOptionsContext   = logOptionsContext' configIsTerminal
+                          }
+        logOptionsContext' = \case
+                            False -> [ ("app", configAppName)
+                                     , ("pid", show configProcessID)
+                                     , ("hostname", configHostName)
+                                     , ("sha", buildSHA)
+                                     ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
+                            _ -> []
+
 
 withHaystackFromConfig :: Config -> Haystack.ErrorLogger -> (HaystackQueue -> IO c) -> IO c
 withHaystackFromConfig Config{..} errorLogger =
