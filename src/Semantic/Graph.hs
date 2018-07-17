@@ -89,9 +89,10 @@ runCallGraph :: ( HasField ann Span
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
-      extractGraph (_, (_, pairs)) = simplify (foldMap fst pairs)
+      extractGraph (_, pairs) = simplify (foldMap (fst . snd) pairs)
       runGraphAnalysis
         = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
+        . caching
         . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) All Abstract))
         . runFresh 0
         . resumingLoadError
@@ -100,7 +101,6 @@ runCallGraph lang includePackages modules package = do
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
-        . caching
         . graphing
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
