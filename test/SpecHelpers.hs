@@ -108,12 +108,12 @@ type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
                              , Unspecialized Val
                              , LoadError Precise
                              ]
-testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
+testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                -> IO
                  ( [String]
                  , ( Heap Precise Latest Val
                    , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
-                            (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
+                            (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                    )
                  )
 testEvaluating
