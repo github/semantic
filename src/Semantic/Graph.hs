@@ -27,7 +27,6 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
-import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -90,7 +89,7 @@ runCallGraph :: ( HasField ann Span
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
-      extractGraph (_, (_, (graph, _))) = simplify graph
+      extractGraph (_, (graph, _)) = simplify graph
       runGraphAnalysis
         = runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) All Abstract))
         . runFresh 0
@@ -130,7 +129,7 @@ runImportGraph lang (package :: Package term)
   | [m :| []] <- toList (packageModules package) = vertex m <$ trace ("single module, skipping import graph computation for " <> modulePath (moduleInfo m))
   | otherwise =
   let analyzeModule = graphingModuleInfo
-      extractGraph (_, (_, (graph, _))) = do
+      extractGraph (_, (graph, _)) = do
         info <- graph
         maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
       runImportGraphAnalysis
@@ -250,10 +249,8 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError: " <> pretty
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: (AbstractHole address, Effects effects) => Evaluator address value (Resumable (EnvironmentError address) ': effects) a -> Evaluator address value effects ([Name], a)
-resumingEnvironmentError
-  = runState []
-  . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)
+resumingEnvironmentError :: (AbstractHole address, Effects effects) => Evaluator address value (Resumable (EnvironmentError address) ': effects) a -> Evaluator address value effects a
+resumingEnvironmentError = interpret (\ (Resumable (FreeVariable _)) -> pure hole)
 
 resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      , Effects effects
