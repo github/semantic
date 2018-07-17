@@ -230,9 +230,9 @@ resumingUnspecialized :: (Member Trace effects, AbstractHole value, Effects effe
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized: " <> prettyShow err) $> hole)
 
 resumingAddressError :: (AbstractHole value, Lower (Cell address value), Member Trace effects, Show address, Effects effects) => Evaluator address value (Resumable (AddressError address value) ': effects) a -> Evaluator address value effects a
-resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError: " <> prettyShow err) *> case err of
+resumingAddressError = runAddressErrorWith $ \ err -> trace ("AddressError: " <> prettyShow err) *> case err of
   Unallocated   _ -> pure lowerBound
-  Uninitialized _ -> pure hole)
+  Uninitialized _ -> pure hole
 
 resumingValueError :: (Member Trace effects, Show address, Effects effects) => Evaluator address (Value address body) (Resumable (ValueError address body) ': effects) a -> Evaluator address (Value address body) effects a
 resumingValueError = runValueErrorWith (\ err -> trace ("ValueError: " <> prettyShow err) *> case err of
