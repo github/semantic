@@ -82,7 +82,7 @@ checking
   . runFresh 0
   . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
-  . caching @[]
+  . caching
   . providingLiveSet
   . fmap reassociate
   . runLoadError
