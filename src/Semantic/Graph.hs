@@ -101,7 +101,7 @@ runCallGraph lang includePackages modules package = do
         . resumingAddressError
         . runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
         . graphing
-        . caching @[]
+        . caching
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
         . providingLiveSet
