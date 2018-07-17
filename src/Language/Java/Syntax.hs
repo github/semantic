@@ -262,3 +262,13 @@ instance Ord1 ClassLiteral where liftCompare = genericLiftCompare
 instance Show1 ClassLiteral where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ClassLiteral
+
+data TryWithResources a = TryWithResources { tryResources :: ![a], tryBody :: !a, tryCatch :: ![a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TryWithResources where liftEq = genericLiftEq
+instance Ord1 TryWithResources where liftCompare = genericLiftCompare
+instance Show1 TryWithResources where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TryWithResources
+instance Evaluatable TryWithResources

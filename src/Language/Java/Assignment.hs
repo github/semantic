@@ -25,7 +25,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Prelude hiding (break)
-import Prologue hiding (for, try, This)
+import Prologue hiding (for, try, This, catches, finally)
 
 type Syntax =
   '[ Comment.Comment
@@ -87,6 +87,7 @@ type Syntax =
    , Java.Syntax.SpreadParameter
    , Java.Syntax.StaticInitializer
    , Java.Syntax.Synchronized
+   , Java.Syntax.TryWithResources
    , Java.Syntax.TypeParameter
    , Java.Syntax.TypeWithModifiers
    , Java.Syntax.Variable
@@ -434,17 +435,30 @@ throw :: Assignment Term
 throw = makeTerm <$> symbol ThrowStatement <*> children (Statement.Throw <$> term expression)
 
 try :: Assignment Term
-try = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expression <*> (append <$> optional catches <*> optional finally))
+try = symbol TryStatement *> children tryWithResources <|> makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expression <*> (append <$> optional catches <*> optional finally))
+
+catches :: Assignment [Term]
+catches = symbol Catches *> children (manyTerm catch)
   where
-    catches = symbol Catches *> children (manyTerm catch)
     catch = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> catchFormalParameter <*> term expression)
     catchFormalParameter = makeTerm <$> symbol CatchFormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
-    finally = makeTerm <$> symbol Finally <*> children (Statement.Finally <$> term expression)
-    -- append catches finally =
-    append Nothing Nothing = []
-    append Nothing (Just a) = [a]
-    append (Just a) Nothing = a
-    append (Just a) (Just b) = a <> [b]
+
+finally :: Assignment Term
+finally = makeTerm <$> symbol Finally <*> children (Statement.Finally <$> term expression)
+
+append :: Maybe [a] -> Maybe a -> [a]
+append Nothing Nothing = []
+append Nothing (Just a) = [a]
+append (Just a) Nothing = a
+append (Just a) (Just b) = a <> [b]
+
+tryWithResources :: Assignment Term
+tryWithResources = makeTerm <$> symbol TryWithResourcesStatement <*> children (Java.Syntax.TryWithResources <$> resourceSpecification <*> block <*> (append <$> optional catches <*> optional finally))
+  where
+    resourceSpecification = symbol ResourceSpecification *> children (manyTerm resource)
+    resource = symbol Resource *> children variableAccess <|> makeTerm <$> symbol Resource <*> children (makeSingleDecl <$> many modifier <*> type' <*> variableDeclaratorId <*> term expression)
+    variableAccess = symbol VariableAccess *> children (identifier <|> fieldAccess)
+    makeSingleDecl modifiers type' target value = Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value
 
 for :: Assignment Term
 for = symbol ForStatement *> children (basicFor <|> enhancedFor)
