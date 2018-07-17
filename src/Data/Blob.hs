@@ -59,7 +59,7 @@ instance Message BlobPair where
     (Join (That b)) -> Encode.embedded 2 (encodeMessage 1 b)
   decodeMessage _ = Join <$> (these <|> this <|> that)
     where
-      embeddedAt parser num = Decode.at (Decode.embedded'' parser) num
+      embeddedAt parser = Decode.at (Decode.embedded'' parser)
       these = These <$> embeddedAt (decodeMessage 1) 1 <*> embeddedAt (decodeMessage 1) 2
       this = This <$> embeddedAt (decodeMessage 1) 1
       that = That <$> embeddedAt (decodeMessage 1) 2

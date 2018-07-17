@@ -167,7 +167,7 @@ instance ((Show (f (Diff f () ()))), (Show (f (Term f ()))), Show1 f, Named1 f, 
     Encode.embedded 4 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f) <> Encode.embedded 2 (liftEncodeMessage encodeMessage 1 g))
   decodeMessage _ = Decode.oneof undefined [(1, m), (2, d), (3, i), (4, r)]
     where
-      embeddedAt parser num = Decode.at (Decode.embedded'' parser) num
+      embeddedAt parser = Decode.at (Decode.embedded'' parser)
       m = merge ((), ()) <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
       i = inserting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
       d = deleting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
