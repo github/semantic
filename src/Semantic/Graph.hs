@@ -17,6 +17,7 @@ module Semantic.Graph
 , resumingAddressError
 , resumingValueError
 , resumingEnvironmentError
+, resumingTypeError
 ) where
 
 
@@ -32,6 +33,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
+import           Data.Abstract.Value.Abstract
 import           Data.Abstract.Value.Type
 import           Data.Abstract.Value.Concrete (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
@@ -87,7 +89,7 @@ runCallGraph lang includePackages modules package = do
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
       extractGraph (_, (_, (graph, _))) = simplify graph
       runGraphAnalysis
-        = runState (lowerBound @(Heap (Hole (Located Monovariant)) All Type))
+        = runState (lowerBound @(Heap (Hole (Located Monovariant)) All Abstract))
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -95,10 +97,9 @@ runCallGraph lang includePackages modules package = do
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
-        . runTermEvaluator @_ @(Hole (Located Monovariant)) @Type
+        . runTermEvaluator @_ @(Hole (Located Monovariant)) @Abstract
         . graphing
         . caching @[]
-        . resumingTypeError
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
         . providingLiveSet
