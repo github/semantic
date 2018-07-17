@@ -91,7 +91,8 @@ runCallGraph lang includePackages modules package = do
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
       extractGraph (_, (graph, _)) = simplify graph
       runGraphAnalysis
-        = runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) All Abstract))
+        = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
+        . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) All Abstract))
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -99,7 +100,6 @@ runCallGraph lang includePackages modules package = do
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
-        . runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
         . graphing
         . caching
         . runReader (packageInfo package)
