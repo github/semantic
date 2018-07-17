@@ -135,8 +135,8 @@ type Val = Value Precise (UtilEff Precise)
 
 
 deNamespace :: Value Precise term -> Maybe (Name, [Name])
-deNamespace (Namespace name scope) = Just (name, Env.names scope)
-deNamespace _                      = Nothing
+deNamespace (Namespace name _ binds) = Just (name, Env.names binds)
+deNamespace _                        = Nothing
 
 namespaceScope :: Value Precise term -> Maybe (Environment Precise)
 namespaceScope (Namespace _ scope) = Just scope
