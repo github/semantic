@@ -20,7 +20,7 @@ data Error grammar = Error
 
 -- | This instance does not take into account the call stack.
 instance Eq grammar => Eq (Error grammar) where
-  (Error s e a _) == (Error s' e' a' _) = all id [s == s', e == e', a == a']
+  (Error s e a _) == (Error s' e' a' _) = (s == s') && (e == e') && (a == a')
 
 deriving instance Foldable Error
 deriving instance Functor Error
