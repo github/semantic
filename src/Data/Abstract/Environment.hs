@@ -115,9 +115,9 @@ intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
   where
     lookupName name = (,) name <$> lookupEnv' name env
 
--- | Get all bound 'Name's in an environment.
-names :: Environment address -> [Name]
-names = fmap fst . flatPairs
+-- | Get all bound 'Name's in a binding.
+names :: Bindings address -> [Name]
+names = fmap fst . pairs
 
 aliasBindings :: [(Name, Name)] -> Bindings address -> Bindings address
 aliasBindings pairs binds = unpairs $ mapMaybe lookupAndAlias pairs
