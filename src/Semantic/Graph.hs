@@ -249,7 +249,7 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError: " <> pretty
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: Effects effects => Evaluator (Hole (Maybe Name) address) value (Resumable (EnvironmentError (Hole (Maybe Name) address)) ': effects) a -> Evaluator (Hole (Maybe Name) address) value effects a
+resumingEnvironmentError :: (Applicative (m (Hole (Maybe Name) address) value effects), Effectful (m (Hole (Maybe Name) address) value), Effects effects) => m (Hole (Maybe Name) address) value (Resumable (EnvironmentError (Hole (Maybe Name) address)) ': effects) a -> m (Hole (Maybe Name) address) value effects a
 resumingEnvironmentError = runResumableWith (\ (FreeVariable name) -> pure (Partial (Just name)))
 
 resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
