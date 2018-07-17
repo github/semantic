@@ -18,15 +18,14 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract
 import           Data.Abstract.Address
-import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
+import           Data.Abstract.Declarations
+import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Name
-import           Data.Abstract.Package (PackageInfo(..))
+import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.Vertex
 import           Data.Record
-import           Data.Sum
-import qualified Data.Syntax as Syntax
 import           Data.Term
 import qualified Data.Text.Encoding as T
 import           Prologue hiding (project)
@@ -38,7 +37,7 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
   }
   where vertexAttributes Package{}  = [ "style" := "dashed", "shape" := "box" ]
         vertexAttributes Module{}   = [ "style" := "dotted, rounded", "shape" := "box" ]
-        vertexAttributes Variable{} = []
+        vertexAttributes _ = []
         edgeAttributes Package{}  Module{}   = [ "style" := "dashed" ]
         edgeAttributes Module{}   Variable{} = [ "style" := "dotted" ]
         edgeAttributes Variable{} Module{}   = [ "color" := "blue" ]
@@ -46,19 +45,22 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
 
 
 -- | Add vertices to the graph for evaluated identifiers.
-graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Member (Reader ModuleInfo) effects
+graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
                  , HasField fields Span
-                 , Base term ~ TermF (Sum syntax) (Record fields)
+                 , VertexDeclaration syntax
+                 , Declarations1 syntax
+                 , Foldable syntax
+                 , Functor syntax
+                 , term ~ Term syntax (Record fields)
                  )
               => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
               -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
 graphingTerms recur term@(In a syntax) = do
-  case project syntax of
-    Just (Syntax.Identifier name) -> do
-      variableDefinition name (getField a)
+  definedInModule <- currentModule
+  case toVertex a definedInModule (subterm <$> syntax) of
+    Just (v, name) -> variableDefinition v name
     _ -> pure ()
   recur term
 
@@ -131,15 +133,13 @@ moduleInclusion v = do
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Member (Env (Hole (Located address))) effects
                       , Member (State (Graph Vertex)) effects
-                      , Member (Reader ModuleInfo) effects
                       )
-                   => Name
-                   -> Span
+                   => Vertex
+                   -> Name
                    -> TermEvaluator term (Hole (Located address)) value effects ()
-variableDefinition name span = do
-  definedInModule <- currentModule
+variableDefinition var name = do
   usedInModuleVertex <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
-  appendGraph $ vertex (variableVertex (formatName name) definedInModule span) `connect` usedInModuleVertex
+  appendGraph $ vertex var `connect` usedInModuleVertex
 
 appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m effects ()
 appendGraph = modify' . (<>)

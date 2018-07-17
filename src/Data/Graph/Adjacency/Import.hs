@@ -43,6 +43,7 @@ data VertexType
   = PACKAGE
   | MODULE
   | VARIABLE
+  | METHOD
     deriving (Eq, Ord, Show, Enum, Bounded, Generic, ToJSON, FromJSON, PB.Named, PB.Finite, PB.MessageField)
 
 -- | Defaults to 'PACKAGE'.
@@ -118,6 +119,7 @@ taggedGraphToImportGraph = accumToAdj . adjMapToAccum . adjacencyMap . toGraph .
             V.Package{}  -> PACKAGE
             V.Module{}   -> MODULE
             V.Variable{} -> VARIABLE
+            V.Method{}   -> METHOD
 
 -- Annotate all vertices of a 'Graph' with a 'Tag', starting from 1.
 -- Two vertices @a@ and @b@ will share a 'Tag' iff @a == b@.
@@ -160,6 +162,7 @@ importGraphToGraph (ImportGraph vs es) = simplify built
           MODULE   -> V.Module c
           PACKAGE  -> V.Package c
           VARIABLE -> V.Variable c "unknown" emptySpan
+          METHOD   -> V.Method c "unknown" emptySpan
 
 
 -- | For debugging: returns True if all edges reference a valid vertex tag.
