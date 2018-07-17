@@ -170,7 +170,7 @@ runAllocator :: ( Addressable address effects
              -> Evaluator address value effects a
 runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
-  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (Unallocated addr)) >>= derefCell addr >>= maybeM (throwResumable (Uninitialized addr))
   Assign addr value -> modifyHeap (heapInsert addr value)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
@@ -182,16 +182,16 @@ instance Effect (Allocator address value) where
 
 
 data AddressError address value resume where
-  UnallocatedAddress   :: address -> AddressError address value (Cell address value)
-  UninitializedAddress :: address -> AddressError address value value
+  Unallocated   :: address -> AddressError address value (Cell address value)
+  Uninitialized :: address -> AddressError address value value
 
 deriving instance Eq address => Eq (AddressError address value resume)
 deriving instance Show address => Show (AddressError address value resume)
 instance Show address => Show1 (AddressError address value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq address => Eq1 (AddressError address value) where
-  liftEq _ (UninitializedAddress a) (UninitializedAddress b) = a == b
-  liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
+  liftEq _ (Uninitialized a) (Uninitialized b) = a == b
+  liftEq _ (Unallocated a)   (Unallocated b)   = a == b
   liftEq _ _                        _                        = False
 
 
