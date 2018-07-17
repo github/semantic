@@ -24,6 +24,7 @@ import           Data.Abstract.Package (PackageInfo(..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.Vertex
+import           Data.Record
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -49,15 +50,15 @@ graphingTerms :: ( Element Syntax.Identifier syntax
                  , Member (Reader ModuleInfo) effects
                  , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
-                 , Base term ~ TermF (Sum syntax) ann
+                 , HasField fields Span
+                 , Base term ~ TermF (Sum syntax) (Record fields)
                  )
               => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
               -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
-graphingTerms recur term@(In _ syntax) = do
+graphingTerms recur term@(In a syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
-      moduleInclusion (Variable (formatName name))
-      variableDefinition name
+      variableDefinition name (getField a)
     _ -> pure ()
   recur term
 
@@ -130,12 +131,15 @@ moduleInclusion v = do
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Member (Env (Hole (Located address))) effects
                       , Member (State (Graph Vertex)) effects
+                      , Member (Reader ModuleInfo) effects
                       )
                    => Name
+                   -> Span
                    -> TermEvaluator term (Hole (Located address)) value effects ()
-variableDefinition name = do
-  graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
-  appendGraph (vertex (Variable (formatName name)) `connect` graph)
+variableDefinition name span = do
+  definedInModule <- currentModule
+  usedInModuleVertex <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
+  appendGraph $ vertex (variableVertex (formatName name) definedInModule span) `connect` usedInModuleVertex
 
 appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m effects ()
 appendGraph = modify' . (<>)

@@ -29,6 +29,7 @@ import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Set (Set)
 import qualified Data.Set as Set
+import           Data.Span
 import qualified Data.Vector as Vec
 import           Data.Word
 import           GHC.Exts (fromList)
@@ -158,7 +159,7 @@ importGraphToGraph (ImportGraph vs es) = simplify built
         pbToVertex (Vertex t c _) = case t of
           MODULE   -> V.Module c
           PACKAGE  -> V.Package c
-          VARIABLE -> V.Variable c
+          VARIABLE -> V.Variable c "unknown" emptySpan
 
 
 -- | For debugging: returns True if all edges reference a valid vertex tag.
