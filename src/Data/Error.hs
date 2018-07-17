@@ -11,19 +11,25 @@ import Data.Source
 import Data.Span
 import System.Console.ANSI
 
-data Error grammar = HasCallStack => Error { errorSpan :: Span, errorExpected :: [grammar], errorActual :: Maybe grammar }
-  deriving (Typeable)
+data Error grammar = Error
+  { errorSpan :: Span
+  , errorExpected :: [grammar]
+  , errorActual :: Maybe grammar
+  , errorCallStack :: CallStack
+  } deriving (Typeable)
 
-deriving instance Eq grammar => Eq (Error grammar)
+-- | This instance does not take into account the call stack.
+instance Eq grammar => Eq (Error grammar) where
+  (Error s e a _) == (Error s' e' a' _) = all id [s == s', e == e', a == a']
+
 deriving instance Foldable Error
 deriving instance Functor Error
 deriving instance Show grammar => Show (Error grammar)
 deriving instance Traversable Error
 instance Exception (Error String)
 
-errorCallStack :: Error grammar -> CallStack
-errorCallStack Error{} = callStack
-
+makeError :: HasCallStack => Span -> [grammar] -> Maybe grammar -> Error grammar
+makeError s e a = Error s e a ?callStack
 
 withCallStack :: CallStack -> (HasCallStack => a) -> a
 withCallStack cs action = let ?callStack = cs in action

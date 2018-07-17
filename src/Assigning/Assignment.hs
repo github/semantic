@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, ImplicitParams #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 -- | Assignment of AST onto some other structure (typically terms).
 --
@@ -83,7 +83,6 @@ module Assigning.Assignment
 , putLocals
 -- Results
 , Error(..)
-, errorCallStack
 , nodeError
 , firstSet
 -- Running
@@ -225,7 +224,7 @@ manyThrough step stop = go
 
 
 nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (Either String grammar)
-nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
+nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol)) ?callStack
 
 
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
@@ -279,15 +278,15 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
-                  Fail s -> throwError ((makeError node) { errorActual = Just (Left s) })
+                  Fail s -> throwError ((makeError' node) { errorActual = Just (Left s) })
                   Choose _ (Just atEnd) _ | Nothing <- node -> go atEnd state >>= uncurry yield
-                  _ -> Left (makeError node)
+                  _ -> Left (makeError' node)
 
                 state@State{..} = case (runTracing t, initialState) of
                   (Choose table _ _, State { stateNodes = Term (In node _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
                   _ -> initialState
                 expectedSymbols = firstSet (t `Then` return)
-                makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
+                makeError' = withStateCallStack (tracingCallSite t) state $ maybe (makeError (Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
 requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
 requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
