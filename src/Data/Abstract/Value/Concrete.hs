@@ -98,6 +98,27 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
+materializeEnvironment :: ( Member (Allocator address (Value address body)) effects
+                          )
+                       => Value address body
+                       -> Evaluator address (Value address body) effects (Maybe (Environment address))
+materializeEnvironment val = do
+  ancestors <- rec val
+  pure (Env.Environment <$> nonEmpty ancestors)
+    where
+      rec val = do
+        supers <- concat <$> traverse (deref >=> rec) (parents val)
+        pure . maybe [] (: supers) $ bindsFrom val
+
+      bindsFrom = \case
+        Class _ _ binds -> Just binds
+        Namespace _ _ binds -> Just binds
+        _ -> Nothing
+
+      parents = \case
+        Class _ supers _ -> supers
+        Namespace _ supers _ -> toList supers
+        _ -> []
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
@@ -130,14 +151,7 @@ instance ( Coercible body (Eff effects)
             | Namespace _ _ binds' <- v = pure binds'
             | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
-  scopedEnvironment ptr = do
-    ancestors <- ancestorBinds [ptr]
-    pure (Env.Environment <$> nonEmpty ancestors)
-      where
-        ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
-          Class _ supers binds -> (binds :) <$> ancestorBinds (reverse supers)
-          Namespace _ supers binds -> (binds :) <$> ancestorBinds (toList supers)
-          _ -> pure [])
+  scopedEnvironment = deref >=> materializeEnvironment
 
   asString v
     | String n <- v = pure n
