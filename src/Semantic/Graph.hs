@@ -92,7 +92,7 @@ runCallGraph lang includePackages modules package = do
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
       extractGraph (_, (_, (graph, _))) = simplify graph
       runGraphAnalysis
-        = runState (lowerBound @(Heap (Hole (Located Monovariant)) All Abstract))
+        = runState (lowerBound @(Heap (Hole () (Located Monovariant)) All Abstract))
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -100,13 +100,13 @@ runCallGraph lang includePackages modules package = do
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
-        . runTermEvaluator @_ @(Hole (Located Monovariant)) @Abstract
+        . runTermEvaluator @_ @(Hole () (Located Monovariant)) @Abstract
         . graphing
         . caching @[]
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
         . providingLiveSet
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment (Hole (Located Monovariant)), Hole (Located Monovariant))))))
+        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment (Hole () (Located Monovariant)), Hole () (Located Monovariant))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
 
@@ -146,7 +146,7 @@ runImportGraph lang (package :: Package term)
         . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole Precise) (ImportGraphEff term (Hole Precise) effs))
+        . runTermEvaluator @_ @_ @(Value (Hole () Precise) (ImportGraphEff term (Hole () Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
   in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
