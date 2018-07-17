@@ -184,7 +184,7 @@ parsePackage parser project@Project{..} = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
   let pkg = Package.fromModules n p resMap
-  pkg <$ trace ("project: " <> show (() <$ pkg))
+  pkg <$ trace ("project: " <> prettyShow (() <$ pkg))
 
   where
     n = name (projectName project)
