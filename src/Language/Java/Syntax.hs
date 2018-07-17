@@ -67,7 +67,7 @@ instance Show1 Synchronized where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Synchronized
 instance Evaluatable Synchronized
 
-data New a = New { newType :: !a, newArgs :: ![a] }
+data New a = New { newType :: !a, newArgs :: ![a], newClassBody :: Maybe a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 New where liftEq = genericLiftEq
@@ -244,3 +244,21 @@ instance Ord1 DimsExpr where liftCompare = genericLiftCompare
 instance Show1 DimsExpr where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DimsExpr
+
+newtype ClassBody a = ClassBody { classBodyExpression :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ClassBody where liftEq = genericLiftEq
+instance Ord1 ClassBody where liftCompare = genericLiftCompare
+instance Show1 ClassBody where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ClassBody
+
+newtype ClassLiteral a = ClassLiteral { classLiteralType :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ClassLiteral where liftEq = genericLiftEq
+instance Ord1 ClassLiteral where liftCompare = genericLiftCompare
+instance Show1 ClassLiteral where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ClassLiteral

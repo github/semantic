@@ -71,6 +71,8 @@ type Syntax =
    , Java.Syntax.ArrayCreationExpression
    , Java.Syntax.Asterisk
    , Java.Syntax.Constructor
+   , Java.Syntax.ClassBody
+   , Java.Syntax.ClassLiteral
    , Java.Syntax.DimsExpr
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.GenericType
@@ -176,7 +178,9 @@ expressionChoices =
   , castExpression
   , char
   , class'
+  , classBody
   , classInstance
+  , classLiteral
   , continue
   , constructorDeclaration
   , dimsExpr
@@ -243,7 +247,7 @@ variableDeclaratorList = symbol VariableDeclaratorList *> children (makeDecl <$>
 
 -- variable declarator -> variable initializer -> expression -> primary -> array creation expression
 arrayCreationExpression :: Assignment Term
-arrayCreationExpression = symbol Grammar.ArrayCreationExpression *> children (makeTerm1 <$> (Java.Syntax.ArrayCreationExpression <$> (new *> type') <*> many dimsExpr))
+arrayCreationExpression = makeTerm <$> symbol Grammar.ArrayCreationExpression <*> children (Java.Syntax.ArrayCreationExpression <$> (new *> type') <*> many dimsExpr)
   where new = token AnonNew *> pure NewKeyword
 
 localVariableDeclarationStatement :: Assignment Term
@@ -293,8 +297,11 @@ class' :: Assignment Term
 class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> (superInterfaces <|> pure []) <*> classBody)
   where
     makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers <> typeParams) identifier (maybeToList superClass <> superInterfaces) -- not doing an assignment, just straight up function
-    classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
+    -- classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
     superClass = symbol Superclass *> children type'
+
+classBody :: Assignment Term
+classBody = makeTerm <$> symbol Grammar.ClassBody <*> children (manyTerm expression)
 
 staticInitializer :: Assignment Term
 staticInitializer = makeTerm <$> symbol Grammar.StaticInitializer <*> children (Java.Syntax.StaticInitializer <$> block)
@@ -543,7 +550,10 @@ synchronized = makeTerm <$> symbol SynchronizedStatement <*> children (Java.Synt
 classInstance :: Assignment Term
 classInstance = makeTerm <$> symbol ClassInstanceCreationExpression <*> children unqualified
   where
-    unqualified = symbol UnqualifiedClassInstanceCreationExpression *> children (Java.Syntax.New <$> type' <*> (argumentList <|> pure []))
+    unqualified = symbol UnqualifiedClassInstanceCreationExpression *> children (Java.Syntax.New <$> type' <*> (argumentList <|> pure []) <*> optional classBody)
+
+classLiteral :: Assignment Term
+classLiteral = makeTerm <$> symbol Grammar.ClassLiteral <*> children (Java.Syntax.ClassLiteral <$> type')
 
 argumentList :: Assignment [Term]
 argumentList = symbol ArgumentList *> children (manyTerm expression)
