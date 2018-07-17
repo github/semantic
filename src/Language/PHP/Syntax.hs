@@ -361,7 +361,7 @@ instance Ord1 NamespaceUseGroupClause where liftCompare = genericLiftCompare
 instance Show1 NamespaceUseGroupClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NamespaceUseGroupClause
 
-data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a }
+data Namespace a = Namespace { namespaceName :: [a], namespaceBody :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Namespace where liftEq = genericLiftEq
@@ -369,16 +369,20 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = rvalBox =<< go (freeVariables (subterm namespaceName))
+  eval Namespace{..} = rvalBox =<< go (declaredName . subterm <$> namespaceName)
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
-      go (name:x:xs) = letrec' name $ \addr ->
-        go (x:xs) <* makeNamespace name addr Nothing
+      go (n:x:xs) = do
+        name <- maybeM (throwResumable NoNameError) n
+        letrec' name $ \addr ->
+          go (x:xs) <* makeNamespace name addr Nothing
       -- The last name creates a closure over the namespace body.
-      go names = do
-        name <- maybeM (throwEvalError (FreeVariablesError [])) (listToMaybe names)
+      go [n] = do
+        name <- maybeM (throwResumable NoNameError) n
         letrec' name $ \addr ->
           subtermValue namespaceBody *> makeNamespace name addr Nothing
+      -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php
+      go [] = subtermValue namespaceBody
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
