@@ -2,9 +2,10 @@ syntax = "proto3";
 
 package github.semantic;
 
-import "ruby.proto";
-import "json.proto";
-import "typescript.proto";
+import "ruby-terms.proto";
+import "ruby-diffs.proto";
+import "json-terms.proto";
+import "typescript-terms.proto";
 import "types.proto";
 import "error_details.proto";
 
@@ -51,15 +52,15 @@ message ParseTreeResponse {
 }
 
 message RubyResponse {
-  repeated ruby.RubyTerm terms = 1;
+  repeated ruby_terms.RubyTerm terms = 1;
 }
 
 message JSONResponse {
-  repeated json.JSONTerm terms = 1;
+  repeated json_terms.JSONTerm terms = 1;
 }
 
 message TypeScriptResponse {
-  repeated typescript.TypeScriptTerm terms = 1;
+  repeated typescript_terms.TypeScriptTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {
@@ -82,7 +83,7 @@ message DiffTreeResponse {
 }
 
 message RubyDiffResponse {
-  repeated ruby.RubyDiff diffs = 1;
+  repeated ruby_diffs.RubyDiff diffs = 1;
 }
 
 message ImportGraphRequest {
