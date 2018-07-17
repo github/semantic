@@ -17,6 +17,7 @@ module Semantic.Graph
 , resumingAddressError
 , resumingValueError
 , resumingEnvironmentError
+, resumingTypeError
 ) where
 
 
@@ -32,6 +33,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
+import           Data.Abstract.Value.Abstract
 import           Data.Abstract.Value.Type
 import           Data.Abstract.Value.Concrete (Value, ValueError (..), runValueErrorWith)
 import           Data.Graph
@@ -40,9 +42,12 @@ import           Data.Record
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text (pack)
+import           Language.Haskell.HsColour
+import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.Task as Task
+import           Text.Show.Pretty (ppShow)
 
 data GraphType = ImportGraph | CallGraph
 
@@ -87,7 +92,7 @@ runCallGraph lang includePackages modules package = do
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
       extractGraph (_, (_, (graph, _))) = simplify graph
       runGraphAnalysis
-        = runState (lowerBound @(Heap (Hole (Located Monovariant)) All Type))
+        = runState (lowerBound @(Heap (Hole (Located Monovariant)) All Abstract))
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -95,10 +100,9 @@ runCallGraph lang includePackages modules package = do
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
-        . runTermEvaluator @_ @(Hole (Located Monovariant)) @Type
+        . runTermEvaluator @_ @(Hole (Located Monovariant)) @Abstract
         . graphing
         . caching @[]
-        . resumingTypeError
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
         . providingLiveSet
@@ -181,7 +185,7 @@ parsePackage parser project@Project{..} = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
   let pkg = Package.fromModules n p resMap
-  pkg <$ trace ("project: " <> show (() <$ pkg))
+  pkg <$ trace ("project: " <> prettyShow (() <$ pkg))
 
   where
     n = name (projectName project)
@@ -206,7 +210,7 @@ withTermSpans :: ( HasField fields Span
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects, Effects effects) => m (Resumable ResolutionError ': effects) a -> m effects a
-resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionError:" <> show err) *> case err of
+resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionError: " <> prettyShow err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
@@ -214,7 +218,7 @@ resumingLoadError :: (Member Trace effects, AbstractHole address, Effects effect
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> (lowerBound, hole))
 
 resumingEvalError :: (Member Fresh effects, Member Trace effects, Effects effects) => Evaluator address value (Resumable EvalError ': effects) a -> Evaluator address value effects a
-resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
+resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError:" <> prettyShow err) *> case err of
   DefaultExportError{}  -> pure ()
   ExportError{}         -> pure ()
   IntegerFormatError{}  -> pure 0
@@ -223,17 +227,17 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *
   NoNameError           -> gensym)
 
 resumingUnspecialized :: (Member Trace effects, AbstractHole value, Effects effects) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
-resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
+resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized: " <> prettyShow err) $> hole)
 
 resumingAddressError :: (AbstractHole value, Lower (Cell address value), Member Trace effects, Show address, Effects effects) => Evaluator address value (Resumable (AddressError address value) ': effects) a -> Evaluator address value effects a
-resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> show err) *> case err of
+resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError: " <> prettyShow err) *> case err of
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
 resumingValueError :: (Member Trace effects, Show address, Effects effects) => Evaluator address (Value address body) (Resumable (ValueError address body) ': effects) a -> Evaluator address (Value address body) effects a
-resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
+resumingValueError = runValueErrorWith (\ err -> trace ("ValueError: " <> prettyShow err) *> case err of
   CallError val     -> pure val
-  StringError val   -> pure (pack (show val))
+  StringError val   -> pure (pack (prettyShow val))
   BoolError{}       -> pure True
   BoundsError{}     -> pure hole
   IndexError{}      -> pure hole
@@ -258,6 +262,9 @@ resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      )
                   => m address Type (Resumable TypeError ': State TypeMap ': effects) a
                   -> m address Type effects a
-resumingTypeError = runTypesWith (\err -> trace ("TypeError " <> show err) *> case err of
+resumingTypeError = runTypesWith (\err -> trace ("TypeError: " <> prettyShow err) *> case err of
   UnificationError l r -> pure l <|> pure r
   InfiniteType _ r -> pure r)
+
+prettyShow :: Show a => a -> String
+prettyShow = hscolour TTY defaultColourPrefs False False "" False . ppShow

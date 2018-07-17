@@ -16,6 +16,7 @@ import qualified Data.Term.Spec
 import qualified Diffing.Algorithm.RWS.Spec
 import qualified Diffing.Algorithm.SES.Spec
 import qualified Diffing.Interpreter.Spec
+import qualified Graphing.Calls.Spec
 import qualified Integration.Spec
 import qualified Matching.Go.Spec
 import qualified Numeric.Spec
@@ -52,6 +53,7 @@ main = do
       describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
       describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
       describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
+      describe "Graphing.Calls" Graphing.Calls.Spec.spec
       describe "Matching" Matching.Go.Spec.spec
       describe "Numeric" Numeric.Spec.spec
       describe "Rendering.TOC" Rendering.TOC.Spec.spec
