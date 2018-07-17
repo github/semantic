@@ -76,7 +76,7 @@ message CallGraphRequest {
 }
 
 message CallGraphResponse {
-  ImportGraph graph = 1;
+  AdjacencyList graph = 1;
   DebugInfo error_info = 2;
 }
 
@@ -85,7 +85,7 @@ message ImportGraphRequest {
 }
 
 message ImportGraphResponse {
-  ImportGraph graph = 1;
+  AdjacencyList graph = 1;
   DebugInfo error_info = 2;
 }
 
