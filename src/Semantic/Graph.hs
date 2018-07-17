@@ -225,7 +225,7 @@ resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError:" <> prettyShow
   RationalFormatError{} -> pure 0
   NoNameError           -> gensym)
 
-resumingUnspecialized :: (Member Trace effects, AbstractHole value, Effects effects) => Evaluator address value (Resumable (Unspecialized value) ': effects) a -> Evaluator address value effects a
+resumingUnspecialized :: (AbstractHole value, Effectful (m value), Effects effects, Functor (m value effects), Member Trace effects) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized: " <> prettyShow err) $> hole)
 
 resumingAddressError :: (AbstractHole value, Lower (Cell address value), Member Trace effects, Show address, Effects effects) => Evaluator address value (Resumable (AddressError address value) ': effects) a -> Evaluator address value effects a
