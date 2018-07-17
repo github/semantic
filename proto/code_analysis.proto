@@ -33,7 +33,7 @@ service CodeAnalysis {
   // Calculate an import graph for a project.
   rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
 
-  // rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
+  rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
 
   // Check health & status of the service.
   rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
@@ -86,12 +86,21 @@ message RubyDiffResponse {
   repeated ruby_diffs.RubyDiff diffs = 1;
 }
 
+message CallGraphRequest {
+  Project project = 1;
+}
+
+message CallGraphResponse {
+  AdjacencyList graph = 1;
+  DebugInfo error_info = 2;
+}
+
 message ImportGraphRequest {
   Project project = 1;
 }
 
 message ImportGraphResponse {
-  ImportGraph graph = 1;
+  AdjacencyList graph = 1;
   DebugInfo error_info = 2;
 }
 

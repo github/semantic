@@ -5,8 +5,8 @@ package github.semantic.ruby_terms;
 
 import "types.proto";
 
-option java_package = "com.github.semantic.ruby";
-option go_package = "github.com/semantic/ruby;ruby";
+option java_package = "com.github.semantic.ruby_terms";
+option go_package = "github.com/semantic/ruby_terms;ruby";
 
 message RubyTerm {
   RubySyntax syntax = 1;

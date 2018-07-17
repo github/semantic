@@ -5,8 +5,8 @@ package github.semantic.ruby_diffs;
 
 import "types.proto";
 
-option java_package = "com.github.semantic.ruby.diffs";
-option go_package = "github.com/semantic/ruby.diffs;ruby";
+option java_package = "com.github.semantic.ruby_diffs";
+option go_package = "github.com/semantic/ruby_diffs;ruby";
 
 message RubyDiff {
   oneof diff {
