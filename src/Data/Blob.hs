@@ -22,7 +22,6 @@ import Data.Language
 import Data.Source as Source
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import Proto3.Suite
 
 -- | The source, path, and language of a blob.
 data Blob = Blob
