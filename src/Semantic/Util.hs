@@ -109,7 +109,7 @@ callGraphRubyProject paths = runTaskWithOptions debugOptions $ do
   package <- parsePackage rubyParser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraph proxy package
   x <- runCallGraph proxy False modules package
-  pure (x, modules)
+  pure (x, (() <$) <$> modules)
 
 
 -- Evaluate a project consisting of the listed paths.
