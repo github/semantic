@@ -83,7 +83,6 @@ module Assigning.Assignment
 , putLocals
 -- Results
 , Error(..)
-, errorCallStack
 , nodeError
 , firstSet
 -- Running
@@ -224,8 +223,8 @@ manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
 
-nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (Either String grammar)
-nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
+nodeError :: CallStack -> [Either String grammar] -> Node grammar -> Error (Either String grammar)
+nodeError cs expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol)) cs
 
 
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
@@ -279,23 +278,26 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
-                  Fail s -> throwError ((makeError node) { errorActual = Just (Left s) })
+                  Fail s -> throwError ((makeError' node) { errorActual = Just (Left s) })
                   Choose _ (Just atEnd) _ | Nothing <- node -> go atEnd state >>= uncurry yield
-                  _ -> Left (makeError node)
+                  _ -> Left (makeError' node)
 
                 state@State{..} = case (runTracing t, initialState) of
                   (Choose table _ _, State { stateNodes = Term (In node _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
                   _ -> initialState
                 expectedSymbols = firstSet (t `Then` return)
-                makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
+                assignmentStack = maybe emptyCallStack (fromCallSiteList . pure) (tracingCallSite t)
+                makeError' = maybe
+                             (Error (Span statePos statePos) (fmap Right expectedSymbols) Nothing assignmentStack)
+                             (nodeError assignmentStack (fmap Right expectedSymbols))
 
 requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
-requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
-  [] -> Right (a, state')
-  Term (In node _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
-
-withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallStack => a) -> a
-withStateCallStack callSite state = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state))))
+requireExhaustive callSite (a, state) =
+  let state' = skipTokens state
+      stack = fromCallSiteList (maybe id (:) callSite (stateCallSites state))
+  in case stateNodes state' of
+    [] -> Right (a, state')
+    Term (In node _) : _ -> Left (nodeError stack [] node)
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
 skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . termAnnotation) (stateNodes state) }
