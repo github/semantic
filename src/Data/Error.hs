@@ -4,7 +4,6 @@ module Data.Error
   , formatError
   , makeError
   , showExpectation
-  , withCallStack
   , withSGRCode
   ) where
 
@@ -37,10 +36,7 @@ instance Eq grammar => Eq (Error grammar) where
 instance Exception (Error String)
 
 makeError :: HasCallStack => Span -> [grammar] -> Maybe grammar -> Error grammar
-makeError s e a = withFrozenCallStack (Error s e a ?callStack)
-
-withCallStack :: CallStack -> (HasCallStack => a) -> a
-withCallStack cs action = let ?callStack = cs in action
+makeError s e a = withFrozenCallStack (Error s e a callStack)
 
 type IncludeSource = Bool
 type Colourize = Bool
