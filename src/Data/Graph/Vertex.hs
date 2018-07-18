@@ -44,15 +44,15 @@ instance ToJSON Vertex where
 vertexName :: Vertex -> Text
 vertexName Package{..} = packageName <> " (Package)"
 vertexName Module{..} = moduleName <> " (Module)"
-vertexName Variable{..} = "[" <> variableModuleName <> "]." <> variableName <> " (Variable" <> " " <> showSpan variableSpan <> ")"
-vertexName Method{..} = "[" <> methodModuleName <> "]." <> methodName <> " (Method" <> " " <> showSpan methodSpan <> ")"
-vertexName Function{..} = "[" <> functionModuleName <> "]." <> functionName <> " (Function" <> " " <> showSpan functionSpan <> ")"
+vertexName Variable{..} = variableModuleName <> "::" <> variableName <> " (Variable)"
+vertexName Method{..} = methodModuleName <> "::" <> methodName <> " (Method)"
+vertexName Function{..} = functionModuleName <> "::" <> functionName <> " (Function)"
 
 showSpan :: Span -> Text
 showSpan (Span (Pos a b) (Pos c d)) = T.pack $
-  show a <> "," <> show b
+     "[" <> show a <> ", " <> show b <> "]"
   <> " - "
-  <> show c <> "," <> show d
+  <> "[" <> show c <> ", " <> show d <> "]"
 
 vertexToType :: Vertex -> Text
 vertexToType Package{}  = "package"
