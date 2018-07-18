@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ImplicitParams, RankNTypes #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 module Data.Error
   ( Error (..)
   , formatError
