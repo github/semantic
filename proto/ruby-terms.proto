@@ -12,28 +12,6 @@ message RubyTerm {
   RubySyntax syntax = 1;
 }
 
-message RubyDiff {
-  oneof diff {
-    Merge merge = 1;
-    Delete delete = 2;
-    Insert insert = 3;
-    Replace replace = 4;
-  }
-  message Merge {
-    RubySyntax syntax = 1;
-  }
-  message Delete {
-    RubySyntax before = 1;
-  }
-  message Insert {
-    RubySyntax after = 1;
-  }
-  message Replace {
-    RubySyntax before = 1;
-    RubySyntax after = 2;
-  }
-}
-
 message Comment {
   string commentContent = 1;
 }
