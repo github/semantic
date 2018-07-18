@@ -35,12 +35,18 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
-  where vertexAttributes Package{}  = [ "style" := "dashed", "shape" := "box" ]
-        vertexAttributes Module{}   = [ "style" := "dotted, rounded", "shape" := "box" ]
-        vertexAttributes _ = []
+  where vertexAttributes Package{}    = [ "style" := "dashed", "shape" := "box" ]
+        vertexAttributes Module{}     = [ "style" := "dotted, rounded", "shape" := "box" ]
+        vertexAttributes Variable{..} = [ "tooltip" := T.encodeUtf8Builder (showSpan variableSpan), "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Method{..}   = [ "tooltip" := T.encodeUtf8Builder (showSpan methodSpan)  , "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Function{..} = [ "tooltip" := T.encodeUtf8Builder (showSpan functionSpan), "style" := "rounded", "shape" := "box" ]
         edgeAttributes Package{}  Module{}   = [ "style" := "dashed" ]
-        edgeAttributes Module{}   Variable{} = [ "style" := "dotted" ]
-        edgeAttributes Variable{} Module{}   = [ "color" := "blue" ]
+        edgeAttributes Module{}   Module{}   = [ "label" := "imports" ]
+        edgeAttributes Variable{} Module{}   = [ "color" := "blue", "label" := "refers to symbol defined in" ]
+        edgeAttributes _          Module{}   = [ "color" := "blue", "label" := "defined in" ]
+        edgeAttributes Method{}   Variable{} = [ "color" := "green", "label" := "calls" ]
+        edgeAttributes Function{} Variable{} = [ "color" := "green", "label" := "calls" ]
+        edgeAttributes Module{}   _          = [ "color" := "red", "label" := "defines" ]
         edgeAttributes _          _          = []
 
 
