@@ -107,7 +107,6 @@ import Data.Span
 import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8')
-import GHC.Exts (fromList)
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
