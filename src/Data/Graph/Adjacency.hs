@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveAnyClass, LambdaCase, ScopedTypeVariables #-}
 
-module Data.Graph.Adjacency.Import
-  ( ImportGraph (..)
+module Data.Graph.Adjacency
+  ( AdjacencyList (..)
   , Edge (..)
   , Tag
   , Vertex (..)
   , VertexType (..)
-  , graphToImportGraph
+  , graphToAdjacencyList
   , importGraphToGraph
   , tagGraph
   , isCoherent
@@ -60,7 +60,7 @@ instance PB.Primitive VertexType where
     (PB.Enumerated (Right r)) -> pure r
     other                     -> Prelude.fail ("VertexType decodeMessageField: unexpected value" <> show other)
 
--- | A tag used on each vertext of a 'Graph' to convert to an 'ImportGraph'.
+-- | A tag used on each vertext of a 'Graph' to convert to an 'AdjacencyList'.
 type Tag = Word64
 
 -- | A protobuf-compatible vertex type, with a unique 'Tag' identifier.
@@ -76,16 +76,16 @@ data Edge = Edge { edgeFrom :: Tag, edgeTo :: Tag }
   deriving (Eq, Ord, Show, Generic, Hashable, PB.Named, PB.Message)
 
 -- | An adjacency list-representation of a graph. You generally build these by calling
--- 'graphToImportGraph' on an algebraic 'Graph'. This representation is less efficient and
+-- 'graphToAdjacencyList' on an algebraic 'Graph'. This representation is less efficient and
 -- fluent than an ordinary 'Graph', but is more amenable to serialization.
-data ImportGraph = ImportGraph
+data AdjacencyList = AdjacencyList
   { graphVertices :: PB.NestedVec Vertex
   , graphEdges    :: PB.NestedVec Edge
   } deriving (Eq, Ord, Show, Generic, PB.Named, PB.Message)
 
 -- | Convert an algebraic graph to an adjacency list.
-graphToImportGraph :: Graph V.Vertex -> ImportGraph
-graphToImportGraph = taggedGraphToImportGraph . tagGraph . simplify
+graphToAdjacencyList :: Graph V.Vertex -> AdjacencyList
+graphToAdjacencyList = taggedGraphToAdjacencyList . tagGraph . simplify
 
 -- * Internal interface stuff
 
@@ -102,8 +102,8 @@ data Acc = Acc [Vertex] (HashSet Edge)
 -- to build a 'Graph', avoiding inefficient vector concatenation.
 -- Time complexity, given V vertices and E edges, is at least O(2V + 2E + (V * E * log E)),
 -- plus whatever overhead converting the graph to 'AdjacencyMap' may entail.
-taggedGraphToImportGraph :: Graph (V.Vertex, Tag) -> ImportGraph
-taggedGraphToImportGraph = accumToAdj . adjMapToAccum . adjacencyMap . toGraph . simplify
+taggedGraphToAdjacencyList :: Graph (V.Vertex, Tag) -> AdjacencyList
+taggedGraphToAdjacencyList = accumToAdj . adjMapToAccum . adjacencyMap . toGraph . simplify
   where adjMapToAccum :: Map (V.Vertex, Tag) (Set (V.Vertex, Tag)) -> Acc
         adjMapToAccum = Map.foldlWithKey go (Acc [] mempty)
 
@@ -111,8 +111,8 @@ taggedGraphToImportGraph = accumToAdj . adjMapToAccum . adjacencyMap . toGraph .
         go (Acc vs es) (v, from) edges = Acc (vertexToPB v from : vs) (Set.foldr' (add . snd) es edges)
           where add = HashSet.insert . Edge from
 
-        accumToAdj :: Acc -> ImportGraph
-        accumToAdj (Acc vs es) = ImportGraph (fromList vs) (fromList (toList es))
+        accumToAdj :: Acc -> AdjacencyList
+        accumToAdj (Acc vs es) = AdjacencyList (fromList vs) (fromList (toList es))
 
         vertexToPB :: V.Vertex -> Tag -> Vertex
         vertexToPB s = Vertex t (V.vertexName s) where
@@ -139,10 +139,10 @@ tagGraph = unwrap . traverse go where
       modify' (HashMap.insert v next)
       pure (v, next)
 
--- | This is the reverse of 'graphToImportGraph'. Don't use this outside of a testing context.
--- N.B. @importGraphToGraph . graphToImportGraph@ is 'id', but @graphToImportGraph . importGraphToGraph@ is not.
-importGraphToGraph :: ImportGraph -> Graph V.Vertex
-importGraphToGraph (ImportGraph vs es) = simplify built
+-- | This is the reverse of 'graphToAdjacencyList'. Don't use this outside of a testing context.
+-- N.B. @importGraphToGraph . graphToAdjacencyList@ is 'id', but @graphToAdjacencyList . importGraphToGraph@ is not.
+importGraphToGraph :: AdjacencyList -> Graph V.Vertex
+importGraphToGraph (AdjacencyList vs es) = simplify built
   where built = allEdges <> vertices unreferencedVertices
 
         allEdges :: Graph V.Vertex
@@ -169,7 +169,7 @@ importGraphToGraph (ImportGraph vs es) = simplify built
 
 
 -- | For debugging: returns True if all edges reference a valid vertex tag.
-isCoherent :: ImportGraph -> Bool
-isCoherent (ImportGraph vs es) = all edgeValid es where
+isCoherent :: AdjacencyList -> Bool
+isCoherent (AdjacencyList vs es) = all edgeValid es where
   edgeValid (Edge a b) = HashSet.member a allTags && HashSet.member b allTags
   allTags = HashSet.fromList (toList (vertexTag <$> vs))
