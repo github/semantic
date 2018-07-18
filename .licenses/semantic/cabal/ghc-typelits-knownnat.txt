@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc-typelits-knownnat
-version: 0.4.2
+version: '0.5'
 summary: Derive KnownNat constraints from other KnownNat constraints
 homepage: https://clash-lang.org/
 license: bsd-2-clause

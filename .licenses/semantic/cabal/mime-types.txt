@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: mime-types
-version: 0.1.0.7
+version: 0.1.0.8
 summary: Basic mime-type handling types and functions
 homepage: https://github.com/yesodweb/wai
 license: mit

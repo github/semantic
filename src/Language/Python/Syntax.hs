@@ -168,7 +168,7 @@ instance Evaluatable QualifiedAliasedImport where
     for_ (NonEmpty.init modulePaths) require
 
     -- Evaluate and import the last module, aliasing and updating the environment
-    alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
+    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
       unit <$ makeNamespace alias addr Nothing (void (bindAll . fst =<< require path)))

@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: http-client
-version: 0.5.12.1
+version: 0.5.13.1
 summary: An HTTP client engine
 homepage: https://github.com/snoyberg/http-client
 license: mit

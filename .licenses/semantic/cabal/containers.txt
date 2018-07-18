@@ -1,9 +1,9 @@
 ---
 type: cabal
 name: containers
-version: 0.5.10.2
+version: 0.5.11.0
 summary: Assorted concrete container types
-homepage: https://github.com/haskell/containers
+homepage: 
 license: bsd-3-clause
 ---
 The Glasgow Haskell Compiler License

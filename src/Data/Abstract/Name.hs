@@ -15,9 +15,8 @@ import qualified Data.Char as Char
 import           Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.Lazy as LT
-import           Data.String
 import           Prologue
-import Proto3.Suite
+import           Proto3.Suite
 import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
 
@@ -32,7 +31,7 @@ instance HasDefault Name where
 
 instance Primitive Name where
   encodePrimitive num (Name text) = Encode.text num (LT.fromStrict text)
-  encodePrimitive num (I index) = Encode.int num index
+  encodePrimitive num (I index)   = Encode.int num index
   decodePrimitive = Name . LT.toStrict <$> Decode.text <|> I <$> Decode.int
   primType _ = Bytes
 
@@ -54,9 +53,6 @@ formatName (Name name) = name
 formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
-
-instance IsString Name where
-  fromString = Name . Text.pack
 
 -- $
 -- >>> I 0

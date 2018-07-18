@@ -1,12 +1,12 @@
 ---
 type: cabal
 name: filepath
-version: 1.4.1.2
+version: 1.4.2
 summary: Library for manipulating FilePaths in a cross platform way.
 homepage: https://github.com/haskell/filepath
 license: bsd-3-clause
 ---
-Copyright Neil Mitchell 2005-2017.
+Copyright Neil Mitchell 2005-2018.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

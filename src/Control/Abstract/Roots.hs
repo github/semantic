@@ -7,14 +7,11 @@ module Control.Abstract.Roots
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Live
-import Prologue
-
 
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots address value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> Live address
-
 
 -- | Retrieve the local 'Live' set.
 askRoots :: Member (Reader (Live address)) effects => Evaluator address value effects (Live address)
