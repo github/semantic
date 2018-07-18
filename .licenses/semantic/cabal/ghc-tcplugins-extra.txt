@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc-tcplugins-extra
-version: 0.2.5
+version: '0.3'
 summary: Utilities for writing GHC type-checker plugins
 homepage: https://github.com/clash-lang/ghc-tcplugins-extra
 license: bsd-2-clause

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
@@ -81,7 +81,7 @@ doRequire :: ( AbstractValue address value effects
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> flip (,) (boolean True) . fst <$> load path
+    Nothing       -> (, boolean True) . fst <$> load path
     Just (env, _) -> pure (env, boolean False)
 
 
@@ -132,7 +132,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Class where
   eval Class{..} = do
     super <- traverse subtermAddress classSuperClass
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
     rvalBox =<< letrec' name (\addr ->
       makeNamespace name addr super (void (subtermAddress classBody)))
 
@@ -145,7 +145,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = do
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
       makeNamespace name addr Nothing (void (eval xs)))
 

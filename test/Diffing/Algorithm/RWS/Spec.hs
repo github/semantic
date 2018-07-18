@@ -12,8 +12,8 @@ import Data.Term
 import Data.These
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
-import Test.Hspec
 import Test.Hspec.LeanCheck
+import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do

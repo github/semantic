@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: temporary
-version: 1.2.1.1
+version: '1.3'
 summary: Portable temporary file and directory support
 homepage: https://github.com/feuerbach/temporary
 license: bsd-3-clause

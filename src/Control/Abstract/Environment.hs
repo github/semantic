@@ -31,8 +31,8 @@ import Prologue
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
 
--- | Replace the environment.
-putEnv :: Member (Env address) effects => (Environment address) -> Evaluator address value effects ()
+-- | Replace the environment. This is only for use in Analysis.Abstract.Caching.
+putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
 putEnv = send . PutEnv
 
 -- | Replace the environment for a computation
@@ -66,7 +66,7 @@ bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.pairs
 
 -- | Run an action in a new local scope.
 locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
-locally = send . Locally @address . lowerEff
+locally = send . Locally @_ @_ @address . lowerEff
 
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close

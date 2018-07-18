@@ -42,7 +42,7 @@ message ErrorSite {
   SrcLoc errorLocation = 2;
 }
 
-message ImportGraph {
+message AdjacencyList {
   repeated Vertex graphVertices = 1;
   repeated Edge graphEdges = 2;
 }

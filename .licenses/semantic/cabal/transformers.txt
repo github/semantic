@@ -1,9 +1,9 @@
 ---
 type: cabal
 name: transformers
-version: 0.5.2.0
+version: 0.5.5.0
 summary: Concrete functor and monad transformers
-homepage: https://hub.darcs.net/ross/transformers
+homepage: 
 license: bsd-3-clause
 ---
 The Glasgow Haskell Compiler License

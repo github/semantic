@@ -5,7 +5,6 @@ module Data.Semigroup.App
 ) where
 
 import Control.Applicative
-import Data.Semigroup
 
 -- $setup
 -- >>> import Test.QuickCheck
