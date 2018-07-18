@@ -54,6 +54,7 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
 graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
+                 , Member (Reader (Maybe Vertex)) effects
                  , HasField fields Span
                  , VertexDeclaration syntax
                  , Declarations1 syntax
@@ -66,9 +67,14 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
 graphingTerms recur term@(In a syntax) = do
   definedInModule <- currentModule
   case toVertex a definedInModule (subterm <$> syntax) of
-    Just (v, name) -> variableDefinition v name
-    _ -> pure ()
-  recur term
+    Just (v, name) -> do
+      variableDefinition v name
+      case v of
+        Method{} -> do
+          moduleInclusion v
+          local (const (Just v)) (recur term)
+        _ -> recur term
+    _ -> recur term
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) effects
@@ -139,13 +145,18 @@ moduleInclusion v = do
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Member (Env (Hole (Located address))) effects
                       , Member (State (Graph Vertex)) effects
+                      , Member (Reader (Maybe Vertex)) effects
                       )
                    => Vertex
                    -> Name
                    -> TermEvaluator term (Hole (Located address)) value effects ()
 variableDefinition var name = do
-  usedInModuleVertex <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
-  appendGraph $ vertex var `connect` usedInModuleVertex
+  context <- ask
+  case context of
+    Just c -> do appendGraph $ vertex c `connect` vertex var
+    _ -> pure ()
+  definedInModuleVertex <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
+  appendGraph $ vertex var `connect` definedInModuleVertex
 
 appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m effects ()
 appendGraph = modify' . (<>)
