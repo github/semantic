@@ -287,7 +287,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   (Choose table _ _, State { stateNodes = Term (In node _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
                   _ -> initialState
                 expectedSymbols = firstSet (t `Then` return)
-                assignmentStack = maybe emptyCallStack (fromList . pure) (tracingCallSite t)
+                assignmentStack = maybe emptyCallStack (fromCallSiteList . pure) (tracingCallSite t)
                 makeError' = maybe
                              (Error (Span statePos statePos) (fmap Right expectedSymbols) Nothing assignmentStack)
                              (nodeError assignmentStack (fmap Right expectedSymbols))
