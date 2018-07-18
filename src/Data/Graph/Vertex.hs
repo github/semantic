@@ -1,16 +1,16 @@
 {-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Graph.Vertex where
 
-import Data.Abstract.Declarations
+import           Data.Abstract.Declarations
 import           Data.Abstract.Module (ModuleInfo (..))
 import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
-import           Data.Span
 import           Data.Record
-import           Data.Term
-import qualified Data.Syntax.Declaration as Declaration
+import           Data.Span
 import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Declaration as Declaration
+import           Data.Term
 import qualified Data.Text as T
 import           Prologue hiding (packageName)
 
