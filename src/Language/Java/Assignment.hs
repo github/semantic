@@ -69,6 +69,7 @@ type Syntax =
    , Java.Syntax.Annotation
    , Java.Syntax.AnnotationField
    , Java.Syntax.ArrayCreationExpression
+   , Java.Syntax.AssertStatement
    , Java.Syntax.Asterisk
    , Java.Syntax.Constructor
    , Java.Syntax.ClassBody
@@ -171,6 +172,7 @@ expressionChoices =
     arrayAccess
   , arrayCreationExpression
   , arrayInitializer
+  , assert
   , assignment'
   , block
   , binary
@@ -472,6 +474,9 @@ basicFor = makeTerm <$> symbol BasicForStatement <*> children (Statement.For <$ 
 enhancedFor :: Assignment Term
 enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.ForEach <$> (variable <$> manyTerm modifier <*> type' <*> variableDeclaratorId) <*> term expression <*> term expression)
   where variable modifiers type' variableDeclaratorId = makeTerm1 (Java.Syntax.Variable modifiers type' variableDeclaratorId)
+
+assert :: Assignment Term
+assert = makeTerm <$> symbol Grammar.AssertStatement <*> children (Java.Syntax.AssertStatement <$> term expression)
 
 -- TODO: instanceOf
 binary :: Assignment Term
