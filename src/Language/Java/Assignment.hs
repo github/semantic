@@ -476,7 +476,7 @@ enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.F
   where variable modifiers type' variableDeclaratorId = makeTerm1 (Java.Syntax.Variable modifiers type' variableDeclaratorId)
 
 assert :: Assignment Term
-assert = makeTerm <$> symbol Grammar.AssertStatement <*> children (Java.Syntax.AssertStatement <$> term expression)
+assert = makeTerm <$> symbol Grammar.AssertStatement <*> children (Java.Syntax.AssertStatement <$> term expression <*> term expression)
 
 -- TODO: instanceOf
 binary :: Assignment Term
