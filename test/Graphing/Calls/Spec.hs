@@ -9,8 +9,10 @@ import SpecHelpers hiding (readFile)
 import Algebra.Graph
 import Data.List (uncons)
 
+import           Data.Abstract.Module
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
 import           Data.Graph.Vertex
+import           Data.Span
 import qualified Data.Language as Language
 import           Semantic.Config (defaultOptions)
 import           Semantic.Graph
@@ -27,21 +29,21 @@ callGraphPythonProject paths = runTaskWithOptions defaultOptions $ do
 spec :: Spec
 spec = describe "call graphing" $ do
 
-  let needs r n = unGraph r `shouldSatisfy` hasVertex (Variable n)
+  let needs r v = unGraph r `shouldSatisfy` hasVertex v
 
   it "should work for a simple example" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/simple/simple.py"]
-    res `needs` "magnus"
+    res `needs` Variable "magnus" "simple.py" (Span (Pos 4 1) (Pos 4 7))
 
   it "should evaluate both sides of an if-statement" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/conditional/conditional.py"]
-    res `needs` "merle"
-    res `needs` "taako"
+    res `needs` Variable "merle" "conditional.py" (Span (Pos 5 5) (Pos 5 10))
+    res `needs` Variable "taako" "conditional.py" (Span (Pos 8 5) (Pos 8 10))
 
   it "should continue even when a type error is encountered" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/typeerror/typeerror.py"]
-    res `needs` "lup"
+    res `needs` Variable "lup" "typeerror.py" (Span (Pos 5 1) (Pos 5 4))
 
   it "should continue when an unbound variable is encountered" $ do
     res <- callGraphPythonProject ["test/fixtures/python/graphing/unbound/unbound.py"]
-    res `needs` "lucretia"
+    res `needs` Variable "lucretia" "unbound.py" (Span (Pos 5 1) (Pos 5 9))
