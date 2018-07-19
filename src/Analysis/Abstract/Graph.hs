@@ -107,6 +107,7 @@ graphingModules recur m = do
   appendGraph (vertex v)
   local (const v) $
     eavesdrop @(Modules address) (\ m -> case m of
+      -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
       Load path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
       Lookup path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
       _ -> pure ())
