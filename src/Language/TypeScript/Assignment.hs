@@ -35,7 +35,6 @@ import qualified Data.Term as Term
 import qualified Data.Diff as Diff
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
-import qualified Language.TypeScript.Syntax.JSX as TypeScript.Syntax
 import qualified Language.TypeScript.Resolution as TypeScript.Resolution
 import Prologue
 import Proto3.Suite (Named1(..), Named(..))
