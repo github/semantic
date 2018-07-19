@@ -10,6 +10,7 @@ import           Data.Record
 import           Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
 import           Prologue hiding (packageName)
@@ -44,7 +45,8 @@ instance ToJSON Vertex where
 vertexName :: Vertex -> Text
 vertexName Package{..} = packageName <> " (Package)"
 vertexName Module{..} = moduleName <> " (Module)"
-vertexName Variable{..} = variableModuleName <> "::" <> variableName <> " (Variable)"
+-- vertexName Variable{..} = variableModuleName <> "::" <> variableName <> " (Variable)"
+vertexName Variable{..} = variableName <> " (Variable)"
 vertexName Method{..} = methodModuleName <> "::" <> methodName <> " (Method)"
 vertexName Function{..} = functionModuleName <> "::" <> functionName <> " (Function)"
 
@@ -66,7 +68,7 @@ class VertexDeclaration syntax where
   toVertex :: (Declarations1 syntax, Foldable syntax, HasField fields Span)
            => Record fields
            -> ModuleInfo
-           -> syntax (Term syntax a)
+           -> syntax (Term syntax (Record fields))
            -> Maybe (Vertex, Name)
 
 instance (VertexDeclaration' syntax syntax) => VertexDeclaration syntax where
@@ -76,7 +78,7 @@ class VertexDeclaration' whole syntax where
   toVertex' :: (Declarations1 whole, Foldable whole, HasField fields Span)
             => Record fields
             -> ModuleInfo
-            -> syntax (Term whole a)
+            -> syntax (Term whole (Record fields))
             -> Maybe (Vertex, Name)
 
 instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStrategy strategy whole syntax) => VertexDeclaration' whole syntax where
@@ -88,6 +90,7 @@ type family VertexDeclarationStrategy syntax where
   VertexDeclarationStrategy Syntax.Identifier = 'Custom
   VertexDeclarationStrategy Declaration.Function = 'Custom
   VertexDeclarationStrategy Declaration.Method = 'Custom
+  VertexDeclarationStrategy Expression.MemberAccess = 'Custom
   VertexDeclarationStrategy (Sum _) = 'Custom
   VertexDeclarationStrategy syntax  = 'Default
 
@@ -96,7 +99,7 @@ class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
                        => proxy strategy
                        -> Record fields
                        -> ModuleInfo
-                       -> syntax (Term whole a)
+                       -> syntax (Term whole (Record fields))
                        -> Maybe (Vertex, Name)
 
 -- | The 'Default' strategy produces 'Nothing'.
@@ -111,7 +114,7 @@ class CustomVertexDeclaration whole syntax where
   customToVertex :: (Declarations1 whole, Foldable whole, HasField fields Span)
                  => Record fields
                  -> ModuleInfo
-                 -> syntax (Term whole a)
+                 -> syntax (Term whole (Record fields))
                  -> Maybe (Vertex, Name)
 
 instance Apply (VertexDeclaration' whole) fs => CustomVertexDeclaration whole (Sum fs) where
@@ -125,3 +128,9 @@ instance CustomVertexDeclaration whole Declaration.Function where
 
 instance CustomVertexDeclaration whole Declaration.Method where
   customToVertex ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
+
+instance CustomVertexDeclaration whole whole => CustomVertexDeclaration whole Expression.MemberAccess where
+  customToVertex ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) name) =
+    case customToVertex lhsAnn info lhs of
+      Just (Variable n _ _, _) -> Just (variableVertex (n <> "." <> formatName name) info (getField ann), name)
+      _ -> Just (variableVertex (formatName name) info (getField ann), name)
