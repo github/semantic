@@ -1,32 +1,42 @@
-{-# LANGUAGE GADTs, ImplicitParams, RankNTypes, StandaloneDeriving #-}
-module Data.Error where
+{-# LANGUAGE GADTs, RankNTypes #-}
+module Data.Error
+  ( Error (..)
+  , formatError
+  , makeError
+  , showExpectation
+  , withSGRCode
+  ) where
 
 import Prologue
-import Data.Blob
+
 import Data.ByteString (isSuffixOf)
 import Data.ByteString.Char8 (pack, unpack)
 import Data.Ix (inRange)
 import Data.List (intersperse)
-import Data.Source
-import Data.Span
 import System.Console.ANSI
 
-data Error grammar = HasCallStack => Error { errorSpan :: Span, errorExpected :: [grammar], errorActual :: Maybe grammar }
-  deriving (Typeable)
+import Data.Blob
+import Data.Source
+import Data.Span
 
-deriving instance Eq grammar => Eq (Error grammar)
-deriving instance Foldable Error
-deriving instance Functor Error
-deriving instance Show grammar => Show (Error grammar)
-deriving instance Traversable Error
+-- | Rather than using the Error constructor directly, you probably
+-- want to call 'makeError', which takes care of inserting the call
+-- stack for you.
+data Error grammar = Error
+  { errorSpan      :: Span
+  , errorExpected  :: [grammar]
+  , errorActual    :: Maybe grammar
+  , errorCallStack :: CallStack
+  } deriving (Show, Functor, Typeable)
+
+-- | This instance does not take into account the call stack.
+instance Eq grammar => Eq (Error grammar) where
+  (Error s e a _) == (Error s' e' a' _) = (s == s') && (e == e') && (a == a')
+
 instance Exception (Error String)
 
-errorCallStack :: Error grammar -> CallStack
-errorCallStack Error{} = callStack
-
-
-withCallStack :: CallStack -> (HasCallStack => a) -> a
-withCallStack cs action = let ?callStack = cs in action
+makeError :: HasCallStack => Span -> [grammar] -> Maybe grammar -> Error grammar
+makeError s e a = withFrozenCallStack (Error s e a callStack)
 
 type IncludeSource = Bool
 type Colourize = Bool
@@ -64,11 +74,11 @@ showExpectation colourize = go
 
 showSymbols :: Colourize -> [String] -> ShowS
 showSymbols colourize = go
-  where go [] = showString "end of input nodes"
-        go [symbol] = showSymbol symbol
-        go [a, b] = showSymbol a . showString " or " . showSymbol b
+  where go []        = showString "end of input nodes"
+        go [symbol]  = showSymbol symbol
+        go [a, b]    = showSymbol a . showString " or " . showSymbol b
         go [a, b, c] = showSymbol a . showString ", " . showSymbol b . showString ", or " . showSymbol c
-        go (h:t) = showSymbol h . showString ", " . go t
+        go (h:t)     = showSymbol h . showString ", " . go t
         showSymbol = withSGRCode colourize [SetColor Foreground Vivid Red] . showString
 
 showSpan :: Maybe FilePath -> Span -> ShowS
