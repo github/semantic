@@ -45,8 +45,7 @@ instance ToJSON Vertex where
 vertexName :: Vertex -> Text
 vertexName Package{..} = packageName <> " (Package)"
 vertexName Module{..} = moduleName <> " (Module)"
--- vertexName Variable{..} = variableModuleName <> "::" <> variableName <> " (Variable)"
-vertexName Variable{..} = variableName <> " (Variable)"
+vertexName Variable{..} = variableModuleName <> "::" <> variableName <> " (Variable)"
 vertexName Method{..} = methodModuleName <> "::" <> methodName <> " (Method)"
 vertexName Function{..} = functionModuleName <> "::" <> functionName <> " (Function)"
 
