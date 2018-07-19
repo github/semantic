@@ -28,6 +28,7 @@ instance AbstractIntro Abstract where
   null       = Abstract
 
 instance ( Member (Allocator address Abstract) effects
+         , Member (Deref address Abstract) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member Fresh effects
@@ -46,6 +47,7 @@ instance ( Member (Allocator address Abstract) effects
     box Abstract
 
 instance ( Member (Allocator address Abstract) effects
+         , Member (Deref address Abstract) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member NonDet effects

@@ -68,6 +68,7 @@ lambda body = withCurrentCallStack callStack $ do
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
                 , Member (Allocator address value) effects
+                , Member (Deref address value) effects
                 , Member (Env address) effects
                 , Member Fresh effects
                 , Member (Reader ModuleInfo) effects
@@ -81,6 +82,7 @@ builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpa
 builtInExport :: ( AbstractValue address value effects
                  , HasCallStack
                  , Member (Allocator address value) effects
+                 , Member (Deref address value) effects
                  , Member (Env address) effects
                  , Member Fresh effects
                  , Member (Reader ModuleInfo) effects

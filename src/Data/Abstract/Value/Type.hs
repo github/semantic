@@ -233,6 +233,7 @@ instance AbstractIntro Type where
 
 
 instance ( Member (Allocator address Type) effects
+         , Member (Deref address Type) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member Fresh effects
@@ -260,6 +261,7 @@ instance ( Member (Allocator address Type) effects
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address Type) effects
+         , Member (Deref address Type) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member Fresh effects

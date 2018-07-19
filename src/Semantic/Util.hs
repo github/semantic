@@ -56,6 +56,7 @@ newtype UtilEff address a = UtilEff
   { runUtilEff :: Eff '[ Exc (LoopControl address)
                        , Exc (Return address)
                        , Env address
+                       , Deref address (Value address (UtilEff address))
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo
                        , Modules address
