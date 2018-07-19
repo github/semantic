@@ -151,7 +151,7 @@ variableDefinition :: ( Member (Env (Hole (Located address))) effects
 variableDefinition var name = do
   context <- ask
   case context of
-    Just c -> do appendGraph $ vertex c `connect` vertex var
+    Just c -> appendGraph $ vertex c `connect` vertex var
     _ -> pure ()
   definedInModuleVertex <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
   appendGraph $ vertex var `connect` definedInModuleVertex
