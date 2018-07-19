@@ -1,6 +1,9 @@
 {-# OPTIONS_GHC -fforce-recomp #-} -- So that gitHash is correct.
 {-# LANGUAGE TemplateHaskell #-}
-module Semantic.Version where
+module Semantic.Version
+  ( buildSHA
+  , buildVersion
+  ) where
 
 import Data.Version (showVersion)
 import Development.GitRev

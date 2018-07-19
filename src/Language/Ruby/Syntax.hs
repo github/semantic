@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)

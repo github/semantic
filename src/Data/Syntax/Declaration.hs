@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
 import qualified Data.Abstract.Environment as Env
