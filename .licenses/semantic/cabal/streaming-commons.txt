@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: streaming-commons
-version: 0.1.19
+version: 0.2.1.0
 summary: Common lower-level functions needed by various streaming data libraries
 homepage: https://github.com/fpco/streaming-commons
 license: mit

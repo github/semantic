@@ -77,7 +77,6 @@ cachingTerms recur term = do
 
 convergingModules :: ( AbstractValue address value effects
                      , Cacheable term address (Cell address) value
-                     , Member (Allocator address value) effects
                      , Member Fresh effects
                      , Member NonDet effects
                      , Member (Reader (Cache term address (Cell address) value)) effects
@@ -86,14 +85,16 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (State (Cache term address (Cell address) value)) effects
                      , Member (Env address) effects
                      , Member (State (Heap address (Cell address) value)) effects
+                     , Effects effects
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects address)
                   -> SubtermAlgebra Module term (TermEvaluator term address value effects address)
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
-  cache <- converge lowerBound (\ prevCache -> isolateCache . raiseHandler locally $ do
+  cache <- converge lowerBound (\ prevCache -> isolateCache $ do
     TermEvaluator (putHeap (configurationHeap        c))
+    TermEvaluator (putEnv  (configurationEnvironment c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
@@ -103,7 +104,6 @@ convergingModules recur m = do
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
   TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
-
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
@@ -125,8 +125,8 @@ scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address (Cell
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 
-caching :: (Alternative f, Effects effects) => TermEvaluator term address value (NonDet ': Reader (Cache term address (Cell address) value) ': State (Cache term address (Cell address) value) ': effects) a -> TermEvaluator term address value effects (Cache term address (Cell address) value, f a)
+caching :: Effects effects => TermEvaluator term address value (NonDet ': Reader (Cache term address (Cell address) value) ': State (Cache term address (Cell address) value) ': effects) a -> TermEvaluator term address value effects (Cache term address (Cell address) value, [a])
 caching
   = runState lowerBound
   . runReader lowerBound
-  . runNonDetA
+  . runNonDet

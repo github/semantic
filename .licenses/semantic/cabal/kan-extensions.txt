@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: kan-extensions
-version: '5.1'
+version: '5.2'
 summary: Kan extensions, Kan lifts, the Yoneda lemma, and (co)density (co)monads
 homepage: https://github.com/ekmett/kan-extensions/
 license: bsd-3-clause

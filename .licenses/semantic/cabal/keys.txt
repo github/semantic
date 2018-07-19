@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: keys
-version: '3.12'
+version: 3.12.1
 summary: Keyed functors and containers
 homepage: https://github.com/ekmett/keys/
 license: bsd-3-clause

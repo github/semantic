@@ -4,19 +4,23 @@ module Proto3.Roundtrip (spec) where
 
 import SpecHelpers
 
+import Data.Blob
 import Data.Span
 import qualified Data.ByteString.Lazy as L
 import Data.Source
+import Data.Functor.Foldable
 import Proto3.Suite
 import qualified Proto3.Wire.Encode as E
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term (Term)
+import Data.Diff (Diff)
 import Data.Sum
-import Language.JSON.Assignment (Syntax)
+import Language.Ruby.Assignment (Syntax)
 import qualified Language.Ruby.Assignment as Ruby
 import Data.Functor.Classes
+import qualified Data.Syntax.Expression as Expression
 
 shouldRoundtrip :: (Eq a, Show a, Message a) => a -> Expectation
 shouldRoundtrip a = go a `shouldBe` Right a
@@ -26,8 +30,16 @@ shouldRoundtrip1 :: forall f a. (Show (f a), Eq (f a), Show1 f, Eq1 f, Eq a, Sho
 shouldRoundtrip1 a = go a `shouldBe` Right a
   where go = fromByteString1 . L.toStrict . toLazyByteString1
 
+instance Named1 (Sum '[Literal.Null]) where nameOf1 _ = "NullSyntax"
+
 spec :: Spec
 spec = parallel $ do
+  describe "blobs" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip @Blob sp
+  describe "blob pairs" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip @BlobPair sp
   describe "spans" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip @Span sp
@@ -44,6 +56,10 @@ spec = parallel $ do
     prop "roundtrips" $
       \sp -> shouldRoundtrip1 @Literal.Float @(Term (Sum Syntax) ()) (unListableF sp)
 
+  describe "negate" $
+    prop "roundtrips" $
+      \sp -> shouldRoundtrip1 @Expression.Negate @(Term (Sum '[Literal.Null]) ()) (unListableF sp)
+
   describe "booleans" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip1 @Literal.Boolean @(Term (Sum Syntax) ()) (unListableF sp)
@@ -51,6 +67,11 @@ spec = parallel $ do
   describe "terms of syntax" $
     prop "roundtrips" $
       \sp -> shouldRoundtrip @(Term (Sum Syntax) ()) (unListableF sp)
+
+  -- describe "diffs of syntax" $
+  --   prop "roundtrips" $
+  --     \sp -> do
+  --       shouldRoundtrip @(Diff (Sum Syntax) () ()) (unListableF2 sp)
 
   describe "arrays" $
     prop "roundtrips" $

@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc
-version: 8.2.2
+version: 8.4.3
 summary: The GHC API
 homepage: https://www.haskell.org/ghc/
 license: bsd-3-clause

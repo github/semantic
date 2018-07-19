@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Diff
 ( Diff(..)
 , DiffF(..)
@@ -31,6 +31,11 @@ import Data.Patch
 import Data.Record
 import Data.Term
 import Text.Show
+import Prologue
+import Proto3.Suite.Class
+import Proto3.Suite.DotProto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
 newtype Diff syntax ann1 ann2 = Diff { unDiff :: DiffF syntax ann1 ann2 (Diff syntax ann1 ann2) }
@@ -152,6 +157,53 @@ instance (Show1 syntax, Show ann1, Show ann2) => Show1 (DiffF syntax ann1 ann2) 
 instance (Show1 syntax, Show ann1, Show ann2, Show recur) => Show (DiffF syntax ann1 ann2 recur) where
   showsPrec = showsPrec3
 
+instance ((Show (f (Diff f () ()))), (Show (f (Term f ()))), Show1 f, Named1 f, Message1 f, Named (Diff f () ()), Foldable f, Functor f) => Message (Diff f () ()) where
+  encodeMessage _ (Diff (Merge (In _ f))) = Encode.embedded 1 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Delete (In _ f)))) =
+    Encode.embedded 2 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Insert (In _ f)))) =
+    Encode.embedded 3 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Replace (In _ f) (In _ g)))) =
+    Encode.embedded 4 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f) <> Encode.embedded 2 (liftEncodeMessage encodeMessage 1 g))
+  decodeMessage _ = Decode.oneof undefined [(1, m), (2, d), (3, i), (4, r)]
+    where
+      embeddedAt parser = Decode.at (Decode.embedded'' parser)
+      m = merge ((), ()) <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
+      i = inserting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
+      d = deleting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
+      r =
+        (\(a, b) -> replacing (termIn () a) (termIn () b))
+          <$> Decode.embedded'' ((,) <$> embeddedAt (liftDecodeMessage decodeMessage 1) 1 <*> embeddedAt (liftDecodeMessage decodeMessage 1) 2)
+
+  dotProto (_ :: Proxy (Diff f () ())) =
+    [ DotProtoMessageOneOf (Single "diff")
+      [ DotProtoField 1 (Prim . Named $ Single "Merge") (Single "merge") [] Nothing
+      , DotProtoField 2 (Prim . Named $ Single "Delete") (Single "delete") [] Nothing
+      , DotProtoField 3 (Prim . Named $ Single "Insert") (Single "insert") [] Nothing
+      , DotProtoField 4 (Prim . Named $ Single "Replace") (Single "replace") [] Nothing
+      ]
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Merge" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "syntax") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Delete" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Insert" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Replace" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
+          , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
+          ] )
+    ]
 
 instance Functor syntax => Bifunctor (Diff syntax) where
   bimap f g = go where go = Diff . trimap f g go . unDiff

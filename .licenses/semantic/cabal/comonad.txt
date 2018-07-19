@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: comonad
-version: 5.0.3
+version: 5.0.4
 summary: Comonads
 homepage: https://github.com/ekmett/comonad/
 license: bsd-2-clause

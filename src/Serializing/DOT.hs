@@ -9,7 +9,6 @@ import Algebra.Graph.Export hiding ((<+>))
 import Algebra.Graph.Export.Dot hiding (export)
 import Data.List
 import Data.String
-import Prologue
 
 -- | Serialize a graph to DOT format.
 --

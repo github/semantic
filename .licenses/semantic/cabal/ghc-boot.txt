@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ghc-boot
-version: 8.2.2
+version: 8.4.3
 summary: Shared functionality between GHC and its boot libraries
 homepage: 
 license: bsd-3-clause

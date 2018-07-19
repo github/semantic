@@ -2,9 +2,10 @@ syntax = "proto3";
 
 package github.semantic;
 
-import "ruby.proto";
-import "json.proto";
-import "typescript.proto";
+import "ruby-terms.proto";
+import "ruby-diffs.proto";
+import "json-terms.proto";
+import "typescript-terms.proto";
 import "types.proto";
 import "error_details.proto";
 
@@ -24,15 +25,15 @@ service CodeAnalysis {
   //
   // Summarize an AST diff of source blobs.
   rpc SummarizeDiff (SummarizeDiffRequest) returns (SummarizeDiffResponse);
-  // AST diff of source blobs
-  // rpc Diff (DiffRequest) returns (DiffResponse) {}
+  // Diff the ASTs of source blobs
+  rpc DiffTree (DiffTreeRequest) returns (DiffTreeResponse);
 
   // Analyzing
   //
   // Calculate an import graph for a project.
   rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
 
-  // rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
+  rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
 
   // Check health & status of the service.
   rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
@@ -51,15 +52,15 @@ message ParseTreeResponse {
 }
 
 message RubyResponse {
-  repeated ruby.RubyTerm terms = 1;
+  repeated ruby_terms.RubyTerm terms = 1;
 }
 
 message JSONResponse {
-  repeated json.JSONTerm terms = 1;
+  repeated json_terms.JSONTerm terms = 1;
 }
 
 message TypeScriptResponse {
-  repeated typescript.TypeScriptTerm terms = 1;
+  repeated typescript_terms.TypeScriptTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {
@@ -71,18 +72,36 @@ message SummarizeDiffResponse {
   repeated ParseError errors = 2;
 }
 
+message DiffTreeRequest  {
+  repeated BlobPair blobPairs = 1;
+}
+
+message DiffTreeResponse {
+  oneof response_type {
+    RubyDiffResponse ruby = 1;
+  }
+}
+
+message RubyDiffResponse {
+  repeated ruby_diffs.RubyDiff diffs = 1;
+}
+
+message CallGraphRequest {
+  Project project = 1;
+}
+
+message CallGraphResponse {
+  AdjacencyList graph = 1;
+  DebugInfo error_info = 2;
+}
+
 message ImportGraphRequest {
   Project project = 1;
 }
 
 message ImportGraphResponse {
-  ImportGraph graph = 1;
+  AdjacencyList graph = 1;
   DebugInfo error_info = 2;
-}
-
-message BlobPair {
-  Blob before = 1;
-  Blob after = 2;
 }
 
 message DiffSummary {

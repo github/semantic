@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
@@ -54,7 +54,7 @@ instance Evaluatable Send where
     let sel = case sendSelector of
           Just sel -> subtermAddress sel
           Nothing  -> variable (name "call")
-    func <- deref =<< maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
+    func <- deref =<< maybe sel (flip evaluateInScopedEnv sel <=< subtermAddress) sendReceiver
     Rval <$> call func (map subtermAddress sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
@@ -81,7 +81,7 @@ doRequire :: ( AbstractValue address value effects
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> flip (,) (boolean True) . fst <$> load path
+    Nothing       -> (, boolean True) . fst <$> load path
     Just (env, _) -> pure (env, boolean False)
 
 
@@ -131,8 +131,8 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    super <- traverse subtermValue classSuperClass
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
+    super <- traverse subtermAddress classSuperClass
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
     rvalBox =<< letrec' name (\addr ->
       subtermValue classBody <* makeNamespace name addr super)
 
@@ -145,7 +145,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = do
-    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 

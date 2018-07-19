@@ -36,7 +36,7 @@ import           Prologue
 
 -- | A map of names to values. Represents a single scope level of an environment chain.
 newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 instance Semigroup (Bindings address) where
   (<>) (Bindings a) (Bindings b) = Bindings (a <> b)
@@ -151,5 +151,8 @@ addresses = fromAddresses . map snd . flatPairs
 
 instance Lower (Environment address) where lowerBound = Environment (lowerBound :| [])
 
+-- N.B. this show instance drops some information to avoid generating
+-- an infinite string in certain cases. As such, two unequal
+-- environments may produce equal outputs over Show.
 instance Show address => Show (Environment address) where
   showsPrec d = showsUnaryWith showsPrec "Environment" d . flatPairs
