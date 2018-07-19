@@ -106,31 +106,20 @@ class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 instance VertexDeclarationWithStrategy 'Default whole syntax where
   toVertexWithStrategy _ _ _ _ = Nothing
 
--- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomVertexDeclaration' instance for the type.
-instance CustomVertexDeclaration whole syntax => VertexDeclarationWithStrategy 'Custom whole syntax where
-  toVertexWithStrategy _ = customToVertex
+instance Apply (VertexDeclaration' whole) fs => VertexDeclarationWithStrategy 'Custom whole (Sum fs) where
+  toVertexWithStrategy _ ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
 
-class CustomVertexDeclaration whole syntax where
-  customToVertex :: (Declarations1 whole, Foldable whole, HasField fields Span)
-                 => Record fields
-                 -> ModuleInfo
-                 -> syntax (Term whole (Record fields))
-                 -> Maybe (Vertex, Name)
+instance VertexDeclarationWithStrategy 'Custom whole Syntax.Identifier where
+  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (getField ann), name)
 
-instance Apply (VertexDeclaration' whole) fs => CustomVertexDeclaration whole (Sum fs) where
-  customToVertex ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
+instance VertexDeclarationWithStrategy 'Custom whole Declaration.Function where
+  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
 
-instance CustomVertexDeclaration whole Syntax.Identifier where
-  customToVertex ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (getField ann), name)
+instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
+  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
 
-instance CustomVertexDeclaration whole Declaration.Function where
-  customToVertex ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
-
-instance CustomVertexDeclaration whole Declaration.Method where
-  customToVertex ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
-
-instance CustomVertexDeclaration whole whole => CustomVertexDeclaration whole Expression.MemberAccess where
-  customToVertex ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) name) =
-    case customToVertex lhsAnn info lhs of
+instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
+  toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) name) =
+    case toVertexWithStrategy proxy lhsAnn info lhs of
       Just (Variable n _ _, _) -> Just (variableVertex (n <> "." <> formatName name) info (getField ann), name)
       _ -> Just (variableVertex (formatName name) info (getField ann), name)
