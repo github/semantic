@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Comment where
 
 import Data.Abstract.Evaluatable

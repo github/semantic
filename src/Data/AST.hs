@@ -1,5 +1,10 @@
 {-# LANGUAGE DataKinds #-}
-module Data.AST where
+module Data.AST
+  ( Node (..)
+  , AST
+  , Location
+  , nodeLocation
+  ) where
 
 import Data.Range
 import Data.Record
