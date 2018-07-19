@@ -1,4 +1,8 @@
-module Control.Abstract.Hole where
+module Control.Abstract.Hole
+  ( AbstractHole (..)
+  , Hole (..)
+  , toMaybe
+  ) where
 
 class AbstractHole a where
   hole :: a

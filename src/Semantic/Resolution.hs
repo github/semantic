@@ -1,5 +1,10 @@
 {-# LANGUAGE ConstraintKinds, GADTs, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
-module Semantic.Resolution where
+module Semantic.Resolution
+  ( Resolution (..)
+  , nodeJSResolutionMap
+  , resolutionMap
+  , runResolution
+  ) where
 
 import           Control.Monad.Effect
 import           Data.Aeson

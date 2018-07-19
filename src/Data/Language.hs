@@ -1,5 +1,12 @@
 {-# LANGUAGE DeriveAnyClass, DeriveGeneric, LambdaCase #-}
-module Data.Language where
+module Data.Language
+  ( Language (..)
+  , ensureLanguage
+  , extensionsForLanguage
+  , knownLanguage
+  , languageForFilePath
+  , languageForType
+  ) where
 
 import           Data.Aeson
 import           Data.Char (toUpper)

@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, UndecidableInstances #-}
-module Data.Abstract.Value.Abstract where
+module Data.Abstract.Value.Abstract ( Abstract (..) ) where
 
 import Control.Abstract
 import Data.Abstract.Environment as Env

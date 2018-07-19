@@ -1,5 +1,8 @@
 {-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, UndecidableInstances #-}
-module Data.Abstract.FreeVariables where
+module Data.Abstract.FreeVariables
+  ( FreeVariables (..)
+  , FreeVariables1 (..)
+  ) where
 
 import Data.Abstract.Name
 import           Data.Sum

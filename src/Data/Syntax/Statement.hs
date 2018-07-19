@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, UndecidableInstances, ViewPatterns, DuplicateRecordFields #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Statement where
 
 import Data.Abstract.Evaluatable

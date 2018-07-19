@@ -1,5 +1,13 @@
 {-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, TypeFamilies #-}
-module Data.Abstract.Cache where
+module Data.Abstract.Cache
+  ( Cache
+  , Cached (..)
+  , Cacheable
+  , cacheLookup
+  , cacheSet
+  , cacheInsert
+  , cacheKeys
+  ) where
 
 import Data.Abstract.Configuration
 import Data.Abstract.Heap

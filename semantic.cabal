@@ -83,7 +83,6 @@ library
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
-                     , Data.Options
                      , Data.Patch
                      , Data.Project
                      , Data.Range
@@ -251,7 +250,7 @@ library
   if flag(release)
     ghc-options:       -Wall -Werror -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j
   else
-    ghc-options:       -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j
+    ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j
   ghc-prof-options:    -fprof-auto
 
 executable semantic

@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Haskell.Syntax where
 
 import           Data.Abstract.Evaluatable
