@@ -62,6 +62,8 @@ vertexToType Variable{} = "variable"
 vertexToType Method{}   = "method"
 vertexToType Function{} = "function"
 
+instance Lower Vertex where
+  lowerBound = Package ""
 
 class VertexDeclaration syntax where
   toVertex :: (Declarations1 syntax, Foldable syntax, HasField fields Span)

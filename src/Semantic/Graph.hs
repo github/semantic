@@ -107,7 +107,7 @@ runCallGraph lang includePackages modules package = do
         . caching @[]
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
-        . runReader (lowerBound @(Maybe Vertex))
+        . runReader (lowerBound @Vertex)
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment (Hole (Located Monovariant)), Hole (Located Monovariant))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))

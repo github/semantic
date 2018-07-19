@@ -20,7 +20,6 @@ import           Control.Abstract
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
-import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
@@ -46,7 +45,9 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
         edgeAttributes _          Module{}   = [ "len" := "5.0", "color" := "blue", "label" := "defined in" ]
         edgeAttributes Method{}   Variable{} = [ "len" := "2.0", "color" := "green", "label" := "calls" ]
         edgeAttributes Function{} Variable{} = [ "len" := "2.0", "color" := "green", "label" := "calls" ]
-        edgeAttributes Module{}   _          = [ "len" := "2.0", "color" := "red", "label" := "defines" ]
+        edgeAttributes Module{}   Function{} = [ "len" := "2.0", "color" := "red", "label" := "defines" ]
+        edgeAttributes Module{}   Method{}   = [ "len" := "2.0", "color" := "red", "label" := "defines" ]
+        edgeAttributes Module{}   _          = [ "len" := "2.0", "color" := "green", "label" := "calls" ]
         edgeAttributes _          _          = []
 
 
@@ -54,7 +55,7 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
 graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (Env (Hole (Located address))) effects
                  , Member (State (Graph Vertex)) effects
-                 , Member (Reader (Maybe Vertex)) effects
+                 , Member (Reader Vertex) effects
                  , HasField fields Span
                  , VertexDeclaration syntax
                  , Declarations1 syntax
@@ -67,25 +68,28 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
 graphingTerms recur term@(In a syntax) = do
   definedInModule <- currentModule
   case toVertex a definedInModule (subterm <$> syntax) of
-    Just (v@Function{}, name) -> recurWithContext v name
-    Just (v@Method{}, name) -> recurWithContext v name
-    Just (v, name) -> do
-      variableDefinition v name
+    Just (v@Function{}, _) -> recurWithContext v
+    Just (v@Method{}, _) -> recurWithContext v
+    Just (Variable{..}, name) -> do
+      definedInModuleInfo <- maybe (ModuleInfo "unknown") (maybe (ModuleInfo "hole") addressModule . toMaybe) <$> TermEvaluator (lookupEnv name)
+      variableDefinition (variableVertex variableName definedInModuleInfo variableSpan)
       recur term
     _ -> recur term
   where
-    recurWithContext v name = do
-      variableDefinition v name
+    recurWithContext v = do
+      variableDefinition v
       moduleInclusion v
-      local (const (Just v)) (recur term)
+      local (const v) (recur term)
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph Vertex)) effects
+                    , Member (Reader Vertex) effects
                     )
                  => SubtermAlgebra Module term (TermEvaluator term address value effects a)
                  -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
-graphingPackages recur m = packageInclusion (moduleVertex (moduleInfo m)) *> recur m
+graphingPackages recur m =
+  let v = moduleVertex (moduleInfo m) in packageInclusion v *> local (const v) (recur m)
 
 -- | Add vertices to the graph for imported modules.
 graphingModules :: forall term address value effects a
@@ -93,16 +97,19 @@ graphingModules :: forall term address value effects a
                    , Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph Vertex)) effects
+                  , Member (Reader Vertex) effects
                    )
                 => SubtermAlgebra Module term (TermEvaluator term address value effects a)
                 -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingModules recur m = do
-  appendGraph (vertex (moduleVertex (moduleInfo m)))
-  eavesdrop @(Modules address) (\ m -> case m of
-    Load path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
-    Lookup path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
-    _ -> pure ())
-    (recur m)
+  let v = moduleVertex (moduleInfo m)
+  appendGraph (vertex v)
+  local (const v) $
+    eavesdrop @(Modules address) (\ m -> case m of
+      Load path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
+      Lookup path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
+      _ -> pure ())
+      (recur m)
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: forall term address value effects a
@@ -145,21 +152,15 @@ moduleInclusion v = do
   m <- currentModule
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
--- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Env (Hole (Located address))) effects
-                      , Member (State (Graph Vertex)) effects
-                      , Member (Reader (Maybe Vertex)) effects
+-- | Add an edge from the passed variable name to the context it originated within.
+variableDefinition :: ( Member (State (Graph Vertex)) effects
+                      , Member (Reader Vertex) effects
                       )
                    => Vertex
-                   -> Name
                    -> TermEvaluator term (Hole (Located address)) value effects ()
-variableDefinition var name = do
+variableDefinition var = do
   context <- ask
-  case context of
-    Just c -> appendGraph $ vertex c `connect` vertex var
-    _ -> pure ()
-  definedInModuleVertex <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
-  appendGraph $ vertex var `connect` definedInModuleVertex
+  appendGraph $ vertex context `connect` vertex var
 
 appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m effects ()
 appendGraph = modify' . (<>)
