@@ -214,7 +214,7 @@ evaluateInScopedEnv scopedEnvTerm term = do
 
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
-         , Member (Allocator address value) effects
+         , Member (Deref address value) effects
          , Member (Env address) effects
          , Member (Resumable (EnvironmentError address)) effects
          )
@@ -224,7 +224,7 @@ value = deref <=< address
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
-                , Member (Allocator address value) effects
+                , Member (Deref address value) effects
                 , Member (Env address) effects
                 , Member (Resumable (EnvironmentError address)) effects
                 )

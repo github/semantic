@@ -155,6 +155,7 @@ newtype ImportGraphEff term address outerEffects a = ImportGraphEff
   { runImportGraphEff :: Eff (  Exc (LoopControl address)
                              ': Exc (Return address)
                              ': Env address
+                             ': Deref address (Value address (ImportGraphEff term address outerEffects))
                              ': Allocator address (Value address (ImportGraphEff term address outerEffects))
                              ': Reader ModuleInfo
                              ': Reader Span

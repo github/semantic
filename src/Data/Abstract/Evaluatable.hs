@@ -49,6 +49,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Declarations term
           , FreeVariables term
           , Member (Allocator address value) effects
+          , Member (Deref address value) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
@@ -72,6 +73,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 evaluate :: ( AbstractValue address value inner
             , Addressable address (Reader ModuleInfo ': effects)
+            , Addressable address (Allocator address value ': Reader ModuleInfo ': effects)
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
@@ -94,7 +96,7 @@ evaluate :: ( AbstractValue address value inner
             , Recursive term
             , Reducer value (Cell address value)
             , ValueRoots address value
-            , inner ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
+            , inner ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
@@ -121,6 +123,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
         runInModule preludeBinds info
           = runReader info
           . runAllocator
+          . runDeref
           . runEnv (newEnv preludeBinds)
           . runReturn
           . runLoopControl
@@ -136,6 +139,7 @@ class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator address value) effects
+                   , Member (Deref address value) effects
                    , Member (Env address) effects
                    , Member Fresh effects
                    , Member (Reader ModuleInfo) effects
@@ -179,6 +183,7 @@ class HasPostlude (language :: Language) where
   postlude :: ( AbstractValue address value effects
               , HasCallStack
               , Member (Allocator address value) effects
+              , Member (Deref address value) effects
               , Member (Env address) effects
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects

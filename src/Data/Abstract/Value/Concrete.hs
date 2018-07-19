@@ -98,7 +98,7 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
-materializeEnvironment :: ( Member (Allocator address (Value address body)) effects
+materializeEnvironment :: ( Member (Deref address (Value address body)) effects
                           )
                        => Value address body
                        -> Evaluator address (Value address body) effects (Maybe (Environment address))
@@ -123,6 +123,7 @@ materializeEnvironment val = do
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
+         , Member (Deref address (Value address body)) effects
          , Member (Env address) effects
          , Member (Exc (LoopControl address)) effects
          , Member (Exc (Return address)) effects
