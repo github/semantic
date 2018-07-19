@@ -357,7 +357,7 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> (extends <|> pure []) <*> interfaceBody)
     makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
-    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> pure [] <*> annotationTypeBody)
+    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> AnonAt *> identifier <*> pure [] <*> annotationTypeBody)
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
     extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))
@@ -476,7 +476,7 @@ enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.F
   where variable modifiers type' variableDeclaratorId = makeTerm1 (Java.Syntax.Variable modifiers type' variableDeclaratorId)
 
 assert :: Assignment Term
-assert = makeTerm <$> symbol Grammar.AssertStatement <*> children (Java.Syntax.AssertStatement <$> term expression <*> term expression)
+assert = makeTerm <$> symbol Grammar.AssertStatement <*> children (Java.Syntax.AssertStatement <$> term expression <*> optional (term expression))
 
 -- TODO: instanceOf
 binary :: Assignment Term
