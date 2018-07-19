@@ -224,10 +224,7 @@ instance Ord1 Or where liftCompare = genericLiftCompare
 instance Show1 Or where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Or where
-  eval t = rvalBox =<< go (fmap subtermValue t) where
-    go (Or a b) = do
-      cond <- a
-      ifthenelse cond (pure cond) b
+  eval (Or a b) = disjunction (subtermValue a) (subtermValue b) >>= rvalBox
 
 data And a = And { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

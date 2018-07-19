@@ -40,12 +40,12 @@ instance (Addressable address effects, Member (Reader ModuleInfo) effects, Membe
   allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule)
   derefCell (Located loc _ _) = relocate . derefCell loc
 
-instance Addressable address effects => Addressable (Hole address) effects where
-  type Cell (Hole address) = Cell address
+instance (Addressable address effects, Ord context, Show context) => Addressable (Hole context address) effects where
+  type Cell (Hole context address) = Cell address
 
   allocCell name = relocate (Total <$> allocCell name)
   derefCell (Total loc) = relocate . derefCell loc
-  derefCell Partial     = const (pure Nothing)
+  derefCell (Partial _) = const (pure Nothing)
 
 relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
 relocate = raiseEff . lowerEff
