@@ -60,13 +60,13 @@ choose :: (Enum symbol, HasCallStack)
 choose nullable firstSet table src state follow = case stateInput state of
   []  -> case nullable of
     Nullable f -> Right (state, f state)
-    _          -> Left (withFrozenCallStack (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) Nothing))
+    _          -> Left (makeError (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) Nothing)
   s:_ -> case fromEnum (astSymbol s) `IntMap.lookup` table of
     Just k -> k src state follow
     _      -> notFound (astSymbol s) state follow
   where notFound s state follow = case nullable of
           Nullable f | any (fromEnum s `IntSet.member`) follow -> Right (state, f state)
-          _                                                    -> Left (withFrozenCallStack (Error (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) (Just (Right s))))
+          _                                                    -> Left (makeError (stateSpan state) (Right . toEnum <$> IntSet.toList firstSet) (Just (Right s)))
 
 instance (Enum symbol, Ord symbol) => Applicative (Assignment symbol) where
   pure a = Assignment (pure a) lowerBound []
@@ -99,15 +99,15 @@ instance (Enum symbol, Ord symbol) => Alternative (Assignment symbol) where
 instance (Enum symbol, Ord symbol, Show symbol) => Assigning symbol (Assignment symbol) where
   leafNode s = Assignment NotNullable (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
-      []  -> Left (withFrozenCallStack (Error (stateSpan state) [Right s] Nothing))
+      []  -> Left (makeError (stateSpan state) [Right s] Nothing)
       s:_ -> case decodeUtf8' (sourceBytes (Source.slice (astRange s) src)) of
-        Left err   -> Left (withFrozenCallStack (Error (astSpan s) [Left "valid utf-8"] (Just (Left (show err)))))
+        Left err   -> Left (makeError (astSpan s) [Left "valid utf-8"] (Just (Left (show err))))
         Right text -> Right (advanceState state, text))
     ]
 
   branchNode s a = Assignment NotNullable (IntSet.singleton (fromEnum s))
     [ (s, \ src state _ -> case stateInput state of
-      []  -> Left (withFrozenCallStack (Error (stateSpan state) [Right s] Nothing))
+      []  -> Left (makeError (stateSpan state) [Right s] Nothing)
       s:_ -> first (const (advanceState state)) <$> runAssignment a src state { stateInput = astChildren s })
     ]
 
@@ -132,7 +132,7 @@ runAssignment (Assignment nullable firstSet table) src input
     Left err -> Left err
     Right (state', a') -> case stateInput state' of
       []   -> Right (state', a')
-      s':_ -> Left (withFrozenCallStack (Error (stateSpan state') [] (Just (Right (astSymbol s')))))
+      s':_ -> Left (makeError (stateSpan state') [] (Just (Right (astSymbol s'))))
 
 
 data Nullable symbol a
