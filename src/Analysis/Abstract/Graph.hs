@@ -24,6 +24,7 @@ import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.Vertex
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Record
 import           Data.Term
 import qualified Data.Text.Encoding as T
@@ -70,8 +71,8 @@ graphingTerms recur term@(In a syntax) = do
   case toVertex a definedInModule (subterm <$> syntax) of
     Just (v@Function{}, _) -> recurWithContext v
     Just (v@Method{}, _) -> recurWithContext v
-    Just (Variable{..}, name) -> do
-      definedInModuleInfo <- maybe (ModuleInfo "unknown") (maybe (ModuleInfo "hole") addressModule . toMaybe) <$> TermEvaluator (lookupEnv name)
+    Just (Variable{..}, names) -> do
+      definedInModuleInfo <- maybe (ModuleInfo "unknown") (maybe (ModuleInfo "hole") addressModule . toMaybe) <$> TermEvaluator (lookupEnv (NonEmpty.last names))
       variableDefinition (variableVertex variableName definedInModuleInfo variableSpan)
       recur term
     _ -> recur term
