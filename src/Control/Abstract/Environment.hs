@@ -3,6 +3,7 @@ module Control.Abstract.Environment
 ( Environment
 , Exports
 , getEnv
+, putEnv
 , export
 , lookupEnv
 , bind
@@ -29,6 +30,10 @@ import Prologue
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
 getEnv = send GetEnv
 
+-- | Replace the environment. This is only for use in Analysis.Abstract.Caching.
+putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
+putEnv = send . PutEnv
+
 -- | Add an export to the global export state.
 export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
 export name alias addr = send (Export name alias addr)
@@ -48,7 +53,7 @@ bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.flatPairs
 
 -- | Run an action in a new local scope.
 locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
-locally = send . Locally @address . lowerEff
+locally = send . Locally @_ @_ @address . lowerEff
 
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close
@@ -62,6 +67,7 @@ data Env address m return where
   Close  :: Set Name        -> Env address m (Environment address)
   Locally :: m a            -> Env address m a
   GetEnv ::                    Env address m (Environment address)
+  PutEnv :: Environment address -> Env address m ()
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
 instance Effect (Env address) where
@@ -70,6 +76,7 @@ instance Effect (Env address) where
   handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
   handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c))) (dist . fmap k)
   handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
+  handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (dist . (<$ c) . k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
 runEnv :: Effects effects
@@ -94,6 +101,7 @@ handleEnv = \case
     a <- reinterpret2 handleEnv (raiseEff action)
     a <$ modify' (Env.pop @address)
   GetEnv -> get
+  PutEnv e -> put e
   Export name alias addr -> modify (Exports.insert name alias addr)
 
 -- | Errors involving the environment.

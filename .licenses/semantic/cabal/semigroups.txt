@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: semigroups
-version: 0.18.4
+version: 0.18.5
 summary: Anything that associates
 homepage: https://github.com/ekmett/semigroups/
 license: bsd-2-clause

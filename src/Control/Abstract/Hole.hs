@@ -1,15 +1,17 @@
 module Control.Abstract.Hole where
 
+import Prologue
+
 class AbstractHole a where
   hole :: a
 
 
-data Hole a = Partial | Total a
+data Hole context a = Partial context | Total a
   deriving (Foldable, Functor, Eq, Ord, Show, Traversable)
 
-instance AbstractHole (Hole a) where
-  hole = Partial
+instance Lower context => AbstractHole (Hole context a) where
+  hole = Partial lowerBound
 
-toMaybe :: Hole a -> Maybe a
-toMaybe Partial = Nothing
-toMaybe (Total a) = Just a
+toMaybe :: Hole context a -> Maybe a
+toMaybe (Partial _) = Nothing
+toMaybe (Total a)   = Just a

@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: cmark-gfm
-version: 0.1.3
+version: 0.1.4
 summary: Fast, accurate GitHub Flavored Markdown parser and renderer
 homepage: https://github.com/kivikakk/cmark-gfm-hs
 license: multiple

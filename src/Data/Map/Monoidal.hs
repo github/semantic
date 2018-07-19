@@ -8,6 +8,7 @@ module Data.Map.Monoidal
 , insert
 , filterWithKey
 , pairs
+, keys
 , module Reducer
 ) where
 
@@ -37,6 +38,8 @@ insert key value = Map . Map.insert key value . unMap
 filterWithKey :: (key -> value -> Bool) -> Map key value -> Map key value
 filterWithKey f = Map . Map.filterWithKey f . unMap
 
+keys :: Map key value -> [key]
+keys = map fst . pairs
 
 pairs :: Map key value -> [(key, value)]
 pairs = Map.toList . unMap

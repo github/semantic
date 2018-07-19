@@ -415,8 +415,8 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
     aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source) <|> symbol DottedName *> (name <$> source)
-    makeNameAliasPair from (Just alias) = (from, alias)
-    makeNameAliasPair from Nothing = (from, from)
+    makeNameAliasPair from (Just alias) = Python.Syntax.Alias from alias
+    makeNameAliasPair from Nothing = Python.Syntax.Alias from from
 
 assertStatement :: Assignment Term
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)

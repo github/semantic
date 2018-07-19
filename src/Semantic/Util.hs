@@ -7,6 +7,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
+import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -27,9 +28,12 @@ import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (weaken)
+import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
+import           Semantic.Telemetry (LogQueue, StatQueue)
+import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
 import           Text.Show.Pretty (ppShow)
@@ -78,7 +82,7 @@ checking
   . runFresh 0
   . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
-  . caching @[]
+  . caching
   . providingLiveSet
   . fmap reassociate
   . runLoadError
@@ -98,8 +102,22 @@ evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
+callGraphProject parser proxy lang opts paths = runTaskWithOptions opts $ do
+  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
+  package <- parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+  modules <- topologicalSort <$> runImportGraph proxy package
+  x <- runCallGraph proxy False modules package
+  pure (x, (() <$) <$> modules)
+
+callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) Language.Ruby debugOptions
+
 -- Evaluate a project consisting of the listed paths.
-evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
+evaluateProject proxy parser lang paths = withOptions debugOptions $ \ config logger statter ->
+  evaluateProject' (TaskConfig config logger statter) proxy parser lang paths
+
+data TaskConfig = TaskConfig Config LogQueue StatQueue
+
+evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
   blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraph proxy package
@@ -110,6 +128,7 @@ evaluateProject proxy parser lang paths = runTaskWithOptions debugOptions $ do
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (evaluate proxy id withTermSpans modules))))))
+
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []

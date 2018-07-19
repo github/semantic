@@ -5,12 +5,16 @@ module Data.Syntax where
 import Data.Abstract.Evaluatable
 import Data.Aeson (ToJSON(..), object)
 import Data.AST
+import Data.Char (toLower)
 import Data.JSON.Fields
 import Data.Range
 import Data.Record
+import qualified Data.Set as Set
 import Data.Span
 import Data.Sum
 import Data.Term
+import GHC.Types (Constraint)
+import GHC.TypeLits
 import Diffing.Algorithm hiding (Empty)
 import Prelude
 import Prologue
@@ -18,12 +22,9 @@ import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
 import Proto3.Wire.Types
-import GHC.Types (Constraint)
-import GHC.TypeLits
 import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import Data.Char (toLower)
 
 -- Combinators
 
@@ -166,7 +167,7 @@ instance Evaluatable Identifier where
   eval (Identifier name) = pure (LvalLocal name)
 
 instance FreeVariables1 Identifier where
-  liftFreeVariables _ (Identifier x) = pure x
+  liftFreeVariables _ (Identifier x) = Set.singleton x
 
 instance Declarations1 Identifier where
   liftDeclaredName _ (Identifier x) = pure x
@@ -220,7 +221,8 @@ errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack)) (Error.Error span errorExpected errorActual)
+unError span Error{..} = Error.Error span errorExpected errorActual stack
+  where stack = fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack
 
 data ErrorSite = ErrorSite { errorMessage :: String, errorLocation :: SrcLoc }
   deriving (Eq, Show, Generic, Named, Message)

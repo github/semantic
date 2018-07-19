@@ -128,9 +128,9 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   index :: value -> value -> Evaluator address value effects address
 
   -- | Build a class value from a name and environment.
-  klass :: Name                 -- ^ The new class's identifier
-        -> [value]              -- ^ A list of superclasses
-        -> Environment address -- ^ The environment to capture
+  klass :: Name             -- ^ The new class's identifier
+        -> [address]        -- ^ A list of superclasses
+        -> Bindings address -- ^ The environment to capture
         -> Evaluator address value effects value
 
   -- | Build a namespace value from a name and environment stack
@@ -141,7 +141,7 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
             -> Evaluator address value effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> Evaluator address value effects (Maybe (Environment address))
+  scopedEnvironment :: address -> Evaluator address value effects (Maybe (Environment address))
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --
@@ -189,7 +189,7 @@ makeNamespace :: ( AbstractValue address value effects
                  )
               => Name
               -> address
-              -> Maybe value
+              -> Maybe address
               -> Evaluator address value effects value
 makeNamespace name addr super = do
   superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
@@ -203,11 +203,11 @@ makeNamespace name addr super = do
 evaluateInScopedEnv :: ( AbstractValue address value effects
                        , Member (Env address) effects
                        )
-                    => Evaluator address value effects value
+                    => address
                     -> Evaluator address value effects a
                     -> Evaluator address value effects a
 evaluateInScopedEnv scopedEnvTerm term = do
-  scopedEnv <- scopedEnvTerm >>= scopedEnvironment
+  scopedEnv <- scopedEnvironment scopedEnvTerm
   maybe term (\ env -> locally (bindAll env *> term)) scopedEnv
 
 
@@ -233,19 +233,17 @@ subtermValue = value <=< subtermRef
 
 -- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue address value effects
-           , Member (Allocator address value) effects
            , Member (Env address) effects
            , Member (Resumable (EnvironmentError address)) effects
            )
         => ValueRef address
         -> Evaluator address value effects address
 address (LvalLocal var) = variable var
-address (LvalMember obj prop) = evaluateInScopedEnv (deref obj) (variable prop)
+address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
 address (Rval addr) = pure addr
 
 -- | Evaluates a 'Subterm' to the address of its rval
 subtermAddress :: ( AbstractValue address value effects
-                  , Member (Allocator address value) effects
                   , Member (Env address) effects
                   , Member (Resumable (EnvironmentError address)) effects
                   )
@@ -254,7 +252,9 @@ subtermAddress :: ( AbstractValue address value effects
 subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: Member (Allocator address value) effects
+rvalBox :: ( Member (Allocator address value) effects
+           , Member Fresh effects
+           )
         => value
         -> Evaluator address value effects (ValueRef address)
 rvalBox val = Rval <$> box val

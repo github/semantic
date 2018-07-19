@@ -15,11 +15,22 @@ import           Diffing.Algorithm
 import           GHC.Generics
 import           Prologue
 import           System.FilePath.Posix
+import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named(..), MessageField(..))
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 data QualifiedName
-  = QualifiedName (NonEmpty FilePath)
-  | RelativeQualifiedName FilePath (Maybe QualifiedName)
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON)
+  = QualifiedName { paths :: NonEmpty FilePath }
+  | RelativeQualifiedName { path :: FilePath, maybeQualifiedName ::  Maybe QualifiedName }
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message)
+
+instance MessageField QualifiedName where
+  encodeMessageField num QualifiedName{..} = Encode.embedded num (encodeMessageField 1 paths)
+  encodeMessageField num RelativeQualifiedName{..} = Encode.embedded num (encodeMessageField 1 path <> encodeMessageField 2 maybeQualifiedName)
+  decodeMessageField = undefined -- qualifiedName <|> relativeName
+  protoType = undefined
+      -- embeddedAt num = Decode.at (Decode.embedded'' parser) num
+      -- qualifiedName = Decode.embedded'' (QualifiedName <$> embeddedAt 1 <*> embeddedAt 2)
 
 qualifiedName :: NonEmpty Text -> QualifiedName
 qualifiedName xs = QualifiedName (T.unpack <$> xs)
@@ -86,20 +97,27 @@ resolvePythonModules q = do
 -- | Import declarations (symbols are added directly to the calling environment).
 --
 -- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![(Name, Name)] }
+data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
+data Alias = Alias { aliasValue :: Name, aliasName :: Name }
+  deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON)
+
+toTuple :: Alias -> (Name, Name)
+toTuple Alias{..} = (aliasValue, aliasName)
+
+
 -- from a import b
 instance Evaluatable Import where
   -- from . import moduleY
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval (Import (RelativeQualifiedName n Nothing) [(name, _)]) = do
-    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName name :| []))))
-    rvalBox =<< evalQualifiedImport name path
+  eval (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
+    path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
+    rvalBox =<< evalQualifiedImport aliasValue path
 
   -- from a import b
   -- from a import b as c
@@ -119,7 +137,7 @@ instance Evaluatable Import where
     where
       select importedEnv
         | Prologue.null xs = importedEnv
-        | otherwise = Env.overwrite xs importedEnv
+        | otherwise = Env.overwrite (toTuple <$> xs) importedEnv
 
 
 -- Evaluate a qualified import
@@ -135,7 +153,19 @@ evalQualifiedImport name path = letrec' name $ \addr -> do
   unit <$ makeNamespace name addr Nothing
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Message1 QualifiedImport where
+  liftEncodeMessage _ _ = undefined
+  liftDecodeMessage _ = undefined
+  liftDotProto _ = undefined
+
+instance Named Prelude.String where nameOf _ = "string"
+
+instance Message Prelude.String where
+  encodeMessage _ x = encodePrimitive 1 x
+  decodeMessage _ = undefined
+  dotProto = undefined
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
@@ -171,7 +201,7 @@ instance Evaluatable QualifiedAliasedImport where
     for_ (NonEmpty.init modulePaths) require
 
     -- Evaluate and import the last module, aliasing and updating the environment
-    alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
+    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
       importedEnv <- fst <$> require path

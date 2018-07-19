@@ -77,7 +77,7 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
-                     , Data.Graph.Adjacency.Import
+                     , Data.Graph.Adjacency
                      , Data.Graph.Vertex
                      , Data.JSON.Fields
                      , Data.Language
@@ -144,7 +144,6 @@ library
                      , Paths_semantic
                      -- Rendering formats
                      , Rendering.Graph
-                     , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.Symbol
@@ -290,6 +289,7 @@ test-suite test
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
+                     , Graphing.Calls.Spec
                      , Integration.Spec
                      , Matching.Go.Spec
                      , Numeric.Spec
@@ -302,6 +302,7 @@ test-suite test
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
+                     , algebraic-graphs
                      , array
                      , async
                      , base
