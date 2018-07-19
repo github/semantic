@@ -273,7 +273,7 @@ instance Show1 TryWithResources where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for TryWithResources
 instance Evaluatable TryWithResources
 
-data AssertStatement a = AssertStatement { assertLHS :: !a, assertRHS :: !a }
+data AssertStatement a = AssertStatement { assertLHS :: !a, assertRHS :: !(Maybe a) }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 AssertStatement where liftEq = genericLiftEq
