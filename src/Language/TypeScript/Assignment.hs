@@ -32,6 +32,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import qualified Data.Diff as Diff
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import Prologue
@@ -213,6 +214,9 @@ instance Named1 (Sum Syntax) where
 
 instance Named (Term.Term (Sum Syntax) ()) where
   nameOf _ = "TypeScriptTerm"
+
+instance Named (Diff.Diff (Sum Syntax) () ()) where
+  nameOf _ = "TypeScriptDiff"
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment Term

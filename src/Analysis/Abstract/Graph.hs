@@ -47,12 +47,12 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
                  , Member (Reader ModuleInfo) effects
-                 , Member (Env (Hole (Located address))) effects
+                 , Member (Env (Hole context (Located address))) effects
                  , Member (State (Graph Vertex)) effects
                  , Base term ~ TermF (Sum syntax) ann
                  )
-              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
-              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
+              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects a)
+              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects a)
 graphingTerms recur term@(In _ syntax) = do
   case project syntax of
     Just (Syntax.Identifier name) -> do
@@ -128,11 +128,11 @@ moduleInclusion v = do
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Env (Hole (Located address))) effects
+variableDefinition :: ( Member (Env (Hole context (Located address))) effects
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name
-                   -> TermEvaluator term (Hole (Located address)) value effects ()
+                   -> TermEvaluator term (Hole context (Located address)) value effects ()
 variableDefinition name = do
   graph <- maybe lowerBound (maybe lowerBound (vertex . moduleVertex . addressModule) . toMaybe) <$> TermEvaluator (lookupEnv name)
   appendGraph (vertex (Variable (formatName name)) `connect` graph)

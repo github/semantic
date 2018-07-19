@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
+{-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
 import Prelude hiding (readFile)
@@ -82,7 +82,7 @@ checking
   . runFresh 0
   . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
-  . caching @[]
+  . caching
   . providingLiveSet
   . fmap reassociate
   . runLoadError
@@ -102,15 +102,14 @@ evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
-callGraphRubyProject paths = runTaskWithOptions debugOptions $ do
-  let proxy = Proxy @'Language.Ruby
-  let lang = Language.Ruby
+callGraphProject parser proxy lang opts paths = runTaskWithOptions opts $ do
   blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
-  package <- parsePackage rubyParser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+  package <- parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraph proxy package
   x <- runCallGraph proxy False modules package
-  pure (x, modules)
+  pure (x, (() <$) <$> modules)
 
+callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) Language.Ruby debugOptions
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser lang paths = withOptions debugOptions $ \ config logger statter ->
