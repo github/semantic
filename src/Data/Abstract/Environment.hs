@@ -3,6 +3,7 @@ module Data.Abstract.Environment
   , Bindings(..)
   , addresses
   , aliasBindings
+  , allNames
   , delete
   , flatPairs
   , head
@@ -118,6 +119,10 @@ intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
 -- | Get all bound 'Name's in a binding.
 names :: Bindings address -> [Name]
 names = fmap fst . pairs
+
+-- | Get all bound 'Name's in an environment.
+allNames :: Environment address -> [Name]
+allNames = fmap fst . flatPairs
 
 aliasBindings :: [(Name, Name)] -> Bindings address -> Bindings address
 aliasBindings pairs binds = unpairs $ mapMaybe lookupAndAlias pairs
