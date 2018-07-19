@@ -1,4 +1,10 @@
-module Semantic.Telemetry.Haystack where
+module Semantic.Telemetry.Haystack
+  ( HaystackClient (..)
+  , ErrorReport (..)
+  , ErrorLogger
+  , haystackClient
+  , reportError
+  ) where
 
 import           Control.Exception
 import           Crypto.Hash

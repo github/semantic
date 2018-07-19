@@ -54,7 +54,7 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Member (Reader ModuleInfo) effects
-                 , Member (Env (Hole (Located address))) effects
+                 , Member (Env (Hole context (Located address))) effects
                  , Member (State (Graph Vertex)) effects
                  , Member (Reader Vertex) effects
                  , HasField fields Span
@@ -64,8 +64,8 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Functor syntax
                  , term ~ Term syntax (Record fields)
                  )
-              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
-              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole (Located address)) value effects a)
+              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects a)
+              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects a)
 graphingTerms recur term@(In a syntax) = do
   definedInModule <- currentModule
   case toVertex a definedInModule (subterm <$> syntax) of
@@ -158,7 +158,7 @@ variableDefinition :: ( Member (State (Graph Vertex)) effects
                       , Member (Reader Vertex) effects
                       )
                    => Vertex
-                   -> TermEvaluator term (Hole (Located address)) value effects ()
+                   -> TermEvaluator term (Hole context (Located address)) value effects ()
 variableDefinition var = do
   context <- ask
   appendGraph $ vertex context `connect` vertex var
