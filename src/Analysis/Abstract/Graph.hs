@@ -67,14 +67,17 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
 graphingTerms recur term@(In a syntax) = do
   definedInModule <- currentModule
   case toVertex a definedInModule (subterm <$> syntax) of
+    Just (v@Function{}, name) -> recurWithContext v name
+    Just (v@Method{}, name) -> recurWithContext v name
     Just (v, name) -> do
       variableDefinition v name
-      case v of
-        Method{} -> do
-          moduleInclusion v
-          local (const (Just v)) (recur term)
-        _ -> recur term
+      recur term
     _ -> recur term
+  where
+    recurWithContext v name = do
+      variableDefinition v name
+      moduleInclusion v
+      local (const (Just v)) (recur term)
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) effects
