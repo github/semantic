@@ -1,5 +1,5 @@
 {-# LANGUAGE DefaultSignatures, TypeOperators, UndecidableInstances #-}
-module Data.Mergeable where
+module Data.Mergeable ( Mergeable (..) ) where
 
 import Control.Applicative
 import Data.Functor.Identity

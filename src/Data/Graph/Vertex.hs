@@ -6,14 +6,14 @@ module Data.Graph.Vertex
   , vertexToType
   ) where
 
-import Prologue hiding (packageName)
+import Prologue
 
 import           Data.Aeson
 import qualified Data.Text as T
 
 import Data.Abstract.Module (ModuleInfo (..))
 import Data.Abstract.Name
-import Data.Abstract.Package (PackageInfo (..))
+import Data.Abstract.Package hiding (Package (Package))
 
 -- | A vertex of some specific type.
 data Vertex
@@ -23,7 +23,7 @@ data Vertex
   deriving (Eq, Ord, Show, Generic, Hashable)
 
 packageVertex :: PackageInfo -> Vertex
-packageVertex = Package . formatName . packageName
+packageVertex = Package . formatName . Data.Abstract.Package.packageName
 
 moduleVertex :: ModuleInfo -> Vertex
 moduleVertex = Module . T.pack . modulePath

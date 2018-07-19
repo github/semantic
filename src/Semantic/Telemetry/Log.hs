@@ -1,4 +1,12 @@
-module Semantic.Telemetry.Log where
+module Semantic.Telemetry.Log
+  ( Level (..)
+  , LogOptions (..)
+  , Message (..)
+  , LogFormatter
+  , logfmtFormatter
+  , terminalFormatter
+  , writeLogMessage
+  ) where
 
 import           Control.Monad.IO.Class
 import           Data.Error (withSGRCode)
