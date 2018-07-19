@@ -125,7 +125,9 @@ library
                      , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
+                     , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
+                     , Language.TypeScript.Syntax.JSX
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
