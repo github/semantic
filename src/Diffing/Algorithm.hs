@@ -1,5 +1,18 @@
 {-# LANGUAGE DefaultSignatures, GADTs, TypeOperators, UndecidableInstances #-}
-module Diffing.Algorithm where
+module Diffing.Algorithm
+  ( AlgorithmF (..)
+  , Algorithm
+  , Diffable (..)
+  , Equivalence (..)
+  , diff
+  , diffThese
+  , diffMaybe
+  , linearly
+  , byReplacing
+  , comparableTerms
+  , equivalentTerms
+  , algorithmForTerms
+  ) where
 
 import Control.Monad.Free.Freer
 import Data.Diff

@@ -1,4 +1,8 @@
-module Data.Abstract.Path where
+module Data.Abstract.Path
+  ( dropRelativePrefix
+  , joinPaths
+  , stripQuotes
+  ) where
 
 import Prologue
 import qualified Data.Text as T

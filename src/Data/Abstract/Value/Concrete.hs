@@ -1,5 +1,12 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
-module Data.Abstract.Value.Concrete where
+module Data.Abstract.Value.Concrete
+  ( Value (..)
+  , ValueError (..)
+  , ClosureBody (..)
+  , runValueError
+  , runValueErrorWith
+  , throwValueError
+  ) where
 
 import Control.Abstract
 import Data.Abstract.Environment (Environment, Bindings)

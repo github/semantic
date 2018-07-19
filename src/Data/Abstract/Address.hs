@@ -1,5 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
-module Data.Abstract.Address where
+module Data.Abstract.Address
+  ( Precise (..)
+  , Located (..)
+  , Latest (..)
+  , All (..)
+  , Monovariant (..)
+  ) where
 
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name

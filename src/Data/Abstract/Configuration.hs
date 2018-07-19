@@ -1,4 +1,4 @@
-module Data.Abstract.Configuration where
+module Data.Abstract.Configuration ( Configuration (..) ) where
 
 import Data.Abstract.Environment
 import Data.Abstract.Heap
