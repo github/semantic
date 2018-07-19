@@ -67,6 +67,7 @@ instance ( Member (Allocator address Abstract) effects
   index _ _ = box Abstract
 
   ifthenelse _ if' else' = if' <|> else'
+  disjunction = (<|>)
 
   liftNumeric _ _ = pure Abstract
   liftNumeric2 _ _ _ = pure Abstract
