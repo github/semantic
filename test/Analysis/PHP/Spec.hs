@@ -34,9 +34,9 @@ spec config = parallel $ do
         Right (Just (Module _ (env, addr) :| [])) -> do
           Env.names env `shouldBe` [ "Foo", "NS1" ]
 
-          (derefQName heap ("NS1" :| [])               env >>= deNamespace) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])
-          (derefQName heap ("NS1" :| ["Sub1"])         env >>= deNamespace) `shouldBe` Just ("Sub1", ["Sub2"])
-          (derefQName heap ("NS1" :| ["Sub1", "Sub2"]) env >>= deNamespace) `shouldBe` Just ("Sub2", ["f"])
+          (derefQName heap ("NS1" :| [])               env >>= deNamespace heap) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])
+          (derefQName heap ("NS1" :| ["Sub1"])         env >>= deNamespace heap) `shouldBe` Just ("Sub1", ["Sub2"])
+          (derefQName heap ("NS1" :| ["Sub1", "Sub2"]) env >>= deNamespace heap) `shouldBe` Just ("Sub2", ["f"])
         other -> expectationFailure (show other)
 
   where
