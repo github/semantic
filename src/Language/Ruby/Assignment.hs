@@ -34,6 +34,7 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
+import qualified Data.Diff as Diff
 import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Prologue hiding (for)
@@ -132,6 +133,9 @@ instance Named1 (Sum Syntax) where
 
 instance Named (Term.Term (Sum Syntax) ()) where
   nameOf _ = "RubyTerm"
+
+instance Named (Diff.Diff (Sum Syntax) () ()) where
+  nameOf _ = "RubyDiff"
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment Term
