@@ -125,8 +125,8 @@ scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address (Cell
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 
-caching :: (Alternative f, Effects effects) => TermEvaluator term address value (NonDet ': Reader (Cache term address (Cell address) value) ': State (Cache term address (Cell address) value) ': effects) a -> TermEvaluator term address value effects (Cache term address (Cell address) value, f a)
+caching :: Effects effects => TermEvaluator term address value (NonDet ': Reader (Cache term address (Cell address) value) ': State (Cache term address (Cell address) value) ': effects) a -> TermEvaluator term address value effects (Cache term address (Cell address) value, [a])
 caching
   = runState lowerBound
   . runReader lowerBound
-  . runNonDetA
+  . runNonDet
