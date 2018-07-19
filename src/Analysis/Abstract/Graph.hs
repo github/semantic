@@ -100,6 +100,7 @@ graphingModules recur m = do
   appendGraph (vertex (moduleVertex (moduleInfo m)))
   eavesdrop @(Modules address) (\ m -> case m of
     Load path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
+    Lookup path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
     _ -> pure ())
     (recur m)
 
@@ -116,6 +117,7 @@ graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
   eavesdrop @(Modules address) (\ eff -> case eff of
     Load path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Lookup path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _ -> pure ())
     (recur m)
 
