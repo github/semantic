@@ -1,4 +1,11 @@
-module Control.Abstract.Primitive where
+module Control.Abstract.Primitive
+  ( define
+  , defineClass
+  , defineNamespace
+  , builtInPrint
+  , builtInExport
+  , lambda
+  ) where
 
 import Control.Abstract.Context
 import Control.Abstract.Environment

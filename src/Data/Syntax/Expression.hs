@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, DuplicateRecordFields #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable hiding (Member)

@@ -35,7 +35,7 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract
 import           Data.Abstract.Value.Type
-import           Data.Abstract.Value.Concrete (Value, ValueError (..), runValueErrorWith)
+import           Data.Abstract.Value.Concrete (Value,ValueError (..), runValueErrorWith)
 import           Data.Graph
 import           Data.Project
 import           Data.Record
