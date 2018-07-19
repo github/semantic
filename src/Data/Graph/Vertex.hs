@@ -83,7 +83,7 @@ class VertexDeclaration syntax where
            => Record fields
            -> ModuleInfo
            -> syntax (Term syntax (Record fields))
-           -> Maybe (Vertex, NonEmpty Name)
+           -> Maybe (Vertex, Name)
 
 instance (VertexDeclaration' syntax syntax) => VertexDeclaration syntax where
   toVertex = toVertex'
@@ -93,7 +93,7 @@ class VertexDeclaration' whole syntax where
             => Record fields
             -> ModuleInfo
             -> syntax (Term whole (Record fields))
-            -> Maybe (Vertex, NonEmpty Name)
+            -> Maybe (Vertex, Name)
 
 instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStrategy strategy whole syntax) => VertexDeclaration' whole syntax where
   toVertex' = toVertexWithStrategy (Proxy :: Proxy strategy)
@@ -114,7 +114,7 @@ class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
                        -> Record fields
                        -> ModuleInfo
                        -> syntax (Term whole (Record fields))
-                       -> Maybe (Vertex, NonEmpty Name)
+                       -> Maybe (Vertex, Name)
 
 -- | The 'Default' strategy produces 'Nothing'.
 instance VertexDeclarationWithStrategy 'Default whole syntax where
@@ -124,16 +124,16 @@ instance Apply (VertexDeclaration' whole) fs => VertexDeclarationWithStrategy 'C
   toVertexWithStrategy _ ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
 
 instance VertexDeclarationWithStrategy 'Custom whole Syntax.Identifier where
-  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (getField ann), name :| [])
+  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (getField ann), name)
 
 instance VertexDeclarationWithStrategy 'Custom whole Declaration.Function where
-  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (getField ann), n :| [])) <$> liftDeclaredName declaredName term
+  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
-  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n :| [])) <$> liftDeclaredName declaredName term
+  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
   toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) name) =
     case toVertexWithStrategy proxy lhsAnn info lhs of
-      Just (Variable n _ _, names) -> Just (variableVertex (n <> "." <> formatName name) info (getField ann), names <> (name :| []))
-      _ -> Just (variableVertex (formatName name) info (getField ann), name :| [])
+      Just (Variable n _ _, _) -> Just (variableVertex (n <> "." <> formatName name) info (getField ann), name)
+      _ -> Just (variableVertex (formatName name) info (getField ann), name)
