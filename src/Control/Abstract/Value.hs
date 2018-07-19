@@ -124,6 +124,7 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
 
+  -- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
   disjunction :: Evaluator address value effects value -> Evaluator address value effects value -> Evaluator address value effects value
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
