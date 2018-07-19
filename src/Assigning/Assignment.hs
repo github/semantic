@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, ImplicitParams #-}
+{-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 -- | Assignment of AST onto some other structure (typically terms).
 --
@@ -223,8 +223,8 @@ manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
 
-nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (Either String grammar)
-nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol)) ?callStack
+nodeError :: CallStack -> [Either String grammar] -> Node grammar -> Error (Either String grammar)
+nodeError cs expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol)) cs
 
 
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
@@ -286,15 +286,18 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   (Choose table _ _, State { stateNodes = Term (In node _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
                   _ -> initialState
                 expectedSymbols = firstSet (t `Then` return)
-                makeError' = withStateCallStack (tracingCallSite t) state $ maybe (makeError (Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
+                assignmentStack = maybe emptyCallStack (fromCallSiteList . pure) (tracingCallSite t)
+                makeError' = maybe
+                             (Error (Span statePos statePos) (fmap Right expectedSymbols) Nothing assignmentStack)
+                             (nodeError assignmentStack (fmap Right expectedSymbols))
 
 requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
-requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
-  [] -> Right (a, state')
-  Term (In node _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
-
-withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallStack => a) -> a
-withStateCallStack callSite state = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state))))
+requireExhaustive callSite (a, state) =
+  let state' = skipTokens state
+      stack = fromCallSiteList (maybe id (:) callSite (stateCallSites state))
+  in case stateNodes state' of
+    [] -> Right (a, state')
+    Term (In node _) : _ -> Left (nodeError stack [] node)
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
 skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . termAnnotation) (stateNodes state) }

@@ -14,6 +14,7 @@ import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
+import qualified Data.Diff as Diff
 import Language.JSON.Grammar as Grammar
 import Proto3.Suite (Named1(..), Named(..))
 import Prologue
@@ -38,6 +39,9 @@ instance Named1 (Sum Syntax) where
 
 instance Named (Term.Term (Sum Syntax) ()) where
   nameOf _ = "JSONTerm"
+
+instance Named (Diff.Diff (Sum Syntax) () ()) where
+  nameOf _ = "JSONDiff"
 
 
 assignment :: Assignment Term
