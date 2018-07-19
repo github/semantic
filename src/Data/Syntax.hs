@@ -221,7 +221,8 @@ errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack $ errorSite <$> getCallStack callStack) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack)) (Error.Error span errorExpected errorActual)
+unError span Error{..} = Error.Error span errorExpected errorActual stack
+  where stack = fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack
 
 data ErrorSite = ErrorSite { errorMessage :: String, errorLocation :: SrcLoc }
   deriving (Eq, Show, Generic, Named, Message)
