@@ -1,5 +1,18 @@
 {-# LANGUAGE DeriveAnyClass, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Data.Graph.Vertex where
+module Data.Graph.Vertex
+( Vertex (..)
+, packageVertex
+, moduleVertex
+, variableVertex
+, methodVertex
+, functionVertex
+, vertexName
+, showSpan
+, VertexDeclaration (..)
+, VertexDeclaration' (..)
+, VertexDeclarationStrategy
+, VertexDeclarationWithStrategy
+) where
 
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (ModuleInfo (..))
