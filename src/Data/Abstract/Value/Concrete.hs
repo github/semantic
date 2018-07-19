@@ -145,6 +145,11 @@ instance ( Coercible body (Eff effects)
     bool <- case cond of { Boolean b -> pure b ; _ -> throwValueError (BoolError cond) }
     if bool then if' else else'
 
+  disjunction a b = do
+    a' <- a
+    ifthenelse a' (pure a') b
+
+
   index = go where
     tryIdx list ii
       | ii > genericLength list = box =<< throwValueError (BoundsError list ii)
