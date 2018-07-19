@@ -162,7 +162,7 @@ data Allocator address value (m :: * -> *) return where
 data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
 
-runAllocator :: ( Addressable address effects
+runAllocator :: ( Allocatable address effects
                 , Effects effects
                 , Foldable (Cell address)
                 , Member (State (Heap address (Cell address) value)) effects
@@ -176,12 +176,10 @@ runAllocator = interpret $ \ eff -> case eff of
   Assign addr value -> modifyHeap (heapInsert addr value)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
-runDeref :: ( Addressable address effects
+runDeref :: ( Derefable address effects
             , Effects effects
             , Member (Resumable (AddressError address value)) effects
             , Member (State (Heap address (Cell address) value)) effects
-            , Reducer value (Cell address value)
-            , ValueRoots address value
             )
          => Evaluator address value (Deref address value ': effects) a
          -> Evaluator address value effects a
