@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, ViewPatterns, ScopedTypeVariables, DuplicateRecordFields #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
 import           Data.Abstract.Evaluatable

@@ -1,6 +1,17 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Semantic.Config where
+module Semantic.Config
+  ( Config (..)
+  , defaultConfig
+  , Options (..)
+  , defaultOptions
+  , debugOptions
+  , lookupStatsAddr
+  , withHaystackFromConfig
+  , withLoggerFromConfig
+  , withStatterFromConfig
+  , withTelemetry
+  ) where
 
 import           Network.BSD
 import           Network.HTTP.Client.TLS

@@ -1,4 +1,9 @@
-module Data.Abstract.Package where
+module Data.Abstract.Package
+  ( Package (..)
+  , PackageInfo (..)
+  , PackageName
+  , Data.Abstract.Package.fromModules
+  ) where
 
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
