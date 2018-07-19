@@ -96,8 +96,7 @@ graphingModules :: forall term address value effects a
 graphingModules recur m = do
   appendGraph (vertex (moduleVertex (moduleInfo m)))
   eavesdrop @(Modules address) (\ m -> case m of
-    Load   path -> moduleInclusion (moduleVertex (ModuleInfo path))
-    Lookup path -> moduleInclusion (moduleVertex (ModuleInfo path))
+    Load path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
     _ -> pure ())
     (recur m)
 
@@ -113,8 +112,7 @@ graphingModuleInfo :: forall term address value effects a
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
   eavesdrop @(Modules address) (\ eff -> case eff of
-    Load   path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
-    Lookup path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Load path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _ -> pure ())
     (recur m)
 
