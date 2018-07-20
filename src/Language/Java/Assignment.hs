@@ -372,7 +372,7 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))
 
 constant :: Assignment Term
-constant = makeTerm <$> symbol ConstantDeclaration <*> children ((,) <$> pure [] <*> typeIdentifier <**> variableDeclaratorList)
+constant = makeTerm <$> symbol ConstantDeclaration <*> children ((,) <$> pure [] <*> type' <**> variableDeclaratorList)
 
 package :: Assignment Term
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
