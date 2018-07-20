@@ -397,10 +397,10 @@ dimsExpr = makeTerm <$> symbol Grammar.DimsExpr <*> children (Java.Syntax.DimsEx
 
 type' :: Assignment Term
 type' =  choice [
-       makeTerm <$> symbol VoidType <*> pure Type.Void
-     , makeTerm <$> symbol IntegralType <*> children (token AnonInt *> pure Type.Int)
-     , makeTerm <$> symbol FloatingPointType <*> pure Type.Float
-     , makeTerm <$> symbol BooleanType <*> pure Type.Bool
+       makeTerm <$> symbol VoidType <*> children (pure Type.Void)
+     , makeTerm <$> symbol IntegralType <*> children (pure Type.Int)
+     , makeTerm <$> symbol FloatingPointType <*> children (pure Type.Float)
+     , makeTerm <$> symbol BooleanType <*> children (pure Type.Bool)
      , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
