@@ -1,7 +1,9 @@
 {-# LANGUAGE DataKinds #-}
 module Diffing.Interpreter.Spec where
 
+import Control.Applicative ((<|>))
 import Data.Diff
+import Data.Foldable (asum)
 import Data.Functor.Listable
 import Data.Maybe
 import Data.Mergeable
