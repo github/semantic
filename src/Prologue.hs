@@ -47,7 +47,6 @@ import Data.Functor.Classes.Generic as X
 import Data.Functor.Foldable as X (Base, Corecursive (..), Recursive (..))
 import Data.Hashable as X (Hashable, hash, hashUsing, hashWithSalt)
 import Data.Hashable.Lifted as X (Hashable1(..), hashWithSalt1)
-import Data.Mergeable as X (Mergeable)
 import Data.Monoid as X (First (..), Last (..), Monoid (..))
 import Data.Proxy as X (Proxy (..))
 import Data.Semigroup as X (Semigroup (..))
