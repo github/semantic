@@ -82,7 +82,6 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Mergeable
                      , Data.Patch
                      , Data.Project
                      , Data.Range
@@ -282,10 +281,11 @@ test-suite test
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
-                     , Data.Diff.Spec
                      , Data.Abstract.Path.Spec
+                     , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
+                     , Data.Mergeable
                      , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
