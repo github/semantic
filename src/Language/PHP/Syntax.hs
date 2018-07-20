@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 
 import           Control.Abstract.Modules

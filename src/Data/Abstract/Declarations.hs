@@ -1,5 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
-module Data.Abstract.Declarations  where
+module Data.Abstract.Declarations
+  ( Declarations (..)
+  , Declarations1 (..)
+  ) where
 
 import Data.Abstract.Name
 import Data.Sum

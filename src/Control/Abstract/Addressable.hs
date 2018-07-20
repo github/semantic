@@ -54,15 +54,15 @@ instance (Allocatable address effects, Member (Reader ModuleInfo) effects, Membe
 instance Derefable address effects => Derefable (Located address) effects where
   derefCell (Located loc _ _) = relocate . derefCell loc
 
-instance Addressable address effects => Addressable (Hole address) effects where
-  type Cell (Hole address) = Cell address
+instance (Addressable address effects, Ord context, Show context) => Addressable (Hole context address) effects where
+  type Cell (Hole context address) = Cell address
 
-instance Allocatable address effects => Allocatable (Hole address) effects where
+instance (Allocatable address effects, Ord context, Show context) => Allocatable (Hole context address) effects where
   allocCell name = relocate (Total <$> allocCell name)
 
-instance Derefable address effects => Derefable (Hole address) effects where
+instance (Derefable address effects, Ord context, Show context) => Derefable (Hole context address) effects where
   derefCell (Total loc) = relocate . derefCell loc
-  derefCell Partial     = const (pure Nothing)
+  derefCell (Partial _) = const (pure Nothing)
 
 relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
 relocate = raiseEff . lowerEff

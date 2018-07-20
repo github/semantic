@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env

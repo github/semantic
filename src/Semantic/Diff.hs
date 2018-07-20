@@ -1,5 +1,11 @@
 {-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables #-}
-module Semantic.Diff where
+module Semantic.Diff
+  ( runDiff
+  , runRubyDiff
+  , runTypeScriptDiff
+  , runJSONDiff
+  , diffBlobTOCPairs
+  ) where
 
 import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)

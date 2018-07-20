@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.TypeScript.Syntax where
 
 import qualified Data.Abstract.Environment as Env
