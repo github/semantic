@@ -12,6 +12,7 @@ import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
 import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer
+import Data.Span
 import Data.Set as Set
 import Prologue
 
@@ -35,6 +36,8 @@ data Located address = Located
   { address        :: address
   , addressPackage :: {-# UNPACK #-} !PackageInfo
   , addressModule  :: !ModuleInfo
+  , addressName    :: Name
+  , addressSpan    :: Span
   }
   deriving (Eq, Ord, Show)
 
