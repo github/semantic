@@ -39,9 +39,9 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
   }
   where vertexAttributes Package{}    = [ "style" := "dashed", "shape" := "box" ]
         vertexAttributes Module{}     = [ "style" := "dotted, rounded", "shape" := "box" ]
-        vertexAttributes Variable{..} = [ "tooltip" := T.encodeUtf8Builder (showSpan variableSpan), "style" := "rounded", "shape" := "box" ]
-        vertexAttributes Method{..}   = [ "tooltip" := T.encodeUtf8Builder (showSpan methodSpan)  , "style" := "rounded", "shape" := "box" ]
-        vertexAttributes Function{..} = [ "tooltip" := T.encodeUtf8Builder (showSpan functionSpan), "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Variable{..} = [ "label" := T.encodeUtf8Builder (variableName <> " (Variable)"), "tooltip" := T.encodeUtf8Builder (showSpan variableSpan), "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Method{..}   = [ "label" := T.encodeUtf8Builder (methodName <> " (Method)"), "tooltip" := T.encodeUtf8Builder (showSpan methodSpan)  , "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Function{..} = [ "label" := T.encodeUtf8Builder (functionName <> " (Function)"), "tooltip" := T.encodeUtf8Builder (showSpan functionSpan), "style" := "rounded", "shape" := "box" ]
         edgeAttributes Package{}  Module{}   = [ "len" := "5.0", "style" := "dashed" ]
         edgeAttributes Module{}   Module{}   = [ "len" := "5.0", "label" := "imports" ]
         edgeAttributes Variable{} Module{}   = [ "len" := "5.0", "color" := "blue", "label" := "refers to symbol defined in" ]
@@ -51,6 +51,8 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
         edgeAttributes Module{}   Function{} = [ "len" := "2.0", "color" := "red", "label" := "defines" ]
         edgeAttributes Module{}   Method{}   = [ "len" := "2.0", "color" := "red", "label" := "defines" ]
         edgeAttributes Module{}   _          = [ "len" := "2.0", "color" := "green", "label" := "calls" ]
+        edgeAttributes Variable{} Function{} = [ "len" := "2.0", "color" := "blue", "label" := "references" ]
+        edgeAttributes Variable{} Method{}   = [ "len" := "2.0", "color" := "blue", "label" := "references" ]
         edgeAttributes _          _          = []
 
 
