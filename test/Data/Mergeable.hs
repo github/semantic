@@ -1,10 +1,14 @@
-{-# LANGUAGE DefaultSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, DeriveAnyClass, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Data.Mergeable ( Mergeable (..) ) where
 
 import Control.Applicative
 import Data.Functor.Identity
 import Data.List.NonEmpty
 import Data.Sum
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Statement as Statement
 import GHC.Generics
 
 -- Classes
@@ -72,3 +76,14 @@ instance (GMergeable f, GMergeable g) => GMergeable (f :+: g) where
 
 instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
   gsequenceAlt (a :*: b) = (:*:) <$> gsequenceAlt a <*> gsequenceAlt b
+
+
+-- Orphan instances
+
+deriving instance Mergeable Comment.Comment
+deriving instance Mergeable Declaration.Function
+deriving instance Mergeable Declaration.Method
+deriving instance Mergeable Statement.If
+deriving instance Mergeable Syntax.Context
+deriving instance Mergeable Syntax.Empty
+deriving instance Mergeable Syntax.Identifier
