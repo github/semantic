@@ -371,20 +371,20 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = rvalBox =<< go (declaredName . subterm <$> namespaceName)
+  eval Namespace{..} = Rval <$> go (declaredName . subterm <$> namespaceName)
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (n:x:xs) = do
         name <- maybeM (throwResumable NoNameError) n
         letrec' name $ \addr ->
-          go (x:xs) <* makeNamespace name addr Nothing (pure ())
+          box =<< makeNamespace name addr Nothing (void $ go (x:xs))
       -- The last name creates a closure over the namespace body.
       go [n] = do
         name <- maybeM (throwResumable NoNameError) n
         letrec' name $ \addr ->
-          subtermValue namespaceBody *> makeNamespace name addr Nothing (pure ())
+          box =<< makeNamespace name addr Nothing (void $ subtermAddress namespaceBody)
       -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php
-      go [] = subtermValue namespaceBody
+      go [] = subtermAddress namespaceBody
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
