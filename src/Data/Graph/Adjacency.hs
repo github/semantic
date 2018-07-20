@@ -115,7 +115,7 @@ taggedGraphToAdjacencyList = accumToAdj . adjMapToAccum . adjacencyMap . toGraph
         accumToAdj (Acc vs es) = AdjacencyList (fromList vs) (fromList (toList es))
 
         vertexToPB :: V.Vertex -> Tag -> Vertex
-        vertexToPB s = Vertex t (V.vertexName s) where
+        vertexToPB s = Vertex t (V.vertexIdentifier s) where
           t = case s of
             V.Package{}  -> PACKAGE
             V.Module{}   -> MODULE
