@@ -4,6 +4,7 @@ module Diffing.Interpreter.Spec where
 import Data.Diff
 import Data.Functor.Listable
 import Data.Maybe
+import Data.Mergeable
 import Data.Record
 import Data.Sum
 import Data.Term
