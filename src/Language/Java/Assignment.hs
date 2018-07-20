@@ -635,7 +635,7 @@ annotation = makeTerm <$> symbol NormalAnnotation <*> children (Java.Syntax.Anno
            elementValue = symbol ElementValue *> children (term expression)
 
 throws :: Assignment [Term]
-throws = symbol Throws *> children (symbol ExceptionTypeList *> children(manyTerm type'))
+throws = symbol Throws *> children (symbol ExceptionTypeList *> children (manyTerm type'))
 
 formalParameters :: Assignment [Term]
 formalParameters = manyTerm (parameter <|> spreadParameter)
