@@ -73,8 +73,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 evaluate :: ( AbstractValue address value inner
             , Allocatable address (Reader ModuleInfo ': effects)
-            , Allocatable address (Allocator address value ': Reader ModuleInfo ': effects)
-            , Derefable address (Reader ModuleInfo ': effects)
             , Derefable address (Allocator address value ': Reader ModuleInfo ': effects)
             , Declarations term
             , Effects effects
