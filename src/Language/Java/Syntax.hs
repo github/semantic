@@ -313,7 +313,7 @@ instance Show1 DefaultValue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultValue
 
-data AnnotationTypeElement a = AnnotationTypeElement { modifiers :: ![a], identifier :: !a, dims :: ![a], defaultValue :: !a }
+data AnnotationTypeElement a = AnnotationTypeElement { modifiers :: ![a], annotationType :: a, identifier :: !a, dims :: ![a], defaultValue :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 AnnotationTypeElement where liftEq = genericLiftEq
