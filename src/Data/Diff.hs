@@ -15,12 +15,10 @@ module Data.Diff
 , stripDiff
 ) where
 
-import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
-import Data.Foldable (asum)
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
