@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Java.Syntax where
 
@@ -283,3 +283,22 @@ instance Show1 AssertStatement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for AssertStatement
 instance Evaluatable AssertStatement
+
+newtype DefaultValue a = DefaultValue { defaultValueElement :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DefaultValue where liftEq = genericLiftEq
+instance Ord1 DefaultValue where liftCompare = genericLiftCompare
+instance Show1 DefaultValue where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultValue
+
+data AnnotationTypeElement a = AnnotationTypeElement { modifiers :: ![a], identifier :: !a, dims :: ![a], defaultValue :: !a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AnnotationTypeElement where liftEq = genericLiftEq
+instance Ord1 AnnotationTypeElement where liftCompare = genericLiftCompare
+instance Show1 AnnotationTypeElement where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for AnnotationTypeElement
+instance Evaluatable AnnotationTypeElement
