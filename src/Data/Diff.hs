@@ -12,8 +12,6 @@ module Data.Diff
 , mergeF
 , merging
 , diffPatches
-, beforeTerm
-, afterTerm
 , stripDiff
 ) where
 
