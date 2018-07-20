@@ -139,6 +139,26 @@ instance Show1 GenericType where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for GenericType
 instance Evaluatable GenericType
 
+data AnnotatedType a = AnnotatedType { annotationes :: [a], annotatedType :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AnnotatedType where liftEq = genericLiftEq
+instance Ord1 AnnotatedType where liftCompare = genericLiftCompare
+instance Show1 AnnotatedType where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for AnnotatedType
+instance Evaluatable AnnotatedType
+
+data CatchType a = CatchType { types :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 CatchType where liftEq = genericLiftEq
+instance Ord1 CatchType where liftCompare = genericLiftCompare
+instance Show1 CatchType where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for CatchType
+instance Evaluatable CatchType
+
 data TypeWithModifiers a = TypeWithModifiers [a] a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
 
