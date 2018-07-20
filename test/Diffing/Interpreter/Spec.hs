@@ -4,9 +4,11 @@ module Diffing.Interpreter.Spec where
 import Control.Applicative ((<|>))
 import Data.Diff
 import Data.Foldable (asum)
+import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Maybe
 import Data.Mergeable
+import Data.Patch (after, before)
 import Data.Record
 import Data.Sum
 import Data.Term
