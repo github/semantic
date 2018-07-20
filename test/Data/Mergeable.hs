@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, DeriveAnyClass, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, TypeOperators, UndecidableInstances #-}
 module Data.Mergeable ( Mergeable (..) ) where
 
 import Control.Applicative
@@ -80,10 +80,10 @@ instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
 
 -- Orphan instances
 
-deriving instance Mergeable Comment.Comment
-deriving instance Mergeable Declaration.Function
-deriving instance Mergeable Declaration.Method
-deriving instance Mergeable Statement.If
-deriving instance Mergeable Syntax.Context
-deriving instance Mergeable Syntax.Empty
-deriving instance Mergeable Syntax.Identifier
+instance Mergeable Comment.Comment
+instance Mergeable Declaration.Function
+instance Mergeable Declaration.Method
+instance Mergeable Statement.If
+instance Mergeable Syntax.Context
+instance Mergeable Syntax.Empty
+instance Mergeable Syntax.Identifier
