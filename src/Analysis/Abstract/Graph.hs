@@ -18,6 +18,8 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract
 import           Data.Abstract.Address
+import           Data.Abstract.Name
+import           Data.Abstract.Ref
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
@@ -26,6 +28,7 @@ import           Data.Graph
 import           Data.Graph.Vertex
 import           Data.Record
 import           Data.Term
+import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue hiding (project)
 
@@ -55,31 +58,47 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexName))
 graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (Env (Hole context (Located address))) effects
                  , Member (State (Graph Vertex)) effects
+                 , Member (State (Map (Hole context (Located address)) Vertex)) effects
+                 , Member (Resumable (EnvironmentError (Hole context (Located address)))) effects
+                 , AbstractValue (Hole context (Located address)) value effects
                  , Member (Reader Vertex) effects
                  , HasField fields Span
                  , VertexDeclaration syntax
                  , Declarations1 syntax
+                 , Ord address
+                 , Ord context
                  , Foldable syntax
                  , Functor syntax
                  , term ~ Term syntax (Record fields)
                  )
-              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects a)
-              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects a)
+              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
+              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
 graphingTerms recur term@(In a syntax) = do
   definedInModule <- currentModule
   case toVertex a definedInModule (subterm <$> syntax) of
     Just (v@Function{}, _) -> recurWithContext v
     Just (v@Method{}, _) -> recurWithContext v
-    Just (Variable{..}, name) -> do
-      definedInModuleInfo <- maybe (ModuleInfo "unknown") (maybe (ModuleInfo "hole") addressModule . toMaybe) <$> TermEvaluator (lookupEnv name)
-      variableDefinition (variableVertex variableName definedInModuleInfo variableSpan)
+    Just (v@Variable{..}, name) -> do
+      variableDefinition v
+
+      maybeAddr <- TermEvaluator (lookupEnv name)
+      case maybeAddr of
+        Just a -> do
+          defined <- gets (Map.lookup a)
+          maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
+        _ -> pure ()
+
       recur term
     _ -> recur term
   where
     recurWithContext v = do
       variableDefinition v
       moduleInclusion v
-      local (const v) (recur term)
+      local (const v) $ do
+        valRef <- recur term
+        addr <- TermEvaluator (Control.Abstract.address valRef)
+        modify' (Map.insert addr v)
+        pure valRef
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) effects
@@ -167,5 +186,6 @@ appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m e
 appendGraph = modify' . (<>)
 
 
-graphing :: (Effectful m, Effects effects) => m (State (Graph Vertex) ': effects) result -> m effects (Graph Vertex, result)
-graphing = runState mempty
+graphing :: (Effectful m, Effects effects, Functor (m (State (Graph Vertex) : effects)))
+         => m (State (Map (Hole context (Located address)) Vertex) ': State (Graph Vertex) ': effects) result -> m effects (Graph Vertex, result)
+graphing = runState mempty . fmap snd . runState lowerBound
