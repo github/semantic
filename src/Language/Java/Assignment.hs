@@ -14,7 +14,7 @@ import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import Data.Sum
 import Language.Java.Grammar as Grammar
-import Language.Java.Syntax as Java.Syntax
+import qualified Language.Java.Syntax as Java.Syntax
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -68,12 +68,14 @@ type Syntax =
    , Expression.This
    , Java.Syntax.Annotation
    , Java.Syntax.AnnotationField
+   , Java.Syntax.AnnotationTypeElement
    , Java.Syntax.ArrayCreationExpression
    , Java.Syntax.AssertStatement
    , Java.Syntax.Asterisk
    , Java.Syntax.Constructor
    , Java.Syntax.ClassBody
    , Java.Syntax.ClassLiteral
+   , Java.Syntax.DefaultValue
    , Java.Syntax.DimsExpr
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.GenericType
@@ -251,7 +253,7 @@ variableDeclaratorList = symbol VariableDeclaratorList *> children (makeDecl <$>
 -- variable declarator -> variable initializer -> expression -> primary -> array creation expression
 arrayCreationExpression :: Assignment Term
 arrayCreationExpression = makeTerm <$> symbol Grammar.ArrayCreationExpression <*> children (Java.Syntax.ArrayCreationExpression <$> (new *> type') <*> many dimsExpr)
-  where new = token AnonNew *> pure NewKeyword
+  where new = token AnonNew *> pure Java.Syntax.NewKeyword
 
 localVariableDeclarationStatement :: Assignment Term
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
@@ -285,8 +287,11 @@ char = makeTerm <$> symbol CharacterLiteral <*> (Literal.TextElement <$> source)
 identifier :: Assignment Term
 identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
 
+typeIdentifier :: Assignment Term
+typeIdentifier = makeTerm <$> (symbol Identifier) <*> (Syntax.Identifier . name <$> source)
+
 identifier' :: Assignment Name
-identifier' = (symbol Identifier <|> symbol TypeIdentifier) *> (name <$> source)
+identifier' = (symbol Identifier <|> symbol TypeIdentifier <|> symbol Identifier') *> (name <$> source)
 -- we want a name and not a full term wrapping the same, so we match the same stuff as identifier but we just produce the name
 
 scopedIdentifier :: Assignment Term
@@ -333,7 +338,7 @@ methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Ex
 
 methodReference :: Assignment Term
 methodReference = makeTerm <$> symbol Grammar.MethodReference <*> children (Java.Syntax.MethodReference <$> term type' <*> manyTerm typeArgument <*> (new <|> term identifier))
-  where new = makeTerm <$> token AnonNew <*> pure NewKeyword
+  where new = makeTerm <$> token AnonNew <*> pure Java.Syntax.NewKeyword
 -- can't do term identifier' because identifier' returns a name, not a term, and we want a term
 -- <*> - left assoc so when you have a token that you need to match but not retain,
 -- manyTerm or alternation with pure, but not bowf
@@ -357,10 +362,17 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> (extends <|> pure []) <*> interfaceBody)
     makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
-    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> AnonAt *> identifier <*> pure [] <*> annotationTypeBody)
-    annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
+    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> pure [] <*> annotationTypeBody)
+    annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (manyTerm annotationTypeMember)
+    annotationTypeMember = symbol AnnotationTypeMemberDeclaration *> children (class' <|> interface <|> constant)
+    annotationTypeElement = makeTerm <$> symbol AnnotationTypeElementDeclaration <*> children (Java.Syntax.AnnotationTypeElement <$> many modifier <*> identifier <*> (dims <|> pure []) <*> (defaultValue <|> emptyTerm))
+    defaultValue = makeTerm <$> symbol DefaultValue <*> children (Java.Syntax.DefaultValue <$> elementValue)
+    elementValue = symbol ElementValue *> children (term expression) -- pull this to top level l8r
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
     extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))
+
+constant :: Assignment Term
+constant = makeTerm <$> symbol ConstantDeclaration <*> ((,) <$> pure [] <*> typeIdentifier <**> variableDeclaratorList)
 
 package :: Assignment Term
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
@@ -395,6 +407,7 @@ type' =  choice [
      , makeTerm <$> symbol ScopedTypeIdentifier <*> children (Expression.MemberAccess <$> term type' <*> identifier')
      , wildcard
      , identifier
+     , typeIdentifier
      , generic
      , typeArgument
     ]
