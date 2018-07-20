@@ -285,7 +285,7 @@ char = makeTerm <$> symbol CharacterLiteral <*> (Literal.TextElement <$> source)
 
 -- Identifiers
 identifier :: Assignment Term
-identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> (symbol Identifier) <*> (Syntax.Identifier . name <$> source)
 
 typeIdentifier :: Assignment Term
 typeIdentifier = makeTerm <$> (symbol Identifier) <*> (Syntax.Identifier . name <$> source)
