@@ -29,6 +29,7 @@ import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Set (Set)
 import qualified Data.Set as Set
+import           Data.Span
 import qualified Data.Vector as Vec
 import           Data.Word
 import           GHC.Exts (fromList)
@@ -42,6 +43,8 @@ data VertexType
   = PACKAGE
   | MODULE
   | VARIABLE
+  | METHOD
+  | FUNCTION
     deriving (Eq, Ord, Show, Enum, Bounded, Generic, ToJSON, FromJSON, PB.Named, PB.Finite, PB.MessageField)
 
 -- | Defaults to 'PACKAGE'.
@@ -117,6 +120,8 @@ taggedGraphToAdjacencyList = accumToAdj . adjMapToAccum . adjacencyMap . toGraph
             V.Package{}  -> PACKAGE
             V.Module{}   -> MODULE
             V.Variable{} -> VARIABLE
+            V.Method{}   -> METHOD
+            V.Function{} -> FUNCTION
 
 -- Annotate all vertices of a 'Graph' with a 'Tag', starting from 1.
 -- Two vertices @a@ and @b@ will share a 'Tag' iff @a == b@.
@@ -158,7 +163,9 @@ importGraphToGraph (AdjacencyList vs es) = simplify built
         pbToVertex (Vertex t c _) = case t of
           MODULE   -> V.Module c
           PACKAGE  -> V.Package c
-          VARIABLE -> V.Variable c
+          VARIABLE -> V.Variable c "unknown" emptySpan
+          METHOD   -> V.Method c "unknown" emptySpan
+          FUNCTION   -> V.Function c "unknown" emptySpan
 
 
 -- | For debugging: returns True if all edges reference a valid vertex tag.
