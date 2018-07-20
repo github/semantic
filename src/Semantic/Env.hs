@@ -1,4 +1,7 @@
-module Semantic.Env where
+module Semantic.Env
+  ( envLookupInt
+  , envLookupString
+  ) where
 
 import Control.Monad.IO.Class
 import Prologue

@@ -1,5 +1,15 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
-module Data.Abstract.Live where
+module Data.Abstract.Live
+  ( Live (..)
+  , fromAddresses
+  , liveSingleton
+  , liveInsert
+  , liveDelete
+  , liveDifference
+  , liveMember
+  , liveSplit
+  , liveMap
+  ) where
 
 import Data.Set as Set
 import Prologue

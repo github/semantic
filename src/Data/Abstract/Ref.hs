@@ -1,5 +1,8 @@
 {-# LANGUAGE GADTs #-}
-module Data.Abstract.Ref where
+module Data.Abstract.Ref
+  ( ValueRef (..)
+  , Ref (..)
+  ) where
 
 import Data.Abstract.Name
 

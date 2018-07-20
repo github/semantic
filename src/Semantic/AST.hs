@@ -1,5 +1,11 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Semantic.AST where
+module Semantic.AST
+  ( SomeAST (..)
+  , withSomeAST
+  , astParseBlob
+  , ASTFormat (..)
+  , runASTParse
+  ) where
 
 import Data.AST
 import Data.Blob
