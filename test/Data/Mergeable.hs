@@ -43,6 +43,14 @@ instance Mergeable Identity where
 instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Sum fs) where
   sequenceAlt = apply' @Mergeable (\ reinj t -> reinj <$> sequenceAlt t)
 
+instance Mergeable Comment.Comment
+instance Mergeable Declaration.Function
+instance Mergeable Declaration.Method
+instance Mergeable Statement.If
+instance Mergeable Syntax.Context
+instance Mergeable Syntax.Empty
+instance Mergeable Syntax.Identifier
+
 
 -- Generics
 
@@ -76,14 +84,3 @@ instance (GMergeable f, GMergeable g) => GMergeable (f :+: g) where
 
 instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
   gsequenceAlt (a :*: b) = (:*:) <$> gsequenceAlt a <*> gsequenceAlt b
-
-
--- Orphan instances
-
-instance Mergeable Comment.Comment
-instance Mergeable Declaration.Function
-instance Mergeable Declaration.Method
-instance Mergeable Statement.If
-instance Mergeable Syntax.Context
-instance Mergeable Syntax.Empty
-instance Mergeable Syntax.Identifier
