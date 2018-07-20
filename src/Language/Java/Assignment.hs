@@ -370,7 +370,7 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     annotationTypeElement = makeTerm <$> symbol AnnotationTypeElementDeclaration <*> children (Java.Syntax.AnnotationTypeElement <$> many modifier <*> type' <*> identifier <*> (dims <|> pure []) <*> (defaultValue <|> emptyTerm))
     defaultValue = makeTerm <$> symbol DefaultValue <*> children (Java.Syntax.DefaultValue <$> elementValue)
     elementValue = symbol ElementValue *> children (term expression) -- pull this to top level l8r
-    interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
+    interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (constant <|> method <|> class' <|> interface)
     extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))
 
 constant :: Assignment Term
