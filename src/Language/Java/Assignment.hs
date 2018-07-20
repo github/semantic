@@ -66,12 +66,14 @@ type Syntax =
    , Expression.Member
    , Expression.Super
    , Expression.This
+   , Java.Syntax.AnnotatedType
    , Java.Syntax.Annotation
    , Java.Syntax.AnnotationField
    , Java.Syntax.AnnotationTypeElement
    , Java.Syntax.ArrayCreationExpression
    , Java.Syntax.AssertStatement
    , Java.Syntax.Asterisk
+   , Java.Syntax.CatchType
    , Java.Syntax.Constructor
    , Java.Syntax.ClassBody
    , Java.Syntax.ClassLiteral
@@ -408,8 +410,12 @@ type' =  choice [
      , typeIdentifier
      , generic
      , typeArgument
+     , annotatedType
     ]
     where array = foldl (\into each -> makeTerm1 (Type.Array (Just each) into))
+
+annotatedType :: Assignment Term
+annotatedType = makeTerm <$> symbol AnnotatedType <*> children (Java.Syntax.AnnotatedType <$> many annotation <*> type')
 
 typeArgument :: Assignment Term
 typeArgument = symbol TypeArgument *> children (term type')
@@ -454,7 +460,10 @@ catches :: Assignment [Term]
 catches = symbol Catches *> children (manyTerm catch)
   where
     catch = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> catchFormalParameter <*> term expression)
-    catchFormalParameter = makeTerm <$> symbol CatchFormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
+    catchFormalParameter = makeTerm <$> symbol CatchFormalParameter <*> children (flip Type.Annotation <$> catchType <* symbol VariableDeclaratorId <*> children identifier)
+
+catchType :: Assignment Term
+catchType = makeTerm <$> symbol CatchType <*> (Java.Syntax.CatchType <$> many type')
 
 finally :: Assignment Term
 finally = makeTerm <$> symbol Finally <*> children (Statement.Finally <$> term expression)
