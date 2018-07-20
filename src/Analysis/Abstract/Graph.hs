@@ -18,7 +18,6 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract
 import           Data.Abstract.Address
-import           Data.Abstract.Name
 import           Data.Abstract.Ref
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
@@ -33,15 +32,15 @@ import qualified Data.Text.Encoding as T
 import           Prologue hiding (project)
 
 style :: Style Vertex Builder
-style = (defaultStyle (T.encodeUtf8Builder . vertexName))
+style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
   where vertexAttributes Package{}    = [ "style" := "dashed", "shape" := "box" ]
         vertexAttributes Module{}     = [ "style" := "dotted, rounded", "shape" := "box" ]
-        vertexAttributes Variable{..} = [ "label" := T.encodeUtf8Builder (variableName <> " (Variable)"), "tooltip" := T.encodeUtf8Builder (showSpan variableSpan), "style" := "rounded", "shape" := "box" ]
-        vertexAttributes Method{..}   = [ "label" := T.encodeUtf8Builder (methodName <> " (Method)"), "tooltip" := T.encodeUtf8Builder (showSpan methodSpan)  , "style" := "rounded", "shape" := "box" ]
-        vertexAttributes Function{..} = [ "label" := T.encodeUtf8Builder (functionName <> " (Function)"), "tooltip" := T.encodeUtf8Builder (showSpan functionSpan), "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Variable{..} = [ "label" := T.encodeUtf8Builder (vertexName <> " (Variable)"), "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan), "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Method{..}   = [ "label" := T.encodeUtf8Builder (vertexName <> " (Method)"),   "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan)  , "style" := "rounded", "shape" := "box" ]
+        vertexAttributes Function{..} = [ "label" := T.encodeUtf8Builder (vertexName <> " (Function)"), "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan), "style" := "rounded", "shape" := "box" ]
         edgeAttributes Package{}  Module{}   = [ "len" := "5.0", "style" := "dashed" ]
         edgeAttributes Module{}   Module{}   = [ "len" := "5.0", "label" := "imports" ]
         edgeAttributes Variable{} Module{}   = [ "len" := "5.0", "color" := "blue", "label" := "refers to symbol defined in" ]
@@ -82,14 +81,12 @@ graphingTerms recur term@(In a syntax) = do
     Just (v@Method{}, _) -> recurWithContext v
     Just (v@Variable{..}, name) -> do
       variableDefinition v
-
       maybeAddr <- TermEvaluator (lookupEnv name)
       case maybeAddr of
         Just a -> do
           defined <- gets (Map.lookup a)
           maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
         _ -> pure ()
-
       recur term
     _ -> recur term
   where
