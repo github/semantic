@@ -363,7 +363,7 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> (extends <|> pure []) <*> interfaceBody)
     makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> pure [] <*> annotationTypeBody)
-    annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (manyTerm annotationTypeMember)
+    annotationTypeBody = symbol AnnotationTypeBody *> children (annotationTypeMember)
     annotationTypeMember = symbol AnnotationTypeMemberDeclaration *> children (class' <|> interface <|> constant)
     annotationTypeElement = makeTerm <$> symbol AnnotationTypeElementDeclaration <*> children (Java.Syntax.AnnotationTypeElement <$> many modifier <*> identifier <*> (dims <|> pure []) <*> (defaultValue <|> emptyTerm))
     defaultValue = makeTerm <$> symbol DefaultValue <*> children (Java.Syntax.DefaultValue <$> elementValue)
@@ -397,10 +397,10 @@ dimsExpr = makeTerm <$> symbol Grammar.DimsExpr <*> children (Java.Syntax.DimsEx
 
 type' :: Assignment Term
 type' =  choice [
-       makeTerm <$> token VoidType <*> pure Type.Void
-     , makeTerm <$> token IntegralType <*> pure Type.Int
-     , makeTerm <$> token FloatingPointType <*> pure Type.Float
-     , makeTerm <$> token BooleanType <*> pure Type.Bool
+       makeTerm <$> symbol VoidType <*> pure Type.Void
+     , makeTerm <$> symbol IntegralType <*> children (token AnonInt *> pure Type.Int)
+     , makeTerm <$> symbol FloatingPointType <*> pure Type.Float
+     , makeTerm <$> symbol BooleanType <*> pure Type.Bool
      , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
