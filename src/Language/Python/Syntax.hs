@@ -88,7 +88,7 @@ resolvePythonModules q = do
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![(Name, Name)] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
@@ -136,7 +136,7 @@ evalQualifiedImport name path = letrec' name $ \addr -> do
   unit <$ makeNamespace name addr Nothing
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
@@ -157,7 +157,7 @@ instance Evaluatable QualifiedImport where
         makeNamespace name addr Nothing
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -181,7 +181,7 @@ instance Evaluatable QualifiedAliasedImport where
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Ord1 Ellipsis where liftCompare = genericLiftCompare
@@ -192,7 +192,7 @@ instance Evaluatable Ellipsis
 
 
 data Redirect a = Redirect !a !a
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Ord1 Redirect where liftCompare = genericLiftCompare
