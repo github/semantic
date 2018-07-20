@@ -26,7 +26,6 @@ import Data.Foldable (asum)
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
-import Data.Mergeable (Mergeable(sequenceAlt))
 import Data.Patch
 import Data.Record
 import Data.Term
@@ -91,19 +90,6 @@ diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Pa
 diffPatches = para $ \ diff -> case diff of
   Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch
   Merge merge -> foldMap snd merge
-
-
--- | Recover the before state of a diff.
-beforeTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
-beforeTerm = cata $ \ diff -> case diff of
-  Patch patch -> (before patch >>= \ (In  a     l) -> termIn a <$> sequenceAlt l) <|> (after patch >>= asum)
-  Merge                              (In (a, _) l) -> termIn a <$> sequenceAlt l
-
--- | Recover the after state of a diff.
-afterTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
-afterTerm = cata $ \ diff -> case diff of
-  Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
-  Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
 -- | Strips the head annotation off a diff annotated with non-empty records.
