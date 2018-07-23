@@ -52,6 +52,10 @@ data Function address value m result where
   Function :: [Name] -> Set Name -> m address -> Function address value m value
   Call     :: value -> [address]              -> Function address value m address
 
+instance PureEffect (Function address value) where
+  handle handler (Request (Function name fvs body) k) = Request (Function name fvs (handler body)) (handler . k)
+  handle handler (Request (Call fn addrs)          k) = Request (Call fn addrs)                    (handler . k)
+
 
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
