@@ -19,6 +19,7 @@ import Data.Diff (Diff)
 import Data.Sum
 import Language.Ruby.Assignment (Syntax)
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.Python.Syntax as Python
 import Data.Functor.Classes
 import qualified Data.Syntax.Expression as Expression
 
@@ -98,6 +99,8 @@ spec = parallel $ do
       let bl = Blob (fromUTF8 "puts 'hi'") "example.rb" Ruby
       shouldRoundtrip bl
 
+  describe "qualifed names" $ do
+    prop "roundtrips" (shouldRoundtrip @Python.QualifiedName)
   describe "languages" $ do
     -- If this test broke, it means you've probably added another 'Language'.
     -- Add it to the list of languages below and everything should be good,
