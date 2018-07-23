@@ -1,7 +1,6 @@
 (Statements
   (InterfaceDeclaration
     (Empty)
-    (Empty)
     (Identifier)
     (ObjectType
       (PropertySignature
