@@ -58,6 +58,7 @@ data Modules address (m :: * -> *) return where
   Resolve :: [FilePath] -> Modules address m (Maybe ModulePath)
   List    :: FilePath   -> Modules address m [ModulePath]
 
+instance PureEffect (Modules address)
 instance Effect (Modules address) where
   handleState c dist (Request (Load path) k) = Request (Load path) (dist . (<$ c) . k)
   handleState c dist (Request (Lookup path) k) = Request (Lookup path) (dist . (<$ c) . k)
