@@ -16,6 +16,7 @@ import           GHC.Generics
 import           Prologue
 import           System.FilePath.Posix
 import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named(..), MessageField(..), DotProtoIdentifier(..), DotProtoPrimType(..), DotProtoType(..), messageField)
+import qualified Proto3.Suite as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 
@@ -158,9 +159,9 @@ newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty Fi
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Message1 QualifiedImport where
-  liftEncodeMessage _ _ = undefined
-  liftDecodeMessage _ = undefined
-  liftDotProto _ = undefined
+  liftEncodeMessage _ _ QualifiedImport{..} = encodeMessageField 1 qualifiedImportFrom
+  liftDecodeMessage _ _ = QualifiedImport <$> Decode.at decodeMessageField 1
+  liftDotProto _ = [ Proto.DotProtoMessageField $ Proto.DotProtoField 1 (Repeated Proto.String) (Single "qualifiedImportFrom") [] Nothing ]
 
 instance Named Prelude.String where nameOf _ = "string"
 
