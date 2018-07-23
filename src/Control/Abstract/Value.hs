@@ -5,6 +5,9 @@ module Control.Abstract.Value
 , AbstractFunction(..)
 , Comparator(..)
 , Function(..)
+, Unit(..)
+, Boolean(..)
+, Pair(..)
 , asBool
 , while
 , doWhile

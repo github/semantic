@@ -8,7 +8,7 @@ module Data.Abstract.Value.Type
   , unify
   ) where
 
-import Control.Abstract hiding (raiseHandler)
+import Control.Abstract hiding (Boolean(..), Function(..), Pair(..), Unit(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
