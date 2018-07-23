@@ -65,6 +65,16 @@ instance Effect (Unit value) where
   handleState state handler (Request Unit k) = Request Unit (handler . (<$ state) . k)
 
 
+data Boolean value (m :: * -> *) result where
+  Boolean :: Bool  -> Boolean value m value
+  AsBool  :: value -> Boolean value m Bool
+
+instance PureEffect (Boolean value)
+instance Effect (Boolean value) where
+  handleState state handler (Request (Boolean b) k) = Request (Boolean b) (handler . (<$ state) . k)
+  handleState state handler (Request (AsBool v)  k) = Request (AsBool v)  (handler . (<$ state) . k)
+
+
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
