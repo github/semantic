@@ -9,6 +9,7 @@ module Data.Abstract.Value.Type
   , runUnit
   , runBoolean
   , runPair
+  , runFunction
   ) where
 
 import qualified Control.Abstract as Abstract
@@ -246,6 +247,33 @@ runPair = interpret $ \case
     t1 <- fresh
     t2 <- fresh
     unify v (Var t1 :* Var t2) $> (Var t1, Var t2)
+
+runFunction :: ( Member (Allocator address Type) effects
+               , Member (Env address) effects
+               , Member (Exc (Return address)) effects
+               , Member Fresh effects
+               , Member (Resumable TypeError) effects
+               , Member (State TypeMap) effects
+               , PureEffects effects
+               )
+            => Evaluator address Type (Abstract.Function address Type ': effects) a
+            -> Evaluator address Type effects a
+runFunction = interpret $ \case
+  Abstract.Function params _ body -> do
+    (env, tvars) <- foldr (\ name rest -> do
+      addr <- alloc name
+      tvar <- Var <$> fresh
+      assign addr tvar
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
+    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
+  Abstract.Call op params -> do
+    tvar <- fresh
+    paramTypes <- traverse deref params
+    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
+    unified <- op `unify` needed
+    case unified of
+      _ :-> ret -> box ret
+      actual    -> throwResumable (UnificationError needed actual) >>= box
 
 
 instance AbstractHole Type where
