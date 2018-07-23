@@ -60,6 +60,9 @@ instance PureEffect (Function address value) where
   handle handler (Request (Call fn addrs)          k) = Request (Call fn addrs)                    (handler . k)
 
 
+unit' :: Member (Unit value) effects => Evaluator address value effects value
+unit' = send Unit
+
 data Unit value (m :: * -> *) result where
   Unit :: Unit value m value
 
