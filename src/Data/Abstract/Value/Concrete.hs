@@ -8,7 +8,7 @@ module Data.Abstract.Value.Concrete
   , throwValueError
   ) where
 
-import Control.Abstract
+import Control.Abstract hiding (Boolean(..), Function(..), Pair(..), Unit(..))
 import Data.Abstract.Environment (Environment, Bindings)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
