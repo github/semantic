@@ -167,6 +167,7 @@ data Task (m :: * -> *) output where
   Render    :: Renderer input output -> input -> Task m output
   Serialize :: Format input -> input -> Task m Builder
 
+instance PureEffect Task
 instance Effect Task where
   handleState c dist (Request (Parse parser blob) k) = Request (Parse parser blob) (dist . (<$ c) . k)
   handleState c dist (Request (Analyze run analysis) k) = Request (Analyze run analysis) (dist . (<$ c) . k)

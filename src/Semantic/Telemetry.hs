@@ -133,6 +133,7 @@ data Telemetry (m :: * -> *) output where
   WriteStat :: Stat                                  -> Telemetry m ()
   WriteLog  :: Level -> String -> [(String, String)] -> Telemetry m ()
 
+instance PureEffect Telemetry
 instance Effect Telemetry where
   handleState c dist (Request (WriteStat stat) k) = Request (WriteStat stat) (dist . (<$ c) . k)
   handleState c dist (Request (WriteLog level message pairs) k) = Request (WriteLog level message pairs) (dist . (<$ c) . k)
