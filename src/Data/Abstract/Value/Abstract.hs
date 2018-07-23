@@ -42,7 +42,7 @@ instance ( Member (Allocator address Abstract) effects
     deref addr
 
   call Abstract params = do
-    traverse_ (>>= deref) params
+    traverse_ deref params
     box Abstract
 
 instance ( Member (Allocator address Abstract) effects
