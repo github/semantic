@@ -33,7 +33,7 @@ instance ( Member (Allocator address Abstract) effects
          , Member Fresh effects
          )
       => AbstractFunction address Abstract effects where
-  closure names _ body = do
+  function names _ body = do
     env <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract

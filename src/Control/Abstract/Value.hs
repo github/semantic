@@ -43,10 +43,10 @@ data Comparator
 
 class Show value => AbstractFunction address value effects where
   -- | Build a closure (a binder like a lambda or method definition).
-  closure :: [Name]                                 -- ^ The parameter names.
-          -> Set Name                               -- ^ The set of free variables to close over.
-          -> Evaluator address value effects address -- ^ The evaluator for the body of the closure.
-          -> Evaluator address value effects value
+  function :: [Name]                                 -- ^ The parameter names.
+           -> Set Name                               -- ^ The set of free variables to close over.
+           -> Evaluator address value effects address -- ^ The evaluator for the body of the closure.
+           -> Evaluator address value effects value
   -- | Evaluate an application (like a function call).
   call :: value -> [address] -> Evaluator address value effects address
 

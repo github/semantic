@@ -240,7 +240,7 @@ instance ( Member (Allocator address Type) effects
          , Member (State TypeMap) effects
          )
       => AbstractFunction address Type effects where
-  closure names _ body = do
+  function names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
