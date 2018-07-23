@@ -9,7 +9,6 @@
   (AmbientDeclaration
     (InterfaceDeclaration
       (Empty)
-      (Empty)
       (Identifier)
       (ObjectType)))
   (AmbientDeclaration
