@@ -3,11 +3,13 @@ module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
   , ClosureBody (..)
+  , runUnit
   , runValueError
   , runValueErrorWith
   , throwValueError
   ) where
 
+import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), Pair(..), Unit(..))
 import Data.Abstract.Environment (Environment, Bindings)
 import qualified Data.Abstract.Environment as Env
@@ -55,6 +57,10 @@ instance Ord address => ValueRoots address (Value address body) where
   valueRoots v
     | Closure _ _ _ _ env <- v = Env.addresses env
     | otherwise                = mempty
+
+
+runUnit :: PureEffects effects => Evaluator address (Value address body) (Abstract.Unit (Value address body) ': effects) a -> Evaluator address (Value address body) effects a
+runUnit = interpret $ \ Abstract.Unit -> pure Unit
 
 
 instance AbstractHole (Value address body) where
