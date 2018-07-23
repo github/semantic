@@ -87,6 +87,9 @@ instance Effect (Boolean value) where
   handleState state handler (Request (AsBool v)  k) = Request (AsBool v)  (handler . (<$ state) . k)
 
 
+pair' :: Member (Pair value) effects => value -> value -> Evaluator address value effects value
+pair' a b = send (Pair a b)
+
 data Pair value (m :: * -> *) result where
   Pair   :: value -> value -> Pair value m value
   AsPair :: value          -> Pair value m (value, value)
