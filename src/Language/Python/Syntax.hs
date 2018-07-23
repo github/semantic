@@ -15,7 +15,7 @@ import           Diffing.Algorithm
 import           GHC.Generics
 import           Prologue
 import           System.FilePath.Posix
-import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named(..), MessageField(..))
+import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named(..), MessageField(..), DotProtoIdentifier(..), DotProtoPrimType(..), DotProtoType(..), messageField)
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 
@@ -26,11 +26,13 @@ data QualifiedName
 
 instance MessageField QualifiedName where
   encodeMessageField num QualifiedName{..} = Encode.embedded num (encodeMessageField 1 paths)
-  encodeMessageField num RelativeQualifiedName{..} = Encode.embedded num (encodeMessageField 1 path <> encodeMessageField 2 maybeQualifiedName)
-  decodeMessageField = undefined -- qualifiedName <|> relativeName
-  protoType = undefined
-      -- embeddedAt num = Decode.at (Decode.embedded'' parser) num
-      -- qualifiedName = Decode.embedded'' (QualifiedName <$> embeddedAt 1 <*> embeddedAt 2)
+  encodeMessageField num RelativeQualifiedName{..} = Encode.embedded num (encodeMessageField 1 path <> (encodeMessageField 2 maybeQualifiedName))
+  decodeMessageField = Decode.embedded'' (qualifiedName <|> relativeQualifiedName)
+    where
+      embeddedAt parser num = Decode.at parser num
+      qualifiedName = QualifiedName <$> embeddedAt decodeMessageField 1
+      relativeQualifiedName = RelativeQualifiedName <$> embeddedAt decodeMessageField 1 <*> embeddedAt decodeMessageField 2
+  protoType _ = messageField (Prim $ Named (Single (nameOf (Proxy @QualifiedName)))) Nothing
 
 qualifiedName :: NonEmpty Text -> QualifiedName
 qualifiedName xs = QualifiedName (T.unpack <$> xs)
@@ -164,7 +166,7 @@ instance Named Prelude.String where nameOf _ = "string"
 
 instance Message Prelude.String where
   encodeMessage _ x = encodePrimitive 1 x
-  decodeMessage _ = undefined
+  decodeMessage _ = Decode.at (Decode.one decodePrimitive mempty) 1
   dotProto = undefined
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
