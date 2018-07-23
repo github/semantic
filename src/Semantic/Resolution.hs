@@ -44,6 +44,7 @@ data Resolution (m :: * -> *) output where
   NodeJSResolution :: FilePath -> Text -> [FilePath] -> Resolution m (Map FilePath FilePath)
   NoResolution     ::                                   Resolution m (Map FilePath FilePath)
 
+instance PureEffect Resolution
 instance Effect Resolution where
   handleState c dist (Request (NodeJSResolution path key paths) k) = Request (NodeJSResolution path key paths) (dist . (<$ c) . k)
   handleState c dist (Request NoResolution k) = Request NoResolution (dist . (<$ c) . k)

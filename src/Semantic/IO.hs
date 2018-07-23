@@ -220,6 +220,7 @@ data Files (m :: * -> *) out where
   FindFiles   :: FilePath -> [String] -> [FilePath]                   -> Files m [FilePath]
   Write       :: Destination -> B.Builder                             -> Files m ()
 
+instance PureEffect Files
 instance Effect Files where
   handleState c dist (Request (Read source) k) = Request (Read source) (dist . (<$ c) . k)
   handleState c dist (Request (ReadProject rootDir dir language excludeDirs) k) = Request (ReadProject rootDir dir language excludeDirs) (dist . (<$ c) . k)
