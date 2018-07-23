@@ -54,6 +54,9 @@ class Show value => AbstractFunction address value effects where
 function' :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
 function' names fvs (Evaluator body) = send (Function names fvs body)
 
+call' :: Member (Function address value) effects => value -> [address] -> Evaluator address value effects address
+call' fn args = send (Call fn args)
+
 data Function address value m result where
   Function :: [Name] -> Set Name -> m address -> Function address value m value
   Call     :: value -> [address]              -> Function address value m address
