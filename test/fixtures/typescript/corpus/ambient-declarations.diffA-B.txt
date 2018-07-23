@@ -23,7 +23,6 @@
       {-(Empty)-})-})
   ->(InterfaceDeclaration
     {+(Empty)+}
-    {+(Empty)+}
     {+(Identifier)+}
     {+(ObjectType)+}) })
 {-(AmbientDeclaration
@@ -64,7 +63,6 @@
         {-(Empty)-})-})-}
     {-(InterfaceDeclaration
       {-(Empty)-}
-      {-(Empty)-}
       {-(Identifier)-}
       {-(ObjectType
         {-(PropertySignature
@@ -74,7 +72,6 @@
             {-(PredefinedType)-})-}
           {-(Identifier)-})-})-})-}
     {-(InterfaceDeclaration
-      {-(Empty)-}
       {-(Empty)-}
       {-(Identifier)-}
       {-(ObjectType
