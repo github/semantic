@@ -6,8 +6,10 @@ module Data.Abstract.Value.Type
   , runTypes
   , runTypesWith
   , unify
+  , runUnit
   ) where
 
+import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), Pair(..), Unit(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
@@ -213,6 +215,10 @@ unify a b = do
 
 instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
+
+
+runUnit :: PureEffects effects => Evaluator address Type (Abstract.Unit Type ': effects) a -> Evaluator address Type effects a
+runUnit = interpret $ \ Abstract.Unit -> pure Unit
 
 
 instance AbstractHole Type where
