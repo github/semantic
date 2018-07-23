@@ -4,6 +4,7 @@ module Data.Abstract.Value.Concrete
   , ValueError (..)
   , ClosureBody (..)
   , runUnit
+  , runBoolean
   , runValueError
   , runValueErrorWith
   , throwValueError
@@ -61,6 +62,12 @@ instance Ord address => ValueRoots address (Value address body) where
 
 runUnit :: PureEffects effects => Evaluator address (Value address body) (Abstract.Unit (Value address body) ': effects) a -> Evaluator address (Value address body) effects a
 runUnit = interpret $ \ Abstract.Unit -> pure Unit
+
+runBoolean :: (Member (Resumable (ValueError address body)) effects, PureEffects effects) => Evaluator address (Value address body) (Abstract.Boolean (Value address body) ': effects) a -> Evaluator address (Value address body) effects a
+runBoolean = interpret $ \case
+  Abstract.Boolean b -> pure (Boolean b)
+  Abstract.AsBool (Boolean b) -> pure b
+  Abstract.AsBool other       -> throwValueError (BoolError other)
 
 
 instance AbstractHole (Value address body) where
