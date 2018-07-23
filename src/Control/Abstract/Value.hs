@@ -71,6 +71,9 @@ instance Effect (Unit value) where
   handleState state handler (Request Unit k) = Request Unit (handler . (<$ state) . k)
 
 
+boolean' :: Member (Boolean value) effects => Bool -> Evaluator address value effects value
+boolean' = send . Boolean
+
 data Boolean value (m :: * -> *) result where
   Boolean :: Bool  -> Boolean value m value
   AsBool  :: value -> Boolean value m Bool
