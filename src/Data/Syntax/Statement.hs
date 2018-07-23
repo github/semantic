@@ -183,7 +183,7 @@ instance Evaluatable PreDecrement
 
 -- Returns
 
-newtype Return a = Return { term :: a }
+newtype Return a = Return { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Return where liftEq = genericLiftEq
@@ -193,7 +193,7 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Return where
   eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
 
-newtype Yield a = Yield { term :: a }
+newtype Yield a = Yield { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Yield where liftEq = genericLiftEq
@@ -204,7 +204,7 @@ instance Show1 Yield where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Yield
 
 
-newtype Break a = Break { term :: a }
+newtype Break a = Break { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Break where liftEq = genericLiftEq
@@ -214,7 +214,7 @@ instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Break where
   eval (Break x) = Rval <$> (subtermAddress x >>= throwBreak)
 
-newtype Continue a = Continue { term :: a }
+newtype Continue a = Continue { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Continue where liftEq = genericLiftEq
@@ -224,7 +224,7 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Continue where
   eval (Continue x) = Rval <$> (subtermAddress x >>= throwContinue)
 
-newtype Retry a = Retry { term :: a }
+newtype Retry a = Retry { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Retry where liftEq = genericLiftEq
@@ -324,7 +324,7 @@ instance Show1 Catch where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Catch
 
 
-newtype Finally a = Finally { term :: a }
+newtype Finally a = Finally { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Finally where liftEq = genericLiftEq
