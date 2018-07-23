@@ -253,7 +253,7 @@ variableDeclaratorList = symbol VariableDeclaratorList *> children (makeDecl <$>
 
 arrayCreationExpression :: Assignment Term
 arrayCreationExpression = makeTerm <$> symbol Grammar.ArrayCreationExpression <*> children (Java.Syntax.ArrayCreationExpression <$> (new *> type') <*> many dimsExpr)
-  where new = token AnonNew *> pure Java.Syntax.NewKeyword
+  where new = token AnonNew $> pure Java.Syntax.NewKeyword
 
 localVariableDeclarationStatement :: Assignment Term
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
@@ -285,7 +285,7 @@ char = makeTerm <$> symbol CharacterLiteral <*> (Literal.TextElement <$> source)
 
 -- Identifiers
 identifier :: Assignment Term
-identifier = makeTerm <$> (symbol Identifier) <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier . name <$> source)
 
 typeIdentifier :: Assignment Term
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
