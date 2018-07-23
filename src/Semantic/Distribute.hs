@@ -35,6 +35,7 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 -- | Distribute effects run tasks concurrently.
 newtype Distribute task output = Distribute (task output)
 
+instance PureEffect Distribute
 instance Effect Distribute where
   handleState c dist (Request (Distribute task) k) = Request (Distribute (dist (task <$ c))) (dist . fmap k)
 
