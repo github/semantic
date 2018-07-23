@@ -82,7 +82,6 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Mergeable
                      , Data.Patch
                      , Data.Project
                      , Data.Range
@@ -125,7 +124,11 @@ library
                      , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
+                     , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
+                     , Language.TypeScript.Syntax.JavaScript
+                     , Language.TypeScript.Syntax.JSX
+                     , Language.TypeScript.Syntax.TypeScript
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
@@ -278,10 +281,11 @@ test-suite test
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
-                     , Data.Diff.Spec
                      , Data.Abstract.Path.Spec
+                     , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
+                     , Data.Mergeable
                      , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
