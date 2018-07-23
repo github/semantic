@@ -71,7 +71,7 @@ instance ( Coercible body (Eff effects)
          , Show address
          )
       => AbstractFunction address (Value address body) effects where
-  closure parameters freeVariables body = do
+  function parameters freeVariables body = do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
