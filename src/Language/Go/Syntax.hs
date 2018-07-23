@@ -87,7 +87,7 @@ instance Evaluatable QualifiedImport where
     paths <- resolveGoImport importPath
     alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
     void . letrec' alias $ \addr -> do
-      makeNamespace alias addr Nothing $ for_ paths $ \p -> do
+      makeNamespace alias addr Nothing . for_ paths $ \p -> do
         traceResolve (unPath importPath) p
         importedEnv <- fst <$> require p
         bindAll importedEnv
