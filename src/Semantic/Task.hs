@@ -154,7 +154,7 @@ runTaskWithConfig options logger statter task = do
   queueStat statter stat
   pure result
 
-runTraceInTelemetry :: (Member Telemetry effects, Effects effects) => Eff (Trace ': effects) a -> Eff effects a
+runTraceInTelemetry :: (Member Telemetry effects, PureEffects effects) => Eff (Trace ': effects) a -> Eff effects a
 runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 
@@ -167,6 +167,7 @@ data Task (m :: * -> *) output where
   Render    :: Renderer input output -> input -> Task m output
   Serialize :: Format input -> input -> Task m Builder
 
+instance PureEffect Task
 instance Effect Task where
   handleState c dist (Request (Parse parser blob) k) = Request (Parse parser blob) (dist . (<$ c) . k)
   handleState c dist (Request (Analyze run analysis) k) = Request (Analyze run analysis) (dist . (<$ c) . k)
@@ -176,7 +177,7 @@ instance Effect Task where
   handleState c dist (Request (Serialize format input) k) = Request (Serialize format input) (dist . (<$ c) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, Effects effs) => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, PureEffects effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
@@ -197,7 +198,7 @@ data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, Effects effs) => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, PureEffects effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -227,7 +228,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Member (Reader Config) effs
                          , Member Telemetry effs
                          , Member Trace effs
-                         , Effects effs
+                         , PureEffects effs
                          )
                       => (Source -> assignment (Term (Sum syntaxes) (Record Assignment.Location)) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) (Record Assignment.Location)))
                       -> Parser ast
