@@ -28,12 +28,11 @@ data QualifiedName
 
 instance MessageField QualifiedName where
   encodeMessageField num QualifiedName{..} = Encode.embedded num (encodeMessageField 1 paths)
-  encodeMessageField num RelativeQualifiedName{..} = Encode.embedded num (encodeMessageField 1 path <> (encodeMessageField 2 maybeQualifiedName))
+  encodeMessageField num RelativeQualifiedName{..} = Encode.embedded num (encodeMessageField 1 path <> encodeMessageField 2 maybeQualifiedName)
   decodeMessageField = Decode.embedded'' (qualifiedName <|> relativeQualifiedName)
     where
-      embeddedAt parser num = Decode.at parser num
-      qualifiedName = QualifiedName <$> embeddedAt decodeMessageField 1
-      relativeQualifiedName = RelativeQualifiedName <$> embeddedAt decodeMessageField 1 <*> embeddedAt decodeMessageField 2
+      qualifiedName = QualifiedName <$> Decode.at decodeMessageField 1
+      relativeQualifiedName = RelativeQualifiedName <$> Decode.at decodeMessageField 1 <*> Decode.at decodeMessageField 2
   protoType _ = messageField (Prim $ Named (Single (nameOf (Proxy @QualifiedName)))) Nothing
 
 qualifiedName :: NonEmpty Text -> QualifiedName
@@ -167,7 +166,7 @@ instance Message1 QualifiedImport where
 instance Named Prelude.String where nameOf _ = "string"
 
 instance Message Prelude.String where
-  encodeMessage _ x = encodePrimitive 1 x
+  encodeMessage _ = encodePrimitive 1
   decodeMessage _ = Decode.at (Decode.one decodePrimitive mempty) 1
   dotProto = undefined
 
