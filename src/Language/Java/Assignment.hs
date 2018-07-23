@@ -192,7 +192,6 @@ expressionChoices =
   , constructorDeclaration
   , dimsExpr
   , explicitConstructorInvocation
-  -- , TODO: constantDeclaration
   , doWhile
   , fieldAccess
   , fieldDeclaration
@@ -252,7 +251,6 @@ variableDeclaratorList = symbol VariableDeclaratorList *> children (makeDecl <$>
     makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
     makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
 
--- variable declarator -> variable initializer -> expression -> primary -> array creation expression
 arrayCreationExpression :: Assignment Term
 arrayCreationExpression = makeTerm <$> symbol Grammar.ArrayCreationExpression <*> children (Java.Syntax.ArrayCreationExpression <$> (new *> type') <*> many dimsExpr)
   where new = token AnonNew *> pure Java.Syntax.NewKeyword
@@ -294,7 +292,6 @@ typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . nam
 
 identifier' :: Assignment Name
 identifier' = (symbol Identifier <|> symbol TypeIdentifier <|> symbol Identifier') *> (name <$> source)
--- we want a name and not a full term wrapping the same, so we match the same stuff as identifier but we just produce the name
 
 scopedIdentifier :: Assignment Term
 scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> identifier')
@@ -306,8 +303,7 @@ superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *
 class' :: Assignment Term
 class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> (superInterfaces <|> pure []) <*> classBody)
   where
-    makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers <> typeParams) identifier (maybeToList superClass <> superInterfaces) -- not doing an assignment, just straight up function
-    -- classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
+    makeClass modifiers identifier typeParams superClass superInterfaces = Declaration.Class (modifiers <> typeParams) identifier (maybeToList superClass <> superInterfaces)
     superClass = symbol Superclass *> children type'
 
 classBody :: Assignment Term
@@ -326,7 +322,6 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) = Declaration.Method (returnType : modifiers <> typeParams <> annotations <> throws) receiver name params
--- methodHeader needs to include typeParameters (it does)
 
 generic :: Assignment Term
 generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
@@ -336,14 +331,10 @@ methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (uncurry Ex
   where
     callFunction a (Just (typeArguments, b)) = (typeArguments, makeTerm1 (Expression.MemberAccess a b))
     callFunction a Nothing = ([], a)
-    -- optional produces a Maybe type (takes a Maybe a and returns a rule that produces a Maybe a)
 
 methodReference :: Assignment Term
 methodReference = makeTerm <$> symbol Grammar.MethodReference <*> children (Java.Syntax.MethodReference <$> term type' <*> manyTerm typeArgument <*> (new <|> term identifier))
   where new = makeTerm <$> token AnonNew <*> pure Java.Syntax.NewKeyword
--- can't do term identifier' because identifier' returns a name, not a term, and we want a term
--- <*> - left assoc so when you have a token that you need to match but not retain,
--- manyTerm or alternation with pure, but not bowf
 
 explicitConstructorInvocation :: Assignment Term
 explicitConstructorInvocation = makeTerm <$> symbol ExplicitConstructorInvocation <*> children (uncurry Expression.Call <$> (callFunction <$> term expression <*> optional ((,) <$ optional (token AnonRParen) <* token AnonDot <*> manyTerm type' <*> identifier')) <*> argumentList <*> emptyTerm)
@@ -363,18 +354,18 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
   where
     interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
     normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> (extends <|> pure []) <*> interfaceBody)
-    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier
+    makeInterface modifiers identifier typeParams = Declaration.InterfaceDeclaration (modifiers <> typeParams) identifier
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> pure [] <*> annotationTypeBody)
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (manyTerm annotationTypeMember)
     annotationTypeMember = symbol AnnotationTypeMemberDeclaration *> children (class' <|> interface <|> constant <|> annotationTypeElement)
     annotationTypeElement = makeTerm <$> symbol AnnotationTypeElementDeclaration <*> children (Java.Syntax.AnnotationTypeElement <$> many modifier <*> type' <*> identifier <*> (dims <|> pure []) <*> (defaultValue <|> emptyTerm))
     defaultValue = makeTerm <$> symbol DefaultValue <*> children (Java.Syntax.DefaultValue <$> elementValue)
-    elementValue = symbol ElementValue *> children (term expression) -- pull this to top level l8r
+    elementValue = symbol ElementValue *> children (term expression)
     interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (constant <|> method <|> class' <|> interface)
     extends = symbol ExtendsInterfaces *> children (symbol InterfaceTypeList *> children (manyTerm type'))
 
 constant :: Assignment Term
-constant = makeTerm <$> symbol ConstantDeclaration <*> children ((,) <$> pure [] <*> type' <**> variableDeclaratorList)
+constant = makeTerm <$> symbol ConstantDeclaration <*> children ((,) [] <$> type' <**> variableDeclaratorList)
 
 package :: Assignment Term
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
@@ -388,12 +379,9 @@ enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.Enu
 return' :: Assignment Term
 return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children (expression <|> emptyTerm))
 
--- method expressions
 dims :: Assignment [Term]
 dims = symbol Dims *> children (many (emptyTerm <* token AnonLBracket <* token AnonRBracket))
 
--- not sure why we did <* token with the dims (possibly because it's the only thing happening?)
--- will define with manyTerm annotation <*> manyTerm expression and then revisit whether or not I need brackets
 dimsExpr :: Assignment Term
 dimsExpr = makeTerm <$> symbol Grammar.DimsExpr <*> children (Java.Syntax.DimsExpr <$> manyTerm annotation <*> manyTerm expression)
 
@@ -480,7 +468,7 @@ tryWithResources = makeTerm <$> symbol TryWithResourcesStatement <*> children (J
     resourceSpecification = symbol ResourceSpecification *> children (manyTerm resource)
     resource = symbol Resource *> children variableAccess <|> makeTerm <$> symbol Resource <*> children (makeSingleDecl <$> many modifier <*> type' <*> variableDeclaratorId <*> term expression)
     variableAccess = symbol VariableAccess *> children (identifier <|> fieldAccess)
-    makeSingleDecl modifiers type' target value = Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value
+    makeSingleDecl modifiers type' target = Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target))
 
 for :: Assignment Term
 for = symbol ForStatement *> children (basicFor <|> enhancedFor)
@@ -498,7 +486,6 @@ enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.F
 assert :: Assignment Term
 assert = makeTerm <$> symbol Grammar.AssertStatement <*> children (Java.Syntax.AssertStatement <$> term expression <*> optional (term expression))
 
--- TODO: instanceOf
 binary :: Assignment Term
 binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expressionAndParens expressionAndParens
   [ (inject .) . Expression.LessThan         <$ symbol AnonLAngle
@@ -525,8 +512,8 @@ binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expressio
   where
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
     expressionAndParens = token AnonLParen *> expressionAndParens <* token AnonRParen <|> expression
-    -- TODO: expressionAndParens is a hack that accommodates Java's nested parens case but
-    -- altering the TreeSitter Java grammar is a better longer term goal.
+    -- TODO: expressionAndParens is a hack that accommodates Java's nested parens
+    --       but altering the TreeSitter Java grammar is a better longer term goal.
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment Term
@@ -596,14 +583,9 @@ classLiteral = makeTerm <$> symbol Grammar.ClassLiteral <*> children (Java.Synta
 
 argumentList :: Assignment [Term]
 argumentList = symbol ArgumentList *> children (manyTerm expression)
--- this takes care of expression, expression, ..., expression
--- but does this take care of parenthesized argumentList (it's a separate rule in TS)
--- I think methodReference being a top-level expression now will make manyTerm expression recognize this
 
 super :: Assignment Term
 super = makeTerm <$> token Super <*> pure Expression.Super
--- INCORRECT: super = makeTerm <$> token Super $> Expression.Super
--- Take partially applied function and replace it instead of applying
 
 this :: Assignment Term
 this = makeTerm <$> token This <*> pure Expression.This
@@ -618,8 +600,6 @@ constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children
 
 typeParameters :: Assignment [Term]
 typeParameters = symbol TypeParameters *> children (manyTerm typeParam)
--- not making a term, just matching children and returning the whole list
--- unpacking the TypeParameters node
   where
     typeParam = makeTerm <$> symbol Grammar.TypeParameter <*> children (Java.Syntax.TypeParameter <$> manyTerm annotation <*> term identifier <*> (typeBound <|> pure []))
     typeBound = symbol TypeBound *> children (manyTerm type')
