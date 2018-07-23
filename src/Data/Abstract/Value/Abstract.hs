@@ -3,6 +3,7 @@ module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runUnit
 , runBoolean
+, runPair
 ) where
 
 import Control.Abstract as Abstract
@@ -20,6 +21,11 @@ runBoolean :: (Member NonDet effects, PureEffects effects) => Evaluator address 
 runBoolean = interpret $ \case
   Boolean _ -> pure Abstract
   AsBool  _ -> pure True <|> pure False
+
+runPair :: PureEffects effects => Evaluator address Abstract (Pair Abstract ': effects) a -> Evaluator address Abstract effects a
+runPair = interpret $ \case
+  Pair _ _ -> pure Abstract
+  AsPair _ -> pure (Abstract, Abstract)
 
 
 instance Ord address => ValueRoots address Abstract where
