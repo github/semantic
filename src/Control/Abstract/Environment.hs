@@ -93,7 +93,7 @@ instance Effect (Env address) where
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
 -- | Runs a computation in the context of an existing environment.
--- | New bindings created in the computation are returned.
+--   New bindings created in the computation are returned.
 runEnv :: Effects effects
        => Environment address
        -> Evaluator address value (Env address ': effects) a
