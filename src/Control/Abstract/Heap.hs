@@ -159,10 +159,10 @@ data Allocator address value (m :: * -> *) return where
   GC     :: Live address     -> Allocator address value m ()
 
 runAllocator :: ( Addressable address effects
-                , Effects effects
                 , Foldable (Cell address)
                 , Member (Resumable (AddressError address value)) effects
                 , Member (State (Heap address (Cell address) value)) effects
+                , PureEffects effects
                 , Reducer value (Cell address value)
                 , ValueRoots address value
                 )
@@ -174,6 +174,7 @@ runAllocator = interpret $ \ eff -> case eff of
   Assign addr value -> modifyHeap (heapInsert addr value)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
+instance PureEffect (Allocator address value)
 instance Effect (Allocator address value) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
   handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
