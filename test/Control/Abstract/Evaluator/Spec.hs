@@ -24,7 +24,8 @@ spec = parallel $ do
   it "calls functions" $ do
     (_, expected) <- evaluate $ do
       identity <- function [name "x"] lowerBound (variable (name "x"))
-      call identity [box (integer 123)]
+      addr <- box (integer 123)
+      call identity [addr]
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
 evaluate
