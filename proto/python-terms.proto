@@ -26,6 +26,11 @@ message QualifiedName {
   }
 }
 
+message Alias {
+  bytes aliasValue = 1;
+  bytes aliasName = 2;
+}
+
 message PythonSyntax {
   oneof syntax {
     Comment comment = 1;
