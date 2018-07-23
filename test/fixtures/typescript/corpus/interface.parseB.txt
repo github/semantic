@@ -1,10 +1,6 @@
 (Statements
   (InterfaceDeclaration
-    (TypeParameters
-      (TypeParameter
-        (Identifier)
-        (Empty)
-        (Empty)))
+    (Empty)
     (Identifier)
     (ObjectType
       (PropertySignature
