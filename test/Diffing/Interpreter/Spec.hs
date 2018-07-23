@@ -1,9 +1,14 @@
 {-# LANGUAGE DataKinds #-}
 module Diffing.Interpreter.Spec where
 
+import Control.Applicative ((<|>))
 import Data.Diff
+import Data.Foldable (asum)
+import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Maybe
+import Data.Mergeable
+import Data.Patch (after, before)
 import Data.Record
 import Data.Sum
 import Data.Term
@@ -63,3 +68,16 @@ spec = parallel $ do
     prop "produces a Delete when the second term is missing" $ do
       \ before -> let diff = diffTermPair (This before) :: Diff ListableSyntax (Record '[]) (Record '[]) in
         diff `shouldBe` deleting before
+
+
+-- | Recover the before state of a diff.
+beforeTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
+beforeTerm = cata $ \ diff -> case diff of
+  Patch patch -> (before patch >>= \ (In  a     l) -> termIn a <$> sequenceAlt l) <|> (after patch >>= asum)
+  Merge                              (In (a, _) l) -> termIn a <$> sequenceAlt l
+
+-- | Recover the after state of a diff.
+afterTerm :: (Foldable syntax, Mergeable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
+afterTerm = cata $ \ diff -> case diff of
+  Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
+  Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
