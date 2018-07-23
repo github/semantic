@@ -228,7 +228,7 @@ instance Effect Files where
   handleState c dist (Request (Write destination builder) k) = Request (Write destination builder) (dist . (<$ c) . k)
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Effects effs) => Eff (Files ': effs) a -> Eff effs a
+runFiles :: (Member (Exc SomeException) effs, Member (Lift IO) effs, PureEffects effs) => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   Read (FromPath path)         -> rethrowing (readBlobFromPath path)
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)
