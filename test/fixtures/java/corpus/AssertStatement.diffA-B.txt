@@ -1,0 +1,25 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+        {+(AssertStatement
+          {+(Identifier)+}
+          {+(TextElement)+})+}
+        {-(ForEach
+          {-(Variable
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(Call
+            {-(MemberAccess
+              {-(Identifier)-})-}
+            {-(Empty)-})-}
+          {-(Statements
+            {-(AssertStatement
+              {-(Equal
+                {-(Identifier)-}
+                {-(Null)-})-})-})-})-})))))

@@ -1,0 +1,19 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Identifier)
+        (Empty)
+        (Identifier)
+        (Statements
+          (Statements
+            (Assignment
+              (Variable
+                (Identifier)
+                (Identifier))
+              (TextElement)))
+          (If
+            (Identifier)
+            (Identifier)
+            (Empty)))))))
