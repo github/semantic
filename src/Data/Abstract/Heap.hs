@@ -1,5 +1,13 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Data.Abstract.Heap where
+module Data.Abstract.Heap
+  ( Heap
+  , heapLookup
+  , heapLookupAll
+  , heapInsert
+  , heapInit
+  , heapSize
+  , heapRestrict
+  ) where
 
 import Data.Abstract.Live
 import qualified Data.Map.Monoidal as Monoidal

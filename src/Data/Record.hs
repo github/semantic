@@ -1,5 +1,10 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Data.Record where
+module Data.Record
+  ( Record (..)
+  , HasField (..)
+  , rhead
+  , rtail
+  ) where
 
 import Data.Aeson
 import Data.JSON.Fields

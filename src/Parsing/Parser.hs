@@ -29,8 +29,9 @@ module Parsing.Parser
 import           Assigning.Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
-import           Data.Abstract.Evaluatable (HasPrelude, HasPostlude)
+import           Data.Abstract.Evaluatable (HasPostlude, HasPrelude)
 import           Data.AST
+import           Data.Graph.Vertex (VertexDeclaration')
 import           Data.Kind
 import           Data.Language
 import           Data.Record
@@ -49,14 +50,14 @@ import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 import           Prologue
 import           TreeSitter.Go
+import           TreeSitter.Haskell
+import           TreeSitter.Java
 import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
-import           TreeSitter.Java
 import           TreeSitter.PHP
 import           TreeSitter.Python
 import           TreeSitter.Ruby
 import           TreeSitter.TypeScript
-import           TreeSitter.Haskell
 
 
 type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
@@ -66,6 +67,7 @@ type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *])
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser typeclasses ann where
   SomeAnalysisParser :: ( ApplyAll' typeclasses fs
+                        , Apply (VertexDeclaration' (Sum fs)) fs
                         , Element Syntax.Identifier fs
                         , HasPrelude lang
                         , HasPostlude lang

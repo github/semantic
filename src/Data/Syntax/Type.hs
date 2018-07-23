@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Type where
 
 import Data.Abstract.Evaluatable
@@ -9,7 +10,7 @@ import Prologue hiding (Map)
 import Proto3.Suite.Class
 
 data Array a = Array { arraySize :: !(Maybe a), arrayElementType :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Array where liftEq = genericLiftEq
 instance Ord1 Array where liftCompare = genericLiftCompare
@@ -21,7 +22,7 @@ instance Evaluatable Array
 
 -- TODO: What about type variables? re: FreeVariables1
 data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
@@ -33,7 +34,7 @@ instance Evaluatable Annotation where
 
 
 data Function a = Function { functionParameters :: ![a], functionReturn :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
@@ -44,7 +45,7 @@ instance Evaluatable Function
 
 
 newtype Interface a = Interface [a]
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Interface where liftEq = genericLiftEq
 instance Ord1 Interface where liftCompare = genericLiftCompare
@@ -55,7 +56,7 @@ instance Evaluatable Interface
 
 
 data Map a = Map { mapKeyType :: !a, mapElementType :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Map where liftEq = genericLiftEq
 instance Ord1 Map where liftCompare = genericLiftCompare
@@ -66,7 +67,7 @@ instance Evaluatable Map
 
 
 newtype Parenthesized a = Parenthesized a
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Parenthesized where liftEq = genericLiftEq
 instance Ord1 Parenthesized where liftCompare = genericLiftCompare
@@ -77,7 +78,7 @@ instance Evaluatable Parenthesized
 
 
 newtype Pointer a = Pointer a
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Pointer where liftEq = genericLiftEq
 instance Ord1 Pointer where liftCompare = genericLiftCompare
@@ -88,7 +89,7 @@ instance Evaluatable Pointer
 
 
 newtype Product a = Product [a]
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Product where liftEq = genericLiftEq
 instance Ord1 Product where liftCompare = genericLiftCompare
@@ -99,7 +100,7 @@ instance Evaluatable Product
 
 
 data Readonly a = Readonly
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Readonly where liftEq = genericLiftEq
 instance Ord1 Readonly where liftCompare = genericLiftCompare
@@ -110,7 +111,7 @@ instance Evaluatable Readonly
 
 
 newtype Slice a = Slice { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Slice where liftEq = genericLiftEq
 instance Ord1 Slice where liftCompare = genericLiftCompare
@@ -121,7 +122,7 @@ instance Evaluatable Slice
 
 
 newtype TypeParameters a = TypeParameters { terms :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 TypeParameters where liftEq = genericLiftEq
 instance Ord1 TypeParameters where liftCompare = genericLiftCompare
@@ -132,7 +133,7 @@ instance Evaluatable TypeParameters
 
 -- data instead of newtype because no payload
 data Void a = Void
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Void where liftEq = genericLiftEq
 instance Ord1 Void where liftCompare = genericLiftCompare
@@ -143,7 +144,7 @@ instance Evaluatable Void
 
 -- data instead of newtype because no payload
 data Int a = Int
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Int where liftEq = genericLiftEq
 instance Ord1 Int where liftCompare = genericLiftCompare
@@ -153,7 +154,7 @@ instance Show1 Int where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Int
 
 data Float a = Float
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Float where liftEq = genericLiftEq
 instance Ord1 Float where liftCompare = genericLiftCompare
@@ -163,7 +164,7 @@ instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Float
 
 data Double a = Double
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Double where liftEq = genericLiftEq
 instance Ord1 Double where liftCompare = genericLiftCompare
@@ -173,7 +174,7 @@ instance Show1 Double where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Double
 
 data Bool a = Bool
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
 
 instance Eq1 Bool where liftEq = genericLiftEq
 instance Ord1 Bool where liftCompare = genericLiftCompare

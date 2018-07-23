@@ -1,10 +1,14 @@
 {-# LANGUAGE DefaultSignatures, TypeOperators, UndecidableInstances #-}
-module Data.Mergeable where
+module Data.Mergeable ( Mergeable (..) ) where
 
 import Control.Applicative
 import Data.Functor.Identity
 import Data.List.NonEmpty
 import Data.Sum
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Statement as Statement
 import GHC.Generics
 
 -- Classes
@@ -38,6 +42,14 @@ instance Mergeable Identity where
 
 instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Sum fs) where
   sequenceAlt = apply' @Mergeable (\ reinj t -> reinj <$> sequenceAlt t)
+
+instance Mergeable Comment.Comment
+instance Mergeable Declaration.Function
+instance Mergeable Declaration.Method
+instance Mergeable Statement.If
+instance Mergeable Syntax.Context
+instance Mergeable Syntax.Empty
+instance Mergeable Syntax.Identifier
 
 
 -- Generics
