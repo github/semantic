@@ -58,6 +58,7 @@ data Modules address (m :: * -> *) return where
   Resolve :: [FilePath] -> Modules address m (Maybe ModulePath)
   List    :: FilePath   -> Modules address m [ModulePath]
 
+instance PureEffect (Modules address)
 instance Effect (Modules address) where
   handleState c dist (Request (Load path) k) = Request (Load path) (dist . (<$ c) . k)
   handleState c dist (Request (Lookup path) k) = Request (Lookup path) (dist . (<$ c) . k)
@@ -67,9 +68,9 @@ instance Effect (Modules address) where
 sendModules :: Member (Modules address) effects => Modules address (Eff effects) return -> Evaluator address value effects return
 sendModules = send
 
-runModules :: ( Effects effects
-              , Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
+runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
               , Member (Resumable (LoadError address)) effects
+              , PureEffects effects
               )
            => Set ModulePath
            -> Evaluator address value (Modules address ': effects) a

@@ -93,11 +93,11 @@ graphingPackages recur m =
 
 -- | Add vertices to the graph for imported modules.
 graphingModules :: forall term address value effects a
-                .  ( Effects effects
-                   , Member (Modules address) effects
+                .  ( Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph Vertex)) effects
-                  , Member (Reader Vertex) effects
+                   , Member (Reader Vertex) effects
+                   , PureEffects effects
                    )
                 => SubtermAlgebra Module term (TermEvaluator term address value effects a)
                 -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
@@ -114,10 +114,10 @@ graphingModules recur m = do
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: forall term address value effects a
-                   .  ( Effects effects
-                      , Member (Modules address) effects
+                   .  ( Member (Modules address) effects
                       , Member (Reader ModuleInfo) effects
                       , Member (State (Graph ModuleInfo)) effects
+                      , PureEffects effects
                       )
                    => SubtermAlgebra Module term (TermEvaluator term address value effects a)
                    -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
