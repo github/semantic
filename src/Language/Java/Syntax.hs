@@ -209,7 +209,6 @@ instance Show1 StaticInitializer where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable StaticInitializer
 
--- I think this is wrong because it doesn't acknowledge double colon.
 data MethodReference a = MethodReference { methodReferenceType :: !a, methodReferenceTypeArgs :: ![a], methodReferenceIdentifier :: !a}
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
