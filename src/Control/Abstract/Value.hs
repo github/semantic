@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types #-}
+{-# LANGUAGE GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -55,6 +55,14 @@ data Function address value m result where
 instance PureEffect (Function address value) where
   handle handler (Request (Function name fvs body) k) = Request (Function name fvs (handler body)) (handler . k)
   handle handler (Request (Call fn addrs)          k) = Request (Call fn addrs)                    (handler . k)
+
+
+data Unit value (m :: * -> *) result where
+  Unit :: Unit value m value
+
+instance PureEffect (Unit value)
+instance Effect (Unit value) where
+  handleState state handler (Request Unit k) = Request Unit (handler . (<$ state) . k)
 
 
 class Show value => AbstractIntro value where
