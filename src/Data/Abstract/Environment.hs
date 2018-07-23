@@ -94,10 +94,11 @@ lookup name = Map.lookup name . unBindings
 lookupEnv' :: Name -> Environment address -> Maybe address
 lookupEnv' name = foldMapA (lookup name) . unEnvironment
 
--- | Insert a 'Name' in the environment.
+-- | Insert a 'Name' in the bindings
 insert :: Name -> address -> Bindings address -> Bindings address
 insert name addr = Bindings . Map.insert name addr . unBindings
 
+-- | Insert a 'Name' in the environment
 insertEnv :: Name -> address -> Environment address -> Environment address
 insertEnv name addr (Environment (Bindings a :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
 
