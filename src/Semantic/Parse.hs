@@ -19,6 +19,7 @@ import Serializing.Format
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 import qualified Language.JSON.Assignment as JSON
+import qualified Language.Python.Assignment as Python
 
 runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm) >=> serialize JSON
@@ -35,6 +36,11 @@ runRubyParse = flip distributeFor (\ blob -> do
 runTypeScriptParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum TypeScript.Syntax) ()]
 runTypeScriptParse = flip distributeFor (\ blob -> do
     term <- parse typescriptParser blob
+    pure (() <$ term))
+
+runPythonParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum Python.Syntax) ()]
+runPythonParse = flip distributeFor (\ blob -> do
+    term <- parse pythonParser blob
     pure (() <$ term))
 
 runJSONParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
