@@ -8,6 +8,7 @@ module Data.Abstract.Value.Type
   , unify
   , runUnit
   , runBoolean
+  , runPair
   ) where
 
 import qualified Control.Abstract as Abstract
@@ -231,6 +232,20 @@ runBoolean :: ( Member NonDet effects
 runBoolean = interpret $ \case
   Abstract.Boolean _ -> pure Bool
   Abstract.AsBool  b -> unify b Bool *> (pure True <|> pure False)
+
+runPair :: ( Member Fresh effects
+           , Member (Resumable TypeError) effects
+           , Member (State TypeMap) effects
+           , PureEffects effects
+           )
+        => Evaluator address Type (Abstract.Pair Type ': effects) a
+        -> Evaluator address Type effects a
+runPair = interpret $ \case
+  Abstract.Pair a b -> pure (a :* b)
+  Abstract.AsPair v -> do
+    t1 <- fresh
+    t2 <- fresh
+    unify v (Var t1 :* Var t2) $> (Var t1, Var t2)
 
 
 instance AbstractHole Type where
