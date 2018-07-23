@@ -1,5 +1,12 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
-module Data.Abstract.Value.Concrete where
+module Data.Abstract.Value.Concrete
+  ( Value (..)
+  , ValueError (..)
+  , ClosureBody (..)
+  , runValueError
+  , runValueErrorWith
+  , throwValueError
+  ) where
 
 import Control.Abstract
 import Data.Abstract.Environment (Environment, Bindings)
@@ -144,6 +151,11 @@ instance ( Coercible body (Eff effects)
   ifthenelse cond if' else' = do
     bool <- case cond of { Boolean b -> pure b ; _ -> throwValueError (BoolError cond) }
     if bool then if' else else'
+
+  disjunction a b = do
+    a' <- a
+    ifthenelse a' (pure a') b
+
 
   index = go where
     tryIdx list ii

@@ -12,6 +12,7 @@ import Data.Term
 import Data.These
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
+import Diffing.Interpreter.Spec (afterTerm, beforeTerm)
 import Test.Hspec.LeanCheck
 import SpecHelpers
 

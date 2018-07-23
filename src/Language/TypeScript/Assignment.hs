@@ -35,6 +35,7 @@ import qualified Data.Term as Term
 import qualified Data.Diff as Diff
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
+import qualified Language.TypeScript.Resolution as TypeScript.Resolution
 import Prologue
 import Proto3.Suite (Named1(..), Named(..))
 
@@ -714,7 +715,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeNameAliasPair from Nothing = (from, from)
 
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
-    fromClause = symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source)
+    fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)
 
 debuggerStatement :: Assignment Term
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ rawSource)
@@ -752,8 +753,8 @@ enumAssignment :: Assignment Term
 enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statement.Assignment [] <$> term propertyName <*> term expression)
 
 interfaceDeclaration :: Assignment Term
-interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (term extendsClause <|> emptyTerm) <*> term objectType)
-  where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Declaration.InterfaceDeclaration [typeParams, clause] identifier objectType)
+interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> optional (term extendsClause) <*> term objectType)
+  where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Declaration.InterfaceDeclaration [typeParams] identifier (toList clause) objectType)
 
 ambientDeclaration :: Assignment Term
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
@@ -770,7 +771,7 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     makeNameAliasPair from Nothing = TypeScript.Syntax.Alias from from
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
-    fromClause = symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source)
+    fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)
 
 propertySignature :: Assignment Term
 propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
@@ -839,7 +840,7 @@ variableDeclarator =
     requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier') *> do
       s <- source
       guard (s == "require")
-      symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source))
+      symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source))
       )
 
 

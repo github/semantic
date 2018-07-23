@@ -293,6 +293,9 @@ instance ( Member (Allocator address Type) effects
     box (Var field)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
+  disjunction a b = do
+    a' <- a
+    unify a' Bool *> (pure a' <|> b)
 
   liftNumeric _ = unify (Int :+ Float :+ Rational)
   liftNumeric2 _ left right = case (left, right) of

@@ -1,5 +1,11 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Semantic.Parse where
+module Semantic.Parse
+  ( runParse
+  , runPythonParse
+  , runRubyParse
+  , runTypeScriptParse
+  , runJSONParse
+  ) where
 
 import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
