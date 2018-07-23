@@ -74,6 +74,9 @@ instance Effect (Unit value) where
 boolean' :: Member (Boolean value) effects => Bool -> Evaluator address value effects value
 boolean' = send . Boolean
 
+asBool' :: Member (Boolean value) effects => value -> Evaluator address value effects Bool
+asBool' = send . AsBool
+
 data Boolean value (m :: * -> *) result where
   Boolean :: Bool  -> Boolean value m value
   AsBool  :: value -> Boolean value m Bool
