@@ -7,6 +7,7 @@ module Data.Abstract.Value.Type
   , runTypesWith
   , unify
   , runUnit
+  , runBoolean
   ) where
 
 import qualified Control.Abstract as Abstract
@@ -219,6 +220,17 @@ instance Ord address => ValueRoots address Type where
 
 runUnit :: PureEffects effects => Evaluator address Type (Abstract.Unit Type ': effects) a -> Evaluator address Type effects a
 runUnit = interpret $ \ Abstract.Unit -> pure Unit
+
+runBoolean :: ( Member NonDet effects
+              , Member (Resumable TypeError) effects
+              , Member (State TypeMap) effects
+              , PureEffects effects
+              )
+           => Evaluator address Type (Abstract.Boolean Type ': effects) a
+           -> Evaluator address Type effects a
+runBoolean = interpret $ \case
+  Abstract.Boolean _ -> pure Bool
+  Abstract.AsBool  b -> unify b Bool *> (pure True <|> pure False)
 
 
 instance AbstractHole Type where
