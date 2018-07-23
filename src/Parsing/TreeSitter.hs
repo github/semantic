@@ -58,7 +58,7 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Trace effects, Effects effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
+parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Trace effects, PureEffects effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
 parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   let parserTimeout = s * 1000
 

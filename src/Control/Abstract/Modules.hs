@@ -68,9 +68,9 @@ instance Effect (Modules address) where
 sendModules :: Member (Modules address) effects => Modules address (Eff effects) return -> Evaluator address value effects return
 sendModules = send
 
-runModules :: ( Effects effects
-              , Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
+runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
               , Member (Resumable (LoadError address)) effects
+              , PureEffects effects
               )
            => Set ModulePath
            -> Evaluator address value (Modules address ': effects) a

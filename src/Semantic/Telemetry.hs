@@ -139,13 +139,13 @@ instance Effect Telemetry where
   handleState c dist (Request (WriteLog level message pairs) k) = Request (WriteLog level message pairs) (dist . (<$ c) . k)
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: (Member (Lift IO) effects, Effects effects) => LogQueue -> StatQueue -> Eff (Telemetry ': effects) a -> Eff effects a
+runTelemetry :: (Member (Lift IO) effects, PureEffects effects) => LogQueue -> StatQueue -> Eff (Telemetry ': effects) a -> Eff effects a
 runTelemetry logger statter = interpret (\ t -> case t of
   WriteStat stat -> queueStat statter stat
   WriteLog level message pairs -> queueLogMessage logger level message pairs)
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
-ignoreTelemetry :: Effects effs => Eff (Telemetry ': effs) a -> Eff effs a
+ignoreTelemetry :: PureEffects effs => Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
   WriteLog{}  -> pure ())
