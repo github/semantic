@@ -90,6 +90,9 @@ instance Effect (Boolean value) where
 pair' :: Member (Pair value) effects => value -> value -> Evaluator address value effects value
 pair' a b = send (Pair a b)
 
+asPair' :: Member (Pair value) effects => value -> Evaluator address value effects (value, value)
+asPair' = send . AsPair
+
 data Pair value (m :: * -> *) result where
   Pair   :: value -> value -> Pair value m value
   AsPair :: value          -> Pair value m (value, value)
