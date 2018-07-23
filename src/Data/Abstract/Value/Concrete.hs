@@ -5,6 +5,7 @@ module Data.Abstract.Value.Concrete
   , ClosureBody (..)
   , runUnit
   , runBoolean
+  , runPair
   , runValueError
   , runValueErrorWith
   , throwValueError
@@ -68,6 +69,12 @@ runBoolean = interpret $ \case
   Abstract.Boolean b -> pure (Boolean b)
   Abstract.AsBool (Boolean b) -> pure b
   Abstract.AsBool other       -> throwValueError (BoolError other)
+
+runPair :: (Member (Resumable (ValueError address body)) effects, PureEffects effects) => Evaluator address (Value address body) (Abstract.Pair (Value address body) ': effects) a -> Evaluator address (Value address body) effects a
+runPair = interpret $ \case
+  Abstract.Pair a b -> pure (KVPair a b)
+  Abstract.AsPair (KVPair a b) -> pure (a, b)
+  Abstract.AsPair other        -> throwValueError (KeyValueError other)
 
 
 instance AbstractHole (Value address body) where
