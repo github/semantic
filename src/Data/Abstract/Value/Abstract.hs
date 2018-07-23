@@ -1,12 +1,19 @@
-{-# LANGUAGE GADTs, UndecidableInstances #-}
-module Data.Abstract.Value.Abstract ( Abstract (..) ) where
+{-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
+module Data.Abstract.Value.Abstract
+( Abstract (..)
+, runUnit
+) where
 
-import Control.Abstract
+import Control.Abstract as Abstract
 import Data.Abstract.Environment as Env
 import Prologue
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
+
+
+runUnit :: PureEffects effects => Evaluator address Abstract (Unit Abstract ': effects) a -> Evaluator address Abstract effects a
+runUnit = interpret $ \ Unit -> pure Abstract
 
 
 instance Ord address => ValueRoots address Abstract where
