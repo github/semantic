@@ -1,0 +1,22 @@
+(Statements
+  (InterfaceDeclaration
+    (TypeParameters
+      (TypeParameter
+        (Identifier)
+        (Empty)
+        (Empty)))
+    (Identifier)
+    (ObjectType
+      (PropertySignature
+        (Empty)
+        (Empty)
+        (Annotation
+          (LiteralType
+            (TextElement)))
+        (Identifier))
+      (PropertySignature
+        (Empty)
+        (Readonly)
+        (Annotation
+          (TypeIdentifier))
+        (Identifier)))))
