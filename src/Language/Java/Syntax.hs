@@ -149,7 +149,7 @@ instance Show1 AnnotatedType where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for AnnotatedType
 instance Evaluatable AnnotatedType
 
-data CatchType a = CatchType { types :: [a] }
+newtype CatchType a = CatchType { types :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 CatchType where liftEq = genericLiftEq
