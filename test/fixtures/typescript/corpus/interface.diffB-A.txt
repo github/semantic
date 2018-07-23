@@ -5,7 +5,6 @@
       {+(Identifier)+}
       {+(Empty)+}
       {+(Empty)+})+})+}
-    (Empty)
   {-(Empty)-}
   { (Identifier)
   ->(Identifier) }
