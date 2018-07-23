@@ -1,0 +1,19 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (AccessibilityModifier)
+        (Empty)
+        (Identifier)
+        (Statements
+          (Call
+            (MemberAccess
+              (Identifier))
+            (New
+              (GenericType
+                (Identifier)
+                (Identifier))
+              (Statements))
+            (Empty)))))))
