@@ -44,11 +44,12 @@ data Resolution (m :: * -> *) output where
   NodeJSResolution :: FilePath -> Text -> [FilePath] -> Resolution m (Map FilePath FilePath)
   NoResolution     ::                                   Resolution m (Map FilePath FilePath)
 
+instance PureEffect Resolution
 instance Effect Resolution where
   handleState c dist (Request (NodeJSResolution path key paths) k) = Request (NodeJSResolution path key paths) (dist . (<$ c) . k)
   handleState c dist (Request NoResolution k) = Request NoResolution (dist . (<$ c) . k)
 
-runResolution :: (Member Files effs, Effects effs) => Eff (Resolution ': effs) a -> Eff effs a
+runResolution :: (Member Files effs, PureEffects effs) => Eff (Resolution ': effs) a -> Eff effs a
 runResolution = interpret $ \ res -> case res of
   NodeJSResolution dir prop excludeDirs -> nodeJSResolutionMap dir prop excludeDirs
   NoResolution                          -> pure Map.empty

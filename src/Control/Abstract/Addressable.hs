@@ -34,11 +34,11 @@ instance Member NonDet effects => Addressable Monovariant effects where
   derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
 
 -- | 'Located' addresses allocate & dereference using the underlying address, contextualizing addresses with the current 'PackageInfo' & 'ModuleInfo'.
-instance (Addressable address effects, Member (Reader ModuleInfo) effects, Member (Reader PackageInfo) effects) => Addressable (Located address) effects where
+instance (Addressable address effects, Member (Reader ModuleInfo) effects, Member (Reader PackageInfo) effects, Member (Reader Span) effects) => Addressable (Located address) effects where
   type Cell (Located address) = Cell address
 
-  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule)
-  derefCell (Located loc _ _) = relocate . derefCell loc
+  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule <*> pure name <*> ask)
+  derefCell (Located loc _ _ _ _) = relocate . derefCell loc
 
 instance (Addressable address effects, Ord context, Show context) => Addressable (Hole context address) effects where
   type Cell (Hole context address) = Cell address

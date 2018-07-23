@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables #-}
 module Semantic.Diff
   ( runDiff
+  , runPythonDiff
   , runRubyDiff
   , runTypeScriptDiff
   , runJSONDiff
@@ -27,6 +28,7 @@ import Serializing.Format
 import qualified Language.TypeScript.Assignment as TypeScript
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.JSON.Assignment as JSON
+import qualified Language.Python.Assignment as Python
 
 runDiff :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
@@ -49,6 +51,17 @@ runRubyDiff = flip distributeFor (\ (blobs :: BlobPair) -> do
 runTypeScriptDiff :: (Member Telemetry effs, Member (Lift IO) effs, Member Distribute effs, Member Task effs) => [BlobPair] -> Eff effs [Diff (Sum TypeScript.Syntax) () ()]
 runTypeScriptDiff = flip distributeFor (\ (blobs :: BlobPair) -> do
     terms <- distributeFor blobs (parse typescriptParser)
+    diffs <- diffTerms blobs terms
+    pure (bimap (const ()) (const ()) diffs))
+    where
+      diffTerms blobs terms = time "diff" languageTag $ do
+        diff <- diff (runJoin terms)
+        diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
+        where languageTag = languageTagForBlobPair blobs
+
+runPythonDiff :: (Member Telemetry effs, Member (Lift IO) effs, Member Distribute effs, Member Task effs) => [BlobPair] -> Eff effs [Diff (Sum Python.Syntax) () ()]
+runPythonDiff = flip distributeFor (\ (blobs :: BlobPair) -> do
+    terms <- distributeFor blobs (parse pythonParser)
     diffs <- diffTerms blobs terms
     pure (bimap (const ()) (const ()) diffs))
     where
