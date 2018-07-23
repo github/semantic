@@ -16,7 +16,7 @@ module Analysis.Abstract.Graph
 ) where
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract
+import           Control.Abstract hiding (Function(..))
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))

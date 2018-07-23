@@ -4,6 +4,7 @@ module Control.Abstract.Value
 , AbstractIntro(..)
 , AbstractFunction(..)
 , Comparator(..)
+, Function(..)
 , asBool
 , while
 , doWhile
@@ -45,6 +46,11 @@ class Show value => AbstractFunction address value effects where
           -> Evaluator address value effects value
   -- | Evaluate an application (like a function call).
   call :: value -> [Evaluator address value effects address] -> Evaluator address value effects address
+
+
+data Function address value m result where
+  Function :: [Name] -> Set Name -> m address -> Function address value m value
+  Call     :: value -> [address]              -> Function address value m address
 
 
 class Show value => AbstractIntro value where
