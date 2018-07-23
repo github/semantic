@@ -153,12 +153,17 @@ instance ( Coercible body (Eff effects)
     pure $ Class n supers binds
 
   namespace name super binds = do
-    maybeAddr <- lookupEnv name
-    binds' <- maybe (pure lowerBound) (asNamespaceBinds <=< deref) maybeAddr
-    pure (Namespace name super (binds' <> binds))
-    where asNamespaceBinds v
-            | Namespace _ _ binds' <- v = pure binds'
-            | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
+    maybeNs <- lookupEnv name >>= traverse deref
+    binds' <- maybe (pure lowerBound) asNamespaceBinds maybeNs
+    let super' = (maybeNs >>= asNamespaceSuper) <|> super
+    pure (Namespace name super' (binds <> binds'))
+    where
+      asNamespaceSuper = \case
+        Namespace _ super _ -> super
+        _ -> Nothing
+      asNamespaceBinds v
+        | Namespace _ _ binds' <- v = pure binds'
+        | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment = deref >=> materializeEnvironment
 
