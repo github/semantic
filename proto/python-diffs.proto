@@ -413,7 +413,7 @@ message Let {
 }
 
 message NoOp {
-  PythonDiff  = 1;
+  PythonDiff value = 1;
 }
 
 message Return {

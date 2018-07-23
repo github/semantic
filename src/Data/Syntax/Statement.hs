@@ -234,7 +234,7 @@ instance Show1 Retry where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Retry
 
 
-newtype NoOp a = NoOp a
+newtype NoOp a = NoOp { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 NoOp where liftEq = genericLiftEq

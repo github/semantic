@@ -395,7 +395,7 @@ message Let {
 }
 
 message NoOp {
-  PythonTerm  = 1;
+  PythonTerm value = 1;
 }
 
 message Return {
