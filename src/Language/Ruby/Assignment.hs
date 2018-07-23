@@ -257,24 +257,22 @@ literal =
   <|> makeTerm <$> symbol SymbolArray <*> children (Literal.Array <$> many expression)
   <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many expression)
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
-  <|> makeTerm <$> symbol BareString <*> (Literal.TextElement <$> source)
   <|> string
   <|> symbol'
   <|> makeTerm <$> symbol Character <*> (Literal.Character <$> source)
   <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
   <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
-  <|> makeTerm <$> symbol BareSymbol <*> (Literal.SymbolElement <$> source)
 
   where
     string :: Assignment Term
     string =
-          makeTerm <$> symbol String <*> (Literal.TextElement <$> source) -- NB. Order matters, this must be first.
-      <|> makeTerm <$> symbol String <*> children (Literal.String <$> some interpolation)
+          makeTerm <$> (symbol String <|> symbol BareString) <*> (Literal.TextElement <$> source) -- NB. Order matters, this must be first.
+      <|> makeTerm <$> (symbol String <|> symbol BareString) <*> children (Literal.String <$> some interpolation)
 
     symbol' :: Assignment Term
     symbol' =
-          makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.SymbolElement <$> source) -- NB. Order matters, this must be first.
-      <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> children (Literal.Symbol <$> some interpolation)
+          makeTerm <$> (symbol Symbol <|> symbol Symbol' <|> symbol BareSymbol) <*> (Literal.SymbolElement <$> source) -- NB. Order matters, this must be first.
+      <|> makeTerm <$> (symbol Symbol <|> symbol Symbol' <|> symbol BareSymbol) <*> children (Literal.Symbol <$> some interpolation)
 
 interpolation :: Assignment Term
 interpolation = makeTerm <$> symbol Interpolation <*> children (Literal.InterpolationElement <$> expression)
