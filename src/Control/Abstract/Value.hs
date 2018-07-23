@@ -211,7 +211,7 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
                     -> Evaluator address value effects a
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvironment scopedEnvTerm
-  env <- maybe getEnv pure scopedEnv
+  env <- maybeM getEnv scopedEnv
   withEnv env term
 
 
