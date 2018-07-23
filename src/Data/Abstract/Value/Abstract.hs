@@ -4,6 +4,7 @@ module Data.Abstract.Value.Abstract
 , runUnit
 , runBoolean
 , runPair
+, runFunction
 ) where
 
 import Control.Abstract as Abstract
@@ -26,6 +27,26 @@ runPair :: PureEffects effects => Evaluator address Abstract (Pair Abstract ': e
 runPair = interpret $ \case
   Pair _ _ -> pure Abstract
   AsPair _ -> pure (Abstract, Abstract)
+
+runFunction :: ( Member (Allocator address Abstract) effects
+               , Member (Env address) effects
+               , Member (Exc (Return address)) effects
+               , Member Fresh effects
+               , PureEffects effects
+               )
+            => Evaluator address Abstract (Function address Abstract ': effects) a
+            -> Evaluator address Abstract effects a
+runFunction = interpret $ \case
+  Function params _ body -> do
+    env <- foldr (\ name rest -> do
+      addr <- alloc name
+      assign addr Abstract
+      Env.insert name addr <$> rest) (pure lowerBound) params
+    addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
+    deref addr
+  Call _ params -> do
+    traverse_ deref params
+    box Abstract
 
 
 instance Ord address => ValueRoots address Abstract where
