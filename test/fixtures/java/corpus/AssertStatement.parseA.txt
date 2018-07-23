@@ -1,0 +1,22 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+          (ForEach
+            (Variable
+              (Identifier)
+              (Identifier))
+            (Call
+              (MemberAccess
+                (Identifier))
+              (Empty))
+            (Statements
+              (AssertStatement
+                (Equal
+                  (Identifier)
+                  (Null))))))))))
