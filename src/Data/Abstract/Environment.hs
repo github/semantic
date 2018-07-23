@@ -24,6 +24,7 @@ module Data.Abstract.Environment
 
 import           Data.Abstract.Live
 import           Data.Abstract.Name
+import qualified Data.Set as Set
 import qualified Data.Map as Map
 import           Prelude hiding (head, lookup)
 import           Prologue
@@ -120,9 +121,18 @@ intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
 names :: Bindings address -> [Name]
 names = fmap fst . pairs
 
+-- | Order preserving deduplication function. Removes all duplicates, not just consecutive duplicates ie 'nub'
+dedup :: Ord a => [a] -> [a]
+dedup = go Set.empty
+  where
+    go _ [] = []
+    go seen (x:xs)
+      | Set.member x seen = go seen xs
+      | otherwise = x : go (Set.insert x seen) xs
+
 -- | Get all bound 'Name's in an environment.
 allNames :: Environment address -> [Name]
-allNames = fmap fst . flatPairs
+allNames = dedup . fmap fst . flatPairs
 
 aliasBindings :: [(Name, Name)] -> Bindings address -> Bindings address
 aliasBindings pairs binds = unpairs $ mapMaybe lookupAndAlias pairs
