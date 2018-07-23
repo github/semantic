@@ -122,7 +122,7 @@ intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
 names :: Bindings address -> [Name]
 names = fmap fst . pairs
 
--- | Order preserving deduplication function. Removes all duplicates, not just consecutive duplicates ie 'nub'
+-- | Order preserving deduplication in O(n log n) time
 dedup :: Ord a => [a] -> [a]
 dedup = go Set.empty
   where
