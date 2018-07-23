@@ -1,7 +1,8 @@
-{-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runUnit
+, runBoolean
 ) where
 
 import Control.Abstract as Abstract
@@ -14,6 +15,11 @@ data Abstract = Abstract
 
 runUnit :: PureEffects effects => Evaluator address Abstract (Unit Abstract ': effects) a -> Evaluator address Abstract effects a
 runUnit = interpret $ \ Unit -> pure Abstract
+
+runBoolean :: (Member NonDet effects, PureEffects effects) => Evaluator address Abstract (Boolean Abstract ': effects) a -> Evaluator address Abstract effects a
+runBoolean = interpret $ \case
+  Boolean _ -> pure Abstract
+  AsBool  _ -> pure True <|> pure False
 
 
 instance Ord address => ValueRoots address Abstract where
