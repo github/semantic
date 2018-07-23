@@ -122,7 +122,7 @@ instance Declarations a => Declarations (VariableDeclaration a) where
 
 -- | A TypeScript/Java style interface declaration to implement.
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationSuperInterfaces :: ![a], interfaceDeclarationBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Mergeable, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
 instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
