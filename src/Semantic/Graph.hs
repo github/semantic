@@ -33,12 +33,12 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract
+import           Data.Abstract.Value.Concrete (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type
-import           Data.Abstract.Value.Concrete (Value,ValueError (..), runValueErrorWith)
 import           Data.Graph
+import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Project
 import           Data.Record
-import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text (pack)
 import           Language.Haskell.HsColour
@@ -67,18 +67,20 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraph lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: ( HasField ann Span
-                , Element Syntax.Identifier syntax
-                , Base term ~ TermF (Sum syntax) (Record ann)
-                , Ord term
-                , Corecursive term
-                , Declarations term
-                , Evaluatable (Base term)
+runCallGraph :: ( HasField fields Span
+                , Show (Record fields)
+                , Ord (Record fields)
+                , (VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax)
+                , Declarations1 syntax
+                , Ord1 syntax
+                , Functor syntax
+                , Evaluatable syntax
+                , term ~ Term syntax (Record fields)
                 , FreeVariables term
+                , Recursive term
                 , HasPrelude lang
                 , HasPostlude lang
                 , Member Trace effs
-                , Recursive term
                 , Effects effs
                 )
              => Proxy lang
@@ -104,6 +106,7 @@ runCallGraph lang includePackages modules package = do
         . resumingAddressError
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
+        . runReader (lowerBound @Vertex)
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment (Hole (Maybe Name) (Located Monovariant)), Hole (Maybe Name) (Located Monovariant))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
