@@ -238,7 +238,7 @@ instance Show1 Lambda where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Lambda
 
-newtype LambdaBody a = LambdaBody { lambdaBodyExpression :: ![a] }
+newtype LambdaBody a = LambdaBody { lambdaBodyExpression :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 LambdaBody where liftEq = genericLiftEq
