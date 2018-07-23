@@ -267,12 +267,14 @@ literal =
 
   where
     string :: Assignment Term
-    string = makeTerm <$> symbol String <*> children (Literal.String <$> (some interpolation <|> (pure <$> stringLiteral)))
-      where stringLiteral = makeTerm <$> location <*> (Literal.TextElement <$> source)
+    string =
+          makeTerm <$> symbol String <*> (Literal.TextElement <$> source) -- NB. Order matters, this must be first.
+      <|> makeTerm <$> symbol String <*> children (Literal.String <$> some interpolation)
 
     symbol' :: Assignment Term
-    symbol' = makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> children (Literal.Symbol <$> (some interpolation <|> (pure <$> symbolLiteral)))
-       where symbolLiteral = makeTerm <$> location <*> (Literal.SymbolElement <$> source)
+    symbol' =
+          makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.SymbolElement <$> source) -- NB. Order matters, this must be first.
+      <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> children (Literal.Symbol <$> some interpolation)
 
 interpolation :: Assignment Term
 interpolation = makeTerm <$> symbol Interpolation <*> children (Literal.InterpolationElement <$> expression)
