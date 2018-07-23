@@ -75,6 +75,16 @@ instance Effect (Boolean value) where
   handleState state handler (Request (AsBool v)  k) = Request (AsBool v)  (handler . (<$ state) . k)
 
 
+data Pair value (m :: * -> *) result where
+  Pair   :: value -> value -> Pair value m value
+  AsPair :: value          -> Pair value m (value, value)
+
+instance PureEffect (Pair value)
+instance Effect (Pair value) where
+  handleState state handler (Request (Pair a b) k) = Request (Pair a b) (handler . (<$ state) . k)
+  handleState state handler (Request (AsPair v) k) = Request (AsPair v) (handler . (<$ state) . k)
+
+
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
