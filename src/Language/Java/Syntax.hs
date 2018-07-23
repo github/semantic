@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Java.Syntax where
 
@@ -68,7 +68,7 @@ instance Show1 Synchronized where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Synchronized
 instance Evaluatable Synchronized
 
-data New a = New { newType :: !a, newArgs :: ![a] }
+data New a = New { newType :: !a, newArgs :: ![a], newClassBody :: Maybe a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Eq1 New where liftEq = genericLiftEq
@@ -139,6 +139,26 @@ instance Show1 GenericType where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for GenericType
 instance Evaluatable GenericType
 
+data AnnotatedType a = AnnotatedType { annotationes :: [a], annotatedType :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AnnotatedType where liftEq = genericLiftEq
+instance Ord1 AnnotatedType where liftCompare = genericLiftCompare
+instance Show1 AnnotatedType where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for AnnotatedType
+instance Evaluatable AnnotatedType
+
+newtype CatchType a = CatchType { types :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 CatchType where liftEq = genericLiftEq
+instance Ord1 CatchType where liftCompare = genericLiftCompare
+instance Show1 CatchType where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for CatchType
+instance Evaluatable CatchType
+
 data TypeWithModifiers a = TypeWithModifiers [a] a
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
 
@@ -178,3 +198,126 @@ instance Show1 SpreadParameter where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for SpreadParameter
 instance Evaluatable SpreadParameter
+
+newtype StaticInitializer a = StaticInitializer { staticInitializerBlock :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+
+instance Eq1 StaticInitializer where liftEq = genericLiftEq
+instance Ord1 StaticInitializer where liftCompare = genericLiftCompare
+instance Show1 StaticInitializer where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable StaticInitializer
+
+data MethodReference a = MethodReference { methodReferenceType :: !a, methodReferenceTypeArgs :: ![a], methodReferenceIdentifier :: !a}
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 MethodReference where liftEq = genericLiftEq
+instance Ord1 MethodReference where liftCompare = genericLiftCompare
+instance Show1 MethodReference where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeWithModifiers
+instance Evaluatable MethodReference
+
+data NewKeyword a = NewKeyword
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 NewKeyword where liftEq = genericLiftEq
+instance Ord1 NewKeyword where liftCompare = genericLiftCompare
+instance Show1 NewKeyword where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeWithModifiers
+instance Evaluatable NewKeyword
+
+data Lambda a = Lambda { lambdaParams :: ![a], lambdaBody :: !a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Lambda where liftEq = genericLiftEq
+instance Ord1 Lambda where liftCompare = genericLiftCompare
+instance Show1 Lambda where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Lambda
+
+newtype LambdaBody a = LambdaBody { lambdaBodyExpression :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 LambdaBody where liftEq = genericLiftEq
+instance Ord1 LambdaBody where liftCompare = genericLiftCompare
+instance Show1 LambdaBody where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable LambdaBody
+
+data ArrayCreationExpression a = ArrayCreationExpression { arrayCreationExpressionType :: !a, arrayCreationExpressionDims :: ![a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ArrayCreationExpression where liftEq = genericLiftEq
+instance Ord1 ArrayCreationExpression where liftCompare = genericLiftCompare
+instance Show1 ArrayCreationExpression where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ArrayCreationExpression
+
+data DimsExpr a = DimsExpr { dimsExprAnnotation :: ![a], dimsExprExpression :: ![a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DimsExpr where liftEq = genericLiftEq
+instance Ord1 DimsExpr where liftCompare = genericLiftCompare
+instance Show1 DimsExpr where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DimsExpr
+
+newtype ClassBody a = ClassBody { classBodyExpression :: [a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ClassBody where liftEq = genericLiftEq
+instance Ord1 ClassBody where liftCompare = genericLiftCompare
+instance Show1 ClassBody where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ClassBody
+
+newtype ClassLiteral a = ClassLiteral { classLiteralType :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 ClassLiteral where liftEq = genericLiftEq
+instance Ord1 ClassLiteral where liftCompare = genericLiftCompare
+instance Show1 ClassLiteral where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable ClassLiteral
+
+data TryWithResources a = TryWithResources { tryResources :: ![a], tryBody :: !a, tryCatch :: ![a] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 TryWithResources where liftEq = genericLiftEq
+instance Ord1 TryWithResources where liftCompare = genericLiftCompare
+instance Show1 TryWithResources where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TryWithResources
+instance Evaluatable TryWithResources
+
+data AssertStatement a = AssertStatement { assertLHS :: !a, assertRHS :: !(Maybe a) }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AssertStatement where liftEq = genericLiftEq
+instance Ord1 AssertStatement where liftCompare = genericLiftCompare
+instance Show1 AssertStatement where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for AssertStatement
+instance Evaluatable AssertStatement
+
+newtype DefaultValue a = DefaultValue { defaultValueElement :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 DefaultValue where liftEq = genericLiftEq
+instance Ord1 DefaultValue where liftCompare = genericLiftCompare
+instance Show1 DefaultValue where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultValue
+
+data AnnotationTypeElement a = AnnotationTypeElement { modifiers :: ![a], annotationType :: a, identifier :: !a, dims :: ![a], defaultValue :: !a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 AnnotationTypeElement where liftEq = genericLiftEq
+instance Ord1 AnnotationTypeElement where liftCompare = genericLiftCompare
+instance Show1 AnnotationTypeElement where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for AnnotationTypeElement
+instance Evaluatable AnnotationTypeElement
