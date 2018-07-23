@@ -45,7 +45,7 @@ spec config = parallel $ do
           heapLookupAll addr heap `shouldBe` Just [String "\"<bar>\""]
           Env.names env `shouldContain` [ "Bar", "Foo" ]
 
-          (derefQName heap ("Bar" :| []) env >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "foo", "inspect"])
+          (derefQName heap ("Bar" :| []) env >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
         other -> expectationFailure (show other)
 
     it "evaluates modules" $ do
