@@ -83,9 +83,7 @@ instance ( Coercible body (Eff effects)
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, param) rest -> do
-            addr <- param
-            Env.insert name addr <$> rest) (pure env) (zip names params)
+          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure env) (zip names params)
           locally (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> box =<< throwValueError (CallError op)
 

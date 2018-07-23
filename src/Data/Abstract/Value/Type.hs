@@ -250,7 +250,7 @@ instance ( Member (Allocator address Type) effects
 
   call op params = do
     tvar <- fresh
-    paramTypes <- traverse (>>= deref) params
+    paramTypes <- traverse deref params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
     unified <- op `unify` needed
     case unified of

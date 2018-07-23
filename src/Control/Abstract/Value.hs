@@ -48,7 +48,7 @@ class Show value => AbstractFunction address value effects where
           -> Evaluator address value effects address -- ^ The evaluator for the body of the closure.
           -> Evaluator address value effects value
   -- | Evaluate an application (like a function call).
-  call :: value -> [Evaluator address value effects address] -> Evaluator address value effects address
+  call :: value -> [address] -> Evaluator address value effects address
 
 
 function' :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
