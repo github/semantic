@@ -1,0 +1,18 @@
+(Statements
+  (Class
+    (AccessibilityModifier)
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+          (Statements
+            (Assignment
+              (Variable
+                (Identifier)
+              { (Identifier)
+              ->(Identifier) })
+            { (Boolean)
+            ->(Boolean) })))))))
