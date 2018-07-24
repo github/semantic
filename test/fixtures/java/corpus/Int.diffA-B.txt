@@ -1,0 +1,32 @@
+(Statements
+  (Class
+    (AccessibilityModifier)
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+          (Statements
+            (Assignment
+              (Variable
+                (Identifier)
+              { (Identifier)
+              ->(Identifier) })
+            { (Integer)
+            ->(Integer) }))
+        {+(Statements
+          {+(Assignment
+            {+(Variable
+              {+(Identifier)+}
+              {+(Identifier)+})+}
+            {+(Integer)+})+})+}
+        {+(Call
+          {+(MemberAccess
+            {+(MemberAccess
+              {+(Identifier)+})+})+}
+          {+(Plus
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(Empty)+})+})))))
