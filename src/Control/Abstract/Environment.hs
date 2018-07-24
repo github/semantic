@@ -2,8 +2,9 @@
 module Control.Abstract.Environment
 ( Environment
 , Exports
+, getCtx
+, putCtx
 , getEnv
-, putEnv
 , withEnv
 , export
 , lookupEnv
@@ -21,31 +22,41 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.Environment (Bindings, Environment)
+import Data.Abstract.Environment (Bindings, Environment, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports
 import Data.Abstract.Name
 import Prologue
 
--- | Retrieve the environment.
-getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
-getEnv = send GetEnv
+-- | Retrieve the current execution context
+getCtx :: Member (Env address) effects => Evaluator address value effects (EvalContext address)
+getCtx = send GetCtx
 
--- | Replace the environment. This is only for use in Analysis.Abstract.Caching.
-putEnv :: Member (Env address) effects => Environment address -> Evaluator address value effects ()
-putEnv = send . PutEnv
+-- | Retrieve the current environment
+getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
+getEnv = ctxEnvironment <$> getCtx
+
+-- | Replace the execution context. This is only for use in Analysis.Abstract.Caching.
+putCtx :: Member (Env address) effects => EvalContext address -> Evaluator address value effects ()
+putCtx = send . PutCtx
+
+withCtx :: Member (Env address) effects
+        => EvalContext address
+        -> Evaluator address value effects a
+        -> Evaluator address value effects a
+withCtx ctx comp = do
+  oldCtx <- getCtx
+  putCtx ctx
+  value <- comp
+  putCtx oldCtx
+  pure value
 
 -- | Replace the environment for a computation
 withEnv :: Member (Env address) effects
         => Environment address
         -> Evaluator address value effects a
         -> Evaluator address value effects a
-withEnv env comp = do
-  oldEnv <- getEnv
-  putEnv env
-  value <- comp
-  putEnv oldEnv
-  pure value
+withEnv env = withCtx (EvalContext env)
 
 -- | Add an export to the global export state.
 export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
@@ -79,8 +90,8 @@ data Env address m return where
   Bind   :: Name -> address -> Env address m ()
   Close  :: Set Name        -> Env address m (Environment address)
   Locally :: m a            -> Env address m a
-  GetEnv ::                    Env address m (Environment address)
-  PutEnv :: Environment address -> Env address m ()
+  GetCtx ::                    Env address m (EvalContext address)
+  PutCtx :: EvalContext address -> Env address m ()
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
 instance PureEffect (Env address)
@@ -89,8 +100,8 @@ instance Effect (Env address) where
   handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (dist . (<$ c) . k)
   handleState c dist (Request (Close names) k) = Request (Close names) (dist . (<$ c) . k)
   handleState c dist (Request (Locally action) k) = Request (Locally (dist (action <$ c))) (dist . fmap k)
-  handleState c dist (Request GetEnv k) = Request GetEnv (dist . (<$ c) . k)
-  handleState c dist (Request (PutEnv e) k) = Request (PutEnv e) (dist . (<$ c) . k)
+  handleState c dist (Request GetCtx k) = Request GetCtx (dist . (<$ c) . k)
+  handleState c dist (Request (PutCtx e) k) = Request (PutCtx e) (dist . (<$ c) . k)
   handleState c dist (Request (Export name alias addr) k) = Request (Export name alias addr) (dist . (<$ c) . k)
 
 -- | Runs a computation in the context of an existing environment.
@@ -99,7 +110,7 @@ runEnv :: Effects effects
        => Environment address
        -> Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects (Bindings address, a)
-runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound . runState (Env.push initial) . reinterpret2 handleEnv
+runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState (EvalContext (Env.push initial)) . reinterpret2 handleEnv
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
@@ -107,17 +118,17 @@ runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound 
           | Exports.null ports = (binds, a)
           | otherwise          = (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds, a)
 
-handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
+handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (EvalContext address) ': State (Exports address) ': effects) a
 handleEnv = \case
-  Lookup name -> Env.lookupEnv' name <$> get
-  Bind name addr -> modify (Env.insertEnv name addr)
-  Close names -> Env.intersect names <$> get
+  Lookup name -> Env.lookupEnv' name . ctxEnvironment <$> get
+  Bind name addr -> modify (EvalContext . Env.insertEnv name addr . ctxEnvironment)
+  Close names -> Env.intersect names . ctxEnvironment <$> get
   Locally action -> do
-    modify' (Env.push @address)
+    modify' (EvalContext . Env.push @address . ctxEnvironment)
     a <- reinterpret2 handleEnv (raiseEff action)
-    a <$ modify' (Env.pop @address)
-  GetEnv -> get
-  PutEnv e -> put e
+    a <$ modify' (EvalContext . Env.pop @address . ctxEnvironment)
+  GetCtx -> get
+  PutCtx e -> put e
   Export name alias addr -> modify (Exports.insert name alias addr)
 
 -- | Errors involving the environment.
