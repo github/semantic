@@ -167,7 +167,5 @@ evalRequire :: ( AbstractValue address value effects
             => M.ModulePath
             -> Name
             -> Evaluator address value effects value
-evalRequire modulePath alias = letrec' alias $ \addr -> do
-  importedEnv <- fst <$> require modulePath
-  bindAll importedEnv
-  unit <$ makeNamespace alias addr Nothing
+evalRequire modulePath alias = letrec' alias $ \addr ->
+  unit <$ makeNamespace alias addr Nothing (bindAll . fst =<< require modulePath)

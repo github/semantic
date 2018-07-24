@@ -108,7 +108,7 @@ runCallGraph lang includePackages modules package = do
         . runReader (lowerBound @Span)
         . runReader (lowerBound @Vertex)
         . providingLiveSet
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment (Hole (Maybe Name) (Located Monovariant)), Hole (Maybe Name) (Located Monovariant))))))
+        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
 
@@ -157,12 +157,13 @@ newtype ImportGraphEff term address outerEffects a = ImportGraphEff
   { runImportGraphEff :: Eff (  Exc (LoopControl address)
                              ': Exc (Return address)
                              ': Env address
+                             ': Deref address (Value address (ImportGraphEff term address outerEffects))
                              ': Allocator address (Value address (ImportGraphEff term address outerEffects))
                              ': Reader ModuleInfo
                              ': Reader Span
                              ': Reader PackageInfo
                              ': Modules address
-                             ': Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                             ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                              ': State (Graph ModuleInfo)
                              ': Resumable (ValueError address (ImportGraphEff term address outerEffects))
                              ': Resumable (AddressError address (Value address (ImportGraphEff term address outerEffects)))
