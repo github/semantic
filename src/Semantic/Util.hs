@@ -56,10 +56,11 @@ newtype UtilEff address a = UtilEff
   { runUtilEff :: Eff '[ Exc (LoopControl address)
                        , Exc (Return address)
                        , Env address
+                       , Deref address (Value address (UtilEff address))
                        , Allocator address (Value address (UtilEff address))
                        , Reader ModuleInfo
                        , Modules address
-                       , Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (ValueError address (UtilEff address))
@@ -125,7 +126,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = ei
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Precise, Precise)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (evaluate proxy id withTermSpans modules))))))
 
@@ -136,7 +137,7 @@ evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOpti
   modules <- topologicalSort <$> runImportGraph proxy package
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment Monovariant, Monovariant)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (evaluate proxy id withTermSpans modules)))))
 

@@ -26,8 +26,8 @@ spec config = parallel $ do
         Right (Just (Module _ (env, _) :| [])) -> do
           Env.names env `shouldBe` [ "b", "z" ]
 
-          (derefQName heap ("b" :| []) env >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
-          (derefQName heap ("z" :| []) env >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
+          (derefQName heap ("b" :| []) env >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
+          (derefQName heap ("z" :| []) env >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
         other -> expectationFailure (show other)
 
     it "side effect only imports" $ do

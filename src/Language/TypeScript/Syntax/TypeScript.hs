@@ -25,13 +25,13 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- fst <$> require modulePath
-    bindAll (renamed importedEnv)
+    importedBinds <- fst <$> require modulePath
+    bindAll (renamed importedBinds)
     rvalBox unit
     where
-      renamed importedEnv
-        | Prologue.null symbols = importedEnv
-        | otherwise = Env.overwrite (toTuple <$> symbols) importedEnv
+      renamed importedBinds
+        | Prologue.null symbols = importedBinds
+        | otherwise = Env.aliasBindings (toTuple <$> symbols) importedBinds
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -92,10 +92,10 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedEnv <- fst <$> require modulePath
+    importedBinds <- fst <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \Alias{..} -> do
-      let address = Env.lookup aliasValue importedEnv
+      let address = Env.lookup aliasValue importedBinds
       maybe (throwEvalError $ ExportError modulePath aliasValue) (export aliasValue aliasName . Just) address
     rvalBox unit
 
@@ -492,7 +492,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
-      value =<< (eval xs <* makeNamespace name addr Nothing))
+      makeNamespace name addr Nothing (void (eval xs)))
 
 
 data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
@@ -506,7 +506,7 @@ instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
-      value =<< (eval xs <* makeNamespace name addr Nothing))
+      makeNamespace name addr Nothing (void (eval xs)))
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier
