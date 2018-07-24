@@ -4,8 +4,8 @@ module Control.Abstract.Environment
 , Exports
 , getCtx
 , putCtx
+, withCtx
 , getEnv
-, withEnv
 , export
 , lookupEnv
 , bind
@@ -50,13 +50,6 @@ withCtx ctx comp = do
   value <- comp
   putCtx oldCtx
   pure value
-
--- | Replace the environment for a computation
-withEnv :: Member (Env address) effects
-        => Environment address
-        -> Evaluator address value effects a
-        -> Evaluator address value effects a
-withEnv env = withCtx (EvalContext env)
 
 -- | Add an export to the global export state.
 export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()

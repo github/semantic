@@ -10,7 +10,7 @@ module Data.Abstract.Value.Concrete
   ) where
 
 import Control.Abstract
-import Data.Abstract.Environment (Environment, Bindings)
+import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -87,8 +87,8 @@ instance ( Coercible body (Eff effects)
           bindings <- foldr (\ (name, param) rest -> do
             addr <- param
             Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-          let fnEnv = Env.push env
-          withEnv fnEnv (catchReturn (bindAll bindings *> raiseEff (coerce body)))
+          let fnCtx = EvalContext (Env.push env)
+          withCtx fnCtx (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> box =<< throwValueError (CallError op)
 
 
