@@ -93,8 +93,8 @@ convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   cache <- converge lowerBound (\ prevCache -> isolateCache $ do
-    TermEvaluator (putHeap (configurationHeap        c))
-    TermEvaluator (putEnv  (configurationEnvironment c))
+    TermEvaluator (putHeap (configurationHeap    c))
+    TermEvaluator (putCtx  (configurationContext c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
