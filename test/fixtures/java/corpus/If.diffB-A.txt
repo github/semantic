@@ -1,0 +1,14 @@
+(Statements
+  (If
+  { (Assignment
+    {-(Identifier)-}
+    {-(Integer)-})
+  ->(Identifier) }
+  { (Call
+    {-(MemberAccess
+      {-(MemberAccess
+        {-(Identifier)-})-})-}
+    {-(Identifier)-}
+    {-(Empty)-})
+  ->(Identifier) }
+    (Empty)))
