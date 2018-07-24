@@ -32,9 +32,9 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
-import           Data.Abstract.Value.Abstract
-import           Data.Abstract.Value.Concrete (Value, ValueError (..), runValueErrorWith)
-import           Data.Abstract.Value.Type
+import           Data.Abstract.Value.Abstract as Abstract
+import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runValueErrorWith)
+import           Data.Abstract.Value.Type as Type
 import           Data.Graph
 import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Project
