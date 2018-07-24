@@ -249,7 +249,7 @@ instance ( Member (Allocator address Type) effects
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
     (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll binds *> body)))
 
-  call op params = do
+  call op _ params = do
     tvar <- fresh
     paramTypes <- traverse (>>= deref) params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar

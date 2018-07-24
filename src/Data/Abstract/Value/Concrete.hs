@@ -78,7 +78,7 @@ instance ( Coercible body (Eff effects)
     i <- fresh
     Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) <$> close (foldr Set.delete freeVariables parameters)
 
-  call op params = do
+  call op self params = do
     case op of
       Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
@@ -87,7 +87,7 @@ instance ( Coercible body (Eff effects)
           bindings <- foldr (\ (name, param) rest -> do
             addr <- param
             Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-          let fnCtx = EvalContext () (Env.push env)
+          let fnCtx = EvalContext (Just self) (Env.push env)
           withCtx fnCtx (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> box =<< throwValueError (CallError op)
 
