@@ -7,7 +7,7 @@
   (Subscript
     (Send
       (Identifier))
-    (Symbol))
+    (SymbolElement))
   (Assignment
     (Subscript
       (Send
