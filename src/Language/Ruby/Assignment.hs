@@ -80,6 +80,7 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
+  , Expression.This
   , Expression.Member
   , Literal.Array
   , Literal.Complex
@@ -178,6 +179,7 @@ expressionChoices =
   , parseError
   , rescue
   , scopeResolution
+  , self
   , singletonClass
   , singletonMethod
   , subscript
@@ -217,7 +219,6 @@ identifier =
   <|> mk ClassVariable
   <|> mk GlobalVariable
   <|> mk Operator
-  <|> mk Self
   <|> mk Super
   <|> mk Setter
   <|> mk SplatArgument
@@ -236,6 +237,9 @@ identifier =
           if ident `elem` locals
             then pure identTerm
             else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
+
+self :: Assignment Term
+self = makeTerm <$> symbol Self <*> pure Expression.This
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment Term
