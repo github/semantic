@@ -58,6 +58,9 @@ newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings 
 data EvalContext address = EvalContext { ctxSelf :: Maybe address, ctxEnvironment :: Environment address }
   deriving (Eq, Ord, Show)
 
+instance Lower (EvalContext address) where
+  lowerBound = EvalContext Nothing lowerBound
+
 -- | Make and enter a new empty scope in the given environment.
 push :: Environment address -> Environment address
 push (Environment (a :| as)) = Environment (mempty :| a : as)
