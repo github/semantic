@@ -103,7 +103,7 @@ runEnv :: Effects effects
        => Environment address
        -> Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects (Bindings address, a)
-runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState (EvalContext (Env.push initial)) . reinterpret2 handleEnv
+runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState (EvalContext () (Env.push initial)) . reinterpret2 handleEnv
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
@@ -114,12 +114,12 @@ runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . r
 handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (EvalContext address) ': State (Exports address) ': effects) a
 handleEnv = \case
   Lookup name -> Env.lookupEnv' name . ctxEnvironment <$> get
-  Bind name addr -> modify (EvalContext . Env.insertEnv name addr . ctxEnvironment)
+  Bind name addr -> modify (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment))
   Close names -> Env.intersect names . ctxEnvironment <$> get
   Locally action -> do
-    modify' (EvalContext . Env.push @address . ctxEnvironment)
+    modify' (\EvalContext{..} -> EvalContext ctxSelf (Env.push @address ctxEnvironment))
     a <- reinterpret2 handleEnv (raiseEff action)
-    a <$ modify' (EvalContext . Env.pop @address . ctxEnvironment)
+    a <$ modify' (\EvalContext{..} -> EvalContext ctxSelf (Env.pop @address ctxEnvironment))
   GetCtx -> get
   PutCtx e -> put e
   Export name alias addr -> modify (Exports.insert name alias addr)

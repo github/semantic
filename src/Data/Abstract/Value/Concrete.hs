@@ -87,7 +87,7 @@ instance ( Coercible body (Eff effects)
           bindings <- foldr (\ (name, param) rest -> do
             addr <- param
             Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-          let fnCtx = EvalContext (Env.push env)
+          let fnCtx = EvalContext () (Env.push env)
           withCtx fnCtx (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> box =<< throwValueError (CallError op)
 
