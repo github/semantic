@@ -4,9 +4,16 @@ module Control.Abstract.Value
 , AbstractIntro(..)
 , AbstractFunction(..)
 , Comparator(..)
+, function'
+, call'
 , Function(..)
+, unit'
 , Unit(..)
+, boolean'
+, asBool'
 , Boolean(..)
+, pair'
+, asPair'
 , Pair(..)
 , asBool
 , while
