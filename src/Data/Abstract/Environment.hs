@@ -31,8 +31,8 @@ import           Prologue
 
 -- $setup
 -- >>> import Data.Abstract.Address
--- >>> let bright = push (insert (name "foo") (Precise 0) lowerBound)
--- >>> let shadowed = insert (name "foo") (Precise 1) bright
+-- >>> let bright = push (insertEnv (name "foo") (Precise 0) lowerBound)
+-- >>> let shadowed = insertEnv (name "foo") (Precise 1) bright
 
 -- | A map of names to values. Represents a single scope level of an environment chain.
 newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
@@ -89,7 +89,7 @@ lookup name = Map.lookup name . unBindings
 
 -- | Lookup a 'Name' in the environment.
 --
--- >>> lookup (name "foo") shadowed
+-- >>> lookupEnv' (name "foo") shadowed
 -- Just (Precise 1)
 lookupEnv' :: Name -> Environment address -> Maybe address
 lookupEnv' name = foldMapA (lookup name) . unEnvironment
