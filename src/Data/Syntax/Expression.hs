@@ -7,7 +7,7 @@ import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedF
 import Data.Fixed
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prologue hiding (index, Member)
+import Prologue hiding (index, Member, This)
 import Proto3.Suite.Class
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -501,4 +501,5 @@ data This a = This
 instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable This
+instance Evaluatable This where
+  eval This = Rval <$> (maybeM (box unit) =<< self)
