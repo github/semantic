@@ -1,0 +1,15 @@
+(Statements
+  (InterfaceDeclaration
+  { (Identifier)
+  ->(Identifier) }
+    (Statements
+    {-(Statements
+      {-(Assignment
+        {-(Variable
+          {-(Identifier)-}
+          {-(Identifier)-})-}
+        {-(Integer)-})-})-}))
+  (Context
+  { (Comment)
+  ->(Comment) }
+    (Empty)))
