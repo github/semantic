@@ -124,7 +124,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
           = runReader info
           . runAllocator
           . runDeref
-          . runEnv (newEnv preludeBinds)
+          . runEnv (EvalContext Nothing (newEnv preludeBinds))
           . runReturn
           . runLoopControl
 

@@ -44,7 +44,7 @@ class Show value => AbstractFunction address value effects where
           -> Evaluator address value effects address -- ^ The evaluator for the body of the closure.
           -> Evaluator address value effects value
   -- | Evaluate an application (like a function call).
-  call :: value -> [Evaluator address value effects address] -> Evaluator address value effects address
+  call :: value -> address -> [Evaluator address value effects address] -> Evaluator address value effects address
 
 
 class Show value => AbstractIntro value where
@@ -209,10 +209,10 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
                     => address
                     -> Evaluator address value effects a
                     -> Evaluator address value effects a
-evaluateInScopedEnv scopedEnvTerm term = do
-  scopedEnv <- scopedEnvironment scopedEnvTerm
+evaluateInScopedEnv receiver term = do
+  scopedEnv <- scopedEnvironment receiver
   env <- maybeM getEnv scopedEnv
-  withCtx (EvalContext () env) term
+  withCtx (EvalContext (Just receiver) env) term
 
 
 -- | Evaluates a 'Value' returning the referenced value

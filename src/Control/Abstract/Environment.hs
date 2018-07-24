@@ -12,6 +12,7 @@ module Control.Abstract.Environment
 , bindAll
 , locally
 , close
+, self
 -- * Effects
 , Env(..)
 , runEnv
@@ -75,6 +76,8 @@ locally = send . Locally @_ @_ @address . lowerEff
 close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
 close = send . Close
 
+self :: Member (Env address) effects => Evaluator address value effects (Maybe address)
+self = ctxSelf <$> getCtx
 
 -- Effects
 
@@ -100,10 +103,10 @@ instance Effect (Env address) where
 -- | Runs a computation in the context of an existing environment.
 --   New bindings created in the computation are returned.
 runEnv :: Effects effects
-       => Environment address
+       => EvalContext address
        -> Evaluator address value (Env address ': effects) a
        -> Evaluator address value effects (Bindings address, a)
-runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState (EvalContext () (Env.push initial)) . reinterpret2 handleEnv
+runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState initial . reinterpret2 handleEnv
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.

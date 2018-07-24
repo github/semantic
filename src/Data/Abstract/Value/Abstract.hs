@@ -42,7 +42,7 @@ instance ( Member (Allocator address Abstract) effects
     addr <- locally (bindAll binds *> catchReturn body)
     deref addr
 
-  call Abstract params = do
+  call Abstract _ params = do
     traverse_ (>>= deref) params
     box Abstract
 
