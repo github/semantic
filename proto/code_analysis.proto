@@ -6,6 +6,9 @@ import "ruby-terms.proto";
 import "ruby-diffs.proto";
 import "json-terms.proto";
 import "typescript-terms.proto";
+import "typescript-diffs.proto";
+import "python-terms.proto";
+import "python-diffs.proto";
 import "types.proto";
 import "error_details.proto";
 
@@ -48,6 +51,7 @@ message ParseTreeResponse {
     RubyResponse ruby = 1;
     JSONResponse json = 2;
     TypeScriptResponse typescript = 3;
+    PythonResponse python = 4;
   }
 }
 
@@ -61,6 +65,10 @@ message JSONResponse {
 
 message TypeScriptResponse {
   repeated typescript_terms.TypeScriptTerm terms = 1;
+}
+
+message PythonResponse {
+  repeated python_terms.PythonTerm terms = 1;
 }
 
 message SummarizeDiffRequest  {
@@ -79,11 +87,21 @@ message DiffTreeRequest  {
 message DiffTreeResponse {
   oneof response_type {
     RubyDiffResponse ruby = 1;
+    PythonDiffResponse python = 2;
+    TypeScriptDiffResponse typescript = 3;
   }
 }
 
 message RubyDiffResponse {
   repeated ruby_diffs.RubyDiff diffs = 1;
+}
+
+message PythonDiffResponse {
+  repeated python_diffs.PythonDiff diffs = 1;
+}
+
+message TypeScriptDiffResponse {
+  repeated typescript_diffs.TypeScriptDiff diffs = 1;
 }
 
 message CallGraphRequest {

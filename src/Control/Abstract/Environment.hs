@@ -83,6 +83,7 @@ data Env address m return where
   PutEnv :: Environment address -> Env address m ()
   Export :: Name -> Name -> Maybe address -> Env address m ()
 
+instance PureEffect (Env address)
 instance Effect (Env address) where
   handleState c dist (Request (Lookup name) k) = Request (Lookup name) (dist . (<$ c) . k)
   handleState c dist (Request (Bind name addr) k) = Request (Bind name addr) (dist . (<$ c) . k)

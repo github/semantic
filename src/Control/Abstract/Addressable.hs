@@ -48,11 +48,11 @@ instance Member NonDet effects => Derefable Monovariant effects where
 instance Addressable address effects => Addressable (Located address) effects where
   type Cell (Located address) = Cell address
 
-instance (Allocatable address effects, Member (Reader ModuleInfo) effects, Member (Reader PackageInfo) effects) => Allocatable (Located address) effects where
-  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule)
+instance (Allocatable address effects, Member (Reader ModuleInfo) effects, Member (Reader PackageInfo) effects, Member (Reader Span) effects) => Allocatable (Located address) effects where
+  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule <*> pure name <*> ask)
 
 instance Derefable address effects => Derefable (Located address) effects where
-  derefCell (Located loc _ _) = relocate . derefCell loc
+  derefCell (Located loc _ _ _ _) = relocate . derefCell loc
 
 instance (Addressable address effects, Ord context, Show context) => Addressable (Hole context address) effects where
   type Cell (Hole context address) = Cell address
