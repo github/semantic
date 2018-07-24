@@ -23,7 +23,7 @@ callGraphPythonProject paths = runTaskWithOptions defaultOptions $ do
   let lang = Language.Python
   blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
   package <- parsePackage pythonParser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
-  modules <- topologicalSort <$> runImportGraph proxy package
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package
 
 spec :: Spec
