@@ -57,10 +57,8 @@ defineNamespace :: ( AbstractValue address value effects
                 -> Evaluator address value effects a
                 -> Evaluator address value effects ()
 defineNamespace name scope = define name $ do
-  env <- locally $ do
-    void scope
-    Env.newEnv . Env.head <$> getEnv
-  namespace name env
+  binds <- Env.head <$> locally (scope >> getEnv)
+  namespace name Nothing binds
 
 lambda :: ( AbstractFunction address value effects
           , HasCallStack
@@ -77,6 +75,7 @@ lambda body = withCurrentCallStack callStack $ do
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
                 , Member (Allocator address value) effects
+                , Member (Deref address value) effects
                 , Member (Env address) effects
                 , Member Fresh effects
                 , Member (Reader ModuleInfo) effects
@@ -90,6 +89,7 @@ builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpa
 builtInExport :: ( AbstractValue address value effects
                  , HasCallStack
                  , Member (Allocator address value) effects
+                 , Member (Deref address value) effects
                  , Member (Env address) effects
                  , Member Fresh effects
                  , Member (Reader ModuleInfo) effects
