@@ -1,7 +1,7 @@
 (Statements
-{+(Symbol)+}
-{ (Symbol)
-->(Symbol) }
-{ (Symbol)
-->(Symbol) }
-{-(Symbol)-})
+{ (SymbolElement)
+->(SymbolElement) }
+{ (SymbolElement)
+->(SymbolElement) }
+{ (SymbolElement)
+->(SymbolElement) })

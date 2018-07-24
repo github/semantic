@@ -2,7 +2,7 @@
   (Boolean)
   (Boolean)
   (Null)
-  (Symbol)
+  (SymbolElement)
   (Integer)
   (Identifier)
   (Identifier)
