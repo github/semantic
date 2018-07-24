@@ -70,7 +70,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     rvalBox v
 
 
-evaluate :: ( AbstractValue address value inner
+evaluate :: ( AbstractValue address value moduleEffects
             , Addressable address (Reader ModuleInfo ': effects)
             , Declarations term
             , Effects effects
@@ -94,11 +94,11 @@ evaluate :: ( AbstractValue address value inner
             , Recursive term
             , Reducer value (Cell address value)
             , ValueRoots address value
-            , inner ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
+            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
             )
          => proxy lang
-         -> (SubtermAlgebra Module      term (TermEvaluator term address value inner address)            -> SubtermAlgebra Module      term (TermEvaluator term address value inner address))
-         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value inner (ValueRef address)))
+         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)            -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
+         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value moduleEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value moduleEffects (ValueRef address)))
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
 evaluate lang analyzeModule analyzeTerm modules = do
