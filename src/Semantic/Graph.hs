@@ -94,7 +94,7 @@ runCallGraph lang includePackages modules package = do
       extractGraph (graph, _) = simplify graph
       runGraphAnalysis
         = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
-        . graphing
+        . graphing @_ @_ @(Maybe Name) @Monovariant
         . caching
         . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) All Abstract))
         . runFresh 0

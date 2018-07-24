@@ -19,6 +19,7 @@ import Data.Diff (Diff)
 import Data.Sum
 import Language.Ruby.Assignment (Syntax)
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.Python.Syntax as Python
 import Data.Functor.Classes
 import qualified Data.Syntax.Expression as Expression
 

@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Assignment
 ( assignment
 , Syntax
@@ -6,10 +7,14 @@ module Language.Python.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (Name, name)
-import Data.Record
-import Data.Syntax
+import           Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
+import           Data.Abstract.Name (Name, name)
+import qualified Data.Diff as Diff
+import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Record
+import           Data.Sum
+import           Data.Syntax
     ( contextualize
     , emptyTerm
     , handleError
@@ -21,11 +26,6 @@ import Data.Syntax
     , parseError
     , postContextualize
     )
-import Language.Python.Grammar as Grammar
-import Language.Python.Syntax as Python.Syntax
-import qualified Assigning.Assignment as Assignment
-import qualified Data.List.NonEmpty as NonEmpty
-import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -35,7 +35,10 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Data.Text as T
-import Prologue
+import           Language.Python.Grammar as Grammar
+import           Language.Python.Syntax as Python.Syntax
+import           Prologue
+import           Proto3.Suite (Named (..), Named1 (..))
 
 
 -- | The type of Python syntax.
@@ -119,6 +122,15 @@ type Syntax =
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "PythonSyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "PythonTerm"
+
+instance Named (Diff.Diff (Sum Syntax) () ()) where
+  nameOf _ = "PythonDiff"
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.
 assignment :: Assignment Term
@@ -415,8 +427,8 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
     aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source) <|> symbol DottedName *> (name <$> source)
-    makeNameAliasPair from (Just alias) = (from, alias)
-    makeNameAliasPair from Nothing = (from, from)
+    makeNameAliasPair from (Just alias) = Python.Syntax.Alias from alias
+    makeNameAliasPair from Nothing = Python.Syntax.Alias from from
 
 assertStatement :: Assignment Term
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call [] <$> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)

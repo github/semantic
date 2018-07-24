@@ -1,12 +1,11 @@
 (Statements
   (InterfaceDeclaration
+  {+(Empty)+}
   {-(TypeParameters
     {-(TypeParameter
       {-(Identifier)-}
       {-(Empty)-}
       {-(Empty)-})-})-}
-    (Empty)
-  {+(Empty)+}
   { (Identifier)
   ->(Identifier) }
     (ObjectType

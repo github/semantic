@@ -163,9 +163,9 @@ data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
 
 runAllocator :: ( Allocatable address effects
-                , Effects effects
                 , Foldable (Cell address)
                 , Member (State (Heap address (Cell address) value)) effects
+                , PureEffects effects
                 , Reducer value (Cell address value)
                 , ValueRoots address value
                 )
@@ -177,7 +177,7 @@ runAllocator = interpret $ \ eff -> case eff of
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
 runDeref :: ( Derefable address effects
-            , Effects effects
+            , PureEffects effects
             , Member (Resumable (AddressError address value)) effects
             , Member (State (Heap address (Cell address) value)) effects
             )
@@ -186,10 +186,14 @@ runDeref :: ( Derefable address effects
 runDeref = interpret $ \ eff -> case eff of
   Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
 
+instance PureEffect (Allocator address value)
+
 instance Effect (Allocator address value) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
   handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (dist . (<$ c) . k)
   handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
+
+instance PureEffect (Deref address value)
 
 instance Effect (Deref address value) where
   handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
