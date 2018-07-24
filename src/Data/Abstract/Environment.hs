@@ -55,7 +55,7 @@ instance Lower (Bindings address) where
 newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings address) }
   deriving (Eq, Ord)
 
-data EvalContext address = EvalContext { ctxEnvironment :: Environment address }
+data EvalContext address = EvalContext { ctxSelf :: (), ctxEnvironment :: Environment address }
   deriving (Eq, Ord, Show)
 
 -- | Make and enter a new empty scope in the given environment.
