@@ -3,7 +3,9 @@
   {+(Send
     {+(Identifier)+}
     {+(TextElement)+}
-    {+(TextElement)+})+}
+    {+(Statements
+      {+(TextElement)+})+})+}
   {+(Identifier)+})+}
 {-(TextElement)-}
-{-(TextElement)-})
+{-(Statements
+  {-(TextElement)-})-})
