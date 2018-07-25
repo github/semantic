@@ -1,5 +1,11 @@
 (Statements
-{ (Symbol)
-->(Symbol) }
-{ (TextElement)
-->(TextElement) })
+  (Symbol
+    (InterpolationElement
+      (Send
+      { (Identifier)
+      ->(Identifier) })))
+  (String
+    (InterpolationElement
+      (Send
+      { (Identifier)
+      ->(Identifier) }))))
