@@ -3,6 +3,8 @@ module Semantic.Graph
 ( runGraph
 , runCallGraph
 , runImportGraph
+, runImportGraphToModules
+, runImportGraphToModuleInfos
 , GraphType(..)
 , Graph
 , Vertex
@@ -60,11 +62,11 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
-    fmap (Graph.moduleVertex . moduleInfo) <$> runImportGraph lang package
+    runImportGraphToModuleInfos lang package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
-    modules <- topologicalSort <$> runImportGraph lang package
+    modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
 runCallGraph :: ( HasField fields Span
@@ -94,7 +96,7 @@ runCallGraph lang includePackages modules package = do
       extractGraph (graph, _) = simplify graph
       runGraphAnalysis
         = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
-        . graphing
+        . graphing @_ @_ @(Maybe Name) @Monovariant
         . caching
         . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) All Abstract))
         . runFresh 0
@@ -108,13 +110,27 @@ runCallGraph lang includePackages modules package = do
         . runReader (lowerBound @Span)
         . runReader (lowerBound @Vertex)
         . providingLiveSet
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (Environment (Hole (Maybe Name) (Located Monovariant)), Hole (Maybe Name) (Located Monovariant))))))
+        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
 
+runImportGraphToModuleInfos :: forall effs lang term.
+                  ( Declarations term
+                  , Evaluatable (Base term)
+                  , FreeVariables term
+                  , HasPrelude lang
+                  , HasPostlude lang
+                  , Member Trace effs
+                  , Recursive term
+                  , Effects effs
+                  )
+               => Proxy lang
+               -> Package term
+               -> Eff effs (Graph Vertex)
+runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
+  where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-
-runImportGraph :: forall effs lang term.
+runImportGraphToModules :: forall effs lang term.
                   ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
@@ -127,14 +143,26 @@ runImportGraph :: forall effs lang term.
                => Proxy lang
                -> Package term
                -> Eff effs (Graph (Module term))
-runImportGraph lang (package :: Package term)
-  -- Optimization for the common (when debugging) case of one-and-only-one module.
-  | [m :| []] <- toList (packageModules package) = vertex m <$ trace ("single module, skipping import graph computation for " <> modulePath (moduleInfo m))
-  | otherwise =
+runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
+  where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
+
+runImportGraph :: forall effs lang term vertex.
+                  ( Declarations term
+                  , Evaluatable (Base term)
+                  , FreeVariables term
+                  , HasPrelude lang
+                  , HasPostlude lang
+                  , Member Trace effs
+                  , Recursive term
+                  , Effects effs
+                  )
+               => Proxy lang
+               -> Package term
+               -> (ModuleInfo -> Graph vertex)
+               -> Eff effs (Graph vertex)
+runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
-      extractGraph (_, (graph, _)) = do
-        info <- graph
-        maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
+      extractGraph (_, (graph, _)) = graph >>= f
       runImportGraphAnalysis
         = runState lowerBound
         . runFresh 0
@@ -157,12 +185,13 @@ newtype ImportGraphEff term address outerEffects a = ImportGraphEff
   { runImportGraphEff :: Eff (  Exc (LoopControl address)
                              ': Exc (Return address)
                              ': Env address
+                             ': Deref address (Value address (ImportGraphEff term address outerEffects))
                              ': Allocator address (Value address (ImportGraphEff term address outerEffects))
                              ': Reader ModuleInfo
                              ': Reader Span
                              ': Reader PackageInfo
                              ': Modules address
-                             ': Reader (ModuleTable (NonEmpty (Module (Environment address, address))))
+                             ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                              ': State (Graph ModuleInfo)
                              ': Resumable (ValueError address (ImportGraphEff term address outerEffects))
                              ': Resumable (AddressError address (Value address (ImportGraphEff term address outerEffects)))
