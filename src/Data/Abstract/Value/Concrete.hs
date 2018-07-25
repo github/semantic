@@ -126,7 +126,7 @@ instance ( Coercible body (Eff effects)
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) <$> close (foldr Set.delete freeVariables parameters)
+    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce body)) <$> close (foldr Set.delete freeVariables parameters)
 
   call op params = do
     case op of
@@ -136,7 +136,7 @@ instance ( Coercible body (Eff effects)
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
           let fnEnv = Env.push env
-          withEnv fnEnv (catchReturn (bindAll bindings *> raiseEff (coerce body)))
+          withEnv fnEnv (catchReturn (bindAll bindings *> coerce body))
       _ -> box =<< throwValueError (CallError op)
 
 
