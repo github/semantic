@@ -176,32 +176,32 @@ runImportGraph lang (package :: Package term) f =
         . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff term (Hole (Maybe Name) Precise) effs))
+        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
   in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
-newtype ImportGraphEff term address outerEffects a = ImportGraphEff
+newtype ImportGraphEff address outerEffects a = ImportGraphEff
   { runImportGraphEff :: Eff (  Exc (LoopControl address)
                              ': Exc (Return address)
                              ': Env address
-                             ': Deref address (Value address (ImportGraphEff term address outerEffects))
-                             ': Allocator address (Value address (ImportGraphEff term address outerEffects))
+                             ': Deref address (Value address (ImportGraphEff address outerEffects))
+                             ': Allocator address (Value address (ImportGraphEff address outerEffects))
                              ': Reader ModuleInfo
                              ': Reader Span
                              ': Reader PackageInfo
                              ': Modules address
                              ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                              ': State (Graph ModuleInfo)
-                             ': Resumable (ValueError address (ImportGraphEff term address outerEffects))
-                             ': Resumable (AddressError address (Value address (ImportGraphEff term address outerEffects)))
+                             ': Resumable (ValueError address (ImportGraphEff address outerEffects))
+                             ': Resumable (AddressError address (Value address (ImportGraphEff address outerEffects)))
                              ': Resumable ResolutionError
                              ': Resumable EvalError
                              ': Resumable (EnvironmentError address)
-                             ': Resumable (Unspecialized (Value address (ImportGraphEff term address outerEffects)))
+                             ': Resumable (Unspecialized (Value address (ImportGraphEff address outerEffects)))
                              ': Resumable (LoadError address)
                              ': Fresh
-                             ': State (Heap address Latest (Value address (ImportGraphEff term address outerEffects)))
+                             ': State (Heap address Latest (Value address (ImportGraphEff address outerEffects)))
                              ': outerEffects
                              ) a
   }
