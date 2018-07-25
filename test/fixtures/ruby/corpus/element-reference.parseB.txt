@@ -6,4 +6,4 @@
   (Subscript
     (Send
       (Identifier))
-    (Symbol)))
+    (SymbolElement)))

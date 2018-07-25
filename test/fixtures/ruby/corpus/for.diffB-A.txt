@@ -7,33 +7,34 @@
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+})+}
+{+(ForEach
+  {+(Statements
+    {+(Send
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+})+})+}
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+})+}
   (ForEach
     (Statements
       (Send
       { (Identifier)
-      ->(Identifier) })
-    {+(Send
-      {+(Identifier)+})+})
+      ->(Identifier) }))
   { (Array
     {-(Integer)-}
     {-(Integer)-}
     {-(Integer)-})
-  ->(Send
-    {+(Identifier)+}) }
-    (Send
-    { (Identifier)
-    ->(Identifier) }
+  ->(Enumeration
+    {+(Integer)+}
+    {+(Integer)+}
+    {+(Empty)+}) }
+  { (Send
+    {-(Identifier)-}
     {-(Send
-      {-(Identifier)-})-}))
-{+(ForEach
-  {+(Statements
-    {+(Send
-      {+(Identifier)+})+})+}
-  {+(Enumeration
-    {+(Integer)+}
-    {+(Integer)+}
-    {+(Empty)+})+}
-  {+(Boolean)+})+}
+      {-(Identifier)-})-})
+  ->(Boolean) })
 {+(ForEach
   {+(Statements
     {+(Send

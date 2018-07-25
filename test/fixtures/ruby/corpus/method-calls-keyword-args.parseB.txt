@@ -2,8 +2,8 @@
   (Send
     (Identifier)
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Boolean))
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Integer))))

@@ -3,10 +3,11 @@ module Data.Graph.Vertex
 ( Vertex (..)
 , packageVertex
 , moduleVertex
+, unknownModuleVertex
 , variableVertex
 , methodVertex
 , functionVertex
-, vertexName
+, vertexIdentifier
 , showSpan
 , VertexDeclaration (..)
 , VertexDeclaration' (..)
@@ -30,11 +31,12 @@ import           Prologue hiding (packageName)
 
 -- | A vertex of some specific type.
 data Vertex
-  = Package  { packageName :: Text }
-  | Module   { moduleName :: Text }
-  | Variable { variableName :: Text, variableModuleName :: Text, variableSpan :: Span }
-  | Method   { methodName :: Text, methodModuleName :: Text, methodSpan :: Span }
-  | Function { functionName :: Text, functionModuleName :: Text, functionSpan :: Span }
+  = Package       { vertexName :: Text }
+  | Module        { vertexName :: Text }
+  | UnknownModule { vertexName :: Text }
+  | Variable      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
+  | Method        { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
+  | Function      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
   deriving (Eq, Ord, Show, Generic, Hashable)
 
 packageVertex :: PackageInfo -> Vertex
@@ -42,6 +44,9 @@ packageVertex (PackageInfo name _) = Package (formatName name)
 
 moduleVertex :: ModuleInfo -> Vertex
 moduleVertex = Module . T.pack . modulePath
+
+unknownModuleVertex :: ModuleInfo -> Vertex
+unknownModuleVertex = UnknownModule . T.pack . modulePath
 
 variableVertex :: Text -> ModuleInfo -> Span -> Vertex
 variableVertex name ModuleInfo{..} = Variable name (T.pack modulePath)
@@ -53,14 +58,13 @@ functionVertex :: Text -> ModuleInfo -> Span -> Vertex
 functionVertex name ModuleInfo{..} = Function name (T.pack modulePath)
 
 instance ToJSON Vertex where
-  toJSON v = object [ "name" .= vertexName v, "type" .= vertexToType v ]
+  toJSON v = object [ "name" .= vertexIdentifier v, "type" .= vertexToType v ]
 
-vertexName :: Vertex -> Text
-vertexName Package{..} = packageName <> " (Package)"
-vertexName Module{..} = moduleName <> " (Module)"
-vertexName Variable{..} = variableModuleName <> "::" <> variableName <> " (Variable)"
-vertexName Method{..} = methodModuleName <> "::" <> methodName <> " (Method)"
-vertexName Function{..} = functionModuleName <> "::" <> functionName <> " (Function)"
+vertexIdentifier :: Vertex -> Text
+vertexIdentifier v@Package{..}  = vertexName <> " (" <> vertexToType v <> ")"
+vertexIdentifier v@Module{..}   = vertexName <> " (" <> vertexToType v <> ")"
+vertexIdentifier v@UnknownModule{..}   = vertexName <> " (" <> vertexToType v <> ")"
+vertexIdentifier v = vertexModuleName v <> "::" <> vertexName v <> " (" <> vertexToType v <> " " <> showSpan (vertexSpan v) <>  ")"
 
 showSpan :: Span -> Text
 showSpan (Span (Pos a b) (Pos c d)) = T.pack $
@@ -69,11 +73,12 @@ showSpan (Span (Pos a b) (Pos c d)) = T.pack $
   <> "[" <> show c <> ", " <> show d <> "]"
 
 vertexToType :: Vertex -> Text
-vertexToType Package{}  = "package"
-vertexToType Module{}   = "module"
-vertexToType Variable{} = "variable"
-vertexToType Method{}   = "method"
-vertexToType Function{} = "function"
+vertexToType Package{}       = "Package"
+vertexToType Module{}        = "Module"
+vertexToType UnknownModule{} = "Unknown Module"
+vertexToType Variable{}      = "Variable"
+vertexToType Method{}        = "Method"
+vertexToType Function{}      = "Function"
 
 instance Lower Vertex where
   lowerBound = Package ""

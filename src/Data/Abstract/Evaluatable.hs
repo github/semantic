@@ -49,6 +49,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Declarations term
           , FreeVariables term
           , Member (Allocator address value) effects
+          , Member (Deref address value) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
@@ -71,7 +72,8 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 
 evaluate :: ( AbstractValue address value moduleEffects
-            , Addressable address (Reader ModuleInfo ': effects)
+            , Allocatable address (Reader ModuleInfo ': effects)
+            , Derefable address (Allocator address value ': Reader ModuleInfo ': effects)
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
@@ -81,7 +83,7 @@ evaluate :: ( AbstractValue address value moduleEffects
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
-            , Member (Reader (ModuleTable (NonEmpty (Module (Environment address, address))))) effects
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (AddressError address value)) effects
@@ -94,21 +96,21 @@ evaluate :: ( AbstractValue address value moduleEffects
             , Recursive term
             , Reducer value (Cell address value)
             , ValueRoots address value
-            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Allocator address value ': Reader ModuleInfo ': effects)
+            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)            -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value moduleEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value moduleEffects (ValueRef address)))
          -> [Module term]
-         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (Environment address, address))))
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm modules = do
-  (preludeEnv, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
+  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
     definePrelude lang
     box unit
-  foldr (run preludeEnv) ask modules
-  where run preludeEnv m rest = do
+  foldr (run preludeBinds) ask modules
+  where run preludeBinds m rest = do
           evaluated <- coerce
-            (runInModule preludeEnv (moduleInfo m))
+            (runInModule preludeBinds (moduleInfo m))
             (analyzeModule (subtermRef . moduleBody)
             (evalModuleBody <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
@@ -118,10 +120,11 @@ evaluate lang analyzeModule analyzeTerm modules = do
           result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
           result <$ TermEvaluator (postlude lang))
 
-        runInModule preludeEnv info
+        runInModule preludeBinds info
           = runReader info
           . runAllocator
-          . runEnv preludeEnv
+          . runDeref
+          . runEnv (newEnv preludeBinds)
           . runReturn
           . runLoopControl
 
@@ -136,6 +139,7 @@ class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator address value) effects
+                   , Member (Deref address value) effects
                    , Member (Env address) effects
                    , Member Fresh effects
                    , Member (Reader ModuleInfo) effects
@@ -179,6 +183,7 @@ class HasPostlude (language :: Language) where
   postlude :: ( AbstractValue address value effects
               , HasCallStack
               , Member (Allocator address value) effects
+              , Member (Deref address value) effects
               , Member (Env address) effects
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects

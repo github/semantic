@@ -6,10 +6,10 @@
     (Send
       (Identifier))
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Integer))
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Boolean)))
   (Send
     (Send

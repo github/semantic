@@ -7,6 +7,7 @@ module Data.Abstract.Value.Concrete
   , runUnit
   , runBoolean
   , runPair
+  , materializeEnvironment
   , runValueError
   , runValueErrorWith
   , throwValueError
@@ -37,7 +38,7 @@ data Value address body
   | Tuple [address]
   | Array [address]
   | Class Name [address] (Bindings address)
-  | Namespace Name (Environment address)
+  | Namespace Name (Maybe address) (Bindings address)
   | KVPair (Value address body) (Value address body)
   | Hash [Value address body]
   | Null
@@ -101,8 +102,9 @@ runFunction = interpret $ \case
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure env) (zip names params)
-          locally (catchReturn (bindAll bindings *> Evaluator (coerce body)))
+          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
+          let fnEnv = Env.push env
+          withEnv fnEnv (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> throwValueError (CallError op) >>= box
 
 
@@ -132,8 +134,9 @@ instance ( Coercible body (Eff effects)
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure env) (zip names params)
-          locally (catchReturn (bindAll bindings *> raiseEff (coerce body)))
+          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
+          let fnEnv = Env.push env
+          withEnv fnEnv (catchReturn (bindAll bindings *> raiseEff (coerce body)))
       _ -> box =<< throwValueError (CallError op)
 
 
@@ -151,10 +154,32 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
+materializeEnvironment :: ( Member (Deref address (Value address body)) effects
+                          )
+                       => Value address body
+                       -> Evaluator address (Value address body) effects (Maybe (Environment address))
+materializeEnvironment val = do
+  ancestors <- rec val
+  pure (Env.Environment <$> nonEmpty ancestors)
+    where
+      rec val = do
+        supers <- concat <$> traverse (deref >=> rec) (parents val)
+        pure . maybe [] (: supers) $ bindsFrom val
+
+      bindsFrom = \case
+        Class _ _ binds -> Just binds
+        Namespace _ _ binds -> Just binds
+        _ -> Nothing
+
+      parents = \case
+        Class _ supers _ -> supers
+        Namespace _ supers _ -> toList supers
+        _ -> []
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Member (Allocator address (Value address body)) effects
+         , Member (Deref address (Value address body)) effects
          , Member (Env address) effects
          , Member (Exc (LoopControl address)) effects
          , Member (Exc (Return address)) effects
@@ -175,21 +200,20 @@ instance ( Coercible body (Eff effects)
   klass n supers binds = do
     pure $ Class n supers binds
 
-  namespace name env = do
-    maybeAddr <- lookupEnv name
-    env' <- maybe (pure lowerBound) (asNamespaceEnv <=< deref) maybeAddr
-    pure (Namespace name (Env.mergeNewer env' env))
-    where asNamespaceEnv v
-            | Namespace _ env' <- v = pure env'
-            | otherwise             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
+  namespace name super binds = do
+    maybeNs <- lookupEnv name >>= traverse deref
+    binds' <- maybe (pure lowerBound) asNamespaceBinds maybeNs
+    let super' = (maybeNs >>= asNamespaceSuper) <|> super
+    pure (Namespace name super' (binds <> binds'))
+    where
+      asNamespaceSuper = \case
+        Namespace _ super _ -> super
+        _ -> Nothing
+      asNamespaceBinds v
+        | Namespace _ _ binds' <- v = pure binds'
+        | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
-  scopedEnvironment ptr = do
-    ancestors <- ancestorBinds [ptr]
-    pure (Env.Environment <$> nonEmpty ancestors)
-      where ancestorBinds = (pure . concat) <=< traverse (deref >=> \case
-                Class _ supers binds -> (binds :) <$> ancestorBinds (reverse supers)
-                Namespace _ env -> pure . toList . Env.unEnvironment $ env
-                _ -> pure [])
+  scopedEnvironment = deref >=> materializeEnvironment
 
   asString v
     | String n <- v = pure n
@@ -285,7 +309,7 @@ data ValueError address body resume where
   StringError            :: Value address body                       -> ValueError address body Text
   BoolError              :: Value address body                       -> ValueError address body Bool
   IndexError             :: Value address body -> Value address body -> ValueError address body (Value address body)
-  NamespaceError         :: Prelude.String                           -> ValueError address body (Environment address)
+  NamespaceError         :: Prelude.String                           -> ValueError address body (Bindings address)
   CallError              :: Value address body                       -> ValueError address body (Value address body)
   NumericError           :: Value address body                       -> ValueError address body (Value address body)
   Numeric2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)

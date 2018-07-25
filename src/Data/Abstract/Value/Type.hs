@@ -249,6 +249,7 @@ runPair = interpret $ \case
     unify v (Var t1 :* Var t2) $> (Var t1, Var t2)
 
 runFunction :: ( Member (Allocator address Type) effects
+               , Member (Deref address Type) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
@@ -294,6 +295,7 @@ instance AbstractIntro Type where
 
 
 instance ( Member (Allocator address Type) effects
+         , Member (Deref address Type) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member Fresh effects
@@ -302,12 +304,12 @@ instance ( Member (Allocator address Type) effects
          )
       => AbstractFunction address Type effects where
   function names _ body = do
-    (env, tvars) <- foldr (\ name rest -> do
+    (binds, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
-    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll env *> body)))
+    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll binds *> body)))
 
   call op params = do
     tvar <- fresh
@@ -321,6 +323,7 @@ instance ( Member (Allocator address Type) effects
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address Type) effects
+         , Member (Deref address Type) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member Fresh effects
@@ -336,8 +339,8 @@ instance ( Member (Allocator address Type) effects
 
   tuple fields = zeroOrMoreProduct <$> traverse deref fields
 
-  klass _ _ _   = pure Object
-  namespace _ _ = pure Unit
+  klass _ _ _     = pure Object
+  namespace _ _ _ = pure Unit
 
   scopedEnvironment _ = pure (Just lowerBound)
 

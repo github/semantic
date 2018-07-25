@@ -25,6 +25,8 @@ enum VertexType {
   PACKAGE = 0;
   MODULE = 1;
   VARIABLE = 2;
+  METHOD = 3;
+  FUNCTION = 4;
 }
 
 message BlobPair {

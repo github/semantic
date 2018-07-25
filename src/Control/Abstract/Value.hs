@@ -209,7 +209,8 @@ class (AbstractFunction address value effects, AbstractIntro value) => AbstractV
   --
   -- Namespaces model closures with monoidal environments.
   namespace :: Name                 -- ^ The namespace's identifier
-            -> Environment address -- ^ The environment to mappend
+            -> Maybe address        -- The ancestor of the namespace
+            -> Bindings address     -- ^ The environment to mappend
             -> Evaluator address value effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
@@ -262,12 +263,11 @@ makeNamespace :: ( AbstractValue address value effects
               => Name
               -> address
               -> Maybe address
+              -> Evaluator address value effects ()
               -> Evaluator address value effects value
-makeNamespace name addr super = do
-  superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
-  let env' = fromMaybe lowerBound superEnv
-  namespaceEnv <- newEnv . Env.head <$> getEnv
-  v <- namespace name (Env.mergeNewer env' namespaceEnv)
+makeNamespace name addr super body = do
+  namespaceBinds <- Env.head <$> locally (body >> getEnv)
+  v <- namespace name super namespaceBinds
   v <$ assign addr v
 
 
@@ -280,12 +280,13 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
                     -> Evaluator address value effects a
 evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvironment scopedEnvTerm
-  maybe term (\ env -> locally (bindAll env *> term)) scopedEnv
+  env <- maybeM getEnv scopedEnv
+  withEnv env term
 
 
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
-         , Member (Allocator address value) effects
+         , Member (Deref address value) effects
          , Member (Env address) effects
          , Member (Resumable (EnvironmentError address)) effects
          )
@@ -295,7 +296,7 @@ value = deref <=< address
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
-                , Member (Allocator address value) effects
+                , Member (Deref address value) effects
                 , Member (Env address) effects
                 , Member (Resumable (EnvironmentError address)) effects
                 )

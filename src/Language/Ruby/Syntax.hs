@@ -79,7 +79,7 @@ doRequire :: ( AbstractValue address value effects
              , Member (Modules address) effects
              )
           => M.ModulePath
-          -> Evaluator address value effects (Environment address, value)
+          -> Evaluator address value effects (Bindings address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
@@ -136,7 +136,7 @@ instance Evaluatable Class where
     super <- traverse subtermAddress classSuperClass
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
     rvalBox =<< letrec' name (\addr ->
-      subtermValue classBody <* makeNamespace name addr super)
+      makeNamespace name addr super (void (subtermAddress classBody)))
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -149,7 +149,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
     rvalBox =<< letrec' name (\addr ->
-      value =<< (eval xs <* makeNamespace name addr Nothing))
+      makeNamespace name addr Nothing (void (eval xs)))
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
