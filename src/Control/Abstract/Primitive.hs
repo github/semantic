@@ -60,9 +60,9 @@ defineNamespace name scope = define name $ do
   binds <- Env.head <$> locally (scope >> getEnv)
   namespace name Nothing binds
 
-lambda :: ( AbstractFunction address value effects
-          , HasCallStack
+lambda :: ( HasCallStack
           , Member Fresh effects
+          , Member (Function address value) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           )
@@ -70,7 +70,7 @@ lambda :: ( AbstractFunction address value effects
        -> Evaluator address value effects value
 lambda body = withCurrentCallStack callStack $ do
   var <- gensym
-  function [var] lowerBound (body var)
+  function' [var] lowerBound (body var)
 
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
@@ -78,6 +78,7 @@ builtInPrint :: ( AbstractValue address value effects
                 , Member (Deref address value) effects
                 , Member (Env address) effects
                 , Member Fresh effects
+                , Member (Function address value) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
                 , Member (Resumable (EnvironmentError address)) effects
@@ -92,6 +93,7 @@ builtInExport :: ( AbstractValue address value effects
                  , Member (Deref address value) effects
                  , Member (Env address) effects
                  , Member Fresh effects
+                 , Member (Function address value) effects
                  , Member (Reader ModuleInfo) effects
                  , Member (Reader Span) effects
                  , Member (Resumable (EnvironmentError address)) effects

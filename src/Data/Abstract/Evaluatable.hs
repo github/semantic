@@ -71,7 +71,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     rvalBox v
 
 
-evaluate :: ( AbstractValue address value moduleEffects
+evaluate :: ( AbstractValue address value valueEffects
             , Allocatable address (Reader ModuleInfo ': effects)
             , Derefable address (Allocator address value ': Reader ModuleInfo ': effects)
             , Declarations term
@@ -97,14 +97,16 @@ evaluate :: ( AbstractValue address value moduleEffects
             , Reducer value (Cell address value)
             , ValueRoots address value
             , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
+            , valueEffects ~ (Function address value ': moduleEffects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)            -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
-         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value moduleEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value moduleEffects (ValueRef address)))
+         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
+         -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule analyzeTerm modules = do
-  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack $ do
+evaluate lang analyzeModule analyzeTerm runValue modules = do
+  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
   foldr (run preludeBinds) ask modules
@@ -116,9 +118,9 @@ evaluate lang analyzeModule analyzeTerm modules = do
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModuleBody term = Subterm term (do
+        evalModuleBody term = Subterm term (coerce runValue (do
           result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
-          result <$ TermEvaluator (postlude lang))
+          result <$ TermEvaluator (postlude lang)))
 
         runInModule preludeBinds info
           = runReader info
@@ -142,6 +144,7 @@ class HasPrelude (language :: Language) where
                    , Member (Deref address value) effects
                    , Member (Env address) effects
                    , Member Fresh effects
+                   , Member (Function address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
                    , Member (Resumable (EnvironmentError address)) effects
