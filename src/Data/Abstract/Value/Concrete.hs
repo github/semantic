@@ -112,35 +112,6 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
 instance AbstractHole (Value address body) where
   hole = Hole
 
-instance ( Coercible body (Eff effects)
-         , Member (Allocator address (Value address body)) effects
-         , Member (Env address) effects
-         , Member Fresh effects
-         , Member (Reader ModuleInfo) effects
-         , Member (Reader PackageInfo) effects
-         , Member (Resumable (ValueError address body)) effects
-         , Member (Exc (Return address)) effects
-         , Show address
-         )
-      => AbstractFunction address (Value address body) effects where
-  function parameters freeVariables body = do
-    packageInfo <- currentPackage
-    moduleInfo <- currentModule
-    i <- fresh
-    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce body)) <$> close (foldr Set.delete freeVariables parameters)
-
-  call op params = do
-    case op of
-      Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
-        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
-        -- charge them to the closure's origin.
-        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-          let fnEnv = Env.push env
-          withEnv fnEnv (catchReturn (bindAll bindings *> coerce body))
-      _ -> box =<< throwValueError (CallError op)
-
-
 instance Show address => AbstractIntro (Value address body) where
   unit     = Unit
   integer  = Integer . Number.Integer
