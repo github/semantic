@@ -11,6 +11,7 @@ import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Value
 import Data.Algebra
 import Data.Bifunctor (first)
+import Data.Coerce
 import Data.Functor.Const
 import Data.Sum
 import SpecHelpers hiding (reassociate)
@@ -44,13 +45,15 @@ evaluate
   . runEnv lowerBound
   . runReturn
   . runLoopControl
+  . Value.runFunction coerce coerce
 
 reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
 reassociate = mergeExcs . mergeExcs . mergeExcs . Right
 
 type Val = Value Precise SpecEff
 newtype SpecEff a = SpecEff
-  { runSpecEff :: Eff '[ Exc (LoopControl Precise)
+  { runSpecEff :: Eff '[ Function Precise Val
+                       , Exc (LoopControl Precise)
                        , Exc (Return Precise)
                        , Env Precise
                        , Allocator Precise Val
