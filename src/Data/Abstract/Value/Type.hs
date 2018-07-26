@@ -293,39 +293,9 @@ instance AbstractIntro Type where
 
   null        = Null
 
-
-instance ( Member (Allocator address Type) effects
-         , Member (Deref address Type) effects
-         , Member (Env address) effects
-         , Member (Exc (Return address)) effects
-         , Member Fresh effects
-         , Member (Resumable TypeError) effects
-         , Member (State TypeMap) effects
-         )
-      => AbstractFunction address Type effects where
-  function names _ body = do
-    (binds, tvars) <- foldr (\ name rest -> do
-      addr <- alloc name
-      tvar <- Var <$> fresh
-      assign addr tvar
-      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
-    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll binds *> body)))
-
-  call op params = do
-    tvar <- fresh
-    paramTypes <- traverse deref params
-    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
-    unified <- op `unify` needed
-    case unified of
-      _ :-> ret -> box ret
-      gotten    -> box =<< throwResumable (UnificationError needed gotten)
-
-
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address Type) effects
          , Member (Deref address Type) effects
-         , Member (Env address) effects
-         , Member (Exc (Return address)) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects

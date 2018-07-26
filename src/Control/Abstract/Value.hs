@@ -2,10 +2,9 @@
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
-, AbstractFunction(..)
 , Comparator(..)
-, function'
-, call'
+, function
+, call
 , Function(..)
 , unit'
 , Unit(..)
@@ -48,21 +47,11 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
-class Show value => AbstractFunction address value effects where
-  -- | Build a closure (a binder like a lambda or method definition).
-  function :: [Name]                                 -- ^ The parameter names.
-           -> Set Name                               -- ^ The set of free variables to close over.
-           -> Evaluator address value effects address -- ^ The evaluator for the body of the closure.
-           -> Evaluator address value effects value
-  -- | Evaluate an application (like a function call).
-  call :: value -> [address] -> Evaluator address value effects address
+function :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
+function names fvs (Evaluator body) = send (Function names fvs body)
 
-
-function' :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
-function' names fvs (Evaluator body) = send (Function names fvs body)
-
-call' :: Member (Function address value) effects => value -> [address] -> Evaluator address value effects address
-call' fn args = send (Call fn args)
+call :: Member (Function address value) effects => value -> [address] -> Evaluator address value effects address
+call fn args = send (Call fn args)
 
 data Function address value m result where
   Function :: [Name] -> Set Name -> m address -> Function address value m value
@@ -153,7 +142,7 @@ class Show value => AbstractIntro value where
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (AbstractFunction address value effects, AbstractIntro value) => AbstractValue address value effects where
+class AbstractIntro value => AbstractValue address value effects where
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
                -> (value -> Evaluator address value effects value)
