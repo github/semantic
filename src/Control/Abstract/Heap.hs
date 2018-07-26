@@ -19,6 +19,8 @@ module Control.Abstract.Heap
 -- * Effects
 , Allocator(..)
 , runAllocator
+, Deref(..)
+, runDeref
 , AddressError(..)
 , runAddressError
 , runAddressErrorWith
@@ -68,7 +70,7 @@ alloc :: Member (Allocator address value) effects => Name -> Evaluator address v
 alloc = sendAllocator . Alloc
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
-deref :: Member (Allocator address value) effects => address -> Evaluator address value effects value
+deref :: Member (Deref address value) effects => address -> Evaluator address value effects value
 deref = send . Deref
 
 
@@ -154,15 +156,16 @@ sendAllocator = send
 
 data Allocator address value (m :: * -> *) return where
   Alloc  :: Name             -> Allocator address value m address
-  Deref  :: address          -> Allocator address value m value
   Assign :: address -> value -> Allocator address value m ()
   GC     :: Live address     -> Allocator address value m ()
 
-runAllocator :: ( Addressable address effects
-                , Effects effects
+data Deref address value (m :: * -> *) return where
+  Deref  :: address          -> Deref address value m value
+
+runAllocator :: ( Allocatable address effects
                 , Foldable (Cell address)
-                , Member (Resumable (AddressError address value)) effects
                 , Member (State (Heap address (Cell address) value)) effects
+                , PureEffects effects
                 , Reducer value (Cell address value)
                 , ValueRoots address value
                 )
@@ -170,16 +173,30 @@ runAllocator :: ( Addressable address effects
              -> Evaluator address value effects a
 runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
-  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
   Assign addr value -> modifyHeap (heapInsert addr value)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
+runDeref :: ( Derefable address effects
+            , PureEffects effects
+            , Member (Resumable (AddressError address value)) effects
+            , Member (State (Heap address (Cell address) value)) effects
+            )
+         => Evaluator address value (Deref address value ': effects) a
+         -> Evaluator address value effects a
+runDeref = interpret $ \ eff -> case eff of
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
+
+instance PureEffect (Allocator address value)
+
 instance Effect (Allocator address value) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
-  handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
   handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (dist . (<$ c) . k)
   handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
 
+instance PureEffect (Deref address value)
+
+instance Effect (Deref address value) where
+  handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
 
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Cell address value)

@@ -28,17 +28,18 @@ instance AbstractIntro Abstract where
   null       = Abstract
 
 instance ( Member (Allocator address Abstract) effects
+         , Member (Deref address Abstract) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member Fresh effects
          )
       => AbstractFunction address Abstract effects where
   closure names _ body = do
-    env <- foldr (\ name rest -> do
+    binds <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract
       Env.insert name addr <$> rest) (pure lowerBound) names
-    addr <- locally (bindAll env *> catchReturn body)
+    addr <- locally (bindAll binds *> catchReturn body)
     deref addr
 
   call Abstract params = do
@@ -46,6 +47,7 @@ instance ( Member (Allocator address Abstract) effects
     box Abstract
 
 instance ( Member (Allocator address Abstract) effects
+         , Member (Deref address Abstract) effects
          , Member (Env address) effects
          , Member (Exc (Return address)) effects
          , Member NonDet effects
@@ -57,7 +59,7 @@ instance ( Member (Allocator address Abstract) effects
   tuple _ = pure Abstract
 
   klass _ _ _ = pure Abstract
-  namespace _ _ = pure Abstract
+  namespace _ _ _ = pure Abstract
 
   scopedEnvironment _ = pure lowerBound
 

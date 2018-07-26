@@ -1,0 +1,59 @@
+(Statements
+{+(GreaterThan
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(LessThan
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(Equal
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(GreaterThanEqual
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(LessThanEqual
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(Not
+  {+(Equal
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
+{+(And
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(Or
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(BAnd
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(BOr
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{-(BXOr
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(Modulo
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(LShift
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(RShift
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(UnsignedRShift
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(Plus
+  {-(Integer)-}
+  {-(Integer)-})-}
+{-(Minus
+  {-(Integer)-}
+  {-(Integer)-})-}
+{-(Times
+  {-(Integer)-}
+  {-(Integer)-})-}
+{-(DividedBy
+  {-(Integer)-}
+  {-(Integer)-})-})
