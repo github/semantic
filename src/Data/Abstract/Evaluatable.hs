@@ -53,6 +53,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
+          , Member (Function address value) effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
