@@ -78,8 +78,7 @@ runPair = interpret $ \case
   Abstract.AsPair (KVPair a b) -> pure (a, b)
   Abstract.AsPair other        -> throwValueError (KeyValueError other)
 
-runFunction :: ( Coercible body (Eff effects)
-               , Member (Allocator address (Value address body)) effects
+runFunction :: ( Member (Allocator address (Value address body)) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
@@ -88,14 +87,16 @@ runFunction :: ( Coercible body (Eff effects)
                , Member (Resumable (ValueError address body)) effects
                , PureEffects effects
                )
-            => Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
+            => (body address -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) address)
+            -> (Evaluator address value (Abstract.Function address (Value address body) ': effects) address -> body address)
+            -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
             -> Evaluator address (Value address body) effects a
-runFunction = interpret $ \case
+runFunction toEvaluator fromEvaluator = interpret $ \case
   Abstract.Function params fvs body -> do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo params (ClosureBody i (coerce (runFunction (Evaluator body)))) <$> close (foldr Set.delete fvs params)
+    Closure packageInfo moduleInfo params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
   Abstract.Call op params -> do
     case op of
       Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
@@ -104,7 +105,7 @@ runFunction = interpret $ \case
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
           let fnEnv = Env.push env
-          withEnv fnEnv (catchReturn (bindAll bindings *> coerce body))
+          withEnv fnEnv (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
       _ -> throwValueError (CallError op) >>= box
 
 

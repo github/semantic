@@ -35,8 +35,9 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
-import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runValueErrorWith)
+import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runFunction, runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
+import           Data.Coerce
 import           Data.Graph
 import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Project
@@ -112,7 +113,7 @@ runCallGraph lang includePackages modules package = do
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm Abstract.runFunction modules))
 
 runImportGraphToModuleInfos :: forall effs lang term.
                   ( Declarations term
@@ -179,10 +180,11 @@ runImportGraph lang (package :: Package term) f =
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 newtype ImportGraphEff address outerEffects a = ImportGraphEff
-  { runImportGraphEff :: Eff (  Exc (LoopControl address)
+  { runImportGraphEff :: Eff (  Function address (Value address (ImportGraphEff address outerEffects))
+                             ': Exc (LoopControl address)
                              ': Exc (Return address)
                              ': Env address
                              ': Deref address (Value address (ImportGraphEff address outerEffects))
