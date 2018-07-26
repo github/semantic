@@ -37,6 +37,7 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
+  . runDeref
   . runAllocator @Precise @_ @Val
   . (>>= deref . snd)
   . runEnv lowerBound
@@ -52,6 +53,7 @@ newtype SpecEff a = SpecEff
                        , Exc (Return Precise)
                        , Env Precise
                        , Allocator Precise Val
+                       , Deref Precise Val
                        , Resumable (AddressError Precise Val)
                        , Resumable (EnvironmentError Precise)
                        , Resumable (ValueError Precise SpecEff)

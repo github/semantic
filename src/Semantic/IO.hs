@@ -220,6 +220,7 @@ data Files (m :: * -> *) out where
   FindFiles   :: FilePath -> [String] -> [FilePath]                   -> Files m [FilePath]
   Write       :: Destination -> B.Builder                             -> Files m ()
 
+instance PureEffect Files
 instance Effect Files where
   handleState c dist (Request (Read source) k) = Request (Read source) (dist . (<$ c) . k)
   handleState c dist (Request (ReadProject rootDir dir language excludeDirs) k) = Request (ReadProject rootDir dir language excludeDirs) (dist . (<$ c) . k)
@@ -227,7 +228,7 @@ instance Effect Files where
   handleState c dist (Request (Write destination builder) k) = Request (Write destination builder) (dist . (<$ c) . k)
 
 -- | Run a 'Files' effect in 'IO'.
-runFiles :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Effects effs) => Eff (Files ': effs) a -> Eff effs a
+runFiles :: (Member (Exc SomeException) effs, Member (Lift IO) effs, PureEffects effs) => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   Read (FromPath path)         -> rethrowing (readBlobFromPath path)
   Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)

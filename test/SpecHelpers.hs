@@ -30,7 +30,7 @@ import Data.Abstract.Heap as X
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
-import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
+import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError, materializeEnvironment)
 import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.ByteString.Builder (toLazyByteString)
@@ -116,12 +116,12 @@ type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
                              , Unspecialized Val
                              , LoadError Precise
                              ]
-testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
+testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                -> IO
                  ( [String]
                  , ( Heap Precise Latest Val
                    , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
-                            (ModuleTable (NonEmpty (Module (Environment Precise, Precise))))
+                            (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                    )
                  )
 testEvaluating
@@ -142,19 +142,31 @@ testEvaluating
 type Val = Value Precise (UtilEff Precise)
 
 
-deNamespace :: Value Precise term -> Maybe (Name, [Name])
-deNamespace (Namespace name scope) = Just (name, Env.names scope)
-deNamespace _                      = Nothing
+deNamespace :: Heap Precise (Cell Precise) (Value Precise term)
+            -> Value Precise term
+            -> Maybe (Name, [Name])
+deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
+deNamespace _ _                          = Nothing
 
-namespaceScope :: Value Precise term -> Maybe (Environment Precise)
-namespaceScope (Namespace _ scope) = Just scope
-namespaceScope _                   = Nothing
+namespaceScope :: Heap Precise (Cell Precise) (Value Precise term)
+               -> Value Precise term
+               -> Maybe (Environment Precise)
+namespaceScope heap ns@(Namespace _ _ _)
+  = either (const Nothing) snd
+  . run
+  . runFresh 0
+  . runAddressError
+  . runState heap
+  . runDeref
+  $ materializeEnvironment ns
 
-derefQName :: Heap Precise (Cell Precise) (Value Precise term) -> NonEmpty Name -> Environment Precise -> Maybe (Value Precise term)
-derefQName heap = go
-  where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
+namespaceScope _ _ = Nothing
+
+derefQName :: Heap Precise (Cell Precise) (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
+derefQName heap names binds = go names (Env.newEnv binds)
+  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
           []        -> Just
-          (n2 : ns) -> namespaceScope >=> go (n2 :| ns)
+          (n2 : ns) -> namespaceScope heap >=> go (n2 :| ns)
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

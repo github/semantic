@@ -53,6 +53,7 @@ import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Expression as Expression
 import qualified Language.Ruby.Syntax as Ruby.Syntax
+import qualified Language.Python.Syntax as Python.Syntax
 import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
@@ -280,6 +281,12 @@ instance Listable1 Literal.Null where
 instance Listable1 Literal.TextElement where
   liftTiers tiers = cons1 Literal.TextElement
 
+instance Listable1 Literal.InterpolationElement where
+  liftTiers tiers = liftCons1 tiers Literal.InterpolationElement
+
+instance Listable1 Literal.Character where
+  liftTiers tiers = cons1 Literal.Character
+
 instance Listable1 Statement.Statements where
   liftTiers tiers = liftCons1 (liftTiers tiers) Statement.Statements
 
@@ -410,7 +417,10 @@ instance Listable1 Literal.String where
   liftTiers tiers = liftCons1 (liftTiers tiers) Literal.String
 
 instance Listable1 Literal.Symbol where
-  liftTiers tiers = cons1 Literal.Symbol
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Symbol 
+
+instance Listable1 Literal.SymbolElement where
+  liftTiers tiers = cons1 Literal.SymbolElement
 
 instance Listable1 Statement.Assignment where
   liftTiers tiers = liftCons3 (liftTiers tiers) tiers tiers Statement.Assignment
@@ -477,6 +487,15 @@ instance Listable1 Ruby.Syntax.Require where
 
 instance Listable1 Ruby.Syntax.Send where
   liftTiers tiers = liftCons4 (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) Ruby.Syntax.Send
+
+instance Listable Python.Syntax.QualifiedName where
+  tiers = liftCons1 tiers1 Python.Syntax.QualifiedName \/ liftCons2 tiers tiers1 Python.Syntax.RelativeQualifiedName
+
+instance Listable1 Python.Syntax.Import where
+  liftTiers tiers = cons2 Python.Syntax.Import
+
+instance Listable Python.Syntax.Alias where
+  tiers = cons2 Python.Syntax.Alias
 
 
 type ListableSyntax = Sum

@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 
+import           Control.Abstract.Modules
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
@@ -48,7 +49,7 @@ resolvePHPName n = do
         toName = T.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue address value effects
-           , Member (Allocator address value) effects
+           , Member (Deref address value) effects
            , Member (Env address) effects
            , Member (Modules address) effects
            , Member (Resumable ResolutionError) effects
@@ -56,7 +57,7 @@ include :: ( AbstractValue address value effects
            , Member Trace effects
            )
         => Subterm term (Evaluator address value effects (ValueRef address))
-        -> (ModulePath -> Evaluator address value effects (Environment address, address))
+        -> (ModulePath -> Evaluator address value effects (ModuleResult address))
         -> Evaluator address value effects (ValueRef address)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
@@ -370,20 +371,20 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = rvalBox =<< go (declaredName . subterm <$> namespaceName)
+  eval Namespace{..} = Rval <$> go (declaredName . subterm <$> namespaceName)
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (n:x:xs) = do
         name <- maybeM (throwResumable NoNameError) n
         letrec' name $ \addr ->
-          go (x:xs) <* makeNamespace name addr Nothing
+          box =<< makeNamespace name addr Nothing (void $ go (x:xs))
       -- The last name creates a closure over the namespace body.
       go [n] = do
         name <- maybeM (throwResumable NoNameError) n
         letrec' name $ \addr ->
-          subtermValue namespaceBody *> makeNamespace name addr Nothing
+          box =<< makeNamespace name addr Nothing (void $ subtermAddress namespaceBody)
       -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php
-      go [] = subtermValue namespaceBody
+      go [] = subtermAddress namespaceBody
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable)

@@ -1,8 +1,8 @@
 (Statements
   (Call
     (Identifier)
-    (Symbol)
-    (Symbol)
+    (SymbolElement)
+    (SymbolElement)
     (Empty))
   (Call
     (Identifier)
