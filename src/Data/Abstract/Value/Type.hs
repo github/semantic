@@ -6,9 +6,11 @@ module Data.Abstract.Value.Type
   , runTypes
   , runTypesWith
   , unify
+  , runFunction
   ) where
 
-import Control.Abstract hiding (raiseHandler)
+import qualified Control.Abstract as Abstract
+import Control.Abstract hiding (Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
@@ -215,6 +217,35 @@ instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
+runFunction :: ( Member (Allocator address Type) effects
+               , Member (Deref address Type) effects
+               , Member (Env address) effects
+               , Member (Exc (Return address)) effects
+               , Member Fresh effects
+               , Member (Resumable TypeError) effects
+               , Member (State TypeMap) effects
+               , PureEffects effects
+               )
+            => Evaluator address Type (Abstract.Function address Type ': effects) a
+            -> Evaluator address Type effects a
+runFunction = interpret $ \case
+  Abstract.Function params _ body -> do
+    (env, tvars) <- foldr (\ name rest -> do
+      addr <- alloc name
+      tvar <- Var <$> fresh
+      assign addr tvar
+      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
+    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
+  Abstract.Call op params -> do
+    tvar <- fresh
+    paramTypes <- traverse deref params
+    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
+    unified <- op `unify` needed
+    case unified of
+      _ :-> ret -> box ret
+      actual    -> throwResumable (UnificationError needed actual) >>= box
+
+
 instance AbstractHole Type where
   hole = Hole
 
@@ -231,39 +262,9 @@ instance AbstractIntro Type where
 
   null        = Null
 
-
-instance ( Member (Allocator address Type) effects
-         , Member (Deref address Type) effects
-         , Member (Env address) effects
-         , Member (Exc (Return address)) effects
-         , Member Fresh effects
-         , Member (Resumable TypeError) effects
-         , Member (State TypeMap) effects
-         )
-      => AbstractFunction address Type effects where
-  closure names _ body = do
-    (binds, tvars) <- foldr (\ name rest -> do
-      addr <- alloc name
-      tvar <- Var <$> fresh
-      assign addr tvar
-      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) names
-    (zeroOrMoreProduct tvars :->) <$> (deref =<< locally (catchReturn (bindAll binds *> body)))
-
-  call op params = do
-    tvar <- fresh
-    paramTypes <- traverse (>>= deref) params
-    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
-    unified <- op `unify` needed
-    case unified of
-      _ :-> ret -> box ret
-      gotten    -> box =<< throwResumable (UnificationError needed gotten)
-
-
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address Type) effects
          , Member (Deref address Type) effects
-         , Member (Env address) effects
-         , Member (Exc (Return address)) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Resumable TypeError) effects
