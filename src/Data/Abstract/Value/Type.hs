@@ -6,14 +6,11 @@ module Data.Abstract.Value.Type
   , runTypes
   , runTypesWith
   , unify
-  , runUnit
-  , runBoolean
-  , runPair
   , runFunction
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Pair(..), Unit(..), raiseHandler)
+import Control.Abstract hiding (Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Semigroup.Foldable (foldMap1)
@@ -219,34 +216,6 @@ unify a b = do
 instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
-
-runUnit :: PureEffects effects => Evaluator address Type (Abstract.Unit Type ': effects) a -> Evaluator address Type effects a
-runUnit = interpret $ \ Abstract.Unit -> pure Unit
-
-runBoolean :: ( Member NonDet effects
-              , Member (Resumable TypeError) effects
-              , Member (State TypeMap) effects
-              , PureEffects effects
-              )
-           => Evaluator address Type (Abstract.Boolean Type ': effects) a
-           -> Evaluator address Type effects a
-runBoolean = interpret $ \case
-  Abstract.Boolean _ -> pure Bool
-  Abstract.AsBool  b -> unify b Bool *> (pure True <|> pure False)
-
-runPair :: ( Member Fresh effects
-           , Member (Resumable TypeError) effects
-           , Member (State TypeMap) effects
-           , PureEffects effects
-           )
-        => Evaluator address Type (Abstract.Pair Type ': effects) a
-        -> Evaluator address Type effects a
-runPair = interpret $ \case
-  Abstract.Pair a b -> pure (a :* b)
-  Abstract.AsPair v -> do
-    t1 <- fresh
-    t2 <- fresh
-    unify v (Var t1 :* Var t2) $> (Var t1, Var t2)
 
 runFunction :: ( Member (Allocator address Type) effects
                , Member (Deref address Type) effects
