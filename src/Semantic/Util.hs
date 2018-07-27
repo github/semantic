@@ -14,9 +14,10 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
-import           Data.Abstract.Value.Concrete
-import           Data.Abstract.Value.Type
+import           Data.Abstract.Value.Concrete as Concrete
+import           Data.Abstract.Value.Type as Type
 import           Data.Blob
+import           Data.Coerce
 import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
@@ -53,7 +54,8 @@ justEvaluating
   . runValueError
 
 newtype UtilEff address a = UtilEff
-  { runUtilEff :: Eff '[ Exc (LoopControl address)
+  { runUtilEff :: Eff '[ Function address (Value address (UtilEff address))
+                       , Exc (LoopControl address)
                        , Exc (Return address)
                        , Env address
                        , Deref address (Value address (UtilEff address))
@@ -128,7 +130,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = ei
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules))))))
+       (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
 
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
@@ -139,7 +141,7 @@ evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOpti
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules)))))
+       (evaluate proxy id withTermSpans Type.runFunction modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
