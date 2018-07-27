@@ -4,9 +4,6 @@ module Data.Abstract.Value.Concrete
   , ValueError (..)
   , ClosureBody (..)
   , runFunction
-  , runUnit
-  , runBoolean
-  , runPair
   , materializeEnvironment
   , runValueError
   , runValueErrorWith
@@ -14,7 +11,7 @@ module Data.Abstract.Value.Concrete
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), Pair(..), Unit(..))
+import Control.Abstract hiding (Function(..))
 import Data.Abstract.Environment (Environment, Bindings)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
@@ -62,21 +59,6 @@ instance Ord address => ValueRoots address (Value address body) where
     | Closure _ _ _ _ env <- v = Env.addresses env
     | otherwise                = mempty
 
-
-runUnit :: PureEffects effects => Evaluator address (Value address body) (Abstract.Unit (Value address body) ': effects) a -> Evaluator address (Value address body) effects a
-runUnit = interpret $ \ Abstract.Unit -> pure Unit
-
-runBoolean :: (Member (Resumable (ValueError address body)) effects, PureEffects effects) => Evaluator address (Value address body) (Abstract.Boolean (Value address body) ': effects) a -> Evaluator address (Value address body) effects a
-runBoolean = interpret $ \case
-  Abstract.Boolean b -> pure (Boolean b)
-  Abstract.AsBool (Boolean b) -> pure b
-  Abstract.AsBool other       -> throwValueError (BoolError other)
-
-runPair :: (Member (Resumable (ValueError address body)) effects, PureEffects effects) => Evaluator address (Value address body) (Abstract.Pair (Value address body) ': effects) a -> Evaluator address (Value address body) effects a
-runPair = interpret $ \case
-  Abstract.Pair a b -> pure (KVPair a b)
-  Abstract.AsPair (KVPair a b) -> pure (a, b)
-  Abstract.AsPair other        -> throwValueError (KeyValueError other)
 
 runFunction :: ( Member (Allocator address (Value address body)) effects
                , Member (Env address) effects

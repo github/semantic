@@ -25,7 +25,7 @@ import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnviron
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Heap as X hiding (AddressError(..), runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve)
-import Control.Abstract.Value as X hiding (Boolean(..), Function(..), Pair(..), Unit(..))
+import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.FreeVariables as X

@@ -1,9 +1,6 @@
 {-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Abstract
 ( Abstract (..)
-, runUnit
-, runBoolean
-, runPair
 , runFunction
 ) where
 
@@ -14,19 +11,6 @@ import Prologue
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
 
-
-runUnit :: PureEffects effects => Evaluator address Abstract (Unit Abstract ': effects) a -> Evaluator address Abstract effects a
-runUnit = interpret $ \ Unit -> pure Abstract
-
-runBoolean :: (Member NonDet effects, PureEffects effects) => Evaluator address Abstract (Boolean Abstract ': effects) a -> Evaluator address Abstract effects a
-runBoolean = interpret $ \case
-  Boolean _ -> pure Abstract
-  AsBool  _ -> pure True <|> pure False
-
-runPair :: PureEffects effects => Evaluator address Abstract (Pair Abstract ': effects) a -> Evaluator address Abstract effects a
-runPair = interpret $ \case
-  Pair _ _ -> pure Abstract
-  AsPair _ -> pure (Abstract, Abstract)
 
 runFunction :: ( Member (Allocator address Abstract) effects
                , Member (Deref address Abstract) effects
