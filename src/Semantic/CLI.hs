@@ -91,13 +91,11 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
                 <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
                 <|> flag'                             (Task.serialize Show)        (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      rootDir <- rootDirectoryOption
-      excludeDirs <- excludeDirsOption
+      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
+      excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
       pure $ Task.readProject rootDir filePath fileLanguage excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
 
-    rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
-    excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | Just lang <- readMaybe b >>= ensureLanguage -> Right (File a lang)
