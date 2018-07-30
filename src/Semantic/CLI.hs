@@ -45,10 +45,11 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
       pure $ Options logLevel requestId failOnWarning
 
-    argumentsParser = do
-      subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
-      output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
-      pure $ subparser >>= Task.write output
+argumentsParser :: Parser (Task.TaskEff ())
+argumentsParser = do
+  subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
+  output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
+  pure $ subparser >>= Task.write output
 
 diffCommand :: Mod CommandFields (Task.TaskEff Builder)
 diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
