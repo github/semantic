@@ -6,8 +6,9 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
+import           Control.Monad.IO.Class
 import           Data.Language (ensureLanguage)
-import           Data.List (intercalate)
+import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
 import           Data.Project
 import           Options.Applicative hiding (style)
@@ -22,6 +23,7 @@ import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
 import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
+import           System.FilePath
 import           Serializing.Format hiding (Options)
 import           Text.Read
 
@@ -100,12 +102,20 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <$> graphType
       <*> switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
       <*> serializer
-      <*> readProjectRecursively
+      <*> (readProjectFromPaths <|> readProjectRecursively)
     graphType =  flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
              <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
     serializer =  flag (Task.serialize (DOT Graph.style)) (Task.serialize (DOT Graph.style)) (long "dot"  <> help "Output in DOT graph format (default)")
               <|> flag'                                   (Task.serialize JSON)              (long "json" <> help "Output JSON graph")
               <|> flag'                                   (Task.serialize Show)              (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
+    readProjectFromPaths = makeReadProjectFromPathsTask
+      <$> option auto (long "language" <> help "The language for the analysis.")
+      <*> (   Just <$> some (strArgument (metavar "FILES..."))
+          <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
+    makeReadProjectFromPathsTask language maybePaths = do
+      paths <- maybeM (liftIO (many getLine)) maybePaths
+      blobs <- traverse IO.readBlob (flip File language <$> paths)
+      pure $! Project (takeDirectory (maybe "/" fst (uncons paths))) blobs language []
     readProjectRecursively = makeReadProjectRecursivelyTask
       <$> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
       <*> many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
