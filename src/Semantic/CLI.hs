@@ -50,7 +50,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
       pure $ subparser >>= Task.write output
 
-    diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
+diffCommand :: Mod CommandFields (Task.TaskEff Builder)
+diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
+  where
     diffArgumentsParser = do
       renderer <- flag  (Diff.runDiff SExpressionDiffRenderer) (Diff.runDiff SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                        (Diff.runDiff JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
