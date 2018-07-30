@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 
 module Rendering.Reprinter
   ( History (..)
@@ -6,16 +6,20 @@ module Rendering.Reprinter
   , mark
   -- * The Reprinter monad
   , Reprinter
+  -- * Reprintable interface
+  , Reprintable (..)
+  -- * Invocation/esults
   , reprint
   , Token (..)
   ) where
 
-import Prologue
+import Prologue hiding (Element)
 
 import Control.Monad.Effect
 import Control.Monad.Effect.State (get, put, runState)
 import Control.Monad.Trans (lift)
-import Data.Machine hiding (run, source, Source)
+import qualified Data.Machine as Machine
+import Data.Machine hiding (yield, run, source, Source)
 
 import           Data.Algebra
 import           Data.Range
@@ -46,6 +50,7 @@ mark f = fmap go where go (r :. a) = f r :. a
 
 data RPState = RPState
   { rpCursor  :: Int
+  , rpRange   :: Maybe Range
   , rpHistory :: History
   , rpSource  :: Source
   }
@@ -54,6 +59,8 @@ data Reprinter a where
   Pure :: a -> Reprinter a
   Bind :: Reprinter a -> (a -> Reprinter b) -> Reprinter b
 
+  YElement :: Element -> Reprinter ()
+  YControl :: Control -> Reprinter ()
   Finish :: Reprinter ()
 
   Get :: Reprinter RPState
@@ -81,27 +88,73 @@ finish = Finish
 history :: Reprinter History
 history = rpHistory <$> Get
 
+locally :: (RPState -> RPState) -> Reprinter a -> Reprinter a
+locally f x = Get >>= \st -> Put (f st) *> x <* Put st
+
+data Element
+  = Whole Integer
+    deriving (Eq, Show)
+
+data Control
+  = Separator
+    deriving (Eq, Show)
+
+yield :: Element -> Reprinter ()
+yield = YElement
+
+control :: Control -> Reprinter ()
+control = YControl
+
+class Traversable constr => Reprintable constr where
+  whenGenerated :: FAlgebra constr (Reprinter ())
+
+  whenRefactored :: FAlgebra constr (Reprinter ())
+  whenRefactored = whenGenerated
+
+  whenModified :: FAlgebra constr (Reprinter ())
+  whenModified = sequence_
+
+-- | Sums of reprintable terms are reprintable.
+instance (Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Reprintable fs) => Reprintable (Sum fs) where
+  whenGenerated = apply @Reprintable whenGenerated
+  whenRefactored = apply @Reprintable whenRefactored
+  whenModified = apply @Reprintable whenModified
+
+-- | Annotated terms are reprintable and operate in a context derived from the annotation.
+instance (HasField fields History, Reprintable (Sum fs)) => Reprintable (TermF (Sum fs) (Record fields)) where
+  whenGenerated t = locally (withAnn (termFAnnotation t)) (whenGenerated (termFOut t) )
+  whenRefactored t = locally (withAnn (termFAnnotation t)) (whenRefactored (termFOut t))
+  whenModified t = locally (withAnn (termFAnnotation t)) (whenModified (termFOut t))
+
+withAnn :: HasField fields History => HasField fields History => Record fields -> RPState -> RPState
+withAnn ann s = let h = getField ann in s { rpRange = historyRange h, rpHistory = h}
+
 data Token
   = Chunk Source
+  | TElement Element
+  | TControl Control
     deriving (Show, Eq)
 
 initial :: History -> Source -> RPState
-initial = RPState 0
+initial = RPState 0 Nothing
 
 descend :: HasField fields History => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
 descend t = history >>= \case
   Pristine _   -> pure ()
   Modified _   -> pure ()
-  Refactored _ -> pure ()
   Generated    -> pure ()
+  Refactored _ -> pure ()
+
 
 compile :: Reprinter a -> PlanT k Token (Eff '[State RPState]) a
 compile r = case r of
-  Get      -> lift get
-  Put a    -> lift (put a)
-  Pure v   -> pure v
-  Bind p f -> compile p >>= compile . f
-  Finish   -> compile (dropSource <$> cursor <*> source) >>= yield . Chunk
+  Get       -> lift get
+  Put a     -> lift (put a)
+  Pure v    -> pure v
+  Bind p f  -> compile p >>= compile . f
+  YElement e -> Machine.yield (TElement e)
+  YControl c -> Machine.yield (TControl c)
+  Finish    -> compile (dropSource <$> cursor <*> source) >>= Machine.yield . Chunk
 
 reprint :: (Functor a, HasField fields History) => Source -> Term a (Record fields) -> [Token]
 reprint s t =
@@ -232,7 +285,7 @@ reprint s t =
 -- instance (HasField fields History, Tokenizable (Sum fs)) => Tokenizable (TermF (Sum fs) (Record fields)) where
 --   whenGenerated = locally (withAnn (termFAnnotation t)) (termFOut t)
 --   whenRefactored = locally (withAnn (termFAnnotation t)) (termFOut t)
---   whenPositioned = locally (withAnn (termFAnnotation )) (termFOut t)
+--   whenPositioned = locally (withAnn (termFAnnotation t)) (termFOut t)
 
 -- withAnn :: HasField fields History => HasField fields History => Record fields -> ReprintState -> ReprintState
 -- withAnn ann s =
