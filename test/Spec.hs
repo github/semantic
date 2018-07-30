@@ -21,6 +21,7 @@ import qualified Integration.Spec
 import qualified Matching.Go.Spec
 import qualified Numeric.Spec
 import qualified Rendering.TOC.Spec
+import qualified Rendering.Reprinting.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
@@ -57,6 +58,7 @@ main = do
       describe "Matching" Matching.Go.Spec.spec
       describe "Numeric" Numeric.Spec.spec
       describe "Rendering.TOC" Rendering.TOC.Spec.spec
+      describe "Rendering.Reprinting" Rendering.Reprinting.Spec.spec
       describe "Semantic" Semantic.Spec.spec
       describe "Semantic.CLI" Semantic.CLI.Spec.spec
       describe "Semantic.IO" Semantic.IO.Spec.spec

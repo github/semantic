@@ -148,6 +148,7 @@ library
                      , Rendering.Graph
                      , Rendering.JSON
                      , Rendering.Renderer
+                     , Rendering.Reprinter
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
@@ -203,6 +204,7 @@ library
                      , http-client-tls
                      , http-types
                      , kdt
+                     , machines
                      , mersenne-random-pure64
                      , mtl
                      , network
@@ -297,6 +299,7 @@ test-suite test
                      , Matching.Go.Spec
                      , Numeric.Spec
                      , Proto3.Roundtrip
+                     , Rendering.Reprinting.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
