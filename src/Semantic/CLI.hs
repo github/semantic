@@ -74,6 +74,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
+    -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
+    symbolFieldsReader = eitherReader (Right . parseSymbolFields)
+
     tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
@@ -106,6 +109,3 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
     options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
     findOption options value = maybe "" fst (find ((== value) . snd) options)
-
-    -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
-    symbolFieldsReader = eitherReader (Right . parseSymbolFields)
