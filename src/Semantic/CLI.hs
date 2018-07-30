@@ -96,18 +96,19 @@ tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Prin
 graphCommand :: Mod CommandFields (Task.TaskEff Builder)
 graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or from a top-level entry point module"))
   where
-    graphArgumentsParser = do
-      graphType <- flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
-               <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
-      let style = Graph.style
-      includePackages <- switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
-      serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
-                <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
-                <|> flag'                             (Task.serialize Show)        (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
-      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
-      excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
-      File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
-      pure $ Task.readProject rootDir filePath fileLanguage excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
+    graphArgumentsParser = makeGraphTask
+      <$> graphType
+      <*> switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
+      <*> serializer
+      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
+      <*> many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
+      <*> argument filePathReader (metavar "DIR:LANGUAGE | FILE")
+    graphType =  flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
+             <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
+    serializer =  flag (Task.serialize (DOT Graph.style)) (Task.serialize (DOT Graph.style)) (long "dot"  <> help "Output in DOT graph format (default)")
+              <|> flag'                                   (Task.serialize JSON)              (long "json" <> help "Output JSON graph")
+              <|> flag'                                   (Task.serialize Show)              (long "show" <> help "Output using the Show instance (debug only, format subject to change without notice)")
+    makeGraphTask graphType includePackages serializer rootDir excludeDirs File{..} = Task.readProject rootDir filePath fileLanguage excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
 
 filePathReader :: ReadM File
 filePathReader = eitherReader parseFilePath
