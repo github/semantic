@@ -36,7 +36,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> buildVersion <> " (" <> buildSHA <> ")"
-    description = fullDesc <> header "semantic -- Parse and diff semantically"
+    description = fullDesc <> header "semantic -- Semantic (syntax-aware) diffs, program analysis toolkit"
 
     optionsParser = do
       logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
