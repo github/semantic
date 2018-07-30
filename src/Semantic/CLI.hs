@@ -77,7 +77,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
     symbolFieldsReader = eitherReader (Right . parseSymbolFields)
 
-    tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
+tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
+tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
+  where
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
