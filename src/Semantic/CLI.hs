@@ -99,7 +99,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
       pure $ Task.readProject rootDir filePath fileLanguage excludeDirs >>= Graph.runGraph graphType includePackages >>= serializer
 
-    filePathReader = eitherReader parseFilePath
+filePathReader :: ReadM File
+filePathReader = eitherReader parseFilePath
+  where
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | Just lang <- readMaybe b >>= ensureLanguage -> Right (File a lang)
                | Just lang <- readMaybe a >>= ensureLanguage -> Right (File b lang)
