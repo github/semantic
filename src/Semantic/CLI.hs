@@ -100,8 +100,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | (Just lang) <- readMaybe b >>= ensureLanguage -> Right (File a lang)
-               | (Just lang) <- readMaybe a >>= ensureLanguage -> Right (File b lang)
+        [a, b] | Just lang <- readMaybe b >>= ensureLanguage -> Right (File a lang)
+               | Just lang <- readMaybe a >>= ensureLanguage -> Right (File b lang)
         [path] -> maybe (Left $ "Cannot identify language for path: " <> path) (Right . File path) (ensureLanguage (languageForFilePath path))
         args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
