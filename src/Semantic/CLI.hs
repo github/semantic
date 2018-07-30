@@ -60,7 +60,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       filesOrStdin <- Right <$> some (both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ Task.readBlobPairs filesOrStdin >>= renderer
 
-    parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
+parseCommand :: Mod CommandFields (Task.TaskEff Builder)
+parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
+  where
     parseArgumentsParser = do
       renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
