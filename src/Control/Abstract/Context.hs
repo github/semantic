@@ -8,11 +8,14 @@ module Control.Abstract.Context
 , Span
 , currentSpan
 , withCurrentSpan
+, ErrorContext
+, currentErrorContext
 , withCurrentCallStack
 ) where
 
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
+import Data.Abstract.ErrorContext
 import Data.Abstract.Module
 import Data.Abstract.Package
 import Data.Span
@@ -47,6 +50,11 @@ withCurrentSpan = local . const
 -- | Run an action with locally-replaced 'ModuleInfo' & 'Span' derived from the passed 'SrcLoc'.
 withCurrentSrcLoc :: (Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects) => SrcLoc -> m effects a -> m effects a
 withCurrentSrcLoc loc = withCurrentModule (moduleInfoFromSrcLoc loc) . withCurrentSpan (spanFromSrcLoc loc)
+
+currentErrorContext :: ( Monad (m effects), Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects) => m effects ErrorContext
+currentErrorContext = do
+  moduleInfo <- currentModule
+  ErrorContext moduleInfo <$> currentSpan
 
 -- | Run an action with locally replaced 'ModuleInfo' & 'Span' derived from the Haskell call stack.
 --
