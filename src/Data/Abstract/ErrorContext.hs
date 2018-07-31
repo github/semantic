@@ -1,6 +1,10 @@
 {-# LANGUAGE KindSignatures #-}
 
-module Data.Abstract.ErrorContext where
+module Data.Abstract.ErrorContext (
+  BaseError(..)
+, ErrorContext(..)
+)
+where
 
 data ErrorContext = ErrorContext { moduleInfo :: ModuleInfo , span :: Span } deriving (Show)
 import qualified Data.Abstract.Module as M
