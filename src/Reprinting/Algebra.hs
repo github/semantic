@@ -4,6 +4,7 @@ module Reprinting.Algebra
   ( module Reprinting.Token
   , History (..)
   , mark
+  , remark
   -- * Token types
   , Element (..)
   , Control (..)
@@ -23,7 +24,7 @@ import Prelude hiding (fail)
 import Prologue hiding (Element)
 
 import Control.Monad.Effect
-import Control.Monad.Effect.State (get, put, runState)
+import Control.Monad.Effect.State (get, localState, put, runState)
 import Control.Monad.Effect.Writer
 import Data.Sequence (singleton)
 
@@ -45,6 +46,15 @@ data History
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
 mark :: Functor f => (Range -> History) -> f (Record (Range ': fields)) -> f (Record (History ': fields))
 mark f = fmap go where go (r :. a) = f r :. a
+
+remark :: Functor f => (Range -> History) -> f (Record (History ': fields)) -> f (Record (History ': fields))
+remark f = fmap go where
+  go (r :. a) = x :. a where
+    x = case r of
+      Generated    -> Generated
+      Refactored r -> f r
+      Modified r   -> f r
+      Pristine r   -> f r
 
 -- | The 'Reprinter' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
@@ -131,6 +141,9 @@ data RPState = RPState
   , rpSource  :: Source  -- the original source text (immutable)
   }
 
+instance Show RPState where
+  show (RPState c h _) = "[ cursor = " <> show c <> ", history = " <> show h <> "]"
+
 -- Accessors
 
 cursor :: Reprinter Int
@@ -160,16 +173,24 @@ descend t = history >>= \case
   -- No action is necessary for a pristine node.
   Pristine _   -> pure ()
   Generated    -> whenGenerated (fmap subtermRef t) -- Enter children, generating values
-  Modified _   -> whenModified (fmap withHistory t) -- Enter children contextually
+  Modified _   -> do
+    st <- Get
+    control (Log ("State is " <> show st))
+    whenModified (fmap withHistory t) -- Enter children contextually
   Refactored r -> do
     st <- Get
+    control (Log ("State is " <> show st))
     -- Slice from cursor->lower bound and log it
     let range = Range (rpCursor st) (start r)
+    control (Log ("Slice range is now " <> show range))
     -- Log the sliced chunk
     source >>= (YChunk . slice range)
+    control (Log ("cursor is now " <> show (start r)))
     Put (st { rpCursor = start r, rpHistory = Generated })
+    newst <- Get
+    control (Log ("New state is " <> show newst))
     -- Enter the children, if any, with the refactoring action
-    whenRefactored (fmap subtermRef t)
+    locally (const newst) (whenRefactored (fmap withHistory t))
     -- The cursor is now the upper bound
     Put (st { rpCursor = end r})
 

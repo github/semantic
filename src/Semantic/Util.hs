@@ -23,20 +23,25 @@ import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project hiding (readFile)
+import           Data.Record
 import           Data.Sum (weaken)
+import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (weaken)
+import           Reprinting.Algebra
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
+import qualified Data.Sum as Sum
 import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
+import           Text.Show.Pretty (pPrint)
 import           Text.Show.Pretty (ppShow)
 
 justEvaluating
@@ -113,6 +118,25 @@ callGraphProject parser proxy lang opts paths = runTaskWithOptions opts $ do
   pure (x, (() <$) <$> modules)
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) Language.Ruby debugOptions
+
+increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
+increaseNumbers p = case Sum.project (termOut p) of
+  Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
+  Nothing                -> Term (fmap increaseNumbers (unTerm p))
+
+testReprinter = do
+  let path = "test/fixtures/javascript/reprinting/map.json"
+
+  (src, tree) <- do
+    src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
+    tree <- parseFile jsonParser "test/fixtures/javascript/reprinting/map.json"
+    pure (src, tree)
+
+  let tagged = increaseNumbers (mark Modified tree)
+  pPrint tagged
+  let toks = reprint src tagged
+  pure toks
+
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser lang paths = withOptions debugOptions $ \ config logger statter ->

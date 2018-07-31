@@ -6,7 +6,6 @@ module Reprinting.Concrete
   , concretize
   ) where
 
-import Prelude hiding (foldl)
 import Prologue hiding (Element)
 
 import           Control.Monad.Effect
@@ -30,6 +29,8 @@ import           Reprinting.Token
 -- Some possible issues we should tackle before finalizing this design:
 -- * Is a stack machine too inexpressive?
 -- * Is this interface too clumsy? Do we just want to use Eff, or another monad?
+-- * Do we want to use a generic MonadError rather than instantiate that to Either?
+-- * Can we remove this somewhat-warty functional dependency?
 class Lower stack => Concrete (l :: Language) stack | l -> stack, stack -> l where
 
   -- | Each 'Element' data token should emit a chunk of source code,
@@ -82,6 +83,7 @@ instance ContextStack JSONState where
 
 instance Concrete 'JSON JSONState where
   onControl t st = case t of
+    Log _ -> pure st
     Enter c -> pure (push c st)
     Exit c  -> do
       let curr = current st
@@ -89,11 +91,19 @@ instance Concrete 'JSON JSONState where
         then throwError (InvalidContext curr c (contexts st))
         else pure (pop st)
 
-  onElement c st = do
+  onElement c st =
     case c of
       Fragment f -> pure (pretty f)
       Truth t    -> pure (if t then "true" else "false")
       Nullity    -> pure "null"
+      Open -> case current st of
+        Just List -> pure "["
+        Just Associative -> pure "["
+        x -> throwError (Unexpected (show (Open, x)))
+      Close -> case current st of
+        Just List -> pure "]"
+        Just Associative -> pure "}"
+        x -> throwError (Unexpected (show (Close, x)))
       Separator  -> case current st of
         Just List        -> pure ","
         Just Associative -> pure ", "
