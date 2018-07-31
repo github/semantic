@@ -62,6 +62,9 @@ defineNamespace name scope = define name $ do
   binds <- Env.head <$> locally (scope >> getEnv)
   namespace name Nothing binds
 
+-- | Construct a function from a Haskell function taking 'Name's as arguments.
+--
+-- The constructed function will have the same arity as the Haskell function. Nullary functions are constructed by providing an evaluator producing an address. Note that the constructed function must not contain free variables as they will not be captured by the closure, and/or will be garbage collected.
 lambda :: ( HasCallStack
           , Lambda address value effects fn
           , Member (Reader ModuleInfo) effects
