@@ -6,6 +6,7 @@ module Control.Abstract.Primitive
   , builtInPrint
   , builtInExport
   , lambda
+  , Lambda(..)
   ) where
 
 import Control.Abstract.Context
