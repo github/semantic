@@ -123,6 +123,8 @@ class Traversable constr => Reprintable constr where
   whenRefactored = whenGenerated
 
   -- | Corresponds to 'Modified'. Should emit control tokens only.
+  -- Defaults to 'sequenceA_', which is a suitable definition for
+  -- nodes with no children.
   whenModified :: FAlgebra constr (Reprinter ())
   whenModified = sequenceA_
 

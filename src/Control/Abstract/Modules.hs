@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs, LambdaCase, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+
 module Control.Abstract.Modules
 ( ModuleResult
 , lookupModule
@@ -117,9 +118,9 @@ runLoadErrorWith = runResumableWith
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError resume where
-  NotFoundError :: String   -- ^ The path that was not found.
-                -> [String] -- ^ List of paths searched that shows where semantic looked for this module.
-                -> Language -- ^ Language.
+  NotFoundError :: String   -- The path that was not found.
+                -> [String] -- List of paths searched that shows where semantic looked for this module.
+                -> Language -- Language.
                 -> ResolutionError ModulePath
 
   GoImportError :: FilePath -> ResolutionError [ModulePath]

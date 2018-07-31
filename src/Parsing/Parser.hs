@@ -72,7 +72,7 @@ data SomeAnalysisParser typeclasses ann where
                         , HasPrelude lang
                         , HasPostlude lang
                         )
-                     => Parser (Term (Sum fs) ann) -- ^ A parser.
+                     => Parser (Term (Sum fs) ann) -- A parser.
                      -> Proxy lang
                      -> SomeAnalysisParser typeclasses ann
 
@@ -85,9 +85,9 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                       , ApplyAll' typeclasses TypeScript.Syntax
                       , ApplyAll' typeclasses Haskell.Syntax
                       )
-                   => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                                         -- ^ The 'Language' to select.
-                   -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
+                   => proxy typeclasses                                -- A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                                         -- The 'Language' to select.
+                   -> SomeAnalysisParser typeclasses (Record Location) -- A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
 someAnalysisParser _ Java       = SomeAnalysisParser javaParser       (Proxy :: Proxy 'Java)
