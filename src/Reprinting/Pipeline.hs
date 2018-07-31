@@ -5,7 +5,7 @@ import Prologue
 import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Text
 
-import Reprinting.Algebra
+import Reprinting.Algebraic
 import Reprinting.Concrete
 import Data.Record
 import Data.Term

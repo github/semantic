@@ -8,7 +8,7 @@ import Data.Functor.Foldable (embed, cata)
 import qualified Data.Language as Language
 import qualified Data.Syntax.Literal as Literal
 import Data.Algebra
-import Reprinting.Algebra
+import Reprinting.Algebraic
 import Reprinting.Pipeline
 import Data.Sum
 import Semantic.IO
