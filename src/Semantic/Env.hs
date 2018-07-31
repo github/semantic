@@ -18,5 +18,5 @@ envLookupInt defaultVal k = liftIO $ parse <$> lookupEnv k
                     , Just p <- readMaybe s = p
                     | otherwise = defaultVal
 
-envLookupBool :: MonadIO io => Bool -> String -> io Bool
-envLookupBool defaultVal k = liftIO $ isJust <$> lookupEnv k
+envLookupBool :: MonadIO io => String -> io Bool
+envLookupBool k = liftIO $ isJust <$> lookupEnv k
