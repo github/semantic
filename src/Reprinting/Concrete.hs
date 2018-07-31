@@ -3,7 +3,6 @@
 module Reprinting.Concrete
   ( Concrete (..)
   , ConcreteException (..)
-  , Precedence (..)
   , concretize
   ) where
 
@@ -27,6 +26,10 @@ import           Reprinting.Token
 -- typeclass describes how a given 'Language' interprets tokens, using
 -- a stack machine described by the @stack@ parameter.  @stack@ must
 -- have a 'Lower' instance so we know where to start.
+--
+-- Some possible issues we should tackle before finalizing this design:
+-- * Is a stack machine too inexpressive?
+-- * Is this interface too clumsy? Do we just want to use Eff, or another monad?
 class Lower stack => Concrete (l :: Language) stack | l -> stack, stack -> l where
 
   -- | Each 'Element' data token should emit a chunk of source code,
@@ -59,6 +62,9 @@ concretize prox =
   . traverse (stepM prox)
 
 -- Private interfaces
+
+newtype JSONState = JSONState { contexts :: [Context] }
+  deriving (Eq, Show, Lower)
 
 -- A class for pushing and popping contexts. This may or may not be useful
 -- when we implement 'Concrete' for languages other than JSON.
