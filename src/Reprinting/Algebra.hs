@@ -71,6 +71,7 @@ data Reprinter a where
 
   Get :: Reprinter RPState
   Put :: RPState -> Reprinter ()
+  Locally :: (RPState -> RPState) -> Reprinter a -> Reprinter a
 
 -- We could implement these types more efficiently, or perhaps move to Freer.
 instance Functor Reprinter where
@@ -155,9 +156,8 @@ source = rpSource <$> Get
 history :: Reprinter History
 history = rpHistory <$> Get
 
--- Like 'local', but hand-rolled. That's how you know it's good.
 locally :: (RPState -> RPState) -> Reprinter a -> Reprinter a
-locally f x = Get >>= \st -> Put (f st) *> x <* Put st
+locally = Locally
 
 -- Build a mutator function out of a provided 'History'-containing 'Record'.
 withAnn :: HasField fields History => Record fields -> RPState -> RPState
@@ -172,14 +172,17 @@ descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra const
 descend t = history >>= \case
   -- No action is necessary for a pristine node.
   Pristine _   -> pure ()
-  Generated    -> whenGenerated (fmap subtermRef t) -- Enter children, generating values
+  Generated    -> do
+    st <- Get
+    control (Log ("GENERATED: state is " <> show st))
+    whenGenerated (fmap subtermRef t) -- Enter children, generating values
   Modified _   -> do
     st <- Get
-    control (Log ("State is " <> show st))
+    control (Log ("MODIFIED: state is " <> show st))
     whenModified (fmap withHistory t) -- Enter children contextually
   Refactored r -> do
     st <- Get
-    control (Log ("State is " <> show st))
+    control (Log ("REFACTORED: State is " <> show st))
     -- Slice from cursor->lower bound and log it
     let range = Range (rpCursor st) (start r)
     control (Log ("Slice range is now " <> show range))
@@ -190,7 +193,7 @@ descend t = history >>= \case
     newst <- Get
     control (Log ("New state is " <> show newst))
     -- Enter the children, if any, with the refactoring action
-    locally (const newst) (whenRefactored (fmap withHistory t))
+    locally (const newst) (whenRefactored (fmap subtermRef t))
     -- The cursor is now the upper bound
     Put (st { rpCursor = end r})
 
@@ -201,6 +204,7 @@ compile r = case r of
   Bind p f   -> compile p >>= compile . f
   Get        -> get
   Put a      -> put a
+  Locally f a -> localState f (compile a)
   YChunk c   -> tell (singleton (Chunk c))
   YElement e -> tell (singleton (TElement e))
   YControl c -> tell (singleton (TControl c))
