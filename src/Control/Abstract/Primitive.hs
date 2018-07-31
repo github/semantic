@@ -1,3 +1,4 @@
+{-# LANGUAGE FunctionalDependencies, UndecidableInstances #-}
 module Control.Abstract.Primitive
   ( define
   , defineClass
@@ -85,6 +86,11 @@ lambda2 body = withCurrentCallStack callStack $ do
   var1 <- gensym
   var2 <- gensym
   function [var1, var2] lowerBound (body var1 var2)
+
+class Lambda address value effects ty | ty -> address, ty -> value, ty -> effects where
+  lambda' :: [Name]
+          -> ty
+          -> Evaluator address value effects value
 
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
