@@ -200,12 +200,12 @@ instance Evaluatable Array where
 instance Reprintable Array where
   whenModified t = do
     control (Enter List)
-    sequence_ t
+    sequenceA_ t
     control (Exit List)
 
   whenGenerated t = do
     control (Enter List)
-    sequence_ (intersperse (yield Separator) (toList t))
+    sequenceA_ (intersperse (yield Separator) (toList t))
     control (Exit List)
 
 newtype Hash a = Hash { hashElements :: [a] }
@@ -221,7 +221,7 @@ instance Evaluatable Hash where
 instance Reprintable Hash where
   whenGenerated t = do
     control (Enter Associative)
-    sequence_ t
+    sequenceA_ t
     control (Exit Associative)
 
   whenModified = whenGenerated
@@ -247,7 +247,7 @@ instance Reprintable KeyValue where
 
   whenModified t = do
     control (Enter Pair)
-    sequence_ t
+    sequenceA_ t
     control (Exit Pair)
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
