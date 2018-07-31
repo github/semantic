@@ -1,9 +1,10 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns, ScopedTypeVariables, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
 import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
+import           Data.List (intersperse)
 import           Data.Scientific.Exts
 import qualified Data.Text as T
 import           Diffing.Algorithm
@@ -11,6 +12,7 @@ import           Numeric.Exts
 import           Prelude hiding (Float, null)
 import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
+import           Rendering.Reprinter
 import           Text.Read (readMaybe)
 
 -- Boolean
@@ -30,6 +32,9 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
   eval (Boolean x) = rvalBox (boolean x)
+
+instance Reprintable Boolean where
+  whenGenerated = yield . Truth . booleanContent
 
 -- Numeric
 
@@ -58,6 +63,9 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
+
+instance Reprintable Data.Syntax.Literal.Float where
+  whenGenerated = yield . Fragment . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -130,6 +138,9 @@ instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
+instance Reprintable TextElement where
+  whenGenerated = yield . Fragment . textElementContent
+
 data Null a = Null
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
@@ -138,6 +149,9 @@ instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Null where eval _ = rvalBox null
+
+instance Reprintable Null where
+  whenGenerated _ = yield Nullity
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -183,6 +197,17 @@ instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Array where
   eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
+instance Reprintable Array where
+  whenModified t = do
+    control (Enter List)
+    sequence_ t
+    control (Exit List)
+
+  whenGenerated t = do
+    control (Enter List)
+    sequence_ (intersperse (yield Separator) (toList t))
+    control (Exit List)
+
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
@@ -192,6 +217,14 @@ instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Hash where
   eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
+
+instance Reprintable Hash where
+  whenGenerated t = do
+    control (Enter Associative)
+    sequence_ t
+    control (Exit Associative)
+
+  whenModified = whenGenerated
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -203,6 +236,19 @@ instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable KeyValue where
   eval (fmap subtermValue -> KeyValue{..}) =
     rvalBox =<< (kvPair <$> key <*> value)
+
+instance Reprintable KeyValue where
+  whenGenerated (KeyValue k v) = do
+    control (Enter Pair)
+    k
+    yield Separator
+    v
+    control (Exit Pair)
+
+  whenModified t = do
+    control (Enter Pair)
+    sequence_ t
+    control (Exit Pair)
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
