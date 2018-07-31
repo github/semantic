@@ -12,7 +12,7 @@ import           Numeric.Exts
 import           Prelude hiding (Float, null)
 import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
-import           Rendering.Reprinter
+import           Reprinting.Algebra
 import           Text.Read (readMaybe)
 
 -- Boolean

@@ -1,7 +1,8 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 
 module Reprinting.Algebra
-  ( History (..)
+  ( module Reprinting.Token
+  , History (..)
   , mark
   -- * Token types
   , Element (..)
@@ -30,6 +31,7 @@ import Data.Range
 import Data.Record
 import Data.Source
 import Data.Term
+import Reprinting.Token
 
 -- | 'History' values, when attached to a given 'Term', describe the ways in which
 -- that term was refactored, if any.
@@ -71,40 +73,9 @@ instance Applicative Reprinter where
 instance Monad Reprinter where
   (>>=) = Bind
 
--- | 'Element' tokens describe atomic pieces of source code to be
--- output to a rendered document. These tokens are language-agnostic
--- and are interpreted into language-specific representations at a
--- later point in the reprinting pipeline.
-data Element
-  = Fragment Text -- ^ A literal chunk of text.
-  | Truth Bool    -- ^ A boolean value.
-  | Nullity       -- ^ @null@ or @nil@ or some other zero value.
-  | Separator     -- ^ Some sort of delimiter, interpreted in some 'Context'.
-    deriving (Eq, Show)
-
 -- | Yield an 'Element' token in a 'Reprinter' context.
 yield :: Element -> Reprinter ()
 yield = YElement
-
--- | 'Control' tokens describe information about some AST's context.
--- Though these are ultimately rendered as whitespace (or nothing) on
--- the page, they are needed to provide information as to how deeply
--- subsequent entries in the pipeline should indent.
-data Control
-  = Enter Context
-  | Exit Context
-    deriving (Eq, Show)
-
-data Context
-  = List
-  | Associative
-  | Pair
-  | Infix Operator
-    deriving (Show, Eq)
-
-data Operator
-  = Add
-    deriving (Show, Eq)
 
 -- | Yield a 'Control' token in a 'Reprinter' context.
 control :: Control -> Reprinter ()
@@ -139,14 +110,6 @@ instance (HasField fields History, Reprintable a) => Reprintable (TermF a (Recor
   whenGenerated t = locally (withAnn (termFAnnotation t)) (whenGenerated (termFOut t) )
   whenRefactored t = locally (withAnn (termFAnnotation t)) (whenRefactored (termFOut t))
   whenModified t = locally (withAnn (termFAnnotation t)) (whenModified (termFOut t))
-
--- | 'Token' encapsulates 'Element' and 'Control' tokens, as well as sliced
--- portions of the original 'Source' for a given AST.
-data Token
-  = Chunk Source
-  | TElement Element
-  | TControl Control
-    deriving (Show, Eq)
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.

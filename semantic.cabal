@@ -151,6 +151,9 @@ library
                      , Rendering.Symbol
                      , Rendering.TOC
                      , Reprinting.Algebra
+                     , Reprinting.Concrete
+                     , Reprinting.Pipeline
+                     , Reprinting.Token
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.AST
                      , Semantic.CLI
@@ -204,7 +207,6 @@ library
                      , http-client-tls
                      , http-types
                      , kdt
-                     , machines
                      , mersenne-random-pure64
                      , mtl
                      , network
@@ -212,6 +214,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , prettyprinter
                      , pretty-show
                      , recursion-schemes
                      , reducers
