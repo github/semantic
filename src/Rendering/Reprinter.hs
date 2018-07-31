@@ -6,6 +6,12 @@ module Rendering.Reprinter
   , mark
   -- * The Reprinter monad
   , Reprinter
+  , yield
+  , control
+  -- * Token types
+  , Element (..)
+  , Control (..)
+  , Context (..)
   -- * Reprintable interface
   , Reprintable (..)
   -- * Invocation/esults
@@ -13,19 +19,21 @@ module Rendering.Reprinter
   , Token (..)
   ) where
 
+import Prelude hiding (fail)
 import Prologue hiding (Element)
 
-import Control.Monad.Effect
-import Control.Monad.Effect.State (get, put, runState)
-import Control.Monad.Trans (lift)
-import qualified Data.Machine as Machine
-import Data.Machine hiding (yield, run, source, Source)
+import           Control.Monad.Effect
+import           Control.Monad.Effect.Fail
+import           Control.Monad.Effect.State (get, put, runState)
+import           Control.Monad.Effect.Writer
+import Debug.Trace (traceM)
+import Data.Sequence (singleton)
 
-import           Data.Algebra
-import           Data.Range
-import           Data.Record
+import Data.Algebra
+import Data.Range
+import Data.Record
 import Data.Source
-import           Data.Term
+import Data.Term
 
 -- | 'History' values, when attached to a given 'Term', describe the ways in which
 -- that term was refactored, if any.
@@ -44,13 +52,12 @@ historyRange (Refactored r) = Just r
 historyRange Generated      = Nothing
 
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
-mark :: Functor a => (Range -> History) -> Term a (Record (Range ': fields)) -> Term a (Record (History ': fields))
+mark :: Functor f => (Range -> History) -> f (Record (Range ': fields)) -> f (Record (History ': fields))
 mark f = fmap go where go (r :. a) = f r :. a
 
 
 data RPState = RPState
   { rpCursor  :: Int
-  , rpRange   :: Maybe Range
   , rpHistory :: History
   , rpSource  :: Source
   }
@@ -61,6 +68,7 @@ data Reprinter a where
 
   YElement :: Element -> Reprinter ()
   YControl :: Control -> Reprinter ()
+  YChunk   :: Source  -> Reprinter ()
   Finish :: Reprinter ()
 
   Get :: Reprinter RPState
@@ -92,12 +100,23 @@ locally :: (RPState -> RPState) -> Reprinter a -> Reprinter a
 locally f x = Get >>= \st -> Put (f st) *> x <* Put st
 
 data Element
-  = Whole Integer
+  = Fragment Text
+  | Truth Bool
+  | Nullity
+  | Separator
     deriving (Eq, Show)
 
 data Control
-  = Separator
+  = Enter Context
+  | Exit Context
     deriving (Eq, Show)
+
+data Context
+  = List
+  | Associative
+  | Pair
+  | Parenthesized
+    deriving (Show, Eq)
 
 yield :: Element -> Reprinter ()
 yield = YElement
@@ -112,7 +131,7 @@ class Traversable constr => Reprintable constr where
   whenRefactored = whenGenerated
 
   whenModified :: FAlgebra constr (Reprinter ())
-  whenModified = sequence_
+  whenModified = sequenceA_
 
 -- | Sums of reprintable terms are reprintable.
 instance (Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Reprintable fs) => Reprintable (Sum fs) where
@@ -121,13 +140,17 @@ instance (Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Repri
   whenModified = apply @Reprintable whenModified
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
-instance (HasField fields History, Reprintable (Sum fs)) => Reprintable (TermF (Sum fs) (Record fields)) where
+instance (HasField fields History, Reprintable a) => Reprintable (TermF a (Record fields)) where
   whenGenerated t = locally (withAnn (termFAnnotation t)) (whenGenerated (termFOut t) )
   whenRefactored t = locally (withAnn (termFAnnotation t)) (whenRefactored (termFOut t))
   whenModified t = locally (withAnn (termFAnnotation t)) (whenModified (termFOut t))
 
-withAnn :: HasField fields History => HasField fields History => Record fields -> RPState -> RPState
-withAnn ann s = let h = getField ann in s { rpRange = historyRange h, rpHistory = h}
+withAnn :: HasField fields History => Record fields -> RPState -> RPState
+withAnn ann s = let h = getField ann in s { rpHistory = h }
+
+withHistory :: HasField fields History
+            => Subterm (Term syntax (Record fields)) (Reprinter a) -> Reprinter a
+withHistory t = locally (withAnn (termAnnotation (subterm t))) (subtermRef t)
 
 data Token
   = Chunk Source
@@ -135,34 +158,38 @@ data Token
   | TControl Control
     deriving (Show, Eq)
 
-initial :: History -> Source -> RPState
-initial = RPState 0 Nothing
-
-descend :: HasField fields History => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
+descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
 descend t = history >>= \case
   Pristine _   -> pure ()
-  Modified _   -> pure ()
-  Generated    -> pure ()
-  Refactored _ -> pure ()
+  Modified _   -> whenModified (fmap subtermRef t)
+  Generated    -> whenGenerated (fmap withHistory t)
+  Refactored r -> do
+    st <- Get
+    let range = Range (rpCursor st) (start r)
+    source >>= (YChunk . slice range)
+    Put (st { rpCursor = start r })
+    whenRefactored (fmap withHistory t)
+    Put (st { rpCursor = end r})
 
-
-compile :: Reprinter a -> PlanT k Token (Eff '[State RPState]) a
+compile :: Reprinter a -> Eff '[State RPState, Writer (Seq Token)] a
 compile r = case r of
-  Get       -> lift get
-  Put a     -> lift (put a)
-  Pure v    -> pure v
-  Bind p f  -> compile p >>= compile . f
-  YElement e -> Machine.yield (TElement e)
-  YControl c -> Machine.yield (TControl c)
-  Finish    -> compile (dropSource <$> cursor <*> source) >>= Machine.yield . Chunk
+  Pure v     -> pure v
+  Bind p f   -> compile p >>= compile . f
+  Get        -> get
+  Put a      -> put a
+  YChunk c   -> tell (singleton (Chunk c))
+  YElement e -> tell (singleton (TElement e))
+  YControl c -> tell (singleton (TControl c))
+  Finish     -> compile (dropSource <$> cursor <*> source) >>= tell . singleton . Chunk
 
-reprint :: (Functor a, HasField fields History) => Source -> Term a (Record fields) -> [Token]
+
+reprint :: (Reprintable a, HasField fields History) => Source -> Term a (Record fields) -> Seq Token
 reprint s t =
   run
+  . fmap fst
+  . runWriter
   . fmap snd
-  . runState (initial (getField (termAnnotation t)) s)
-  . runT
-  . repeatedly
+  . runState (RPState 0 (getField (termAnnotation t)) s)
   . compile
   $ foldSubterms descend t *> finish
 
