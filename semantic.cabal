@@ -150,7 +150,7 @@ library
                      , Rendering.Renderer
                      , Rendering.Symbol
                      , Rendering.TOC
-                     , Reprinting.Algebra
+                     , Reprinting.Algebraic
                      , Reprinting.Concrete
                      , Reprinting.Pipeline
                      , Reprinting.Token

@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, FunctionalDependencies #-}
 module Data.Term
 ( Term(..)
 , termIn
@@ -9,6 +9,7 @@ module Data.Term
 , hoistTerm
 , hoistTermF
 , stripTerm
+, Annotated (..)
 ) where
 
 import Prologue
@@ -30,9 +31,19 @@ termAnnotation = termFAnnotation . unTerm
 termOut :: Term syntax ann -> syntax (Term syntax ann)
 termOut = termFOut . unTerm
 
-
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable)
+
+-- | A convenience typeclass to get the annotation out of a 'Term' or 'TermF'.
+-- Useful in term-rewriting algebras.
+class Annotated t ann | t -> ann where
+  annotation :: t -> ann
+
+instance Annotated (TermF syntax ann recur) ann where
+  annotation = termFAnnotation
+
+instance Annotated (Term syntax ann) ann where
+  annotation = termAnnotation
 
 
 -- | Return the node count of a term.

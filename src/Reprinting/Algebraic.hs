@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 
-module Reprinting.Algebra
+module Reprinting.Algebraic
   ( module Reprinting.Token
   , History (..)
   , mark
@@ -43,12 +43,6 @@ data History
   | Modified Range    -- ^ A 'Modified' node was not changed by a refactor, but its children may be 'Generated' or 'Refactored'.
   | Pristine Range    -- ^ A 'Pristine' node was not changed and has no changed (non-'Pristine') children.
   deriving (Show, Eq)
-
-unsafeRange :: History -> Range
-unsafeRange Generated = error "No range for Generated history"
-unsafeRange (Refactored r) = r
-unsafeRange (Modified r) = r
-unsafeRange (Pristine r) = r
 
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
 mark :: Functor f => (Range -> History) -> f (Record (Range ': fields)) -> f (Record (History ': fields))
@@ -106,9 +100,9 @@ instance (Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Repri
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
 instance (HasField fields History, Reprintable a) => Reprintable (TermF a (Record fields)) where
-  whenGenerated t = local (\c -> c { rcHistory = getField (termFAnnotation t)}) (whenGenerated (termFOut t))
-  whenRefactored t = local (\c -> c { rcHistory = getField (termFAnnotation t)}) (whenRefactored (termFOut t))
-  whenModified t = local (\c -> c { rcHistory = getField (termFAnnotation t)}) (whenModified (termFOut t))
+  whenGenerated t = into t (whenGenerated (termFOut t))
+  whenRefactored t = into t (whenRefactored (termFOut t))
+  whenModified t = into t (whenModified (termFOut t))
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
@@ -144,11 +138,11 @@ source = rcSource <$> ask
 history :: Reprinter History
 history = rcHistory <$> ask
 
-locally :: (RPState -> RPState) -> Reprinter a -> Reprinter a
-locally = localState
-
 finish :: Reprinter ()
 finish = (dropSource <$> cursor <*> source) >>= chunk
+
+into :: (Annotated t (Record fields), HasField fields History) => t -> Reprinter a -> Reprinter a
+into x = local (\c -> c { rcHistory = getField (annotation x)} )
 
 -- A subterm algebra that implements the /Scrap Your Reprinter/ algorithm.
 descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
@@ -156,15 +150,14 @@ descend t = history >>= \case
   -- No action is necessary for a pristine node.
   Pristine _   -> pure ()
   Generated    -> local (\c -> c { rcHistory = Generated}) (whenGenerated (fmap subtermRef t))
-  Modified _   -> whenGenerated (fmap go t) where go x = local (\c -> c { rcHistory = getField (termAnnotation (subterm x))}) (subtermRef x)
+  Modified _   -> whenGenerated (fmap (\x -> into (subterm x) (subtermRef x)) t)
   Refactored r -> do
     st <- get @RPState
     control (Log ("Refactor state is " <> show st))
     let range = Range (rpCursor st) (start r)
     source >>= (chunk . slice range)
     modify' (\s -> s { rpCursor = start r })
-    let go x = local (\c -> c { rcHistory = getField (termAnnotation (subterm x))}) (subtermRef x)
-    whenRefactored (fmap go t)
+    whenRefactored (fmap (\x -> into (subterm x) (subtermRef x)) t)
     modify' (\s -> s { rpCursor = end r })
 
 -- Interpret a Reprinter to a state/writer effect.
