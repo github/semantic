@@ -30,6 +30,7 @@ import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Data.Abstract.Address
+import           Data.Abstract.ErrorContext (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -195,7 +196,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': Modules address
                              ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                              ': State (Graph ModuleInfo)
-                             ': Resumable (ValueError address (ImportGraphEff address outerEffects))
+                             ': Resumable (BaseError (ValueError address (ImportGraphEff address outerEffects)))
                              ': Resumable (AddressError address (Value address (ImportGraphEff address outerEffects)))
                              ': Resumable ResolutionError
                              ': Resumable EvalError
@@ -267,8 +268,8 @@ resumingAddressError = runAddressErrorWith $ \ err -> trace ("AddressError: " <>
   UnallocatedAddress   _ -> pure lowerBound
   UninitializedAddress _ -> pure hole
 
-resumingValueError :: (Applicative (m address (Value address body) effects), Effectful (m address (Value address body)), Effects effects, Member Trace effects, Show address) => m address (Value address body) (Resumable (ValueError address body) ': effects) a -> m address (Value address body) effects a
-resumingValueError = runValueErrorWith (\ err -> trace ("ValueError: " <> prettyShow err) *> case err of
+resumingValueError :: (Applicative (m address (Value address body) effects), Effectful (m address (Value address body)), Effects effects, Member Trace effects, Show address) => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a -> m address (Value address body) effects a
+resumingValueError = runValueErrorWith (\ (BaseError context err) -> trace ("ValueError: " <> prettyShow context <> prettyShow err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (prettyShow val))
   BoolError{}       -> pure True
