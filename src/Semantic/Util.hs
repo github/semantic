@@ -134,9 +134,10 @@ testReprinter = do
     pure (src, tree)
 
   let tagged = increaseNumbers (mark Modified tree)
-  pPrint tagged
   let toks = reprint src tagged
   pure toks
+
+testConcrete = concretize (Proxy @'Language.JSON) <$> testReprinter
 
 
 -- Evaluate a project consisting of the listed paths.
