@@ -5,6 +5,7 @@ module Control.Abstract.Primitive
   , builtInPrint
   , builtInExport
   , lambda
+  , lambda2
   ) where
 
 import Control.Abstract.Context
@@ -71,6 +72,19 @@ lambda :: ( HasCallStack
 lambda body = withCurrentCallStack callStack $ do
   var <- gensym
   function [var] lowerBound (body var)
+
+lambda2 :: ( HasCallStack
+           , Member Fresh effects
+           , Member (Function address value) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (Reader Span) effects
+           )
+        => (Name -> Name -> Evaluator address value effects address)
+        -> Evaluator address value effects value
+lambda2 body = withCurrentCallStack callStack $ do
+  var1 <- gensym
+  var2 <- gensym
+  function [var1, var2] lowerBound (body var1 var2)
 
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
