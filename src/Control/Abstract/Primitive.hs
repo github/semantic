@@ -74,6 +74,7 @@ lambda :: ( HasCallStack
        -> Evaluator address value effects value
 lambda body = withCurrentCallStack callStack (lambda' [] body)
 
+-- | A class of types forming the body of 'lambda's. Note that there should in general only be two cases: a recursive case of functions taking 'Name's as parameters, and a base case of an 'Evaluator'.
 class Lambda address value effects ty | ty -> address, ty -> value, ty -> effects where
   lambda' :: [Name]
           -> ty
