@@ -92,6 +92,11 @@ class Lambda address value effects ty | ty -> address, ty -> value, ty -> effect
           -> ty
           -> Evaluator address value effects value
 
+instance (Member Fresh effects, Lambda address value effects ret) => Lambda address value effects (Name -> ret) where
+  lambda' vars body = do
+    var <- gensym
+    lambda' (var : vars) (body var)
+
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
                 , Member (Allocator address value) effects
