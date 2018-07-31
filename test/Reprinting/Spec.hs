@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedLists #-}
 
-module Rendering.Reprinting.Spec where
+module Reprinting.Spec where
 
 import SpecHelpers
 

@@ -148,9 +148,9 @@ library
                      , Rendering.Graph
                      , Rendering.JSON
                      , Rendering.Renderer
-                     , Rendering.Reprinter
                      , Rendering.Symbol
                      , Rendering.TOC
+                     , Reprinting.Algebra
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.AST
                      , Semantic.CLI
@@ -299,7 +299,7 @@ test-suite test
                      , Matching.Go.Spec
                      , Numeric.Spec
                      , Proto3.Roundtrip
-                     , Rendering.Reprinting.Spec
+                     , Reprinting.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
