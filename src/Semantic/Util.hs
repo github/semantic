@@ -32,6 +32,7 @@ import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (weaken)
 import           Reprinting.Algebra
+import           Reprinting.Concrete
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
