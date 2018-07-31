@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable hiding (Close)
 import           Data.JSON.Fields
 import           Data.List (intersperse)
 import           Data.Scientific.Exts
@@ -205,7 +205,9 @@ instance Reprintable Array where
 
   whenGenerated t = do
     control (Enter List)
+    yield Open
     sequenceA_ (intersperse (yield Separator) (toList t))
+    yield Close
     control (Exit List)
 
 newtype Hash a = Hash { hashElements :: [a] }
@@ -219,12 +221,17 @@ instance Evaluatable Hash where
   eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
 instance Reprintable Hash where
-  whenGenerated t = do
+  whenModified t = do
     control (Enter Associative)
     sequenceA_ t
     control (Exit Associative)
 
-  whenModified = whenGenerated
+  whenGenerated t = do
+    control (Enter Associative)
+    yield Open
+    sequenceA_ t
+    yield Close
+    control (Exit Associative)
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)

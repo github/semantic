@@ -27,6 +27,8 @@ data Element
   | Truth Bool    -- ^ A boolean value.
   | Nullity       -- ^ @null@ or @nil@ or some other zero value.
   | Separator     -- ^ Some sort of delimiter, interpreted in some 'Context'.
+  | Open          -- ^ The beginning of some 'Context', such as an @[@ or @{@.
+  | Close         -- ^ The opposite of 'Open'.
     deriving (Eq, Show)
 
 -- | 'Control' tokens describe information about some AST's context.
@@ -36,6 +38,7 @@ data Element
 data Control
   = Enter Context
   | Exit Context
+  | Log String
     deriving (Eq, Show)
 
 -- | A 'Context' represents a scope in which other tokens can be
