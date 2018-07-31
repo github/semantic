@@ -1,16 +1,16 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 
-module Rendering.Reprinter
+module Reprinting.Algebra
   ( History (..)
   , mark
-  -- * The Reprinter monad
-  , Reprinter
-  , yield
-  , control
   -- * Token types
   , Element (..)
   , Control (..)
   , Context (..)
+    -- * The Reprinter monad
+  , Reprinter
+  , yield
+  , control
   -- * Reprintable interface
   , Reprintable (..)
   -- * Invocation/results
