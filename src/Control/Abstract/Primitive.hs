@@ -63,16 +63,13 @@ defineNamespace name scope = define name $ do
   namespace name Nothing binds
 
 lambda :: ( HasCallStack
-          , Member Fresh effects
-          , Member (Function address value) effects
+          , Lambda address value effects fn
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           )
-       => (Name -> Evaluator address value effects address)
+       => fn
        -> Evaluator address value effects value
-lambda body = withCurrentCallStack callStack $ do
-  var <- gensym
-  function [var] lowerBound (body var)
+lambda body = withCurrentCallStack callStack (lambda' [] body)
 
 lambda2 :: ( HasCallStack
            , Member Fresh effects
