@@ -1,6 +1,7 @@
 module Semantic.Env
   ( envLookupInt
   , envLookupString
+  , envLookupBool
   ) where
 
 import Control.Monad.IO.Class
@@ -16,3 +17,6 @@ envLookupInt defaultVal k = liftIO $ parse <$> lookupEnv k
   where parse x | Just s <- x
                     , Just p <- readMaybe s = p
                     | otherwise = defaultVal
+
+envLookupBool :: MonadIO io => Bool -> String -> io Bool
+envLookupBool defaultVal k = liftIO $ isJust <$> lookupEnv k
