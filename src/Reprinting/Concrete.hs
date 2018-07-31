@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, KindSignatures, LambdaCase, ScopedTypeVariables, TupleSections, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, FunctionalDependencies, KindSignatures, LambdaCase, ScopedTypeVariables, TupleSections, TypeOperators #-}
 
 module Reprinting.Concrete
   ( Concrete (..)
@@ -21,42 +21,60 @@ import           Data.Language
 import qualified Data.Source as Source
 import           Reprinting.Token
 
-data ConcreteException
-  = InvalidContext (Maybe Context) Context [Context]
-  | Unexpected String
-    deriving (Eq, Show)
+-- | Once the 'Reprintable' algebra has yielded a sequence of tokens,
+-- we need to apply per-language interpretation to each token so as to
+-- yield language-specific chunks of source code. The 'Concrete'
+-- typeclass describes how a given 'Language' interprets tokens, using
+-- a stack machine described by the @stack@ parameter.  @stack@ must
+-- have a 'Lower' instance so we know where to start.
+class Lower stack => Concrete (l :: Language) stack | l -> stack, stack -> l where
 
-class Concrete (l :: Language) stack | l -> stack, stack -> l where
-  initial :: stack
-
+  -- | Each 'Element' data token should emit a chunk of source code,
+  -- taking into account (but not changing) the state of the stack.
   onElement :: Element -> stack -> Either ConcreteException (Doc a)
+
+  -- | Each 'Control' token can (but doesn't have to) change the state of the stack.
   onControl :: Control -> stack -> Either ConcreteException stack
 
-data JSState = JSState
-  { _currentPrecedence :: Precedence
-  , contexts           :: [Context]
-  }
+-- | Represents failure occurring in a 'Concrete' machine.
+data ConcreteException
+  = InvalidContext (Maybe Context) Context [Context]
+  -- ^ Thrown if an unbalanced 'Enter'/'Exit' pair is encountered.
+  | Unexpected String
+  -- ^ Catch-all exception for unexpected tokens.
+    deriving (Eq, Show)
 
-class HasContexts state where
+-- | Run a 'Concrete' machine over each 'Token' in the provided
+-- 'Sequence'.  Each resulting 'Doc' will be concatenated with
+-- 'mconcat'.  Pass in an appropriately-kinded 'Proxy' to select how
+-- to interpret the language.
+concretize :: Concrete lang state => Proxy lang -> Seq Token -> Either ConcreteException (Doc a)
+concretize prox =
+  run
+  . Exc.runError
+  . fmap snd
+  . runState lowerBound
+  . fmap fst
+  . runWriter
+  . traverse (stepM prox)
+
+-- Private interfaces
+
+-- A class for pushing and popping contexts. This may or may not be useful
+-- when we implement 'Concrete' for languages other than JSON.
+class ContextStack state where
   push    :: Context -> state -> state
   pop     :: state -> state
   current :: state -> Maybe Context
 
-instance HasContexts JSState where
+instance ContextStack JSONState where
   push c s = s { contexts = c : contexts s }
 
   pop s = s { contexts = drop 1 (contexts s)}
 
   current = listToMaybe . contexts
 
-data Precedence
-  = None
-  | Level Int
-
-instance Concrete 'JSON JSState where
-
-  initial = JSState None []
-
+instance Concrete 'JSON JSONState where
   onControl t st = case t of
     Enter c -> pure (push c st)
     Exit c  -> do
@@ -77,25 +95,18 @@ instance Concrete 'JSON JSState where
         Nothing          -> pure mempty
         ctx              -> throwError (Unexpected (show ctx))
 
+-- Distribute 'onControl' and 'onElement' over 'Token', using the
+-- obvious case to handle 'Chunk' tokens.
 step :: Concrete lang state => Token -> state -> Either ConcreteException (Doc a, state)
 step t st = case t of
   Chunk src   -> pure (pretty . Source.toText $ src, st)
   TElement el -> onElement el st >>= \doc -> pure (doc, st)
   TControl ct -> (mempty, ) <$> onControl ct st
 
+-- Kludgy hack to convert 'step' into an effect.
 stepM :: forall lang state a . Concrete lang state => Proxy lang -> Token -> Eff '[Writer (Doc a), State state, Exc ConcreteException] ()
 stepM _ t = do
   st <- get @state
   case step t st of
     Left exc                 -> Exc.throwError exc
     Right (doc :: Doc a, st) -> tell doc *> put st
-
-concretize :: Concrete lang state => Proxy lang -> Seq Token -> Either ConcreteException (Doc a)
-concretize prox =
-  run
-  . Exc.runError
-  . fmap snd
-  . runState initial
-  . fmap fst
-  . runWriter
-  . traverse (stepM prox)
