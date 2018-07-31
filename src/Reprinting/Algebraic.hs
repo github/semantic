@@ -149,7 +149,7 @@ descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra const
 descend t = history >>= \case
   -- No action is necessary for a pristine node.
   Pristine _   -> pure ()
-  Generated    -> local (\c -> c { rcHistory = Generated}) (whenGenerated (fmap subtermRef t))
+  Generated    -> whenGenerated (fmap subtermRef t)
   Modified _   -> whenGenerated (fmap (\x -> into (subterm x) (subtermRef x)) t)
   Refactored r -> do
     st <- get @RPState
