@@ -203,6 +203,8 @@ instance Reprintable Array where
     sequenceA_ t
     control (Exit List)
 
+  whenRefactored = whenModified
+
   whenGenerated t = do
     control (Enter List)
     yield Open

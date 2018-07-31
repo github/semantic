@@ -24,7 +24,8 @@ import Prelude hiding (fail)
 import Prologue hiding (Element)
 
 import Control.Monad.Effect
-import Control.Monad.Effect.State (get, localState, put, runState)
+import Control.Monad.Effect.State
+import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Writer
 import Data.Sequence (singleton)
 
@@ -43,6 +44,12 @@ data History
   | Pristine Range    -- ^ A 'Pristine' node was not changed and has no changed (non-'Pristine') children.
   deriving (Show, Eq)
 
+unsafeRange :: History -> Range
+unsafeRange Generated = error "No range for Generated history"
+unsafeRange (Refactored r) = r
+unsafeRange (Modified r) = r
+unsafeRange (Pristine r) = r
+
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
 mark :: Functor f => (Range -> History) -> f (Record (Range ': fields)) -> f (Record (History ': fields))
 mark f = fmap go where go (r :. a) = f r :. a
@@ -60,37 +67,18 @@ remark f = fmap go where
 -- tokens and 'Element' tokens can be sent to some downstream
 -- consumer. Its primary interface is through the 'Reprintable'
 -- typeclass.
-data Reprinter a where
-  Pure :: a -> Reprinter a
-  Bind :: Reprinter a -> (a -> Reprinter b) -> Reprinter b
-
-  YElement :: Element -> Reprinter ()
-  YControl :: Control -> Reprinter ()
-  YChunk   :: Source  -> Reprinter ()
-  Finish :: Reprinter ()
-
-  Get :: Reprinter RPState
-  Put :: RPState -> Reprinter ()
-  Locally :: (RPState -> RPState) -> Reprinter a -> Reprinter a
-
--- We could implement these types more efficiently, or perhaps move to Freer.
-instance Functor Reprinter where
-  fmap = liftA
-
-instance Applicative Reprinter where
-  pure  = Pure
-  (<*>) = ap
-
-instance Monad Reprinter where
-  (>>=) = Bind
+type Reprinter = Eff '[Reader RPContext, State RPState, Writer (Seq Token)]
 
 -- | Yield an 'Element' token in a 'Reprinter' context.
 yield :: Element -> Reprinter ()
-yield = YElement
+yield = tell . singleton . TElement
 
 -- | Yield a 'Control' token in a 'Reprinter' context.
 control :: Control -> Reprinter ()
-control = YControl
+control = tell . singleton . TControl
+
+chunk :: Source -> Reprinter ()
+chunk = tell . singleton . Chunk
 
 -- | An instance of the 'Reprintable' typeclass describes how
 -- to emit tokens based on the 'History' value of the supplied
@@ -118,94 +106,67 @@ instance (Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Repri
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
 instance (HasField fields History, Reprintable a) => Reprintable (TermF a (Record fields)) where
-  whenGenerated t = locally (withAnn (termFAnnotation t)) (whenGenerated (termFOut t) )
-  whenRefactored t = locally (withAnn (termFAnnotation t)) (whenRefactored (termFOut t))
-  whenModified t = locally (withAnn (termFAnnotation t)) (whenModified (termFOut t))
+  whenGenerated t = local (\c -> c { rcHistory = getField (termFAnnotation t)}) (whenGenerated (termFOut t))
+  whenRefactored t = local (\c -> c { rcHistory = getField (termFAnnotation t)}) (whenRefactored (termFOut t))
+  whenModified t = local (\c -> c { rcHistory = getField (termFAnnotation t)}) (whenModified (termFOut t))
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
 reprint :: (Reprintable a, HasField fields History) => Source -> Term a (Record fields) -> Seq Token
-reprint s t =
+reprint s t = let h = getField (termAnnotation t) in
   run
   . fmap fst
   . runWriter
   . fmap snd
-  . runState (RPState 0 (getField (termAnnotation t)) s)
+  . runState (RPState 0)
+  . runReader (RPContext s h)
   . compile
-  $ foldSubterms descend t *> Finish
+  $ foldSubterms descend t *> finish
 
 -- Private interfaces
 
-data RPState = RPState
+newtype RPState = RPState
   { rpCursor  :: Int     -- from SYR, used to slice and dice a 'Source' (mutates)
-  , rpHistory :: History -- the currently-examined node (locally mutates)
-  , rpSource  :: Source  -- the original source text (immutable)
-  }
+  } deriving (Show, Eq)
 
-instance Show RPState where
-  show (RPState c h _) = "[ cursor = " <> show c <> ", history = " <> show h <> "]"
-
+data RPContext = RPContext
+  { rcSource :: Source
+  , rcHistory :: History
+  } deriving (Show, Eq)
 -- Accessors
 
 cursor :: Reprinter Int
-cursor = rpCursor <$> Get
+cursor = rpCursor <$> get
 
 source :: Reprinter Source
-source = rpSource <$> Get
+source = rcSource <$> ask
 
 history :: Reprinter History
-history = rpHistory <$> Get
+history = rcHistory <$> ask
 
 locally :: (RPState -> RPState) -> Reprinter a -> Reprinter a
-locally = Locally
+locally = localState
 
--- Build a mutator function out of a provided 'History'-containing 'Record'.
-withAnn :: HasField fields History => Record fields -> RPState -> RPState
-withAnn ann s = let h = getField ann in s { rpHistory = h }
-
--- As 'withAnn', but applied to the monad level.
-withHistory :: HasField fields History => Subterm (Term syntax (Record fields)) (Reprinter a) -> Reprinter a
-withHistory t = locally (withAnn (termAnnotation (subterm t))) (subtermRef t)
+finish :: Reprinter ()
+finish = (dropSource <$> cursor <*> source) >>= chunk
 
 -- A subterm algebra that implements the /Scrap Your Reprinter/ algorithm.
 descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
 descend t = history >>= \case
   -- No action is necessary for a pristine node.
   Pristine _   -> pure ()
-  Generated    -> do
-    st <- Get
-    control (Log ("GENERATED: state is " <> show st))
-    whenGenerated (fmap subtermRef t) -- Enter children, generating values
-  Modified _   -> do
-    st <- Get
-    control (Log ("MODIFIED: state is " <> show st))
-    whenModified (fmap withHistory t) -- Enter children contextually
+  Generated    -> local (\c -> c { rcHistory = Generated}) (whenGenerated (fmap subtermRef t))
+  Modified _   -> whenGenerated (fmap go t) where go x = local (\c -> c { rcHistory = getField (termAnnotation (subterm x))}) (subtermRef x)
   Refactored r -> do
-    st <- Get
-    control (Log ("REFACTORED: State is " <> show st))
-    -- Slice from cursor->lower bound and log it
+    st <- get @RPState
+    control (Log ("Refactor state is " <> show st))
     let range = Range (rpCursor st) (start r)
-    control (Log ("Slice range is now " <> show range))
-    -- Log the sliced chunk
-    source >>= (YChunk . slice range)
-    control (Log ("cursor is now " <> show (start r)))
-    Put (st { rpCursor = start r, rpHistory = Generated })
-    newst <- Get
-    control (Log ("New state is " <> show newst))
-    -- Enter the children, if any, with the refactoring action
-    locally (const newst) (whenRefactored (fmap subtermRef t))
-    -- The cursor is now the upper bound
-    Put (st { rpCursor = end r})
+    source >>= (chunk . slice range)
+    modify' (\s -> s { rpCursor = start r })
+    let go x = local (\c -> c { rcHistory = getField (termAnnotation (subterm x))}) (subtermRef x)
+    whenRefactored (fmap go t)
+    modify' (\s -> s { rpCursor = end r })
 
 -- Interpret a Reprinter to a state/writer effect.
-compile :: Reprinter a -> Eff '[State RPState, Writer (Seq Token)] a
-compile r = case r of
-  Pure v     -> pure v
-  Bind p f   -> compile p >>= compile . f
-  Get        -> get
-  Put a      -> put a
-  Locally f a -> localState f (compile a)
-  YChunk c   -> tell (singleton (Chunk c))
-  YElement e -> tell (singleton (TElement e))
-  YControl c -> tell (singleton (TControl c))
-  Finish     -> compile (dropSource <$> cursor <*> source) >>= tell . singleton . Chunk
+compile :: Reprinter a -> Reprinter a
+compile = id
