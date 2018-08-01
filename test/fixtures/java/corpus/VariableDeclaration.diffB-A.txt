@@ -1,0 +1,17 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+          (Statements
+            (Assignment
+              (Variable
+              { (Float)
+              ->(Int) }
+                (Identifier))
+            { (Float)
+            ->(Integer) })))))))
