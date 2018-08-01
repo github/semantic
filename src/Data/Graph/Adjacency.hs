@@ -42,6 +42,7 @@ import qualified Data.Graph.Vertex as V
 data VertexType
   = PACKAGE
   | MODULE
+  | UNKNOWN_MODULE
   | VARIABLE
   | METHOD
   | FUNCTION
@@ -119,6 +120,7 @@ taggedGraphToAdjacencyList = accumToAdj . adjMapToAccum . adjacencyMap . toGraph
           t = case s of
             V.Package{}  -> PACKAGE
             V.Module{}   -> MODULE
+            V.UnknownModule{}   -> UNKNOWN_MODULE
             V.Variable{} -> VARIABLE
             V.Method{}   -> METHOD
             V.Function{} -> FUNCTION
@@ -161,8 +163,9 @@ importGraphToGraph (AdjacencyList vs es) = simplify built
 
         pbToVertex :: Vertex -> V.Vertex
         pbToVertex (Vertex t c _) = case t of
-          MODULE   -> V.Module c
           PACKAGE  -> V.Package c
+          MODULE   -> V.Module c
+          UNKNOWN_MODULE   -> V.UnknownModule c
           VARIABLE -> V.Variable c "unknown" emptySpan
           METHOD   -> V.Method c "unknown" emptySpan
           FUNCTION   -> V.Function c "unknown" emptySpan

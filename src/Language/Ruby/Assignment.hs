@@ -83,16 +83,19 @@ type Syntax = '[
   , Expression.This
   , Expression.Member
   , Literal.Array
+  , Literal.Character
   , Literal.Complex
   , Literal.Float
   , Literal.Hash
   , Literal.Integer
+  , Literal.InterpolationElement
   , Literal.KeyValue
   , Literal.Null
   , Literal.Rational
   , Literal.Regex
   , Literal.String
   , Literal.Symbol
+  , Literal.SymbolElement
   , Literal.TextElement
   , Statement.Assignment
   , Statement.Break
@@ -254,16 +257,32 @@ literal =
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
+  <|> makeTerm <$> symbol StringArray <*> children (Literal.Array <$> many expression)
+  <|> makeTerm <$> symbol SymbolArray <*> children (Literal.Array <$> many expression)
   <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many expression)
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
-  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+  <|> string
+  <|> symbol'
+  <|> makeTerm <$> symbol Character <*> (Literal.Character <$> source)
   <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
   <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
-  <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.Symbol <$> source)
+
+  where
+    string :: Assignment Term
+    string = makeTerm' <$> (symbol String <|> symbol BareString) <*>
+      (children (inject . Literal.String <$> some interpolation) <|> inject . Literal.TextElement <$> source)
+
+    symbol' :: Assignment Term
+    symbol' = makeTerm' <$> (symbol Symbol <|> symbol Symbol' <|> symbol BareSymbol) <*>
+      (children (inject . Literal.Symbol <$> some interpolation) <|> inject . Literal.SymbolElement <$> source)
+
+interpolation :: Assignment Term
+interpolation = makeTerm <$> symbol Interpolation <*> children (Literal.InterpolationElement <$> expression)
 
 heredoc :: Assignment Term
 heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
-       <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
+       <|> makeTerm <$> symbol HeredocBody <*> children (some (interpolation <|> heredocEnd))
+  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 beginBlock :: Assignment Term
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many expression)

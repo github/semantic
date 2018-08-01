@@ -14,9 +14,10 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
-import           Data.Abstract.Value.Concrete
-import           Data.Abstract.Value.Type
+import           Data.Abstract.Value.Concrete as Concrete
+import           Data.Abstract.Value.Type as Type
 import           Data.Blob
+import           Data.Coerce
 import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
@@ -53,7 +54,8 @@ justEvaluating
   . runValueError
 
 newtype UtilEff address a = UtilEff
-  { runUtilEff :: Eff '[ Exc (LoopControl address)
+  { runUtilEff :: Eff '[ Function address (Value address (UtilEff address))
+                       , Exc (LoopControl address)
                        , Exc (Return address)
                        , Env address
                        , Deref address (Value address (UtilEff address))
@@ -106,7 +108,7 @@ typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Langu
 callGraphProject parser proxy lang opts paths = runTaskWithOptions opts $ do
   blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
   package <- parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
-  modules <- topologicalSort <$> runImportGraph proxy package
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
@@ -121,25 +123,25 @@ data TaskConfig = TaskConfig Config LogQueue StatQueue
 evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
   blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
-  modules <- topologicalSort <$> runImportGraph proxy package
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules))))))
+       (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
 
 
 evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePackage parser project
-  modules <- topologicalSort <$> runImportGraph proxy package
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans modules)))))
+       (evaluate proxy id withTermSpans Type.runFunction modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
