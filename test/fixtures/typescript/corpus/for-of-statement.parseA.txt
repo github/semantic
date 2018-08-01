@@ -1,8 +1,8 @@
-(Program
+(Statements
   (ForOf
     (Identifier)
     (Identifier)
-    (
+    (Statements
       (Call
         (Identifier)
         (Identifier)

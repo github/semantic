@@ -1,21 +1,21 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Annotation
-          (
+          (Statements
             (Identifier))
           (Identifier))
-        ([]))
+        (Statements))
       (Assignment
         (Annotation
-          (
+          (Statements
             (Identifier)
             (Identifier))
           (Identifier))
-        ([])))))
+        (Statements)))))

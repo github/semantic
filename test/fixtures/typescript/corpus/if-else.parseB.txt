@@ -1,16 +1,16 @@
-(Program
+(Statements
   (If
     (Identifier)
     (Identifier)
     (If
       (Identifier)
-      (
+      (Statements
         (Identifier))
       (If
         (Identifier)
         (Identifier)
         (If
           (Identifier)
-          (
+          (Statements
             (Identifier))
           (Identifier))))))

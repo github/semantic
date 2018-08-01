@@ -1,47 +1,47 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-  { (
+    (Statements)
+  { (Statements
     {-(Match
-      {-([])-}
+      {-(Statements)-}
       {-(Pattern
         {-(Identifier)-}
         {-(Call
           {-(Identifier)-}
-          {-([])-}
+          {-(Statements)-}
           {-(Empty)-})-})-})-}
     {-(Match
-      {-(
+      {-(Statements
         {-(Identifier)-})-}
-      {-(
+      {-(Statements
         {-(Pattern
-          {-(
+          {-(Statements
             {-(Integer)-}
             {-(Integer)-})-}
-          {-(
+          {-(Statements
             {-(Call
               {-(Identifier)-}
-              {-([])-}
+              {-(Statements)-}
               {-(Empty)-})-}
             {-(Call
               {-(Identifier)-}
-              {-([])-}
+              {-(Statements)-}
               {-(Empty)-})-}
             {-(Pattern
               {-(Identifier)-}
               {-(Empty)-})-})-})-}
         {-(DefaultPattern
-          {-(
+          {-(Statements
             {-(Call
               {-(Identifier)-}
-              {-([])-}
+              {-(Statements)-}
               {-(Empty)-})-}
             {-(Break
               {-(Empty)-})-})-})-})-})-})
   ->(Match
     {+(Empty)+}
-    {+([])+}) }))
+    {+(Statements)+}) }))

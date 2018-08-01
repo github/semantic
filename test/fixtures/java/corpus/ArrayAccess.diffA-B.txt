@@ -1,0 +1,17 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+        {+(Subscript
+          {+(Identifier)+}
+          {+(Integer)+})+}
+        {-(Annotation
+          {-(Subscript
+            {-(Identifier)-}
+            {-(Integer)-})-}
+          {-(Identifier)-})-})))))

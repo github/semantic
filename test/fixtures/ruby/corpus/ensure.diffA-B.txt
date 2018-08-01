@@ -1,9 +1,9 @@
-(Program
+(Statements
   (Try
-    (
+    (Statements
       (Send
         (Identifier))
       (Finally
-      { ([])
+      { (Statements)
       ->(Send
         {+(Identifier)+}) }))))

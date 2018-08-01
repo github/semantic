@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.JSON.Grammar where
 
 import Language.Haskell.TH

@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Hash
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (TextElement))
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Integer))
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Boolean))))

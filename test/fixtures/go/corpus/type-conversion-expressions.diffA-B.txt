@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Pointer
         (Call
           (Identifier)
@@ -31,70 +31,71 @@
       ->(Identifier) })
       (TypeConversion
         (Function
-          ([])
+          (Statements)
           (Empty))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
         (Parenthesized
           (Function
-            ([])
+            (Statements)
             (Empty)))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
         (Parenthesized
           (Function
-            ([])
+            (Statements)
             (Identifier)))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
         (Function
-          ([])
+          (Statements)
           (Identifier))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
         (Slice
-          (MemberAccess
-          { (Identifier)
-          ->(Identifier) }
-          { (Identifier)
-          ->(Identifier) }))
-        (MemberAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) }))
-      (TypeConversion
-        (Parenthesized
-          (Slice
-            (MemberAccess
-            { (Identifier)
-            ->(Identifier) }
-            { (Identifier)
-            ->(Identifier) })))
-        (MemberAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) }))
-      (Call
-        (MemberAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (Call
-        (MemberAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))))
+        { (MemberAccess
+          {-(Identifier)-})
+        ->(MemberAccess
+          {+(Identifier)+}) })
+      { (MemberAccess
+        {-(Identifier)-})
+      ->(MemberAccess
+        {+(Identifier)+}) })
+    {+(TypeConversion
+      {+(Parenthesized
+        {+(Slice
+          {+(MemberAccess
+            {+(Identifier)+})+})+})+}
+      {+(MemberAccess
+        {+(Identifier)+})+})+}
+    {+(Call
+      {+(MemberAccess
+        {+(Identifier)+})+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(Call
+      {+(MemberAccess
+        {+(Identifier)+})+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {-(TypeConversion
+      {-(Parenthesized
+        {-(Slice
+          {-(MemberAccess
+            {-(Identifier)-})-})-})-}
+      {-(MemberAccess
+        {-(Identifier)-})-})-}
+    {-(Call
+      {-(MemberAccess
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(Call
+      {-(MemberAccess
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(Empty)-})-})))

@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Require
   { (TextElement)
   ->(TextElement) })
   (Send
   { (Identifier)
   ->(Identifier) }
-  {+(Symbol)+}
+  {+(SymbolElement)+}
   {+(TextElement)+}
   {-(Send
     {-(Identifier)-})-}))

@@ -1,11 +1,11 @@
-(Program
-  (LowOr
+(Statements
+  (LowPrecedenceOr
     (Send
       (Identifier))
     (Send
       (Identifier)))
-  (LowAnd
-    (LowOr
+  (LowPrecedenceAnd
+    (LowPrecedenceOr
       (Send
         (Identifier))
       (Send

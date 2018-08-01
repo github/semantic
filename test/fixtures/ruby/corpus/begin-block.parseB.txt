@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Send
     (Identifier))
   (ScopeEntry

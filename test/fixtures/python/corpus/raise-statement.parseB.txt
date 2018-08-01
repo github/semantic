@@ -1,15 +1,15 @@
-(Program
+(Statements
   (Throw
     (Call
       (Identifier)
       (TextElement)
       (Empty)))
   (Throw
-    (
+    (Statements
       (Call
         (Identifier)
         (TextElement)
         (Empty))
       (Identifier)))
   (Throw
-    ([])))
+    (Statements)))

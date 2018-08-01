@@ -1,16 +1,16 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Type
       { (Identifier)
       ->(Identifier) }
         (Function
-          (
+          (Statements
           { (Identifier)
           ->(Identifier) })
         { (Identifier)
@@ -19,18 +19,18 @@
       { (Identifier)
       ->(Identifier) }
         (Function
-          (
-          {-(
+          (Statements
+          {-(Statements
             {-(Identifier)-})-}
-            (
+            (Statements
               (Identifier))
-          {+(
+          {+(Statements
             {+(Identifier)+})+})
-          (
-            (
+          (Statements
+            (Statements
             {+(BidirectionalChannel
               {+(Identifier)+})+}
             {-(Identifier)-})
-            (
+            (Statements
               (Identifier)))
           (Empty))))))

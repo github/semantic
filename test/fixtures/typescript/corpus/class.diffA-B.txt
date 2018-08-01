@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Class
     (TypeParameter
     { (Identifier)
@@ -10,7 +10,7 @@
     (ExtendsClause
     { (TypeIdentifier)
     ->(TypeIdentifier) })
-    (
+    (Statements
     {+(Method
       {+(Empty)+}
       {+(Empty)+}
@@ -25,7 +25,7 @@
         {+(Assignment
           {+(Identifier)+}
           {+(Empty)+})+})+}
-      {+(
+      {+(Statements
         {+(Return
           {+(Identifier)+})+})+})+}
     {+(Method
@@ -42,7 +42,7 @@
         {+(Assignment
           {+(Identifier)+}
           {+(Empty)+})+})+}
-      {+(
+      {+(Statements
         {+(Return
           {+(Identifier)+})+})+})+}
     {+(Method
@@ -59,7 +59,7 @@
         {+(Assignment
           {+(Identifier)+}
           {+(Empty)+})+})+}
-      {+(
+      {+(Statements
         {+(Return
           {+(Identifier)+})+})+})+}
     {-(PublicFieldDefinition
@@ -82,7 +82,7 @@
         {-(Assignment
           {-(Identifier)-}
           {-(Empty)-})-})-}
-      {-(
+      {-(Statements
         {-(Return
           {-(Identifier)-})-})-})-}
     {-(Method
@@ -99,7 +99,7 @@
         {-(Assignment
           {-(Identifier)-}
           {-(Empty)-})-})-}
-      {-(
+      {-(Statements
         {-(Return
           {-(Identifier)-})-})-})-}
     {-(Method
@@ -116,6 +116,6 @@
         {-(Assignment
           {-(Identifier)-}
           {-(Empty)-})-})-}
-      {-(
+      {-(Statements
         {-(Return
           {-(Identifier)-})-})-})-})))

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Send
     (Identifier)
     (Function
@@ -7,7 +7,7 @@
     { (Plus
       {-(Identifier)-}
       {-(Integer)-})
-    ->([]) }))
+    ->(Statements) }))
 {+(Send
   {+(Identifier)+}
   {+(Function
@@ -26,7 +26,7 @@
   {+(Empty)+}
   {+(Function
     {+(Empty)+}
-    {+([])+})+})+}
+    {+(Statements)+})+})+}
 {+(Function
   {+(Empty)+}
   {+(Function
@@ -43,9 +43,9 @@
   {+(Empty)+}
   {+(Identifier)+}
   {+(Identifier)+}
-  {+(
+  {+(Statements
     {+(Identifier)+}
     {+(Identifier)+})+}
   {+(Function
     {+(Empty)+}
-    {+([])+})+})+})
+    {+(Statements)+})+})+})

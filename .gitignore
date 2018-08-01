@@ -1,6 +1,7 @@
 .DS_Store
 
 .stack-work
+.stack-work-profiling
 profiles
 tags
 
@@ -24,3 +25,5 @@ bin/
 .bundle/
 .licenses/vendor/gems
 .licenses/log/
+
+codex.tags

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Subscript
     (Send
       (Identifier))
@@ -6,4 +6,4 @@
   (Subscript
     (Send
       (Identifier))
-    (Symbol)))
+    (SymbolElement)))

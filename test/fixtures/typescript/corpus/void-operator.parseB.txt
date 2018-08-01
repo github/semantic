@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Void
     (Call
       (Identifier)

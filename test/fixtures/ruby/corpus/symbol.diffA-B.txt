@@ -1,7 +1,7 @@
-(Program
-{+(Symbol)+}
-{ (Symbol)
-->(Symbol) }
-{+(Symbol)+}
-{-(Symbol)-}
-{-(Symbol)-})
+(Statements
+{ (SymbolElement)
+->(SymbolElement) }
+{ (SymbolElement)
+->(SymbolElement) }
+{ (SymbolElement)
+->(SymbolElement) })

@@ -1,317 +1,290 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
-, MonadEvaluatable
 , Evaluatable(..)
-, Unspecialized(..)
-, EvalError(..)
-, LoadError(..)
-, ResolutionError(..)
-, variable
-, evaluateInScopedEnv
-, evalModule
-, evaluatePackage
-, evaluatePackageBody
-, throwEvalError
-, resolve
+, evaluate
 , traceResolve
-, listModulesInDir
-, require
-, load
+-- * Preludes
+, HasPrelude(..)
+-- * Postludes
+, HasPostlude(..)
+-- * Effects
+, EvalError(..)
+, throwEvalError
+, runEvalError
+, runEvalErrorWith
+, Unspecialized(..)
+, runUnspecialized
+, runUnspecializedWith
+, Cell
 ) where
 
-import           Control.Abstract.Addressable as X
-import           Control.Abstract.Analysis as X hiding (LoopControl(..), Return(..))
-import           Control.Abstract.Analysis (LoopControl, Return(..))
-import           Control.Monad.Effect as Eff
-import           Data.Abstract.Address
-import           Data.Abstract.Declarations as X
-import           Data.Abstract.Environment as X
-import qualified Data.Abstract.Exports as Exports
-import           Data.Abstract.FreeVariables as X
-import           Data.Abstract.Module
-import           Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Origin (packageOrigin)
-import           Data.Abstract.Package as Package
-import           Data.Language
-import           Data.Scientific (Scientific)
-import           Data.Semigroup.App
-import           Data.Semigroup.Foldable
-import           Data.Semigroup.Reducer hiding (unit)
-import           Data.Term
-import           Prologue
+import Control.Abstract hiding (Load)
+import Control.Abstract.Context as X
+import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
+import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
+import Control.Abstract.Heap as X hiding (AddressError(..), runAddressError, runAddressErrorWith)
+import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve)
+import Control.Abstract.Value as X hiding (Function(..))
+import Data.Abstract.Declarations as X
+import Data.Abstract.Environment as X
+import Data.Abstract.FreeVariables as X
+import Data.Abstract.Module
+import Data.Abstract.ModuleTable as ModuleTable
+import Data.Abstract.Name as X
+import Data.Abstract.Ref as X
+import Data.Coerce
+import Data.Language
+import Data.Scientific (Scientific)
+import Data.Semigroup.App
+import Data.Semigroup.Foldable
+import Data.Semigroup.Reducer hiding (unit)
+import Data.Sum
+import Data.Term
+import Prologue
 
-type MonadEvaluatable location term value effects m =
-  ( Declarations term
-  , Evaluatable (Base term)
-  , FreeVariables term
-  , Member (EvalClosure term value) effects
-  , Member (Call value) effects
-  , Member (EvalModule term value) effects
-  , Member Fail effects
-  , Member (LoopControl value) effects
-  , Member (Resumable (Unspecialized value)) effects
-  , Member (Resumable (LoadError term)) effects
-  , Member (Resumable (EvalError value)) effects
-  , Member (Resumable (ResolutionError value)) effects
-  , Member (Resumable (AddressError location value)) effects
-  , Member (Return value) effects
-  , MonadAddressable location effects m
-  , MonadEvaluator location term value effects m
-  , MonadValue location value effects m
-  , Recursive term
-  , Reducer value (Cell location value)
-  )
+-- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
+class (Show1 constr, Foldable constr) => Evaluatable constr where
+  eval :: ( AbstractValue address value effects
+          , Declarations term
+          , FreeVariables term
+          , Member (Allocator address value) effects
+          , Member (Deref address value) effects
+          , Member (Env address) effects
+          , Member (Exc (LoopControl address)) effects
+          , Member (Exc (Return address)) effects
+          , Member (Function address value) effects
+          , Member (Modules address) effects
+          , Member (Reader ModuleInfo) effects
+          , Member (Reader PackageInfo) effects
+          , Member (Reader Span) effects
+          , Member (Resumable (EnvironmentError address)) effects
+          , Member (Resumable (Unspecialized value)) effects
+          , Member (Resumable EvalError) effects
+          , Member (Resumable ResolutionError) effects
+          , Member Fresh effects
+          , Member Trace effects
+          )
+       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
+  eval expr = do
+    traverse_ subtermValue expr
+    v <- throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
+    rvalBox v
 
--- | An error thrown when we can't resolve a module from a qualified name.
-data ResolutionError value resume where
-  NotFoundError :: String   -- ^ The path that was not found.
-                -> [String] -- ^ List of paths searched that shows where semantic looked for this module.
-                -> Language -- ^ Language.
-                -> ResolutionError value ModulePath
 
-  GoImportError :: FilePath -> ResolutionError value [ModulePath]
+evaluate :: ( AbstractValue address value valueEffects
+            , Allocatable address (Reader ModuleInfo ': effects)
+            , Derefable address (Allocator address value ': Reader ModuleInfo ': effects)
+            , Declarations term
+            , Effects effects
+            , Evaluatable (Base term)
+            , Foldable (Cell address)
+            , FreeVariables term
+            , HasPostlude lang
+            , HasPrelude lang
+            , Member Fresh effects
+            , Member (Modules address) effects
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
+            , Member (Reader PackageInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (AddressError address value)) effects
+            , Member (Resumable (EnvironmentError address)) effects
+            , Member (Resumable EvalError) effects
+            , Member (Resumable ResolutionError) effects
+            , Member (Resumable (Unspecialized value)) effects
+            , Member (State (Heap address (Cell address) value)) effects
+            , Member Trace effects
+            , Recursive term
+            , Reducer value (Cell address value)
+            , ValueRoots address value
+            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
+            , valueEffects ~ (Function address value ': moduleEffects)
+            )
+         => proxy lang
+         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)            -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
+         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
+         -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
+         -> [Module term]
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
+evaluate lang analyzeModule analyzeTerm runValue modules = do
+  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
+    definePrelude lang
+    box unit
+  foldr (run preludeBinds) ask modules
+  where run preludeBinds m rest = do
+          evaluated <- coerce
+            (runInModule preludeBinds (moduleInfo m))
+            (analyzeModule (subtermRef . moduleBody)
+            (evalModuleBody <$> m))
+          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
+          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-deriving instance Eq (ResolutionError a b)
-deriving instance Show (ResolutionError a b)
-instance Show1 (ResolutionError value) where liftShowsPrec _ _ = showsPrec
-instance Eq1 (ResolutionError value) where
-  liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
-  liftEq _ (GoImportError a) (GoImportError b) = a == b
-  liftEq _ _ _ = False
+        evalModuleBody term = Subterm term (coerce runValue (do
+          result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
+          result <$ TermEvaluator (postlude lang)))
 
--- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError term resume where
-  LoadError :: ModulePath -> LoadError term [Module term]
+        runInModule preludeBinds info
+          = runReader info
+          . runAllocator
+          . runDeref
+          . runEnv (newEnv preludeBinds)
+          . runReturn
+          . runLoopControl
 
-deriving instance Eq (LoadError term resume)
-deriving instance Show (LoadError term resume)
-instance Show1 (LoadError term) where
-  liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError term) where
-  liftEq _ (LoadError a) (LoadError b) = a == b
+
+traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
+traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
+
+
+-- Preludes
+
+class HasPrelude (language :: Language) where
+  definePrelude :: ( AbstractValue address value effects
+                   , HasCallStack
+                   , Member (Allocator address value) effects
+                   , Member (Deref address value) effects
+                   , Member (Env address) effects
+                   , Member Fresh effects
+                   , Member (Function address value) effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (EnvironmentError address)) effects
+                   , Member Trace effects
+                   )
+                => proxy language
+                -> Evaluator address value effects ()
+  definePrelude _ = pure ()
+
+instance HasPrelude 'Go
+instance HasPrelude 'Haskell
+instance HasPrelude 'Java
+instance HasPrelude 'PHP
+
+instance HasPrelude 'Python where
+  definePrelude _ =
+    define (name "print") builtInPrint
+
+instance HasPrelude 'Ruby where
+  definePrelude _ = do
+    define (name "puts") builtInPrint
+
+    defineClass (name "Object") [] $ do
+      define (name "inspect") (lambda (const (box (string "<object>"))))
+
+instance HasPrelude 'TypeScript where
+  definePrelude _ =
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
+
+instance HasPrelude 'JavaScript where
+  definePrelude _ = do
+    defineNamespace (name "console") $ do
+      define (name "log") builtInPrint
+
+-- Postludes
+
+class HasPostlude (language :: Language) where
+  postlude :: ( AbstractValue address value effects
+              , HasCallStack
+              , Member (Allocator address value) effects
+              , Member (Deref address value) effects
+              , Member (Env address) effects
+              , Member Fresh effects
+              , Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Member (Resumable (EnvironmentError address)) effects
+              , Member Trace effects
+              )
+           => proxy language
+           -> Evaluator address value effects ()
+  postlude _ = pure ()
+
+instance HasPostlude 'Go
+instance HasPostlude 'Haskell
+instance HasPostlude 'Java
+instance HasPostlude 'PHP
+instance HasPostlude 'Python
+instance HasPostlude 'Ruby
+instance HasPostlude 'TypeScript
+
+instance HasPostlude 'JavaScript where
+  postlude _ = trace "JS postlude"
+
+
+-- Effects
 
 -- | The type of error thrown when failing to evaluate a term.
-data EvalError value resume where
-  -- Indicates we weren't able to dereference a name from the evaluated environment.
-  FreeVariableError :: Name -> EvalError value value
-  FreeVariablesError :: [Name] -> EvalError value Name
+data EvalError return where
+  NoNameError :: EvalError Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: ByteString -> EvalError value Integer
-  FloatFormatError    :: ByteString -> EvalError value Scientific
-  RationalFormatError :: ByteString -> EvalError value Rational
-  DefaultExportError  :: EvalError value ()
-  ExportError         :: ModulePath -> Name -> EvalError value ()
-  EnvironmentLookupError :: value -> EvalError value value
+  IntegerFormatError  :: Text -> EvalError Integer
+  FloatFormatError    :: Text -> EvalError Scientific
+  RationalFormatError :: Text -> EvalError Rational
+  DefaultExportError  :: EvalError ()
+  ExportError         :: ModulePath -> Name -> EvalError ()
 
--- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
---   Throws an 'EnvironmentLookupError' if @scopedEnvTerm@ does not have an environment.
-evaluateInScopedEnv :: MonadEvaluatable location term value effects m
-                    => m effects value
-                    -> m effects value
-                    -> m effects value
-evaluateInScopedEnv scopedEnvTerm term = do
-  value <- scopedEnvTerm
-  scopedEnv <- scopedEnvironment value
-  maybe (throwEvalError (EnvironmentLookupError value)) (flip localEnv term . mergeEnvs) scopedEnv
+deriving instance Eq (EvalError return)
+deriving instance Show (EvalError return)
 
--- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Resumable (AddressError location value)) effects
-            , Member (Resumable (EvalError value)) effects
-            , MonadAddressable location effects m
-            , MonadEvaluator location term value effects m
-            )
-         => Name
-         -> m effects value
-variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
-
-deriving instance Eq a => Eq (EvalError a b)
-deriving instance Show a => Show (EvalError a b)
-instance Show value => Show1 (EvalError value) where
-  liftShowsPrec _ _ = showsPrec
-instance Eq term => Eq1 (EvalError term) where
-  liftEq _ (FreeVariableError a) (FreeVariableError b)     = a == b
-  liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
+instance Eq1 EvalError where
+  liftEq _ NoNameError        NoNameError                  = True
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
   liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
-  liftEq _ (EnvironmentLookupError a) (EnvironmentLookupError b) = a == b
   liftEq _ _ _                                             = False
 
+instance Show1 EvalError where
+  liftShowsPrec _ _ = showsPrec
 
-throwEvalError :: (Member (Resumable (EvalError value)) effects, MonadEvaluator location term value effects m) => EvalError value resume -> m effects resume
+throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
 throwEvalError = throwResumable
+
+runEvalError :: (Effectful m, Effects effects) => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
+runEvalError = runResumable
+
+runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
+runEvalErrorWith = runResumableWith
 
 
 data Unspecialized a b where
-  Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
+  Unspecialized :: String -> Unspecialized value value
+
+deriving instance Eq (Unspecialized a b)
+deriving instance Show (Unspecialized a b)
 
 instance Eq1 (Unspecialized a) where
   liftEq _ (Unspecialized a) (Unspecialized b) = a == b
 
-deriving instance Eq (Unspecialized a b)
-deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
--- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
-class Evaluatable constr where
-  eval :: MonadEvaluatable location term value effects m
-       => SubtermAlgebra constr term (m effects value)
-  default eval :: (MonadEvaluatable location term value effects m, Show1 constr) => SubtermAlgebra constr term (m effects value)
-  eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+runUnspecialized :: (Effectful (m value), Effects effects) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized = runResumable
+
+runUnspecializedWith :: (Effectful (m value), Effects effects) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
+runUnspecializedWith = runResumableWith
 
 
 -- Instances
 
--- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
-instance Apply Evaluatable fs => Evaluatable (Union fs) where
-  eval = Prologue.apply (Proxy :: Proxy Evaluatable) eval
+-- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
+instance (Apply Evaluatable fs, Apply Show1 fs, Apply Foldable fs) => Evaluatable (Sum fs) where
+  eval = apply @Evaluatable eval
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
-instance Evaluatable s => Evaluatable (TermF s a) where
+instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
   eval = eval . termFOut
 
---- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
----
----   1. Each statement’s effects on the store are accumulated;
----   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
----   3. Only the last statement’s return value is returned.
+
+-- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
+--
+-- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
+--
+--   1. Each statement’s effects on the store are accumulated;
+--   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
+--   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
-
--- Resolve a list of module paths to a possible module table entry.
-resolve :: MonadEvaluatable location term value effects m
-        => [FilePath]
-        -> m effects (Maybe ModulePath)
-resolve names = do
-  tbl <- askModuleTable
-  pure $ find (`ModuleTable.member` tbl) names
-
-traceResolve :: (Show a, Show b) => a -> b -> c -> c
-traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
-
-listModulesInDir :: MonadEvaluatable location term value effects m
-        => FilePath
-        -> m effects [ModulePath]
-listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
-
--- | Require/import another module by name and return it's environment and value.
---
--- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: ( Member (EvalModule term value) effects
-           , Member (Resumable (LoadError term)) effects
-           , MonadEvaluator location term value effects m
-           , MonadValue location value effects m
-           )
-        => ModulePath
-        -> m effects (Environment location value, value)
-require = requireWith evaluateModule
-
-requireWith :: ( Member (Resumable (LoadError term)) effects
-               , MonadEvaluator location term value effects m
-               , MonadValue location value effects m
-               )
-            => (Module term -> m effects value)
-            -> ModulePath
-            -> m effects (Environment location value, value)
-requireWith with name = getModuleTable >>= maybeM (loadWith with name) . ModuleTable.lookup name
-
--- | Load another module by name and return it's environment and value.
---
--- Always loads/evaluates.
-load :: ( Member (EvalModule term value) effects
-        , Member (Resumable (LoadError term)) effects
-        , MonadEvaluator location term value effects m
-        , MonadValue location value effects m
-        )
-     => ModulePath
-     -> m effects (Environment location value, value)
-load = loadWith evaluateModule
-
-loadWith :: ( Member (Resumable (LoadError term)) effects
-            , MonadEvaluator location term value effects m
-            , MonadValue location value effects m
-            )
-         => (Module term -> m effects value)
-         -> ModulePath
-         -> m effects (Environment location value, value)
-loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
-  where
-    notFound = throwResumable (LoadError name)
-
-    evalAndCache []     = (,) emptyEnv <$> unit
-    evalAndCache [x]    = evalAndCache' x
-    evalAndCache (x:xs) = do
-      (env, _) <- evalAndCache' x
-      (env', v') <- evalAndCache xs
-      pure (mergeEnvs env env', v')
-
-    evalAndCache' x = do
-      let mPath = modulePath (moduleInfo x)
-      LoadStack{..} <- getLoadStack
-      if mPath `elem` unLoadStack
-        then do -- Circular load, don't keep evaluating.
-          v <- trace ("load (skip evaluating, circular load): " <> show mPath) unit
-          pure (emptyEnv, v)
-        else do
-          modifyLoadStack (loadStackPush mPath)
-          v <- trace ("load (evaluating): " <> show mPath) $ with x
-          modifyLoadStack loadStackPop
-          traceM ("load done:" <> show mPath)
-          env <- filterEnv <$> getExports <*> getEnv
-          modifyModuleTable (ModuleTable.insert name (env, v))
-          pure (env, v)
-
-    -- TODO: If the set of exports is empty because no exports have been
-    -- defined, do we export all terms, or no terms? This behavior varies across
-    -- languages. We need better semantics rather than doing it ad-hoc.
-    filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
-    filterEnv ports env
-      | Exports.null ports = env
-      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-
-
--- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
-evalModule :: forall location term value effects m
-           .  ( MonadAnalysis location term value effects m
-              , MonadEvaluatable location term value effects m
-              )
-           => Module term
-           -> m effects value
-evalModule m = raiseHandler
-  (interpose @(EvalModule term value) pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
-  (analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m))
-  where evalTerm term = catchReturn @m @value
-          (raiseHandler
-            (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
-            (foldSubterms (analyzeTerm eval) term))
-          (\ (Return value) -> pure value)
-
--- | Evaluate a given package.
-evaluatePackage :: ( MonadAnalysis location term value effects m
-                   , MonadEvaluatable location term value effects m
-                   )
-                => Package term
-                -> m effects [value]
-evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
-
--- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: ( MonadAnalysis location term value effects m
-                       , MonadEvaluatable location term value effects m
-                       )
-                    => PackageBody term
-                    -> m effects [value]
-evaluatePackageBody body = withPrelude (packagePrelude body) $
-  localModuleTable (<> packageModules body) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
-  where
-    evaluateEntryPoint (m, sym) = do
-      (_, v) <- requireWith evalModule m
-      maybe (pure v) ((`evalCall` []) <=< variable) sym
-    withPrelude Nothing a = a
-    withPrelude (Just prelude) a = do
-      preludeEnv <- evalModule prelude *> getEnv
-      withDefaultEnvironment preludeEnv a
+  eval = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty

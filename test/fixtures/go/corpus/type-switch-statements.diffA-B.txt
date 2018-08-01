@@ -1,13 +1,13 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (TypeSwitch
-        (
+        (Statements
           (Assignment
           { (Identifier)
           ->(Identifier) }
@@ -16,15 +16,14 @@
           (TypeSwitchGuard
           { (Identifier)
           ->(Identifier) }))
-        (
+        (Statements
           (Pattern
-            (
+            (Statements
               (Identifier)
               (Pointer
                 (MemberAccess
-                  (Identifier)
                   (Identifier))))
-            ([]))
+            (Statements))
           (Context
             (Comment)
             (Pattern
@@ -32,7 +31,7 @@
                 (Identifier))
               (Call
                 (Identifier)
-                ([])
+                (Statements)
                 (Empty))))
           (Pattern
             (Pointer
@@ -41,55 +40,53 @@
               (Empty)))
         {+(Pattern
           {+(DefaultPattern
-            {+([])+})+}
+            {+(Statements)+})+}
           {+(Break
             {+(Empty)+})+})+}))
       (TypeSwitch
-        (
+        (Statements
           (TypeSwitchGuard
-            (
+            (Statements
             { (Identifier)
             ->(Identifier) }
             { (Identifier)
             ->(Identifier) })))
-        (
+        (Statements
           (Pattern
           { (Identifier)
           ->(Identifier) }
             (Call
               (MemberAccess
-                (Identifier)
                 (Identifier))
-              (
+              (Statements
               { (TextElement)
               ->(TextElement) }
-              { (Times
-                {-(Identifier)-}
-                {-(Integer)-})
-              ->(DividedBy
+              {+(DividedBy
                 {+(Integer)+}
-                {+(Identifier)+}) })
+                {+(Identifier)+})+}
+              {-(Times
+                {-(Identifier)-}
+                {-(Integer)-})-})
               (Empty)))
           (Pattern
           { (Identifier)
           ->(Identifier) }
             (Call
               (MemberAccess
-                (Identifier)
                 (Identifier))
-              (
+              (Statements
               { (TextElement)
               ->(TextElement) }
-              { (DividedBy
-                {-(Integer)-}
-                {-(Identifier)-})
-              ->(Times
+              {+(Times
                 {+(Identifier)+}
-                {+(Integer)+}) })
+                {+(Integer)+})+}
+              {-(DividedBy
+                {-(Integer)-}
+                {-(Identifier)-})-})
               (Empty)))
           (Pattern
             (Identifier)
-            (
+            (Statements
               (Assignment
               { (Identifier)
               ->(Identifier) }
@@ -102,9 +99,8 @@
                   (Integer)))
               (Call
                 (MemberAccess
-                  (Identifier)
                   (Identifier))
-                (
+                (Statements
                   (TextElement)
                   (Plus
                     (Slice
@@ -124,13 +120,13 @@
                 (Empty))))
           (Pattern
             (DefaultPattern
-              ([]))
-            ([]))))
+              (Statements))
+            (Statements))))
       (TypeSwitch
         (Empty)
-        (
+        (Statements
           (TypeSwitchGuard
-            (
+            (Statements
               (Identifier)
             { (Identifier)
             ->(Identifier) }))

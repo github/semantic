@@ -1,36 +1,61 @@
-{-# LANGUAGE GADTs #-}
-module Semantic.Parse where
+{-# LANGUAGE GADTs, RankNTypes #-}
+module Semantic.Parse
+  ( runParse
+  , runPythonParse
+  , runRubyParse
+  , runTypeScriptParse
+  , runJSONParse
+  ) where
 
-import Analysis.ConstructorName (ConstructorName, constructorLabel)
-import Analysis.IdentifierName (IdentifierName, identifierLabel)
+import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
+import Analysis.PackageDef (HasPackageDef)
+import Data.AST
 import Data.Blob
 import Data.JSON.Fields
-import Data.Output
 import Data.Record
+import Data.Term
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
+import Rendering.Graph
 import Rendering.Renderer
-import Semantic.IO (NoLanguageForBlob(..))
+import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
+import Serializing.Format
+import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TypeScript.Assignment as TypeScript
+import qualified Language.JSON.Assignment as JSON
+import qualified Language.Python.Assignment as Python
 
-parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
-parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
-  where toOutput' = case renderer of
-          JSONTermRenderer -> toOutput . renderJSONTerms
-          SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
-          _ -> toOutput
+runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
+runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm) >=> serialize JSON
+runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
+runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
+runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
+runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
--- | A task to parse a 'Blob' and render the resulting 'Term'.
-parseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
-parseBlob renderer blob@Blob{..}
-  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
-  = parse parser blob >>= case renderer of
-    JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
-    SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
-    TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
-    ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
-    SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
-    DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
-  | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+runRubyParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum Ruby.Syntax) ()]
+runRubyParse = flip distributeFor (\ blob -> do
+    term <- parse rubyParser blob
+    pure (() <$ term))
+
+runTypeScriptParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum TypeScript.Syntax) ()]
+runTypeScriptParse = flip distributeFor (\ blob -> do
+    term <- parse typescriptParser blob
+    pure (() <$ term))
+
+runPythonParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum Python.Syntax) ()]
+runPythonParse = flip distributeFor (\ blob -> do
+    term <- parse pythonParser blob
+    pure (() <$ term))
+
+runJSONParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
+runJSONParse = flip distributeFor (\ blob -> do
+    term <- parse jsonParser blob
+    pure (() <$ term))
+
+withParsedBlobs :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs, Monoid output) => (forall syntax . (ConstructorName syntax, Foldable syntax, Functor syntax, HasDeclaration syntax, HasPackageDef syntax, Show1 syntax, ToJSONFields1 syntax) => Blob -> Term syntax (Record Location) -> Eff effs output) -> [Blob] -> Eff effs output
+withParsedBlobs render = distributeFoldMap (\ blob -> parseSomeBlob blob >>= withSomeTerm (render blob))
+
+parseSomeBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1] (Record Location))
+parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (`parse` blob) (someParser blobLanguage)

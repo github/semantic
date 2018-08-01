@@ -1,7 +1,8 @@
-(Program
+(Statements
   (Send
     (Send
       (Identifier)
       (TextElement)
-      (TextElement))
+      (Statements
+        (TextElement)))
     (Identifier)))

@@ -1,55 +1,55 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (If
-        (
+        (Statements
           (Call
           { (Identifier)
           ->(Identifier) }
-            ([])
+            (Statements)
             (Empty)))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty))
         (Empty))
       (If
-        (
+        (Statements
           (Assignment
           { (Identifier)
           ->(Identifier) }
             (Call
               (Identifier)
-              ([])
+              (Statements)
               (Empty)))
           (Identifier))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty))
         (Empty))
       (If
-        (
+        (Statements
           (Call
           { (Identifier)
           ->(Identifier) }
-            ([])
+            (Statements)
             (Empty)))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty)))
       (If
-        (
+        (Statements
           (Assignment
             (Identifier)
           { (Integer)
@@ -60,12 +60,12 @@
         (Call
         { (Identifier)
         ->(Identifier) }
-          ([])
+          (Statements)
           (Empty))
       {+(Context
         {+(Comment)+}
           (If
-            (
+            (Statements
               (LessThan
                 (Identifier)
               { (Integer)
@@ -73,22 +73,22 @@
             (Call
             { (Identifier)
             ->(Identifier) }
-              ([])
+              (Statements)
               (Empty))
           { (Context
             {-(Comment)-}
             {-(If
-              {-(
+              {-(Statements
                 {-(Call
                   {-(Identifier)-}
-                  {-([])-}
+                  {-(Statements)-}
                   {-(Empty)-})-})-}
               {-(Call
                 {-(Identifier)-}
-                {-([])-}
+                {-(Statements)-}
                 {-(Empty)-})-}
               {-(Empty)-})-})
           ->(Call
             {+(Identifier)+}
-            {+([])+}
+            {+(Statements)+}
             {+(Empty)+}) }))+}))))

@@ -22,6 +22,7 @@ module Data.Functor.Listable
 , liftCons4
 , liftCons5
 , ListableF(..)
+, ListableF2(..)
 , addWeight
 , ofWeight
 , ListableSyntax
@@ -40,19 +41,25 @@ import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
 import Data.Record
-import Data.Semigroup
+import Data.Semigroup (Semigroup(..))
 import Data.Source
+import Data.Blob
 import Data.Span
 import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Statement as Statement
-import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Syntax.Expression as Expression
+import qualified Language.Ruby.Syntax as Ruby.Syntax
+import qualified Language.Python.Syntax as Python.Syntax
+import qualified Data.Abstract.Name as Name
 import Data.Term
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
-import Data.Union
+import Data.Sum
 import Diffing.Algorithm.RWS
 import Test.LeanCheck
 
@@ -121,6 +128,13 @@ liftCons5 tiers1 tiers2 tiers3 tiers4 tiers5 f = mapT (uncurry5 f) (tiers1 >< ti
 -- | Convenient wrapper for 'Listable1' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
 newtype ListableF f a = ListableF { unListableF :: f a }
   deriving Show
+
+-- | Convenient wrapper for 'Listable2' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
+newtype ListableF2 f a b = ListableF2 { unListableF2 :: f a b }
+  deriving Show
+
+instance (Listable2 f, Listable a, Listable b) => Listable (ListableF2 f a b) where
+  tiers = ListableF2 `mapT` tiers2
 
 
 -- Instances
@@ -212,13 +226,13 @@ instance (Listable a, Listable b) => Listable (Patch a b) where
   tiers = tiers2
 
 
-instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g ': fs)) where
-  liftTiers tiers = (inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Union (g ': fs) a)]) tiers))
+instance (Listable1 f, Listable1 (Sum (g ': fs))) => Listable1 (Sum (f ': g ': fs)) where
+  liftTiers tiers = (inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
 
-instance Listable1 f => Listable1 (Union '[f]) where
-  liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+instance Listable1 f => Listable1 (Sum '[f]) where
+  liftTiers tiers = inject `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
 
-instance (Listable1 (Union fs), Listable a) => Listable (Union fs a) where
+instance (Listable1 (Sum fs), Listable a) => Listable (Sum fs a) where
   tiers = tiers1
 
 
@@ -246,7 +260,245 @@ instance Listable1 Syntax.Empty where
 instance Listable1 Syntax.Identifier where
   liftTiers _ = cons1 Syntax.Identifier
 
-type ListableSyntax = Union
+instance Listable1 Literal.KeyValue where
+  liftTiers tiers = liftCons2 tiers tiers Literal.KeyValue
+
+instance Listable1 Literal.Array where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Array
+
+instance Listable1 Literal.Boolean where
+  liftTiers tiers = cons1 Literal.Boolean
+
+instance Listable1 Literal.Hash where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Hash
+
+instance Listable1 Literal.Float where
+  liftTiers tiers = cons1 Literal.Float
+
+instance Listable1 Literal.Null where
+  liftTiers tiers = cons0 Literal.Null
+
+instance Listable1 Literal.TextElement where
+  liftTiers tiers = cons1 Literal.TextElement
+
+instance Listable1 Literal.InterpolationElement where
+  liftTiers tiers = liftCons1 tiers Literal.InterpolationElement
+
+instance Listable1 Literal.Character where
+  liftTiers tiers = cons1 Literal.Character
+
+instance Listable1 Statement.Statements where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Statement.Statements
+
+instance Listable1 Syntax.Error where
+  liftTiers tiers = liftCons4 mempty mempty mempty (liftTiers tiers) Syntax.Error
+
+instance Listable1 Directive.File where
+  liftTiers tiers = cons0 Directive.File
+
+instance Listable1 Directive.Line where
+  liftTiers tiers = cons0 Directive.Line
+
+instance Listable1 Expression.Plus where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Plus
+
+instance Listable1 Expression.Minus where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Minus
+
+instance Listable1 Expression.Times where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Times
+
+instance Listable1 Expression.DividedBy where
+  liftTiers tiers = liftCons2 tiers tiers Expression.DividedBy
+
+instance Listable1 Expression.FloorDivision where
+  liftTiers tiers = liftCons2 tiers tiers Expression.FloorDivision
+
+instance Listable1 Expression.Modulo where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Modulo
+
+instance Listable1 Expression.Power where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Power
+
+instance Listable1 Expression.Negate where
+  liftTiers tiers = liftCons1 tiers Expression.Negate
+
+instance Listable1 Expression.BOr where
+  liftTiers tiers = liftCons2 tiers tiers Expression.BOr
+
+instance Listable1 Expression.BAnd where
+  liftTiers tiers = liftCons2 tiers tiers Expression.BAnd
+
+instance Listable1 Expression.BXOr where
+  liftTiers tiers = liftCons2 tiers tiers Expression.BXOr
+
+instance Listable1 Expression.LShift where
+  liftTiers tiers = liftCons2 tiers tiers Expression.LShift
+
+instance Listable1 Expression.RShift where
+  liftTiers tiers = liftCons2 tiers tiers Expression.RShift
+
+instance Listable1 Expression.UnsignedRShift where
+  liftTiers tiers = liftCons2 tiers tiers Expression.UnsignedRShift
+
+instance Listable1 Expression.Complement where
+  liftTiers tiers = liftCons1 tiers Expression.Complement
+
+instance Listable1 Expression.Or where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Or
+
+instance Listable1 Expression.And where
+  liftTiers tiers = liftCons2 tiers tiers Expression.And
+
+instance Listable1 Expression.Not where
+  liftTiers tiers = liftCons1 tiers Expression.Not
+
+instance Listable1 Expression.XOr where
+  liftTiers tiers = liftCons2 tiers tiers Expression.XOr
+
+instance Listable1 Expression.Call where
+  liftTiers tiers = liftCons4 (liftTiers tiers) tiers (liftTiers tiers) tiers Expression.Call
+
+instance Listable1 Expression.LessThan where
+  liftTiers tiers = liftCons2 tiers tiers Expression.LessThan
+
+instance Listable1 Expression.LessThanEqual where
+  liftTiers tiers = liftCons2 tiers tiers Expression.LessThanEqual
+
+instance Listable1 Expression.GreaterThan where
+  liftTiers tiers = liftCons2 tiers tiers Expression.GreaterThan
+
+instance Listable1 Expression.GreaterThanEqual where
+  liftTiers tiers = liftCons2 tiers tiers Expression.GreaterThanEqual
+
+instance Listable1 Expression.Equal where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Equal
+
+instance Listable1 Expression.StrictEqual where
+  liftTiers tiers = liftCons2 tiers tiers Expression.StrictEqual
+
+instance Listable1 Expression.Comparison where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Comparison
+
+instance Listable1 Expression.Enumeration where
+  liftTiers tiers = liftCons3 tiers tiers tiers Expression.Enumeration
+
+instance Listable1 Expression.Matches where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Matches
+
+instance Listable1 Expression.NotMatches where
+  liftTiers tiers = liftCons2 tiers tiers Expression.NotMatches
+
+instance Listable1 Expression.MemberAccess where
+  liftTiers tiers = liftCons2 tiers mempty Expression.MemberAccess
+
+instance Listable1 Expression.ScopeResolution where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Expression.ScopeResolution
+
+instance Listable1 Expression.Subscript where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Expression.Subscript
+
+instance Listable1 Expression.Member where
+  liftTiers tiers = liftCons2 tiers tiers Expression.Member
+
+instance Listable1 Literal.Complex where
+  liftTiers tiers = cons1 Literal.Complex
+
+instance Listable1 Literal.Integer where
+  liftTiers tiers = cons1 Literal.Integer
+
+instance Listable1 Literal.Rational where
+  liftTiers tiers = cons1 Literal.Rational
+
+instance Listable1 Literal.Regex where
+  liftTiers tiers = cons1 Literal.Regex
+
+instance Listable1 Literal.String where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.String
+
+instance Listable1 Literal.Symbol where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Symbol 
+
+instance Listable1 Literal.SymbolElement where
+  liftTiers tiers = cons1 Literal.SymbolElement
+
+instance Listable1 Statement.Assignment where
+  liftTiers tiers = liftCons3 (liftTiers tiers) tiers tiers Statement.Assignment
+
+instance Listable1 Statement.Break where
+  liftTiers tiers = liftCons1 tiers Statement.Break
+
+instance Listable1 Statement.Catch where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Catch
+
+instance Listable1 Statement.Continue where
+  liftTiers tiers = liftCons1 tiers Statement.Continue
+
+instance Listable1 Statement.Else where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Else
+
+instance Listable1 Statement.Finally where
+  liftTiers tiers = liftCons1 tiers Statement.Finally
+
+instance Listable1 Statement.ForEach where
+  liftTiers tiers = liftCons3 tiers tiers tiers Statement.ForEach
+
+instance Listable1 Statement.Match where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Match
+
+instance Listable1 Statement.Pattern where
+  liftTiers tiers = liftCons2 tiers tiers Statement.Pattern
+
+instance Listable1 Statement.Retry where
+  liftTiers tiers = liftCons1 tiers Statement.Retry
+
+instance Listable1 Statement.ScopeEntry where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Statement.ScopeEntry
+
+instance Listable1 Statement.ScopeExit where
+  liftTiers tiers = liftCons1 (liftTiers tiers) Statement.ScopeExit
+
+instance Listable1 Statement.Try where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Statement.Try
+
+instance Listable1 Statement.While where
+  liftTiers tiers = liftCons2 tiers tiers Statement.While
+
+instance Listable1 Statement.Yield where
+  liftTiers tiers = liftCons1 tiers Statement.Yield
+
+instance Listable1 Ruby.Syntax.Class where
+  liftTiers tiers = liftCons3 tiers (liftTiers tiers) tiers Ruby.Syntax.Class
+
+instance Listable1 Ruby.Syntax.Load where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Ruby.Syntax.Load
+
+instance Listable1 Ruby.Syntax.LowPrecedenceOr where
+  liftTiers tiers = liftCons2 tiers tiers Ruby.Syntax.LowPrecedenceOr
+
+instance Listable1 Ruby.Syntax.LowPrecedenceAnd where
+  liftTiers tiers = liftCons2 tiers tiers Ruby.Syntax.LowPrecedenceAnd
+
+instance Listable1 Ruby.Syntax.Module where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) Ruby.Syntax.Module
+
+instance Listable1 Ruby.Syntax.Require where
+  liftTiers tiers' = liftCons2 tiers tiers' Ruby.Syntax.Require
+
+instance Listable1 Ruby.Syntax.Send where
+  liftTiers tiers = liftCons4 (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) (liftTiers tiers) Ruby.Syntax.Send
+
+instance Listable Python.Syntax.QualifiedName where
+  tiers = liftCons1 tiers1 Python.Syntax.QualifiedName \/ liftCons2 tiers tiers1 Python.Syntax.RelativeQualifiedName
+
+instance Listable1 Python.Syntax.Import where
+  liftTiers tiers = cons2 Python.Syntax.Import
+
+instance Listable Python.Syntax.Alias where
+  tiers = cons2 Python.Syntax.Alias
+
+
+type ListableSyntax = Sum
   '[ Comment.Comment
    , Declaration.Function
    , Declaration.Method
@@ -257,8 +509,8 @@ type ListableSyntax = Union
    , []
    ]
 
-instance Listable FV.Name where
-  tiers = cons1 FV.name
+instance Listable Name.Name where
+  tiers = cons1 Name.name
 
 instance Listable1 Gram where
   liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
@@ -274,7 +526,7 @@ instance Listable Declaration where
   tiers
     =  cons4 MethodDeclaration
     \/ cons3 FunctionDeclaration
-    \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
+    \/ cons2 (\ a b -> ErrorDeclaration a b Language.Unknown)
 
 instance Listable CyclomaticComplexity where
   tiers = cons1 CyclomaticComplexity
@@ -297,9 +549,14 @@ instance Listable Pos where
 instance Listable Span where
   tiers = cons2 Span
 
+instance Listable Blob where
+  tiers = cons3 Blob
+
+instance Listable (Join These Blob) where
+  tiers = liftTiers tiers
 
 instance Listable Source where
-  tiers = fromBytes `mapT` tiers
+  tiers = fromUTF8 `mapT` tiers
 
 instance Listable ByteString where
   tiers = (T.encodeUtf8 . T.pack) `mapT` strings

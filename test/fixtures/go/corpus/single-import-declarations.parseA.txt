@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (QualifiedImport
@@ -10,5 +10,5 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([])))
+    (Statements)
+    (Statements)))

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (For
     (Assignment
       (Identifier)
@@ -8,12 +8,12 @@
       (Float))
     (Update
       (Identifier))
-    (
+    (Statements
       (If
-        (Equal
+        (StrictEqual
           (Identifier)
           (Float))
-        (
+        (Statements
           (Continue
             (Empty)))
         (Empty))

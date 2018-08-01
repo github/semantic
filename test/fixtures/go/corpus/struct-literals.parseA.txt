@@ -1,16 +1,16 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Composite
           (Identifier)
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (TextElement))
@@ -24,9 +24,9 @@
             (Empty)
             (Field
               (Identifier)
-              (
+              (Statements
                 (Identifier))))
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (Integer)))))
@@ -34,6 +34,5 @@
         (Identifier)
         (Composite
           (MemberAccess
-            (Identifier)
             (Identifier))
-          ([]))))))
+          (Statements))))))

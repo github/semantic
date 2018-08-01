@@ -5,8 +5,8 @@
 #/ Generate expected output for a test fixture example or directory of examples.
 #/
 #/ Example:
-#/  script/generate-example test/fixtures/ruby/and-or.{A,B}.rb
-#/  script/generate-example test/fixtures/ruby
+#/  script/generate-example test/fixtures/ruby/corpus/and-or.{A,B}.rb
+#/  script/generate-example test/fixtures/ruby/corpus
 
 set -e
 [ $# -eq 0 ] && set -- --help
@@ -37,20 +37,20 @@ generate_example () {
 
   if [ -e "$fileA" ]; then
     status $parseFileA
-    "$(dirname "$0")/run" semantic parse --sexpression $fileA > $parseFileA
+    stack exec semantic -- parse --sexpression $fileA > $parseFileA
   fi
 
   if [ -e "$fileB" ]; then
     status $parseFileB
-    "$(dirname "$0")/run" semantic parse --sexpression $fileB > $parseFileB
+    stack exec semantic -- parse --sexpression $fileB > $parseFileB
   fi
 
   if [ -e "$fileA" -a -e "$fileB" ]; then
     status $diffFileAB
-    "$(dirname "$0")/run" semantic diff --sexpression $fileA $fileB > $diffFileAB
+    stack exec semantic -- diff --sexpression $fileA $fileB > $diffFileAB
 
     status $diffFileBA
-    "$(dirname "$0")/run" semantic diff --sexpression $fileB $fileA > $diffFileBA
+    stack exec semantic -- diff --sexpression $fileB $fileA > $diffFileBA
   fi
 }
 

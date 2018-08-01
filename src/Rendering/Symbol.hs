@@ -1,46 +1,30 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Symbol
-( renderSymbolTerms
-, renderToSymbols
-, renderToTags
+( renderToSymbols
 , SymbolFields(..)
 , defaultSymbolFields
+, parseSymbolFields
 ) where
 
 import Prologue
 import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
+import Data.Language (ensureLanguage)
 import Data.Record
 import Data.Span
+import Data.List.Split (splitWhen)
 import Data.Term
 import qualified Data.Text as T
-import qualified Data.Map as Map
 import Rendering.TOC
 
-
--- | Render a 'Term' to a ctags like output (See 'Tag').
---
--- This format is going away. Prefer the new 'renderToSymbols' as it provides a
--- more compact data representation and custom field selection. This exists to
--- back support the staff shipped tag generation in github/github.
-renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
-renderToTags Blob{..} = fmap toJSON . termToC blobPath
-  where
-    termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => FilePath -> Term f (Record fields) -> [Symbol]
-    termToC path = mapMaybe (symbolSummary defaultTagSymbolFields path "unchanged") . termTableOfContentsBy declaration
-
-
--- | Render terms to final JSON structure.
-renderSymbolTerms :: [Value] -> Map.Map T.Text Value
-renderSymbolTerms = Map.singleton "files" . toJSON
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
 renderToSymbols :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => SymbolFields -> Blob -> Term f (Record fields) -> [Value]
 renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
   where
     termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => SymbolFields -> FilePath -> Term f (Record fields) -> File
-    termToC fields path = File (T.pack path) (T.pack . show <$> blobLanguage) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
+    termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
 symbolSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => SymbolFields -> FilePath -> T.Text -> Record fields -> Maybe Symbol
@@ -49,7 +33,7 @@ symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
   Just declaration -> Just Symbol
     { symbolName = when symbolFieldsName (declarationIdentifier declaration)
     , symbolPath = when symbolFieldsPath (T.pack path)
-    , symbolLang = join (when symbolFieldsLang (T.pack . show <$> declarationLanguage declaration))
+    , symbolLang = join (when symbolFieldsLang (T.pack . show <$> ensureLanguage (declarationLanguage declaration)))
     , symbolKind = when symbolFieldsKind (toCategoryName declaration)
     , symbolLine = when symbolFieldsLine (declarationText declaration)
     , symbolSpan = when symbolFieldsSpan (getField record)
@@ -58,7 +42,7 @@ symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
 
 data File = File
   { filePath :: T.Text
-  , fileLanguage :: Maybe T.Text
+  , fileLanguage :: T.Text
   , fileSymbols :: [Symbol]
   } deriving (Generic, Eq, Show)
 
@@ -103,5 +87,14 @@ data SymbolFields = SymbolFields
 defaultSymbolFields :: SymbolFields
 defaultSymbolFields = SymbolFields True False False True False True
 
-defaultTagSymbolFields :: SymbolFields
-defaultTagSymbolFields = SymbolFields True True True True True True
+parseSymbolFields :: String -> SymbolFields
+parseSymbolFields arg =
+  let fields = splitWhen (== ',') arg in
+  SymbolFields
+    { symbolFieldsName = "symbol" `elem` fields
+    , symbolFieldsPath = "path" `elem` fields
+    , symbolFieldsLang = "language" `elem` fields
+    , symbolFieldsKind = "kind" `elem` fields
+    , symbolFieldsLine = "line" `elem` fields
+    , symbolFieldsSpan = "span" `elem` fields
+    }

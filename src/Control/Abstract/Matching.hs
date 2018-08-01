@@ -15,8 +15,9 @@ module Control.Abstract.Matching
   ) where
 
 import           Data.Algebra
-import           Prologue
+import           Data.Sum
 import           Data.Term
+import           Prologue hiding (project)
 
 -- | A @Matcher t a@ is a tree automaton that matches some 'Recursive' and 'Corecursive' type @t@, yielding values of type @a@.
 --   Matching operations are implicitly recursive: when you run a 'Matcher', it is applied bottom-up.
@@ -24,7 +25,7 @@ import           Data.Term
 --   functions to control whether a given datum is matched. The @t@ datum matched by a matcher is immutable; future APIs will
 --   provide the ability to rewrite and change these data.
 data Matcher t a where
-  -- TODO: Choice is inflexible and slow. A Union over fs can be queried for its index, and we can build a jump table over that.
+  -- TODO: Choice is inflexible and slow. A Sum over fs can be queried for its index, and we can build a jump table over that.
   -- We can copy NonDet to have fair conjunction or disjunction.
   Choice :: Matcher t a -> Matcher t a -> Matcher t a
   Target :: Matcher t t
@@ -35,7 +36,7 @@ data Matcher t a where
   Then   :: Matcher t b -> (b -> Matcher t a) -> Matcher t a
 
 -- | A convenience alias for matchers that both target and return 'Term' values.
-type TermMatcher fs ann = Matcher (Term (Union fs) ann) (Term (Union fs) ann)
+type TermMatcher fs ann = Matcher (Term (Sum fs) ann) (Term (Sum fs) ann)
 
 instance Functor (Matcher t) where
   fmap = liftA
@@ -81,24 +82,24 @@ matchM = Match
 --   execute. An example:
 --
 -- @
--- integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Union fs) ann) ByteString
+-- integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) ByteString
 -- integerMatcher = match Lit.integerContent target
 -- @
 --
 -- @integerMatcher@ accepts any union type that contains an integer literal, and only succeeds if the
 -- target in question is actually an integer literal.
 match :: (f :< fs)
-      => (f (Term (Union fs) ann) -> b)
+      => (f (Term (Sum fs) ann) -> b)
       -> Matcher b a
-      -> Matcher (Term (Union fs) ann) a
-match f = Match (fmap f . prj . termOut)
+      -> Matcher (Term (Sum fs) ann) a
+match f = Match (fmap f . project . termOut)
 
 -- | @narrow'@ attempts to project a union-type target to a more specific type.
-narrow' :: (f :< fs) => Matcher (Term (Union fs) ann) (Maybe (f (Term (Union fs) ann)))
-narrow' = fmap (prj . termOut) Target
+narrow' :: (f :< fs) => Matcher (Term (Sum fs) ann) (Maybe (f (Term (Sum fs) ann)))
+narrow' = fmap (project . termOut) Target
 
 -- | 'narrow' behaves as @narrow'@, but fails if the target cannot be thus projected.
-narrow :: (f :< fs) => Matcher (Term (Union fs) ann) (f (Term (Union fs) ann))
+narrow :: (f :< fs) => Matcher (Term (Sum fs) ann) (f (Term (Sum fs) ann))
 narrow = narrow' >>= foldMapA pure
 
 -- | The entry point for executing matchers.

@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(SequenceExpression
   {+(Assignment
     {+(Identifier)+}

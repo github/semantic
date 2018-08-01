@@ -1,5 +1,5 @@
-(Program
-  (MemberAccess
-    (Identifier)
-  { (Identifier)
-  ->(Identifier) }))
+(Statements
+{ (MemberAccess
+  {-(Identifier)-})
+->(MemberAccess
+  {+(Identifier)+}) })

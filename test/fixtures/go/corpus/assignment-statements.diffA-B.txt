@@ -1,28 +1,28 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
       { (Identifier)
       ->(Identifier) }
         (Integer))
       (Assignment
-        (
+        (Statements
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) })
         (Plus
-          (
+          (Statements
           { (Identifier)
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
-          (
+          (Statements
             (Integer)
             (Integer))))
     {+(Assignment
@@ -68,13 +68,13 @@
           {+(Integer)+})+})+})+}
     {+(Assignment
       {+(Identifier)+}
-      {+(
+      {+(Statements
         {+(Pointer
           {+(Identifier)+})+}
         {+(Reference
           {+(Composite
             {+(Identifier)+}
-            {+(
+            {+(Statements
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
@@ -121,13 +121,13 @@
           {-(Integer)-})-})-})-}
     {-(Assignment
       {-(Identifier)-}
-      {-(
+      {-(Statements
         {-(Pointer
           {-(Identifier)-})-}
         {-(Reference
           {-(Composite
             {-(Identifier)-}
-            {-(
+            {-(Statements
               {-(KeyValue
                 {-(Identifier)-}
                 {-(Integer)-})-})-})-})-})-})-})))

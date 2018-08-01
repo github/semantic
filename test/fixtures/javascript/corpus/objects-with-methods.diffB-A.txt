@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Hash
     (Method
       (Empty)
@@ -22,7 +22,7 @@
         (Assignment
           (Identifier)
           (Empty)))
-      (
+      (Statements
         (Return
         { (Minus
           {-(Identifier)-}

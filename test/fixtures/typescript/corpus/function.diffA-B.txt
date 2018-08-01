@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Function
   {+(Empty)+}
   {+(Annotation
@@ -25,7 +25,7 @@
       (Assignment
         (Identifier)
         (Empty)))
-    (
+    (Statements
     { (Identifier)
     ->(Identifier) }))
   (Empty))

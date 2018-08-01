@@ -1,19 +1,19 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
-      (
+    (Statements)
+    (Statements
+      (Statements
         (Type
           (Identifier)
           (Slice
           { (Identifier)
           ->(Slice
             {+(Identifier)+}) })))
-      (
+      (Statements
         (Type
           (Identifier)
           (Slice

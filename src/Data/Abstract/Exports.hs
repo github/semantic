@@ -4,37 +4,33 @@ module Data.Abstract.Exports
     , aliases
     , insert
     , null
-    , toEnvironment
+    , toBindings
     ) where
 
+import Data.Abstract.Environment (Bindings, unpairs)
+import Data.Abstract.Name
+import qualified Data.Map as Map
 import Prelude hiding (null)
 import Prologue hiding (null)
-import Data.Abstract.Address
-import Data.Abstract.Environment (Environment, unpairs)
-import Data.Abstract.FreeVariables
-import qualified Data.Map as Map
-import Data.Semilattice.Lower
 
 -- | A map of export names to an alias & address tuple.
-newtype Exports l a = Exports { unExports :: Map.Map Name (Name, Maybe (Address l a)) }
-  deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Show, Traversable)
+newtype Exports address = Exports { unExports :: Map.Map Name (Name, Maybe address) }
+  deriving (Eq, Lower, Monoid, Ord, Semigroup)
 
-null :: Exports l a -> Bool
+null :: Exports address -> Bool
 null = Map.null . unExports
 
-toEnvironment :: Exports l a -> Environment l a
-toEnvironment exports = unpairs (mapMaybe collectExport (toList (unExports exports)))
-  where
-    collectExport (_, Nothing) = Nothing
-    collectExport (n, Just a)  = Just (n, a)
+toBindings :: Exports address -> Bindings address
+toBindings = unpairs . mapMaybe sequenceA . toList . unExports
 
-insert :: Name -> Name -> Maybe (Address l a) -> Exports l a -> Exports l a
+-- TODO: Should inserts overwrite an existing value for a given name?
+insert :: Name -> Name -> Maybe address -> Exports address -> Exports address
 insert name alias address = Exports . Map.insert name (alias, address) . unExports
 
 -- TODO: Should we filter for duplicates here?
-aliases :: Exports l a -> [(Name, Name)]
+aliases :: Exports address -> [(Name, Name)]
 aliases = Map.toList . fmap fst . unExports
 
-instance Eq l => Eq1 (Exports l) where liftEq = genericLiftEq
-instance Ord l => Ord1 (Exports l) where liftCompare = genericLiftCompare
-instance Show l => Show1 (Exports l) where liftShowsPrec = genericLiftShowsPrec
+
+instance Show address => Show (Exports address) where
+  showsPrec d = showsUnaryWith showsPrec "Exports" d . Map.toList . unExports

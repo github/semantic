@@ -1,23 +1,26 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
     {+(Assignment
       {+(Identifier)+}
       {+(Identifier)+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->([]) })
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-        ([]))
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Statements)+})+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Statements)+})+}
     {-(Assignment
       {-(Identifier)-}
-      {-([])-})-})))
+      {-(Identifier)-})-}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Statements)-})-}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Statements)-})-})))

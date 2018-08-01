@@ -1,15 +1,15 @@
-(Program
+(Statements
   (Comprehension
   { (Identifier)
   ->(Identifier) }
-    (
-    {+(
+    (Statements
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+})+}
     {+(Call
       {+(Identifier)+}
       {+(Empty)+})+}
-    {+(
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+})+}
     {+(Call
@@ -22,10 +22,10 @@
   ->(Plus
     {+(Identifier)+}
     {+(Integer)+}) }
-    (
+    (Statements
     {+(Identifier)+}
     {+(Identifier)+}
-    {-(
+    {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-}
     {-(Identifier)-})))

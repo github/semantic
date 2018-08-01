@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
+, renderRPCToCDiff
 , renderToCTerm
 , diffTOC
 , Summaries(..)
@@ -21,13 +22,11 @@ import Analysis.Declaration
 import Data.Aeson
 import Data.Align (bicrosswalk)
 import Data.Blob
-import Data.ByteString.Lazy (toStrict)
 import Data.Diff
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
 import qualified Data.Map as Map
-import Data.Output
 import Data.Patch
 import Data.Record
 import Data.Span
@@ -44,9 +43,6 @@ instance Monoid Summaries where
   mempty = Summaries mempty mempty
   mappend = (<>)
 
-instance Output Summaries where
-  toOutput = toStrict . (<> "\n") . encode
-
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
@@ -58,12 +54,12 @@ data TOCSummary
     , summarySpan :: Span
     , summaryChangeType :: T.Text
     }
-  | ErrorSummary { error :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
+  | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
-  toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
+  toJSON ErrorSummary{..} = object [ "error" .= errorText, "span" .= errorSpan, "language" .= errorLanguage ]
 
 isValidSummary :: TOCSummary -> Bool
 isValidSummary ErrorSummary{} = False
@@ -150,7 +146,7 @@ recordSummary changeText record = case getDeclaration record of
   Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (getField record) changeText
   Nothing -> Nothing
   where
-    formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiver)) = "(" <> receiver <> ") " <> identifier
+    formatIdentifier (MethodDeclaration identifier _ Language.Go        (Just receiver)) = "(" <> receiver <> ") " <> identifier
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
@@ -159,6 +155,9 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = T.pack $ pathKeyForBlobPair blobs
+
+renderRPCToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> ([TOCSummary], [TOCSummary])
+renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration

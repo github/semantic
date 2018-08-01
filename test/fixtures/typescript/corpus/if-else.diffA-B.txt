@@ -1,4 +1,4 @@
-(Program
+(Statements
   (If
   { (Identifier)
   ->(Identifier) }
@@ -8,7 +8,7 @@
     { (Identifier)
     ->(Identifier) }
     { (Identifier)
-    ->(
+    ->(Statements
       {+(Identifier)+}) }
       (If
       { (Identifier)
@@ -19,7 +19,7 @@
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
-        ->(
+        ->(Statements
           {+(Identifier)+}) }
         { (Identifier)
         ->(Identifier) })))))

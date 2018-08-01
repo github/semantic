@@ -1,46 +1,52 @@
-{-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
+import Control.Arrow ((&&&))
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import qualified Language.TypeScript.Assignment as TypeScript
-import Data.Abstract.Value as Value
 import Data.Abstract.Number as Number
+import qualified Data.Abstract.ModuleTable as ModuleTable
+import Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
-
+import qualified Data.List.NonEmpty as NonEmpty
+import Data.Sum
 import SpecHelpers
 
-spec :: Spec
-spec = parallel $ do
-  describe "evaluates TypeScript" $ do
+spec :: TaskConfig -> Spec
+spec config = parallel $ do
+  describe "TypeScript" $ do
     it "imports with aliased symbols" $ do
-      env <- environment . snd <$> evaluate "main.ts"
-      env `shouldBe` [ ("bar", addr 0)
-                     , ("quz", addr 3)]
+      (_, (_, res)) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
+      case ModuleTable.lookup "main.ts" <$> res of
+        Right (Just (Module _ (env, _) :| [])) -> Env.names env `shouldBe` [ "bar", "quz" ]
+        other -> expectationFailure (show other)
 
     it "imports with qualified names" $ do
-      res <- snd <$> evaluate "main1.ts"
-      environment res `shouldBe` [ ("b", addr 0)
-                                 , ("z", addr 4)
-                                 ]
+      (_, (heap, res)) <- evaluate ["main1.ts", "foo.ts", "a.ts"]
+      case ModuleTable.lookup "main1.ts" <$> res of
+        Right (Just (Module _ (env, _) :| [])) -> do
+          Env.names env `shouldBe` [ "b", "z" ]
 
-      heapLookup (Address (Precise 0)) (heap res) `shouldBe` ns "b" [ ("baz", addr 1)
-                                                                    , ("foo", addr 3) ]
-      heapLookup (Address (Precise 4)) (heap res) `shouldBe` ns "z" [ ("baz", addr 1)
-                                                                    , ("foo", addr 3) ]
+          (derefQName heap ("b" :| []) env >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
+          (derefQName heap ("z" :| []) env >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
+        other -> expectationFailure (show other)
 
     it "side effect only imports" $ do
-      env <- environment . snd <$> evaluate "main2.ts"
-      env `shouldBe` emptyEnv
+      (_, (_, res)) <- evaluate ["main2.ts", "a.ts", "foo.ts"]
+      case ModuleTable.lookup "main2.ts" <$> res of
+        Right (Just (Module _ (env, _) :| [])) -> env `shouldBe` lowerBound
+        other -> expectationFailure (show other)
 
     it "fails exporting symbols not defined in the module" $ do
-      v <- fst <$> evaluate "bad-export.ts"
-      v `shouldBe` Right (Right (Right (Right (Right (Left (SomeExc (ExportError "foo.ts" (Name "pip"))))))))
+      (_, (_, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
+      res `shouldBe` Left (SomeExc (inject @EvalError (ExportError "foo.ts" (name "pip"))))
 
     it "evaluates early return statements" $ do
-      res <- evaluate "early-return.ts"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Float (Number.Decimal 123.0))))))))))
+      (_, (heap, res)) <- evaluate ["early-return.ts"]
+      case ModuleTable.lookup "early-return.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 123.0)]
+        other -> expectationFailure (show other)
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
-    evaluate entry = evalTypeScriptProject (fixtures <> entry)
-    evalTypeScriptProject path = interpret @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+    evaluate = evalTypeScriptProject . map (fixtures <>)
+    evalTypeScriptProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript

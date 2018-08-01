@@ -1,29 +1,29 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (For
         (Empty)
         (Empty)
         (Empty)
-        (
+        (Statements
           (Call
             (Identifier)
-            ([])
+            (Statements)
             (Empty))
           (Goto
             (Identifier))))
       (ForEach
         (Identifier)
         (Identifier)
-        (
+        (Statements
           (Call
             (Identifier)
-            ([])
+            (Statements)
             (Empty))
           (Break
             (Identifier))))
@@ -31,10 +31,10 @@
         (Empty)
         (Empty)
         (Empty)
-        (
+        (Statements
           (Call
             (Identifier)
-            ([])
+            (Statements)
             (Empty))
           (Continue
             (Identifier))))
@@ -45,10 +45,10 @@
         (PostIncrement
           (Identifier))
         (Empty)
-        (
+        (Statements
           (Call
             (Identifier)
-            ([])
+            (Statements)
             (Empty))
           (Continue
             (Empty))))
@@ -56,7 +56,7 @@
         (Empty)
         (Empty)
         (Empty)
-        (
+        (Statements
           (Call
             (Identifier)
             (Identifier)
@@ -64,24 +64,24 @@
           (Break
             (Empty))))
       (ForEach
-        (
+        (Statements
           (Identifier)
           (Identifier))
         (Identifier)
         (Call
           (Identifier)
-          (
+          (Statements
             (Identifier)
             (Identifier))
           (Empty)))
       (ForEach
-        (
+        (Statements
           (Identifier)
           (Identifier))
         (Identifier)
         (Call
           (Identifier)
-          (
+          (Statements
             (Identifier)
             (Identifier))
           (Empty)))
@@ -93,9 +93,9 @@
         (Empty)
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty)))
       (ForEach
         (Empty)
         (Identifier)
-        ([])))))
+        (Statements)))))

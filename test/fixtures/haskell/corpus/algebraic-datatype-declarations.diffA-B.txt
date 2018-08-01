@@ -1,0 +1,443 @@
+(Module
+  (Empty)
+  (Statements
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters)
+        (Empty))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters
+          (TypeVariableIdentifier))
+        (Empty))
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (TypeVariableIdentifier)))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters
+          (TypeVariableIdentifier))
+        (Empty))
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (StrictTypeVariable
+            (TypeVariableIdentifier))))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))
+        (Empty))
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (StrictTypeVariable
+            (TypeVariableIdentifier))
+          (TypeVariableIdentifier)))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters)
+        (Empty))
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
+    {+(Constructor
+      {+(ConstructorIdentifier)+}
+      {+(TypeParameters)+})+}
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
+    {-(Constructor
+      {-(ConstructorIdentifier)-}
+      {-(TypeParameters)-})-}
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters)
+        (Empty))
+      (RecordDataConstructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (Statements
+          (Field
+            (Statements
+              (VariableIdentifier))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty)))))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters)
+        (Empty))
+      (RecordDataConstructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (Statements
+          (Field
+            (Statements
+              (VariableIdentifier)
+              (VariableIdentifier))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty)))))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters)
+        (Empty))
+      (RecordDataConstructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (Statements
+          (Field
+            (Statements
+              (VariableIdentifier))
+            (Type
+              (StrictType
+                (TypeConstructorIdentifier)
+                (TypeParameters))
+              (TypeParameters)
+              (Empty)))
+          (Field
+            (Statements
+              (VariableIdentifier))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty)))))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters)
+        (Empty))
+      (RecordDataConstructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (Statements
+          (Field
+            (Statements
+              (VariableIdentifier)
+              (VariableIdentifier))
+            (Type
+              (Context
+                (Pragma)
+                (StrictType
+                  (TypeConstructorIdentifier)
+                  (TypeParameters)))
+              (TypeParameters)
+              (Empty)))
+          (Field
+            (Statements
+              (VariableIdentifier))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty)))))
+      (Empty))
+  {-(Datatype
+    {-(Empty)-}
+    {-(Type
+      {-(TypeConstructorIdentifier)-}
+      {-(TypeParameters)-}
+      {-(Empty)-})-}
+    {-(RecordDataConstructor
+      {-(ConstructorIdentifier)-}
+      {-(Statements
+        {-(Field
+          {-(Statements
+            {-(VariableIdentifier)-})-}
+          {-(Type
+            {-(TypeConstructorIdentifier)-}
+            {-(TypeParameters)-}
+            {-(Empty)-})-})-})-})-}
+    {-(RecordDataConstructor
+      {-(ConstructorIdentifier)-}
+      {-(Statements
+        {-(Field
+          {-(Statements
+            {-(VariableIdentifier)-})-}
+          {-(Type
+            {-(TypeConstructorIdentifier)-}
+            {-(TypeParameters)-}
+            {-(Empty)-})-})-})-})-}
+    {-(Empty)-})-}
+    (Datatype
+      (Empty)
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters)
+        (Empty))
+      (RecordDataConstructor
+        (ConstructorIdentifier)
+        (Statements
+          (Field
+            (Statements
+              (VariableIdentifier))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty)))))
+      (RecordDataConstructor
+        (ConstructorIdentifier)
+        (Statements
+          (Field
+            (Statements
+              (VariableIdentifier))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty)))))
+      (Empty))
+  {+(Datatype
+    {+(Empty)+}
+    {+(Type
+      {+(TypeConstructorIdentifier)+}
+      {+(TypeParameters)+}
+      {+(Empty)+})+}
+    {+(RecordDataConstructor
+      {+(ConstructorIdentifier)+}
+      {+(Statements
+        {+(Field
+          {+(Statements
+            {+(VariableIdentifier)+})+}
+          {+(Type
+            {+(TypeConstructorIdentifier)+}
+            {+(TypeParameters)+}
+            {+(Empty)+})+})+})+})+}
+    {+(RecordDataConstructor
+      {+(ConstructorIdentifier)+}
+      {+(Statements
+        {+(Field
+          {+(Statements
+            {+(VariableIdentifier)+})+}
+          {+(Type
+            {+(TypeConstructorIdentifier)+}
+            {+(TypeParameters)+}
+            {+(Empty)+})+})+})+})+}
+    {+(Empty)+})+}
+    (Datatype
+      (Empty)
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters)
+        (Empty))
+      (Constructor
+        (ConstructorIdentifier)
+        (TypeParameters))
+      (Deriving
+        (TypeClassIdentifier)))
+    (Datatype
+      (Empty)
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters)
+        (Empty))
+      (Constructor
+        (ConstructorIdentifier)
+        (TypeParameters))
+      (Deriving
+      { (TypeClassIdentifier)
+      ->(TypeClassIdentifier) }
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)
+        (TypeClassIdentifier)))
+    (Datatype
+      (Context'
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (TypeVariableIdentifier)))
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters
+          (TypeVariableIdentifier))
+        (Empty))
+      (Constructor
+        (ConstructorIdentifier)
+        (TypeParameters
+          (TypeVariableIdentifier)))
+      (Empty))
+    (Datatype
+      (Context'
+        (Statements
+          (Class
+          { (TypeClassIdentifier)
+          ->(TypeClassIdentifier) }
+            (TypeVariableIdentifier))
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier))
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier))))
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))
+        (Empty))
+      (Constructor
+        (ConstructorIdentifier)
+        (TypeParameters
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
+      (Empty))
+    (Datatype
+      (Context'
+        (Statements
+          (Class
+            (TypeClassIdentifier)
+            (Statements
+              (TypeVariableIdentifier)
+              (TypeVariableIdentifier)))
+          (Class
+          { (TypeClassIdentifier)
+          ->(TypeClassIdentifier) }
+            (TypeVariableIdentifier))))
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier))
+        (Empty))
+      (Constructor
+        (ConstructorIdentifier)
+        (TypeParameters
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters
+          (TypeVariableIdentifier))
+        (Empty))
+      (Constructor
+        (Context'
+          (TypeConstructorIdentifier))
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (TypeVariableIdentifier)))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters
+        { (TypeVariableIdentifier)
+        ->(TypeVariableIdentifier) })
+        (Empty))
+      (Constructor
+        (Context'
+          (Class
+            (TypeClassIdentifier)
+          { (TypeVariableIdentifier)
+          ->(TypeVariableIdentifier) }))
+        (ConstructorIdentifier)
+        (TypeParameters
+        { (TypeVariableIdentifier)
+        ->(TypeVariableIdentifier) }))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) }
+        (TypeParameters)
+        (Empty))
+      (Constructor
+      { (ConstructorIdentifier)
+      ->(ConstructorIdentifier) }
+        (TypeParameters
+          (StrictTypeVariable
+            (PrimitiveConstructorIdentifier))))
+      (Empty))
+    (Datatype
+      (Empty)
+      (Type
+        (TypeConstructorIdentifier)
+        (TypeParameters)
+        (Empty))
+      (Constructor
+        (ScopedTypeVariables
+        { (TypeVariableIdentifier)
+        ->(TypeVariableIdentifier) })
+        (Context'
+          (Class
+            (TypeClassIdentifier)
+          { (TypeVariableIdentifier)
+          ->(TypeVariableIdentifier) }))
+        (ConstructorIdentifier)
+        (TypeParameters
+          (Statements
+            (TypeConstructorIdentifier)
+          { (TypeVariableIdentifier)
+          ->(TypeVariableIdentifier) })))
+      (Empty))))

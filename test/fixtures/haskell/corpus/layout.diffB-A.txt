@@ -1,0 +1,219 @@
+(Module
+  (Empty)
+  (Statements
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (Let
+        {-(Function
+          {-(VariableIdentifier)-}
+          {-(Statements
+            {-(VariableIdentifier)-})-})-}
+          (Function
+            (VariableIdentifier)
+            (Statements
+            {+(VariableIdentifier)+}
+            {-(Let
+              {-(Function
+                {-(VariableIdentifier)-}
+                {-(Statements
+                  {-(Integer)-})-})-}
+              {-(VariableIdentifier)-})-}))
+        {+(Function
+          {+(VariableIdentifier)+}
+          {+(Statements
+            {+(Let
+              {+(Function
+                {+(VariableIdentifier)+}
+                {+(Statements
+                  {+(Integer)+})+})+}
+              {+(VariableIdentifier)+})+})+})+}
+        { (VariableIdentifier)
+        ->(VariableIdentifier) })))
+    (Function
+      (VariableIdentifier)
+      (Statements
+      { (VariableIdentifier)
+      ->(VariableIdentifier) }
+        (Statements
+        {-(Function
+          {-(VariableIdentifier)-}
+          {-(Statements
+            {-(VariableIdentifier)-})-})-}
+          (Function
+            (VariableIdentifier)
+            (Statements
+            {+(VariableIdentifier)+}
+            {-(Integer)-}))
+        {+(Function
+          {+(VariableIdentifier)+}
+          {+(Statements
+            {+(Integer)+})+})+})))
+    (Function
+      (VariableIdentifier)
+      (Statements
+      { (VariableIdentifier)
+      ->(VariableIdentifier) }
+        (Statements
+          (Function
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (Statements
+              (VariableIdentifier)))
+          (Function
+            (VariableIdentifier)
+            (Statements
+              (Integer))))))
+    (Function
+      (VariableIdentifier)
+      (Statements
+      { (VariableIdentifier)
+      ->(VariableIdentifier) }
+        (Statements
+          (Function
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (Statements
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }
+              (Statements
+                (Function
+                { (VariableIdentifier)
+                ->(VariableIdentifier) }
+                  (Statements
+                  { (VariableIdentifier)
+                  ->(VariableIdentifier) }))
+                (Function
+                  (VariableIdentifier)
+                  (Statements
+                    (VariableIdentifier))))))
+          (Function
+          { (VariableIdentifier)
+          ->(VariableIdentifier) }
+            (Statements
+            { (VariableIdentifier)
+            ->(VariableIdentifier) })))))
+    (Function
+      (VariableIdentifier)
+      (Statements
+        (Do
+        {+(VariableIdentifier)+}
+          (VariableIdentifier)
+        {+(Do
+          {+(VariableIdentifier)+}
+          {+(VariableIdentifier)+}
+          {+(Do
+            {+(VariableIdentifier)+}
+            {+(VariableIdentifier)+})+}
+          {+(VariableIdentifier)+})+}
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+        {-(Do
+          {-(VariableIdentifier)-}
+          {-(VariableIdentifier)-}
+          {-(Do
+            {-(VariableIdentifier)-}
+            {-(VariableIdentifier)-})-}
+          {-(VariableIdentifier)-})-}
+        {-(VariableIdentifier)-})))
+    (Function
+    { (VariableIdentifier)
+    ->(VariableIdentifier) }
+      (Statements
+        (Do
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (Statements
+            (Function
+            { (VariableIdentifier)
+            ->(VariableIdentifier) }
+              (Statements
+              { (VariableIdentifier)
+              ->(VariableIdentifier) }))))))
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Do
+        {+(VariableIdentifier)+}
+        {+(Statements
+          {+(Function
+            {+(VariableIdentifier)+}
+            {+(Statements
+              {+(VariableIdentifier)+})+})+})+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Do
+        {+(VariableIdentifier)+}
+        {+(Statements
+          {+(Function
+            {+(VariableIdentifier)+}
+            {+(Statements
+              {+(VariableIdentifier)+})+})+})+})+})+})+}
+  {+(TypeClass
+    {+(Empty)+}
+    {+(TypeClassIdentifier)+}
+    {+(TypeVariableIdentifier)+}
+    {+(Statements
+      {+(Context
+        {+(Comment)+}
+        {+(TypeSignature
+          {+(VariableIdentifier)+}
+          {+(FunctionType
+            {+(Type
+              {+(TypeVariableIdentifier)+}
+              {+(TypeParameters)+}
+              {+(Empty)+})+}
+            {+(Type
+              {+(Array
+                {+(Type
+                  {+(TypeConstructorIdentifier)+}
+                  {+(TypeParameters)+}
+                  {+(Empty)+})+})+}
+              {+(TypeParameters)+}
+              {+(Empty)+})+})+})+})+})+})+}
+  {+(TypeClass
+    {+(Empty)+}
+    {+(TypeClassIdentifier)+}
+    {+(TypeVariableIdentifier)+}
+    {+(Statements
+      {+(Function
+        {+(VariableIdentifier)+}
+        {+(Statements
+          {+(VariableIdentifier)+})+})+})+})+}
+  {+(Function
+    {+(VariableIdentifier)+}
+    {+(VariableIdentifier)+}
+    {+(Statements
+      {+(Match
+        {+(App
+          {+(VariableIdentifier)+}
+          {+(Empty)+}
+          {+(VariableIdentifier)+})+}
+        {+(Pattern
+          {+(ListPattern
+            {+(VariableIdentifier)+})+}
+          {+(App
+            {+(ConstructorIdentifier)+}
+            {+(Empty)+}
+            {+(VariableIdentifier)+})+})+})+})+})+}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(Do
+        {-(VariableIdentifier)-}
+        {-(Statements
+          {-(Function
+            {-(VariableIdentifier)-}
+            {-(Statements
+              {-(VariableIdentifier)-})-})-})-})-})-})-}
+  {-(Function
+    {-(VariableIdentifier)-}
+    {-(Statements
+      {-(Do
+        {-(VariableIdentifier)-}
+        {-(Statements
+          {-(Function
+            {-(VariableIdentifier)-}
+            {-(Statements
+              {-(VariableIdentifier)-})-})-})-})-})-})-}))

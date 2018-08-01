@@ -1,7 +1,7 @@
-(Program
+(Statements
   (Call
     (Identifier)
-    (Symbol)
+    (SymbolElement)
     (Empty))
   (Call
     (Identifier)
@@ -22,6 +22,6 @@
     (Empty))
   (Call
     (Identifier)
-    (Symbol)
-    (Symbol)
+    (SymbolElement)
+    (SymbolElement)
     (Empty)))

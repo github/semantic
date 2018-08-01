@@ -1,11 +1,10 @@
-(Program
+(Statements
   (InterfaceDeclaration
   {+(TypeParameters
     {+(TypeParameter
       {+(Identifier)+}
       {+(Empty)+}
       {+(Empty)+})+})+}
-    (Empty)
   {-(Empty)-}
   { (Identifier)
   ->(Identifier) }

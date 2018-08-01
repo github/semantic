@@ -1,93 +1,68 @@
-{-# LANGUAGE GADTs, UndecidableInstances #-}
-module Control.Abstract.Addressable where
+{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Control.Abstract.Addressable
+( Addressable(..)
+, Allocatable(..)
+, Derefable(..)
+) where
 
+import Control.Abstract.Context
 import Control.Abstract.Evaluator
-import Control.Applicative
-import Control.Effect
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.Resumable as Eff
+import Control.Abstract.Hole
 import Data.Abstract.Address
-import Data.Abstract.Environment (insert)
-import Data.Abstract.FreeVariables
-import Data.Semigroup.Reducer
+import Data.Abstract.Name
 import Prologue
 
--- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (Effectful m, Member Fresh effects, Monad (m effects), Ord location) => MonadAddressable location effects m where
-  derefCell :: Address location value -> Cell location value -> m effects (Maybe value)
+-- | Defines allocation and dereferencing of addresses.
+class (Ord address, Show address) => Addressable address (effects :: [(* -> *) -> * -> *]) where
+  -- | The type into which stored values will be written for a given address type.
+  type family Cell address :: * -> *
 
-  allocLoc :: Name -> m effects location
+class Addressable address effects => Allocatable address effects where
+  allocCell :: Name -> Evaluator address value effects address
 
--- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( MonadAddressable location effects m
-                 , MonadEvaluator location term value effects m
-                 )
-              => Name
-              -> m effects (Address location value)
-lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
+class Addressable address effects => Derefable address effects where
+  derefCell :: address -> Cell address value -> Evaluator address value effects (Maybe value)
 
 
-letrec :: ( MonadAddressable location effects m
-          , MonadEvaluator location term value effects m
-          , Reducer value (Cell location value)
-          )
-       => Name
-       -> m effects value
-       -> m effects (value, Address location value)
-letrec name body = do
-  addr <- lookupOrAlloc name
-  v <- localEnv (insert name addr) body
-  assign addr v
-  pure (v, addr)
+-- | 'Precise' addresses are always allocated a fresh address, and dereference to the 'Latest' value written.
+instance Addressable Precise effects where
+  type Cell Precise = Latest
 
--- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( MonadAddressable location effects m
-           , MonadEvaluator location term value effects m
-           )
-        => Name
-        -> (Address location value -> m effects value)
-        -> m effects value
-letrec' name body = do
-  addr <- lookupOrAlloc name
-  v <- localEnv id (body addr)
-  v <$ modifyEnv (insert name addr)
+instance Member Fresh effects => Allocatable Precise effects where
+  allocCell _ = Precise <$> fresh
 
--- Instances
+instance Derefable Precise effects where
+  derefCell _ = pure . getLast . unLatest
 
--- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Precise effects m where
-  derefCell _ = pure . unLatest
-  allocLoc _ = Precise <$> raise fresh
+-- | 'Monovariant' addresses allocate one address per unique variable name, and dereference once per stored value, nondeterministically.
+instance Addressable Monovariant effects where
+  type Cell Monovariant = All
 
--- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative (m effects), Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Monovariant effects m where
-  derefCell _ cell | null cell = pure Nothing
-                   | otherwise = Just <$> foldMapA pure cell
-  allocLoc = pure . Monovariant
+instance Allocatable Monovariant effects where
+  allocCell = pure . Monovariant
 
--- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (Member (Resumable (AddressError location value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Address location value -> m effects value
-deref addr = do
-  cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
-  derefed <- derefCell addr cell
-  maybeM (throwAddressError (UninitializedAddress addr)) derefed
+instance Member NonDet effects => Derefable Monovariant effects where
+  derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
 
-alloc :: MonadAddressable location effects m => Name -> m effects (Address location value)
-alloc = fmap Address . allocLoc
+-- | 'Located' addresses allocate & dereference using the underlying address, contextualizing addresses with the current 'PackageInfo' & 'ModuleInfo'.
+instance Addressable address effects => Addressable (Located address) effects where
+  type Cell (Located address) = Cell address
 
-data AddressError location value resume where
-  UnallocatedAddress :: Address location value -> AddressError location value (Cell location value)
-  UninitializedAddress :: Address location value -> AddressError location value value
+instance (Allocatable address effects, Member (Reader ModuleInfo) effects, Member (Reader PackageInfo) effects, Member (Reader Span) effects) => Allocatable (Located address) effects where
+  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule <*> pure name <*> ask)
 
-deriving instance Eq location => Eq (AddressError location value resume)
-deriving instance Show location => Show (AddressError location value resume)
-instance Show location => Show1 (AddressError location value) where
-  liftShowsPrec _ _ = showsPrec
-instance Eq location => Eq1 (AddressError location value) where
-  liftEq _ (UninitializedAddress a) (UninitializedAddress b) = a == b
-  liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
-  liftEq _ _                        _                        = False
+instance Derefable address effects => Derefable (Located address) effects where
+  derefCell (Located loc _ _ _ _) = relocate . derefCell loc
 
+instance (Addressable address effects, Ord context, Show context) => Addressable (Hole context address) effects where
+  type Cell (Hole context address) = Cell address
 
-throwAddressError :: (Effectful m, Member (Resumable (AddressError location value)) effects) => AddressError location value resume -> m effects resume
-throwAddressError = raise . Eff.throwError
+instance (Allocatable address effects, Ord context, Show context) => Allocatable (Hole context address) effects where
+  allocCell name = relocate (Total <$> allocCell name)
+
+instance (Derefable address effects, Ord context, Show context) => Derefable (Hole context address) effects where
+  derefCell (Total loc) = relocate . derefCell loc
+  derefCell (Partial _) = const (pure Nothing)
+
+relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
+relocate = raiseEff . lowerEff

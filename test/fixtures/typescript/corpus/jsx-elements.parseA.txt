@@ -1,4 +1,4 @@
-(Program
+(Statements
   (VariableDeclaration
     (Assignment
       (Empty)
@@ -10,7 +10,6 @@
             (Call
               (Identifier)
               (MemberAccess
-                (Identifier)
                 (Identifier))
               (Empty))))
         (JsxExpression

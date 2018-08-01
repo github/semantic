@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(Not
   {+(Equal
     {+(Identifier)+}
@@ -30,12 +30,11 @@
 {+(LessThanEqual
   {+(Identifier)+}
   {+(Identifier)+})+}
-{+(LessThan
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{-(LessThan
-  {-(Identifier)-}
-  {-(Identifier)-})-}
+  (LessThan
+  { (Identifier)
+  ->(Identifier) }
+  { (Identifier)
+  ->(Identifier) })
 {-(LessThanEqual
   {-(Identifier)-}
   {-(Identifier)-})-}

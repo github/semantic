@@ -1,0 +1,385 @@
+(Module
+  (Empty)
+  (Statements
+    (TypeClass
+      (Empty)
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (Statements))
+    (TypeClass
+      (Empty)
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (TypeVariableIdentifier)
+      (Statements))
+    (TypeClass
+      (Context'
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (TypeVariableIdentifier)))
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (Statements))
+    (TypeClass
+      (Context'
+        (Statements
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier))
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier))))
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (Statements))
+    (TypeClass
+      (Empty)
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (Statements
+        (TypeSignature
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (Context'
+            (Class
+              (TypeClassIdentifier)
+              (TypeVariableIdentifier)))
+          (FunctionType
+            (Type
+              (TypeVariableIdentifier)
+              (TypeParameters)
+              (Empty))
+            (FunctionType
+              (Type
+                (TypeVariableIdentifier)
+                (TypeParameters)
+                (Empty))
+              (Type
+                (TypeVariableIdentifier)
+                (TypeParameters)
+                (Empty)))))
+        (TypeSignature
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (Context'
+            (Statements
+              (Class
+                (TypeClassIdentifier)
+                (TypeVariableIdentifier))
+              (Class
+                (TypeClassIdentifier)
+                (TypeVariableIdentifier))))
+          (FunctionType
+            (Type
+              (TypeVariableIdentifier)
+              (TypeParameters)
+              (Empty))
+            (FunctionType
+              (Type
+                (TypeVariableIdentifier)
+                (TypeParameters)
+                (Empty))
+              (Type
+                (TypeVariableIdentifier)
+                (TypeParameters)
+                (Empty)))))))
+    (TypeClass
+      (Empty)
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (Statements
+        (Fixity'
+          (Empty)
+          (VariableOperator
+            (InfixVariableIdentifier)))
+        (Fixity'
+        { (Integer)
+        ->(Integer) }
+          (VariableOperator
+            (InfixVariableIdentifier)))
+        (Fixity'
+        { (Integer)
+        ->(Integer) }
+          (VariableOperator
+            (InfixVariableIdentifier))
+          (VariableOperator
+            (InfixVariableIdentifier))
+          (VariableOperator
+            (InfixVariableIdentifier)))
+        (Fixity'
+          (Empty)
+          (VariableOperator
+            (VariableSymbol)))
+        (Fixity'
+        { (Integer)
+        ->(Integer) }
+          (VariableOperator
+            (VariableSymbol)))
+        (Fixity'
+        { (Integer)
+        ->(Integer) }
+          (ConstructorOperator
+            (ConstructorSymbol)))
+        (Fixity'
+        { (Integer)
+        ->(Integer) }
+          (ConstructorOperator
+            (ConstructorSymbol)))
+        (Fixity'
+        { (Integer)
+        ->(Integer) }
+          (ConstructorOperator
+            (ConstructorSymbol)))))
+    (TypeClass
+      (Context'
+        (Class
+          (TypeClassIdentifier)
+        { (TypeVariableIdentifier)
+        ->(TypeVariableIdentifier) }))
+      (TypeClassIdentifier)
+    { (TypeVariableIdentifier)
+    ->(TypeVariableIdentifier) }
+      (Statements
+        (TypeSignature
+          (VariableIdentifier)
+          (FunctionType
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty))
+            (FunctionType
+              (Type
+              { (TypeVariableIdentifier)
+              ->(TypeVariableIdentifier) }
+                (TypeParameters)
+                (Empty))
+              (Type
+                (TypeConstructorIdentifier)
+                (TypeParameters)
+                (Empty)))))
+        (TypeSignature
+          (VariableOperator
+            (VariableSymbol))
+          (VariableOperator
+            (VariableSymbol))
+          (VariableOperator
+            (VariableSymbol))
+          (VariableOperator
+            (VariableSymbol))
+          (FunctionType
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty))
+            (FunctionType
+              (Type
+              { (TypeVariableIdentifier)
+              ->(TypeVariableIdentifier) }
+                (TypeParameters)
+                (Empty))
+              (Type
+                (TypeConstructorIdentifier)
+                (TypeParameters)
+                (Empty)))))
+        (TypeSignature
+          (VariableIdentifier)
+          (VariableIdentifier)
+          (FunctionType
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty))
+            (FunctionType
+              (Type
+              { (TypeVariableIdentifier)
+              ->(TypeVariableIdentifier) }
+                (TypeParameters)
+                (Empty))
+              (Type
+              { (TypeVariableIdentifier)
+              ->(TypeVariableIdentifier) }
+                (TypeParameters)
+                (Empty)))))
+        (TypeSignature
+          (VariableIdentifier)
+        { (TypeVariableIdentifier)
+        ->(TypeVariableIdentifier) })))
+    (TypeClass
+      (Context'
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)
+          (TypeVariableIdentifier)))
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (TypeVariableIdentifier)
+      (TypeVariableIdentifier)
+      (Statements))
+    (TypeClass
+      (Empty)
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+    { (TypeVariableIdentifier)
+    ->(TypeVariableIdentifier) }
+      (Statements
+        (TypeSignature
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (FunctionType
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty))))
+        (DefaultSignature
+        { (VariableIdentifier)
+        ->(VariableIdentifier) }
+          (FunctionType
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty))
+            (Type
+              (TypeConstructorIdentifier)
+              (TypeParameters)
+              (Empty))))))
+    (TypeClass
+      (Empty)
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (AnnotatedTypeVariable
+        (TypeVariableIdentifier)
+      { (TypeConstructorIdentifier)
+      ->(TypeConstructorIdentifier) })
+      (Statements))
+    (TypeClass
+      (Empty)
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (AnnotatedTypeVariable
+      { (TypeVariableIdentifier)
+      ->(TypeVariableIdentifier) }
+        (KindFunctionType
+          (Kind
+            (KindListType
+              (KindFunctionType
+                (Kind
+                  (Star))
+                (Kind
+                  (Star)))))
+          (KindFunctionType
+            (Kind
+              (Star))
+            (Kind
+              (Star)))))
+      (Statements))
+    (TypeClass
+      (Empty)
+      (TypeClassIdentifier)
+      (TypeVariableIdentifier)
+      (Statements
+        (TypeSynonym
+          (Statements
+            (TypeConstructorIdentifier)
+            (TypeVariableIdentifier))
+          (TypeSignature
+            (TypeConstructorIdentifier)))))
+    (TypeClass
+      (Empty)
+      (TypeClassIdentifier)
+      (TypeVariableIdentifier)
+      (Statements
+        (TypeSynonym
+          (Statements
+            (TypeConstructorIdentifier)
+            (TypeVariableIdentifier))
+          (KindSignature
+            (KindListType
+              (KindFunctionType
+                (Kind
+                  (Star))
+                (Kind
+                  (Star))))))))
+    (TypeClass
+      (Context'
+        (Class
+        { (TypeClassIdentifier)
+        ->(TypeClassIdentifier) }
+          (TypeVariableIdentifier)))
+    { (TypeClassIdentifier)
+    ->(TypeClassIdentifier) }
+      (TypeVariableIdentifier)
+      (Statements
+        (TypeFamily
+        { (TypeConstructorIdentifier)
+        ->(TypeConstructorIdentifier) }
+          (TypeVariableIdentifier)
+          (KindSignature
+            (KindListType
+              (KindFunctionType
+                (Kind
+                  (Star))
+                (Kind
+                  (Star)))))
+          (Empty))))
+    (TypeClass
+      (Context'
+        (Statements
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier))
+          (Class
+            (TypeClassIdentifier)
+            (TypeVariableIdentifier))))
+      (TypeClassIdentifier)
+      (TypeVariableIdentifier)
+      (TypeVariableIdentifier)
+      (TypeVariableIdentifier)
+      (FunctionalDependency
+        (Statements
+          (FunctionType
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty))
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty)))
+          (FunctionType
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty))
+            (Type
+            { (TypeVariableIdentifier)
+            ->(TypeVariableIdentifier) }
+              (TypeParameters)
+              (Empty)))))
+      (Statements
+        (TypeSignature
+          (VariableIdentifier)
+          (Statements
+            (TypeVariableIdentifier)
+            (TypeVariableIdentifier)))))))

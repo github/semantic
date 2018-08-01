@@ -1,4 +1,4 @@
-(Program
+(Statements
   (AmbientDeclaration
     (Class
       (Identifier)
@@ -54,7 +54,6 @@
           (Empty)))
       (InterfaceDeclaration
         (Empty)
-        (Empty)
         (Identifier)
         (ObjectType
           (PropertySignature
@@ -64,7 +63,6 @@
               (PredefinedType))
             (Identifier))))
       (InterfaceDeclaration
-        (Empty)
         (Empty)
         (Identifier)
         (ObjectType
@@ -89,7 +87,7 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (
+      (Statements
         (MethodSignature
           (Empty)
           (Empty)

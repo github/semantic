@@ -1,39 +1,56 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 module SpecHelpers
 ( module X
+, runBuilder
 , diffFilePaths
 , parseFilePath
 , readFilePair
-, addr
-, ns
+, testEvaluating
+, deNamespace
+, derefQName
 , verbatim
+, TermEvaluator(..)
 , Verbatim(..)
-, TestEvaluating
+, toList
+, Config
+, LogQueue
+, StatQueue
 ) where
 
-import Analysis.Abstract.Erroring
-import Analysis.Abstract.Evaluating
-import Control.Abstract.Addressable
-import Control.Abstract.Evaluator as X (EvaluatorState(..))
-import Control.Abstract.Value
+import Control.Abstract
+import Control.Arrow ((&&&))
+import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
+import Control.Monad ((>=>))
 import Data.Abstract.Address as X
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables as X hiding (dropExtension)
+import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
+import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
-import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue)
+import Data.Abstract.Name as X
+import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError, materializeEnvironment)
+import Data.Bifunctor (first)
 import Data.Blob as X
-import Data.File as X
+import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Lazy (toStrict)
+import Data.Project as X
+import Data.Proxy as X
+import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
-import Data.Output as X
+import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Range as X
 import Data.Record as X
+import Data.Semilattice.Lower as X
 import Data.Source as X
 import Data.Span as X
+import Data.String
+import Data.Sum
 import Data.Term as X
 import Parsing.Parser as X
-import Rendering.Renderer as X
+import Rendering.Renderer as X hiding (error)
 import Semantic.Diff as X
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
@@ -54,31 +71,102 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
+import Semantic.Config (Config)
+import Semantic.Telemetry (LogQueue, StatQueue)
+import System.Exit (die)
+import Control.Exception (displayException)
+
+runBuilder = toStrict . toLazyByteString
+
+-- | This orphan instance is so we don't have to insert @name@ calls
+-- in dozens and dozens of environment specs.
+instance IsString Name where
+  fromString = name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
-diffFilePaths :: Both FilePath -> IO ByteString
-diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionDiffRenderer
+diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
+diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= runTaskWithConfig config logger statter . runDiff SExpressionDiffRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Returns an s-expression parse tree for the specified FilePath.
-parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath :: TaskConfig -> FilePath -> IO ByteString
+parseFilePath (TaskConfig config logger statter) path = (fromJust <$> IO.readFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluating term
-  = Erroring (AddressError Precise (Value Precise))
-  ( Erroring (EvalError (Value Precise))
-  ( Erroring (ResolutionError (Value Precise))
-  ( Erroring (Unspecialized (Value Precise))
-  ( Erroring (ValueError Precise (Value Precise))
-  ( Erroring (LoadError term)
-  ( Evaluating Precise term (Value Precise)))))))
+type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
+                              , Resumable (AddressError Precise Val)
+                              , Resumable ResolutionError
+                              , Resumable EvalError
+                              , Resumable (EnvironmentError Precise)
+                              , Resumable (Unspecialized Val)
+                              , Resumable (LoadError Precise)
+                              , Trace
+                              , Fresh
+                              , State (Heap Precise Latest Val)
+                              , Lift IO
+                              ]
+type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
+                             , AddressError Precise Val
+                             , ResolutionError
+                             , EvalError
+                             , EnvironmentError Precise
+                             , Unspecialized Val
+                             , LoadError Precise
+                             ]
+testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
+               -> IO
+                 ( [String]
+                 , ( Heap Precise Latest Val
+                   , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
+                            (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
+                   )
+                 )
+testEvaluating
+  = runM
+  . fmap (\ (heap, (traces, res)) -> (traces, (heap, res)))
+  . runState lowerBound
+  . runFresh 0
+  . runReturningTrace
+  . fmap reassociate
+  . runLoadError
+  . runUnspecialized
+  . runEnvironmentError
+  . runEvalError
+  . runResolutionError
+  . runAddressError
+  . runValueError @_ @Precise @(UtilEff Precise)
 
-ns n = Just . Latest . Just . injValue . Namespace n
-addr = Address . Precise
+type Val = Value Precise (UtilEff Precise)
+
+
+deNamespace :: Heap Precise (Cell Precise) (Value Precise term)
+            -> Value Precise term
+            -> Maybe (Name, [Name])
+deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
+deNamespace _ _                          = Nothing
+
+namespaceScope :: Heap Precise (Cell Precise) (Value Precise term)
+               -> Value Precise term
+               -> Maybe (Environment Precise)
+namespaceScope heap ns@(Namespace _ _ _)
+  = either (const Nothing) snd
+  . run
+  . runFresh 0
+  . runAddressError
+  . runState heap
+  . runDeref
+  $ materializeEnvironment ns
+
+namespaceScope _ _ = Nothing
+
+derefQName :: Heap Precise (Cell Precise) (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
+derefQName heap names binds = go names (Env.newEnv binds)
+  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
+          []        -> Just
+          (n2 : ns) -> namespaceScope heap >=> go (n2 :| ns)
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

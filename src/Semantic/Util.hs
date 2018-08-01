@@ -1,90 +1,162 @@
-{-# OPTIONS_GHC -Wno-missing-signatures #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, PartialTypeSignatures #-}
+{-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
-import           Analysis.Abstract.BadAddresses
-import           Analysis.Abstract.BadModuleResolutions
-import           Analysis.Abstract.BadSyntax
-import           Analysis.Abstract.BadValues
-import           Analysis.Abstract.BadLoads
-import           Analysis.Abstract.BadVariables
+import Prelude hiding (readFile)
+
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Analysis.Abstract.Erroring
-import           Analysis.Abstract.Evaluating as X
-import           Analysis.Abstract.TypeChecking
-import           Analysis.Abstract.PythonPackage
-import           Control.Abstract.Analysis
+import           Control.Abstract
+import           Control.Exception (displayException)
+import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Located
-import           Data.Abstract.Type
-import           Data.Abstract.Value
+import           Data.Abstract.Module
+import qualified Data.Abstract.ModuleTable as ModuleTable
+import           Data.Abstract.Package
+import           Data.Abstract.Value.Concrete as Concrete
+import           Data.Abstract.Value.Type as Type
 import           Data.Blob
-import           Data.File
+import           Data.Coerce
+import           Data.Functor.Foldable
+import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
-import qualified GHC.TypeLits as TypeLevel
-import           Language.Preluded
+import           Data.List (uncons)
+import           Data.Project hiding (readFile)
+import           Data.Sum (weaken)
+import           Data.Term
+import           Language.Haskell.HsColour
+import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
-import           Prologue
+import           Prologue hiding (weaken)
+import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
+import           Semantic.Telemetry (LogQueue, StatQueue)
+import           System.Exit (die)
+import           System.FilePath.Posix (takeDirectory)
+import           Text.Show (showListWith)
+import           Text.Show.Pretty (ppShow)
 
-import qualified Language.Go.Assignment as Go
-import qualified Language.PHP.Assignment as PHP
-import qualified Language.Python.Assignment as Python
-import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TypeScript.Assignment as TypeScript
+justEvaluating
+  = runM
+  . runState lowerBound
+  . runFresh 0
+  . runPrintingTrace
+  . fmap reassociate
+  . runLoadError
+  . runUnspecialized
+  . runEnvironmentError
+  . runEvalError
+  . runResolutionError
+  . runAddressError
+  . runValueError
 
-type JustEvaluating term
-  = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
-  ( Erroring (EvalError (Value (Located Precise term)))
-  ( Erroring (ResolutionError (Value (Located Precise term)))
-  ( Erroring (Unspecialized (Value (Located Precise term)))
-  ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
-  ( Erroring (LoadError term)
-  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+newtype UtilEff address a = UtilEff
+  { runUtilEff :: Eff '[ Function address (Value address (UtilEff address))
+                       , Exc (LoopControl address)
+                       , Exc (Return address)
+                       , Env address
+                       , Deref address (Value address (UtilEff address))
+                       , Allocator address (Value address (UtilEff address))
+                       , Reader ModuleInfo
+                       , Modules address
+                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+                       , Reader Span
+                       , Reader PackageInfo
+                       , Resumable (ValueError address (UtilEff address))
+                       , Resumable (AddressError address (Value address (UtilEff address)))
+                       , Resumable ResolutionError
+                       , Resumable EvalError
+                       , Resumable (EnvironmentError address)
+                       , Resumable (Unspecialized (Value address (UtilEff address)))
+                       , Resumable (LoadError address)
+                       , Trace
+                       , Fresh
+                       , State (Heap address Latest (Value address (UtilEff address)))
+                       , Lift IO
+                       ] a
+  }
 
-type EvaluatingWithHoles term
-  = BadAddresses
-  ( BadModuleResolutions
-  ( BadVariables
-  ( BadValues
-  ( BadSyntax
-  ( BadLoads
-  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+checking
+  = runM @_ @IO
+  . runState (lowerBound @(Heap Monovariant All Type))
+  . runFresh 0
+  . runPrintingTrace
+  . runTermEvaluator @_ @Monovariant @Type
+  . caching
+  . providingLiveSet
+  . fmap reassociate
+  . runLoadError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTypes
 
--- The order is significant here: Caching has to come on the outside, or its Interpreter instance
--- will expect the TypeError exception type to have an Ord instance, which is wrong.
-type Checking term
-  = Caching
-  ( TypeChecking
-  ( Erroring (AddressError Monovariant Type)
-  ( Erroring (EvalError Type)
-  ( Erroring (ResolutionError Type)
-  ( Erroring (Unspecialized Type)
-  ( Erroring (LoadError term)
-  ( Retaining
-  ( Evaluating Monovariant term Type))))))))
+evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser         Language.Go
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser       Language.Ruby
+evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser        Language.PHP
+evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser     Language.Python
+evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript
+evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
 
-evalGoProject path = interpret @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
-evalRubyProject path = interpret @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
-evalPHPProject path = interpret @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
-evalPythonProject path = fmap (interpret @(PythonPackaging (EvaluatingWithHoles Python.Term))) <$> evaluatePythonProject pythonParser Language.Python pythonPrelude path
-evalTypeScriptProjectQuietly path = interpret @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
-evalTypeScriptProject path = interpret @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
 
-typecheckGoFile path = interpret @(Checking Go.Term) <$> evaluateProject goParser Language.Go Nothing path
+callGraphProject parser proxy lang opts paths = runTaskWithOptions opts $ do
+  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
+  package <- parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  x <- runCallGraph proxy False modules package
+  pure (x, (() <$) <$> modules)
 
-rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
-pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
+evaluatePythonProject = evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
--- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-evaluatePythonProject parser lang prelude path = fmap evaluatePackage <$> runTask (readProject Nothing path lang [] >>= parsePythonPackage parser prelude)
+callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) Language.Ruby debugOptions
 
-evalRubyFile path = interpret @(JustEvaluating Ruby.Term) <$> evaluateFile rubyParser path
-evaluateFile parser path = evaluateModule <$> runTask (parseModule parser Nothing (file path))
+-- Evaluate a project consisting of the listed paths.
+evaluateProject proxy parser lang paths = withOptions debugOptions $ \ config logger statter ->
+  evaluateProject' (TaskConfig config logger statter) proxy parser lang paths
+
+data TaskConfig = TaskConfig Config LogQueue StatQueue
+
+evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
+  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
+  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
+       (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
+
+evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
+  project <- readProject Nothing path lang []
+  packages <- fmap (fmap quieterm) <$> parsePythonPackage parser Nothing project
+  forM packages $ \package -> do
+    modules <- topologicalSort <$> runImportGraphToModules proxy package
+    trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+    pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
+         (runReader (packageInfo package)
+         (runReader (lowerBound @Span)
+         (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+         (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+         (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
+
+
+evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
+  project <- readProject Nothing path lang []
+  package <- fmap quieterm <$> parsePackage parser project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  pure (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (evaluate proxy id withTermSpans Type.runFunction modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
@@ -92,3 +164,43 @@ parseFile parser = runTask . (parse parser <=< readBlob . file)
 
 blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
+
+
+mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
+mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)
+
+reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) (Either (SomeExc exc4) (Either (SomeExc exc5) (Either (SomeExc exc6) (Either (SomeExc exc7) result)))))) -> Either (SomeExc (Sum '[exc7, exc6, exc5, exc4, exc3, exc2, exc1])) result
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . Right
+
+
+newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }
+  deriving (Declarations, FreeVariables)
+
+type instance Base (Quieterm syntax ann) = TermF syntax ann
+instance Functor syntax => Recursive   (Quieterm syntax ann) where project = unQuieterm
+instance Functor syntax => Corecursive (Quieterm syntax ann) where embed   =   Quieterm
+
+instance Eq1 syntax => Eq1 (Quieterm syntax) where
+  liftEq eqA = go where go t1 t2 = liftEq2 eqA go (unQuieterm t1) (unQuieterm t2)
+
+instance (Eq1 syntax, Eq ann) => Eq (Quieterm syntax ann) where
+  (==) = eq1
+
+instance Ord1 syntax => Ord1 (Quieterm syntax) where
+  liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unQuieterm t1) (unQuieterm t2)
+
+instance (Ord1 syntax, Ord ann) => Ord (Quieterm syntax ann) where
+  compare = compare1
+
+instance Show1 syntax => Show1 (Quieterm syntax) where
+  liftShowsPrec _ _ = go where go d = liftShowsPrec go (showListWith (go 0)) d . termFOut . unQuieterm
+
+instance Show1 syntax => Show (Quieterm syntax ann) where
+  showsPrec = liftShowsPrec (const (const id)) (const id)
+
+quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
+quieterm = cata Quieterm
+
+
+prettyShow :: Show a => a -> IO ()
+prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow

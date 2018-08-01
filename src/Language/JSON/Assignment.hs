@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.JSON.Assignment
 ( assignment
 , Syntax
@@ -6,56 +6,70 @@ module Language.JSON.Assignment
 , Term)
 where
 
-import Prologue
-import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
+import Assigning.Assignment.Deterministic hiding (Assignment)
+import qualified Assigning.Assignment.Deterministic as Deterministic
+import Data.AST
 import Data.Record
-import Data.Syntax (makeTerm, parseError)
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
+import qualified Data.Diff as Diff
 import Language.JSON.Grammar as Grammar
+import Proto3.Suite (Named1(..), Named(..))
+import Prologue
+import Text.Parser.Combinators
 
 type Syntax =
-  [ Literal.Array
+  [ Literal.Null
+  , Literal.Array
   , Literal.Boolean
   , Literal.Hash
   , Literal.Float
   , Literal.KeyValue
-  , Literal.Null
   , Literal.TextElement
   , Syntax.Error
   ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Term = Term.Term (Sum Syntax) (Record Location)
+type Assignment = Deterministic.Assignment Grammar
+
+instance Named1 (Sum Syntax) where
+  nameOf1 _ = "JSONSyntax"
+
+instance Named (Term.Term (Sum Syntax) ()) where
+  nameOf _ = "JSONTerm"
+
+instance Named (Diff.Diff (Sum Syntax) () ()) where
+  nameOf _ = "JSONDiff"
 
 
-assignment :: Assignment
-assignment = Syntax.handleError (value <|> parseError)
+assignment :: Assignment Term
+assignment = value <|> parseError
 
-value :: Assignment
-value = symbol Value *> children (object <|> array)
+value :: Assignment Term
+value = branchNode Value (object <|> array <|> parseError)
 
-jsonValue :: Assignment
-jsonValue = object <|> array <|> number <|> string <|> boolean <|> none
+jsonValue :: Assignment Term
+jsonValue = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
 
-object :: Assignment
-object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pairs)
-  where pairs = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> (number <|> string) <*> jsonValue)
+object :: Assignment Term
+object = toTerm (branchNode Object (Literal.Hash <$ leafNode AnonLBrace <*> sepBy pairs (leafNode AnonComma) <* leafNode AnonRBrace))
+  where pairs = toTerm (branchNode Pair (Literal.KeyValue <$> (number <|> string <|> parseError) <* leafNode AnonColon <*> jsonValue)) <|> parseError
 
-array :: Assignment
-array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
+array :: Assignment Term
+array = toTerm (branchNode Array (Literal.Array <$ leafNode AnonLBracket <*> sepBy jsonValue (leafNode AnonComma) <* leafNode AnonRBracket))
 
-number :: Assignment
-number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
+number :: Assignment Term
+number = toTerm (Literal.Float <$> leafNode Number)
 
-string :: Assignment
-string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
+string :: Assignment Term
+string = toTerm (Literal.TextElement <$> leafNode String)
 
-boolean :: Assignment
-boolean =  makeTerm <$> symbol Grammar.True  <*> (Literal.true <$ source)
-       <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
+boolean :: Assignment Term
+boolean =  toTerm
+  (   leafNode Grammar.True  $> Literal.true
+  <|> leafNode Grammar.False $> Literal.false)
 
-none :: Assignment
-none = makeTerm <$> symbol Null <*> (Literal.Null <$ source)
+none :: Assignment Term
+none = toTerm (leafNode Null $> Literal.Null)

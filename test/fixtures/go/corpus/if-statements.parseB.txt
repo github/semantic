@@ -1,52 +1,52 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (If
-        (
+        (Statements
           (Call
             (Identifier)
-            ([])
+            (Statements)
             (Empty)))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty))
         (Empty))
       (If
-        (
+        (Statements
           (Assignment
             (Identifier)
             (Call
               (Identifier)
-              ([])
+              (Statements)
               (Empty)))
           (Identifier))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty))
         (Empty))
       (If
-        (
+        (Statements
           (Call
             (Identifier)
-            ([])
+            (Statements)
             (Empty)))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty)))
       (If
-        (
+        (Statements
           (Assignment
             (Identifier)
             (Integer))
@@ -55,20 +55,20 @@
             (Integer)))
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty))
         (Context
           (Comment)
           (If
-            (
+            (Statements
               (LessThan
                 (Identifier)
                 (Integer)))
             (Call
               (Identifier)
-              ([])
+              (Statements)
               (Empty))
             (Call
               (Identifier)
-              ([])
+              (Statements)
               (Empty))))))))

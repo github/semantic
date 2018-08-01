@@ -1,0 +1,7 @@
+(Module
+  (QualifiedModuleIdentifier
+  { (ModuleIdentifier)
+  ->(ModuleIdentifier) }
+  { (ModuleIdentifier)
+  ->(ModuleIdentifier) })
+  (Statements))

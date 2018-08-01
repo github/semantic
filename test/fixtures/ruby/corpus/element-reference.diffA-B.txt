@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Subscript
     (Send
     { (Identifier)
@@ -10,8 +10,8 @@
     (Send
     { (Identifier)
     ->(Identifier) })
-  { (Symbol)
-  ->(Symbol) })
+  { (SymbolElement)
+  ->(SymbolElement) })
 {-(Assignment
   {-(Subscript
     {-(Send

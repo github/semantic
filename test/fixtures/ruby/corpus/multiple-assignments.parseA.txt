@@ -1,6 +1,6 @@
-(Program
+(Statements
   (Assignment
-    (
+    (Statements
       (Identifier)
       (Identifier)
       (Identifier))
@@ -9,40 +9,40 @@
       (Integer)
       (Integer)))
   (Assignment
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (Array
       (Integer)
       (Integer)))
   (Assignment
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (Array
       (Integer)
       (Integer)))
   (Assignment
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (Array
       (Integer)
       (Integer)))
   (Assignment
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (Identifier))
   (Assignment
-    (
+    (Statements
       (Send
         (Identifier)
         (Identifier))
       (Send
         (Identifier)
         (Identifier)))
-    (
+    (Statements
       (Send
         (Send
           (Identifier))
@@ -52,8 +52,8 @@
           (Identifier))
         (Identifier))))
   (Assignment
-    (
-      (
+    (Statements
+      (Statements
         (Identifier)
         (Identifier)))
     (Identifier)))

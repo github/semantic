@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Diff
 ( Diff(..)
 , DiffF(..)
@@ -12,25 +12,25 @@ module Data.Diff
 , mergeF
 , merging
 , diffPatches
-, beforeTerm
-, afterTerm
 , stripDiff
 ) where
 
-import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
-import Data.Foldable (asum)
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
-import Data.Mergeable (Mergeable(sequenceAlt))
 import Data.Patch
 import Data.Record
 import Data.Term
 import Text.Show
+import Prologue
+import Proto3.Suite.Class
+import Proto3.Suite.DotProto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- | A recursive structure indicating the changed & unchanged portions of a labelled tree.
 newtype Diff syntax ann1 ann2 = Diff { unDiff :: DiffF syntax ann1 ann2 (Diff syntax ann1 ann2) }
@@ -88,19 +88,6 @@ diffPatches = para $ \ diff -> case diff of
   Merge merge -> foldMap snd merge
 
 
--- | Recover the before state of a diff.
-beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
-beforeTerm = cata $ \ diff -> case diff of
-  Patch patch -> (before patch >>= \ (In  a     l) -> termIn a <$> sequenceAlt l) <|> (after patch >>= asum)
-  Merge                              (In (a, _) l) -> termIn a <$> sequenceAlt l
-
--- | Recover the after state of a diff.
-afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
-afterTerm = cata $ \ diff -> case diff of
-  Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
-  Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
-
-
 -- | Strips the head annotation off a diff annotated with non-empty records.
 stripDiff :: Functor syntax
           => Diff syntax (Record (h1 ': t1)) (Record (h2 ': t2))
@@ -142,7 +129,7 @@ instance (Show1 syntax, Show ann1, Show ann2) => Show (Diff syntax ann1 ann2) wh
 instance Show1 syntax => Show3 (DiffF syntax) where
   liftShowsPrec3 sp1 sl1 sp2 sl2 spRecur slRecur d diff = case diff of
     Patch patch -> showsUnaryWith (liftShowsPrec2 (liftShowsPrec2 sp1 sl1 spRecur slRecur) (liftShowList2 sp1 sl1 spRecur slRecur) (liftShowsPrec2 sp2 sl2 spRecur slRecur) (liftShowList2 sp2 sl2 spRecur slRecur)) "Patch" d patch
-    Merge term  -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spRecur slRecur) "Merge" d term
+    Merge term -> showsUnaryWith (liftShowsPrec2 spBoth slBoth spRecur slRecur) "Merge" d term
     where spBoth = liftShowsPrec2 sp1 sl1 sp2 sl2
           slBoth = liftShowList2 sp1 sl1 sp2 sl2
 
@@ -152,6 +139,53 @@ instance (Show1 syntax, Show ann1, Show ann2) => Show1 (DiffF syntax ann1 ann2) 
 instance (Show1 syntax, Show ann1, Show ann2, Show recur) => Show (DiffF syntax ann1 ann2 recur) where
   showsPrec = showsPrec3
 
+instance ((Show (f (Diff f () ()))), (Show (f (Term f ()))), Show1 f, Named1 f, Message1 f, Named (Diff f () ()), Foldable f, Functor f) => Message (Diff f () ()) where
+  encodeMessage _ (Diff (Merge (In _ f))) = Encode.embedded 1 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Delete (In _ f)))) =
+    Encode.embedded 2 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Insert (In _ f)))) =
+    Encode.embedded 3 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f))
+  encodeMessage _ (Diff (Patch (Replace (In _ f) (In _ g)))) =
+    Encode.embedded 4 (Encode.embedded 1 (liftEncodeMessage encodeMessage 1 f) <> Encode.embedded 2 (liftEncodeMessage encodeMessage 1 g))
+  decodeMessage _ = Decode.oneof undefined [(1, m), (2, d), (3, i), (4, r)]
+    where
+      embeddedAt parser = Decode.at (Decode.embedded'' parser)
+      m = merge ((), ()) <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
+      i = inserting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
+      d = deleting . termIn () <$> Decode.embedded'' (embeddedAt (liftDecodeMessage decodeMessage 1) 1)
+      r =
+        (\(a, b) -> replacing (termIn () a) (termIn () b))
+          <$> Decode.embedded'' ((,) <$> embeddedAt (liftDecodeMessage decodeMessage 1) 1 <*> embeddedAt (liftDecodeMessage decodeMessage 1) 2)
+
+  dotProto (_ :: Proxy (Diff f () ())) =
+    [ DotProtoMessageOneOf (Single "diff")
+      [ DotProtoField 1 (Prim . Named $ Single "Merge") (Single "merge") [] Nothing
+      , DotProtoField 2 (Prim . Named $ Single "Delete") (Single "delete") [] Nothing
+      , DotProtoField 3 (Prim . Named $ Single "Insert") (Single "insert") [] Nothing
+      , DotProtoField 4 (Prim . Named $ Single "Replace") (Single "replace") [] Nothing
+      ]
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Merge" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "syntax") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Delete" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Insert" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
+          ] )
+    , DotProtoMessageDefinition
+        ( DotProtoMessage
+          ( Single "Replace" )
+          [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "before") [] Nothing)
+          , DotProtoMessageField (DotProtoField 2 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "after") [] Nothing)
+          ] )
+    ]
 
 instance Functor syntax => Bifunctor (Diff syntax) where
   bimap f g = go where go = Diff . trimap f g go . unDiff

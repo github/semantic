@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (PostIncrement
       { (Identifier)
       ->(Identifier) })

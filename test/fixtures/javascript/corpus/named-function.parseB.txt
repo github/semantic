@@ -1,9 +1,9 @@
-(Program
+(Statements
   (Function
     (Empty)
     (Empty)
     (Identifier)
-    (
+    (Statements
       (Return
         (Boolean))))
   (Empty))

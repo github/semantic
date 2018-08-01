@@ -5,14 +5,15 @@ module Matching.Go.Spec (spec) where
 import           Control.Abstract.Matching
 import           Data.Abstract.Module
 import           Data.List
+import           Data.Sum
 import qualified Data.Syntax.Declaration as Decl
 import qualified Data.Syntax.Literal as Lit
 import qualified Data.Syntax.Statement as Stmt
-import           Data.Union
+import           Data.Text (Text)
 import           SpecHelpers
 
--- This gets the ByteString contents of all integers
-integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Union fs) ann) ByteString
+-- This gets the Text contents of all integers
+integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) Text
 integerMatcher = match Lit.integerContent target
 
 -- This matches all for-loops with its index variable new variable bound to 0,

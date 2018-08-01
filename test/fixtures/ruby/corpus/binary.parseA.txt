@@ -1,15 +1,15 @@
-(Program
+(Statements
   (And
     (Send
       (Identifier))
     (Send
       (Identifier)))
-  (LowAnd
+  (LowPrecedenceAnd
     (Send
       (Identifier))
     (Send
       (Identifier)))
-  (LowOr
+  (LowPrecedenceOr
     (Send
       (Identifier))
     (Send

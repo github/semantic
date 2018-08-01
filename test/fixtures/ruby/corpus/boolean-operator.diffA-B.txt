@@ -1,11 +1,11 @@
-(Program
-{ (Or
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(And
+(Statements
+{+(And
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) })
+    {+(Identifier)+})+})+}
+{-(Or
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-})

@@ -1,142 +1,165 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeFamilies #-}
 module Data.Abstract.Environment
   ( Environment(..)
+  , Bindings(..)
   , addresses
-  , bind
+  , aliasBindings
+  , allNames
   , delete
+  , flatPairs
   , head
-  , emptyEnv
-  , mergeEnvs
-  , mergeNewer
   , insert
+  , insertEnv
+  , intersect
   , lookup
+  , lookupEnv'
   , names
+  , newEnv
   , overwrite
   , pairs
-  , unpairs
   , pop
   , push
   , roots
+  , unpairs
   ) where
 
-import           Prelude hiding (head, lookup)
-import           Data.Abstract.Address
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Live
-import           Data.Align
+import           Data.Abstract.Name
+import qualified Data.Set as Set
 import qualified Data.Map as Map
-import           Data.Semilattice.Lower
-import           GHC.Exts (IsList (..))
+import           Prelude hiding (head, lookup)
 import           Prologue
-import qualified Data.List.NonEmpty as NonEmpty
 
 -- $setup
--- >>> let bright = push (insert (name "foo") (Address (Precise 0)) emptyEnv)
--- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
+-- >>> import Data.Abstract.Address
+-- >>> let bright = push (insertEnv (name "foo") (Precise 0) lowerBound)
+-- >>> let shadowed = insertEnv (name "foo") (Precise 1) bright
+
+-- | A map of names to values. Represents a single scope level of an environment chain.
+newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
+  deriving (Eq, Ord, Show)
+
+instance Semigroup (Bindings address) where
+  (<>) (Bindings a) (Bindings b) = Bindings (a <> b)
+
+instance Monoid (Bindings address) where
+  mempty = Bindings mempty
+  mappend = (<>)
+
+instance Lower (Bindings address) where
+  lowerBound = mempty
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
-newtype Environment l a = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address l a)) }
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
-
-instance Eq l => Eq1 (Environment l) where liftEq = genericLiftEq
-instance Ord l => Ord1 (Environment l) where liftCompare = genericLiftCompare
-instance Show l => Show1 (Environment l) where liftShowsPrec = genericLiftShowsPrec
-
--- | The provided list will be put into an Environment with one member, so fromList is total
---   (despite NonEmpty's instance being partial). Don't pass in multiple Addresses for the
---   same Name or you violate the axiom that toList . fromList == id.
-instance IsList (Environment l a) where
-  type Item (Environment l a) = (Name, Address l a)
-  fromList xs                   = Environment (Map.fromList xs :| [])
-  toList (Environment (x :| _)) = Map.toList x
-
-mergeEnvs :: Environment l a -> Environment l a -> Environment l a
-mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
-  Environment ((<>) a b :| alignWith (mergeThese (<>)) as bs)
-
-emptyEnv :: Environment l a
-emptyEnv = Environment (lowerBound :| [])
+newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings address) }
+  deriving (Eq, Ord)
 
 -- | Make and enter a new empty scope in the given environment.
-push :: Environment l a -> Environment l a
+push :: Environment address -> Environment address
 push (Environment (a :| as)) = Environment (mempty :| a : as)
 
 -- | Remove the frontmost scope.
-pop :: Environment l a -> Environment l a
-pop (Environment (_ :| []))     = emptyEnv
+pop :: Environment address -> Environment address
+pop (Environment (_ :| []))     = lowerBound
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
--- | Drop all scopes save for the frontmost one.
-head :: Environment l a -> Environment l a
-head (Environment (a :| _)) = Environment (a :| [])
+-- | Return the frontmost (ie. most local) frame of bindings in the environment
+head :: Environment address -> Bindings address
+head (Environment (a :| _)) = a
 
--- | Take the union of two environments. When duplicate keys are found in the
---   name to address map, the second definition wins.
-mergeNewer :: Environment l a -> Environment l a -> Environment l a
-mergeNewer (Environment a) (Environment b) =
-    Environment (NonEmpty.fromList . reverse $ alignWith (mergeThese combine) (reverse as) (reverse bs))
-    where
-      combine = Map.unionWith (flip const)
-      as = NonEmpty.toList a
-      bs = NonEmpty.toList b
-
--- | Extract an association list of bindings from an 'Environment'.
+-- | Extract an association list of bindings from a 'Bindings'.
 --
--- >>> pairs shadowed
--- [(Name {unName = "foo"},Address {unAddress = Precise {unPrecise = 1}})]
-pairs :: Environment l a -> [(Name, Address l a)]
-pairs = Map.toList . fold . unEnvironment
+-- >>> pairs (head shadowed)
+-- [("foo",Precise 1)]
+pairs :: Bindings address -> [(Name, address)]
+pairs = Map.toList . unBindings
 
-unpairs :: [(Name, Address l a)] -> Environment l a
-unpairs = fromList
+unpairs :: [(Name, address)] -> Bindings address
+unpairs = Bindings . Map.fromList
+
+flatPairs :: Environment address -> [(Name, address)]
+flatPairs = (>>= pairs) . toList . unEnvironment
+
+newEnv :: Bindings address -> Environment address
+newEnv = Environment . pure
+
+-- | Lookup a 'Name' in the bindings.
+lookup :: Name -> Bindings address -> Maybe address
+lookup name = Map.lookup name . unBindings
 
 -- | Lookup a 'Name' in the environment.
 --
--- >>> lookup (name "foo") shadowed
--- Just (Address {unAddress = Precise {unPrecise = 1}})
-lookup :: Name -> Environment l a -> Maybe (Address l a)
-lookup k = foldMapA (Map.lookup k) . unEnvironment
+-- >>> lookupEnv' (name "foo") shadowed
+-- Just (Precise 1)
+lookupEnv' :: Name -> Environment address -> Maybe address
+lookupEnv' name = foldMapA (lookup name) . unEnvironment
 
--- | Insert a 'Name' in the environment.
-insert :: Name -> Address l a -> Environment l a -> Environment l a
-insert name value (Environment (a :| as)) = Environment (Map.insert name value a :| as)
+-- | Insert a 'Name' in the bindings
+insert :: Name -> address -> Bindings address -> Bindings address
+insert name addr = Bindings . Map.insert name addr . unBindings
+
+-- | Insert a 'Name' in the environment
+insertEnv :: Name -> address -> Environment address -> Environment address
+insertEnv name addr (Environment (Bindings a :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
 
 -- | Remove a 'Name' from the environment.
 --
 -- >>> delete (name "foo") shadowed
--- Environment {unEnvironment = fromList [] :| []}
-delete :: Name -> Environment l a -> Environment l a
-delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
+-- Environment []
+delete :: Name -> Environment address -> Environment address
+delete name = trim . Environment . fmap (Bindings . Map.delete name . unBindings) . unEnvironment
 
-trim :: Environment l a -> Environment l a
+trim :: Environment address -> Environment address
 trim (Environment (a :| as)) = Environment (a :| filtered)
-  where filtered = filter (not . Map.null) as
+  where filtered = filter (not . Map.null . unBindings) as
 
-bind :: Foldable t => t Name -> Environment l a -> Environment l a
-bind names env = fromList (mapMaybe lookupName (Prologue.toList names))
+intersect :: Foldable t => t Name -> Environment address -> Environment address
+intersect names env = newEnv (unpairs (mapMaybe lookupName (toList names)))
   where
-    lookupName name = (,) name <$> lookup name env
+    lookupName name = (,) name <$> lookupEnv' name env
 
--- | Get all bound 'Name's in an environment.
-names :: Environment l a -> [Name]
+-- | Get all bound 'Name's in a binding.
+names :: Bindings address -> [Name]
 names = fmap fst . pairs
 
--- | Lookup and alias name-value bindings from an environment.
-overwrite :: [(Name, Name)] -> Environment l a -> Environment l a
-overwrite pairs env = fromList $ mapMaybe lookupAndAlias pairs
+-- | Order preserving deduplication in O(n log n) time
+dedup :: Ord a => [a] -> [a]
+dedup = go Set.empty
   where
-    lookupAndAlias (oldName, newName) = (,) newName <$> lookup oldName env
+    go _ [] = []
+    go seen (x:xs)
+      | Set.member x seen = go seen xs
+      | otherwise = x : go (Set.insert x seen) xs
+
+-- | Get all bound 'Name's in an environment.
+allNames :: Environment address -> [Name]
+allNames = dedup . fmap fst . flatPairs
+
+aliasBindings :: [(Name, Name)] -> Bindings address -> Bindings address
+aliasBindings pairs binds = unpairs $ mapMaybe lookupAndAlias pairs
+  where
+    lookupAndAlias (oldName, newName) = (,) newName <$> Map.lookup oldName (unBindings binds)
+
+-- | Lookup and alias name-value bindings from an environment.
+overwrite :: [(Name, Name)] -> Environment address -> Environment address
+overwrite pairs env = newEnv . unpairs $ mapMaybe lookupAndAlias pairs
+  where
+    lookupAndAlias (oldName, newName) = (,) newName <$> lookupEnv' oldName env
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
 --   Unbound names are silently dropped.
-roots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
-roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
+roots :: (Ord address, Foldable t) => Environment address -> t Name -> Live address
+roots env names = addresses (names `intersect` env)
 
-addresses :: Ord l => Environment l a -> Live l a
-addresses = Live . fromList . fmap snd . pairs
+addresses :: Ord address => Environment address -> Live address
+addresses = fromAddresses . map snd . flatPairs
 
 
-instance Lower (Environment location value) where lowerBound = emptyEnv
+instance Lower (Environment address) where lowerBound = Environment (lowerBound :| [])
+
+-- N.B. this show instance drops some information to avoid generating
+-- an infinite string in certain cases. As such, two unequal
+-- environments may produce equal outputs over Show.
+instance Show address => Show (Environment address) where
+  showsPrec d = showsUnaryWith showsPrec "Environment" d . flatPairs

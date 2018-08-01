@@ -1,45 +1,43 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
-      (
+    (Statements)
+    (Statements
+      (Statements
         (Type
           (Identifier)
           (Interface
-            ([]))))
-      (
+            (Statements))))
+      (Statements
         (Type
           (Identifier)
           (Interface
             (MemberAccess
-              (Identifier)
               (Identifier)))))
-      (
+      (Statements
         (Type
           (Identifier)
           (Interface
-            (
+            (Statements
               (Identifier)
               (MemberAccess
-                (Identifier)
                 (Identifier))
               (MethodSignature
                 (Identifier)
                 (Identifier)
-                (
+                (Statements
                   (Identifier)
                   (Identifier)))))))
       (Context
         (Comment)
-        (
+        (Statements
           (Type
             (Identifier)
             (Interface
               (MethodSignature
                 (Empty)
                 (Identifier)
-                ([])))))))))
+                (Statements)))))))))

@@ -1,15 +1,14 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (TypeAssertion
     { (Identifier)
     ->(Identifier) }
-      (MemberAccess
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }))))
+    { (MemberAccess
+      {-(Identifier)-})
+    ->(MemberAccess
+      {+(Identifier)+}) })))

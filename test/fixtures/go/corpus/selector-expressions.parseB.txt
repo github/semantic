@@ -1,15 +1,13 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Call
       (MemberAccess
         (MemberAccess
-          (Identifier)
-          (Identifier))
-        (Identifier))
-      ([])
+          (Identifier)))
+      (Statements)
       (Empty))))

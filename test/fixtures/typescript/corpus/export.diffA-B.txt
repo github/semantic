@@ -1,4 +1,4 @@
-(Program
+(Statements
 { (QualifiedExport)
 ->(QualifiedExport) }
 { (QualifiedExport)
@@ -35,15 +35,15 @@
         (Identifier)
       { (Empty)
       ->(Identifier) })
+    {+(Assignment
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
       (Assignment
         (Empty)
       { (Identifier)
       ->(Identifier) }
-        (Empty))
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Empty)+})+}))
+        (Empty))))
   (DefaultExport
   { (Identifier)
   ->(Identifier) })
@@ -52,13 +52,13 @@
     {+(Empty)+}
     {+(Empty)+}
     {+(Identifier)+}
-    {+([])+})+})+}
+    {+(Statements)+})+})+}
   (DefaultExport
     (Function
       (Empty)
       (Empty)
       (Empty)
-      ([])))
+      (Statements)))
 {+(QualifiedExport)+}
 {+(DefaultExport
   {+(TextElement)+})+}
@@ -69,7 +69,7 @@
     {-(Empty)-}
     {-(Empty)-}
     {-(Identifier)-}
-    {-([])-})-})-}
+    {-(Statements)-})-})-}
 {-(QualifiedExport)-}
 {-(DefaultExport
   {-(TextElement)-})-}

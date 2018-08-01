@@ -1,14 +1,14 @@
-(Program
+(Statements
   (If
     (Send
       (Identifier))
-    (
+    (Statements
       (Send
         (Identifier)))
     (If
       (Send
         (Identifier))
-      ([]
+      (Statements
       {-(Send
         {-(Identifier)-})-})
       (Empty))))

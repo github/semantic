@@ -1,7 +1,7 @@
-(Program
+(Statements
   (If
     (Identifier)
-    (
+    (Statements
       (Call
         (Identifier)
         (Identifier)

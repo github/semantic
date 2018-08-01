@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables #-}
 module Data.Term
 ( Term(..)
 , termIn
@@ -16,6 +16,10 @@ import Data.Aeson
 import Data.JSON.Fields
 import Data.Record
 import Text.Show
+import Proto3.Suite.Class
+import Proto3.Suite.DotProto
+import qualified Proto3.Wire.Encode as Encode
+import qualified Proto3.Wire.Decode as Decode
 
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
@@ -73,10 +77,15 @@ instance (Eq1 f, Eq a) => Eq (Term f a) where
   (==) = eq1
 
 instance Show1 f => Show1 (Term f) where
-  liftShowsPrec spA slA = go where go d = showsUnaryWith (liftShowsPrec2 spA slA go (showListWith (go 0))) "Term" d . unTerm
+  liftShowsPrec spA _ = go where go d (Term (In a f)) = showsBinaryWith spA (liftShowsPrec go (showListWith (go 0))) "Term" d a f
 
 instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
+
+instance (Named1 f, Message1 f) => Message (Term f ()) where
+  encodeMessage num (Term (In _ f)) = Encode.embedded num (liftEncodeMessage encodeMessage 1 f)
+  decodeMessage num = termIn () . fromMaybe undefined <$> Decode.at (Decode.embedded (liftDecodeMessage decodeMessage 1)) num
+  dotProto (_ :: Proxy (Term f ())) = [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "syntax") [] Nothing) ]
 
 instance Ord1 f => Ord1 (Term f) where
   liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unTerm t1) (unTerm t2)
@@ -121,7 +130,7 @@ instance (ToJSONFields a, ToJSONFields1 f) => ToJSONFields (Term f a) where
   toJSONFields = toJSONFields . unTerm
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSONFields (TermF f a b) where
-  toJSONFields (In a f) = toJSONFields a <> toJSONFields1 f
+  toJSONFields (In a f) = toJSONFields1 f <> toJSONFields a
 
 instance (ToJSON b, ToJSONFields a, ToJSONFields1 f) => ToJSON (TermF f a b) where
   toJSON = object . toJSONFields

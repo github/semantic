@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(AmbientDeclaration
   {+(InternalModule
     {+(Identifier)+})+})+}
@@ -13,7 +13,7 @@
         {-(TypeIdentifier)-})-}
       {-(Identifier)-}
       {-(Empty)-})
-    ->([]) }))
+    ->(Statements) }))
   (AmbientDeclaration
   { (VariableDeclaration
     {-(Assignment
@@ -22,7 +22,6 @@
       {-(Identifier)-}
       {-(Empty)-})-})
   ->(InterfaceDeclaration
-    {+(Empty)+}
     {+(Empty)+}
     {+(Identifier)+}
     {+(ObjectType)+}) })
@@ -64,7 +63,6 @@
         {-(Empty)-})-})-}
     {-(InterfaceDeclaration
       {-(Empty)-}
-      {-(Empty)-}
       {-(Identifier)-}
       {-(ObjectType
         {-(PropertySignature
@@ -74,7 +72,6 @@
             {-(PredefinedType)-})-}
           {-(Identifier)-})-})-})-}
     {-(InterfaceDeclaration
-      {-(Empty)-}
       {-(Empty)-}
       {-(Identifier)-}
       {-(ObjectType
@@ -99,7 +96,7 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (
+      (Statements
         (MethodSignature
           (Empty)
           (Empty)

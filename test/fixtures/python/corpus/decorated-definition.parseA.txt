@@ -1,17 +1,17 @@
-(Program
+(Statements
   (Decorator
     (Identifier)
     (Class
       (Identifier)
       (Decorator
         (Identifier)
-        ([])
+        (Statements)
         (Decorator
           (Identifier)
           (Integer)
           (Decorator
             (Identifier)
-            (
+            (Statements
               (Integer)
               (Integer))
             (Decorator
@@ -27,7 +27,7 @@
                   (Identifier)
                   (Decorator
                     (Identifier)
-                    (
+                    (Statements
                       (Integer)
                       (Assignment
                         (Identifier)

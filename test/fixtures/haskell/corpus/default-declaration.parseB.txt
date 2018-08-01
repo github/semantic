@@ -1,0 +1,6 @@
+(Module
+  (ModuleIdentifier)
+  (Statements
+    (DefaultDeclaration
+      (TypeConstructorIdentifier)
+      (TypeConstructorIdentifier))))

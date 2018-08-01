@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Function
     (Empty)
   {-(Identifier)-}
@@ -6,7 +6,7 @@
   {-(Identifier)-}
     (Function
       (Empty)
-    { (
+    { (Statements
       {-(Integer)-}
       {-(Integer)-})
     ->(Send

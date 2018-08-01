@@ -1,14 +1,9 @@
-(Program
-{ (Comparison
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(Equal
+(Statements
+{+(Equal
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) }
+    {+(Identifier)+})+})+}
 {+(Not
   {+(Equal
     {+(Send
@@ -20,6 +15,11 @@
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+})+}
+{-(Comparison
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(Matches
   {-(Send
     {-(Identifier)-})-}

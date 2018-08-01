@@ -1,4 +1,4 @@
-(Program
+(Statements
   (For
     (And
       (Member
@@ -12,7 +12,7 @@
       (Identifier))
     (Update
       (Identifier))
-    (
+    (Statements
       (Call
         (Identifier)
         (Empty)))))

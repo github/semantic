@@ -1,0 +1,152 @@
+{
+  "diffs": [{
+    "diff": {
+      "merge": {
+        "term": "Statements",
+        "statements": [{
+          "merge": {
+            "term": "Method",
+            "methodBody": {
+              "merge": {
+                "children": [{
+                  "patch": {
+                    "insert": {
+                      "term": "Send",
+                      "sourceRange": [13, 16],
+                      "sendReceiver": null,
+                      "sendBlock": null,
+                      "sendArgs": [],
+                      "sourceSpan": {
+                        "start": [2, 3],
+                        "end": [2, 6]
+                      },
+                      "sendSelector": {
+                        "patch": {
+                          "insert": {
+                            "term": "Identifier",
+                            "name": "baz",
+                            "sourceRange": [13, 16],
+                            "sourceSpan": {
+                              "start": [2, 3],
+                              "end": [2, 6]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }],
+                "before": {
+                  "sourceRange": [8, 11],
+                  "sourceSpan": {
+                    "start": [2, 1],
+                    "end": [2, 4]
+                  }
+                },
+                "after": {
+                  "sourceRange": [13, 16],
+                  "sourceSpan": {
+                    "start": [2, 3],
+                    "end": [2, 6]
+                  }
+                }
+              }
+            },
+            "methodContext": [],
+            "methodName": {
+              "patch": {
+                "replace": [{
+                  "term": "Identifier",
+                  "name": "foo",
+                  "sourceRange": [4, 7],
+                  "sourceSpan": {
+                    "start": [1, 5],
+                    "end": [1, 8]
+                  }
+                }, {
+                  "term": "Identifier",
+                  "name": "bar",
+                  "sourceRange": [4, 7],
+                  "sourceSpan": {
+                    "start": [1, 5],
+                    "end": [1, 8]
+                  }
+                }]
+              }
+            },
+            "methodParameters": [{
+              "patch": {
+                "insert": {
+                  "term": "Identifier",
+                  "name": "a",
+                  "sourceRange": [8, 9],
+                  "sourceSpan": {
+                    "start": [1, 9],
+                    "end": [1, 10]
+                  }
+                }
+              }
+            }],
+            "methodReceiver": {
+              "merge": {
+                "term": "Empty",
+                "before": {
+                  "sourceRange": [0, 0],
+                  "sourceSpan": {
+                    "start": [1, 1],
+                    "end": [1, 1]
+                  }
+                },
+                "after": {
+                  "sourceRange": [0, 0],
+                  "sourceSpan": {
+                    "start": [1, 1],
+                    "end": [1, 1]
+                  }
+                }
+              }
+            },
+            "before": {
+              "sourceRange": [0, 11],
+              "sourceSpan": {
+                "start": [1, 1],
+                "end": [2, 4]
+              }
+            },
+            "after": {
+              "sourceRange": [0, 20],
+              "sourceSpan": {
+                "start": [1, 1],
+                "end": [3, 4]
+              }
+            }
+          }
+        }],
+        "before": {
+          "sourceRange": [0, 12],
+          "sourceSpan": {
+            "start": [1, 1],
+            "end": [3, 1]
+          }
+        },
+        "after": {
+          "sourceRange": [0, 21],
+          "sourceSpan": {
+            "start": [1, 1],
+            "end": [4, 1]
+          }
+        }
+      }
+    },
+    "stat": {
+      "path": "test/fixtures/ruby/corpus/method-declaration.A.rb->test/fixtures/ruby/corpus/method-declaration.B.rb",
+      "replace": [{
+        "path": "test/fixtures/ruby/corpus/method-declaration.A.rb",
+        "language": "Ruby"
+      }, {
+        "path": "test/fixtures/ruby/corpus/method-declaration.B.rb",
+        "language": "Ruby"
+      }]
+    }
+  }]
+}

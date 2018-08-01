@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package github.semantic;
+
+import "ruby-terms.proto";
+import "ruby-diffs.proto";
+import "json-terms.proto";
+import "typescript-terms.proto";
+import "typescript-diffs.proto";
+import "python-terms.proto";
+import "python-diffs.proto";
+import "types.proto";
+import "error_details.proto";
+
+option java_package = "com.github.semantic.analysis";
+option go_package = "github.com/semantic/analysis/;analysis";
+
+
+// Semantic's CodeAnalysis service provides endpoints for parsing, analyzing, and
+// comparing source code.
+service CodeAnalysis {
+  // Parsing
+  //
+  // Parse source code blobs and return abstract syntax trees.
+  rpc ParseTree (ParseTreeRequest) returns (ParseTreeResponse);
+
+  // Diffing
+  //
+  // Summarize an AST diff of source blobs.
+  rpc SummarizeDiff (SummarizeDiffRequest) returns (SummarizeDiffResponse);
+  // Diff the ASTs of source blobs
+  rpc DiffTree (DiffTreeRequest) returns (DiffTreeResponse);
+
+  // Analyzing
+  //
+  // Calculate an import graph for a project.
+  rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
+
+  rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
+
+  // Check health & status of the service.
+  rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message ParseTreeRequest {
+  repeated Blob blobs = 1;
+}
+
+message ParseTreeResponse {
+  oneof response_type {
+    RubyResponse ruby = 1;
+    JSONResponse json = 2;
+    TypeScriptResponse typescript = 3;
+    PythonResponse python = 4;
+  }
+}
+
+message RubyResponse {
+  repeated ruby_terms.RubyTerm terms = 1;
+}
+
+message JSONResponse {
+  repeated json_terms.JSONTerm terms = 1;
+}
+
+message TypeScriptResponse {
+  repeated typescript_terms.TypeScriptTerm terms = 1;
+}
+
+message PythonResponse {
+  repeated python_terms.PythonTerm terms = 1;
+}
+
+message SummarizeDiffRequest  {
+  repeated BlobPair blobPairs = 1;
+}
+
+message SummarizeDiffResponse {
+  repeated DiffSummary changes = 1;
+  repeated ParseError errors = 2;
+}
+
+message DiffTreeRequest  {
+  repeated BlobPair blobPairs = 1;
+}
+
+message DiffTreeResponse {
+  oneof response_type {
+    RubyDiffResponse ruby = 1;
+    PythonDiffResponse python = 2;
+    TypeScriptDiffResponse typescript = 3;
+  }
+}
+
+message RubyDiffResponse {
+  repeated ruby_diffs.RubyDiff diffs = 1;
+}
+
+message PythonDiffResponse {
+  repeated python_diffs.PythonDiff diffs = 1;
+}
+
+message TypeScriptDiffResponse {
+  repeated typescript_diffs.TypeScriptDiff diffs = 1;
+}
+
+message CallGraphRequest {
+  Project project = 1;
+}
+
+message CallGraphResponse {
+  AdjacencyList graph = 1;
+  DebugInfo error_info = 2;
+}
+
+message ImportGraphRequest {
+  Project project = 1;
+}
+
+message ImportGraphResponse {
+  AdjacencyList graph = 1;
+  DebugInfo error_info = 2;
+}
+
+message DiffSummary {
+  string term = 1;
+  string name = 2;
+  Span span = 3;
+  string change = 4;
+}
+
+message ParseError {
+  string error = 1;
+  Span span = 2;
+  string language = 3;
+}
+
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+  }
+  ServingStatus status = 1;
+}

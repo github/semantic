@@ -1,0 +1,57 @@
+# HLint configuration file
+# https://github.com/ndmitchell/hlint
+
+- arguments: [--color=auto, -XDataKinds, -XDeriveFoldable, -XDeriveFunctor, -XDeriveGeneric, -XDeriveTraversable, -XFlexibleContexts, -XFlexibleInstances, -XMultiParamTypeClasses, -XOverloadedStrings, -XRecordWildCards, -XStandaloneDeriving, -XStrictData, -XTypeApplications]
+
+# Blacklist some functions by default.
+- functions:
+  - {name: unsafePerformIO, within: []}
+  - {name: unsafeCoerce, within: []}
+  - {name: head, within: []}
+  - {name: tail, within: []}
+  - {name: init, within: []}
+  - {name: last, within: []}
+  - {name: fromJust, within: []}
+
+# Replace a $ b $ c with a . b $ c
+- group: {name: dollar, enabled: true}
+
+# Generalise map to fmap, ++ to <>
+- group: {name: generalise, enabled: true}
+
+# Change the severity of the default group to warning
+- warn: {group: {name: default}}
+
+# Ignore the highly noisy module export list hint
+- ignore: {name: Use module export list}
+
+# Ignore some builtin hints
+- ignore: {name: Use mappend}
+- ignore: {name: Redundant do}
+- ignore: {name: Use lambda-case} # TODO: investigate whether cost-center analysis is better with lambda-case than it was
+- ignore: {name: Use fmap} # Ignored because map has better type inference.
+
+# Change the severity of hints we don’t want to fail CI for
+- suggest: {name: Eta reduce}
+
+# Our customized warnings
+
+# AMP fallout
+- warning: {lhs: mapM, rhs: traverse, name: Generalize mapM}
+- warning: {lhs: mapM_, rhs: traverse_, name: Generalize mapM_}
+- warning: {lhs: forM, rhs: for, name: Generalize forM}
+- warning: {lhs: forM_, rhs: for_, name: Generalize forM_}
+- warning: {lhs: sequence, rhs: sequenceA, name: Generalize sequence}
+- warning: {lhs: sequence_, rhs: sequenceA_, name: Generalize sequence_}
+- warning: {lhs: return, rhs: pure, name: Avoid return}
+
+# Terms
+- warning: {lhs: termFAnnotation . unTerm, rhs: termAnnotation, name: Use termAnnotation}
+- warning: {lhs: termFOut . unTerm, rhs: termOut, name: Use termOut}
+
+# Conveniences
+- warning: {lhs: maybe a pure, rhs: maybeM a, name: Use maybeM}
+
+# Applicative style
+- warning: {lhs: f <$> pure a <*> b, rhs: f a <$> b, name: Avoid redundant pure}
+- warning: {lhs: f <$> pure a <* b, rhs: f a <$ b, name: Avoid redundant pure}

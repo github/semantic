@@ -8,7 +8,6 @@ module Data.Functor.Both
 
 import Data.Bifunctor.Join as X
 import Data.Functor.Classes
-import Data.Semigroup
 
 -- | A computation over both sides of a pair.
 type Both = Join (,)

@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([]))
+    (Statements)
+    (Statements))
   (Function
     (Empty)
   { (Identifier)
@@ -14,7 +14,7 @@
       (Pointer
         (Identifier))
       (Identifier))
-    ([]))
+    (Statements))
   (Function
     (Empty)
   { (Identifier)
@@ -22,15 +22,15 @@
     (Variadic
       (Identifier)
       (Empty))
-    ([]))
+    (Statements))
   (Function
     (Empty)
   { (Identifier)
   ->(Identifier) }
-    (
-      (
+    (Statements
+      (Statements
         (Identifier))
       (Variadic
         (Identifier)
         (Empty)))
-    ([])))
+    (Statements)))

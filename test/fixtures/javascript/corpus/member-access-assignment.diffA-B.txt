@@ -1,7 +1,6 @@
-(Program
+(Statements
   (Assignment
     (MemberAccess
-      (Identifier)
       (Identifier))
   { (Float)
   ->(Float) }))

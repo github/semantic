@@ -1,8 +1,8 @@
-(Program
+(Statements
   (Return
     (Empty))
   (Return
-    (
+    (Statements
       (Plus
         (Identifier)
         (Identifier))

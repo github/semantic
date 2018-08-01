@@ -1,3 +1,9 @@
-(Program
-  (Symbol)
-  (TextElement))
+(Statements
+  (Symbol
+    (InterpolationElement
+      (Send
+        (Identifier))))
+  (String
+    (InterpolationElement
+      (Send
+        (Identifier)))))

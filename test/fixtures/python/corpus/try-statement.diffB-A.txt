@@ -1,34 +1,34 @@
-(Program
+(Statements
   (Try
   { (Identifier)
   ->(Identifier) }
   {+(Identifier)+}
   {+(Catch
-    {+(
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+}
       {+(Identifier)+})+}
-    {+([])+})+}
+    {+(Statements)+})+}
   {+(Catch
     {+(Let
       {+(Identifier)+}
       {+(Identifier)+}
       {+(Empty)+})+}
-    {+(
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+})+})+}
   {+(Catch
-    {+(
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+}
       {+(Identifier)+}
       {+(Identifier)+})+}
-    {+([])+})+}
+    {+(Statements)+})+}
   {+(Catch
-    {+(
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+})+}
-    {+([])+})+}
+    {+(Statements)+})+}
   {-(Finally
     {-(Identifier)-})-})
   (Try
@@ -36,14 +36,14 @@
   ->(Identifier) }
   {+(Identifier)+}
   {+(Finally
-    {+(
+    {+(Statements
       {+(Identifier)+}
       {+(Identifier)+})+})+}
   {-(Catch
-    {-(
+    {-(Statements
       {-(Identifier)-}
       {-(Identifier)-})-}
-    {-([])-})-}
+    {-(Statements)-})-}
   {-(Catch
     {-(Let
       {-(Identifier)-}
@@ -51,11 +51,11 @@
       {-(Empty)-})-}
     {-(Identifier)-})-}
   {-(Catch
-    {-(
+    {-(Statements
       {-(Identifier)-}
       {-(Identifier)-}
       {-(Identifier)-})-}
-    {-([])-})-}
+    {-(Statements)-})-}
   {-(Catch
     {-(Identifier)-}
-    {-([])-})-}))
+    {-(Statements)-})-}))

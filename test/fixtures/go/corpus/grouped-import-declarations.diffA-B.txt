@@ -1,15 +1,15 @@
-(Program
+(Statements
   (Package
     (Identifier))
-  (
+  (Statements
   {+(QualifiedImport
     {+(Identifier)+})+}
   {+(Import
     {+(TextElement)+})+}
-  { (QualifiedImport
-    {-(Identifier)-})
-  ->(QualifiedImport
-    {+(Identifier)+}) }
+  {+(QualifiedImport
+    {+(Identifier)+})+}
+  {-(QualifiedImport
+    {-(Identifier)-})-}
   {-(Import
     {-(TextElement)-})-}
   {-(QualifiedImport
@@ -17,5 +17,5 @@
   (Function
     (Empty)
     (Identifier)
-    ([])
-    ([])))
+    (Statements)
+    (Statements)))

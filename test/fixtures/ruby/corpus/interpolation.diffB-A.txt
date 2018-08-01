@@ -1,5 +1,11 @@
-(Program
-{ (Symbol)
-->(Symbol) }
-{ (TextElement)
-->(TextElement) })
+(Statements
+  (Symbol
+    (InterpolationElement
+      (Send
+      { (Identifier)
+      ->(Identifier) })))
+  (String
+    (InterpolationElement
+      (Send
+      { (Identifier)
+      ->(Identifier) }))))
