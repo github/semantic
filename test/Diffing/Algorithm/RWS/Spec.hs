@@ -1,45 +1,43 @@
 {-# LANGUAGE DataKinds #-}
 module Diffing.Algorithm.RWS.Spec where
 
-import Data.Abstract.FreeVariables
 import Analysis.Decorator
-import Data.Array.IArray
 import Data.Bifunctor
 import Data.Diff
 import Data.Functor.Listable (ListableSyntax)
 import Data.Record
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.These
-import Data.Union
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
-import Diffing.Interpreter
-import Test.Hspec
+import Diffing.Interpreter.Spec (afterTerm, beforeTerm)
 import Test.Hspec.LeanCheck
+import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
   let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
-      \ (term, p, q) -> pqGramDecorator constructorNameAndConstantFields (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively p) . length . stem . rhead)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively p) . length . stem . rhead)
 
     prop "produces grams with bases of the specified width" $
-      \ (term, p, q) -> pqGramDecorator constructorNameAndConstantFields (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively q) . length . base . rhead)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively q) . length . base . rhead)
 
   describe "rws" $ do
     prop "produces correct diffs" $
       \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax (Record '[])])
                         tbs = decorate <$> (bs :: [Term ListableSyntax (Record '[])])
-                        wrap = termIn Nil . inj
-                        diff = merge (Nil, Nil) (inj (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
+                        wrap = termIn Nil . inject
+                        diff = merge (Nil, Nil) (inject (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
-      let (a, b) = (decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier "a")) ])), decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier "b")) ]))) in
+      let (a, b) = (decorate (termIn Nil (inject [ termIn Nil (inject (Syntax.Identifier "a")) ])), decorate (termIn Nil (inject [ termIn Nil (inject (Syntax.Identifier "b")) ]))) in
       fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
-  where decorate = defaultFeatureVectorDecorator constructorNameAndConstantFields
+  where decorate = defaultFeatureVectorDecorator
 
         diffThese = these deleting inserting replacing

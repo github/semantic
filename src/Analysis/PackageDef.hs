@@ -5,15 +5,16 @@ module Analysis.PackageDef
 , packageDefAlgebra
 ) where
 
-import Prologue
 import Data.Blob
 import Data.Range
 import Data.Record
 import Data.Source as Source
 import Data.Span
-import qualified Language.Go.Syntax
+import Data.Sum
 import Data.Term
 import qualified Data.Text as T
+import qualified Language.Go.Syntax
+import Prologue
 
 newtype PackageDef = PackageDef { moduleDefIdentifier :: T.Text }
   deriving (Eq, Generic, Show)
@@ -59,9 +60,9 @@ instance CustomHasPackageDef Language.Go.Syntax.Package where
     = Just $ PackageDef (getSource fromAnn)
     where getSource = toText . flip Source.slice blobSource . getField
 
--- | Produce a 'PackageDef' for 'Union's using the 'HasPackageDef' instance & therefore using a 'CustomHasPackageDef' instance when one exists & the type is listed in 'PackageDefStrategy'.
-instance Apply HasPackageDef fs => CustomHasPackageDef (Union fs) where
-  customToPackageDef blob ann = apply (Proxy :: Proxy HasPackageDef) (toPackageDef blob ann)
+-- | Produce a 'PackageDef' for 'Sum's using the 'HasPackageDef' instance & therefore using a 'CustomHasPackageDef' instance when one exists & the type is listed in 'PackageDefStrategy'.
+instance Apply HasPackageDef fs => CustomHasPackageDef (Sum fs) where
+  customToPackageDef blob ann = apply @HasPackageDef (toPackageDef blob ann)
 
 
 -- | A strategy for defining a 'HasPackageDef' instance. Intended to be promoted to the kind level using @-XDataKinds@.
@@ -81,7 +82,7 @@ class HasPackageDefWithStrategy (strategy :: Strategy) syntax where
 --   If you’re seeing errors about missing a 'CustomHasPackageDef' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasPackageDef' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasPackageDef' method is never being called, you may have forgotten to list the type in here.
 type family PackageDefStrategy syntax where
   PackageDefStrategy Language.Go.Syntax.Package = 'Custom
-  PackageDefStrategy (Union fs) = 'Custom
+  PackageDefStrategy (Sum fs) = 'Custom
   PackageDefStrategy a = 'Default
 
 

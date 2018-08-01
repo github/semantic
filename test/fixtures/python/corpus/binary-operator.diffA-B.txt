@@ -1,4 +1,4 @@
-(Program
+(Statements
 {+(RShift
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -26,18 +26,12 @@
   (Modulo
     (Identifier)
     (Identifier))
-{ (FloorDivision
-  {-(Identifier)-}
-  {-(Identifier)-})
-->(Power
+{+(Power
   {+(Identifier)+}
-  {+(Identifier)+}) }
-{ (Power
-  {-(Identifier)-}
-  {-(Identifier)-})
-->(FloorDivision
+  {+(Identifier)+})+}
+{+(FloorDivision
   {+(Identifier)+}
-  {+(Identifier)+}) }
+  {+(Identifier)+})+}
 {+(Modulo
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -53,6 +47,12 @@
 {+(Plus
   {+(Identifier)+}
   {+(Identifier)+})+}
+{-(FloorDivision
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(Power
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(BOr
   {-(Identifier)-}
   {-(Identifier)-})-}

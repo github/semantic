@@ -1,6 +1,6 @@
-(Program
+(Statements
 {+(ForEach
-  {+(
+  {+(Statements
     {+(Send
       {+(Identifier)+})+})+}
   {+(Array
@@ -12,7 +12,7 @@
     {+(Send
       {+(Identifier)+})+})+})+}
 {-(ForEach
-  {-(
+  {-(Statements
     {-(Send
       {-(Identifier)-})-})-}
   {-(Send
@@ -20,7 +20,7 @@
   {-(Send
     {-(Identifier)-})-})-}
 {-(ForEach
-  {-(
+  {-(Statements
     {-(Send
       {-(Identifier)-})-}
     {-(Send
@@ -30,7 +30,7 @@
   {-(Send
     {-(Identifier)-})-})-}
 {-(ForEach
-  {-(
+  {-(Statements
     {-(Send
       {-(Identifier)-})-})-}
   {-(Enumeration
@@ -39,7 +39,7 @@
     {-(Empty)-})-}
   {-(Boolean)-})-}
 {-(ForEach
-  {-(
+  {-(Statements
     {-(Send
       {-(Identifier)-})-}
     {-(Send

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Function
     (TypeParameters
       (TypeParameter
@@ -22,6 +22,6 @@
       (Assignment
         (Identifier)
         (Empty)))
-    (
+    (Statements
       (Identifier)))
   (Empty))

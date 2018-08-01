@@ -1,16 +1,16 @@
-(Program
-{+(LowAnd
+(Statements
+{+(LowPrecedenceAnd
   {+(Send
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+})+}
-{-(LowOr
+{-(LowPrecedenceOr
   {-(Send
     {-(Identifier)-})-}
   {-(Send
     {-(Identifier)-})-})-}
-{-(LowAnd
-  {-(LowOr
+{-(LowPrecedenceAnd
+  {-(LowPrecedenceOr
     {-(Send
       {-(Identifier)-})-}
     {-(Send

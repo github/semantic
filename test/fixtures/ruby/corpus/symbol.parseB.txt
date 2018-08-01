@@ -1,4 +1,4 @@
-(Program
-  (Symbol)
-  (Symbol)
-  (Symbol))
+(Statements
+  (SymbolElement)
+  (SymbolElement)
+  (SymbolElement))

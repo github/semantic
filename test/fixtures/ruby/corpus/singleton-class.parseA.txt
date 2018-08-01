@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Class
     (Identifier)
-    ([]))
+    (Statements))
   (Class
     (ScopeResolution
       (Identifier)
       (Identifier))
     (Send
       (Identifier)
-      (Symbol))))
+      (SymbolElement))))

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Negate
   { (Integer)
   ->(Integer) })
@@ -8,12 +8,12 @@
 {+(Integer)+}
 {+(Negate
   {+(Integer)+})+}
-{+(Integer)+}
-{+(Integer)+}
-{+(Integer)+}
-{+(Integer)+}
 { (Integer)
 ->(Integer) }
+{+(Integer)+}
+{+(Integer)+}
+{+(Integer)+}
+{+(Integer)+}
 {+(Integer)+}
 {+(Integer)+}
 {+(Integer)+}

@@ -1,11 +1,10 @@
-(Program
+(Statements
   (DoWhile
   { (Boolean)
   ->(Boolean) }
-    (
+    (Statements
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
       { (Identifier)
       ->(Identifier) }

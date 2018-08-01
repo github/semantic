@@ -1,11 +1,11 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Identifier)
       (Negate
         (Identifier))
@@ -15,7 +15,7 @@
       (Pointer
         (Call
           (Identifier)
-          ([])
+          (Statements)
           (Empty)))
       (Complement
         (Identifier))

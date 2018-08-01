@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Send
   {+(Send
     {+(Identifier)+})+}
@@ -11,10 +11,10 @@
   {+(Send
     {+(Identifier)+})+}
   {+(KeyValue
-    {+(Symbol)+}
+    {+(SymbolElement)+}
     {+(Integer)+})+}
   {+(KeyValue
-    {+(Symbol)+}
+    {+(SymbolElement)+}
     {+(Integer)+})+})+}
 {+(Send
   {+(Identifier)+}

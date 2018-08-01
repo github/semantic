@@ -1,18 +1,18 @@
-(Program
+(Statements
   (Try
-    (
+    (Statements
       (Send
         (Identifier))
       (Catch
-        (
-          (
+        (Statements
+          (Statements
             (Identifier)))
         (Catch
-          (
-            (
+          (Statements
+            (Statements
               (Identifier)
               (Identifier))
-            (
+            (Statements
               (Send
                 (Identifier))))
           (Send
@@ -27,25 +27,25 @@
   (Method
     (Empty)
     (Identifier)
-    (
+    (Statements
       (Catch
-        (
-          (
+        (Statements
+          (Statements
             (Identifier)))
         (Catch
-          (
-            (
+          (Statements
+            (Statements
               (Identifier)
               (Identifier))
-            (
+            (Statements
               (Send
                 (Identifier))))
-          ([])))
+          (Statements)))
       (Else
         (Empty)
-        ([]))
+        (Statements))
       (Finally
-        ([]))))
+        (Statements))))
   (Try
     (Send
       (Identifier))

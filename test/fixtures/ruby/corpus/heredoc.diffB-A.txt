@@ -1,9 +1,11 @@
-(Program
+(Statements
 {+(TextElement)+}
-{+(TextElement)+}
+{+(Statements
+  {+(TextElement)+})+}
 {-(Send
   {-(Send
     {-(Identifier)-}
     {-(TextElement)-}
-    {-(TextElement)-})-}
+    {-(Statements
+      {-(TextElement)-})-})-}
   {-(Identifier)-})-})

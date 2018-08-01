@@ -1,16 +1,16 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
+    (Statements)
     (Assignment
     { (Identifier)
-    ->(
+    ->(Statements
       {+(Identifier)+}
       {+(Identifier)+}) }
     { (Integer)
-    ->(
+    ->(Statements
       {+(Integer)+}
       {+(Integer)+}) })))

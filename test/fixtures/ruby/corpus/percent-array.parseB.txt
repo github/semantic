@@ -1,4 +1,8 @@
-(Program
+(Statements
   (Array
-    (Send
-      (Identifier))))
+    (TextElement)
+    (String
+      (InterpolationElement
+        (Send
+          (Identifier))))
+    (TextElement)))

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (ForEach
     (Identifier)
     (Array
@@ -8,25 +8,25 @@
         (Integer))
       (Tuple
         (Integer)))
-    (
+    (Statements
       (Identifier)))
   (Else
     (ForEach
-      (
+      (Statements
         (Identifier)
         (Identifier))
       (Identifier)
-      (
+      (Statements
         (Call
           (Identifier)
           (Identifier)
           (Empty))
         (ForEach
-          (
+          (Statements
             (Identifier)
             (Identifier))
           (Identifier)
-          (
+          (Statements
             (Call
               (Identifier)
               (Identifier)

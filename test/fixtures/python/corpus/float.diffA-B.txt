@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Negate
   { (Float)
   ->(Float) })
@@ -12,8 +12,8 @@
 ->(Float) }
 {+(Float)+}
 {+(Float)+}
-{ (Float)
-->(Float) }
+{+(Float)+}
+{-(Float)-}
 {-(Float)-}
 {-(Float)-}
 {-(Float)-}

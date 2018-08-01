@@ -48,7 +48,7 @@ type OpenFAlgebra f a = forall b . (b -> a) -> f b -> a
 type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
 
 -- | A subterm and its computed value, used in 'SubtermAlgebra'.
-data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
+data Subterm t a = Subterm { subterm :: !t, subtermRef :: !a }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance Bifunctor Subterm where

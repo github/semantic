@@ -1,79 +1,107 @@
-{-# LANGUAGE OverloadedLists #-}
-
 module Analysis.Ruby.Spec (spec) where
 
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import Data.Abstract.Value as Value
+import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Number as Number
+import Data.Abstract.Value.Concrete as Value
+import Data.AST
 import Control.Monad.Effect (SomeExc(..))
 import Data.List.NonEmpty (NonEmpty(..))
-import Data.Map
-import Data.Map.Monoidal as Map
+import Data.Sum
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Data.Language as Language
 
 import SpecHelpers
 
 
-spec :: Spec
-spec = parallel $ do
+spec :: TaskConfig -> Spec
+spec config = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      env <- environment . snd <$> evaluate "main.rb"
-      env `shouldBe` [ ("Object", addr 0)
-                     , ("foo", addr 3) ]
+      (_, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
+      case ModuleTable.lookup "main.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 1)]
+          Env.names env `shouldContain` [ "foo" ]
+        other -> expectationFailure (show other)
 
     it "evaluates load" $ do
-      env <- environment . snd <$> evaluate "load.rb"
-      env `shouldBe` [ ("Object", addr 0)
-                     , ("foo", addr 3) ]
+      (_, (heap, res)) <- evaluate ["load.rb", "foo.rb"]
+      case ModuleTable.lookup "load.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 1)]
+          Env.names env `shouldContain` [ "foo" ]
+        other -> expectationFailure (show other)
 
     it "evaluates load with wrapper" $ do
-      res <- evaluate "load-wrap.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Left (SomeExc (FreeVariableError "foo")))))))
-      environment (snd res) `shouldBe` [ ("Object", addr 0) ]
+      (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
+      res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
 
     it "evaluates subclass" $ do
-      res <- evaluate "subclass.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (String "\"<bar>\"")))))))))
-      environment (snd res) `shouldBe` [ ("Bar", addr 6)
-                                       , ("Foo", addr 3)
-                                       , ("Object", addr 0) ]
+      (_, (heap, res)) <- evaluate ["subclass.rb"]
+      case ModuleTable.lookup "subclass.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [String "\"<bar>\""]
+          Env.names env `shouldContain` [ "Bar", "Foo" ]
 
-      heapLookup (Address (Precise 6)) (heap (snd res))
-        `shouldBe` ns "Bar" [ ("baz", addr 8)
-                            , ("foo", addr 5)
-                            , ("inspect", addr 7) ]
+          (derefQName heap ("Bar" :| []) env >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
+        other -> expectationFailure (show other)
 
     it "evaluates modules" $ do
-      res <- evaluate "modules.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (String "\"<hello>\"")))))))))
-      environment (snd res) `shouldBe` [ ("Object", addr 0)
-                                       , ("Bar", addr 3) ]
+      (_, (heap, res)) <- evaluate ["modules.rb"]
+      case ModuleTable.lookup "modules.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [String "\"<hello>\""]
+          Env.names env `shouldContain` [ "Bar" ]
+        other -> expectationFailure (show other)
 
     it "handles break correctly" $ do
-      res <- evaluate "break.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Integer (Number.Integer 3))))))))))
+      (_, (heap, res)) <- evaluate ["break.rb"]
+      case ModuleTable.lookup "break.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
+        other -> expectationFailure (show other)
 
-    it "handles break correctly" $ do
-      res <- evaluate "next.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Integer (Number.Integer 8))))))))))
+    it "handles next correctly" $ do
+      (_, (heap, res)) <- evaluate ["next.rb"]
+      case ModuleTable.lookup "next.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 8)]
+        other -> expectationFailure (show other)
 
     it "calls functions with arguments" $ do
-      res <- evaluate "call.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Integer (Number.Integer 579))))))))))
+      (_, (heap, res)) <- evaluate ["call.rb"]
+      case ModuleTable.lookup "call.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 579)]
+        other -> expectationFailure (show other)
 
     it "evaluates early return statements" $ do
-      res <- evaluate "early-return.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Integer (Number.Integer 123))))))))))
+      (_, (heap, res)) <- evaluate ["early-return.rb"]
+      case ModuleTable.lookup "early-return.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 123)]
+        other -> expectationFailure (show other)
 
     it "has prelude" $ do
-      res <- fst <$> evaluate "preluded.rb"
-      res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (String "\"<foo>\"")))))))))
+      (_, (heap, res)) <- evaluate ["preluded.rb"]
+      case ModuleTable.lookup "preluded.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"<foo>\""]
+        other -> expectationFailure (show other)
+
+    it "evaluates __LINE__" $ do
+      (_, (heap, res)) <- evaluate ["line.rb"]
+      case ModuleTable.lookup "line.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 4)]
+        other -> expectationFailure (show other)
+
+    it "resolves builtins used in the prelude" $ do
+      (traces, (heap, res)) <- evaluate ["puts.rb"]
+      case ModuleTable.lookup "puts.rb" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [Unit]
+          traces `shouldContain` [ "\"hello\"" ]
+        other -> expectationFailure (show other)
 
   where
-    ns n = Just . Latest . Just . injValue . Namespace n
-    addr = Address . Precise
+    ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/ruby/analysis/"
-    evaluate entry = evalRubyProject (fixtures <> entry)
-    evalRubyProject path = interpret @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
+    evaluate = evalRubyProject . map (fixtures <>)
+    evalRubyProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby

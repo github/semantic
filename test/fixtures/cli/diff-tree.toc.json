@@ -1,0 +1,18 @@
+{
+  "changes":
+  {
+    "test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb": [
+    {
+      "span":
+      {
+        "start": [1, 1],
+        "end": [3, 4]
+      },
+      "category": "Method",
+      "term": "bar",
+      "changeType": "modified"
+    }]
+  },
+  "errors":
+  {}
+}

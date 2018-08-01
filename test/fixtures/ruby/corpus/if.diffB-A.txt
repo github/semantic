@@ -1,16 +1,16 @@
-(Program
+(Statements
   (If
     (Send
     { (Identifier)
     ->(Identifier) })
-    (
+    (Statements
     {+(Send
       {+(Identifier)+})+})
   { (Empty)
   ->(If
     {+(Send
       {+(Identifier)+})+}
-    {+(
+    {+(Statements
       {+(Send
         {+(Identifier)+})+})+}
     {+(Send
@@ -18,5 +18,5 @@
 {-(If
   {-(Send
     {-(Identifier)-})-}
-  {-([])-}
+  {-(Statements)-}
   {-(Empty)-})-})

@@ -1,10 +1,10 @@
-(Program
+(Statements
   (Try
-    (
+    (Statements
       (Send
         (Identifier))
       (Else
         (Empty)
-      { ([])
+      { (Statements)
       ->(Send
         {+(Identifier)+}) }))))

@@ -1,14 +1,14 @@
-(Program
+(Statements
   (If
     (Identifier)
-    (
+    (Statements
       (Identifier)
       (Identifier))
     (If
       (Identifier)
-      (
+      (Statements
         (Identifier)
         (Identifier))
-      (
+      (Statements
         (Identifier)
         (Identifier)))))

@@ -1,4 +1,4 @@
-(Program
+(Statements
   (BOr
     (Send
       (Identifier))

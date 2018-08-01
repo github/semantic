@@ -1,20 +1,21 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, OverloadedLists #-}
 module Assigning.Assignment.Spec (spec) where
 
 import Assigning.Assignment
 import Data.AST
 import Data.Bifunctor (first)
-import Data.ByteString.Char8 as B (ByteString, length, words)
 import Data.Ix
 import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Span
 import Data.Term
+import Data.Text as T (Text, length, words)
+import Data.Text.Encoding (encodeUtf8)
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
 import Test.Hspec
-import TreeSitter.Language (Symbol(..), SymbolType(..))
+import TreeSitter.Language (Symbol (..), SymbolType (..))
 
 spec :: Spec
 spec = do
@@ -33,8 +34,8 @@ spec = do
     it "matches repetitions" $
       let s = "colourless green ideas sleep furiously"
           w = words s
-          (_, nodes) = foldl (\ (i, prev) word -> (i + B.length word + 1, prev <> [node Red i (i + B.length word) []])) (0, []) w in
-      fst <$> runAssignment (fromBytes s) (many red) (makeState nodes)
+          (_, nodes) = foldl (\ (i, prev) word -> (i + T.length word + 1, prev <> [node Red i (i + T.length word) []])) (0, []) w in
+      fst <$> runAssignment (fromUTF8 (encodeUtf8 s)) (many red) (makeState nodes)
       `shouldBe`
         Right (Out <$> w)
 
@@ -113,7 +114,7 @@ spec = do
       fst <$> runAssignment "hello" red (makeState [node Red 0 5 []]) `shouldBe` Right (Out "hello")
 
     it "does not advance past the current node" $
-      runAssignment "hi" (symbol Red) (makeState [ node Red 0 2 [] ]) `shouldBe` Left (Error (Span (Pos 1 1) (Pos 1 3)) [] (Just (Right Red)))
+      runAssignment "hi" (symbol Red) (makeState [ node Red 0 2 [] ]) `shouldBe` Left (Error (Span (Pos 1 1) (Pos 1 3)) [] (Just (Right Red)) [])
 
   describe "without catchError" $ do
     it "assignment returns unexpected symbol error" $
@@ -121,14 +122,14 @@ spec = do
         red
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
+          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)) [])
 
     it "assignment returns unexpected end of input" $
       runAssignment "A"
         (symbol Green *> children (some red))
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
+          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing [])
 
   describe "eof" $ do
     it "matches at the end of branches" $
@@ -150,28 +151,28 @@ spec = do
         (red `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
+          Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)) [])
 
     it "doesn’t catch unexpected end of branch" $
       fst <$> runAssignment ""
         (red `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [])
         `shouldBe`
-          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
+          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing [])
 
     it "doesn’t catch exhaustiveness errors" $
       fst <$> runAssignment "AA"
         (red `catchError` \ _ -> OutError <$ location <*> source)
         (makeState [node Red 0 1 [], node Red 1 2 []])
         `shouldBe`
-          Left (Error (Span (Pos 1 2) (Pos 1 3)) [] (Just (Right Red)))
+          Left (Error (Span (Pos 1 2) (Pos 1 3)) [] (Just (Right Red)) [])
 
     it "can error inside the handler" $
       runAssignment "A"
         (symbol Green *> children red `catchError` const blue)
         (makeState [node Green 0 1 []])
         `shouldBe`
-          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing)
+          Left (Error (Span (Pos 1 1) (Pos 1 1)) [Right Red] Nothing [])
 
   describe "many" $ do
     it "takes ones and only one zero width repetition" $
@@ -204,7 +205,7 @@ spec = do
     it "does not match if its subrule does not match" $
       runAssignment "a" (children red) (makeState [node Blue 0 1 [node Green 0 1 []]])
       `shouldBe`
-        Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)))
+        Left (Error (Span (Pos 1 1) (Pos 1 2)) [Right Red] (Just (Right Green)) [])
 
     it "matches nested children" $
       fst <$> runAssignment "1"
@@ -259,9 +260,9 @@ data Grammar = Palette | Red | Green | Blue | Magenta
 
 instance Symbol Grammar where
   symbolType Magenta = Anonymous
-  symbolType _ = Regular
+  symbolType _       = Regular
 
-data Out = Out B.ByteString | OutError B.ByteString
+data Out = Out T.Text | OutError T.Text
   deriving (Eq, Show)
 
 red :: HasCallStack => Assignment [] Grammar Out

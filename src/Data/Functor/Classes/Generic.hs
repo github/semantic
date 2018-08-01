@@ -13,7 +13,6 @@ module Data.Functor.Classes.Generic
 
 import Data.Functor.Classes
 import Data.List (intersperse)
-import Data.Semigroup
 import GHC.Generics
 import Text.Show (showListWith)
 
@@ -131,7 +130,7 @@ instance (Ord1 f, GOrd1 g) => GOrd1 (f :.: g) where
 
 
 instance GShow1 U1 where
-  gliftShowsPrec _ _ _ _ _ = id
+  gliftShowsPrec _ _ _ _ _ = id
 
 instance GShow1 Par1 where
   gliftShowsPrec _ sp _ d (Par1 a) = sp d a
@@ -149,7 +148,7 @@ instance (Constructor c, GShow1Body f) => GShow1 (M1 C c f) where
   gliftShowsPrec opts sp sl d m = gliftShowsPrecBody opts (conFixity m) (conIsRecord m && optionsUseRecordSyntax opts) (conName m) sp sl d (unM1 m)
 
 instance GShow1Body U1 where
-  gliftShowsPrecBody _ _ _ conName _ _ _ _ = showString conName
+  gliftShowsPrecBody _ _ _ conName _ _ _ _ = showString conName
 
 instance (Selector s, GShow1 f) => GShow1Body (M1 S s f) where
   gliftShowsPrecBody opts _ conIsRecord conName sp sl d m = showParen (d > 10) $ showString conName . showChar ' ' . showBraces conIsRecord (foldr (.) id (gliftShowsPrecAll opts conIsRecord sp sl 11 m))
@@ -163,7 +162,7 @@ instance (GShow1Body f, GShow1Body g) => GShow1Body (f :*: g) where
       else foldr (.) id (intersperse (showString " ") (gliftShowsPrecAll opts conIsRecord sp sl 11 (a :*: b)))
     Infix _ prec -> showParen (d > prec) $ gliftShowsPrec opts sp sl (succ prec) a . showChar ' ' . showString conName . showChar ' ' . gliftShowsPrec opts sp sl (succ prec) b
 
-  gliftShowsPrecAll opts conIsRecord sp sl d (a :*: b) = gliftShowsPrecAll opts conIsRecord sp sl d a ++ gliftShowsPrecAll opts conIsRecord sp sl d b
+  gliftShowsPrecAll opts conIsRecord sp sl d (a :*: b) = gliftShowsPrecAll opts conIsRecord sp sl d a <> gliftShowsPrecAll opts conIsRecord sp sl d b
 
 instance GShow1 f => GShow1 (M1 S c f) where
   gliftShowsPrec opts sp sl d (M1 a) = gliftShowsPrec opts sp sl d a

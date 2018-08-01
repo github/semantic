@@ -22,7 +22,7 @@ spec = parallel $ do
 
   describe "spanToRange" $ do
     prop "computes single-line ranges" $
-      \ s -> let source = fromBytes s
+      \ s -> let source = fromUTF8 s
                  spans = zipWith (\ i Range {..} -> Span (Pos i 1) (Pos i (succ (end - start)))) [1..] ranges
                  ranges = sourceLineRanges source in
         spanToRange source <$> spans `shouldBe` ranges

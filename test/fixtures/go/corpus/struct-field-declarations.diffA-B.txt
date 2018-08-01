@@ -1,18 +1,18 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Type
         (Identifier)
         (Constructor
           (Empty)
           (Field
             (Identifier)
-            (
+            (Statements
             { (Identifier)
             ->(Identifier) }
             {+(Identifier)+})))))))

@@ -1,17 +1,17 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
         (Identifier)
         (Composite
         { (Identifier)
         ->(Identifier) }
-          (
+          (Statements
             (KeyValue
               (Identifier)
               (TextElement))
@@ -26,9 +26,9 @@
             (Field
             { (Identifier)
             ->(Identifier) }
-              (
+              (Statements
                 (Identifier))))
-          (
+          (Statements
             (KeyValue
             { (Identifier)
             ->(Identifier) }
@@ -37,8 +37,8 @@
       (Assignment
         (Identifier)
         (Composite
-          (MemberAccess
-            (Identifier)
-          { (Identifier)
-          ->(Identifier) })
-          ([]))))))
+        { (MemberAccess
+          {-(Identifier)-})
+        ->(MemberAccess
+          {+(Identifier)+}) }
+          (Statements))))))

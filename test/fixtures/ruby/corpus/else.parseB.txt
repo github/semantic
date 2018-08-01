@@ -1,6 +1,6 @@
-(Program
+(Statements
   (Try
-    (
+    (Statements
       (Send
         (Identifier))
       (Else

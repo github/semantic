@@ -1,32 +1,42 @@
-{-# LANGUAGE GADTs, ImplicitParams, RankNTypes, StandaloneDeriving #-}
-module Data.Error where
+{-# LANGUAGE GADTs, RankNTypes #-}
+module Data.Error
+  ( Error (..)
+  , formatError
+  , makeError
+  , showExpectation
+  , withSGRCode
+  ) where
 
 import Prologue
-import Data.Blob
+
 import Data.ByteString (isSuffixOf)
 import Data.ByteString.Char8 (pack, unpack)
 import Data.Ix (inRange)
 import Data.List (intersperse)
-import Data.Source
-import Data.Span
 import System.Console.ANSI
 
-data Error grammar = HasCallStack => Error { errorSpan :: Span, errorExpected :: [grammar], errorActual :: Maybe grammar }
-  deriving (Typeable)
+import Data.Blob
+import Data.Source
+import Data.Span
 
-deriving instance Eq grammar => Eq (Error grammar)
-deriving instance Foldable Error
-deriving instance Functor Error
-deriving instance Show grammar => Show (Error grammar)
-deriving instance Traversable Error
+-- | Rather than using the Error constructor directly, you probably
+-- want to call 'makeError', which takes care of inserting the call
+-- stack for you.
+data Error grammar = Error
+  { errorSpan      :: Span
+  , errorExpected  :: [grammar]
+  , errorActual    :: Maybe grammar
+  , errorCallStack :: CallStack
+  } deriving (Show, Functor, Typeable)
+
+-- | This instance does not take into account the call stack.
+instance Eq grammar => Eq (Error grammar) where
+  (Error s e a _) == (Error s' e' a' _) = (s == s') && (e == e') && (a == a')
+
 instance Exception (Error String)
 
-errorCallStack :: Error grammar -> CallStack
-errorCallStack Error{} = callStack
-
-
-withCallStack :: CallStack -> (HasCallStack => a) -> a
-withCallStack cs action = let ?callStack = cs in action
+makeError :: HasCallStack => Span -> [grammar] -> Maybe grammar -> Error grammar
+makeError s e a = withFrozenCallStack (Error s e a callStack)
 
 type IncludeSource = Bool
 type Colourize = Bool
@@ -42,7 +52,7 @@ formatError includeSource colourize Blob{..} Error{..}
        . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
     else id)
   . showCallStack colourize callStack . showChar '\n'
-  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromBytes (pack (showLineNumber i)) <> fromBytes ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
+  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
 
@@ -64,11 +74,11 @@ showExpectation colourize = go
 
 showSymbols :: Colourize -> [String] -> ShowS
 showSymbols colourize = go
-  where go [] = showString "end of input nodes"
-        go [symbol] = showSymbol symbol
-        go [a, b] = showSymbol a . showString " or " . showSymbol b
+  where go []        = showString "end of input nodes"
+        go [symbol]  = showSymbol symbol
+        go [a, b]    = showSymbol a . showString " or " . showSymbol b
         go [a, b, c] = showSymbol a . showString ", " . showSymbol b . showString ", or " . showSymbol c
-        go (h:t) = showSymbol h . showString ", " . go t
+        go (h:t)     = showSymbol h . showString ", " . go t
         showSymbol = withSGRCode colourize [SetColor Foreground Vivid Red] . showString
 
 showSpan :: Maybe FilePath -> Span -> ShowS
@@ -79,4 +89,4 @@ showCallStack :: Colourize -> CallStack -> ShowS
 showCallStack colourize callStack = foldr (.) id (intersperse (showChar '\n') (uncurry (showCallSite colourize) <$> getCallStack callStack))
 
 showCallSite :: Colourize -> String -> SrcLoc -> ShowS
-showCallSite colourize symbol SrcLoc{..} = showString symbol . showChar ' ' . withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showParen True (showSpan (Just srcLocFile) (Span (Pos srcLocStartLine srcLocStartCol) (Pos srcLocEndLine srcLocEndCol))))
+showCallSite colourize symbol loc@SrcLoc{..} = showString symbol . showChar ' ' . withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showParen True (showSpan (Just srcLocFile) (spanFromSrcLoc loc)))

@@ -1,58 +1,65 @@
-{-# LANGUAGE TypeFamilies #-}
-module Data.Abstract.Address where
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
+module Data.Abstract.Address
+  ( Precise (..)
+  , Located (..)
+  , Latest (..)
+  , All (..)
+  , Monovariant (..)
+  ) where
 
-import Data.Abstract.FreeVariables
+import Data.Abstract.Module (ModuleInfo)
+import Data.Abstract.Name
+import Data.Abstract.Package (PackageInfo)
+import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer
+import Data.Span
+import Data.Set as Set
 import Prologue
-
--- | An abstract address with a location of @l@ pointing to a variable of type @a@.
-newtype Address l a = Address { unAddress :: l }
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
-
-instance Eq l => Eq1 (Address l) where liftEq = genericLiftEq
-instance Ord l => Ord1 (Address l) where liftCompare = genericLiftCompare
-instance Show l => Show1 (Address l) where liftShowsPrec = genericLiftShowsPrec
-
-
-class Ord loc => Location loc where
-  -- | The type into which stored values will be written for a given location type.
-  type family Cell loc :: * -> *
-
 
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
 newtype Precise = Precise { unPrecise :: Int }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
 
-instance Location Precise where
-  type Cell Precise = Latest
+instance Show Precise where
+  showsPrec d = showsUnaryWith showsPrec "Precise" d . unPrecise
 
 
 -- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
 newtype Monovariant = Monovariant { unMonovariant :: Name }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
 
-instance Location Monovariant where
-  type Cell Monovariant = Set
+instance Show Monovariant where
+  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
+
+
+data Located address = Located
+  { address        :: address
+  , addressPackage :: {-# UNPACK #-} !PackageInfo
+  , addressModule  :: !ModuleInfo
+  , addressName    :: Name
+  , addressSpan    :: Span
+  }
+  deriving (Eq, Ord, Show)
 
 
 -- | A cell holding a single value. Writes will replace any prior value.
---   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
---   because it has a 'Reducer' instance.
-newtype Latest a = Latest { unLatest :: Maybe a }
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+--
+--   This is equivalent to 'Data.Monoid.Last', but with a 'Show' instance designed to minimize the amount of text we have to scroll past in ghci.
+newtype Latest value = Latest { unLatest :: Last value }
+  deriving (Eq, Foldable, Functor, Lower, Monoid, Semigroup, Ord, Traversable)
 
-instance Semigroup (Latest a) where
-  a <> Latest Nothing = a
-  _ <> b              = b
+instance Reducer value (Latest value) where
+  unit = Latest . unit . Just
 
--- | 'Option' semantics rather than that of 'Maybe', which is broken.
-instance Monoid (Latest a) where
-  mappend = (<>)
-  mempty  = Latest Nothing
+instance Show value => Show (Latest value) where
+  showsPrec d = showsPrec d . getLast . unLatest
 
-instance Reducer a (Latest a) where
-  unit = Latest . Just
 
-instance Eq1 Latest where liftEq = genericLiftEq
-instance Ord1 Latest where liftCompare = genericLiftCompare
-instance Show1 Latest where liftShowsPrec = genericLiftShowsPrec
+-- | A cell holding all values written to its address.
+--
+--   This is equivalent to 'Set', but with a 'Show' instance designed to minimize the amount of text we have to scroll past in ghci.
+newtype All value = All { unAll :: Set value }
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Reducer value, Semigroup)
+
+instance Show value => Show (All value) where
+  showsPrec d = showsPrec d . Set.toList . unAll

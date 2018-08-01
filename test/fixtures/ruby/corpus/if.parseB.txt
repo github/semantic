@@ -1,11 +1,11 @@
-(Program
+(Statements
   (If
     (Send
       (Identifier))
-    ([])
+    (Statements)
     (Empty))
   (If
     (Send
       (Identifier))
-    ([])
+    (Statements)
     (Empty)))

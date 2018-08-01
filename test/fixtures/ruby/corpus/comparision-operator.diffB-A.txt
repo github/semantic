@@ -1,19 +1,19 @@
-(Program
-{ (LessThanEqual
-  {-(Send
-    {-(Identifier)-})-}
-  {-(Send
-    {-(Identifier)-})-})
-->(LessThan
+(Statements
+{+(LessThan
   {+(Send
     {+(Identifier)+})+}
   {+(Send
-    {+(Identifier)+})+}) }
+    {+(Identifier)+})+})+}
 {+(GreaterThan
   {+(Send
     {+(Identifier)+})+}
   {+(Send
     {+(Identifier)+})+})+}
+{-(LessThanEqual
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(GreaterThanEqual
   {-(Send
     {-(Identifier)-})-}

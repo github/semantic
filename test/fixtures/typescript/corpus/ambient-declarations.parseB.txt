@@ -1,21 +1,20 @@
-(Program
+(Statements
   (AmbientDeclaration
     (InternalModule
       (Identifier)))
   (AmbientDeclaration
     (Class
       (Identifier)
-      ([])))
+      (Statements)))
   (AmbientDeclaration
     (InterfaceDeclaration
-      (Empty)
       (Empty)
       (Identifier)
       (ObjectType)))
   (AmbientDeclaration
     (Class
       (Identifier)
-      (
+      (Statements
         (MethodSignature
           (Empty)
           (Empty)

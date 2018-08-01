@@ -1,23 +1,23 @@
-(Program
+(Statements
   (Hash
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (TextElement))
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Integer))
     (KeyValue
       (TextElement)
       (Boolean))
     (KeyValue
-      (Symbol)
+      (SymbolElement)
       (Integer)))
   (Hash)
   (Hash
     (Context
       (Comment)
       (KeyValue
-        (Symbol)
+        (SymbolElement)
         (Integer)))
     (Context
       (Comment)

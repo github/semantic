@@ -1,8 +1,11 @@
-module Data.Abstract.Path where
+module Data.Abstract.Path
+  ( dropRelativePrefix
+  , joinPaths
+  , stripQuotes
+  ) where
 
 import Prologue
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.ByteString as B
+import qualified Data.Text as T
 import System.FilePath.Posix
 
 -- | Join two paths a and b. Handles walking up relative directories in b. e.g.
@@ -19,8 +22,8 @@ joinPaths a b = let bs = splitPath (normalise b)
     walkup 0 str = str
     walkup n str = walkup (pred n) (takeDirectory str)
 
-stripQuotes :: ByteString -> ByteString
-stripQuotes = B.filter (`B.notElem` "\'\"")
+stripQuotes :: Text -> Text
+stripQuotes = T.dropAround (`elem` ("\'\"" :: String))
 
-dropRelativePrefix :: ByteString -> ByteString
-dropRelativePrefix = BC.dropWhile (== '/') . BC.dropWhile (== '.')
+dropRelativePrefix :: Text -> Text
+dropRelativePrefix = T.dropWhile (== '/') . T.dropWhile (== '.')

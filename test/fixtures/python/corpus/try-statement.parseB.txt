@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Try
     (Identifier)
     (Finally
@@ -6,10 +6,10 @@
   (Try
     (Identifier)
     (Catch
-      (
+      (Statements
         (Identifier)
         (Identifier))
-      ([]))
+      (Statements))
     (Catch
       (Let
         (Identifier)
@@ -17,11 +17,11 @@
         (Empty))
       (Identifier))
     (Catch
-      (
+      (Statements
         (Identifier)
         (Identifier)
         (Identifier))
-      ([]))
+      (Statements))
     (Catch
       (Identifier)
-      ([]))))
+      (Statements))))

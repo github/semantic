@@ -1,6 +1,5 @@
-(Program
+(Statements
   (InterfaceDeclaration
-    (Empty)
     (Empty)
     (Identifier)
     (ObjectType

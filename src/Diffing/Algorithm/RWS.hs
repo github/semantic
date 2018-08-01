@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm.RWS
 ( rws
@@ -14,25 +14,23 @@ module Diffing.Algorithm.RWS
 , equalTerms
 ) where
 
-import Prologue
-import Data.Align.Generic (galignWith)
 import Control.Monad.State.Strict
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Record
 import Data.Term as Term
+import Diffing.Algorithm
 import Diffing.Algorithm.RWS.FeatureVector
 import Diffing.Algorithm.SES
-
-type Label f fields label = forall b. TermF f (Record fields) b -> label
+import Prologue
 
 -- | A relation on 'Term's, guaranteed constant-time in the size of the 'Term' by parametricity.
 --
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
 
-rws :: (Foldable syntax, Functor syntax, GAlign syntax)
+rws :: (Foldable syntax, Functor syntax, Diffable syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
     -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
     -> [Term syntax (Record (FeatureVector ': fields1))]
@@ -104,45 +102,41 @@ toKdMap = KdMap.build unFV . fmap (rhead . termAnnotation . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
- deriving (Eq, Show)
+ deriving (Eq, Generic, Hashable, Show)
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
-defaultFeatureVectorDecorator
- :: (Hashable label, Traversable f)
- => Label f fields label
- -> Term f (Record fields)
- -> Term f (Record (FeatureVector ': fields))
-defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
+defaultFeatureVectorDecorator :: (Hashable1 syntax, Traversable syntax)
+                              => Term syntax (Record fields)
+                              -> Term syntax (Record (FeatureVector ': fields))
+defaultFeatureVectorDecorator = featureVectorDecorator . pqGramDecorator defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (label ': fields)) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator :: (Foldable syntax, Functor syntax, Hashable label) => Term syntax (Record (label ': fields)) -> Term syntax (Record (FeatureVector ': fields))
 featureVectorDecorator = cata (\ (In (label :. rest) functor) ->
   termIn (foldl' addSubtermVector (unitVector (hash label)) functor :. rest) functor)
   where addSubtermVector v term = addVectors v (rhead (termAnnotation term))
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
-pqGramDecorator
-  :: Traversable f
-  => Label f fields label -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
-  -> Int -- ^ 'p'; the desired stem length for the grams.
-  -> Int -- ^ 'q'; the desired base length for the grams.
-  -> Term f (Record fields) -- ^ The term to decorate.
-  -> Term f (Record (Gram label ': fields)) -- ^ The decorated term.
-pqGramDecorator getLabel p q = cata algebra
+pqGramDecorator :: Traversable syntax
+                => Int                                                                          -- ^ 'p'; the desired stem length for the grams.
+                -> Int                                                                          -- ^ 'q'; the desired base length for the grams.
+                -> Term syntax (Record fields)                                                  -- ^ The term to decorate.
+                -> Term syntax (Record (Gram (Label syntax) ': fields)) -- ^ The decorated term.
+pqGramDecorator p q = cata algebra
   where
-    algebra term = let label = getLabel term in
+    algebra term = let label = Label (termFOut term) in
       termIn (gram label :. termFAnnotation term) (assignParentAndSiblingLabels (termFOut term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
     assignLabels :: label
-                 -> Term f (Record (Gram label ': fields))
-                 -> State [Maybe label] (Term f (Record (Gram label ': fields)))
+                 -> Term syntax (Record (Gram label ': fields))
+                 -> State [Maybe label] (Term syntax (Record (Gram label ': fields)))
     assignLabels label (Term.Term (In (gram :. rest) functor)) = do
       labels <- get
       put (drop 1 labels)
       pure $! termIn (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) functor
-    siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
+    siblingLabels :: Traversable syntax => syntax (Term syntax (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . termAnnotation)
     padToSize n list = take n (list <> repeat empty)
 
@@ -159,17 +153,22 @@ equalTerms canCompare = go
 -- | Return an edit distance between two terms, up to a certain depth.
 --
 --   Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Int -> Term syntax ann1 -> Term syntax ann2 -> Int
+editDistanceUpTo :: (Diffable syntax, Foldable syntax, Functor syntax) => Int -> Term syntax ann1 -> Term syntax ann2 -> Int
 editDistanceUpTo m a b = diffCost m (approximateDiff a b)
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (galignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
+        approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
 
 
--- Instances
+data Label syntax where
+  Label :: syntax a -> Label syntax
 
-instance Hashable label => Hashable (Gram label) where
-  hashWithSalt _ = hash
-  hash gram = hash (stem gram <> base gram)
+instance Hashable1 syntax => Hashable (Label syntax) where hashWithSalt salt (Label syntax) = liftHashWithSalt const salt syntax
+
+instance Eq1 syntax => Eq (Label syntax) where Label a == Label b = liftEq (const (const True)) a b
+
+instance Ord1 syntax => Ord (Label syntax) where Label a `compare` Label b = liftCompare (const (const EQ)) a b
+
+instance Show1 syntax => Show (Label syntax) where showsPrec d (Label syntax) = liftShowsPrec (const (const id)) (const id) d syntax

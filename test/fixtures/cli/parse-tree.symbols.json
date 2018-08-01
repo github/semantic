@@ -1,0 +1,17 @@
+{
+  "files": [
+  {
+    "path": "test/fixtures/ruby/corpus/method-declaration.A.rb",
+    "symbols": [
+    {
+      "span":
+      {
+        "start": [1, 1],
+        "end": [2, 4]
+      },
+      "kind": "Method",
+      "symbol": "foo"
+    }],
+    "language": "Ruby"
+  }]
+}

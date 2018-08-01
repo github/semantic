@@ -1,13 +1,13 @@
-(Program
+(Statements
   (Class
     (Identifier)
     (Identifier)
     (Method
       (Empty)
       (Identifier)
-      ([])))
+      (Statements)))
   (Class
     (ScopeResolution
       (Identifier)
       (Identifier))
-    ([])))
+    (Statements)))

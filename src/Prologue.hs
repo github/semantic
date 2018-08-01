@@ -20,12 +20,12 @@ import Data.Map as X (Map)
 import Data.Maybe as X
 import Data.Monoid (Alt (..))
 import Data.Sequence as X (Seq)
+import Data.Semilattice.Lower as X (Lower(..))
 import Data.Set as X (Set)
+import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
 import Data.These as X
 import Data.Union as X
-
-import Debug.Trace as X
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 
@@ -36,7 +36,6 @@ import Control.Monad as X hiding (fail, return, unless, when)
 import Control.Monad.Except as X (MonadError (..))
 import Control.Monad.Fail as X (MonadFail (..))
 import Data.Algebra as X
-import Data.Align.Generic as X (GAlign)
 import Data.Bifoldable as X
 import Data.Bifunctor as X (Bifunctor (..))
 import Data.Bitraversable as X
@@ -47,7 +46,7 @@ import Data.Functor.Classes as X
 import Data.Functor.Classes.Generic as X
 import Data.Functor.Foldable as X (Base, Corecursive (..), Recursive (..))
 import Data.Hashable as X (Hashable, hash, hashUsing, hashWithSalt)
-import Data.Mergeable as X (Mergeable)
+import Data.Hashable.Lifted as X (Hashable1(..), hashWithSalt1)
 import Data.Monoid as X (First (..), Last (..), Monoid (..))
 import Data.Proxy as X (Proxy (..))
 import Data.Semigroup as X (Semigroup (..))

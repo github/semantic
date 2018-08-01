@@ -1,2 +1,4 @@
-(Program
-  (Array))
+(Statements
+  (Array
+    (TextElement)
+    (TextElement)))

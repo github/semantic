@@ -1,5 +1,5 @@
 name:                semantic
-version:             0.3.0
+version:             0.4.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
 homepage:            http://github.com/github/semantic#readme
@@ -11,45 +11,43 @@ build-type:          Simple
 -- extra-source-files:
 cabal-version:       >=1.10
 
+flag release
+  description: Build with optimizations on (for CI or deployment builds)
+  default:     False
+
 library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.BadAddresses
-                     , Analysis.Abstract.BadModuleResolutions
-                     , Analysis.Abstract.BadLoads
-                     , Analysis.Abstract.BadSyntax
-                     , Analysis.Abstract.BadValues
-                     , Analysis.Abstract.BadVariables
-                     , Analysis.Abstract.Caching
-                     , Analysis.Abstract.CallGraph
+                       Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Erroring
-                     , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Graph
-                     , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Tracing
-                     , Analysis.Abstract.TypeChecking
-                     , Analysis.Abstract.PythonPackage
-                     , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
                      , Analysis.Declaration
-                     , Analysis.IdentifierName
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
+                     , Assigning.Assignment.Deterministic
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract
                      , Control.Abstract.Addressable
-                     , Control.Abstract.Analysis
+                     , Control.Abstract.Context
+                     , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Heap
+                     , Control.Abstract.Hole
                      , Control.Abstract.Matching
+                     , Control.Abstract.Modules
+                     , Control.Abstract.Primitive
+                     , Control.Abstract.PythonPackage
+                     , Control.Abstract.Roots
+                     , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
-                     -- Control flow
-                     , Control.Effect
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
@@ -61,35 +59,35 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
-                     , Data.Abstract.Located
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
+                     , Data.Abstract.Name
                      , Data.Abstract.Number
-                     , Data.Abstract.Origin
                      , Data.Abstract.Package
                      , Data.Abstract.Path
-                     , Data.Abstract.Type
-                     , Data.Abstract.Value
+                     , Data.Abstract.Ref
+                     , Data.Abstract.Value.Abstract
+                     , Data.Abstract.Value.Concrete
+                     , Data.Abstract.Value.Type
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
-                     , Data.Align.Generic
                      , Data.AST
                      , Data.Blob
                      , Data.Diff
                      , Data.Error
-                     , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
+                     , Data.Graph
+                     , Data.Graph.Adjacency
+                     , Data.Graph.Vertex
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
-                     , Data.Mergeable
-                     , Data.Output
                      , Data.Patch
+                     , Data.Project
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
-                     , Data.Semilattice.Lower
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
@@ -117,6 +115,9 @@ library
                      , Language.Go.Assignment
                      , Language.Go.Syntax
                      , Language.Go.Type
+                     , Language.Haskell.Grammar
+                     , Language.Haskell.Assignment
+                     , Language.Haskell.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
@@ -124,42 +125,57 @@ library
                      , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
+                     , Language.TypeScript.Resolution
                      , Language.TypeScript.Syntax
+                     , Language.TypeScript.Syntax.JavaScript
+                     , Language.TypeScript.Syntax.JSX
+                     , Language.TypeScript.Syntax.TypeScript
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
-                     , Language.Preluded
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
+                     , Language.Java.Assignment
+                     , Language.Java.Grammar
+                     , Language.Java.Syntax
+                     , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      , Paths_semantic
                      -- Rendering formats
-                     , Rendering.DOT
-                     , Rendering.Imports
+                     , Rendering.Graph
                      , Rendering.JSON
                      , Rendering.Renderer
-                     , Rendering.SExpression
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.AST
                      , Semantic.CLI
+                     , Semantic.Config
                      , Semantic.Diff
                      , Semantic.Distribute
+                     , Semantic.Env
                      , Semantic.Graph
                      , Semantic.IO
-                     , Semantic.Log
                      , Semantic.Parse
-                     , Semantic.Queue
-                     , Semantic.Stat
+                     , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Telemetry
+                     , Semantic.Telemetry.AsyncQueue
+                     , Semantic.Telemetry.Haystack
+                     , Semantic.Telemetry.Log
+                     , Semantic.Telemetry.Stat
                      , Semantic.Util
-                    -- Custom Prelude
-  other-modules:       Prologue
+                     , Semantic.Version
+                     -- Serialization
+                     , Serializing.DOT
+                     , Serializing.Format
+                     , Serializing.SExpression
+                     -- Custom Prelude
+                     , Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , algebraic-graphs
@@ -171,9 +187,11 @@ library
                      , bytestring
                      , cmark-gfm
                      , containers
+                     , cryptohash
                      , directory
                      , directory-tree
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , freer-cofreer
@@ -181,19 +199,24 @@ library
                      , gitrev
                      , Glob
                      , hashable
+                     , hscolour
+                     , http-client
+                     , http-client-tls
+                     , http-types
                      , kdt
                      , mersenne-random-pure64
-                     , microlens
                      , mtl
                      , network
                      , network-uri
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , pretty-show
                      , recursion-schemes
                      , reducers
                      , scientific
                      , semigroupoids
+                     , semilattices
                      , split
                      , stm-chans
                      , template-haskell
@@ -201,13 +224,19 @@ library
                      , these
                      , time
                      , unix
+                     , unordered-containers
+                     , vector
+                     , proto3-suite
+                     , proto3-wire
                      , haskell-tree-sitter
                      , tree-sitter-go
+                     , tree-sitter-haskell
                      , tree-sitter-json
                      , tree-sitter-php
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
+                     , tree-sitter-java
   default-language:    Haskell2010
   default-extensions:  DataKinds
                      , DeriveFoldable
@@ -222,13 +251,19 @@ library
                      , StandaloneDeriving
                      , StrictData
                      , TypeApplications
-  ghc-options:         -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O -j
+  if flag(release)
+    ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j
+  else
+    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j
   ghc-prof-options:    -fprof-auto
 
 executable semantic
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O
+  if flag(release)
+    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O1 -j
+  else
+    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O0 -j
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
@@ -240,25 +275,29 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Assigning.Assignment.Spec
-                     , Analysis.Go.Spec
+  other-modules:       Analysis.Go.Spec
                      , Analysis.PHP.Spec
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
-                     , Data.Diff.Spec
+                     , Assigning.Assignment.Spec
+                     , Control.Abstract.Evaluator.Spec
                      , Data.Abstract.Path.Spec
+                     , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
-                     , Data.Mergeable.Spec
+                     , Data.Mergeable
                      , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
+                     , Graphing.Calls.Spec
                      , Integration.Spec
                      , Matching.Go.Spec
+                     , Numeric.Spec
+                     , Proto3.Roundtrip
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
@@ -267,15 +306,20 @@ test-suite test
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
+                     , algebraic-graphs
                      , array
+                     , async
                      , base
                      , bifunctors
                      , bytestring
                      , comonad
+                     , containers
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , Glob
+                     , hashable
                      , haskell-tree-sitter
                      , hspec >= 2.4.1
                      , hspec-core
@@ -284,8 +328,10 @@ test-suite test
                      , leancheck
                      , mtl
                      , network
-                     , containers
+                     , proto3-suite
+                     , proto3-wire
                      , recursion-schemes >= 4.1
+                     , semilattices
                      , semantic
                      , text >= 1.2.1.3
                      , these
@@ -302,6 +348,15 @@ test-suite test
                      , StandaloneDeriving
                      , TypeApplications
 
+test-suite lint
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Lint.hs
+  default-language:    Haskell2010
+  ghc-options:         -dynamic -threaded -j
+  build-depends:       base
+                     , hlint
+
 test-suite doctests
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
@@ -313,17 +368,16 @@ test-suite doctests
                      , QuickCheck
 
 benchmark evaluation
-  hs-source-dirs: bench
-  type:           exitcode-stdio-1.0
-  main-is:        Main.hs
-  ghc-options:    -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O
-  cc-options:     -DU_STATIC_IMPLEMENTATION=1
-  cpp-options:    -DU_STATIC_IMPLEMENTATION=1
-  default-language: Haskell2010
-  build-depends:  base
-                , criterion
-                , semantic
-
+  hs-source-dirs:      bench
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O1
+  cc-options:          -DU_STATIC_IMPLEMENTATION=1
+  cpp-options:         -DU_STATIC_IMPLEMENTATION=1
+  default-language:    Haskell2010
+  build-depends:       base
+                     , criterion
+                     , semantic
 
 source-repository head
   type:     git

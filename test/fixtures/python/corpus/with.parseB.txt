@@ -1,34 +1,31 @@
-(Program
+(Statements
   (Let
     (Empty)
     (MemberAccess
-      (Identifier)
       (Identifier))
-    (
+    (Statements
       (Assignment
         (Identifier)
         (Boolean))))
-  (
+  (Statements
     (Let
       (Empty)
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Identifier)
         (TextElement)
         (Identifier)
         (Empty))
-      ([]))
+      (Statements))
     (Let
       (Empty)
       (Call
         (MemberAccess
-          (Identifier)
           (Identifier))
         (Identifier)
         (TextElement)
         (Identifier)
         (Empty))
-      (
+      (Statements
         (Identifier)))))

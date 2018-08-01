@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Let
     (Identifier)
     (Call
@@ -6,14 +6,14 @@
       (Identifier)
       (TextElement)
       (Empty))
-    (
+    (Statements
       (Assignment
         (Identifier)
         (Boolean))
       (ForEach
         (Identifier)
         (Identifier)
-        (
+        (Statements
           (Assignment
             (Identifier)
             (Boolean)))))))

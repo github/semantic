@@ -1,14 +1,11 @@
-(Program
-{+(Tuple
-  {+(Identifier)+}
-  {+(Identifier)+}
-  {+(Identifier)+})+}
+(Statements
   (Tuple
   {-(Identifier)-}
     (Identifier)
+  {+(Identifier)+}
   {+(Identifier)+})
-{+(Identifier)+}
-{-(Tuple
+  (Tuple
   {-(Identifier)-}
-  {-(Identifier)-}
-  {-(Identifier)-})-})
+    (Identifier)
+    (Identifier))
+{+(Identifier)+})

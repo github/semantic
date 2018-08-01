@@ -1,28 +1,28 @@
-(Program
+(Statements
   (Package
     (Identifier))
   (Function
     (Empty)
     (Identifier)
-    ([])
-    (
+    (Statements)
+    (Statements
       (Assignment
       { (Identifier)
       ->(Identifier) }
         (Integer))
       (Assignment
-        (
+        (Statements
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) })
         (Plus
-          (
+          (Statements
           { (Identifier)
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
-          (
+          (Statements
             (Integer)
             (Integer))))
     {+(Assignment
@@ -35,16 +35,24 @@
       {+(Plus
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(LShift
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Times
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(LShift
         {+(Identifier)+}
-        {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(RShift
+        {+(Integer)+}) })
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Plus
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(RShift
         {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(DividedBy
@@ -55,15 +63,11 @@
       {+(BXOr
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Times
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(Modulo
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Modulo
         {+(Identifier)+}
-        {+(Integer)+}) })
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(Not
@@ -72,21 +76,16 @@
           {+(Integer)+})+})+})+}
     {+(Assignment
       {+(Identifier)+}
-      {+(
+      {+(Statements
         {+(Pointer
           {+(Identifier)+})+}
         {+(Reference
           {+(Composite
             {+(Identifier)+}
-            {+(
+            {+(Statements
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Plus
-        {-(Identifier)-}
-        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(LShift
@@ -120,13 +119,13 @@
           {-(Integer)-})-})-})-}
     {-(Assignment
       {-(Identifier)-}
-      {-(
+      {-(Statements
         {-(Pointer
           {-(Identifier)-})-}
         {-(Reference
           {-(Composite
             {-(Identifier)-}
-            {-(
+            {-(Statements
               {-(KeyValue
                 {-(Identifier)-}
                 {-(Integer)-})-})-})-})-})-})-})))

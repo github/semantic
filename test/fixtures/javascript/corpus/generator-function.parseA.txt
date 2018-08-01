@@ -1,4 +1,4 @@
-(Program
+(Statements
   (Function
     (Empty)
     (Empty)
@@ -17,7 +17,7 @@
       (Assignment
         (Identifier)
         (Empty)))
-    (
+    (Statements
       (Yield
         (Empty))
       (Yield

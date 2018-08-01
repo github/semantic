@@ -1,9 +1,12 @@
 module Semantic.CLI.Spec (spec) where
 
-import Control.Monad (when)
-import Data.Foldable (for_)
-import Semantic.CLI
-import System.IO (Handle)
+import           Control.Monad (when)
+import qualified Data.ByteString as B
+import           Data.ByteString.Builder
+import           Data.Foldable (for_)
+import           Semantic.CLI
+import           Semantic.IO
+import           Semantic.Task
 
 import SpecHelpers
 
@@ -11,49 +14,40 @@ import SpecHelpers
 spec :: Spec
 spec = parallel $ do
   describe "runDiff" $
-    for_ diffFixtures $ \ (diffRenderer, diffMode, expected) ->
-      it ("renders to " <> show diffRenderer <> " in mode " <> show diffMode) $ do
-        output <- runTask $ runDiff diffRenderer diffMode
-        output `shouldBe'` expected
+    for_ diffFixtures $ \ (diffRenderer, runDiff, files, expected) ->
+      it ("renders to " <> diffRenderer <> " with files " <> show files) $ do
+        output <- runTask $ readBlobPairs (Right files) >>= runDiff
+        runBuilder output `shouldBe'` expected
 
   describe "runParse" $
-    for_ parseFixtures $ \ (parseTreeRenderer, parseMode, expected) ->
-      it ("renders to " <> show parseTreeRenderer <> " in mode " <> show parseMode) $ do
-        output <- runTask $ runParse parseTreeRenderer parseMode
-        output `shouldBe'` expected
+    for_ parseFixtures $ \ (parseTreeRenderer, runParse, files, expected) ->
+      it ("renders to " <> parseTreeRenderer <> " with files " <> show files) $ do
+        output <- runTask $ readBlobs (Right files) >>= runParse
+        runBuilder output `shouldBe'` expected
   where
-    shouldBe' actual expected = do
-      when (actual /= expected) $ print actual
+    shouldBe' actual' expectedFile = do
+      let actual = verbatim actual'
+      expected <- verbatim <$> B.readFile expectedFile
       actual `shouldBe` expected
 
-parseFixtures :: [(SomeRenderer TermRenderer, Either Handle [File], ByteString)]
+parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], FilePath)]
 parseFixtures =
-  [ (SomeRenderer SExpressionTermRenderer, pathMode, sExpressionParseTreeOutput)
-  , (SomeRenderer JSONTermRenderer, pathMode, jsonParseTreeOutput)
-  , (SomeRenderer JSONTermRenderer, pathMode', jsonParseTreeOutput')
-  , (SomeRenderer JSONTermRenderer, Right [], emptyJsonParseTreeOutput)
-  , (SomeRenderer (SymbolsTermRenderer defaultSymbolFields), Right [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], symbolsOutput)
-  , (SomeRenderer TagsTermRenderer, Right [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], tagsOutput)
+  [ (show SExpressionTermRenderer, runParse SExpressionTermRenderer, path, "test/fixtures/ruby/corpus/and-or.parseA.txt")
+  , (show JSONTermRenderer, runParse JSONTermRenderer, path, prefix </> "parse-tree.json")
+  , (show JSONTermRenderer, runParse JSONTermRenderer, path', prefix </> "parse-trees.json")
+  , (show JSONTermRenderer, runParse JSONTermRenderer, [], prefix </> "parse-tree-empty.json")
+  , (show (SymbolsTermRenderer defaultSymbolFields), runParse (SymbolsTermRenderer defaultSymbolFields), path'', prefix </> "parse-tree.symbols.json")
   ]
-  where pathMode = Right [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby)]
-        pathMode' = Right [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby), File "test/fixtures/ruby/corpus/and-or.B.rb" (Just Ruby)]
+  where path = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby]
+        path' = [File "test/fixtures/ruby/corpus/and-or.A.rb" Ruby, File "test/fixtures/ruby/corpus/and-or.B.rb" Ruby]
+        path'' = [File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby]
+        prefix = "test/fixtures/cli"
 
-        sExpressionParseTreeOutput = "(Program\n  (LowAnd\n    (Send\n      (Identifier))\n    (Send\n      (Identifier))))\n"
-        jsonParseTreeOutput = "{\"trees\":[{\"path\":\"test/fixtures/ruby/corpus/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"LowAnd\",\"children\":[{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}}],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"}]}\n"
-        jsonParseTreeOutput' = "{\"trees\":[{\"path\":\"test/fixtures/ruby/corpus/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"LowAnd\",\"children\":[{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}}],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"},{\"path\":\"test/fixtures/ruby/corpus/and-or.B.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"LowOr\",\"children\":[{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}}],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[7,10],\"sourceSpan\":{\"start\":[1,8],\"end\":[1,11]}}],\"sourceRange\":[7,10],\"sourceSpan\":{\"start\":[1,8],\"end\":[1,11]}}],\"sourceRange\":[0,10],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,11]}},{\"category\":\"LowAnd\",\"children\":[{\"category\":\"LowOr\",\"children\":[{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"a\",\"sourceRange\":[11,12],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,2]}}],\"sourceRange\":[11,12],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,2]}},{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"b\",\"sourceRange\":[16,17],\"sourceSpan\":{\"start\":[2,6],\"end\":[2,7]}}],\"sourceRange\":[16,17],\"sourceSpan\":{\"start\":[2,6],\"end\":[2,7]}}],\"sourceRange\":[11,17],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,7]}},{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"c\",\"sourceRange\":[22,23],\"sourceSpan\":{\"start\":[2,12],\"end\":[2,13]}}],\"sourceRange\":[22,23],\"sourceSpan\":{\"start\":[2,12],\"end\":[2,13]}}],\"sourceRange\":[11,23],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,13]}}],\"sourceRange\":[0,24],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}},\"language\":\"Ruby\"}]}\n"
-        emptyJsonParseTreeOutput = "{\"trees\":[]}\n"
-        symbolsOutput = "{\"files\":[{\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb\",\"symbols\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"kind\":\"Method\",\"symbol\":\"foo\"}],\"language\":\"Ruby\"}]}\n"
-        tagsOutput = "[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb\",\"kind\":\"Method\",\"symbol\":\"foo\",\"line\":\"def foo\",\"language\":\"Ruby\"}]\n"
-
-
-diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both File], ByteString)]
+diffFixtures :: [(String, [BlobPair] -> TaskEff Builder, [Both File], FilePath)]
 diffFixtures =
-  [ (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
-  , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
-  , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
+  [ (show JSONDiffRenderer, runDiff JSONDiffRenderer, pathMode, prefix </> "diff-tree.json")
+  , (show SExpressionDiffRenderer, runDiff SExpressionDiffRenderer, pathMode, "test/fixtures/ruby/corpus/method-declaration.diffA-B.txt")
+  , (show ToCDiffRenderer, runDiff ToCDiffRenderer, pathMode, prefix </> "diff-tree.toc.json")
   ]
-  where pathMode = Right [both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  (Just Ruby))]
-
-        jsonOutput =  "{\"diffs\":[{\"diff\":{\"merge\":{\"after\":{\"category\":\"Program\",\"sourceRange\":[0,21],\"sourceSpan\":{\"start\":[1,1],\"end\":[4,1]}},\"children\":[{\"merge\":{\"after\":{\"category\":\"Method\",\"sourceRange\":[0,20],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,4]}},\"children\":[{\"merge\":{\"after\":{\"category\":\"Empty\",\"sourceRange\":[0,0],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,1]}},\"children\":[],\"before\":{\"category\":\"Empty\",\"sourceRange\":[0,0],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,1]}}}},{\"patch\":{\"replace\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}}]}},{\"patch\":{\"insert\":{\"category\":\"Identifier\",\"children\":[],\"name\":\"a\",\"sourceRange\":[8,9],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,10]}}}},{\"merge\":{\"after\":{\"category\":\"\",\"sourceRange\":[13,16],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,6]}},\"children\":[{\"patch\":{\"insert\":{\"category\":\"Send\",\"children\":[{\"patch\":{\"insert\":{\"category\":\"Identifier\",\"children\":[],\"name\":\"baz\",\"sourceRange\":[13,16],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,6]}}}}],\"sourceRange\":[13,16],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,6]}}}}],\"before\":{\"category\":\"[]\",\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,4]}}}}],\"before\":{\"category\":\"Method\",\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}}}}],\"before\":{\"category\":\"Program\",\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}}}},\"stat\":{\"replace\":[{\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb\",\"language\":\"Ruby\"},{\"path\":\"test/fixtures/ruby/corpus/method-declaration.B.rb\",\"language\":\"Ruby\"}],\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb\"}}]}\n"
-        sExpressionOutput = "(Program\n  (Method\n    (Empty)\n  { (Identifier)\n  ->(Identifier) }\n  {+(Identifier)+}\n    (\n    {+(Send\n      {+(Identifier)+})+})))\n"
-        tocOutput = "{\"changes\":{\"test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"}]},\"errors\":{}}\n"
+  where pathMode = [both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" Ruby) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  Ruby)]
+        prefix = "test/fixtures/cli"
