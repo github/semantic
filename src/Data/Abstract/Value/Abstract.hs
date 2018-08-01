@@ -1,12 +1,37 @@
-{-# LANGUAGE GADTs, UndecidableInstances #-}
-module Data.Abstract.Value.Abstract ( Abstract (..) ) where
+{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
+module Data.Abstract.Value.Abstract
+( Abstract (..)
+, runFunction
+) where
 
-import Control.Abstract
+import Control.Abstract as Abstract
 import Data.Abstract.Environment as Env
 import Prologue
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
+
+
+runFunction :: ( Member (Allocator address Abstract) effects
+               , Member (Deref address Abstract) effects
+               , Member (Env address) effects
+               , Member (Exc (Return address)) effects
+               , Member Fresh effects
+               , PureEffects effects
+               )
+            => Evaluator address Abstract (Function address Abstract ': effects) a
+            -> Evaluator address Abstract effects a
+runFunction = interpret $ \case
+  Function params _ body -> do
+    env <- foldr (\ name rest -> do
+      addr <- alloc name
+      assign addr Abstract
+      Env.insert name addr <$> rest) (pure lowerBound) params
+    addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
+    deref addr
+  Call _ params -> do
+    traverse_ deref params
+    box Abstract
 
 
 instance Ord address => ValueRoots address Abstract where
@@ -28,28 +53,6 @@ instance AbstractIntro Abstract where
   null       = Abstract
 
 instance ( Member (Allocator address Abstract) effects
-         , Member (Deref address Abstract) effects
-         , Member (Env address) effects
-         , Member (Exc (Return address)) effects
-         , Member Fresh effects
-         )
-      => AbstractFunction address Abstract effects where
-  closure names _ body = do
-    binds <- foldr (\ name rest -> do
-      addr <- alloc name
-      assign addr Abstract
-      Env.insert name addr <$> rest) (pure lowerBound) names
-    addr <- locally (bindAll binds *> catchReturn body)
-    deref addr
-
-  call Abstract params = do
-    traverse_ (>>= deref) params
-    box Abstract
-
-instance ( Member (Allocator address Abstract) effects
-         , Member (Deref address Abstract) effects
-         , Member (Env address) effects
-         , Member (Exc (Return address)) effects
          , Member NonDet effects
          , Member Fresh effects
          )

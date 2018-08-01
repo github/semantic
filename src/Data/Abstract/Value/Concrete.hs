@@ -3,13 +3,15 @@ module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
   , ClosureBody (..)
+  , runFunction
   , materializeEnvironment
   , runValueError
   , runValueErrorWith
   , throwValueError
   ) where
 
-import Control.Abstract
+import qualified Control.Abstract as Abstract
+import Control.Abstract hiding (Function(..))
 import Data.Abstract.Environment (Environment, Bindings)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
@@ -58,39 +60,39 @@ instance Ord address => ValueRoots address (Value address body) where
     | otherwise                = mempty
 
 
-instance AbstractHole (Value address body) where
-  hole = Hole
-
-instance ( Coercible body (Eff effects)
-         , Member (Allocator address (Value address body)) effects
-         , Member (Env address) effects
-         , Member Fresh effects
-         , Member (Reader ModuleInfo) effects
-         , Member (Reader PackageInfo) effects
-         , Member (Resumable (ValueError address body)) effects
-         , Member (Exc (Return address)) effects
-         , Show address
-         )
-      => AbstractFunction address (Value address body) effects where
-  closure parameters freeVariables body = do
+runFunction :: ( Member (Allocator address (Value address body)) effects
+               , Member (Env address) effects
+               , Member (Exc (Return address)) effects
+               , Member Fresh effects
+               , Member (Reader ModuleInfo) effects
+               , Member (Reader PackageInfo) effects
+               , Member (Resumable (ValueError address body)) effects
+               , PureEffects effects
+               )
+            => (body address -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) address)
+            -> (Evaluator address value (Abstract.Function address (Value address body) ': effects) address -> body address)
+            -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
+            -> Evaluator address (Value address body) effects a
+runFunction toEvaluator fromEvaluator = interpret $ \case
+  Abstract.Function params fvs body -> do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo parameters (ClosureBody i (coerce (lowerEff body))) <$> close (foldr Set.delete freeVariables parameters)
-
-  call op params = do
+    Closure packageInfo moduleInfo params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
+  Abstract.Call op params -> do
     case op of
       Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, param) rest -> do
-            addr <- param
-            Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
+          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
           let fnEnv = Env.push env
-          withEnv fnEnv (catchReturn (bindAll bindings *> raiseEff (coerce body)))
-      _ -> box =<< throwValueError (CallError op)
+          withEnv fnEnv (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
+      _ -> throwValueError (CallError op) >>= box
 
+
+instance AbstractHole (Value address body) where
+  hole = Hole
 
 instance Show address => AbstractIntro (Value address body) where
   unit     = Unit
