@@ -22,6 +22,7 @@ import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
 import           System.FilePath.Posix
 
+import           Data.Abstract.ErrorContext
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
@@ -67,7 +68,8 @@ toName = name . T.pack . unPath
 resolveWithNodejsStrategy :: ( Member (Modules address) effects
                              , Member (Reader M.ModuleInfo) effects
                              , Member (Reader PackageInfo) effects
-                             , Member (Resumable ResolutionError) effects
+                             , Member (Reader Span) effects
+                             , Member (Resumable (BaseError ResolutionError)) effects
                              , Member Trace effects
                              )
                           => ImportPath
@@ -86,7 +88,8 @@ resolveWithNodejsStrategy (ImportPath path _)    exts        = resolveRelativePa
 resolveRelativePath :: ( Member (Modules address) effects
                        , Member (Reader M.ModuleInfo) effects
                        , Member (Reader PackageInfo) effects
-                       , Member (Resumable ResolutionError) effects
+                       , Member (Reader Span) effects
+                       , Member (Resumable (BaseError ResolutionError)) effects
                        , Member Trace effects
                        )
                     => FilePath
@@ -99,7 +102,7 @@ resolveRelativePath relImportPath exts = do
   trace ("attempting to resolve (relative) require/import " <> show relImportPath)
   resolveModule path exts >>= either notFound (\x -> x <$ traceResolve relImportPath path)
   where
-    notFound xs = throwResumable $ NotFoundError relImportPath xs Language.TypeScript
+    notFound xs = throwResolutionError $ NotFoundError relImportPath xs Language.TypeScript
 
 -- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
 --
@@ -114,7 +117,8 @@ resolveRelativePath relImportPath exts = do
 resolveNonRelativePath :: ( Member (Modules address) effects
                           , Member (Reader M.ModuleInfo) effects
                           , Member (Reader PackageInfo) effects
-                          , Member (Resumable ResolutionError) effects
+                          , Member (Reader Span) effects
+                          , Member (Resumable (BaseError ResolutionError)) effects
                           , Member Trace effects
                           )
                        => FilePath
@@ -133,7 +137,7 @@ resolveNonRelativePath name exts = do
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> m <$ traceResolve name m
-    notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
+    notFound xs = throwResolutionError $ NotFoundError name xs Language.TypeScript
 
 -- | Resolve a module name to a ModulePath.
 resolveModule :: ( Member (Modules address) effects
