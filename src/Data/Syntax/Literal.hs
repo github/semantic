@@ -35,6 +35,7 @@ instance Evaluatable Boolean where
 
 instance Reprintable Boolean where
   whenGenerated = yield . Truth . booleanContent
+  whenRefactored _ = pure ()
 
 -- Numeric
 
@@ -65,7 +66,10 @@ instance Evaluatable Data.Syntax.Literal.Float where
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 instance Reprintable Data.Syntax.Literal.Float where
-  whenGenerated = yield . Fragment . floatContent
+  whenRefactored = whenGenerated
+
+  whenGenerated =
+    yield . Fragment . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -139,6 +143,7 @@ instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
 instance Reprintable TextElement where
+  whenRefactored = whenGenerated
   whenGenerated = yield . Fragment . textElementContent
 
 data Null a = Null
@@ -198,19 +203,11 @@ instance Evaluatable Array where
   eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
 instance Reprintable Array where
-  whenModified t = do
-    control (Enter List)
-    sequenceA_ t
-    control (Exit List)
+  whenModified = within List . sequenceA_
 
-  whenRefactored = whenModified
-
-  whenGenerated t = do
-    control (Enter List)
-    yield Open
-    sequenceA_ (intersperse (yield Separator) (toList t))
-    yield Close
-    control (Exit List)
+  whenGenerated t = within List $
+    let withCommas = intersperse (yield Separator) (toList t)
+    in yield Open *> sequenceA_ withCommas *> yield Close
 
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -223,17 +220,10 @@ instance Evaluatable Hash where
   eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
 instance Reprintable Hash where
-  whenModified t = do
-    control (Enter Associative)
-    sequenceA_ t
-    control (Exit Associative)
-
-  whenGenerated t = do
-    control (Enter Associative)
-    yield Open
-    sequenceA_ t
-    yield Close
-    control (Exit Associative)
+  whenRefactored  = whenModified
+  whenModified    = within Associative . sequenceA_
+  whenGenerated t = within Associative $
+    yield Open *> sequenceA_ t *> yield Close
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -247,17 +237,11 @@ instance Evaluatable KeyValue where
     rvalBox =<< (kvPair <$> key <*> value)
 
 instance Reprintable KeyValue where
-  whenGenerated (KeyValue k v) = do
-    control (Enter Pair)
-    k
-    yield Separator
-    v
-    control (Exit Pair)
+  whenGenerated (KeyValue k v) = within Pair $
+    k *> yield Separator *> v
 
-  whenModified t = do
-    control (Enter Pair)
-    sequenceA_ t
-    control (Exit Pair)
+  whenModified = within Pair . sequenceA_
+  whenRefactored = whenModified
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
