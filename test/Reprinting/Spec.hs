@@ -14,11 +14,6 @@ import Data.Sum
 import Semantic.IO
 import Data.Blob
 
-increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
-increaseNumbers p = case project (termOut p) of
-  Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
-  Nothing -> Term (fmap increaseNumbers (unTerm p))
-
 spec :: Spec
 spec = describe "reprinting" $ do
   let path = "test/fixtures/javascript/reprinting/map.json"
