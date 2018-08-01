@@ -43,15 +43,17 @@ type Colourize = Bool
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
 formatError :: IncludeSource -> Colourize -> Blob -> Error String -> String
-formatError includeSource colourize Blob{..} Error{..}
+formatError includeSource colourize blob@Blob{..} Error{..}
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (Just blobPath) errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation colourize errorExpected errorActual . showChar '\n'
-  . (if includeSource
-    then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
-       . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
-    else id)
+  . (if includeSource then showExcerpt colourize errorSpan blob else id)
   . showCallStack colourize callStack . showChar '\n'
+
+showExcerpt :: Colourize -> Span -> Blob -> ShowS
+showExcerpt colourize errorSpan Blob{..}
+  = showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
+  . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
   where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
