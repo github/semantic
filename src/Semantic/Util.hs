@@ -51,28 +51,28 @@ justEvaluating
   . runAddressError
   . runValueError
 
-newtype UtilEff address a = UtilEff
-  { runUtilEff :: Eff '[ Function address (Value address (UtilEff address))
-                       , Exc (LoopControl address)
-                       , Exc (Return address)
-                       , Env address
-                       , Deref address (Value address (UtilEff address))
-                       , Allocator address (Value address (UtilEff address))
+newtype UtilEff a = UtilEff
+  { runUtilEff :: Eff '[ Function Precise (Value Precise UtilEff)
+                       , Exc (LoopControl Precise)
+                       , Exc (Return Precise)
+                       , Env Precise
+                       , Deref Precise (Value Precise UtilEff)
+                       , Allocator Precise (Value Precise UtilEff)
                        , Reader ModuleInfo
-                       , Modules address
-                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+                       , Modules Precise
+                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                        , Reader Span
                        , Reader PackageInfo
-                       , Resumable (ValueError address (UtilEff address))
-                       , Resumable (AddressError address (Value address (UtilEff address)))
+                       , Resumable (ValueError Precise UtilEff)
+                       , Resumable (AddressError Precise (Value Precise UtilEff))
                        , Resumable ResolutionError
                        , Resumable EvalError
-                       , Resumable (EnvironmentError address)
-                       , Resumable (Unspecialized (Value address (UtilEff address)))
-                       , Resumable (LoadError address)
+                       , Resumable (EnvironmentError Precise)
+                       , Resumable (Unspecialized (Value Precise UtilEff))
+                       , Resumable (LoadError Precise)
                        , Trace
                        , Fresh
-                       , State (Heap address Latest (Value address (UtilEff address)))
+                       , State (Heap Precise Latest (Value Precise UtilEff))
                        , Lift IO
                        ] a
   }
@@ -123,7 +123,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = ei
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
+  pure (runTermEvaluator @_ @_ @(Value Precise UtilEff)
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
