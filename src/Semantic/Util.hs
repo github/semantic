@@ -67,7 +67,7 @@ newtype UtilEff address a = UtilEff
                        , Reader Span
                        , Reader PackageInfo
                        , Resumable (BaseError (ValueError address (UtilEff address)))
-                       , Resumable (AddressError address (Value address (UtilEff address)))
+                       , Resumable (BaseError (AddressError address (Value address (UtilEff address))))
                        , Resumable ResolutionError
                        , Resumable EvalError
                        , Resumable (EnvironmentError address)
