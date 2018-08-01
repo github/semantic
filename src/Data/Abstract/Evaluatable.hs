@@ -28,6 +28,7 @@ import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookup
 import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
+import Data.Abstract.ErrorContext as X
 import Data.Abstract.FreeVariables as X
 import qualified Data.Abstract.Module as M
 import Data.Abstract.ModuleTable as ModuleTable
@@ -87,7 +88,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Reader (ModuleTable (NonEmpty (M.Module (ModuleResult address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
-            , Member (Resumable (AddressError address value)) effects
+            , Member (Resumable (BaseError (AddressError address value))) effects
             , Member (Resumable (EnvironmentError address)) effects
             , Member (Resumable EvalError) effects
             , Member (Resumable ResolutionError) effects
