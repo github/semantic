@@ -72,7 +72,17 @@ repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules)))))))
+       (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules)))))))
+
+step :: Member REPL effects
+     => SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
+     -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
+step recur term = do
+  str <- prompt
+  output str
+  res <- recur term
+  output "leaving term"
+  pure res
 
 
 newtype REPLEff address a = REPLEff
