@@ -3,5 +3,5 @@
     (TextElement))
   (Send
     (Identifier)
-    (Symbol)
+    (SymbolElement)
     (TextElement)))

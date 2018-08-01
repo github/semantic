@@ -8,4 +8,4 @@
       (Identifier))
     (Send
       (Identifier)
-      (Symbol))))
+      (SymbolElement))))

@@ -139,15 +139,25 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Null where eval _ = rvalBox null
 
-newtype Symbol a = Symbol { symbolContent :: Text }
+newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Symbol where
-  eval (Symbol s) = rvalBox (symbol s)
+-- TODO: Implement Eval instance for Symbol
+instance Evaluatable Symbol
+
+newtype SymbolElement a = SymbolElement { symbolContent :: Text }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Eq1 SymbolElement where liftEq = genericLiftEq
+instance Ord1 SymbolElement where liftCompare = genericLiftCompare
+instance Show1 SymbolElement where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable SymbolElement where
+  eval (SymbolElement s) = rvalBox (symbol s)
 
 newtype Regex a = Regex { regexContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)

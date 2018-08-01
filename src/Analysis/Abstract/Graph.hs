@@ -3,6 +3,7 @@ module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
 , moduleVertex
+, unknownModuleVertex
 , style
 , appendGraph
 , variableDefinition
@@ -16,7 +17,7 @@ module Analysis.Abstract.Graph
 ) where
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract
+import           Control.Abstract hiding (Function(..))
 import           Data.Abstract.Address
 import           Data.Abstract.Ref
 import           Data.Abstract.Declarations
@@ -36,13 +37,15 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
-  where vertexAttributes Package{}    = [ "style" := "dashed", "shape" := "box" ]
-        vertexAttributes Module{}     = [ "style" := "dotted, rounded", "shape" := "box" ]
+  where vertexAttributes Package{}       = [ "style" := "dashed", "shape" := "box" ]
+        vertexAttributes Module{}        = [ "style" := "dotted, rounded", "shape" := "box" ]
+        vertexAttributes UnknownModule{} = [ "style" := "dotted, rounded", "shape" := "box", "color" := "red", "fontcolor" := "red" ]
         vertexAttributes Variable{..} = [ "label" := T.encodeUtf8Builder (vertexName <> " (Variable)"), "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan), "style" := "rounded", "shape" := "box" ]
         vertexAttributes Method{..}   = [ "label" := T.encodeUtf8Builder (vertexName <> " (Method)"),   "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan)  , "style" := "rounded", "shape" := "box" ]
         vertexAttributes Function{..} = [ "label" := T.encodeUtf8Builder (vertexName <> " (Function)"), "tooltip" := T.encodeUtf8Builder (showSpan vertexSpan), "style" := "rounded", "shape" := "box" ]
+        edgeAttributes Module{}   Module{}          = [ "len" := "5.0", "label" := "imports" ]
+        edgeAttributes Module{}   UnknownModule{}   = [ "len" := "5.0", "label" := "imports" ]
         edgeAttributes Package{}  Module{}   = [ "len" := "5.0", "style" := "dashed" ]
-        edgeAttributes Module{}   Module{}   = [ "len" := "5.0", "label" := "imports" ]
         edgeAttributes Variable{} Module{}   = [ "len" := "5.0", "color" := "blue", "label" := "refers to symbol defined in" ]
         edgeAttributes _          Module{}   = [ "len" := "5.0", "color" := "blue", "label" := "defined in" ]
         edgeAttributes Method{}   Variable{} = [ "len" := "2.0", "color" := "green", "label" := "calls" ]
@@ -124,11 +127,14 @@ graphingModules recur m = do
   appendGraph (vertex v)
   local (const v) $
     eavesdrop @(Modules address) (\ m -> case m of
-      -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
-      Load path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
-      Lookup path | not (Prologue.null path) -> moduleInclusion (moduleVertex (ModuleInfo path))
+      Load path -> includeModule path
+      Lookup path -> includeModule path
       _ -> pure ())
       (recur m)
+  where
+    -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
+    includeModule path = let path' = if Prologue.null path then "unknown, concrete semantics required" else path
+      in moduleInclusion (moduleVertex (ModuleInfo path'))
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: forall term address value effects a

@@ -1,4 +1,4 @@
 (Statements
-  (Symbol)
-  (Symbol)
-  (Symbol))
+  (SymbolElement)
+  (SymbolElement)
+  (SymbolElement))

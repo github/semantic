@@ -3,6 +3,8 @@ module Semantic.Graph
 ( runGraph
 , runCallGraph
 , runImportGraph
+, runImportGraphToModules
+, runImportGraphToModuleInfos
 , GraphType(..)
 , Graph
 , Vertex
@@ -32,9 +34,10 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
-import           Data.Abstract.Value.Abstract
-import           Data.Abstract.Value.Concrete (Value, ValueError (..), runValueErrorWith)
-import           Data.Abstract.Value.Type
+import           Data.Abstract.Value.Abstract as Abstract
+import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runFunction, runValueErrorWith)
+import           Data.Abstract.Value.Type as Type
+import           Data.Coerce
 import           Data.Graph
 import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Project
@@ -60,11 +63,11 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
-    fmap (Graph.moduleVertex . moduleInfo) <$> runImportGraph lang package
+    runImportGraphToModuleInfos lang package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     package <- parsePackage parser project
-    modules <- topologicalSort <$> runImportGraph lang package
+    modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
 runCallGraph :: ( HasField fields Span
@@ -110,11 +113,25 @@ runCallGraph lang includePackages modules package = do
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm Abstract.runFunction modules))
 
+runImportGraphToModuleInfos :: forall effs lang term.
+                  ( Declarations term
+                  , Evaluatable (Base term)
+                  , FreeVariables term
+                  , HasPrelude lang
+                  , HasPostlude lang
+                  , Member Trace effs
+                  , Recursive term
+                  , Effects effs
+                  )
+               => Proxy lang
+               -> Package term
+               -> Eff effs (Graph Vertex)
+runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
+  where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-
-runImportGraph :: forall effs lang term.
+runImportGraphToModules :: forall effs lang term.
                   ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
@@ -127,14 +144,26 @@ runImportGraph :: forall effs lang term.
                => Proxy lang
                -> Package term
                -> Eff effs (Graph (Module term))
-runImportGraph lang (package :: Package term)
-  -- Optimization for the common (when debugging) case of one-and-only-one module.
-  | [m :| []] <- toList (packageModules package) = vertex m <$ trace ("single module, skipping import graph computation for " <> modulePath (moduleInfo m))
-  | otherwise =
+runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
+  where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
+
+runImportGraph :: forall effs lang term vertex.
+                  ( Declarations term
+                  , Evaluatable (Base term)
+                  , FreeVariables term
+                  , HasPrelude lang
+                  , HasPostlude lang
+                  , Member Trace effs
+                  , Recursive term
+                  , Effects effs
+                  )
+               => Proxy lang
+               -> Package term
+               -> (ModuleInfo -> Graph vertex)
+               -> Eff effs (Graph vertex)
+runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
-      extractGraph (_, (graph, _)) = do
-        info <- graph
-        maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
+      extractGraph (_, (graph, _)) = graph >>= f
       runImportGraphAnalysis
         = runState lowerBound
         . runFresh 0
@@ -148,32 +177,33 @@ runImportGraph lang (package :: Package term)
         . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff term (Hole (Maybe Name) Precise) effs))
+        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate @_ @_ @_ @_ @term lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
-newtype ImportGraphEff term address outerEffects a = ImportGraphEff
-  { runImportGraphEff :: Eff (  Exc (LoopControl address)
+newtype ImportGraphEff address outerEffects a = ImportGraphEff
+  { runImportGraphEff :: Eff (  Function address (Value address (ImportGraphEff address outerEffects))
+                             ': Exc (LoopControl address)
                              ': Exc (Return address)
                              ': Env address
-                             ': Deref address (Value address (ImportGraphEff term address outerEffects))
-                             ': Allocator address (Value address (ImportGraphEff term address outerEffects))
+                             ': Deref address (Value address (ImportGraphEff address outerEffects))
+                             ': Allocator address (Value address (ImportGraphEff address outerEffects))
                              ': Reader ModuleInfo
                              ': Reader Span
                              ': Reader PackageInfo
                              ': Modules address
                              ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                              ': State (Graph ModuleInfo)
-                             ': Resumable (ValueError address (ImportGraphEff term address outerEffects))
-                             ': Resumable (AddressError address (Value address (ImportGraphEff term address outerEffects)))
+                             ': Resumable (ValueError address (ImportGraphEff address outerEffects))
+                             ': Resumable (AddressError address (Value address (ImportGraphEff address outerEffects)))
                              ': Resumable ResolutionError
                              ': Resumable EvalError
                              ': Resumable (EnvironmentError address)
-                             ': Resumable (Unspecialized (Value address (ImportGraphEff term address outerEffects)))
+                             ': Resumable (Unspecialized (Value address (ImportGraphEff address outerEffects)))
                              ': Resumable (LoadError address)
                              ': Fresh
-                             ': State (Heap address Latest (Value address (ImportGraphEff term address outerEffects)))
+                             ': State (Heap address Latest (Value address (ImportGraphEff address outerEffects)))
                              ': outerEffects
                              ) a
   }

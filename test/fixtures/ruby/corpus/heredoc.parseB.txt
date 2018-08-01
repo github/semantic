@@ -3,5 +3,6 @@
     (Send
       (Identifier)
       (TextElement)
-      (TextElement))
+      (Statements
+        (TextElement)))
     (Identifier)))
