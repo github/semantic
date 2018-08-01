@@ -298,11 +298,22 @@ deriving instance Show address => Show (ValueError address body resume)
 instance Show address => Show1 (ValueError address body) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: (Member (Resumable (BaseError (ValueError address body))) effects, Member (Reader ModuleInfo) effects, Member (Reader Span) effects) => ValueError address body resume -> Evaluator address (Value address body) effects resume
+throwValueError :: ( Member (Resumable (BaseError (ValueError address body))) effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   )
+                => ValueError address body resume
+                -> Evaluator address (Value address body) effects resume
 throwValueError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
 
-runValueError :: (Effectful (m address (Value address body)), Effects effects) => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a -> m address (Value address body) effects (Either (SomeExc (BaseError (ValueError address body))) a)
+runValueError :: (Effectful (m address (Value address body)), Effects effects)
+              => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
+              -> m address (Value address body) effects (Either (SomeExc (BaseError (ValueError address body))) a)
 runValueError = runResumable
 
-runValueErrorWith :: (Effectful (m address (Value address body)), Effects effects) => (forall resume . BaseError (ValueError address body) resume -> m address (Value address body) effects resume) -> m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a -> m address (Value address body) effects a
+runValueErrorWith :: (Effectful (m address (Value address body)), Effects effects)
+                  => (forall resume . BaseError (ValueError address body) resume
+                  -> m address (Value address body) effects resume)
+                  -> m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
+                  -> m address (Value address body) effects a
 runValueErrorWith = runResumableWith
