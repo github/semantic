@@ -15,16 +15,20 @@ module Control.Abstract.Modules
 , ResolutionError(..)
 , runResolutionError
 , runResolutionErrorWith
+, throwResolutionError
 , ModuleTable
 ) where
 
+import Control.Abstract.Context (currentErrorContext)
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment
+import Data.Abstract.ErrorContext
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Set as Set
+import Data.Span
 import Prologue
 import System.FilePath.Posix (takeDirectory)
 
@@ -132,8 +136,11 @@ instance Eq1 ResolutionError where
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
 
-runResolutionError :: (Effectful m, Effects effects) => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
+runResolutionError :: (Effectful m, Effects effects) => m (Resumable (BaseError ResolutionError) ': effects) a -> m effects (Either (SomeExc (BaseError ResolutionError)) a)
 runResolutionError = runResumable
 
-runResolutionErrorWith :: (Effectful m, Effects effects) => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
+runResolutionErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError ResolutionError) resume -> m effects resume) -> m (Resumable (BaseError ResolutionError) ': effects) a -> m effects a
 runResolutionErrorWith = runResumableWith
+
+throwResolutionError :: (Monad (m effects), Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError ResolutionError)) effects) => ResolutionError resume -> m effects resume
+throwResolutionError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
