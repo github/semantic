@@ -61,7 +61,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader Span) effects
           , Member (Resumable (EnvironmentError address)) effects
           , Member (Resumable (Unspecialized value)) effects
-          , Member (Resumable EvalError) effects
+          , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable ResolutionError) effects
           , Member Fresh effects
           , Member Trace effects
@@ -90,7 +90,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Reader Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
             , Member (Resumable (EnvironmentError address)) effects
-            , Member (Resumable EvalError) effects
+            , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable ResolutionError) effects
             , Member (Resumable (Unspecialized value)) effects
             , Member (State (Heap address (Cell address) value)) effects
@@ -239,14 +239,14 @@ instance Eq1 EvalError where
 instance Show1 EvalError where
   liftShowsPrec _ _ = showsPrec
 
-throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
-throwEvalError = throwResumable
-
-runEvalError :: (Effectful m, Effects effects) => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
+runEvalError :: (Effectful m, Effects effects) => m (Resumable (BaseError EvalError) ': effects) a -> m effects (Either (SomeExc (BaseError EvalError)) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
+runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError EvalError) resume -> m effects resume) -> m (Resumable (BaseError EvalError) ': effects) a -> m effects a
 runEvalErrorWith = runResumableWith
+
+throwEvalError :: (Monad (m effects), Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError EvalError)) effects) => EvalError resume -> m effects resume
+throwEvalError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
 
 
 data Unspecialized a b where

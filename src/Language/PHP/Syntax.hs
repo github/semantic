@@ -375,12 +375,12 @@ instance Evaluatable Namespace where
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (n:x:xs) = do
-        name <- maybeM (throwResumable NoNameError) n
+        name <- maybeM (throwEvalError NoNameError) n
         letrec' name $ \addr ->
           box =<< makeNamespace name addr Nothing (void $ go (x:xs))
       -- The last name creates a closure over the namespace body.
       go [n] = do
-        name <- maybeM (throwResumable NoNameError) n
+        name <- maybeM (throwEvalError NoNameError) n
         letrec' name $ \addr ->
           box =<< makeNamespace name addr Nothing (void $ subtermAddress namespaceBody)
       -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php
