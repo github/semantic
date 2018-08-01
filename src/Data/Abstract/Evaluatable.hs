@@ -29,7 +29,7 @@ import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.FreeVariables as X
-import Data.Abstract.Module
+import qualified Data.Abstract.Module as M
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
 import Data.Abstract.Ref as X
@@ -84,7 +84,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , HasPrelude lang
             , Member Fresh effects
             , Member (Modules address) effects
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
+            , Member (Reader (ModuleTable (NonEmpty (M.Module (ModuleResult address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (AddressError address value)) effects
@@ -101,23 +101,23 @@ evaluate :: ( AbstractValue address value valueEffects
             , valueEffects ~ (Function address value ': moduleEffects)
             )
          => proxy lang
-         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)            -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
+         -> (SubtermAlgebra M.Module      term (TermEvaluator term address value moduleEffects address)            -> SubtermAlgebra M.Module      term (TermEvaluator term address value moduleEffects address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
          -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
-         -> [Module term]
-         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
+         -> [M.Module term]
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (M.Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm runValue modules = do
-  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
+  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound M.moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
   foldr (run preludeBinds) ask modules
   where run preludeBinds m rest = do
           evaluated <- coerce
-            (runInModule preludeBinds (moduleInfo m))
-            (analyzeModule (subtermRef . moduleBody)
+            (runInModule preludeBinds (M.moduleInfo m))
+            (analyzeModule (subtermRef . M.moduleBody)
             (evalModuleBody <$> m))
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
+          local (ModuleTable.insert (M.modulePath (M.moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
         evalModuleBody term = Subterm term (coerce runValue (do
           result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
