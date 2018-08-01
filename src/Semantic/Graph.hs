@@ -198,7 +198,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': State (Graph ModuleInfo)
                              ': Resumable (BaseError (ValueError address (ImportGraphEff address outerEffects)))
                              ': Resumable (BaseError (AddressError address (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable ResolutionError
+                             ': Resumable (BaseError ResolutionError)
                              ': Resumable (BaseError EvalError)
                              ': Resumable (EnvironmentError address)
                              ': Resumable (Unspecialized (Value address (ImportGraphEff address outerEffects)))
@@ -243,8 +243,8 @@ withTermSpans :: ( HasField fields Span
               -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
-resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects, Effects effects) => m (Resumable ResolutionError ': effects) a -> m effects a
-resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionError: " <> prettyShow err) *> case err of
+resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects, Effects effects) => m (Resumable (BaseError ResolutionError) ': effects) a -> m effects a
+resumingResolutionError = runResolutionErrorWith (\ (BaseError context err) -> trace ("ResolutionError: " <> prettyShow context <> prettyShow err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 

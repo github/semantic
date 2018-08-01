@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 
-import           Control.Abstract.Modules
+import           Data.Abstract.ErrorContext
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
@@ -38,13 +38,15 @@ instance Evaluatable VariableName
 -- were defined inside that function.
 
 resolvePHPName :: ( Member (Modules address) effects
-                  , Member (Resumable ResolutionError) effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError ResolutionError)) effects
                   )
                => T.Text
                -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybeM (throwResumable $ NotFoundError name [name] Language.PHP) modulePath
+  maybeM (throwResolutionError $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
         toName = T.unpack . dropRelativePrefix . stripQuotes
 
@@ -52,7 +54,9 @@ include :: ( AbstractValue address value effects
            , Member (Deref address value) effects
            , Member (Env address) effects
            , Member (Modules address) effects
-           , Member (Resumable ResolutionError) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (Reader Span) effects
+           , Member (Resumable (BaseError ResolutionError)) effects
            , Member (Resumable (EnvironmentError address)) effects
            , Member Trace effects
            )

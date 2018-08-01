@@ -3,6 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
+import           Data.Abstract.ErrorContext
 import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -66,7 +67,8 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 --     `parent/three/__init__.py` respectively.
 resolvePythonModules :: ( Member (Modules address) effects
                         , Member (Reader ModuleInfo) effects
-                        , Member (Resumable ResolutionError) effects
+                        , Member (Reader Span) effects
+                        , Member (Resumable (BaseError ResolutionError)) effects
                         , Member Trace effects
                         )
                      => QualifiedName
@@ -94,7 +96,7 @@ resolvePythonModules q = do
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybeM (throwResumable $ NotFoundError path searchPaths Language.Python) modulePath
+      maybeM (throwResolutionError $ NotFoundError path searchPaths Language.Python) modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).

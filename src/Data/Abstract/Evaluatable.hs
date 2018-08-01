@@ -24,7 +24,7 @@ import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Heap as X hiding (AddressError(..), runAddressError, runAddressErrorWith)
-import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve)
+import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
@@ -62,7 +62,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (EnvironmentError address)) effects
           , Member (Resumable (Unspecialized value)) effects
           , Member (Resumable (BaseError EvalError)) effects
-          , Member (Resumable ResolutionError) effects
+          , Member (Resumable (BaseError ResolutionError)) effects
           , Member Fresh effects
           , Member Trace effects
           )
@@ -91,7 +91,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError (AddressError address value))) effects
             , Member (Resumable (EnvironmentError address)) effects
             , Member (Resumable (BaseError EvalError)) effects
-            , Member (Resumable ResolutionError) effects
+            , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (Unspecialized value)) effects
             , Member (State (Heap address (Cell address) value)) effects
             , Member Trace effects
