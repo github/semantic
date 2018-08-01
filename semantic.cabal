@@ -160,6 +160,7 @@ library
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Parse
+                     , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Telemetry
