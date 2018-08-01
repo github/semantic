@@ -22,6 +22,35 @@ import Semantic.Task
 import Semantic.Util
 import System.FilePath
 
+{-
+
+- stop at every term
+  - print an excerpt when we stop
+    - need to have the Blobs for this
+  - showing variable bindings
+
+- interaction
+  - inspecting variables
+  - inspecting the heap
+  - calling functions?
+
+- control
+  - step
+  - step within a file
+  - other variants?
+
+- breakpoints
+  - break on a line
+  - break on a span
+  - break on a function name
+
+what's the ghci workflow look like?
+
+λ rubyREPL ["/Users/rob/Desktop/test.rb"]
+…
+
+-}
+
 data REPL (m :: * -> *) result where
   Prompt :: REPL m String
   Output :: String -> REPL m ()
