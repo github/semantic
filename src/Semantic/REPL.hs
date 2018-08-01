@@ -1,1 +1,1 @@
-module Semantic.REPL where
+module Semantic.REPL () where
