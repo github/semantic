@@ -53,7 +53,7 @@ formatError includeSource colourize blob@Blob{..} Error{..}
 showExcerpt :: Colourize -> Span -> Blob -> ShowS
 showExcerpt colourize Span{..} Blob{..}
   = showString context . (if "\n" `isSuffixOf` context then id else showChar '\n')
-  . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
+  . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showString (replicate caretWidth '~')) . showChar '\n'
   where context = fold contextLines
         contextLines = [ showLineNumber i <> ": " <> unpack (sourceBytes l)
                        | (i, l) <- zip [1..] (sourceLines blobSource)
@@ -62,6 +62,8 @@ showExcerpt colourize Span{..} Blob{..}
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine spanStart) :: Double)))
         caretPaddingWidth = succ (posColumn spanStart)
+        caretWidth | posLine spanStart == posLine spanEnd = pred (posColumn spanEnd - posColumn spanStart)
+                   | otherwise                            = 0
 
 withSGRCode :: Colourize -> [SGR] -> ShowS -> ShowS
 withSGRCode useColour code content =
