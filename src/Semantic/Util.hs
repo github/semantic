@@ -70,7 +70,7 @@ newtype UtilEff address a = UtilEff
                        , Resumable (BaseError (AddressError address (Value address (UtilEff address))))
                        , Resumable (BaseError ResolutionError)
                        , Resumable (BaseError EvalError)
-                       , Resumable (EnvironmentError address)
+                       , Resumable (BaseError (EnvironmentError address))
                        , Resumable (Unspecialized (Value address (UtilEff address)))
                        , Resumable (LoadError address)
                        , Trace

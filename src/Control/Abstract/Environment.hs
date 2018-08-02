@@ -133,13 +133,18 @@ deriving instance Show (EnvironmentError address return)
 instance Show1 (EnvironmentError address) where liftShowsPrec _ _ = showsPrec
 instance Eq1 (EnvironmentError address) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
 
-freeVariableError :: Member (Resumable (EnvironmentError address)) effects => Name -> Evaluator address value effects address
-freeVariableError = throwResumable . FreeVariable
+freeVariableError :: ( Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     , Member (Resumable (BaseError (EnvironmentError address))) effects
+                     )
+                  => Name
+                  -> Evaluator address value effects address
+freeVariableError = throwEnvironmentError . FreeVariable
 
-runEnvironmentError :: (Effectful (m address value), Effects effects) => m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects (Either (SomeExc (EnvironmentError address)) a)
+runEnvironmentError :: (Effectful (m address value), Effects effects) => m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a -> m address value effects (Either (SomeExc (BaseError (EnvironmentError address))) a)
 runEnvironmentError = runResumable
 
-runEnvironmentErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . EnvironmentError address resume -> m address value effects resume) -> m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects a
+runEnvironmentErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . BaseError (EnvironmentError address) resume -> m address value effects resume) -> m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a -> m address value effects a
 runEnvironmentErrorWith = runResumableWith
 
 throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError address))) effects

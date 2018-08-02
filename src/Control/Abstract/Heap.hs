@@ -122,7 +122,9 @@ letrec' name body = do
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: ( Member (Env address) effects
-            , Member (Resumable (EnvironmentError address)) effects
+            , Member (Reader ModuleInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (BaseError (EnvironmentError address))) effects
             )
          => Name
          -> Evaluator address value effects address

@@ -57,7 +57,7 @@ include :: ( AbstractValue address value effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
            , Member (Resumable (BaseError ResolutionError)) effects
-           , Member (Resumable (EnvironmentError address)) effects
+           , Member (Resumable (BaseError (EnvironmentError address))) effects
            , Member Trace effects
            )
         => Subterm term (Evaluator address value effects (ValueRef address))
