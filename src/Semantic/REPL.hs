@@ -92,6 +92,7 @@ evaluatingREPL
   . runResolutionError
   . runAddressError
   . runValueError
+  . runREPL
 
 repl proxy parser lang paths = Evaluator $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File lang <$> paths)
@@ -99,12 +100,11 @@ repl proxy parser lang paths = Evaluator $ do
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runEvaluator
     (runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
-    (runREPL
     (runReader (packageInfo package)
     (runReader (lowerBound @Span)
     (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
     (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-    (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules)))))))
+    (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules))))))
 
 step :: Member REPL effects
      => SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
@@ -130,8 +130,8 @@ newtype REPLEff address rest a = REPLEff
                       ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                       ': Reader Span
                       ': Reader PackageInfo
-                      ': REPL
 
+                      ': REPL
                       ': Resumable (ValueError address (REPLEff address rest))
                       ': Resumable (AddressError address (Value address (REPLEff address rest)))
                       ': Resumable ResolutionError
