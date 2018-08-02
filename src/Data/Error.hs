@@ -52,12 +52,12 @@ formatError includeSource colourize blob@Blob{..} Error{..}
   . showCallStack colourize callStack . showChar '\n'
 
 showExcerpt :: Colourize -> Span -> Blob -> ShowS
-showExcerpt colourize errorSpan Blob{..}
+showExcerpt colourize Span{..} Blob{..}
   = showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
-  . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
-  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
+  . showString (replicate (succ (posColumn spanStart + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
+  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine spanStart - 2, posLine spanStart) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine spanStart) :: Double)))
 
 withSGRCode :: Colourize -> [SGR] -> ShowS -> ShowS
 withSGRCode useColour code content =
