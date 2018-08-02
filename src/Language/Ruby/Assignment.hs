@@ -242,7 +242,7 @@ identifier =
             else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 self :: Assignment Term
-self = makeTerm <$> symbol Self <*> (const Expression.This <$> source)
+self = makeTerm <$> symbol Self <*> (Expression.This <$ source)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment Term
