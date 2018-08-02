@@ -107,7 +107,7 @@ typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Langu
 
 callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)
-  package <- parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+  package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
@@ -122,7 +122,7 @@ data TaskConfig = TaskConfig Config LogQueue StatQueue
 
 evaluateProject' (TaskConfig config logger statter) proxy parser paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
   blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)
-  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+  package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
@@ -135,7 +135,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path (Language.reflect proxy) []
-  package <- fmap quieterm <$> parsePackage parser project
+  package <- fmap (quieterm . snd) <$> parsePackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)

@@ -81,7 +81,7 @@ rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
 
 repl proxy parser paths = runTaskWithOptions debugOptions $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
-  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+  package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runEvaluator
     . runREPL
