@@ -21,8 +21,12 @@ The reprinter was designed with the following goals in mind:
 * Generality: each syntax node should have one and only one
   declaration that describes how reprinting takes place. No node
   should be concerned with language-specific syntactic issues.
+* Precedence-sensitivity: semantic syntax nodes do not contain
+  information about parenthesization of binary operators.
+  Binary operators should report their precedence and the
+  pipeline should insert parentheses as necessary.
 * Component-orientation: each stage in the reprinting pipeline
-  should be testable independently
+  should be testable independently.
 * Time/space efficiency: the reprinting algorithm should scale
   to trees with hundreds of thousands of nodes without linear
   space usage.

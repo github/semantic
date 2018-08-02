@@ -65,7 +65,7 @@ within c r = control (Enter c) *> r <* control (Exit c)
 -- | An instance of the 'Reprintable' typeclass describes how
 -- to emit tokens based on the 'History' value of the supplied
 -- constructor in its AST context.
-class (Show (constr ()), Traversable constr) => Reprintable constr where
+class (Show1 constr, Traversable constr) => Reprintable constr where
   -- | Corresponds to 'Generated'. Should emit control and data tokens.
   whenGenerated :: FAlgebra constr (Reprinter ())
 
@@ -137,6 +137,12 @@ finish = do
 into :: (Annotated t (Record fields), HasField fields History) => t -> Reprinter a -> Reprinter a
 into x = local (\c -> c { rcHistory = getField (annotation x)} )
 
+strategize :: Strategy -> Reprinter ()
+strategize new = do
+  strat <- gets rcStrategy
+  when (strat /= new) $ do
+    control (Change new)
+    modify' (\s -> s { rcStrategy = new })
 
 -- | A subterm algebra that implements the /Scrap Your Reprinter/
 -- algorithm.  Whereas /SYR/ uses a zipper to do a top-down
@@ -145,26 +151,15 @@ into x = local (\c -> c { rcHistory = getField (annotation x)} )
 descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
 descend t = do
   let into' s = into (subterm s) (subtermRef s)
-  log' (show (() <$ t))
-
   h <- history
   log' (show h)
   let next = fmap into' t
   case h of
     Pristine _ -> pure ()
     Generated -> do
-      strat <- gets rcStrategy
-      when (strat /= PrettyPrinting) $ do
-        control (Change PrettyPrinting)
-        modify' (\s -> s { rcStrategy = PrettyPrinting})
-
+      strategize PrettyPrinting
       whenGenerated next
-
-      strat' <- gets rcStrategy
-      when (strat' == PrettyPrinting) $ do
-        control (Change Reprinting)
-        modify' (\s -> s { rcStrategy = Reprinting})
-
+      strategize Reprinting
 
     Modified _ -> whenModified next
     Refactored r -> do
@@ -173,5 +168,7 @@ descend t = do
       log' (show (crs, start r))
       chunk (slice (Range crs (start r)) src)
       modify (\s -> s { rpCursor = start r })
+      strategize PrettyPrinting
       whenRefactored next
+      strategize Reprinting
       modify (\s -> s { rpCursor = end r })

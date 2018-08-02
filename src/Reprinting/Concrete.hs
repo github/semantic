@@ -29,6 +29,7 @@ import           Reprinting.Token
 -- have a 'Lower' instance so we know where to start.
 --
 -- Some possible issues we should tackle before finalizing this design:
+--
 -- * Is a stack machine too inexpressive?
 -- * Is this interface too clumsy? Do we just want to use Eff, or another monad?
 -- * Do we want to use a generic MonadError rather than instantiate that to Either?
