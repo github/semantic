@@ -163,3 +163,8 @@ instance TokenParsing Parser where
   someSpace = Parser $ buildSomeSpaceParser (skipSome (satisfy isSpace)) haskellCommentStyle
   nesting = Parser . nesting . runParser
   highlight h = Parser . highlight h . runParser
+
+
+data Command
+  = Step
+  | List
