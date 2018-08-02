@@ -131,7 +131,7 @@ step blobs recur term = do
         runCommand run (Error err) = output err >> runCommands run
         runCommands run = do
           str <- prompt
-          runCommand run (either Error id (parseString command str))
+          runCommand run (either Error id (parseCommand str))
 
 
 newtype REPLEff address rest a = REPLEff
@@ -181,8 +181,8 @@ command = token (char ':' *> command) <?> "command"
   where command = Step <$ string "step"
               <|> List <$ string "list"
 
-parseString :: Parser a -> String -> Either String a
-parseString p = toResult . Trifecta.parseString (runParser p) mempty
+parseCommand :: String -> Either String Command
+parseCommand = toResult . Trifecta.parseString (runParser command) mempty
 
 toResult :: Trifecta.Result a -> Either String a
 toResult r = case r of
