@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase #-}
 module Data.Language
   ( Language (..)
   , ensureLanguage
@@ -33,6 +33,10 @@ data Language
     | TypeScript
     | PHP
     deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField)
+
+class SLanguage (lang :: Language) where
+  reflect :: proxy lang -> Language
+
 
 -- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
 instance Finite Language where
