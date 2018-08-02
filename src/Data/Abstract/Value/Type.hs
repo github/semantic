@@ -89,6 +89,14 @@ runTypeError = runResumable
 runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
 runTypeErrorWith = runResumableWith
 
+throwTypeError :: ( Member (Resumable (BaseError TypeError)) effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  )
+               => TypeError resume
+               -> Evaluator address value effects resume
+throwTypeError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+
 runTypeMap :: ( Effectful m
               , Effects effects
               )
