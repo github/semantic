@@ -110,8 +110,8 @@ instance Pretty Layout where
 instance Concrete 'JSON where
   type Stack 'JSON = JSONState
   onControl t st = case t of
-    StartLayout -> pure (st { needsLayout = True })
-    EndLayout   -> pure (st { needsLayout = False })
+    Change PrettyPrinting -> pure (st { needsLayout = True })
+    Change Reprinting     -> pure (st { needsLayout = False })
     Log _ -> pure st
     Enter c -> pure (push c st)
     Exit c  -> do
