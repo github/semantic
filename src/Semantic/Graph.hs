@@ -223,7 +223,7 @@ parsePackage parser project = do
   where
     n = name (projectName project)
 
-    parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
+    parseModules parser p = distributeFor (projectFiles p) (parseModule p parser)
 
     parseModule proj parser file = do
       mBlob <- readFile proj file
