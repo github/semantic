@@ -97,7 +97,7 @@ repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File lang <$> paths)
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
-  pure (runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise))
+  pure (runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise '[Lift IO]))
        (runREPL
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
@@ -116,31 +116,31 @@ step recur term = do
   pure res
 
 
-newtype REPLEff address a = REPLEff
-  { runREPLEff :: Eff '[ Function address (Value address (REPLEff address))
-                       , Exc (LoopControl address)
-                       , Exc (Return address)
-                       , Env address
-                       , Deref address (Value address (REPLEff address))
-                       , Allocator address (Value address (REPLEff address))
-                       , Reader ModuleInfo
+newtype REPLEff address rest a = REPLEff
+  { runREPLEff :: Eff (  Function address (Value address (REPLEff address rest))
+                      ': Exc (LoopControl address)
+                      ': Exc (Return address)
+                      ': Env address
+                      ': Deref address (Value address (REPLEff address rest))
+                      ': Allocator address (Value address (REPLEff address rest))
+                      ': Reader ModuleInfo
 
-                       , Modules address
-                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                       , Reader Span
-                       , Reader PackageInfo
-                       , REPL
+                      ': Modules address
+                      ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+                      ': Reader Span
+                      ': Reader PackageInfo
+                      ': REPL
 
-                       , Resumable (ValueError address (REPLEff address))
-                       , Resumable (AddressError address (Value address (REPLEff address)))
-                       , Resumable ResolutionError
-                       , Resumable EvalError
-                       , Resumable (EnvironmentError address)
-                       , Resumable (Unspecialized (Value address (REPLEff address)))
-                       , Resumable (LoadError address)
-                       , Trace
-                       , Fresh
-                       , State (Heap address Latest (Value address (REPLEff address)))
-                       , Lift IO
-                       ] a
+                      ': Resumable (ValueError address (REPLEff address rest))
+                      ': Resumable (AddressError address (Value address (REPLEff address rest)))
+                      ': Resumable ResolutionError
+                      ': Resumable EvalError
+                      ': Resumable (EnvironmentError address)
+                      ': Resumable (Unspecialized (Value address (REPLEff address rest)))
+                      ': Resumable (LoadError address)
+                      ': Trace
+                      ': Fresh
+                      ': State (Heap address Latest (Value address (REPLEff address rest)))
+                      ': rest
+                       ) a
   }
