@@ -227,13 +227,13 @@ parsePackage parser project = do
     parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
     parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
--- | Parse a file into a 'Module'.
-parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
-parseModule proj parser file = do
-  mBlob <- readFile proj file
-  case mBlob of
-    Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
-    Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
+    -- | Parse a file into a 'Module'.
+    parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
+    parseModule proj parser file = do
+      mBlob <- readFile proj file
+      case mBlob of
+        Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
+        Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
