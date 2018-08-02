@@ -100,7 +100,7 @@ instance Semigroup (Merging address) where
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError address resume where
-  ModuleNotFound :: ModulePath -> LoadError address (ModuleResult address)
+  ModuleNotFoundError :: ModulePath -> LoadError address (ModuleResult address)
 
 deriving instance Eq (LoadError address resume)
 deriving instance Show (LoadError address resume)
