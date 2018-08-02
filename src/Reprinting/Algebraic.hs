@@ -31,33 +31,12 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Writer
 import Data.Sequence (singleton)
 
+import Data.History
 import Data.Range
 import Data.Record
 import Data.Source
 import Data.Term
 import Reprinting.Token
-
--- | 'History' values, when attached to a given 'Term', describe the ways in which
--- that term was refactored, if any.
-data History
-  = Generated         -- ^ A 'Generated' node was created by a refactor and has no position information.
-  | Refactored Range  -- ^ A 'Refactored' node was changed by a refactor but still has (possibly-inaccurate) position information.
-  | Modified Range    -- ^ A 'Modified' node was not changed by a refactor, but its children may be 'Generated' or 'Refactored'.
-  | Pristine Range    -- ^ A 'Pristine' node was not changed and has no changed (non-'Pristine') children.
-  deriving (Show, Eq)
-
--- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
-mark :: Functor f => (Range -> History) -> f (Record (Range ': fields)) -> f (Record (History ': fields))
-mark f = fmap go where go (r :. a) = f r :. a
-
-remark :: Functor f => (Range -> History) -> f (Record (History ': fields)) -> f (Record (History ': fields))
-remark f = fmap go where
-  go (r :. a) = x :. a where
-    x = case r of
-      Generated    -> Generated
-      Refactored r -> f r
-      Modified r   -> f r
-      Pristine r   -> f r
 
 -- | The 'Reprinter' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream

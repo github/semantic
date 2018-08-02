@@ -79,6 +79,7 @@ library
                      , Data.Graph
                      , Data.Graph.Adjacency
                      , Data.Graph.Vertex
+                     , Data.History
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
@@ -144,6 +145,7 @@ library
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      , Paths_semantic
+                     , Refactoring.Core
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON

@@ -31,6 +31,7 @@ import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (weaken)
+import           Refactoring.Core
 import           Reprinting.Algebraic
 import           Reprinting.Concrete
 import           Semantic.Config
@@ -133,11 +134,11 @@ testReprinter = do
     tree <- parseFile jsonParser "test/fixtures/javascript/reprinting/map.json"
     pure (src, tree)
 
-  let tagged = increaseNumbers (mark Modified tree)
+  let tagged = increaseNumbers (mark Pristine tree)
   let toks = reprint src tagged
-  pure toks
+  pure (toks, tagged)
 
-testConcrete = concretize (Proxy @'Language.JSON) <$> testReprinter
+testConcrete = concretize (Proxy @'Language.JSON) . fst <$> testReprinter
 
 
 -- Evaluate a project consisting of the listed paths.
