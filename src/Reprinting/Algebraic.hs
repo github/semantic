@@ -25,6 +25,7 @@ module Reprinting.Algebraic
 import Prelude hiding (fail)
 import Prologue hiding (Element)
 
+import Control.Monad
 import Control.Monad.Effect
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Reader
@@ -98,15 +99,15 @@ reprint s t = let h = getField (termAnnotation t) in
   . fmap fst
   . runWriter
   . fmap snd
-  . runState (RPState 0)
+  . runState (RPState 0 Reprinting)
   . runReader (RPContext s h)
-  . compile
   $ foldSubterms descend t *> finish
 
 -- Private interfaces
 
-newtype RPState = RPState
+data RPState = RPState
   { rpCursor  :: Int     -- from SYR, used to slice and dice a 'Source' (mutates)
+  , rcStrategy :: Strategy
   } deriving (Show, Eq)
 
 data RPContext = RPContext
@@ -151,32 +152,26 @@ descend t = do
   let next = fmap into' t
   case h of
     Pristine _ -> pure ()
-    Generated -> whenGenerated next
+    Generated -> do
+      strat <- gets rcStrategy
+      when (strat /= PrettyPrinting) $ do
+        control (Change PrettyPrinting)
+        modify' (\s -> s { rcStrategy = PrettyPrinting})
+
+      whenGenerated next
+
+      strat' <- gets rcStrategy
+      when (strat' == PrettyPrinting) $ do
+        control (Change Reprinting)
+        modify' (\s -> s { rcStrategy = Reprinting})
+
+
     Modified _ -> whenModified next
     Refactored r -> do
       crs <- cursor
       src <- source
       log' (show (crs, start r))
       chunk (slice (Range crs (start r)) src)
-      put (RPState (start r))
+      modify (\s -> s { rpCursor = start r })
       whenRefactored next
-      put (RPState (end r))
-
-  -- traverse_ into' t
--- descend t = history >>= \case
---   -- No action is necessary for a pristine node.
---   Pristine _   -> pure ()
---   Generated    -> whenGenerated (fmap subtermRef t)
---   Modified _   -> whenGenerated (fmap (\x -> into (subterm x) (subtermRef x)) t)
---   Refactored r -> do
---     st <- get @RPState
---     control (Log ("Refactor state is " <> show st))
---     let range = Range (rpCursor st) (start r)
---     source >>= (chunk . slice range)
---     modify' (\s -> s { rpCursor = start r })
---     whenRefactored (fmap (\x -> into (subterm x) (subtermRef x)) t)
---     modify' (\s -> s { rpCursor = end r })
-
--- Interpret a Reprinter to a state/writer effect.
-compile :: Reprinter a -> Reprinter a
-compile = id
+      modify (\s -> s { rpCursor = end r })
