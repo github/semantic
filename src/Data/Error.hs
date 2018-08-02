@@ -55,7 +55,8 @@ showExcerpt :: Colourize -> Span -> Blob -> ShowS
 showExcerpt colourize Span{..} Blob{..}
   = showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
   . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^') . showChar '\n'
-  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine spanStart - 2, posLine spanStart) i ])
+  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty contextLines)
+        contextLines = [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine spanStart - 2, posLine spanStart) i ]
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine spanStart) :: Double)))
         caretPaddingWidth = succ (posColumn spanStart)
