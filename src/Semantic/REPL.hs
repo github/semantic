@@ -77,34 +77,30 @@ runREPL = interpret $ \case
     getLine
   Output s -> liftIO (putStrLn s)
 
-rubyREPL = evaluatingREPL . repl (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby
+rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby
 
-evaluatingREPL
-  = runTaskWithOptions debugOptions
-  . runEvaluator
-  . runState lowerBound
-  . runFresh 0
-  . fmap reassociate
-  . runLoadError
-  . runUnspecialized
-  . runEnvironmentError
-  . runEvalError
-  . runResolutionError
-  . runAddressError
-  . runValueError
-  . runREPL
-
-repl proxy parser lang paths = Evaluator $ do
+repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File lang <$> paths)
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runEvaluator
     (runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
+    (runState lowerBound
+    (runFresh 0
+    (fmap reassociate
+    (runLoadError
+    (runUnspecialized
+    (runEnvironmentError
+    (runEvalError
+    (runResolutionError
+    (runAddressError
+    (runValueError
+    (runREPL
     (runReader (packageInfo package)
     (runReader (lowerBound @Span)
     (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
     (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-    (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules))))))
+    (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules)))))))))))))))))
 
 step :: Member REPL effects
      => SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
@@ -130,7 +126,6 @@ newtype REPLEff address rest a = REPLEff
                       ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                       ': Reader Span
                       ': Reader PackageInfo
-
                       ': REPL
                       ': Resumable (ValueError address (REPLEff address rest))
                       ': Resumable (AddressError address (Value address (REPLEff address rest)))
