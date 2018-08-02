@@ -37,6 +37,7 @@ import System.FilePath
   - inspecting variables
   - inspecting the heap
   - calling functions?
+  - abandoning the computation
 
 - control
   - step
