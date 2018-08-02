@@ -12,19 +12,24 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
+import Data.Char (isSpace)
 import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
 import Data.List (uncons)
 import Data.Project
-import Parsing.Parser
+import Parsing.Parser (rubyParser)
 import Prologue
 import Semantic.Graph
 import Semantic.IO as IO
 import Semantic.Task
 import Semantic.Util
 import System.FilePath
+import Text.Parser.Char
+import Text.Parser.Combinators
+import Text.Parser.Token
+import Text.Parser.Token.Style
 import qualified Text.Trifecta as Trifecta
 
 {-
@@ -152,4 +157,9 @@ newtype REPLEff address rest a = REPLEff
 
 
 newtype Parser a = Parser { runParser :: Trifecta.Parser a }
-  deriving (Alternative, Applicative, Functor, Monad)
+  deriving (Alternative, Applicative, CharParsing, Functor, Monad, Parsing)
+
+instance TokenParsing Parser where
+  someSpace = Parser $ buildSomeSpaceParser (skipSome (satisfy isSpace)) haskellCommentStyle
+  nesting = Parser . nesting . runParser
+  highlight h = Parser . highlight h . runParser
