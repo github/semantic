@@ -1,5 +1,7 @@
 {-# LANGUAGE GADTs, KindSignatures, LambdaCase, TypeOperators #-}
-module Semantic.REPL () where
+module Semantic.REPL
+( rubyREPL
+) where
 
 import Control.Abstract
 import Control.Monad.IO.Class
