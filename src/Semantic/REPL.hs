@@ -84,6 +84,7 @@ repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runEvaluator
+    . runREPL
     . runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
     . runState lowerBound
     . runFresh 0
@@ -95,7 +96,6 @@ repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
     . runResolutionError
     . runAddressError
     . runValueError
-    . runREPL
     . runReader (packageInfo package)
     . runReader (lowerBound @Span)
     . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
@@ -126,7 +126,6 @@ newtype REPLEff address rest a = REPLEff
                       ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                       ': Reader Span
                       ': Reader PackageInfo
-                      ': REPL
                       ': Resumable (ValueError address (REPLEff address rest))
                       ': Resumable (AddressError address (Value address (REPLEff address rest)))
                       ': Resumable ResolutionError
@@ -136,6 +135,7 @@ newtype REPLEff address rest a = REPLEff
                       ': Resumable (LoadError address)
                       ': Fresh
                       ': State (Heap address Latest (Value address (REPLEff address rest)))
+                      ': REPL
                       ': rest
                        ) a
   }
