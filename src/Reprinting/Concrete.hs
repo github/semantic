@@ -64,8 +64,14 @@ concretize prox =
 
 -- Private interfaces
 
-newtype JSONState = JSONState { contexts :: [Context] }
-  deriving (Eq, Show, Lower)
+data JSONState = JSONState
+  { contexts    :: [Context]
+  , needsLayout :: Bool
+  }
+  deriving (Eq, Show)
+
+instance Lower JSONState where
+  lowerBound = JSONState [] False
 
 -- A class for pushing and popping contexts. This may or may not be useful
 -- when we implement 'Concrete' for languages other than JSON.
@@ -81,8 +87,26 @@ instance ContextStack JSONState where
 
   current = listToMaybe . contexts
 
+data Indent = Space | Tab
+
+instance Pretty Indent where
+  pretty Space = " "
+  pretty Tab   = "\t"
+
+data Layout
+  = Hard Int Indent
+  | Soft
+  | Don't
+
+instance Pretty Layout where
+  pretty (Hard times how) = line <> stimes times (pretty how)
+  pretty Soft               = softline
+  pretty Don't              = mempty
+
 instance Concrete 'JSON JSONState where
   onControl t st = case t of
+    StartLayout -> pure (st { needsLayout = True })
+    EndLayout   -> pure (st { needsLayout = False })
     Log _ -> pure st
     Enter c -> pure (push c st)
     Exit c  -> do
@@ -91,7 +115,8 @@ instance Concrete 'JSON JSONState where
         then throwError (InvalidContext curr c (contexts st))
         else pure (pop st)
 
-  onElement c st =
+  onElement c st = do
+
     case c of
       Fragment f -> pure (pretty f)
       Truth t    -> pure (if t then "true" else "false")
@@ -104,12 +129,21 @@ instance Concrete 'JSON JSONState where
         Just List -> pure "]"
         Just Associative -> pure "}"
         x -> throwError (Unexpected (show (Close, x)))
-      Separator  -> case current st of
-        Just List        -> pure ","
-        Just Associative -> pure ", "
-        Just Pair        -> pure ": "
-        Nothing          -> pure mempty
-        ctx              -> throwError (Unexpected (show ctx))
+      Separator  -> do
+        let should = needsLayout st
+
+        let i = pretty $
+              case (current st, should) of
+                (_, False) -> Don't
+                (Just List, _)  -> Soft
+                (Just Associative, _) -> Hard 4 Space
+                _         -> Don't
+        case current st of
+          Just List        -> pure ("," <> i)
+          Just Associative -> pure ("," <> i)
+          Just Pair        -> pure ":"
+          Nothing          -> pure mempty
+          ctx              -> throwError (Unexpected (show ctx))
 
 -- Distribute 'onControl' and 'onElement' over 'Token', using the
 -- obvious case to handle 'Chunk' tokens.

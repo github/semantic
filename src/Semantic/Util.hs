@@ -134,7 +134,7 @@ testReprinter = do
     tree <- parseFile jsonParser "test/fixtures/javascript/reprinting/map.json"
     pure (src, tree)
 
-  let tagged = increaseNumbers (mark Pristine tree)
+  let tagged = ensureAccurateHistory (increaseNumbers (mark Pristine tree))
   let toks = reprint src tagged
   pure (toks, tagged)
 

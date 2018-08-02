@@ -39,6 +39,8 @@ data Control
   = Enter Context
   | Exit Context
   | Log String
+  | StartLayout
+  | EndLayout
     deriving (Eq, Show)
 
 -- | A 'Context' represents a scope in which other tokens can be
