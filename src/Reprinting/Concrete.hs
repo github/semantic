@@ -1,4 +1,6 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, FunctionalDependencies, KindSignatures, LambdaCase, ScopedTypeVariables, TupleSections, TypeOperators #-}
+{-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving,
+             KindSignatures, LambdaCase, ScopedTypeVariables,
+             TupleSections, TypeFamilyDependencies, TypeOperators #-}
 
 module Reprinting.Concrete
   ( Concrete (..)
@@ -30,15 +32,16 @@ import           Reprinting.Token
 -- * Is a stack machine too inexpressive?
 -- * Is this interface too clumsy? Do we just want to use Eff, or another monad?
 -- * Do we want to use a generic MonadError rather than instantiate that to Either?
--- * Can we remove this somewhat-warty functional dependency?
-class Lower stack => Concrete (l :: Language) stack | l -> stack, stack -> l where
+class Concrete (lang :: Language) where
+
+  type Stack lang = s | s -> lang
 
   -- | Each 'Element' data token should emit a chunk of source code,
   -- taking into account (but not changing) the state of the stack.
-  onElement :: Element -> stack -> Either ConcreteException (Doc a)
+  onElement :: Element -> Stack lang -> Either ConcreteException (Doc a)
 
   -- | Each 'Control' token can (but doesn't have to) change the state of the stack.
-  onControl :: Control -> stack -> Either ConcreteException stack
+  onControl :: Control -> Stack lang -> Either ConcreteException (Stack lang)
 
 -- | Represents failure occurring in a 'Concrete' machine.
 data ConcreteException
@@ -52,7 +55,8 @@ data ConcreteException
 -- 'Sequence'.  Each resulting 'Doc' will be concatenated with
 -- 'mconcat'.  Pass in an appropriately-kinded 'Proxy' to select how
 -- to interpret the language.
-concretize :: Concrete lang state => Proxy lang -> Seq Token -> Either ConcreteException (Doc a)
+concretize :: (Concrete lang, Lower (Stack lang))
+           => Proxy lang -> Seq Token -> Either ConcreteException (Doc a)
 concretize prox =
   run
   . Exc.runError
@@ -100,10 +104,11 @@ data Layout
 
 instance Pretty Layout where
   pretty (Hard times how) = line <> stimes times (pretty how)
-  pretty Soft               = softline
-  pretty Don't              = mempty
+  pretty Soft             = softline
+  pretty Don't            = mempty
 
-instance Concrete 'JSON JSONState where
+instance Concrete 'JSON where
+  type Stack 'JSON = JSONState
   onControl t st = case t of
     StartLayout -> pure (st { needsLayout = True })
     EndLayout   -> pure (st { needsLayout = False })
@@ -122,22 +127,22 @@ instance Concrete 'JSON JSONState where
       Truth t    -> pure (if t then "true" else "false")
       Nullity    -> pure "null"
       Open -> case current st of
-        Just List -> pure "["
+        Just List        -> pure "["
         Just Associative -> pure "["
-        x -> throwError (Unexpected (show (Open, x)))
+        x                -> throwError (Unexpected (show (Open, x)))
       Close -> case current st of
-        Just List -> pure "]"
+        Just List        -> pure "]"
         Just Associative -> pure "}"
-        x -> throwError (Unexpected (show (Close, x)))
+        x                -> throwError (Unexpected (show (Close, x)))
       Separator  -> do
         let should = needsLayout st
 
         let i = pretty $
               case (current st, should) of
-                (_, False) -> Don't
-                (Just List, _)  -> Soft
+                (_, False)            -> Don't
+                (Just List, _)        -> Soft
                 (Just Associative, _) -> Hard 4 Space
-                _         -> Don't
+                _                     -> Don't
         case current st of
           Just List        -> pure ("," <> i)
           Just Associative -> pure ("," <> i)
@@ -147,16 +152,16 @@ instance Concrete 'JSON JSONState where
 
 -- Distribute 'onControl' and 'onElement' over 'Token', using the
 -- obvious case to handle 'Chunk' tokens.
-step :: Concrete lang state => Token -> state -> Either ConcreteException (Doc a, state)
+step :: Concrete lang => Token -> Stack lang -> Either ConcreteException (Doc a, Stack lang)
 step t st = case t of
   Chunk src   -> pure (pretty . Source.toText $ src, st)
   TElement el -> onElement el st >>= \doc -> pure (doc, st)
   TControl ct -> (mempty, ) <$> onControl ct st
 
 -- Kludgy hack to convert 'step' into an effect.
-stepM :: forall lang state a . Concrete lang state => Proxy lang -> Token -> Eff '[Writer (Doc a), State state, Exc ConcreteException] ()
+stepM :: forall lang a . Concrete lang => Proxy lang -> Token -> Eff '[Writer (Doc a), State (Stack lang), Exc ConcreteException] ()
 stepM _ t = do
-  st <- get @state
+  st <- get @(Stack lang)
   case step t st of
     Left exc                 -> Exc.throwError exc
     Right (doc :: Doc a, st) -> tell doc *> put st
