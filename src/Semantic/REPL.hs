@@ -171,3 +171,11 @@ data Command
 
 command :: TokenParsing m => m Command
 command = token (char ':' *> (Step <$ string "step" <|> List <$ string "list")) <?> "command"
+
+parseString :: Parser a -> String -> Either String a
+parseString p = toResult . Trifecta.parseString (runParser p) mempty
+
+toResult :: Trifecta.Result a -> Either String a
+toResult r = case r of
+  Trifecta.Success a -> Right a
+  Trifecta.Failure info -> Left (show (Trifecta._errDoc info))
