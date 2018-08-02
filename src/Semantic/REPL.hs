@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, TypeOperators #-}
 module Semantic.REPL
 ( rubyREPL
 ) where
@@ -25,6 +25,7 @@ import Semantic.IO as IO
 import Semantic.Task
 import Semantic.Util
 import System.FilePath
+import qualified Text.Trifecta as Trifecta
 
 {-
 
@@ -148,3 +149,7 @@ newtype REPLEff address rest a = REPLEff
                       ': rest
                        ) a
   }
+
+
+newtype Parser a = Parser { runParser :: Trifecta.Parser a }
+  deriving (Alternative, Applicative, Functor, Monad)
