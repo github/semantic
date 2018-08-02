@@ -1,7 +1,8 @@
-{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, DeriveGeneric, KindSignatures, LambdaCase, RankNTypes #-}
 module Data.Language
   ( Language (..)
   , SLanguage (..)
+  , reify
   , ensureLanguage
   , extensionsForLanguage
   , knownLanguage
@@ -73,6 +74,20 @@ instance SLanguage 'TypeScript where
 
 instance SLanguage 'PHP where
   reflect _ = PHP
+
+reify :: Language -> (forall lang . (SLanguage lang) => Proxy lang -> a) -> a
+reify Unknown    with = with (Proxy :: Proxy 'Unknown)
+reify Go         with = with (Proxy :: Proxy 'Go)
+reify Haskell    with = with (Proxy :: Proxy 'Haskell)
+reify Java       with = with (Proxy :: Proxy 'Java)
+reify JavaScript with = with (Proxy :: Proxy 'JavaScript)
+reify JSON       with = with (Proxy :: Proxy 'JSON)
+reify JSX        with = with (Proxy :: Proxy 'JSX)
+reify Markdown   with = with (Proxy :: Proxy 'Markdown)
+reify Python     with = with (Proxy :: Proxy 'Python)
+reify Ruby       with = with (Proxy :: Proxy 'Ruby)
+reify TypeScript with = with (Proxy :: Proxy 'TypeScript)
+reify PHP        with = with (Proxy :: Proxy 'PHP)
 
 
 -- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
