@@ -1,31 +1,28 @@
 (Statements
-{+(Assignment
-  {+(Statements
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {+(Identifier)+})+}
-  {+(Array
-    {+(Integer)+}
-    {+(Integer)+}
-    {+(Integer)+})+})+}
-{+(Assignment
-  {+(Statements
-    {+(Identifier)+}
-    {+(Identifier)+})+}
-  {+(Array
-    {+(Integer)+}
-    {+(Integer)+})+})+}
   (Assignment
     (Statements
       (Identifier)
     { (Identifier)
-    ->(Identifier) })
+    ->(Identifier) }
+    {+(Identifier)+})
     (Array
-    { (Integer)
-    ->(Integer) }
+      (Integer)
+      (Integer)
+      (Integer)))
+{+(Assignment
+  {+(Statements
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
     {+(Integer)+}
-    {-(Integer)-}
-    {-(Integer)-}))
+    {+(Integer)+})+})+}
+{+(Assignment
+  {+(Statements
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+})+})+}
 {+(Assignment
   {+(Statements
     {+(Identifier)+}
