@@ -77,13 +77,13 @@ runREPL = interpret $ \case
     getLine
   Output s -> liftIO (putStrLn s)
 
-rubyREPL = evaluatingREPL <=< repl (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby
+rubyREPL = evaluatingREPL . repl (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby
 
 evaluatingREPL
-  = runM
+  = runTaskWithOptions debugOptions
+  . runEvaluator
   . runState lowerBound
   . runFresh 0
-  . runPrintingTrace
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -93,17 +93,18 @@ evaluatingREPL
   . runAddressError
   . runValueError
 
-repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
+repl proxy parser lang paths = Evaluator $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File lang <$> paths)
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
-  pure (runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise '[Lift IO]))
-       (runREPL
-       (runReader (packageInfo package)
-       (runReader (lowerBound @Span)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules)))))))
+  runEvaluator
+    (runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
+    (runREPL
+    (runReader (packageInfo package)
+    (runReader (lowerBound @Span)
+    (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+    (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+    (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules)))))))
 
 step :: Member REPL effects
      => SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
@@ -138,7 +139,6 @@ newtype REPLEff address rest a = REPLEff
                       ': Resumable (EnvironmentError address)
                       ': Resumable (Unspecialized (Value address (REPLEff address rest)))
                       ': Resumable (LoadError address)
-                      ': Trace
                       ': Fresh
                       ': State (Heap address Latest (Value address (REPLEff address rest)))
                       ': rest
