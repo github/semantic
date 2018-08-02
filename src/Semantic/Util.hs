@@ -103,7 +103,7 @@ evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser Language.JavaScript
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
 
-typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser Language.Go
+typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser
 
 callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)
@@ -133,8 +133,8 @@ evaluateProject' (TaskConfig config logger statter) proxy parser lang paths = ei
        (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
 
 
-evaluateProjectWithCaching proxy parser lang path = runTaskWithOptions debugOptions $ do
-  project <- readProject Nothing path lang []
+evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
+  project <- readProject Nothing path (Language.reflect proxy) []
   package <- fmap quieterm <$> parsePackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   pure (runReader (packageInfo package)
