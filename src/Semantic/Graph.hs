@@ -214,7 +214,7 @@ parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
-parsePackage parser project@Project{..} = do
+parsePackage parser project = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
   let pkg = Package.fromModules n p resMap
