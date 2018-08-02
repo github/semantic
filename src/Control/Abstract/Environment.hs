@@ -20,11 +20,15 @@ module Control.Abstract.Environment
 , runEnvironmentErrorWith
 ) where
 
+import Control.Abstract.Context (currentErrorContext)
 import Control.Abstract.Evaluator
+import Data.Abstract.ErrorContext
 import Data.Abstract.Environment (Bindings, Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports
+import Data.Abstract.Module
 import Data.Abstract.Name
+import Data.Span
 import Prologue
 
 -- | Retrieve the environment.
@@ -137,3 +141,11 @@ runEnvironmentError = runResumable
 
 runEnvironmentErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . EnvironmentError address resume -> m address value effects resume) -> m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects a
 runEnvironmentErrorWith = runResumableWith
+
+throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError address))) effects
+                         , Member (Reader ModuleInfo) effects
+                         , Member (Reader Span) effects
+                         )
+                      => EnvironmentError address resume
+                      -> Evaluator address value effects resume
+throwEnvironmentError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
