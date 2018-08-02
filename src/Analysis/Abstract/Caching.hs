@@ -7,6 +7,7 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
+import Data.Abstract.ErrorContext hiding (moduleInfo)
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Prologue
@@ -81,7 +82,9 @@ convergingModules :: ( AbstractValue address value effects
                      , Member NonDet effects
                      , Member (Reader (Cache term address (Cell address) value)) effects
                      , Member (Reader (Live address)) effects
-                     , Member (Resumable (EnvironmentError address)) effects
+                     , Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     , Member (Resumable (BaseError (EnvironmentError address))) effects
                      , Member (State (Cache term address (Cell address) value)) effects
                      , Member (Env address) effects
                      , Member (State (Heap address (Cell address) value)) effects

@@ -59,7 +59,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
-          , Member (Resumable (EnvironmentError address)) effects
+          , Member (Resumable (BaseError (EnvironmentError address))) effects
           , Member (Resumable (Unspecialized value)) effects
           , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable (BaseError ResolutionError)) effects
@@ -89,7 +89,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
-            , Member (Resumable (EnvironmentError address)) effects
+            , Member (Resumable (BaseError (EnvironmentError address))) effects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (Unspecialized value)) effects
@@ -149,7 +149,7 @@ class HasPrelude (language :: Language) where
                    , Member (Function address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
-                   , Member (Resumable (EnvironmentError address)) effects
+                   , Member (Resumable (BaseError (EnvironmentError address))) effects
                    , Member Trace effects
                    )
                 => proxy language
@@ -193,7 +193,7 @@ class HasPostlude (language :: Language) where
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects
               , Member (Reader Span) effects
-              , Member (Resumable (EnvironmentError address)) effects
+              , Member (Resumable (BaseError (EnvironmentError address))) effects
               , Member Trace effects
               )
            => proxy language

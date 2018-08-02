@@ -200,7 +200,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': Resumable (BaseError (AddressError address (Value address (ImportGraphEff address outerEffects))))
                              ': Resumable (BaseError ResolutionError)
                              ': Resumable (BaseError EvalError)
-                             ': Resumable (EnvironmentError address)
+                             ': Resumable (BaseError (EnvironmentError address))
                              ': Resumable (Unspecialized (Value address (ImportGraphEff address outerEffects)))
                              ': Resumable (LoadError address)
                              ': Fresh
@@ -300,8 +300,8 @@ resumingValueError = runValueErrorWith (\ (BaseError context err) -> trace ("Val
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: (Applicative (m (Hole (Maybe Name) address) value effects), Effectful (m (Hole (Maybe Name) address) value), Effects effects) => m (Hole (Maybe Name) address) value (Resumable (EnvironmentError (Hole (Maybe Name) address)) ': effects) a -> m (Hole (Maybe Name) address) value effects a
-resumingEnvironmentError = runResumableWith (\ (FreeVariable name) -> pure (Partial (Just name)))
+resumingEnvironmentError :: (Monad (m (Hole (Maybe Name) address) value effects), Effectful (m (Hole (Maybe Name) address) value), Effects effects, Member Trace effects) => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a -> m (Hole (Maybe Name) address) value effects a
+resumingEnvironmentError = runResumableWith (\ (BaseError context err) -> trace ("EnvironmentError: " <> prettyShow context <> prettyShow err) >> (\ (FreeVariable name) -> pure (Partial (Just name))) err)
 
 resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      , Effects effects

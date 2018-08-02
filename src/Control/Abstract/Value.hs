@@ -23,10 +23,13 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Environment as Env
+import Data.Abstract.ErrorContext
+import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
+import Data.Span
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
@@ -226,7 +229,9 @@ evaluateInScopedEnv scopedEnvTerm term = do
 value :: ( AbstractValue address value effects
          , Member (Deref address value) effects
          , Member (Env address) effects
-         , Member (Resumable (EnvironmentError address)) effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader Span) effects
+         , Member (Resumable (BaseError (EnvironmentError address))) effects
          )
       => ValueRef address
       -> Evaluator address value effects value
@@ -236,7 +241,9 @@ value = deref <=< address
 subtermValue :: ( AbstractValue address value effects
                 , Member (Deref address value) effects
                 , Member (Env address) effects
-                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Member (Resumable (BaseError (EnvironmentError address))) effects
                 )
              => Subterm term (Evaluator address value effects (ValueRef address))
              -> Evaluator address value effects value
@@ -245,7 +252,9 @@ subtermValue = value <=< subtermRef
 -- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue address value effects
            , Member (Env address) effects
-           , Member (Resumable (EnvironmentError address)) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (Reader Span) effects
+           , Member (Resumable (BaseError (EnvironmentError address))) effects
            )
         => ValueRef address
         -> Evaluator address value effects address
@@ -256,7 +265,9 @@ address (Rval addr) = pure addr
 -- | Evaluates a 'Subterm' to the address of its rval
 subtermAddress :: ( AbstractValue address value effects
                   , Member (Env address) effects
-                  , Member (Resumable (EnvironmentError address)) effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError (EnvironmentError address))) effects
                   )
                => Subterm term (Evaluator address value effects (ValueRef address))
                -> Evaluator address value effects address
