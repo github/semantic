@@ -114,7 +114,6 @@ step :: ( Member REPL effects
 step blobs recur term = do
   list
   res <- runCommands (recur term)
-  output "leaving term"
   pure res
   where list = do
           path <- asks modulePath
