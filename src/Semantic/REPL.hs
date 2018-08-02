@@ -23,7 +23,7 @@ import Parsing.Parser (rubyParser)
 import Prologue
 import Semantic.Graph
 import Semantic.IO as IO
-import Semantic.Task
+import Semantic.Task hiding (Error)
 import Semantic.Util
 import System.FilePath
 import Text.Parser.Char
@@ -118,14 +118,20 @@ step :: ( Member REPL effects
      -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
      -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
 step blobs recur term = do
-  path <- asks modulePath
-  span <- ask
-  maybe (pure ()) (\ blob -> output (showExcerpt True span blob "")) (Prelude.lookup path blobs)
-  str <- prompt
-  output str
-  res <- recur term
+  list
+  res <- runCommands (recur term)
   output "leaving term"
   pure res
+  where list = do
+          path <- asks modulePath
+          span <- ask
+          maybe (pure ()) (\ blob -> output (showExcerpt True span blob "")) (Prelude.lookup path blobs)
+        runCommand run Step = run
+        runCommand run List = list >> runCommands run
+        runCommand run (Error err) = output err >> runCommands run
+        runCommands run = do
+          str <- prompt
+          runCommand run (either Error id (parseString command str))
 
 
 newtype REPLEff address rest a = REPLEff
@@ -168,6 +174,7 @@ instance TokenParsing Parser where
 data Command
   = Step
   | List
+  | Error String
 
 command :: TokenParsing m => m Command
 command = token (char ':' *> (Step <$ string "step" <|> List <$ string "list")) <?> "command"
