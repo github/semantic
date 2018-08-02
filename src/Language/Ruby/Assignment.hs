@@ -80,8 +80,8 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
-  , Expression.This
   , Expression.Member
+  , Expression.This
   , Literal.Array
   , Literal.Character
   , Literal.Complex
