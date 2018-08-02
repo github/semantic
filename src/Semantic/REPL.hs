@@ -77,11 +77,11 @@ runREPL = interpret $ \case
     getLine
   Output s -> liftIO (putStrLn s)
 
-rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser Language.Ruby
+rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
 
-repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
-  blobs <- catMaybes <$> traverse IO.readFile (flip File lang <$> paths)
-  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
+repl proxy parser paths = runTaskWithOptions debugOptions $ do
+  blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
+  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runEvaluator
     . runREPL
