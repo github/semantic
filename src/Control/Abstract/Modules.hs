@@ -11,6 +11,7 @@ module Control.Abstract.Modules
 , LoadError(..)
 , runLoadError
 , runLoadErrorWith
+, throwLoadError
 , ResolutionError(..)
 , runResolutionError
 , runResolutionErrorWith
@@ -113,6 +114,16 @@ runLoadError = runResumable
 
 runLoadErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . LoadError address resume -> m address value effects resume) -> m address value (Resumable (LoadError address) ': effects) a -> m address value effects a
 runLoadErrorWith = runResumableWith
+
+throwLoadError :: ( Monad (m effects)
+                  , Effectful m
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError (LoadError address))) effects
+                  )
+               => LoadError address resume
+               -> m effects resume
+throwLoadError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
 
 
 -- | An error thrown when we can't resolve a module from a qualified name.
