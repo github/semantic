@@ -249,7 +249,7 @@ resumingResolutionError = runResolutionErrorWith (\ (BaseError context err) -> t
   GoImportError pathToResolve     -> pure [pathToResolve])
 
 resumingLoadError :: (AbstractHole address, Effectful (m address value), Effects effects, Functor (m address value effects), Member Trace effects) => m address value (Resumable (LoadError address) ': effects) a -> m address value effects a
-resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> (lowerBound, hole))
+resumingLoadError = runLoadErrorWith (\ (ModuleNotFoundError path) -> trace ("LoadError: " <> prettyShow path) $> (lowerBound, hole))
 
 resumingEvalError :: (Applicative (m effects), Effectful m, Effects effects, Member Fresh effects, Member Trace effects) => m (Resumable (BaseError EvalError) ': effects) a -> m effects a
 resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> trace ("EvalError:" <> prettyShow context <> prettyShow err) *> case err of

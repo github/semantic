@@ -75,17 +75,15 @@ instance Effect (Modules address) where
 sendModules :: Member (Modules address) effects => Modules address (Eff effects) return -> Evaluator address value effects return
 sendModules = send
 
-runModules :: ( Member (Reader ModuleInfo) effects
-              , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
-              , Member (Reader Span) effects
-              , Member (Resumable (BaseError (LoadError address))) effects
+runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
+              , Member (Resumable (LoadError address)) effects
               , PureEffects effects
               )
            => Set ModulePath
            -> Evaluator address value (Modules address ': effects) a
            -> Evaluator address value effects a
 runModules paths = interpret $ \case
-  Load   name   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable >>= maybeM (throwLoadError $ ModuleNotFoundError name)
+  Load   name   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable >>= maybeM (throwResumable $ ModuleNotFoundError name)
   Lookup path   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
   Resolve names -> pure (find (`Set.member` paths) names)
   List dir      -> pure (filter ((dir ==) . takeDirectory) (toList paths))
@@ -111,20 +109,18 @@ instance Show1 (LoadError address) where
 instance Eq1 (LoadError address) where
   liftEq _ (ModuleNotFoundError a) (ModuleNotFoundError b) = a == b
 
-runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (BaseError (LoadError address)) ': effects) a -> m address value effects (Either (SomeExc (BaseError (LoadError address))) a)
+runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (LoadError address) ': effects) a -> m address value effects (Either (SomeExc (LoadError address)) a)
 runLoadError = runResumable
 
-runLoadErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . (BaseError (LoadError address)) resume -> m address value effects resume) -> m address value (Resumable (BaseError (LoadError address)) ': effects) a -> m address value effects a
+runLoadErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . (LoadError address) resume -> m address value effects resume) -> m address value (Resumable (LoadError address) ': effects) a -> m address value effects a
 runLoadErrorWith = runResumableWith
 
-throwLoadError :: ( Monad (m effects)
-                  , Effectful m
-                  , Member (Reader ModuleInfo) effects
+throwLoadError :: ( Member (Reader ModuleInfo) effects
                   , Member (Reader Span) effects
                   , Member (Resumable (BaseError (LoadError address))) effects
                   )
                => LoadError address resume
-               -> m effects resume
+               -> Evaluator address value effects resume
 throwLoadError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
 
 
