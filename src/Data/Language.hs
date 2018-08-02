@@ -37,6 +37,42 @@ data Language
 class SLanguage (lang :: Language) where
   reflect :: proxy lang -> Language
 
+instance SLanguage 'Unknown where
+  reflect _ = Unknown
+
+instance SLanguage 'Go where
+  reflect _ = Go
+
+instance SLanguage 'Haskell where
+  reflect _ = Haskell
+
+instance SLanguage 'Java where
+  reflect _ = Java
+
+instance SLanguage 'JavaScript where
+  reflect _ = JavaScript
+
+instance SLanguage 'JSON where
+  reflect _ = JSON
+
+instance SLanguage 'JSX where
+  reflect _ = JSX
+
+instance SLanguage 'Markdown where
+  reflect _ = Markdown
+
+instance SLanguage 'Python where
+  reflect _ = Python
+
+instance SLanguage 'Ruby where
+  reflect _ = Ruby
+
+instance SLanguage 'TypeScript where
+  reflect _ = TypeScript
+
+instance SLanguage 'PHP where
+  reflect _ = PHP
+
 
 -- This ensures that the protobuf file is generated with ALL_CAPS_NAMES.
 instance Finite Language where
