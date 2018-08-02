@@ -11,7 +11,9 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
+import Data.Blob (Blob(..))
 import Data.Coerce
+import Data.Error (showExcerpt)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
 import Data.List (uncons)
@@ -81,8 +83,8 @@ rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
 
 repl proxy parser paths = runTaskWithOptions debugOptions $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
-  package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
-  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+  modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
   runEvaluator
     . runREPL
     . runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
@@ -99,13 +101,20 @@ repl proxy parser paths = runTaskWithOptions debugOptions $ do
     . runReader (packageInfo package)
     . runReader (lowerBound @Span)
     . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-    . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-    $ evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules
+    . raiseHandler (runModules (ModuleTable.modulePaths (packageModules (snd <$> package))))
+    $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Concrete.runFunction coerce coerce) modules
 
-step :: Member REPL effects
-     => SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
+step :: ( Member REPL effects
+        , Member (Reader ModuleInfo) effects
+        , Member (Reader Span) effects
+        )
+     => [(ModulePath, Blob)]
      -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
-step recur term = do
+     -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
+step blobs recur term = do
+  path <- asks modulePath
+  span <- ask
+  maybe (pure ()) (\ blob -> output (showExcerpt True span blob "")) (Prelude.lookup path blobs)
   str <- prompt
   output str
   res <- recur term
