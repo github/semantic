@@ -4,6 +4,7 @@ module Data.Error
   , formatError
   , makeError
   , showExpectation
+  , showExcerpt
   , withSGRCode
   ) where
 
