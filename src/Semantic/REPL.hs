@@ -84,23 +84,23 @@ repl proxy parser lang paths = runTaskWithOptions debugOptions $ do
   package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runEvaluator
-    (runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
-    (runState lowerBound
-    (runFresh 0
-    (fmap reassociate
-    (runLoadError
-    (runUnspecialized
-    (runEnvironmentError
-    (runEvalError
-    (runResolutionError
-    (runAddressError
-    (runValueError
-    (runREPL
-    (runReader (packageInfo package)
-    (runReader (lowerBound @Span)
-    (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-    (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-    (evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules)))))))))))))))))
+    . runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
+    . runState lowerBound
+    . runFresh 0
+    . fmap reassociate
+    . runLoadError
+    . runUnspecialized
+    . runEnvironmentError
+    . runEvalError
+    . runResolutionError
+    . runAddressError
+    . runValueError
+    . runREPL
+    . runReader (packageInfo package)
+    . runReader (lowerBound @Span)
+    . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+    . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+    $ evaluate proxy id (withTermSpans . step) (Concrete.runFunction coerce coerce) modules
 
 step :: Member REPL effects
      => SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
