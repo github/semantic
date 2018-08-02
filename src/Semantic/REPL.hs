@@ -177,7 +177,9 @@ data Command
   | Error String
 
 command :: TokenParsing m => m Command
-command = token (char ':' *> (Step <$ string "step" <|> List <$ string "list")) <?> "command"
+command = token (char ':' *> command) <?> "command"
+  where command = Step <$ string "step"
+              <|> List <$ string "list"
 
 parseString :: Parser a -> String -> Either String a
 parseString p = toResult . Trifecta.parseString (runParser p) mempty
