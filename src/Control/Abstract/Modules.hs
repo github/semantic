@@ -9,7 +9,6 @@ module Control.Abstract.Modules
 , Modules(..)
 , runModules
 , LoadError(..)
-, moduleNotFound
 , runLoadError
 , runLoadErrorWith
 , ResolutionError(..)
@@ -108,9 +107,6 @@ instance Show1 (LoadError address) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (LoadError address) where
   liftEq _ (ModuleNotFound a) (ModuleNotFound b) = a == b
-
-moduleNotFound :: Member (Resumable (LoadError address)) effects => ModulePath -> Evaluator address value effects (ModuleResult address)
-moduleNotFound = throwResumable . ModuleNotFound
 
 runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (LoadError address) ': effects) a -> m address value effects (Either (SomeExc (LoadError address)) a)
 runLoadError = runResumable
