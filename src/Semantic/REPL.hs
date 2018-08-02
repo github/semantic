@@ -120,12 +120,12 @@ step blobs recur term = do
           path <- asks modulePath
           span <- ask
           maybe (pure ()) (\ blob -> output (showExcerpt True span blob "")) (Prelude.lookup path blobs)
-        runCommand run Step = run
-        runCommand run List = list >> runCommands run
-        runCommand run (Error err) = output err >> runCommands run
+        runCommand run ":step" = run
+        runCommand run ":list" = list >> runCommands run
+        runCommand run other = output ("unknown command '" <> other <> "'") >> runCommands run
         runCommands run = do
           str <- prompt
-          runCommand run (parseCommand str)
+          runCommand run str
 
 
 newtype REPLEff address rest a = REPLEff
@@ -154,14 +154,3 @@ newtype REPLEff address rest a = REPLEff
                       ': rest
                        ) a
   }
-
-
-data Command
-  = Step
-  | List
-  | Error String
-
-parseCommand :: String -> Command
-parseCommand ":step" = Step
-parseCommand ":list" = List
-parseCommand other = Error $ "unknown command '" <> other <> "'"
