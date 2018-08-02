@@ -308,9 +308,9 @@ resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      , Effectful (m address Type)
                      , Member Trace effects
                      )
-                  => m address Type (Resumable TypeError ': State TypeMap ': effects) a
+                  => m address Type (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
                   -> m address Type effects a
-resumingTypeError = runTypesWith (\err -> trace ("TypeError: " <> prettyShow err) *> case err of
+resumingTypeError = runTypesWith (\ (BaseError context err) -> trace ("TypeError: " <> prettyShow context) *> case err of
   UnificationError l r -> pure l <|> pure r
   InfiniteType _ r -> pure r)
 
