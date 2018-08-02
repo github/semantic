@@ -3,10 +3,10 @@ module Semantic.REPL
 ( rubyREPL
 ) where
 
-import Control.Abstract
+import Control.Abstract hiding (List, string)
 import Control.Monad.IO.Class
 import Data.Abstract.Address
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
@@ -168,3 +168,6 @@ instance TokenParsing Parser where
 data Command
   = Step
   | List
+
+command :: TokenParsing m => m Command
+command = token (char ':' *> (Step <$ string "step" <|> List <$ string "list")) <?> "command"
