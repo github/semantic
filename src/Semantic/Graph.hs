@@ -223,12 +223,8 @@ parsePackage parser project = do
   where
     n = name (projectName project)
 
-    -- | Parse all files in a project into 'Module's.
-    parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
     parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
-    -- | Parse a file into a 'Module'.
-    parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
     parseModule proj parser file = do
       mBlob <- readFile proj file
       case mBlob of
