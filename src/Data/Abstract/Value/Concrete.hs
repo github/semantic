@@ -304,8 +304,7 @@ runValueError :: (Effectful (m address (Value address body)), Effects effects)
 runValueError = runResumable
 
 runValueErrorWith :: (Effectful (m address (Value address body)), Effects effects)
-                  => (forall resume . BaseError (ValueError address body) resume
-                  -> m address (Value address body) effects resume)
+                  => (forall resume . BaseError (ValueError address body) resume -> m address (Value address body) effects resume)
                   -> m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
                   -> m address (Value address body) effects a
 runValueErrorWith = runResumableWith
