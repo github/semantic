@@ -36,7 +36,7 @@ import Semantic.Telemetry
 import Semantic.Telemetry.Log (LogOptions, Message(..), writeLogMessage)
 import Semantic.Util
 import System.Console.Haskeline
-import System.Directory (getHomeDirectory)
+import System.Directory (createDirectoryIfMissing, getHomeDirectory)
 import System.FilePath
 
 {-
@@ -106,9 +106,11 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
   homeDir <- liftIO getHomeDirectory
   prefs <- liftIO (readPrefs (homeDir <> "/.haskeline"))
+  let settingsDir = homeDir <> "/.local/semantic"
+  liftIO $ createDirectoryIfMissing True settingsDir
   let settings = Settings
         { complete = noCompletion
-        , historyFile = Just (homeDir <> "/.local/semantic/repl_history")
+        , historyFile = Just (settingsDir <> "/repl_history")
         , autoAddHistory = True
         }
   runEvaluator
