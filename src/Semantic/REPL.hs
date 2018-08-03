@@ -36,7 +36,7 @@ import Semantic.Telemetry
 import Semantic.Telemetry.Log (LogOptions, Message(..), writeLogMessage)
 import Semantic.Util
 import System.Console.Haskeline
-import qualified System.Environment as System
+import System.Directory (getHomeDirectory)
 import System.FilePath
 
 {-
@@ -104,7 +104,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
   blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
-  homeDir <- liftIO (System.getEnv "HOME")
+  homeDir <- liftIO getHomeDirectory
   prefs <- liftIO (readPrefs (homeDir <> "/.haskeline"))
   let settings = Settings
         { complete = noCompletion
