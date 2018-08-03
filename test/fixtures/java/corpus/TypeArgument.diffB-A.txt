@@ -1,0 +1,31 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+      {-(AccessibilityModifier)-}
+        (Empty)
+        (Identifier)
+        (Annotation
+          (Identifier)
+          (GenericType
+            (Identifier)
+          {+(Identifier)+}
+          {-(Wildcard)-}))
+        (Statements
+          (Context
+            (Comment)
+          { (ForEach
+            {-(Variable
+              {-(Identifier)-}
+              {-(Identifier)-})-}
+            {-(Identifier)-}
+            {-(Statements
+              {-(Call
+                {-(MemberAccess
+                  {-(MemberAccess
+                    {-(Identifier)-})-})-}
+                {-(Identifier)-}
+                {-(Empty)-})-})-})
+          ->(Empty) }))))))

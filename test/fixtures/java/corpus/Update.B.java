@@ -1,4 +1,2 @@
-foo++;
-++bar;
 baz--;
 --boo;

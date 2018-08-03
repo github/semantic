@@ -1,0 +1,17 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+          (TryWithResources
+            (Assignment
+              (Variable
+                (Identifier)
+                (Identifier))
+              (New
+                (Identifier)))
+            (Statements)))))))
