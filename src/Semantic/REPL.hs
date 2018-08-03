@@ -151,8 +151,8 @@ step blobs recur term = do
         showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"] = run
         runCommand run [":list"] = list >> runCommands run
-        runCommand run [":help"] = help >> runCommands run
         runCommand run [":show", "bindings"] = showBindings >> runCommands run
+        runCommand run [":help"] = help >> runCommands run
         runCommand run [":?"] = help >> runCommands run
         runCommand run [] = runCommands run
         runCommand run other = output ("unknown command '" <> intercalate " " other <> "'") >> output "use :? for help" >> runCommands run
