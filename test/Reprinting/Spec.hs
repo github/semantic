@@ -8,7 +8,7 @@ import Data.Functor.Foldable (embed, cata)
 import qualified Data.Language as Language
 import qualified Data.Syntax.Literal as Literal
 import Data.Algebra
-import Reprinting.Algebraic
+import Reprinting.Tokenize
 import Reprinting.Pipeline
 import Data.Sum
 import Semantic.IO
@@ -27,11 +27,11 @@ spec = describe "reprinting" $ do
 
     it "should pass over a pristine tree" $ do
       let tagged = mark Pristine tree
-      let toks = reprint src tagged
+      let toks = tokenizing src tagged
       toks `shouldBe` [Chunk src]
 
     it "should emit control tokens but only 1 chunk for a wholly-modified tree" $ do
-      let toks = reprint src (mark Modified tree)
+      let toks = tokenizing src (mark Modified tree)
       forM_ @[] [List, Associative] $ \t -> do
         toks `shouldSatisfy` (elem (TControl (Enter t)))
         toks `shouldSatisfy` (elem (TControl (Exit t)))

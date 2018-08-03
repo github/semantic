@@ -45,10 +45,10 @@ stages of the pipeline follows:
   ┌───────────────┬──────────────────────────────────┬────────────────────┐
   │    Module     │           Description            │     Generality     │
   ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │   Algebraic   │  A subterm algebra converting    │  Language─agnostic │
+  │    Tokenize   │  A subterm algebra converting    │  Language─agnostic │
   │               │  terms to a stream of tokens.    │                    │
   ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │  Translation  │  A stack machine interface       │  Language─specific │
+  │   Translate   │  A stack machine interface       │  Language─specific │
   │               │  through which tokens are        │                    │
   │               │  interpreted to target           │                    │
   │               │  different languages.            │                    │
@@ -58,7 +58,7 @@ stages of the pipeline follows:
   │               │  themselves out on the page      │                    │
   │               │  with appropriate indentation.   │                    │
   ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │  Typeset      │ A simple function informing the  │  Language─agnostic │
+  │    Typeset    │ A simple function informing the  │  Language─agnostic │
   │               │ prettyprinting library how to    │                    │
   │               │ render laid─out tokens into an   │                    │
   │               │ aesthetically pleasing document. │                    │
@@ -74,7 +74,7 @@ import Prologue
 import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Text
 
-import Reprinting.Algebraic
+import Reprinting.Tokenize
 import Reprinting.Translate
 import Reprinting.Typeset
 import Data.Record
@@ -84,10 +84,10 @@ import Data.Source
 -- | Given a 'Proxy' corresponding to the language of the provided
 -- 'Term' and the original 'Source' from which the provided 'Term' was
 -- passed, run the reprinting pipeline.
-runReprinter :: (Show (Record fields), Reprintable a, HasField fields History, Translate lang, Lower (Stack lang))
+runReprinter :: (Show (Record fields), Tokenize a, HasField fields History, Translate lang, Lower (Stack lang))
              => Proxy lang
              -> Source
              -> Term a (Record fields)
              -> Either TranslationException Source
-runReprinter prox s = fmap go . translating prox . reprint s
+runReprinter prox s = fmap go . translating prox . tokenizing s
   where go = fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset

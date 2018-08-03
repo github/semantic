@@ -12,7 +12,7 @@ import           Numeric.Exts
 import           Prelude hiding (Float, null)
 import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
-import           Reprinting.Algebraic
+import           Reprinting.Tokenize
 import           Text.Read (readMaybe)
 
 -- Boolean
@@ -33,9 +33,9 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Boolean where
   eval (Boolean x) = rvalBox (boolean x)
 
-instance Reprintable Boolean where
-  whenGenerated = yield . Truth . booleanContent
-  whenRefactored _ = pure ()
+instance Tokenize Boolean where
+  whenGenerated  = yield . Truth . booleanContent
+  whenRefactored = ignore
 
 -- Numeric
 
@@ -65,7 +65,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
-instance Reprintable Data.Syntax.Literal.Float where
+instance Tokenize Data.Syntax.Literal.Float where
   whenRefactored = whenGenerated
 
   whenGenerated =
@@ -142,7 +142,7 @@ instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
-instance Reprintable TextElement where
+instance Tokenize TextElement where
   whenRefactored = whenGenerated
   whenGenerated = yield . Fragment . textElementContent
 
@@ -155,10 +155,10 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Null where eval _ = rvalBox null
 
-instance Reprintable Null where
+instance Tokenize Null where
   whenGenerated _ = yield Nullity
-  whenRefactored _ = pure ()
-  whenModified   _ = pure ()
+  whenRefactored  = ignore
+  whenModified    = ignore
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -204,7 +204,7 @@ instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Array where
   eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
-instance Reprintable Array where
+instance Tokenize Array where
   whenModified = within List . sequenceA_
   whenRefactored = within List . sequenceA_
 
@@ -222,7 +222,7 @@ instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Hash where
   eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
-instance Reprintable Hash where
+instance Tokenize Hash where
   whenRefactored  = whenModified
   whenModified    = within Associative . sequenceA_
   whenGenerated t = within Associative $
@@ -239,7 +239,7 @@ instance Evaluatable KeyValue where
   eval (fmap subtermValue -> KeyValue{..}) =
     rvalBox =<< (kvPair <$> key <*> value)
 
-instance Reprintable KeyValue where
+instance Tokenize KeyValue where
   whenGenerated (KeyValue k v) = within Pair $
     k *> yield Separator *> v
 

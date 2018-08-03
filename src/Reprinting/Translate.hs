@@ -24,7 +24,7 @@ import           Data.Language
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 
--- | Once the 'Reprintable' algebra has yielded a sequence of tokens,
+-- | Once the 'Tokenize' algebra has yielded a sequence of tokens,
 -- we need to apply per-language interpretation to each token so as to
 -- yield language-specific 'Splice's of source code. The 'Translate'
 -- typeclass describes a stack machine capable of translating a given
