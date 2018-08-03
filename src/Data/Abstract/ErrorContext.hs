@@ -8,6 +8,7 @@ where
 
 import qualified Data.Abstract.Module as M
 import qualified Data.Span as S
+import Prologue
 
 data BaseError (exc :: * -> *) resume = BaseError { errorContext :: ErrorContext, err :: exc resume } deriving (Show)
 
@@ -29,3 +30,7 @@ instance Show ErrorContext where
                                      startCol  = show (S.posColumn (S.spanStart span))
                                      endCol    = show (S.posColumn (S.spanEnd span))
                                      in startLine <> ":" <> startCol <> "-" <> endLine <> ":" <> endCol
+
+instance Show1 (BaseError exc) where
+  liftShowsPrec sp sl d = liftShowsPrec sp sl d
+
