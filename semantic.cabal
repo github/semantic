@@ -87,6 +87,7 @@ library
                      , Data.Project
                      , Data.Range
                      , Data.Record
+                     , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Source
@@ -153,9 +154,8 @@ library
                      , Rendering.Symbol
                      , Rendering.TOC
                      , Reprinting.Algebraic
-                     , Reprinting.Concrete
+                     , Reprinting.Translate
                      , Reprinting.Pipeline
-                     , Reprinting.Token
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.AST
                      , Semantic.CLI
@@ -210,6 +210,7 @@ library
                      , http-types
                      , kdt
                      , mersenne-random-pure64
+                     , microlens
                      , mtl
                      , network
                      , network-uri

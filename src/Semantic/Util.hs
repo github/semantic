@@ -33,7 +33,7 @@ import           Parsing.Parser
 import           Prologue hiding (weaken)
 import           Refactoring.Core
 import           Reprinting.Algebraic
-import           Reprinting.Concrete
+import           Reprinting.Translate
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
@@ -43,7 +43,6 @@ import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show (showListWith)
-import           Text.Show.Pretty (pPrint)
 import           Text.Show.Pretty (ppShow)
 
 justEvaluating
@@ -138,7 +137,7 @@ testReprinter = do
   let toks = reprint src tagged
   pure (toks, tagged)
 
-testConcrete = concretize (Proxy @'Language.JSON) . fst <$> testReprinter
+testTranslation = translating (Proxy @'Language.JSON) . fst <$> testReprinter
 
 
 -- Evaluate a project consisting of the listed paths.

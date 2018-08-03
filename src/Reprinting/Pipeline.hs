@@ -48,17 +48,17 @@ stages of the pipeline follows:
   │   Algebraic   │  A subterm algebra converting    │  Language─agnostic │
   │               │  terms to a stream of tokens.    │                    │
   ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │   Concrete    │  A stack machine interface       │  Language─specific │
+  │  Translation  │  A stack machine interface       │  Language─specific │
   │               │  through which tokens are        │                    │
   │               │  interpreted to target           │                    │
   │               │  different languages.            │                    │
   ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │   Layout      │  A rules engine that informs     │  Language─specific │
+  │    Rules      │  A rules engine that informs     │  Language─specific │
   │(unimplemented)│  interpreted Tokens how to lay   │  Project─specific  │
   │               │  themselves out on the page      │                    │
   │               │  with appropriate indentation.   │                    │
   ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │   Typeset     │ A stack machine informing the    │  Language─agnostic │
+  │  Typesetting  │ A stack machine informing the    │  Language─agnostic │
   │(unimplemented)│ prettyprinting library how to    │                    │
   │               │ render laid─out tokens into an   │                    │
   │               │ aesthetically pleasing document. │                    │
@@ -76,7 +76,7 @@ import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Render.Text
 
 import Reprinting.Algebraic
-import Reprinting.Concrete
+import Reprinting.Translate
 import Data.Record
 import Data.Term
 import Data.Source
@@ -84,10 +84,10 @@ import Data.Source
 -- | Given a 'Proxy' corresponding to the language of the provided
 -- 'Term' and the original 'Source' from which the provided 'Term' was
 -- passed, run the reprinting pipeline.
-runReprinter :: (Show (Record fields), Reprintable a, HasField fields History, Concrete lang, Lower (Stack lang))
+runReprinter :: (Show (Record fields), Reprintable a, HasField fields History, Translate lang, Lower (Stack lang))
              => Proxy lang
              -> Source
              -> Term a (Record fields)
-             -> Either ConcreteException Source
-runReprinter prox s = fmap go . concretize prox . reprint s
+             -> Either TranslationException Source
+runReprinter prox s = fmap go . translating prox . reprint s
   where go = fromText . renderStrict . layoutPretty defaultLayoutOptions

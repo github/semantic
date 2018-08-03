@@ -2,10 +2,10 @@
              KindSignatures, LambdaCase, ScopedTypeVariables,
              TupleSections, TypeFamilyDependencies, TypeOperators #-}
 
-module Reprinting.Concrete
-  ( Concrete (..)
-  , ConcreteException (..)
-  , concretize
+module Reprinting.Translate
+  ( Translate (..)
+  , TranslationException (..)
+  , translating
   ) where
 
 import Prologue hiding (Element)
@@ -19,33 +19,33 @@ import           Data.Text.Prettyprint.Doc
 
 import           Data.Language
 import qualified Data.Source as Source
-import           Reprinting.Token
+import           Data.Reprinting.Token
 
 -- | Once the 'Reprintable' algebra has yielded a sequence of tokens,
 -- we need to apply per-language interpretation to each token so as to
--- yield language-specific chunks of source code. The 'Concrete'
--- typeclass describes how a given 'Language' interprets tokens, using
--- a stack machine described by the @stack@ parameter.  @stack@ must
--- have a 'Lower' instance so we know where to start.
+-- yield language-specific chunks of source code. The 'Translate'
+-- typeclass describes a stack machine capable of translating a given
+-- a stream of 'Tokens', based on the concrete syntax of the specified
+-- language.
 --
 -- Some possible issues we should tackle before finalizing this design:
 --
 -- * Is a stack machine too inexpressive?
 -- * Is this interface too clumsy? Do we just want to use Eff, or another monad?
 -- * Do we want to use a generic MonadError rather than instantiate that to Either?
-class Concrete (lang :: Language) where
+class Translate (lang :: Language) where
 
   type Stack lang = s | s -> lang
 
   -- | Each 'Element' data token should emit a chunk of source code,
   -- taking into account (but not changing) the state of the stack.
-  onElement :: Element -> Stack lang -> Either ConcreteException (Doc a)
+  onElement :: Element -> Stack lang -> Either TranslationException (Doc a)
 
   -- | Each 'Control' token can (but doesn't have to) change the state of the stack.
-  onControl :: Control -> Stack lang -> Either ConcreteException (Stack lang)
+  onControl :: Control -> Stack lang -> Either TranslationException (Stack lang)
 
 -- | Represents failure occurring in a 'Concrete' machine.
-data ConcreteException
+data TranslationException
   = InvalidContext (Maybe Context) Context [Context]
   -- ^ Thrown if an unbalanced 'Enter'/'Exit' pair is encountered.
   | Unexpected String
@@ -56,9 +56,11 @@ data ConcreteException
 -- 'Sequence'.  Each resulting 'Doc' will be concatenated with
 -- 'mconcat'.  Pass in an appropriately-kinded 'Proxy' to select how
 -- to interpret the language.
-concretize :: (Concrete lang, Lower (Stack lang))
-           => Proxy lang -> Seq Token -> Either ConcreteException (Doc a)
-concretize prox =
+translating :: (Translate lang, Lower (Stack lang))
+            => Proxy lang
+            -> Seq Token
+            -> Either TranslationException (Doc a)
+translating prox =
   run
   . Exc.runError
   . fmap snd
@@ -108,7 +110,7 @@ instance Pretty Layout where
   pretty Soft             = softline
   pretty Don't            = mempty
 
-instance Concrete 'JSON where
+instance Translate 'JSON where
   type Stack 'JSON = JSONState
   onControl t st = case t of
     Change PrettyPrinting -> pure (st { needsLayout = True })
@@ -153,14 +155,14 @@ instance Concrete 'JSON where
 
 -- Distribute 'onControl' and 'onElement' over 'Token', using the
 -- obvious case to handle 'Chunk' tokens.
-step :: Concrete lang => Token -> Stack lang -> Either ConcreteException (Doc a, Stack lang)
+step :: Translate lang => Token -> Stack lang -> Either TranslationException (Doc a, Stack lang)
 step t st = case t of
   Chunk src   -> pure (pretty . Source.toText $ src, st)
   TElement el -> onElement el st >>= \doc -> pure (doc, st)
   TControl ct -> (mempty, ) <$> onControl ct st
 
 -- Kludgy hack to convert 'step' into an effect.
-stepM :: forall lang a . Concrete lang => Proxy lang -> Token -> Eff '[Writer (Doc a), State (Stack lang), Exc ConcreteException] ()
+stepM :: forall lang a . Translate lang => Proxy lang -> Token -> Eff '[Writer (Doc a), State (Stack lang), Exc TranslationException] ()
 stepM _ t = do
   st <- get @(Stack lang)
   case step t st of

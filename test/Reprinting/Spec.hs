@@ -51,6 +51,5 @@ spec = describe "reprinting" $ do
       let tagged = increaseNumbers (mark Modified tree)
       print tagged
       let (Right printed) = runReprinter (Proxy @'Language.JSON) src tagged
-      print printed
       tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
       length tree `shouldSatisfy` (/= 0)
