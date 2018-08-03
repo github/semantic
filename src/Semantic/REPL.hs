@@ -20,6 +20,7 @@ import Data.Graph (topologicalSort)
 import Data.Language as Language
 import Data.List (intercalate, uncons, words)
 import Data.Project
+import Data.Span
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Parsing.Parser (rubyParser)
@@ -181,14 +182,20 @@ step blobs recur term = do
 data Break
   = Always
   | Never
+  | OnLine Int
   deriving Show
 
-shouldBreak :: Member (Reader Break) effects => TermEvaluator term address value effects Bool
+shouldBreak :: (Member (Reader Break) effects, Member (Reader Span) effects) => TermEvaluator term address value effects Bool
 shouldBreak = do
   break <- ask
+  Span{..} <- ask
   pure $ case break of
     Always -> True
     Never  -> False
+    OnLine n
+      | n >= posLine spanStart
+      , n <= posLine spanEnd   -> True
+      | otherwise              -> False
 
 
 settings :: Settings IO
