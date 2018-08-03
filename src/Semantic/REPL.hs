@@ -146,7 +146,8 @@ step blobs recur term = do
           output "  :show bindings              show the current bindings"
         showBindings = do
           bindings <- Env.head <$> TermEvaluator getEnv
-          output $ show bindings
+          output $ intercalate "\n" (uncurry showBinding <$> Env.pairs bindings)
+        showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"] = run
         runCommand run [":list"] = list >> runCommands run
         runCommand run [":help"] = help >> runCommands run
