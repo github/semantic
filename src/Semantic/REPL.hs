@@ -23,7 +23,7 @@ import Data.Project
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Parsing.Parser (rubyParser)
-import Prologue
+import Prologue hiding (throwError)
 import Semantic.Config (logOptionsFromConfig)
 import Semantic.Distribute
 import Semantic.Graph
@@ -77,6 +77,12 @@ output :: (Effectful m, Member REPL effects) => String -> m effects ()
 output s = send (Output s)
 
 
+data Quit = Quit
+  deriving Show
+
+instance Exception Quit
+
+
 instance PureEffect REPL
 instance Effect REPL where
   handleState state handler (Request Prompt k) = Request Prompt (handler . (<$ state) . k)
@@ -122,6 +128,7 @@ runTelemetryIgnoringStat logOptions = interpret $ \case
     writeLogMessage logOptions (Message level message pairs zonedTime)
 
 step :: ( Member (Env address) effects
+        , Member (Exc SomeException) effects
         , Member REPL effects
         , Member (Reader ModuleInfo) effects
         , Member (Reader Span) effects
@@ -145,6 +152,7 @@ step blobs recur term = do
           output "  :list                       show the source code around current breakpoint"
           output "  :step                       single-step after stopping at a breakpoint"
           output "  :show bindings              show the current bindings"
+          output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
         showBindings = do
           bindings <- Env.head <$> TermEvaluator getEnv
           output $ intercalate "\n" (uncurry showBinding <$> Env.pairs bindings)
@@ -152,6 +160,7 @@ step blobs recur term = do
         runCommand run [":step"] = run
         runCommand run [":list"] = list >> runCommands run
         runCommand run [":show", "bindings"] = showBindings >> runCommands run
+        runCommand _   [quit] | quit `elem` [":quit", ":q", ":abandon"] = throwError (SomeException Quit)
         runCommand run [":help"] = help >> runCommands run
         runCommand run [":?"] = help >> runCommands run
         runCommand run [] = runCommands run
