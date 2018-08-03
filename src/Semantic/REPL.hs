@@ -6,6 +6,7 @@ module Semantic.REPL
 import Control.Abstract hiding (List, string)
 import Control.Monad.IO.Class
 import Data.Abstract.Address
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
@@ -120,9 +121,11 @@ runTelemetryIgnoringStat logOptions = interpret $ \case
     zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
     writeLogMessage logOptions (Message level message pairs zonedTime)
 
-step :: ( Member REPL effects
+step :: ( Member (Env address) effects
+        , Member REPL effects
         , Member (Reader ModuleInfo) effects
         , Member (Reader Span) effects
+        , Show address
         )
      => [(ModulePath, Blob)]
      -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
@@ -141,9 +144,14 @@ step blobs recur term = do
           output "  :help, :?                   display this list of commands"
           output "  :list                       show the source code around current breakpoint"
           output "  :step                       single-step after stopping at a breakpoint"
+          output "  :show bindings              show the current bindings"
+        showBindings = do
+          bindings <- Env.head <$> TermEvaluator getEnv
+          output $ show bindings
         runCommand run ":step" = run
         runCommand run ":list" = list >> runCommands run
         runCommand run ":help" = help >> runCommands run
+        runCommand run ":show bindings" = showBindings >> runCommands run
         runCommand run ":?" = help >> runCommands run
         runCommand run s | all isSpace s = runCommands run
         runCommand run other = output ("unknown command '" <> other <> "'") >> output "use :? for help" >> runCommands run
