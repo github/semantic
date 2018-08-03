@@ -34,3 +34,5 @@ instance Show ErrorContext where
 instance Show1 (BaseError exc) where
   liftShowsPrec sp sl d = liftShowsPrec sp sl d
 
+instance Lower (ErrorContext) where
+  lowerBound = ErrorContext lowerBound lowerBound
