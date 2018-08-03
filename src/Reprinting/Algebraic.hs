@@ -1,7 +1,8 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 
+-- TODO: rename this to Reprinting.Tokenize?
 module Reprinting.Algebraic
-  ( module Reprinting.Token
+  ( module Data.Reprinting.Token
   , History (..)
   , mark
   , remark
@@ -31,13 +32,14 @@ import Control.Monad.Effect.State
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Writer
 import Data.Sequence (singleton)
+import Lens.Micro
 
 import Data.History
 import Data.Range
 import Data.Record
 import Data.Source
 import Data.Term
-import Reprinting.Token
+import Data.Reprinting.Token
 
 -- | The 'Reprinter' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
@@ -106,43 +108,42 @@ reprint s t = let h = getField (termAnnotation t) in
 -- Private interfaces
 
 data RPState = RPState
-  { rpCursor  :: Int     -- from SYR, used to slice and dice a 'Source' (mutates)
-  , rcStrategy :: Strategy
+  { _cursor   :: Int -- from SYR, used to slice and dice a 'Source' (mutates)
+  , _strategy :: Strategy
   } deriving (Show, Eq)
+
+cursor :: Lens' RPState Int
+cursor = lens _cursor (\s c -> s { _cursor = c})
+
+strategy :: Lens' RPState Strategy
+strategy = lens _strategy (\s t -> s { _strategy = t})
 
 data RPContext = RPContext
-  { rcSource :: Source
-  , rcHistory :: History
+  { _source  :: Source
+  , _history :: History
   } deriving (Show, Eq)
--- Accessors
 
-cursor :: Reprinter Int
-cursor = rpCursor <$> get
-
-source :: Reprinter Source
-source = rcSource <$> ask
-
-history :: Reprinter History
-history = rcHistory <$> ask
+history :: Lens' RPContext History
+history = lens _history (\c h -> c { _history = h })
 
 chunk :: Source -> Reprinter ()
 chunk = tell . singleton . Chunk
 
 finish :: Reprinter ()
 finish = do
-  crs <- cursor
-  src <- source
+  crs <- gets _cursor
+  src <- asks _source
   chunk (dropSource crs src)
 
 into :: (Annotated t (Record fields), HasField fields History) => t -> Reprinter a -> Reprinter a
-into x = local (\c -> c { rcHistory = getField (annotation x)} )
+into x = local (set history (getField (annotation x)))
 
 strategize :: Strategy -> Reprinter ()
 strategize new = do
-  strat <- gets rcStrategy
+  strat <- gets _strategy
   when (strat /= new) $ do
     control (Change new)
-    modify' (\s -> s { rcStrategy = new })
+    modify' (set strategy new)
 
 -- | A subterm algebra that implements the /Scrap Your Reprinter/
 -- algorithm.  Whereas /SYR/ uses a zipper to do a top-down
@@ -151,8 +152,7 @@ strategize new = do
 descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
 descend t = do
   let into' s = into (subterm s) (subtermRef s)
-  h <- history
-  log' (show h)
+  h <- asks _history
   let next = fmap into' t
   case h of
     Pristine _ -> pure ()
@@ -163,12 +163,11 @@ descend t = do
 
     Modified _ -> whenModified next
     Refactored r -> do
-      crs <- cursor
-      src <- source
-      log' (show (crs, start r))
+      crs <- gets _cursor
+      src <- asks _source
       chunk (slice (Range crs (start r)) src)
-      modify (\s -> s { rpCursor = start r })
+      modify (set cursor (start r))
       strategize PrettyPrinting
       whenRefactored next
       strategize Reprinting
-      modify (\s -> s { rpCursor = end r })
+      modify (set cursor (end r))

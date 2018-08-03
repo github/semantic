@@ -1,4 +1,4 @@
-module Reprinting.Token
+module Data.Reprinting.Token
   ( Token (..)
   , Element (..)
   , Control (..)
