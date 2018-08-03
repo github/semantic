@@ -141,9 +141,9 @@ step :: ( Member (Env address) effects
      -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
      -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
 step blobs recur term = do
-  list
   break <- shouldBreak
-  if break then
+  if break then do
+    list
     runCommands (recur term)
   else
     recur term
