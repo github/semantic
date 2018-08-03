@@ -25,6 +25,7 @@ import Semantic.Graph
 import Semantic.IO as IO
 import Semantic.Task hiding (Error)
 import Semantic.Util
+import System.Console.Haskeline
 import System.FilePath
 
 {-
@@ -58,10 +59,10 @@ what's the ghci workflow look like?
 -}
 
 data REPL (m :: * -> *) result where
-  Prompt :: REPL m String
+  Prompt :: REPL m (Maybe String)
   Output :: String -> REPL m ()
 
-prompt :: (Effectful m, Member REPL effects) => m effects String
+prompt :: (Effectful m, Member REPL effects) => m effects (Maybe String)
 prompt = send Prompt
 
 output :: (Effectful m, Member REPL effects) => String -> m effects ()
@@ -76,10 +77,8 @@ instance Effect REPL where
 
 runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => m (REPL ': effects) a -> m effects a
 runREPL = interpret $ \case
-  Prompt -> liftIO $ do
-    putStr "repl: "
-    getLine
-  Output s -> liftIO (putStrLn s)
+  Prompt   -> liftIO (runInputT settings (getInputLine "repl: "))
+  Output s -> liftIO (runInputT settings (outputStrLn s))
 
 rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
 
@@ -135,7 +134,7 @@ step blobs recur term = do
         runCommand run other = output ("unknown command '" <> other <> "'") >> output "use :? for help" >> runCommands run
         runCommands run = do
           str <- prompt
-          runCommand run str
+          maybe (runCommands run) (runCommand run) str
 
 
 newtype REPLEff address rest a = REPLEff
@@ -163,4 +162,12 @@ newtype REPLEff address rest a = REPLEff
                       ': REPL
                       ': rest
                        ) a
+  }
+
+
+settings :: Settings IO
+settings = Settings
+  { complete = noCompletion
+  , historyFile = Just "~/.local/semantic/repl_history"
+  , autoAddHistory = True
   }
