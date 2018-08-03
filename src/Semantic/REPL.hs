@@ -87,7 +87,7 @@ runREPL = interpret $ \case
   Prompt   -> liftIO (runInputT settings (getInputLine (cyan <> "repl: " <> plain)))
   Output s -> liftIO (runInputT settings (outputStrLn s))
 
-rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
+rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
 repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runDistribute . runError @_ @_ @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader config . IO.runFiles . runResolution . runTaskF $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
