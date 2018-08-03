@@ -121,10 +121,18 @@ step blobs recur term = do
           path <- asks modulePath
           span <- ask
           maybe (pure ()) (\ blob -> output (showExcerpt True span blob "")) (Prelude.lookup path blobs)
+        help = do
+          output "Commands available from the prompt:"
+          output ""
+          output "  :help, :?                   display this list of commands"
+          output "  :list                       show the source code around current breakpoint"
+          output "  :step                       single-step after stopping at a breakpoint"
         runCommand run ":step" = run
         runCommand run ":list" = list >> runCommands run
+        runCommand run ":help" = help >> runCommands run
+        runCommand run ":?" = help >> runCommands run
         runCommand run s | all isSpace s = runCommands run
-        runCommand run other = output ("unknown command '" <> other <> "'") >> runCommands run
+        runCommand run other = output ("unknown command '" <> other <> "'") >> output "use :? for help" >> runCommands run
         runCommands run = do
           str <- prompt
           runCommand run str
