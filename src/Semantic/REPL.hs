@@ -4,7 +4,7 @@ module Semantic.REPL
 ( rubyREPL
 ) where
 
-import Control.Abstract hiding (List, string)
+import Control.Abstract hiding (Continue, List, string)
 import Control.Monad.IO.Class
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
@@ -23,6 +23,7 @@ import Data.Project
 import Data.Span
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
+import Numeric (readDec)
 import Parsing.Parser (rubyParser)
 import Prologue hiding (throwError)
 import Semantic.Config (logOptionsFromConfig)
@@ -104,7 +105,9 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
   runEvaluator
     . runREPL
-    . runReader (OnLine 1)
+    . fmap snd
+    . runState ([] @Breakpoint)
+    . runReader Step
     . runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
     . runState lowerBound
     . runFresh 0
@@ -133,9 +136,10 @@ runTelemetryIgnoringStat logOptions = interpret $ \case
 step :: ( Member (Env address) effects
         , Member (Exc SomeException) effects
         , Member REPL effects
-        , Member (Reader Break) effects
         , Member (Reader ModuleInfo) effects
         , Member (Reader Span) effects
+        , Member (Reader Step) effects
+        , Member (State [Breakpoint]) effects
         , Show address
         )
      => [(ModulePath, Blob)]
@@ -165,8 +169,10 @@ step blobs recur term = do
           bindings <- Env.head <$> TermEvaluator getEnv
           output $ intercalate "\n" (uncurry showBinding <$> Env.pairs bindings)
         showBinding name addr = show name <> " = " <> show addr
-        runCommand run [":step"]     = local (const Always) run
-        runCommand run [":continue"] = local (const Never) run
+        runCommand run [":step"]     = local (const Step) run
+        runCommand run [":continue"] = local (const Continue) run
+        runCommand run [":break", s]
+          | [(i, "")] <- readDec s = modify' (OnLine i :) >> runCommands run
         runCommand run [":list"] = list >> runCommands run
         runCommand run [":show", "bindings"] = showBindings >> runCommands run
         runCommand _   [quit] | quit `elem` [":quit", ":q", ":abandon"] = throwError (SomeException Quit)
@@ -179,23 +185,28 @@ step blobs recur term = do
           maybe (runCommands run) (runCommand run . words) str
 
 
-data Break
-  = Always
-  | Never
-  | OnLine Int
+data Breakpoint
+  = OnLine Int
   deriving Show
 
-shouldBreak :: (Member (Reader Break) effects, Member (Reader Span) effects) => TermEvaluator term address value effects Bool
+data Step
+  = Step
+  | Continue
+  deriving Show
+
+shouldBreak :: (Member (State [Breakpoint]) effects, Member (Reader Span) effects, Member (Reader Step) effects) => TermEvaluator term address value effects Bool
 shouldBreak = do
-  break <- ask
-  Span{..} <- ask
-  pure $ case break of
-    Always -> True
-    Never  -> False
-    OnLine n
-      | n >= posLine spanStart
-      , n <= posLine spanEnd   -> True
-      | otherwise              -> False
+  step <- ask
+  case step of
+    Step -> pure True
+    Continue -> do
+      breakpoints <- get
+      span <- ask
+      pure (any @[] (matching span) breakpoints)
+  where matching Span{..} (OnLine n)
+          | n >= posLine spanStart
+          , n <= posLine spanEnd   = True
+          | otherwise              = False
 
 
 settings :: Settings IO
