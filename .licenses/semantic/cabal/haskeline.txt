@@ -4,7 +4,7 @@ name: haskeline
 version: 0.7.4.2
 summary: A command-line interface for user input, written in Haskell.
 homepage: https://github.com/judah/haskeline
-license: other
+license: bsd-2-clause
 ---
 Copyright 2007-2009, Judah Jacobson.
 All Rights Reserved.
