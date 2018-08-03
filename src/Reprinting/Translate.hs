@@ -17,8 +17,9 @@ import           Control.Monad.Effect.Exception (Exc)
 import qualified Control.Monad.Effect.Exception as Exc
 import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Writer
+import           Data.Sequence (singleton)
 import           Data.String
-import Data.Sequence (singleton)
+import           Lens.Micro
 
 import           Data.Language
 import           Data.Reprinting.Token
@@ -97,67 +98,61 @@ translating prox =
 -- Private interfaces
 
 data JSONState = JSONState
-  { contexts    :: [Context]
-  , needsLayout :: Bool
-  }
-  deriving (Eq, Show)
+  { _contexts    :: [Context]
+  , _needsLayout :: Bool
+  } deriving (Eq, Show)
+
+needsLayout :: Lens' JSONState Bool
+needsLayout = lens _needsLayout (\s l -> s { _needsLayout = l})
+
+contexts :: Lens' JSONState [Context]
+contexts = lens _contexts (\s cs -> s { _contexts = cs })
+
+current :: JSONState -> Maybe Context
+current s = s ^? contexts._head
 
 instance Lower JSONState where
   lowerBound = JSONState [] False
 
--- A class for pushing and popping contexts. This may or may not be useful
--- when we implement 'Concrete' for languages other than JSON.
-class ContextStack state where
-  push    :: Context -> state -> state
-  pop     :: state -> state
-  current :: state -> Maybe Context
-
-instance ContextStack JSONState where
-  push c s = s { contexts = c : contexts s }
-
-  pop s = s { contexts = drop 1 (contexts s)}
-
-  current = listToMaybe . contexts
-
 instance Translate 'JSON where
   type Stack 'JSON = JSONState
+
   onControl t st = case t of
-    Change PrettyPrinting -> pure (st { needsLayout = True })
-    Change Reprinting     -> pure (st { needsLayout = False })
     Log _ -> pure st
-    Enter c -> pure (push c st)
-    Exit c  -> do
-      let curr = current st
+    Change PrettyPrinting -> pure (set needsLayout True st)
+    Change Reprinting     -> pure (set needsLayout False st)
+    Enter c -> pure (over contexts (c:) st)
+    Exit c  -> let curr = current st in
       if curr /= Just c
-        then throwError (InvalidContext curr c (contexts st))
-        else pure (pop st)
+        then throwError (InvalidContext curr c (st ^. contexts))
+        else pure (over contexts tail st)
 
-  onElement c st = do
-
+  onElement c st = let curr = current st in
     case c of
       Fragment f -> pure . splice $ f
       Truth t    -> pure . splice $ if t then "true" else "false"
       Nullity    -> pure . splice $ "null"
-      Open -> case current st of
+      Open -> case curr of
         Just List        -> pure . splice $ "["
         Just Associative -> pure . splice $ "["
         x                -> throwError (Unexpected (show (Open, x)))
-      Close -> case current st of
+      Close -> case curr of
         Just List        -> pure . splice $ "]"
         Just Associative -> pure . splice $ "}"
         x                -> throwError (Unexpected (show (Close, x)))
       Separator  -> do
-        let should = needsLayout st
+        let should = st ^. needsLayout
+        let curr = current st
 
         let i = Directive $
-              case (current st, should) of
+              case (curr, should) of
                 (_, False)            -> Don't
                 (Just List, _)        -> Soft
                 (Just Associative, _) -> Hard 4 Space
                 (Just Pair, _)        -> Soft
                 _                     -> Don't
 
-        case current st of
+        case curr of
           Just List        -> pure [",", i]
           Just Associative -> pure [",", i]
           Just Pair        -> pure [":", i]
