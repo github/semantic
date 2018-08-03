@@ -182,7 +182,6 @@ newtype REPLEff address rest a = REPLEff
                       ': Resumable (LoadError address)
                       ': Fresh
                       ': State (Heap address Latest (Value address (REPLEff address rest)))
-                      ': REPL
                       ': rest
                        ) a
   }
