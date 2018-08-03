@@ -32,7 +32,7 @@ import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (weaken)
 import           Refactoring.Core
-import           Reprinting.Algebraic
+import           Reprinting.Tokenize
 import           Reprinting.Translate
 import           Semantic.Config
 import           Semantic.Graph
@@ -125,7 +125,7 @@ increaseNumbers p = case Sum.project (termOut p) of
   Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
   Nothing                -> Term (fmap increaseNumbers (unTerm p))
 
-testReprinter = do
+testTokenizer = do
   let path = "test/fixtures/javascript/reprinting/map.json"
 
   (src, tree) <- do
@@ -134,10 +134,10 @@ testReprinter = do
     pure (src, tree)
 
   let tagged = ensureAccurateHistory (increaseNumbers (mark Pristine tree))
-  let toks = reprint src tagged
+  let toks = tokenizing src tagged
   pure (toks, tagged)
 
-testTranslation = translating (Proxy @'Language.JSON) . fst <$> testReprinter
+testTranslator = translating (Proxy @'Language.JSON) . fst <$> testTokenizer
 
 
 -- Evaluate a project consisting of the listed paths.

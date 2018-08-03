@@ -1,29 +1,24 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 
--- TODO: rename this to Reprinting.Tokenize?
-module Reprinting.Algebraic
+module Reprinting.Tokenize
   ( module Data.Reprinting.Token
   , History (..)
   , mark
   , remark
-  -- * Token types
-  , Element (..)
-  , Control (..)
-  , Context (..)
     -- * The Reprinter monad
-  , Reprinter
+  , Tokenizer
   , yield
   , control
   , within
-  , log'
-  -- * Reprintable interface
-  , Reprintable (..)
+  , log
+  , ignore
+  -- * Tokenize interface
+  , Tokenize (..)
   -- * Invocation/results
-  , reprint
-  , Token (..)
+  , tokenizing
   ) where
 
-import Prelude hiding (fail)
+import Prelude hiding (fail, log)
 import Prologue hiding (Element)
 
 import Control.Monad
@@ -41,62 +36,67 @@ import Data.Source
 import Data.Term
 import Data.Reprinting.Token
 
--- | The 'Reprinter' monad represents a context in which 'Control'
+-- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
--- consumer. Its primary interface is through the 'Reprintable'
+-- consumer. Its primary interface is through the 'Tokenize'
 -- typeclass.
-type Reprinter = Eff '[Reader RPContext, State RPState, Writer (Seq Token)]
+type Tokenizer = Eff '[Reader RPContext, State RPState, Writer (Seq Token)]
 
--- | Yield an 'Element' token in a 'Reprinter' context.
-yield :: Element -> Reprinter ()
+-- | Yield an 'Element' token in a 'Tokenizer' context.
+yield :: Element -> Tokenizer ()
 yield = tell . singleton . TElement
 
--- | Yield a 'Control' token in a 'Reprinter' context.
-control :: Control -> Reprinter ()
+-- | Yield a 'Control' token in a 'Tokenizer' context.
+control :: Control -> Tokenizer ()
 control = tell . singleton . TControl
 
 -- | Emit a log message to the token stream. Useful for debugging.
-log' :: String -> Reprinter ()
-log' = control . Log
+log :: String -> Tokenizer ()
+log = control . Log
 
 -- | Emit an Enter for the given context, then run the provided
 -- action, then emit a corresponding Exit.
-within :: Context -> Reprinter () -> Reprinter ()
+within :: Context -> Tokenizer () -> Tokenizer ()
 within c r = control (Enter c) *> r <* control (Exit c)
 
--- | An instance of the 'Reprintable' typeclass describes how
+-- | Shortcut for @const (pure ())@, useful for when no action
+-- should be taken.
+ignore :: a -> Tokenizer ()
+ignore = const (pure ())
+
+-- | An instance of the 'Tokenize' typeclass describes how
 -- to emit tokens based on the 'History' value of the supplied
 -- constructor in its AST context.
-class (Show1 constr, Traversable constr) => Reprintable constr where
+class (Show1 constr, Traversable constr) => Tokenize constr where
   -- | Corresponds to 'Generated'. Should emit control and data tokens.
-  whenGenerated :: FAlgebra constr (Reprinter ())
+  whenGenerated :: FAlgebra constr (Tokenizer ())
 
   -- | Corresponds to 'Refactored'. Should emit control and data tokens.
   -- You can often defined this as 'whenGenerated'.
-  whenRefactored :: FAlgebra constr (Reprinter ())
+  whenRefactored :: FAlgebra constr (Tokenizer ())
 
   -- | Corresponds to 'Modified'. Should emit control tokens only.
   -- Defaults to 'sequenceA_', which is a suitable definition for
   -- nodes with no children.
-  whenModified :: FAlgebra constr (Reprinter ())
+  whenModified :: FAlgebra constr (Tokenizer ())
   whenModified = sequenceA_
 
 -- | Sums of reprintable terms are reprintable.
-instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Reprintable fs) => Reprintable (Sum fs) where
-  whenGenerated = apply @Reprintable whenGenerated
-  whenRefactored = apply @Reprintable whenRefactored
-  whenModified = apply @Reprintable whenModified
+instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Tokenize fs) => Tokenize (Sum fs) where
+  whenGenerated = apply @Tokenize whenGenerated
+  whenRefactored = apply @Tokenize whenRefactored
+  whenModified = apply @Tokenize whenModified
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
-instance (HasField fields History, Show (Record fields), Reprintable a) => Reprintable (TermF a (Record fields)) where
+instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize (TermF a (Record fields)) where
   whenGenerated t = into t (whenGenerated (termFOut t))
   whenRefactored t = into t (whenRefactored (termFOut t))
   whenModified t = into t (whenModified (termFOut t))
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
-reprint :: (Show (Record fields), Reprintable a, HasField fields History) => Source -> Term a (Record fields) -> Seq Token
-reprint s t = let h = getField (termAnnotation t) in
+tokenizing :: (Show (Record fields), Tokenize a, HasField fields History) => Source -> Term a (Record fields) -> Seq Token
+tokenizing s t = let h = getField (termAnnotation t) in
   run
   . fmap fst
   . runWriter
@@ -126,30 +126,30 @@ data RPContext = RPContext
 history :: Lens' RPContext History
 history = lens _history (\c h -> c { _history = h })
 
-chunk :: Source -> Reprinter ()
+chunk :: Source -> Tokenizer ()
 chunk = tell . singleton . Chunk
 
-finish :: Reprinter ()
+finish :: Tokenizer ()
 finish = do
   crs <- gets _cursor
   src <- asks _source
   chunk (dropSource crs src)
 
-into :: (Annotated t (Record fields), HasField fields History) => t -> Reprinter a -> Reprinter a
+into :: (Annotated t (Record fields), HasField fields History) => t -> Tokenizer a -> Tokenizer a
 into x = local (set history (getField (annotation x)))
 
-strategize :: Strategy -> Reprinter ()
+strategize :: Strategy -> Tokenizer ()
 strategize new = do
   strat <- gets _strategy
   when (strat /= new) $ do
     control (Change new)
     modify' (set strategy new)
 
--- | A subterm algebra that implements the /Scrap Your Reprinter/
+-- | A subterm algebra that implements the /Scrap Your Tokenizer/
 -- algorithm.  Whereas /SYR/ uses a zipper to do a top-down
 -- depth-first rightward traversal of a tree, we use a subterm algebra
 -- over a monad, which performs the same task.
-descend :: (Reprintable constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Reprinter ())
+descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
 descend t = do
   let into' s = into (subterm s) (subtermRef s)
   h <- asks _history

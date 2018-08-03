@@ -18,7 +18,7 @@ import GHC.TypeLits
 import Diffing.Algorithm hiding (Empty)
 import Prelude
 import Prologue
-import Reprinting.Algebraic hiding (Context, Element)
+import Reprinting.Tokenize hiding (Context, Element)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
@@ -208,8 +208,9 @@ instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
 
-instance Reprintable Error where
-  whenGenerated _ = pure ()
+instance Tokenize Error where
+  whenGenerated = ignore
+  whenRefactored = ignore
 
 instance Named String where
   nameOf _ = "string"

@@ -153,7 +153,7 @@ library
                      , Rendering.Renderer
                      , Rendering.Symbol
                      , Rendering.TOC
-                     , Reprinting.Algebraic
+                     , Reprinting.Tokenize
                      , Reprinting.Translate
                      , Reprinting.Typeset
                      , Reprinting.Pipeline
