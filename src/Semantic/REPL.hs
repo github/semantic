@@ -104,7 +104,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
   runEvaluator
     . runREPL
-    . runReader Always
+    . runReader (OnLine 1)
     . runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
     . runState lowerBound
     . runFresh 0
@@ -165,7 +165,7 @@ step blobs recur term = do
           bindings <- Env.head <$> TermEvaluator getEnv
           output $ intercalate "\n" (uncurry showBinding <$> Env.pairs bindings)
         showBinding name addr = show name <> " = " <> show addr
-        runCommand run [":step"] = run
+        runCommand run [":step"]     = local (const Always) run
         runCommand run [":continue"] = local (const Never) run
         runCommand run [":list"] = list >> runCommands run
         runCommand run [":show", "bindings"] = showBindings >> runCommands run
