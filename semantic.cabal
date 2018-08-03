@@ -199,6 +199,7 @@ library
                      , gitrev
                      , Glob
                      , hashable
+                     , haskeline
                      , hscolour
                      , http-client
                      , http-client-tls
