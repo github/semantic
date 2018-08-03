@@ -52,6 +52,7 @@ import System.FilePath
 - control
   - step
   - step within a file
+  - continuing until the next breakpoint
   - other variants?
 
 - breakpoints
