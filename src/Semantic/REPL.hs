@@ -82,7 +82,7 @@ runREPL = interpret $ \case
 
 rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
 
-repl proxy parser paths = runTaskWithOptions debugOptions $ do
+repl proxy parser paths = withOptions debugOptions $ \ config logger statter -> runTaskWithConfig config logger statter $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
