@@ -171,7 +171,7 @@ step blobs recur term = do
           maybe (runCommands run) (runCommand run . words) str
 
 
-data Breakpoint
+newtype Breakpoint
   = OnLine Int
   deriving Show
 
