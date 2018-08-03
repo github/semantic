@@ -18,7 +18,7 @@ import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
-import Data.List (intercalate, uncons, words)
+import Data.List (uncons)
 import Data.Project
 import Data.Span
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
@@ -149,7 +149,7 @@ step blobs recur term = do
           output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
         showBindings = do
           bindings <- Env.head <$> TermEvaluator getEnv
-          output $ intercalate "\n" (uncurry showBinding <$> Env.pairs bindings)
+          output $ unlines (uncurry showBinding <$> Env.pairs bindings)
         showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"]     = local (const Step) run
         runCommand run [":continue"] = local (const Continue) run
@@ -165,7 +165,7 @@ step blobs recur term = do
         runCommand run [":help"] = help >> runCommands run
         runCommand run [":?"] = help >> runCommands run
         runCommand run [] = runCommands run
-        runCommand run other = output ("unknown command '" <> intercalate " " other <> "'") >> output "use :? for help" >> runCommands run
+        runCommand run other = output ("unknown command '" <> unwords other <> "'") >> output "use :? for help" >> runCommands run
         runCommands run = do
           str <- prompt
           maybe (runCommands run) (runCommand run . words) str
