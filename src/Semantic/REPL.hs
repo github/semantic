@@ -103,6 +103,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
   runEvaluator
     . runREPL
+    . runReader Always
     . runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
     . runState lowerBound
     . runFresh 0
@@ -169,6 +170,12 @@ step blobs recur term = do
         runCommands run = do
           str <- prompt
           maybe (runCommands run) (runCommand run . words) str
+
+
+data Break
+  = Always
+  | Never
+  deriving Show
 
 
 settings :: Settings IO
