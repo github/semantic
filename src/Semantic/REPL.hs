@@ -36,6 +36,7 @@ import Semantic.Telemetry
 import Semantic.Telemetry.Log (LogOptions, Message(..), writeLogMessage)
 import Semantic.Util
 import System.Console.Haskeline
+import qualified System.Environment as System
 import System.FilePath
 
 {-
@@ -92,10 +93,10 @@ instance Effect REPL where
   handleState state handler (Request (Output s) k) = Request (Output s) (handler . (<$ state) . k)
 
 
-runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => m (REPL ': effects) a -> m effects a
-runREPL = interpret $ \case
-  Prompt   -> liftIO (runInputT settings (getInputLine (cyan <> "repl: " <> plain)))
-  Output s -> liftIO (runInputT settings (outputStrLn s))
+runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => Prefs -> Settings IO -> m (REPL ': effects) a -> m effects a
+runREPL prefs settings = interpret $ \case
+  Prompt   -> liftIO (runInputTWithPrefs prefs settings (getInputLine (cyan <> "repl: " <> plain)))
+  Output s -> liftIO (runInputTWithPrefs prefs settings (outputStrLn s))
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
@@ -103,8 +104,15 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
   blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
+  homeDir <- liftIO (System.getEnv "HOME")
+  prefs <- liftIO (readPrefs (homeDir <> "/.haskeline"))
+  let settings = Settings
+        { complete = noCompletion
+        , historyFile = Just (homeDir <> "/.local/semantic/repl_history")
+        , autoAddHistory = True
+        }
   runEvaluator
-    . runREPL
+    . runREPL prefs settings
     . fmap snd
     . runState ([] @Breakpoint)
     . runReader Step
@@ -208,13 +216,6 @@ shouldBreak = do
           , n <= posLine spanEnd   = True
           | otherwise              = False
 
-
-settings :: Settings IO
-settings = Settings
-  { complete = noCompletion
-  , historyFile = Just "~/.local/semantic/repl_history"
-  , autoAddHistory = True
-  }
 
 cyan :: String
 cyan = "\ESC[1;36m\STX"
