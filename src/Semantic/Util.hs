@@ -41,9 +41,9 @@ import           Text.Show.Pretty (ppShow)
 
 justEvaluating
   = runM
+  . runPrintingTrace
   . runState lowerBound
   . runFresh 0
-  . runPrintingTrace
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -72,9 +72,9 @@ newtype UtilEff address a = UtilEff
                        , Resumable (EnvironmentError address)
                        , Resumable (Unspecialized (Value address (UtilEff address)))
                        , Resumable (LoadError address)
-                       , Trace
                        , Fresh
                        , State (Heap address Latest (Value address (UtilEff address)))
+                       , Trace
                        , Lift IO
                        ] a
   }
