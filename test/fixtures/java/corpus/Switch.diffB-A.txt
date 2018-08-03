@@ -1,0 +1,110 @@
+(Statements
+  (Class
+    (AccessibilityModifier)
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (AccessibilityModifier)
+        (AccessibilityModifier)
+        (Empty)
+        (Identifier)
+        (Annotation
+          (Identifier)
+          (Array
+            (Empty)
+            (Identifier)))
+        (Statements
+          (Statements
+            (Assignment
+              (Variable
+                (Int)
+                (Identifier))
+              (Integer)))
+          (Statements
+          {+(Variable
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {-(Assignment
+            {-(Variable
+              {-(Int)-}
+              {-(Identifier)-})-}
+            {-(Integer)-})-})
+          (Match
+            (Identifier)
+            (Statements
+              (Pattern
+                (Integer)
+                (Statements
+                  (Assignment
+                  { (Identifier)
+                  ->(Identifier) }
+                  { (Integer)
+                  ->(TextElement) })
+                  (Break
+                    (Empty))))
+            {+(Pattern
+              {+(Integer)+}
+              {+(Statements
+                {+(Assignment
+                  {+(Identifier)+}
+                  {+(TextElement)+})+}
+                {+(Break
+                  {+(Empty)+})+})+})+}
+              (Pattern
+              { (Empty)
+              ->(Integer) }
+                (Statements
+                  (Assignment
+                  { (Identifier)
+                  ->(Identifier) }
+                  { (Integer)
+                  ->(TextElement) })
+                  (Break
+                    (Empty))))
+            {+(Pattern
+              {+(Integer)+}
+              {+(Statements
+                {+(Assignment
+                  {+(Identifier)+}
+                  {+(TextElement)+})+}
+                {+(Break
+                  {+(Empty)+})+})+})+}
+            {+(Pattern
+              {+(Integer)+}
+              {+(Statements
+                {+(Assignment
+                  {+(Identifier)+}
+                  {+(TextElement)+})+}
+                {+(Break
+                  {+(Empty)+})+})+})+}
+            {+(Pattern
+              {+(Integer)+}
+              {+(Statements
+                {+(Assignment
+                  {+(Identifier)+}
+                  {+(TextElement)+})+}
+                {+(Break
+                  {+(Empty)+})+})+})+}
+            {+(Pattern
+              {+(Integer)+}
+              {+(Statements
+                {+(Assignment
+                  {+(Identifier)+}
+                  {+(TextElement)+})+}
+                {+(Break
+                  {+(Empty)+})+})+})+}
+            {+(Pattern
+              {+(Empty)+}
+              {+(Statements
+                {+(Assignment
+                  {+(Identifier)+}
+                  {+(TextElement)+})+}
+                {+(Break
+                  {+(Empty)+})+})+})+}))
+          (Call
+            (MemberAccess
+              (MemberAccess
+                (Identifier)))
+            (Identifier)
+            (Empty)))))))

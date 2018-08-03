@@ -1,0 +1,20 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Int)
+        (Empty)
+        (Identifier)
+        (Annotation
+          (Identifier)
+          (Identifier))
+        (Annotation
+          (Identifier)
+          (Identifier))
+        (Statements
+          (Call
+            (MemberAccess
+              (Identifier))
+            (Identifier)
+            (Empty)))))))

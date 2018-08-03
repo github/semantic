@@ -30,4 +30,4 @@ spec config = parallel $ do
   where
     fixtures = "test/fixtures/go/analysis/"
     evaluate = evalGoProject . map (fixtures <>)
-    evalGoProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Go) goParser Language.Go
+    evalGoProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Go) goParser

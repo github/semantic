@@ -1,0 +1,51 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (AccessibilityModifier)
+        (AccessibilityModifier)
+        (Empty)
+        (Identifier)
+        (Annotation
+          (Identifier)
+          (Array
+            (Empty)
+            (Identifier)))
+        (Statements
+        {+(Statements
+          {+(Assignment
+            {+(Variable
+              {+(Int)+}
+              {+(Identifier)+})+}
+            {+(Integer)+})+})+}
+          (DoWhile
+          { (Not
+            {-(Call
+              {-(MemberAccess
+                {-(TextElement)-})-}
+              {-(Identifier)-}
+              {-(Empty)-})-})
+          ->(LessThanEqual
+            {+(Identifier)+}
+            {+(Integer)+}) }
+            (Statements
+              (Call
+              { (MemberAccess
+                {-(MemberAccess
+                  {-(Identifier)-})-})
+              ->(MemberAccess
+                {+(MemberAccess
+                  {+(Identifier)+})+}) }
+              {+(Identifier)+}
+              {-(TextElement)-}
+                (Empty))
+            {+(PostIncrement
+              {+(Identifier)+})+}
+            {-(Assignment
+              {-(Identifier)-}
+              {-(Call
+                {-(MemberAccess
+                  {-(Identifier)-})-}
+                {-(Empty)-})-})-})))))))
