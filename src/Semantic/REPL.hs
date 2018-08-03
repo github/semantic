@@ -12,6 +12,7 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
+import Data.Char (isSpace)
 import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.Graph (topologicalSort)
@@ -122,6 +123,7 @@ step blobs recur term = do
           maybe (pure ()) (\ blob -> output (showExcerpt True span blob "")) (Prelude.lookup path blobs)
         runCommand run ":step" = run
         runCommand run ":list" = list >> runCommands run
+        runCommand run s | all isSpace s = runCommands run
         runCommand run other = output ("unknown command '" <> other <> "'") >> runCommands run
         runCommands run = do
           str <- prompt
