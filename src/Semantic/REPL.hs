@@ -21,9 +21,12 @@ import Data.List (uncons)
 import Data.Project
 import Parsing.Parser (rubyParser)
 import Prologue
+import Semantic.Distribute
 import Semantic.Graph
 import Semantic.IO as IO
+import Semantic.Resolution
 import Semantic.Task hiding (Error)
+import Semantic.Telemetry
 import Semantic.Util
 import System.Console.Haskeline
 import System.FilePath
@@ -82,7 +85,7 @@ runREPL = interpret $ \case
 
 rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
 
-repl proxy parser paths = runTaskWithOptions debugOptions $ do
+repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runDistribute . runError @_ @_ @SomeException . ignoreTelemetry . runTraceInTelemetry . runReader config . IO.runFiles . runResolution . runTaskF $ do
   blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
