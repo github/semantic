@@ -132,6 +132,7 @@ runTelemetryIgnoringStat logOptions = interpret $ \case
 step :: ( Member (Env address) effects
         , Member (Exc SomeException) effects
         , Member REPL effects
+        , Member (Reader Break) effects
         , Member (Reader ModuleInfo) effects
         , Member (Reader Span) effects
         , Show address
@@ -141,8 +142,11 @@ step :: ( Member (Env address) effects
      -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
 step blobs recur term = do
   list
-  res <- runCommands (recur term)
-  pure res
+  break <- shouldBreak
+  if break then
+    runCommands (recur term)
+  else
+    recur term
   where list = do
           path <- asks modulePath
           span <- ask
@@ -176,6 +180,13 @@ data Break
   = Always
   | Never
   deriving Show
+
+shouldBreak :: Member (Reader Break) effects => TermEvaluator term address value effects Bool
+shouldBreak = do
+  break <- ask
+  pure $ case break of
+    Always -> True
+    Never  -> False
 
 
 settings :: Settings IO
