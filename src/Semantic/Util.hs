@@ -53,30 +53,29 @@ justEvaluating
   . runAddressError
   . runValueError
 
-newtype UtilEff address a = UtilEff
-  { runUtilEff :: Eff '[ Function address (Value address (UtilEff address))
-                       , Exc (LoopControl address)
-                       , Exc (Return address)
-                       , Env address
-                       , Deref address (Value address (UtilEff address))
-                       , Allocator address (Value address (UtilEff address))
-                       , Reader ModuleInfo
-                       , Modules address
-                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                       , Reader Span
-                       , Reader PackageInfo
-                       , Resumable (ValueError address (UtilEff address))
-                       , Resumable (AddressError address (Value address (UtilEff address)))
-                       , Resumable ResolutionError
-                       , Resumable EvalError
-                       , Resumable (EnvironmentError address)
-                       , Resumable (Unspecialized (Value address (UtilEff address)))
-                       , Resumable (LoadError address)
-                       , Fresh
-                       , State (Heap address Latest (Value address (UtilEff address)))
-                       , Trace
-                       , Lift IO
-                       ] a
+newtype UtilEff address rest a = UtilEff
+  { runUtilEff :: Eff (  Function address (Value address (UtilEff address rest))
+                      ': Exc (LoopControl address)
+                      ': Exc (Return address)
+                      ': Env address
+                      ': Deref address (Value address (UtilEff address rest))
+                      ': Allocator address (Value address (UtilEff address rest))
+                      ': Reader ModuleInfo
+                      ': Modules address
+                      ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+                      ': Reader Span
+                      ': Reader PackageInfo
+                      ': Resumable (ValueError address (UtilEff address rest))
+                      ': Resumable (AddressError address (Value address (UtilEff address rest)))
+                      ': Resumable ResolutionError
+                      ': Resumable EvalError
+                      ': Resumable (EnvironmentError address)
+                      ': Resumable (Unspecialized (Value address (UtilEff address rest)))
+                      ': Resumable (LoadError address)
+                      ': Fresh
+                      ': State (Heap address Latest (Value address (UtilEff address rest)))
+                      ': rest
+                      ) a
   }
 
 checking
@@ -125,7 +124,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
+  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))

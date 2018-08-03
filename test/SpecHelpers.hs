@@ -96,18 +96,19 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
-                              , Resumable (AddressError Precise Val)
-                              , Resumable ResolutionError
-                              , Resumable EvalError
-                              , Resumable (EnvironmentError Precise)
-                              , Resumable (Unspecialized Val)
-                              , Resumable (LoadError Precise)
-                              , Trace
-                              , Fresh
-                              , State (Heap Precise Latest Val)
-                              , Lift IO
-                              ]
+type TestEvaluatingEffects rest
+  = '[ Resumable (ValueError Precise (UtilEff Precise '[Trace, Lift IO]))
+     , Resumable (AddressError Precise Val)
+     , Resumable ResolutionError
+     , Resumable EvalError
+     , Resumable (EnvironmentError Precise)
+     , Resumable (Unspecialized Val)
+     , Resumable (LoadError Precise)
+     , Fresh
+     , State (Heap Precise Latest Val)
+     , Trace
+     , Lift IO
+     ]
 type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
                              , AddressError Precise Val
                              , ResolutionError
@@ -126,10 +127,9 @@ testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonE
                  )
 testEvaluating
   = runM
-  . fmap (\ (heap, (traces, res)) -> (traces, (heap, res)))
+  . runReturningTrace
   . runState lowerBound
   . runFresh 0
-  . runReturningTrace
   . fmap reassociate
   . runLoadError
   . runUnspecialized
