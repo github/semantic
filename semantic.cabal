@@ -155,6 +155,7 @@ library
                      , Rendering.TOC
                      , Reprinting.Algebraic
                      , Reprinting.Translate
+                     , Reprinting.Typeset
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.AST

@@ -49,7 +49,6 @@ spec = describe "reprinting" $ do
 
     it "should be able to parse the output of a refactor" $ do
       let tagged = increaseNumbers (mark Modified tree)
-      print tagged
       let (Right printed) = runReprinter (Proxy @'Language.JSON) src tagged
       tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
       length tree `shouldSatisfy` (/= 0)

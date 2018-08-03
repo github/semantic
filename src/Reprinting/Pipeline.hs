@@ -58,11 +58,10 @@ stages of the pipeline follows:
   │               │  themselves out on the page      │                    │
   │               │  with appropriate indentation.   │                    │
   ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │  Typesetting  │ A stack machine informing the    │  Language─agnostic │
-  │(unimplemented)│ prettyprinting library how to    │                    │
+  │  Typeset      │ A simple function informing the  │  Language─agnostic │
+  │               │ prettyprinting library how to    │                    │
   │               │ render laid─out tokens into an   │                    │
   │               │ aesthetically pleasing document. │                    │
-  │               │                                  │                    │
   └───────────────┴──────────────────────────────────┴────────────────────┘
 @
 
@@ -77,6 +76,7 @@ import Data.Text.Prettyprint.Doc.Render.Text
 
 import Reprinting.Algebraic
 import Reprinting.Translate
+import Reprinting.Typeset
 import Data.Record
 import Data.Term
 import Data.Source
@@ -90,4 +90,4 @@ runReprinter :: (Show (Record fields), Reprintable a, HasField fields History, T
              -> Term a (Record fields)
              -> Either TranslationException Source
 runReprinter prox s = fmap go . translating prox . reprint s
-  where go = fromText . renderStrict . layoutPretty defaultLayoutOptions
+  where go = fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset

@@ -1,10 +1,12 @@
-{-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving,
-             KindSignatures, LambdaCase, ScopedTypeVariables,
-             TupleSections, TypeFamilyDependencies, TypeOperators #-}
+{-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, OverloadedLists,
+             ScopedTypeVariables, TupleSections, TypeFamilyDependencies, TypeOperators #-}
 
 module Reprinting.Translate
   ( Translate (..)
   , TranslationException (..)
+  , Splice (..)
+  , Layout (..)
+  , Indent (..)
   , translating
   ) where
 
@@ -15,18 +17,19 @@ import           Control.Monad.Effect.Exception (Exc)
 import qualified Control.Monad.Effect.Exception as Exc
 import           Control.Monad.Effect.State
 import           Control.Monad.Effect.Writer
-import           Data.Text.Prettyprint.Doc
+import           Data.String
+import Data.Sequence (singleton)
 
 import           Data.Language
-import qualified Data.Source as Source
 import           Data.Reprinting.Token
+import qualified Data.Source as Source
 
 -- | Once the 'Reprintable' algebra has yielded a sequence of tokens,
 -- we need to apply per-language interpretation to each token so as to
--- yield language-specific chunks of source code. The 'Translate'
+-- yield language-specific 'Splice's of source code. The 'Translate'
 -- typeclass describes a stack machine capable of translating a given
 -- a stream of 'Tokens', based on the concrete syntax of the specified
--- language.
+-- language, into concrete-syntax 'Splice's.
 --
 -- Some possible issues we should tackle before finalizing this design:
 --
@@ -39,10 +42,32 @@ class Translate (lang :: Language) where
 
   -- | Each 'Element' data token should emit a chunk of source code,
   -- taking into account (but not changing) the state of the stack.
-  onElement :: Element -> Stack lang -> Either TranslationException (Doc a)
+  onElement :: Element -> Stack lang -> Either TranslationException (Seq Splice)
 
   -- | Each 'Control' token can (but doesn't have to) change the state of the stack.
   onControl :: Control -> Stack lang -> Either TranslationException (Stack lang)
+
+-- | Indentation types. This will eventually be moved into the rules engine.
+data Indent = Space | Tab deriving (Eq, Show)
+
+-- | Indentation/spacing directives.
+data Layout
+  = Hard Int Indent
+  | Soft
+  | Don't
+    deriving (Eq, Show)
+
+-- | The simplest possible representation of concrete syntax: either
+-- it's a run of literal text or information about whitespace.
+data Splice
+  = Insert Text
+  | Directive Layout
+    deriving (Eq, Show)
+
+splice :: Text -> Seq Splice
+splice = singleton . Insert
+
+instance IsString Splice where fromString = Insert . fromString
 
 -- | Represents failure occurring in a 'Concrete' machine.
 data TranslationException
@@ -59,7 +84,7 @@ data TranslationException
 translating :: (Translate lang, Lower (Stack lang))
             => Proxy lang
             -> Seq Token
-            -> Either TranslationException (Doc a)
+            -> Either TranslationException (Seq Splice)
 translating prox =
   run
   . Exc.runError
@@ -94,22 +119,6 @@ instance ContextStack JSONState where
 
   current = listToMaybe . contexts
 
-data Indent = Space | Tab
-
-instance Pretty Indent where
-  pretty Space = " "
-  pretty Tab   = "\t"
-
-data Layout
-  = Hard Int Indent
-  | Soft
-  | Don't
-
-instance Pretty Layout where
-  pretty (Hard times how) = line <> stimes times (pretty how)
-  pretty Soft             = softline
-  pretty Don't            = mempty
-
 instance Translate 'JSON where
   type Stack 'JSON = JSONState
   onControl t st = case t of
@@ -126,45 +135,47 @@ instance Translate 'JSON where
   onElement c st = do
 
     case c of
-      Fragment f -> pure (pretty f)
-      Truth t    -> pure (if t then "true" else "false")
-      Nullity    -> pure "null"
+      Fragment f -> pure . splice $ f
+      Truth t    -> pure . splice $ if t then "true" else "false"
+      Nullity    -> pure . splice $ "null"
       Open -> case current st of
-        Just List        -> pure "["
-        Just Associative -> pure "["
+        Just List        -> pure . splice $ "["
+        Just Associative -> pure . splice $ "["
         x                -> throwError (Unexpected (show (Open, x)))
       Close -> case current st of
-        Just List        -> pure "]"
-        Just Associative -> pure "}"
+        Just List        -> pure . splice $ "]"
+        Just Associative -> pure . splice $ "}"
         x                -> throwError (Unexpected (show (Close, x)))
       Separator  -> do
         let should = needsLayout st
 
-        let i = pretty $
+        let i = Directive $
               case (current st, should) of
                 (_, False)            -> Don't
                 (Just List, _)        -> Soft
                 (Just Associative, _) -> Hard 4 Space
+                (Just Pair, _)        -> Soft
                 _                     -> Don't
+
         case current st of
-          Just List        -> pure ("," <> i)
-          Just Associative -> pure ("," <> i)
-          Just Pair        -> pure ":"
+          Just List        -> pure [",", i]
+          Just Associative -> pure [",", i]
+          Just Pair        -> pure [":", i]
           Nothing          -> pure mempty
           ctx              -> throwError (Unexpected (show ctx))
 
 -- Distribute 'onControl' and 'onElement' over 'Token', using the
 -- obvious case to handle 'Chunk' tokens.
-step :: Translate lang => Token -> Stack lang -> Either TranslationException (Doc a, Stack lang)
+step :: Translate lang => Token -> Stack lang -> Either TranslationException (Seq Splice, Stack lang)
 step t st = case t of
-  Chunk src   -> pure (pretty . Source.toText $ src, st)
-  TElement el -> onElement el st >>= \doc -> pure (doc, st)
+  Chunk src   -> pure (splice . Source.toText $ src, st)
+  TElement el -> onElement el st >>= \s -> pure (s, st)
   TControl ct -> (mempty, ) <$> onControl ct st
 
 -- Kludgy hack to convert 'step' into an effect.
-stepM :: forall lang a . Translate lang => Proxy lang -> Token -> Eff '[Writer (Doc a), State (Stack lang), Exc TranslationException] ()
+stepM :: forall lang . Translate lang => Proxy lang -> Token -> Eff '[Writer (Seq Splice), State (Stack lang), Exc TranslationException] ()
 stepM _ t = do
   st <- get @(Stack lang)
   case step t st of
-    Left exc                 -> Exc.throwError exc
-    Right (doc :: Doc a, st) -> tell doc *> put st
+    Left exc                    -> Exc.throwError exc
+    Right (s :: Seq Splice, st) -> tell s *> put st

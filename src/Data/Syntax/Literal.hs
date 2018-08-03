@@ -157,8 +157,8 @@ instance Evaluatable Null where eval _ = rvalBox null
 
 instance Reprintable Null where
   whenGenerated _ = yield Nullity
-  whenRefactored  = pure ()
-  whenModified    = pure ()
+  whenRefactored _ = pure ()
+  whenModified   _ = pure ()
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
