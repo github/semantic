@@ -1,11 +1,10 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE TypeOperators #-}
 module Semantic.Distribute
 ( distribute
 , distributeFor
 , distributeFoldMap
 , Distribute
 , runDistribute
-, runDistributeWithHandler
 ) where
 
 import qualified Control.Concurrent.Async as Async
@@ -44,12 +43,3 @@ instance Effect Distribute where
 -- | Evaluate a 'Distribute' effect concurrently.
 runDistribute :: Eff '[Distribute, Lift IO] a -> Eff '[Lift IO] a
 runDistribute = interpret (\ (Distribute task) -> liftIO (Async.runConcurrently (Async.Concurrently (runM (runDistribute task)))))
-
-
--- | Evaluate a 'Distribute' effect concurrently, using a handler to lower the final monad into 'IO'.
-runDistributeWithHandler :: forall m a . MonadIO m => (forall x . m x -> IO x) -> Eff '[Distribute, Lift m] a -> Eff '[Lift m] a
-runDistributeWithHandler handler = interpret $ \ (Distribute task) ->
-  sendIO (liftIO @m (Async.runConcurrently (Async.Concurrently (handler (runM (runDistributeWithHandler handler task))))))
-
-sendIO :: (Member (Lift m) effects) => m a -> Eff effects a
-sendIO = send . Lift
