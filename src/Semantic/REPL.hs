@@ -39,37 +39,6 @@ import System.Console.Haskeline
 import System.Directory (createDirectoryIfMissing, getHomeDirectory)
 import System.FilePath
 
-{-
-
-- stop at every term
-  - print an excerpt when we stop
-    - need to have the Blobs for this
-  - showing variable bindings
-
-- interaction
-  - inspecting variables
-  - inspecting the heap
-  - calling functions?
-  - abandoning the computation
-
-- control
-  - step
-  - step within a file
-  - continuing until the next breakpoint
-  - other variants?
-
-- breakpoints
-  - break on a line
-  - break on a span
-  - break on a function name
-
-what's the ghci workflow look like?
-
-λ rubyREPL ["/Users/rob/Desktop/test.rb"]
-…
-
--}
-
 data REPL (m :: * -> *) result where
   Prompt :: REPL m (Maybe String)
   Output :: String -> REPL m ()
@@ -135,6 +104,9 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . raiseHandler (runModules (ModuleTable.modulePaths (packageModules (snd <$> package))))
     $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Concrete.runFunction coerce coerce) modules
 
+-- TODO: REPL for typechecking/abstract semantics
+-- TODO: drive the flow from within the REPL instead of from without
+
 runTelemetryIgnoringStat :: (Effectful m, MonadIO (m effects), PureEffects effects) => LogOptions -> m (Telemetry : effects) a -> m effects a
 runTelemetryIgnoringStat logOptions = interpret $ \case
   WriteStat{} -> pure ()
@@ -183,8 +155,12 @@ step blobs recur term = do
         runCommand run [":continue"] = local (const Continue) run
         runCommand run [":break", s]
           | [(i, "")] <- readDec s = modify' (OnLine i :) >> runCommands run
+        -- TODO: :show breakpoints
+        -- TODO: :delete breakpoints
         runCommand run [":list"] = list >> runCommands run
         runCommand run [":show", "bindings"] = showBindings >> runCommands run
+        -- TODO: show the value(s) in the heap
+        -- TODO: can we call functions somehow? Maybe parse expressions with the current parser?
         runCommand _   [quit] | quit `elem` [":quit", ":q", ":abandon"] = throwError (SomeException Quit)
         runCommand run [":help"] = help >> runCommands run
         runCommand run [":?"] = help >> runCommands run
@@ -199,10 +175,16 @@ data Breakpoint
   = OnLine Int
   deriving Show
 
+-- FIXME: OnLine should take a module, defaulting to the current module
+-- TODO: OnPos, taking a column number as well as line number and module
+-- TODO: OnSymbol, taking a function/method name? This could be tricky to implement cross-language
+
 data Step
   = Step
   | Continue
   deriving Show
+
+-- TODO: StepLocal/StepModule
 
 shouldBreak :: (Member (State [Breakpoint]) effects, Member (Reader Span) effects, Member (Reader Step) effects) => TermEvaluator term address value effects Bool
 shouldBreak = do
