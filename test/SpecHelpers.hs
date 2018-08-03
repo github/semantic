@@ -24,6 +24,7 @@ import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
 import Control.Monad ((>=>))
 import Data.Abstract.Address as X
 import Data.Abstract.Environment as Env
+import Data.Abstract.ErrorContext
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Heap as X
@@ -96,11 +97,11 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
-                              , Resumable (AddressError Precise Val)
-                              , Resumable ResolutionError
-                              , Resumable EvalError
-                              , Resumable (EnvironmentError Precise)
+type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (UtilEff Precise)))
+                              , Resumable (BaseError (AddressError Precise Val))
+                              , Resumable (BaseError ResolutionError)
+                              , Resumable (BaseError EvalError)
+                              , Resumable (BaseError (EnvironmentError Precise))
                               , Resumable (Unspecialized Val)
                               , Resumable (LoadError Precise)
                               , Trace
@@ -108,11 +109,11 @@ type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
                               , State (Heap Precise Latest Val)
                               , Lift IO
                               ]
-type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
-                             , AddressError Precise Val
-                             , ResolutionError
-                             , EvalError
-                             , EnvironmentError Precise
+type TestEvaluatingErrors = '[ BaseError (ValueError Precise (UtilEff Precise))
+                             , BaseError (AddressError Precise Val)
+                             , BaseError ResolutionError
+                             , BaseError EvalError
+                             , BaseError (EnvironmentError Precise)
                              , Unspecialized Val
                              , LoadError Precise
                              ]
@@ -157,6 +158,8 @@ namespaceScope heap ns@(Namespace _ _ _)
   . runFresh 0
   . runAddressError
   . runState heap
+  . runReader (lowerBound @Span)
+  . runReader (lowerBound @ModuleInfo)
   . runDeref
   $ materializeEnvironment ns
 
