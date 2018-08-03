@@ -77,7 +77,7 @@ instance Effect REPL where
 
 runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => m (REPL ': effects) a -> m effects a
 runREPL = interpret $ \case
-  Prompt   -> liftIO (runInputT settings (getInputLine "repl: "))
+  Prompt   -> liftIO (runInputT settings (getInputLine (cyan <> "repl: " <> plain)))
   Output s -> liftIO (runInputT settings (outputStrLn s))
 
 rubyREPL = repl (Proxy :: Proxy 'Language.Ruby) rubyParser
@@ -171,3 +171,9 @@ settings = Settings
   , historyFile = Just "~/.local/semantic/repl_history"
   , autoAddHistory = True
   }
+
+cyan :: String
+cyan = "\ESC[1;36m\STX"
+
+plain :: String
+plain = "\ESC[0m\STX"
