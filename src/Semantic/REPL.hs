@@ -13,12 +13,11 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
-import Data.Char (isSpace)
 import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
-import Data.List (uncons)
+import Data.List (intercalate, uncons, words)
 import Data.Project
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
@@ -148,16 +147,16 @@ step blobs recur term = do
         showBindings = do
           bindings <- Env.head <$> TermEvaluator getEnv
           output $ show bindings
-        runCommand run ":step" = run
-        runCommand run ":list" = list >> runCommands run
-        runCommand run ":help" = help >> runCommands run
-        runCommand run ":show bindings" = showBindings >> runCommands run
-        runCommand run ":?" = help >> runCommands run
-        runCommand run s | all isSpace s = runCommands run
-        runCommand run other = output ("unknown command '" <> other <> "'") >> output "use :? for help" >> runCommands run
+        runCommand run [":step"] = run
+        runCommand run [":list"] = list >> runCommands run
+        runCommand run [":help"] = help >> runCommands run
+        runCommand run [":show", "bindings"] = showBindings >> runCommands run
+        runCommand run [":?"] = help >> runCommands run
+        runCommand run [] = runCommands run
+        runCommand run other = output ("unknown command '" <> intercalate " " other <> "'") >> output "use :? for help" >> runCommands run
         runCommands run = do
           str <- prompt
-          maybe (runCommands run) (runCommand run) str
+          maybe (runCommands run) (runCommand run . words) str
 
 
 newtype REPLEff address rest a = REPLEff
