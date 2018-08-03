@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, TypeOperators #-}
+{-# LANGUAGE GADTs, KindSignatures, LambdaCase, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.REPL
 ( rubyREPL
