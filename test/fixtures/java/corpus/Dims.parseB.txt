@@ -1,0 +1,14 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Annotation
+          (Identifier)
+          (Array
+            (Empty)
+            (Identifier)))
+        (Statements)))))
