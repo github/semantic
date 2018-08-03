@@ -157,6 +157,7 @@ step blobs recur term = do
           output "  :help, :?                   display this list of commands"
           output "  :list                       show the source code around current breakpoint"
           output "  :step                       single-step after stopping at a breakpoint"
+          output "  :continue                   continue evaluation until the next breakpoint"
           output "  :show bindings              show the current bindings"
           output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
         showBindings = do
@@ -164,6 +165,7 @@ step blobs recur term = do
           output $ intercalate "\n" (uncurry showBinding <$> Env.pairs bindings)
         showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"] = run
+        runCommand run [":continue"] = local (const Never) run
         runCommand run [":list"] = list >> runCommands run
         runCommand run [":show", "bindings"] = showBindings >> runCommands run
         runCommand _   [quit] | quit `elem` [":quit", ":q", ":abandon"] = throwError (SomeException Quit)
