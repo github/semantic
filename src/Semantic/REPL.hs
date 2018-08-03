@@ -95,7 +95,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
   runEvaluator
     . runREPL
-    . runTermEvaluator @_ @_ @(Value Precise (REPLEff Precise _))
+    . runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
     . runState lowerBound
     . runFresh 0
     . fmap reassociate
@@ -158,33 +158,6 @@ step blobs recur term = do
         runCommands run = do
           str <- prompt
           maybe (runCommands run) (runCommand run . words) str
-
-
-newtype REPLEff address rest a = REPLEff
-  { runREPLEff :: Eff (  Function address (Value address (REPLEff address rest))
-                      ': Exc (LoopControl address)
-                      ': Exc (Return address)
-                      ': Env address
-                      ': Deref address (Value address (REPLEff address rest))
-                      ': Allocator address (Value address (REPLEff address rest))
-                      ': Reader ModuleInfo
-
-                      ': Modules address
-                      ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                      ': Reader Span
-                      ': Reader PackageInfo
-                      ': Resumable (ValueError address (REPLEff address rest))
-                      ': Resumable (AddressError address (Value address (REPLEff address rest)))
-                      ': Resumable ResolutionError
-                      ': Resumable EvalError
-                      ': Resumable (EnvironmentError address)
-                      ': Resumable (Unspecialized (Value address (REPLEff address rest)))
-                      ': Resumable (LoadError address)
-                      ': Fresh
-                      ': State (Heap address Latest (Value address (REPLEff address rest)))
-                      ': rest
-                       ) a
-  }
 
 
 settings :: Settings IO
