@@ -1,0 +1,6 @@
+(Statements
+  (Class
+    (AccessibilityModifier)
+    (Identifier)
+    (Statements
+      (Error))))

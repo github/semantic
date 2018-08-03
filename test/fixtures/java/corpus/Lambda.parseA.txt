@@ -1,0 +1,13 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+          (Lambda
+            (Identifier)
+            (LambdaBody
+              (Identifier))))))))
