@@ -1,6 +1,7 @@
 module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Environment as Env
+import Data.Abstract.ErrorContext
 import Data.Abstract.Evaluatable
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Number as Number
@@ -36,7 +37,7 @@ spec config = parallel $ do
 
     it "evaluates load with wrapper" $ do
       (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
-      res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
+      res `shouldBe` Left (SomeExc (inject @(BaseError (EnvironmentError Precise)) (BaseError lowerBound (FreeVariable "foo"))))
 
     it "evaluates subclass" $ do
       (_, (heap, res)) <- evaluate ["subclass.rb"]
