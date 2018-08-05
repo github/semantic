@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
@@ -18,6 +18,7 @@ import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.Coerce
+import           Data.History
 import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
@@ -125,6 +126,23 @@ increaseNumbers p = case Sum.project (termOut p) of
   Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
   Nothing                -> Term (fmap increaseNumbers (unTerm p))
 
+addKVPair :: forall fs fields .
+             (Apply Functor fs, Literal.Hash :< fs, Literal.TextElement :< fs, Literal.KeyValue :< fs, Literal.Float :< fs)
+          => Term (Sum fs) (Record (History ': fields))
+          -> Term (Sum fs) (Record (History ': fields))
+addKVPair p = case Sum.project (termOut p) of
+  Just (Literal.Hash h) -> termIn (Data.History.overwrite Modified (rhead (termAnnotation p)) :. rtail (annotation p)) (addToHash h)
+  Nothing -> Term (fmap addKVPair (unTerm p))
+  where
+    addToHash :: [Term (Sum fs) (Record (History : fields))] -> Sum fs (Term (Sum fs) (Record (History : fields)))
+    addToHash pairs = inject . Literal.Hash $ (pairs ++ [newItem])
+    newItem :: Term (Sum fs) (Record (History : fields))
+    newItem = termIn gen (inject (Literal.KeyValue fore aft))
+    fore = termIn gen (inject (Literal.TextElement "fore"))
+    aft = termIn gen (inject (Literal.TextElement "aft"))
+    gen = Generated :. rtail (annotation p)
+--    item = inject (Literal.KeyValue (inject (Literal.TextElement "added")) (inject (Literal.Array [])))
+
 testTokenizer = do
   let path = "test/fixtures/javascript/reprinting/map.json"
 
@@ -133,7 +151,7 @@ testTokenizer = do
     tree <- parseFile jsonParser "test/fixtures/javascript/reprinting/map.json"
     pure (src, tree)
 
-  let tagged = ensureAccurateHistory (increaseNumbers (mark Pristine tree))
+  let tagged = ensureAccurateHistory $ addKVPair (mark Pristine tree)
   let toks = tokenizing src tagged
   pure (toks, tagged)
 

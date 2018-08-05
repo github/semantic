@@ -152,6 +152,7 @@ strategize new = do
 descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
 descend t = do
   let into' s = into (subterm s) (subtermRef s)
+  log (showsPrec1 0 (() <$ t) "")
   h <- asks _history
   let next = fmap into' t
   case h of
@@ -165,7 +166,9 @@ descend t = do
     Refactored r -> do
       crs <- gets _cursor
       src <- asks _source
-      chunk (slice (Range crs (start r)) src)
+      let delimiter = Range crs (start r)
+      log ("slicing: " <> show delimiter)
+      chunk (slice delimiter src)
       modify (set cursor (start r))
       strategize PrettyPrinting
       whenRefactored next

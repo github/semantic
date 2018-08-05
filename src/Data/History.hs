@@ -5,6 +5,7 @@ module Data.History
   , mark
   , remark
   , revise
+  , overwrite
   ) where
 
 import Data.Record
@@ -43,12 +44,12 @@ remark f = fmap go where
 revise :: History -> [History] -> History
 revise parent children
   | null children                   = parent
-  | all (not . wasChanged) children = apply Pristine parent
-  | any wasChanged children         = apply Modified parent
+  | all (not . wasChanged) children = overwrite Pristine parent
+  | any wasChanged children         = overwrite Modified parent
   | otherwise                       = parent
 
-apply :: (Range -> History) -> History -> History
-apply f (Pristine r)   = f r
-apply f (Modified r)   = f r
-apply f (Refactored r) = f r
-apply _ Generated      = Generated
+overwrite :: (Range -> History) -> History -> History
+overwrite f (Pristine r)   = f r
+overwrite f (Modified r)   = f r
+overwrite f (Refactored r) = f r
+overwrite _ Generated      = Generated
