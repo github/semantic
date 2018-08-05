@@ -73,4 +73,9 @@ instance (ConstructorName syntax, Foldable syntax) => ToTreeGraph (TaggedVertex 
     Merge t               -> termAlgebra Merged t
     Patch (Delete  t1)    ->          termAlgebra Deleted t1
     Patch (Insert     t2) ->                                     termAlgebra Inserted t2
-    Patch (Replace t1 t2) -> (<>) <$> termAlgebra Deleted t1 <*> termAlgebra Inserted t2
+    Patch (Replace t1 t2) -> do
+      i <- fresh
+      parent <- ask
+      let replace = vertex (TaggedVertex i Replaced "Replacement")
+      graph <- local (const replace) (overlay <$> termAlgebra Deleted t1 <*> termAlgebra Inserted t2)
+      pure (parent `connect` replace `overlay` graph)
