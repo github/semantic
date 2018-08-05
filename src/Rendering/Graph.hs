@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, MonoLocalBinds, ScopedTypeVariables #-}
+{-# LANGUAGE FunctionalDependencies, MonoLocalBinds #-}
 module Rendering.Graph
 ( renderTreeGraph
 , termStyle
@@ -27,7 +27,7 @@ runGraph :: Eff '[Reader (Graph vertex), Fresh] (Graph vertex) -> Graph vertex
 runGraph = run . runFresh 0 . runReader mempty
 
 
-termAlgebra :: forall tag syntax ann effs. (ConstructorName syntax, Foldable syntax, Member Fresh effs, Member (Reader (Graph (TaggedVertex tag))) effs)
+termAlgebra :: (ConstructorName syntax, Foldable syntax, Member Fresh effs, Member (Reader (Graph (TaggedVertex tag))) effs)
             => tag
             -> TermF syntax ann (Eff effs (Graph (TaggedVertex tag)))
             -> Eff effs (Graph (TaggedVertex tag))
