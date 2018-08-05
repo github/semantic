@@ -58,7 +58,7 @@ diffStyle name = style name diffTagAttributes
 data TaggedVertex tag = TaggedVertex { vertexId :: Int, vertexTag :: tag, vertexName :: String }
   deriving (Eq, Ord, Show)
 
-data DiffTag = Deleted | Inserted | Merged | Replaced
+data DiffTag = Deleted | Inserted | Replaced | Merged
   deriving (Eq, Ord, Show)
 
 
