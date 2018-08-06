@@ -244,7 +244,7 @@ withTermSpans :: ( HasField fields Span
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects, Effects effects) => m (Resumable (BaseError ResolutionError) ': effects) a -> m effects a
-resumingResolutionError = runResolutionErrorWith (\ (BaseError context err) -> trace ("ResolutionError: " <> prettyShow context <> prettyShow err) *> case err of
+resumingResolutionError = runResolutionErrorWith (\ (BaseError context err) -> traceError "ResolutionError" err context *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
@@ -252,7 +252,7 @@ resumingLoadError :: (AbstractHole address, Effectful (m address value), Effects
 resumingLoadError = runLoadErrorWith (\ (ModuleNotFoundError path) -> trace ("LoadError: " <> prettyShow path) $> (lowerBound, hole))
 
 resumingEvalError :: (Applicative (m effects), Effectful m, Effects effects, Member Fresh effects, Member Trace effects) => m (Resumable (BaseError EvalError) ': effects) a -> m effects a
-resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> trace ("EvalError:" <> prettyShow context <> prettyShow err) *> case err of
+resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> traceError "EvalError" err context *> case err of
   DefaultExportError{}  -> pure ()
   ExportError{}         -> pure ()
   IntegerFormatError{}  -> pure 0
@@ -261,7 +261,7 @@ resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> trace ("EvalE
   NoNameError           -> gensym)
 
 resumingUnspecialized :: (Applicative (m value effects), AbstractHole value, Effectful (m value), Effects effects, Member Trace effects) => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a -> m value effects a
-resumingUnspecialized = runUnspecializedWith (\ (BaseError context err) -> trace ("Unspecialized: " <> prettyShow context <> prettyShow err) *> case err of
+resumingUnspecialized = runUnspecializedWith (\ (BaseError context err) -> traceError "UnspecializedError" err context *> case err of
   UnspecializedError _ -> pure hole)
 
 resumingAddressError :: ( AbstractHole value
@@ -274,7 +274,7 @@ resumingAddressError :: ( AbstractHole value
                         )
                      => m address value (Resumable (BaseError (AddressError address value)) ': effects) a
                      -> m address value effects a
-resumingAddressError = runAddressErrorWith $ \ (BaseError context err) -> trace ("AddressError: " <> prettyShow context <> prettyShow err) *> case err of
+resumingAddressError = runAddressErrorWith $ \ (BaseError context err) -> traceError "AddressError" err context *> case err of
   UnallocatedAddress   _ -> pure lowerBound
   UninitializedAddress _ -> pure hole
 
@@ -286,7 +286,7 @@ resumingValueError :: ( Applicative (m address (Value address body) effects)
                       )
                    => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
                    -> m address (Value address body) effects a
-resumingValueError = runValueErrorWith (\ (BaseError context err) -> trace ("ValueError: " <> prettyShow context <> prettyShow err) *> case err of
+resumingValueError = runValueErrorWith (\ (BaseError context err) -> traceError "ValueError" err context *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (prettyShow val))
   BoolError{}       -> pure True
@@ -302,7 +302,7 @@ resumingValueError = runValueErrorWith (\ (BaseError context err) -> trace ("Val
   ArithmeticError{} -> pure hole)
 
 resumingEnvironmentError :: (Monad (m (Hole (Maybe Name) address) value effects), Effectful (m (Hole (Maybe Name) address) value), Effects effects, Member Trace effects) => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a -> m (Hole (Maybe Name) address) value effects a
-resumingEnvironmentError = runResumableWith (\ (BaseError context err) -> trace ("EnvironmentError: " <> prettyShow context <> prettyShow err) >> (\ (FreeVariable name) -> pure (Partial (Just name))) err)
+resumingEnvironmentError = runResumableWith (\ (BaseError context err) -> traceError "EnvironmentError" err context >> (\ (FreeVariable name) -> pure (Partial (Just name))) err)
 
 resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      , Effects effects
@@ -311,7 +311,7 @@ resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      )
                   => m address Type (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
                   -> m address Type effects a
-resumingTypeError = runTypesWith (\ (BaseError context err) -> trace ("TypeError: " <> prettyShow context) *> case err of
+resumingTypeError = runTypesWith (\ (BaseError context err) -> traceError "TypeError" err context *> case err of
   UnificationError l r -> pure l <|> pure r
   InfiniteType _ r -> pure r)
 
