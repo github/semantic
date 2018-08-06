@@ -317,3 +317,6 @@ resumingTypeError = runTypesWith (\ (BaseError context err) -> trace ("TypeError
 
 prettyShow :: Show a => a -> String
 prettyShow = hscolour TTY defaultColourPrefs False False "" False . ppShow
+
+traceError :: (Member Trace effects, Effectful m, Show a) => String -> a -> ErrorContext -> m effects ()
+traceError prefix err context = trace $ prefix <> ": " <> prettyShow err <> " " <> prettyShow context
