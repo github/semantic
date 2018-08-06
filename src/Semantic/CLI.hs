@@ -38,7 +38,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
     versionString = "semantic version " <> buildVersion <> " (" <> buildSHA <> ")"
-    description = fullDesc <> header "semantic -- Parse and diff semantically"
+    description = fullDesc <> header "semantic -- Semantic (syntax-aware) diffs, program analysis toolkit"
 
 optionsParser :: Parser Options
 optionsParser = do
