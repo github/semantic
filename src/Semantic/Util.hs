@@ -70,7 +70,7 @@ newtype UtilEff a = UtilEff
                        , Resumable (BaseError EvalError)
                        , Resumable (BaseError (EnvironmentError Precise))
                        , Resumable (BaseError (UnspecializedError (Value Precise UtilEff)))
-                       , Resumable (LoadError Precise)
+                       , Resumable (BaseError (LoadError Precise))
                        , Trace
                        , Fresh
                        , State (Heap Precise Latest (Value Precise UtilEff))

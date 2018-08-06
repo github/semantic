@@ -202,7 +202,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': Resumable (BaseError EvalError)
                              ': Resumable (BaseError (EnvironmentError address))
                              ': Resumable (BaseError (UnspecializedError (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable (LoadError address)
+                             ': Resumable (BaseError (LoadError address))
                              ': Fresh
                              ': State (Heap address Latest (Value address (ImportGraphEff address outerEffects)))
                              ': outerEffects
@@ -248,8 +248,9 @@ resumingResolutionError = runResolutionErrorWith (\ (BaseError context err) -> t
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: (AbstractHole address, Effectful (m address value), Effects effects, Functor (m address value effects), Member Trace effects) => m address value (Resumable (LoadError address) ': effects) a -> m address value effects a
-resumingLoadError = runLoadErrorWith (\ (ModuleNotFoundError path) -> trace ("LoadError: " <> prettyShow path) $> (lowerBound, hole))
+resumingLoadError :: (Applicative (m address value effects), AbstractHole address, Effectful (m address value), Effects effects, Member Trace effects) => m address value (Resumable (BaseError (LoadError address)) ': effects) a -> m address value effects a
+resumingLoadError = runLoadErrorWith (\ (BaseError context err) -> traceError "LoadError" err context *> case err of
+  ModuleNotFoundError _ -> pure (lowerBound, hole))
 
 resumingEvalError :: (Applicative (m effects), Effectful m, Effects effects, Member Fresh effects, Member Trace effects) => m (Resumable (BaseError EvalError) ': effects) a -> m effects a
 resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> traceError "EvalError" err context *> case err of
