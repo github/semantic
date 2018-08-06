@@ -35,7 +35,7 @@ instance (Eq1 exc) => Eq1 (BaseError exc) where
   liftEq f (BaseError _ exc1) (BaseError _ exc2) = liftEq f exc1 exc2
 
 instance Show1 (BaseError exc) where
-  liftShowsPrec sp sl d = liftShowsPrec sp sl d
+  liftShowsPrec = liftShowsPrec
 
-instance Lower (ErrorContext) where
+instance Lower ErrorContext where
   lowerBound = ErrorContext lowerBound lowerBound
