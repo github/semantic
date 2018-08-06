@@ -1,0 +1,12 @@
+(Statements
+  (If
+    (Assignment
+      (Identifier)
+      (Integer))
+    (Call
+      (MemberAccess
+        (MemberAccess
+          (Identifier)))
+      (Identifier)
+      (Empty))
+    (Empty)))
