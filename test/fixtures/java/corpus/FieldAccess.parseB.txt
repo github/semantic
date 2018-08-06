@@ -1,0 +1,19 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Constructor
+        (Identifier)
+        (Annotation
+          (Identifier)
+          (Identifier))
+        (Statements
+          (Call
+            (MemberAccess
+              (MemberAccess
+                (Identifier)))
+            (MemberAccess
+              (Call
+                (Identifier)
+                (Empty)))
+            (Empty)))))))

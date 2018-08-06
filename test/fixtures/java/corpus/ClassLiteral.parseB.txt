@@ -1,0 +1,19 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (AccessibilityModifier)
+        (AccessibilityModifier)
+        (Empty)
+        (Identifier)
+        (Statements
+          (GreaterThan
+            (LessThan
+              (Identifier)
+              (Identifier))
+            (Assignment
+              (Identifier)
+              (ClassLiteral
+                (Identifier)))))))))

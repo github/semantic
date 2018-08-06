@@ -1,0 +1,7 @@
+(Statements
+  (EnumDeclaration
+  {-(AccessibilityModifier)-}
+    (Identifier)
+  {+(Identifier)+}
+  {+(Identifier)+}
+  {+(Identifier)+}))
