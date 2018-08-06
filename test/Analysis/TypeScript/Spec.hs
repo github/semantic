@@ -2,6 +2,7 @@ module Analysis.TypeScript.Spec (spec) where
 
 import Control.Arrow ((&&&))
 import Data.Abstract.Environment as Env
+import Data.Abstract.ErrorContext
 import Data.Abstract.Evaluatable
 import Data.Abstract.Number as Number
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -38,7 +39,7 @@ spec config = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       (_, (_, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
-      res `shouldBe` Left (SomeExc (inject @EvalError (ExportError "foo.ts" (name "pip"))))
+      res `shouldBe` Left (SomeExc (inject @(BaseError EvalError) (BaseError (ErrorContext lowerBound lowerBound) (ExportError "foo.ts" (name "pip")))))
 
     it "evaluates early return statements" $ do
       (_, (heap, res)) <- evaluate ["early-return.ts"]
