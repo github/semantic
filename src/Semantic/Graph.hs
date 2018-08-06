@@ -243,16 +243,36 @@ withTermSpans :: ( HasField fields Span
               -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
-resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects, Effects effects) => m (Resumable (BaseError ResolutionError) ': effects) a -> m effects a
+resumingResolutionError :: ( Applicative (m effects)
+                           , Effectful m
+                           , Member Trace effects
+                           , Effects effects
+                           )
+                         => m (Resumable (BaseError ResolutionError) ': effects) a
+                         -> m effects a
 resumingResolutionError = runResolutionErrorWith (\ (BaseError context err) -> traceError "ResolutionError" err context *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: (Applicative (m address value effects), AbstractHole address, Effectful (m address value), Effects effects, Member Trace effects) => m address value (Resumable (BaseError (LoadError address)) ': effects) a -> m address value effects a
+resumingLoadError :: ( Applicative (m address value effects)
+                     , AbstractHole address
+                     , Effectful (m address value)
+                     , Effects effects
+                     , Member Trace effects
+                     )
+                  => m address value (Resumable (BaseError (LoadError address)) ': effects) a
+                  -> m address value effects a
 resumingLoadError = runLoadErrorWith (\ (BaseError context err) -> traceError "LoadError" err context *> case err of
   ModuleNotFoundError _ -> pure (lowerBound, hole))
 
-resumingEvalError :: (Applicative (m effects), Effectful m, Effects effects, Member Fresh effects, Member Trace effects) => m (Resumable (BaseError EvalError) ': effects) a -> m effects a
+resumingEvalError :: ( Applicative (m effects)
+                     , Effectful m
+                     , Effects effects
+                     , Member Fresh effects
+                     , Member Trace effects
+                     )
+                  => m (Resumable (BaseError EvalError) ': effects) a
+                  -> m effects a
 resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> traceError "EvalError" err context *> case err of
   DefaultExportError{}  -> pure ()
   ExportError{}         -> pure ()
@@ -261,7 +281,13 @@ resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> traceError "E
   RationalFormatError{} -> pure 0
   NoNameError           -> gensym)
 
-resumingUnspecialized :: (Applicative (m value effects), AbstractHole value, Effectful (m value), Effects effects, Member Trace effects) => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a -> m value effects a
+resumingUnspecialized :: ( Applicative (m value effects)
+                         , AbstractHole value
+                         , Effectful (m value)
+                         , Effects effects
+                         , Member Trace effects)
+                      => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
+                      -> m value effects a
 resumingUnspecialized = runUnspecializedWith (\ (BaseError context err) -> traceError "UnspecializedError" err context *> case err of
   UnspecializedError _ -> pure hole)
 
@@ -302,7 +328,13 @@ resumingValueError = runValueErrorWith (\ (BaseError context err) -> traceError 
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: (Monad (m (Hole (Maybe Name) address) value effects), Effectful (m (Hole (Maybe Name) address) value), Effects effects, Member Trace effects) => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a -> m (Hole (Maybe Name) address) value effects a
+resumingEnvironmentError :: ( Monad (m (Hole (Maybe Name) address) value effects)
+                            , Effectful (m (Hole (Maybe Name) address) value)
+                            , Effects effects
+                            , Member Trace effects
+                            )
+                         => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a
+                         -> m (Hole (Maybe Name) address) value effects a
 resumingEnvironmentError = runResumableWith (\ (BaseError context err) -> traceError "EnvironmentError" err context >> (\ (FreeVariable name) -> pure (Partial (Just name))) err)
 
 resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))

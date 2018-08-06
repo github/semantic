@@ -109,10 +109,15 @@ instance Show1 (LoadError address) where
 instance Eq1 (LoadError address) where
   liftEq _ (ModuleNotFoundError a) (ModuleNotFoundError b) = a == b
 
-runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (BaseError (LoadError address)) ': effects) a -> m address value effects (Either (SomeExc (BaseError (LoadError address))) a)
+runLoadError :: (Effectful (m address value), Effects effects)
+             => m address value (Resumable (BaseError (LoadError address)) ': effects) a
+             -> m address value effects (Either (SomeExc (BaseError (LoadError address))) a)
 runLoadError = runResumable
 
-runLoadErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . (BaseError (LoadError address)) resume -> m address value effects resume) -> m address value (Resumable (BaseError (LoadError address)) ': effects) a -> m address value effects a
+runLoadErrorWith :: (Effectful (m address value), Effects effects)
+                 => (forall resume . (BaseError (LoadError address)) resume -> m address value effects resume)
+                 -> m address value (Resumable (BaseError (LoadError address)) ': effects) a
+                 -> m address value effects a
 runLoadErrorWith = runResumableWith
 
 throwLoadError :: Member (Resumable (BaseError (LoadError address))) effects
@@ -138,11 +143,23 @@ instance Eq1 ResolutionError where
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
 
-runResolutionError :: (Effectful m, Effects effects) => m (Resumable (BaseError ResolutionError) ': effects) a -> m effects (Either (SomeExc (BaseError ResolutionError)) a)
+runResolutionError :: (Effectful m, Effects effects)
+                   => m (Resumable (BaseError ResolutionError) ': effects) a
+                   -> m effects (Either (SomeExc (BaseError ResolutionError)) a)
 runResolutionError = runResumable
 
-runResolutionErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError ResolutionError) resume -> m effects resume) -> m (Resumable (BaseError ResolutionError) ': effects) a -> m effects a
+runResolutionErrorWith :: (Effectful m, Effects effects)
+                       => (forall resume . (BaseError ResolutionError) resume -> m effects resume)
+                       -> m (Resumable (BaseError ResolutionError) ': effects) a
+                       -> m effects a
 runResolutionErrorWith = runResumableWith
 
-throwResolutionError :: (Monad (m effects), Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError ResolutionError)) effects) => ResolutionError resume -> m effects resume
+throwResolutionError :: ( Monad (m effects)
+                        , Effectful m
+                        , Member (Reader ModuleInfo) effects
+                        , Member (Reader Span) effects
+                        , Member (Resumable (BaseError ResolutionError)) effects
+                        )
+                     => ResolutionError resume
+                     -> m effects resume
 throwResolutionError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err

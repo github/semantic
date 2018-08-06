@@ -111,7 +111,9 @@ runEnv initial = fmap (filterEnv . fmap (first Env.head)) . runState lowerBound 
           | Exports.null ports = (binds, a)
           | otherwise          = (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds, a)
 
-handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
+handleEnv :: forall address value effects a . Effects effects
+          => Env address (Eff (Env address ': effects)) a
+          -> Evaluator address value (State (Environment address) ': State (Exports address) ': effects) a
 handleEnv = \case
   Lookup name -> Env.lookupEnv' name <$> get
   Bind name addr -> modify (Env.insertEnv name addr)
@@ -141,10 +143,15 @@ freeVariableError :: ( Member (Reader ModuleInfo) effects
                   -> Evaluator address value effects address
 freeVariableError = throwEnvironmentError . FreeVariable
 
-runEnvironmentError :: (Effectful (m address value), Effects effects) => m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a -> m address value effects (Either (SomeExc (BaseError (EnvironmentError address))) a)
+runEnvironmentError :: (Effectful (m address value), Effects effects)
+                    => m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a
+                    -> m address value effects (Either (SomeExc (BaseError (EnvironmentError address))) a)
 runEnvironmentError = runResumable
 
-runEnvironmentErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . BaseError (EnvironmentError address) resume -> m address value effects resume) -> m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a -> m address value effects a
+runEnvironmentErrorWith :: (Effectful (m address value), Effects effects)
+                        => (forall resume . BaseError (EnvironmentError address) resume -> m address value effects resume)
+                        -> m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a
+                        -> m address value effects a
 runEnvironmentErrorWith = runResumableWith
 
 throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError address))) effects
