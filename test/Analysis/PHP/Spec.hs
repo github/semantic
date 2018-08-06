@@ -42,4 +42,4 @@ spec config = parallel $ do
   where
     fixtures = "test/fixtures/php/analysis/"
     evaluate = evalPHPProject . map (fixtures <>)
-    evalPHPProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.PHP) phpParser Language.PHP
+    evalPHPProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.PHP) phpParser

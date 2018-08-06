@@ -1,0 +1,7 @@
+(Statements
+  (InterfaceDeclaration
+    (Identifier)
+    (Statements))
+  (Context
+    (Comment)
+    (Empty)))

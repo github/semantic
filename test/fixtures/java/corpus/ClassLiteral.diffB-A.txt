@@ -1,0 +1,24 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+      {-(AccessibilityModifier)-}
+      {-(AccessibilityModifier)-}
+        (Empty)
+        (Identifier)
+        (Statements
+        {+(Call
+          {+(Identifier)+}
+          {+(ClassLiteral
+            {+(Identifier)+})+}
+          {+(Empty)+})+}
+        {-(GreaterThan
+          {-(LessThan
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(Assignment
+            {-(Identifier)-}
+            {-(ClassLiteral
+              {-(Identifier)-})-})-})-})))))

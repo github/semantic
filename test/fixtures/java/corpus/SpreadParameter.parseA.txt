@@ -1,0 +1,11 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Constructor
+        (Identifier)
+        (SpreadParameter
+          (Variable
+            (Identifier)
+            (Identifier)))
+        (Statements)))))
