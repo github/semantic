@@ -103,7 +103,7 @@ type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise UtilEff
                               , Resumable (BaseError EvalError)
                               , Resumable (BaseError (EnvironmentError Precise))
                               , Resumable (BaseError (UnspecializedError Val))
-                              , Resumable (LoadError Precise)
+                              , Resumable (BaseError (LoadError Precise))
                               , Trace
                               , Fresh
                               , State (Heap Precise Latest Val)
@@ -115,7 +115,7 @@ type TestEvaluatingErrors = '[ BaseError (ValueError Precise UtilEff)
                              , BaseError EvalError
                              , BaseError (EnvironmentError Precise)
                              , BaseError (UnspecializedError Val)
-                             , LoadError Precise
+                             , BaseError (LoadError Precise)
                              ]
 testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                -> IO
