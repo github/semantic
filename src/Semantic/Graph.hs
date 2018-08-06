@@ -201,7 +201,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': Resumable (BaseError ResolutionError)
                              ': Resumable (BaseError EvalError)
                              ': Resumable (BaseError (EnvironmentError address))
-                             ': Resumable (Unspecialized (Value address (ImportGraphEff address outerEffects)))
+                             ': Resumable (BaseError (UnspecializedError (Value address (ImportGraphEff address outerEffects))))
                              ': Resumable (LoadError address)
                              ': Fresh
                              ': State (Heap address Latest (Value address (ImportGraphEff address outerEffects)))
@@ -260,8 +260,9 @@ resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> trace ("EvalE
   RationalFormatError{} -> pure 0
   NoNameError           -> gensym)
 
-resumingUnspecialized :: (AbstractHole value, Effectful (m value), Effects effects, Functor (m value effects), Member Trace effects) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
-resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized: " <> prettyShow err) $> hole)
+resumingUnspecialized :: (Applicative (m value effects), AbstractHole value, Effectful (m value), Effects effects, Member Trace effects) => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a -> m value effects a
+resumingUnspecialized = runUnspecializedWith (\ (BaseError context err) -> trace ("Unspecialized: " <> prettyShow context <> prettyShow err) *> case err of
+  UnspecializedError _ -> pure hole)
 
 resumingAddressError :: ( AbstractHole value
                         , Applicative (m address value effects)

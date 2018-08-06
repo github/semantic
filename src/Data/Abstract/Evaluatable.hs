@@ -13,9 +13,10 @@ module Data.Abstract.Evaluatable
 , throwEvalError
 , runEvalError
 , runEvalErrorWith
-, Unspecialized(..)
+, UnspecializedError(..)
 , runUnspecialized
 , runUnspecializedWith
+, throwUnspecializedError
 , Cell
 ) where
 
@@ -60,7 +61,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
           , Member (Resumable (BaseError (EnvironmentError address))) effects
-          , Member (Resumable (Unspecialized value)) effects
+          , Member (Resumable (BaseError (UnspecializedError value))) effects
           , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable (BaseError ResolutionError)) effects
           , Member Fresh effects
@@ -69,7 +70,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do
     traverse_ subtermValue expr
-    v <- throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
+    v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
 
@@ -92,7 +93,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError (EnvironmentError address))) effects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
-            , Member (Resumable (Unspecialized value)) effects
+            , Member (Resumable (BaseError (UnspecializedError value))) effects
             , Member (State (Heap address (Cell address) value)) effects
             , Member Trace effects
             , Recursive term
@@ -249,23 +250,36 @@ throwEvalError :: (Monad (m effects), Effectful m, Member (Reader ModuleInfo) ef
 throwEvalError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
 
 
-data Unspecialized a b where
-  Unspecialized :: String -> Unspecialized value value
+data UnspecializedError a b where
+  UnspecializedError :: String -> UnspecializedError value value
 
-deriving instance Eq (Unspecialized a b)
-deriving instance Show (Unspecialized a b)
+deriving instance Eq (UnspecializedError a b)
+deriving instance Show (UnspecializedError a b)
 
-instance Eq1 (Unspecialized a) where
-  liftEq _ (Unspecialized a) (Unspecialized b) = a == b
+instance Eq1 (UnspecializedError a) where
+  liftEq _ (UnspecializedError a) (UnspecializedError b) = a == b
 
-instance Show1 (Unspecialized a) where
+instance Show1 (UnspecializedError a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: (Effectful (m value), Effects effects) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: (Effectful (m value), Effects effects)
+                 => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
+                 -> m value effects (Either (SomeExc (BaseError (UnspecializedError value))) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: (Effectful (m value), Effects effects) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
+runUnspecializedWith :: (Effectful (m value), Effects effects)
+                     => (forall resume . BaseError (UnspecializedError value) resume -> m value effects resume)
+                     -> m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
+                     -> m value effects a
 runUnspecializedWith = runResumableWith
+
+throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) effects
+                           , Member (Reader ModuleInfo) effects
+                           , Member (Reader Span) effects
+                           )
+                        => UnspecializedError value resume
+                        -> Evaluator address value effects resume
+throwUnspecializedError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
 
 
 -- Instances

@@ -392,7 +392,7 @@ instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 -- TODO return a special LvalSubscript instance here
 instance Evaluatable Subscript where
   eval (Subscript l [r]) = Rval <$> join (index <$> subtermValue l <*> subtermValue r)
-  eval (Subscript _ _)   = rvalBox =<< throwResumable (Unspecialized "Eval unspecialized for subscript with slices")
+  eval (Subscript _ _)   = rvalBox =<< throwUnspecializedError (UnspecializedError "Eval unspecialized for subscript with slices")
 
 data Member a = Member { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
