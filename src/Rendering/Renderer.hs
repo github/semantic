@@ -34,7 +34,7 @@ data DiffRenderer output where
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
-  DOTDiffRenderer :: DiffRenderer (Graph (Vertex DiffTag))
+  DOTDiffRenderer :: DiffRenderer (Graph (TaggedVertex DiffTag))
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
   ShowDiffRenderer :: DiffRenderer Builder
 
@@ -50,7 +50,7 @@ data TermRenderer output where
   -- | Render to a list of symbols.
   SymbolsTermRenderer :: SymbolFields -> TermRenderer (JSON "files" SomeJSON)
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
-  DOTTermRenderer :: TermRenderer (Graph (Vertex ()))
+  DOTTermRenderer :: TermRenderer (Graph (TaggedVertex ()))
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
   ShowTermRenderer :: TermRenderer Builder
 
