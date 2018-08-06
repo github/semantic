@@ -32,6 +32,7 @@ data Value address body
   | Float    (Number.Number Scientific)
   | String Text
   | Symbol Text
+  | Regex Text
   | Tuple [address]
   | Array [address]
   | Class Name [address] (Bindings address)
@@ -102,6 +103,7 @@ instance Show address => AbstractIntro (Value address body) where
   float    = Float . Number.Decimal
   symbol   = Symbol
   rational = Rational . Number.Ratio
+  regex    = Regex
 
   kvPair = KVPair
   hash = Hash . map (uncurry KVPair)
