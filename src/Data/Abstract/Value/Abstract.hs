@@ -47,6 +47,7 @@ instance AbstractIntro Abstract where
   string _   = Abstract
   float _    = Abstract
   symbol _   = Abstract
+  regex _    = Abstract
   rational _ = Abstract
   hash _     = Abstract
   kvPair _ _ = Abstract

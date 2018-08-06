@@ -69,6 +69,9 @@ class Show value => AbstractIntro value where
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
   symbol :: Text -> value
 
+  -- | Construct an abstract regex value.
+  regex :: Text -> value
+
   -- | Construct an abstract integral value.
   integer :: Integer -> value
 
@@ -86,7 +89,6 @@ class Show value => AbstractIntro value where
 
   -- | Construct the nil/null datatype.
   null :: value
-
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
