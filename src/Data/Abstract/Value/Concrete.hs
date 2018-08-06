@@ -215,7 +215,13 @@ instance ( Coercible body (Eff effects)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: (AbstractValue address (Value address body) effects, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError (ValueError address body))) effects) => Either ArithException Number.SomeNumber -> Evaluator address (Value address body) effects (Value address body)
+        specialize :: ( AbstractValue address (Value address body) effects
+                      , Member (Reader ModuleInfo) effects
+                      , Member (Reader Span) effects
+                      , Member (Resumable (BaseError (ValueError address body))) effects
+                      )
+                   => Either ArithException Number.SomeNumber
+                   -> Evaluator address (Value address body) effects (Value address body)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
@@ -244,7 +250,6 @@ instance ( Coercible body (Eff effects)
         orderingToInt = toInteger . pred . fromEnum
 
         pair = (left, right)
-
 
   liftBitwise operator target
     | Integer (Number.Integer i) <- target = pure . integer $ operator i
