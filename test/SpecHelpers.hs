@@ -96,7 +96,7 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
+type TestEvaluatingEffects = '[ Resumable (ValueError Precise UtilEff)
                               , Resumable (AddressError Precise Val)
                               , Resumable ResolutionError
                               , Resumable EvalError
@@ -108,7 +108,7 @@ type TestEvaluatingEffects = '[ Resumable (ValueError Precise (UtilEff Precise))
                               , State (Heap Precise Latest Val)
                               , Lift IO
                               ]
-type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise)
+type TestEvaluatingErrors = '[ ValueError Precise UtilEff
                              , AddressError Precise Val
                              , ResolutionError
                              , EvalError
@@ -137,9 +137,9 @@ testEvaluating
   . runEvalError
   . runResolutionError
   . runAddressError
-  . runValueError @_ @Precise @(UtilEff Precise)
+  . runValueError @_ @Precise @UtilEff
 
-type Val = Value Precise (UtilEff Precise)
+type Val = Value Precise UtilEff
 
 
 deNamespace :: Heap Precise (Cell Precise) (Value Precise term)

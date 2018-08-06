@@ -13,6 +13,8 @@ dist-newstyle
 tmp/
 bin/
 
+/semanticd/test/current
+/semanticd/test/rover-example-config/semantic.log
 /test/fixtures/*/examples
 
 *.hp
