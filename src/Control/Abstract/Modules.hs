@@ -118,7 +118,7 @@ runLoadErrorWith = runResumableWith
 throwLoadError :: Member (Resumable (BaseError (LoadError address))) effects
                => LoadError address resume
                -> Evaluator address value effects resume
-throwLoadError err = throwResumable $ BaseError (ErrorContext lowerBound lowerBound) err
+throwLoadError err = throwResumable $ BaseError lowerBound err
 
 
 -- | An error thrown when we can't resolve a module from a qualified name.
