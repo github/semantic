@@ -17,7 +17,7 @@ data ErrorContext = ErrorContext { moduleInfo :: M.ModuleInfo , span :: S.Span }
 instance Show ErrorContext where
   showsPrec _ ErrorContext{..} = shows errorString
     where errorString = path <> position
-          path = "path: " <> show (M.modulePath moduleInfo)
+          path = show (M.modulePath moduleInfo)
           position | startLine <- S.posLine (S.spanStart span)
                    , endLine <- S.posLine (S.spanEnd span)
                    , startLine == endLine
