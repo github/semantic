@@ -47,6 +47,10 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
+                     -- Interfaces to the process-based rule engine
+                     , Control.Rule
+                     , Control.Rule.Engine
+                     , Control.Rule.Engine.Builtin
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
@@ -210,6 +214,7 @@ library
                      , http-client-tls
                      , http-types
                      , kdt
+                     , machines
                      , mersenne-random-pure64
                      , microlens
                      , mtl
@@ -220,6 +225,7 @@ library
                      , parsers
                      , prettyprinter
                      , pretty-show
+                     , profunctors
                      , recursion-schemes
                      , reducers
                      , scientific

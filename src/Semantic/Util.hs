@@ -9,6 +9,7 @@ import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
+import           Control.Rule.Engine.Builtin
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
