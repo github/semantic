@@ -31,7 +31,7 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Roots
 import Control.Abstract.TermEvaluator
 import Data.Abstract.Configuration
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)

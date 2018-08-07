@@ -21,7 +21,7 @@ module Control.Abstract.Modules
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language

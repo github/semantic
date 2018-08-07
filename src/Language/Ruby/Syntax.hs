@@ -3,7 +3,7 @@
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
-import           Data.Abstract.ErrorContext
+import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path

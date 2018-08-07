@@ -23,7 +23,7 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Environment as Env
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number

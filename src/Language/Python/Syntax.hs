@@ -3,7 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
-import           Data.Abstract.ErrorContext
+import           Data.Abstract.BaseError
 import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module

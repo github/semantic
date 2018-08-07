@@ -11,7 +11,7 @@ module Data.Abstract.Value.Concrete
 
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Function(..))
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Environment (Environment, Bindings)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name

@@ -2,7 +2,7 @@ module Analysis.TypeScript.Spec (spec) where
 
 import Control.Arrow ((&&&))
 import Data.Abstract.Environment as Env
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable
 import Data.Abstract.Number as Number
 import qualified Data.Abstract.ModuleTable as ModuleTable
