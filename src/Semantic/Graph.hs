@@ -250,7 +250,7 @@ resumingResolutionError :: ( Applicative (m effects)
                            )
                          => m (Resumable (BaseError ResolutionError) ': effects) a
                          -> m effects a
-resumingResolutionError = runResolutionErrorWith (\ (BaseError context err) -> traceError "ResolutionError" err context *> case err of
+resumingResolutionError = runResolutionErrorWith (\ baseError -> traceError "ResolutionError" baseError *> case baseErrorException baseError of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
@@ -262,7 +262,7 @@ resumingLoadError :: ( Applicative (m address value effects)
                      )
                   => m address value (Resumable (BaseError (LoadError address)) ': effects) a
                   -> m address value effects a
-resumingLoadError = runLoadErrorWith (\ (BaseError context err) -> traceError "LoadError" err context *> case err of
+resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
   ModuleNotFoundError _ -> pure (lowerBound, hole))
 
 resumingEvalError :: ( Applicative (m effects)
@@ -273,7 +273,7 @@ resumingEvalError :: ( Applicative (m effects)
                      )
                   => m (Resumable (BaseError EvalError) ': effects) a
                   -> m effects a
-resumingEvalError = runEvalErrorWith (\ (BaseError context err) -> traceError "EvalError" err context *> case err of
+resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
   DefaultExportError{}  -> pure ()
   ExportError{}         -> pure ()
   IntegerFormatError{}  -> pure 0
@@ -288,7 +288,7 @@ resumingUnspecialized :: ( Applicative (m value effects)
                          , Member Trace effects)
                       => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
                       -> m value effects a
-resumingUnspecialized = runUnspecializedWith (\ (BaseError context err) -> traceError "UnspecializedError" err context *> case err of
+resumingUnspecialized = runUnspecializedWith (\ baseError -> traceError "UnspecializedError" baseError *> case baseErrorException baseError of
   UnspecializedError _ -> pure hole)
 
 resumingAddressError :: ( AbstractHole value
@@ -301,7 +301,7 @@ resumingAddressError :: ( AbstractHole value
                         )
                      => m address value (Resumable (BaseError (AddressError address value)) ': effects) a
                      -> m address value effects a
-resumingAddressError = runAddressErrorWith $ \ (BaseError context err) -> traceError "AddressError" err context *> case err of
+resumingAddressError = runAddressErrorWith $ \ baseError -> traceError "AddressError" baseError *> case baseErrorException baseError of
   UnallocatedAddress   _ -> pure lowerBound
   UninitializedAddress _ -> pure hole
 
@@ -313,7 +313,7 @@ resumingValueError :: ( Applicative (m address (Value address body) effects)
                       )
                    => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
                    -> m address (Value address body) effects a
-resumingValueError = runValueErrorWith (\ (BaseError context err) -> traceError "ValueError" err context *> case err of
+resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
   CallError val     -> pure val
   StringError val   -> pure (pack (prettyShow val))
   BoolError{}       -> pure True
@@ -335,7 +335,7 @@ resumingEnvironmentError :: ( Monad (m (Hole (Maybe Name) address) value effects
                             )
                          => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a
                          -> m (Hole (Maybe Name) address) value effects a
-resumingEnvironmentError = runResumableWith (\ (BaseError context err) -> traceError "EnvironmentError" err context >> (\ (FreeVariable name) -> pure (Partial (Just name))) err)
+resumingEnvironmentError = runResumableWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError))
 
 resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      , Effects effects
@@ -344,12 +344,12 @@ resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      )
                   => m address Type (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
                   -> m address Type effects a
-resumingTypeError = runTypesWith (\ (BaseError context err) -> traceError "TypeError" err context *> case err of
+resumingTypeError = runTypesWith (\ baseError -> traceError "TypeError" baseError *> case baseErrorException baseError of
   UnificationError l r -> pure l <|> pure r
   InfiniteType _ r -> pure r)
 
 prettyShow :: Show a => a -> String
 prettyShow = hscolour TTY defaultColourPrefs False False "" False . ppShow
 
-traceError :: (Member Trace effects, Effectful m, Show a) => String -> a -> ErrorContext -> m effects ()
-traceError prefix err context = trace $ prefix <> ": " <> prettyShow err <> " " <> prettyShow context
+traceError :: (Member Trace effects, Effectful m, Show (exc resume)) => String -> BaseError exc resume -> m effects ()
+traceError prefix baseError = trace $ prefix <> ": " <> prettyShow baseError

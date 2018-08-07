@@ -19,7 +19,6 @@ module Control.Abstract.Modules
 , ModuleTable
 ) where
 
-import Control.Abstract.Context (currentErrorContext)
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment
 import Data.Abstract.ErrorContext
@@ -123,7 +122,7 @@ runLoadErrorWith = runResumableWith
 throwLoadError :: Member (Resumable (BaseError (LoadError address))) effects
                => LoadError address resume
                -> Evaluator address value effects resume
-throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ErrorContext (ModuleInfo name) emptySpan) err
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name) emptySpan err
 
 
 -- | An error thrown when we can't resolve a module from a qualified name.
@@ -154,12 +153,10 @@ runResolutionErrorWith :: (Effectful m, Effects effects)
                        -> m effects a
 runResolutionErrorWith = runResumableWith
 
-throwResolutionError :: ( Monad (m effects)
-                        , Effectful m
-                        , Member (Reader ModuleInfo) effects
+throwResolutionError :: ( Member (Reader ModuleInfo) effects
                         , Member (Reader Span) effects
                         , Member (Resumable (BaseError ResolutionError)) effects
                         )
                      => ResolutionError resume
-                     -> m effects resume
-throwResolutionError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+                     -> Evaluator address value effects resume
+throwResolutionError = throwBaseError

@@ -10,7 +10,6 @@ module Data.Abstract.Value.Type
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract.Context (currentErrorContext)
 import Control.Abstract hiding (Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
@@ -97,7 +96,7 @@ throwTypeError :: ( Member (Resumable (BaseError TypeError)) effects
                   )
                => TypeError resume
                -> Evaluator address value effects resume
-throwTypeError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+throwTypeError = throwBaseError
 
 runTypeMap :: ( Effectful m
               , Effects effects
