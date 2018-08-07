@@ -84,9 +84,11 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
   lambda' vars body = do
     var <- gensym
     lambda' (var : vars) (body var)
+  {-# INLINE lambda' #-}
 
 instance Member (Function address value) effects => Lambda address value effects (Evaluator address value effects address) where
   lambda' vars body = function vars lowerBound body
+  {-# INLINE lambda' #-}
 
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
