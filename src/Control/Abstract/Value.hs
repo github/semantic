@@ -46,8 +46,8 @@ call :: Member (Function address value) effects => value -> [address] -> Evaluat
 call fn args = send (Call fn args)
 
 data Function address value m result where
-  Function :: (Maybe Name) -> [Name] -> Set Name -> m address -> Function address value m value
-  Call     :: value -> [address]              -> Function address value m address
+  Function :: Maybe Name -> [Name] -> Set Name -> m address -> Function address value m value
+  Call     :: value -> [address]                            -> Function address value m address
 
 instance PureEffect (Function address value) where
   handle handler (Request (Function name params fvs body) k) = Request (Function name params fvs (handler body)) (handler . k)
@@ -250,9 +250,9 @@ address :: ( AbstractValue address value effects
            )
         => ValueRef address
         -> Evaluator address value effects address
-address (LvalLocal var) = variable var
+address (LvalLocal var)       = variable var
 address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
-address (Rval addr) = pure addr
+address (Rval addr)           = pure addr
 
 -- | Evaluates a 'Subterm' to the address of its rval
 subtermAddress :: ( AbstractValue address value effects

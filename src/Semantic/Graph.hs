@@ -52,10 +52,9 @@ import           Parsing.Parser
 import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.Task as Task
 import           Text.Show.Pretty (ppShow)
-import qualified Data.ByteString.Char8 as B
 import System.FilePath.Posix ((</>), takeDirectory)
-import Data.List (isPrefixOf, isSuffixOf, partition, sortBy)
-import Data.Ord (Down(..), comparing)
+import Data.List (isPrefixOf, isSuffixOf, sortOn)
+import Data.Ord (comparing)
 import Data.Language as Language
 import Data.Blob (Blob(..))
 
@@ -257,7 +256,7 @@ parsePythonPackage :: forall syntax fields effs term.
 parsePythonPackage parser preludeFile project = do
   prelude <- traverse (parseModule project parser) preludeFile
 
-  setupFile <- maybe (error "no setup.py found in project") pure (find ((== ((projectRootDir project) </> "setup.py")) . filePath) (projectFiles project))
+  setupFile <- maybeM (error "no setup.py found in project") (find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project))
   setupModule <- parseModule project parser setupFile
 
   let runAnalysis = runEvaluator
@@ -277,10 +276,10 @@ parsePythonPackage parser preludeFile project = do
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) (State Strategy ': effs)))
         . runReader (PackageInfo (name "setup") lowerBound)
         . runReader lowerBound
-  (strat, _) <- runAnalysis $ (evaluate (Proxy @'Language.Python) id id (Concrete.runFunction coerce coerce . runPythonPackaging) [ setupModule ] )
+  (strat, _) <- runAnalysis $ evaluate (Proxy @'Language.Python) id id (Concrete.runFunction coerce coerce . runPythonPackaging) (maybeToList prelude <> [ setupModule ])
   case strat of
     PythonPackage.Unknown -> do
-      let sortedBlobs = (sortBy . comparing) (length . blobPath) (projectBlobs project)
+      let sortedBlobs = sortOn (length . blobPath) (projectBlobs project)
       trace (show (blobPath <$> sortedBlobs))
       p <- parseModules parser (project { projectBlobs = sortedBlobs })
       let n = name (projectName project)
@@ -288,25 +287,25 @@ parsePythonPackage parser preludeFile project = do
       pure (Package.fromModules n p resMap)
     PythonPackage.Packages dirs -> do
       filteredBlobs <- for dirs $ \dir -> do
-        let packageDir = (projectRootDir project) </> (unpack dir)
+        let packageDir = projectRootDir project </> unpack dir
         let paths = filter ((packageDir `isPrefixOf`) . filePath) (projectFiles project)
         traverse (readFile project) paths
 
-      let p = project { projectBlobs = (catMaybes $ join filteredBlobs) }
-      modules <- parseModules parser p
-      resMap <- Task.resolutionMap p
-      pure (Package.fromModules (name $ projectName p) modules resMap)
+      packageFromProject project filteredBlobs
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
       let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
-      let packageDirs = filter (`notElem` (((projectRootDir project </>) . unpack) <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
+      let packageDirs = filter (`notElem` ((projectRootDir project </>) . unpack <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
       filteredBlobs <- for packageDirs $ \dir -> do
         let paths = filter ((dir `isPrefixOf`) . filePath) (projectFiles project)
         traverse (readFile project) paths
-      let p = project { projectBlobs = (catMaybes $ join filteredBlobs) }
-      modules <- parseModules parser p
-      resMap <- Task.resolutionMap p
-      pure (Package.fromModules (name $ projectName p) modules resMap)
+      packageFromProject project filteredBlobs
+    where
+      packageFromProject project filteredBlobs = do
+        let p = project { projectBlobs = catMaybes $ join filteredBlobs }
+        modules <- parseModules parser p
+        resMap <- Task.resolutionMap p
+        pure (Package.fromModules (name $ projectName p) modules resMap)
 
 -- Load the prelude
 -- Find the setup.py file in the list of projectFiles
