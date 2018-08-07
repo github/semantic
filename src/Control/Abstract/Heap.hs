@@ -26,7 +26,6 @@ module Control.Abstract.Heap
 ) where
 
 import Control.Abstract.Addressable
-import Control.Abstract.Context (currentErrorContext)
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
@@ -224,7 +223,7 @@ throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))
                      )
                   => AddressError address body resume
                   -> Evaluator address value effects resume
-throwAddressError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+throwAddressError = throwBaseError
 
 runAddressError :: ( Effectful (m address value)
                    , Effects effects

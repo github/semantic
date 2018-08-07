@@ -29,7 +29,7 @@ import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..)
 import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
-import Data.Abstract.ErrorContext hiding (moduleInfo)
+import Data.Abstract.ErrorContext
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
@@ -246,8 +246,13 @@ runEvalError = runResumable
 runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError EvalError) resume -> m effects resume) -> m (Resumable (BaseError EvalError) ': effects) a -> m effects a
 runEvalErrorWith = runResumableWith
 
-throwEvalError :: (Monad (m effects), Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError EvalError)) effects) => EvalError resume -> m effects resume
-throwEvalError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+throwEvalError :: ( Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError EvalError)) effects
+                  )
+               => EvalError resume
+               -> Evaluator address value effects resume
+throwEvalError = throwBaseError
 
 
 data UnspecializedError a b where
@@ -279,7 +284,7 @@ throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError va
                            )
                         => UnspecializedError value resume
                         -> Evaluator address value effects resume
-throwUnspecializedError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+throwUnspecializedError = throwBaseError
 
 
 -- Instances

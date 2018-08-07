@@ -20,7 +20,6 @@ module Control.Abstract.Environment
 , runEnvironmentErrorWith
 ) where
 
-import Control.Abstract.Context (currentErrorContext)
 import Control.Abstract.Evaluator
 import Data.Abstract.ErrorContext
 import Data.Abstract.Environment (Bindings, Environment)
@@ -160,4 +159,4 @@ throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError addres
                          )
                       => EnvironmentError address resume
                       -> Evaluator address value effects resume
-throwEnvironmentError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+throwEnvironmentError = throwBaseError

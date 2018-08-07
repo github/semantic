@@ -7,7 +7,6 @@ module Data.Abstract.Value.Concrete
   , materializeEnvironment
   , runValueError
   , runValueErrorWith
-  , throwValueError
   ) where
 
 import qualified Control.Abstract as Abstract
@@ -320,4 +319,4 @@ throwValueError :: ( Member (Resumable (BaseError (ValueError address body))) ef
                    )
                 => ValueError address body resume
                 -> Evaluator address (Value address body) effects resume
-throwValueError err = currentErrorContext >>= \ errorContext -> throwResumable $ BaseError errorContext err
+throwValueError = throwBaseError
