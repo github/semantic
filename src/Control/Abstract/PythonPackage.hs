@@ -3,24 +3,17 @@
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
-import           Control.Abstract.Heap (AddressError, deref, Allocator, Deref)
-import           Control.Abstract.Modules (LoadError (..))
+import           Control.Abstract.Heap (deref, Allocator, Deref)
 import           Control.Abstract.Value
-import           Control.Monad.Effect.Internal (raiseHandler, lowerHandler)
-import           Control.Monad.Effect (Effectful (..), Effects, interpose)
+import           Control.Monad.Effect (Effectful (..))
 import           qualified Control.Monad.Effect as Eff
-import           Data.Abstract.Evaluatable (EvalError, Evaluator, Resumable, variable, State, runState, put, get, Env, PackageInfo, Fresh, Trace, trace)
+import           Data.Abstract.Evaluatable (Evaluator, Resumable, State, put, get, Env, PackageInfo, Fresh, Trace, trace)
 import Control.Abstract.Evaluator (LoopControl, Return)
 import           Data.Abstract.Module hiding (Module)
-import           Data.Abstract.Name (Name (..), name)
+import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value(..), ValueError(..))
-import Data.Abstract.Address
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.Text as Text
 import qualified Data.Map as Map
-import qualified Data.List as List
-import           Data.Term
 import           Prologue
 import Data.Coerce
 
