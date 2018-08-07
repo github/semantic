@@ -22,7 +22,7 @@ runFunction :: ( Member (Allocator address Abstract) effects
             => Evaluator address Abstract (Function address Abstract ': effects) a
             -> Evaluator address Abstract effects a
 runFunction = interpret $ \case
-  Function params _ body -> do
+  Function _ params _ body -> do
     env <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract

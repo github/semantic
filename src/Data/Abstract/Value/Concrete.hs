@@ -24,7 +24,7 @@ import qualified Data.Set as Set
 import Prologue
 
 data Value address body
-  = Closure PackageInfo ModuleInfo [Name] (ClosureBody address body) (Environment address)
+  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (ClosureBody address body) (Environment address)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -56,7 +56,7 @@ instance Show (ClosureBody address body) where
 
 instance Ord address => ValueRoots address (Value address body) where
   valueRoots v
-    | Closure _ _ _ _ env <- v = Env.addresses env
+    | Closure _ _ _ _ _ env <- v = Env.addresses env
     | otherwise                = mempty
 
 
@@ -74,14 +74,14 @@ runFunction :: ( Member (Allocator address (Value address body)) effects
             -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
             -> Evaluator address (Value address body) effects a
 runFunction toEvaluator fromEvaluator = interpret $ \case
-  Abstract.Function params fvs body -> do
+  Abstract.Function name params fvs body -> do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
+    Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
   Abstract.Call op params -> do
     case op of
-      Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
+      Closure packageInfo moduleInfo name names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
