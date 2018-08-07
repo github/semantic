@@ -70,7 +70,7 @@ lambda :: ( HasCallStack
        -> Evaluator address value effects value
 lambda body = withCurrentCallStack callStack $ do
   var <- gensym
-  function [var] lowerBound (body var)
+  function Nothing [var] lowerBound (body var)
 
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack

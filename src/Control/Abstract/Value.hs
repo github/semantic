@@ -39,18 +39,18 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
-function :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
-function names fvs (Evaluator body) = send (Function names fvs body)
+function :: Member (Function address value) effects => Maybe Name -> [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
+function name params fvs (Evaluator body) = send (Function name params fvs body)
 
 call :: Member (Function address value) effects => value -> [address] -> Evaluator address value effects address
 call fn args = send (Call fn args)
 
 data Function address value m result where
-  Function :: [Name] -> Set Name -> m address -> Function address value m value
+  Function :: (Maybe Name) -> [Name] -> Set Name -> m address -> Function address value m value
   Call     :: value -> [address]              -> Function address value m address
 
 instance PureEffect (Function address value) where
-  handle handler (Request (Function name fvs body) k) = Request (Function name fvs (handler body)) (handler . k)
+  handle handler (Request (Function name params fvs body) k) = Request (Function name params fvs (handler body)) (handler . k)
   handle handler (Request (Call fn addrs)          k) = Request (Call fn addrs)                    (handler . k)
 
 class Show value => AbstractIntro value where
@@ -120,6 +120,8 @@ class AbstractIntro value => AbstractValue address value effects where
 
   -- | Construct an array of zero or more values.
   array :: [address] -> Evaluator address value effects value
+
+  asArray :: value -> Evaluator address value effects [address]
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator address value effects (value, value)

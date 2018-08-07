@@ -229,7 +229,7 @@ runFunction :: ( Member (Allocator address Type) effects
             => Evaluator address Type (Abstract.Function address Type ': effects) a
             -> Evaluator address Type effects a
 runFunction = interpret $ \case
-  Abstract.Function params _ body -> do
+  Abstract.Function _ params _ body -> do
     (env, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
