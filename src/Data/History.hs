@@ -11,8 +11,12 @@ module Data.History
 import Data.Record
 import Data.Range
 
--- | 'History' values, when attached to a given 'Term', describe the ways in which
--- that term was modified during a refactoring pass, if any.
+-- | 'History' values, when attached to a given 'Term', describe the
+-- ways in which that term was modified during a refactoring pass, if
+-- any.
+--
+-- TODO: investigate how this is congruent with our diffing
+-- strategies.
 data History
   = Generated         -- ^ A 'Generated' node was created by a refactor and has no position information.
   | Refactored Range  -- ^ A 'Refactored' node was changed by a refactor but still has (possibly-inaccurate) position information.

@@ -37,6 +37,7 @@ import qualified Data.Source as Source
 -- * Is a stack machine too inexpressive?
 -- * Is this interface too clumsy? Do we just want to use Eff, or another monad?
 -- * Do we want to use a generic MonadError rather than instantiate that to Either?
+-- * @Coassignment@ might be a better name
 class Translate (lang :: Language) where
 
   type Stack lang = s | s -> lang

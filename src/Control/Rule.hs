@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeOperators, GADTs #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
@@ -16,33 +16,45 @@ import           Data.Machine
 import           Data.Profunctor
 import           Data.Text (Text, intercalate, unpack)
 
-data Rule from to = Rule
-  { description :: [Text]
-  , machine     :: MachineT Identity (Is from) to
-  } deriving (Functor)
+-- | The fundamental data type representing a rewrite rule
+-- from 'from' data to 'to' data. A Rule may never emit data,
+-- or it might filter data, or it might be a 1:1 mapping from
+-- input to output.
+data Rule m from to where
+  Rule :: Monad m => [Text] -> ProcessT m from to -> Rule m from to
 
-instance Show (Rule from to) where
+description :: Rule m from to -> [Text]
+description (Rule d _) = d
+
+machine :: Rule m from to -> ProcessT m from to
+machine (Rule _ m) = m
+
+instance Show (Rule m from to) where
   show = unpack . intercalate " | " . description
 
-instance Lower (Rule from to) where
+instance Monad m => Lower (Rule m from to) where
   lowerBound = Rule [] mempty
 
-instance Semigroup (Rule from to) where
+instance Semigroup (Rule m from to) where
   (Rule a c) <> (Rule b d) = Rule (a <> b) (c <> d)
 
-data Previous a = After
-  { previous :: Maybe a
-  , current  :: a
-  } deriving (Show, Eq, Functor)
+fromPlan :: Monad m => Text -> Plan (Is from) to () -> Rule m from to
+fromPlan desc plan = Rule [desc] (repeatedly plan)
 
-fromMealy :: Text -> (Previous from -> to) -> Rule from to
-fromMealy t f = Rule [t] . auto $ unfoldMealy go initial where
-  initial = After Nothing (error shouldn'tHappen)
-  shouldn'tHappen = "bug: attempted to access an After before it was ready"
-  go acc from =
-    let into = acc  { current = from }
-        out  = into { previous = Just from }
-    in (f into, out)
+-- fromFunction :: Text -> (from -> to) -> Rule from to
+-- fromFunction t = Rule [t] . auto
+
+-- justs :: Rule (Maybe it) it
+-- justs = Rule "[builtin] justs"
+
+-- fromMealy :: Text -> Plan from to () -> Rule from to
+-- fromMealy t f = Rule [t] . auto $ unfoldMealy go initial where
+--   initial = After Nothing (error shouldn'tHappen)
+--   shouldn'tHappen = "bug: attempted to access an After before it was ready"
+--   go acc from =
+--     let into = acc  { current = from }
+--         out  = into { previous = Just from }
+--     in (f into, out)
 
 
 -- remembering :: Rule effs from (After from)

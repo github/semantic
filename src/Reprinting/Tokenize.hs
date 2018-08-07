@@ -145,7 +145,7 @@ strategize new = do
     control (Change new)
     modify' (set strategy new)
 
--- | A subterm algebra that implements the /Scrap Your Tokenizer/
+-- | A subterm algebra that implements the /Scrap Your Reprinter/
 -- algorithm.  Whereas /SYR/ uses a zipper to do a top-down
 -- depth-first rightward traversal of a tree, we use a subterm algebra
 -- over a monad, which performs the same task.

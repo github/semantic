@@ -35,7 +35,7 @@ instance Evaluatable Boolean where
 
 instance Tokenize Boolean where
   whenGenerated  = yield . Truth . booleanContent
-  whenRefactored = ignore
+  whenRefactored = whenGenerated
 
 -- Numeric
 
