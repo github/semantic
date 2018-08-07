@@ -14,10 +14,10 @@ data BaseError (exc :: * -> *) resume = BaseError { baseErrorModuleInfo :: Modul
 
 
 instance (Eq1 exc) => Eq1 (BaseError exc) where
-  liftEq f (BaseError _ exc1) (BaseError _ exc2) = liftEq f exc1 exc2
+  liftEq f (BaseError _ _ exc1) (BaseError _ _ exc2) = liftEq f exc1 exc2
 
 instance Show1 exc => Show1 (BaseError exc) where
-  liftShowsPrec sl sp d (BaseError _ exc) = liftShowsPrec sl sp d exc
+  liftShowsPrec sl sp d (BaseError _ _ exc) = liftShowsPrec sl sp d exc
 
 throwBaseError :: ( Member (Resumable (BaseError exc)) effects
                   , Member (Reader M.ModuleInfo) effects
