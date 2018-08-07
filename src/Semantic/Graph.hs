@@ -45,7 +45,7 @@ import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclaration
 import           Data.Project
 import           Data.Record
 import           Data.Term
-import           Data.Text (pack)
+import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
@@ -53,9 +53,10 @@ import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.Task as Task
 import           Text.Show.Pretty (ppShow)
 import qualified Data.ByteString.Char8 as B
-import System.FilePath.Posix ((</>))
-import Data.List (isPrefixOf)
+import System.FilePath.Posix ((</>), takeDirectory)
+import Data.List (isPrefixOf, isSuffixOf, partition)
 import Data.Language as Language
+import Data.Blob (Blob(..))
 
 data GraphType = ImportGraph | CallGraph
 
@@ -251,7 +252,7 @@ parsePythonPackage :: forall syntax fields effs term.
                    => Parser term       -- ^ A parser.
                    -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
-                   -> Eff effs [Package term]
+                   -> Eff effs (Package term)
 parsePythonPackage parser preludeFile project = do
   prelude <- traverse (parseModule project parser) preludeFile
 
@@ -281,17 +282,28 @@ parsePythonPackage parser preludeFile project = do
       p <- parseModules parser project
       let n = name (projectName project)
       resMap <- Task.resolutionMap project
-      pure [ Package.fromModules n p resMap ]
+      pure (Package.fromModules n p resMap)
     PythonPackage.Packages dirs -> do
-      for dirs $ \dir -> do
-        let packageDir = (projectRootDir project) </> (B.unpack dir)
-        let files' = filter ((packageDir `isPrefixOf`) . filePath) (projectFiles project)
-        let p = Project packageDir [] (projectLanguage project) (filePath <$> files')
-        let n = name (projectName p)
-        p' <- parseModules parser p
-        resMap <- Task.resolutionMap project
-        pure (Package.fromModules n p' resMap)
-    PythonPackage.FindPackages excludeDirs -> undefined
+      filteredBlobs <- for dirs $ \dir -> do
+        let packageDir = (projectRootDir project) </> (unpack dir)
+        let paths = filter ((packageDir `isPrefixOf`) . filePath) (projectFiles project)
+        traverse (readFile project) paths
+
+      let p = project { projectBlobs = (catMaybes $ join filteredBlobs) }
+      modules <- parseModules parser p
+      resMap <- Task.resolutionMap p
+      pure (Package.fromModules (name $ projectName p) modules resMap)
+    PythonPackage.FindPackages excludeDirs -> do
+      trace "In Graph.FindPackages"
+      let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
+      let packageDirs = filter (`notElem` (((projectRootDir project </>) . unpack) <$> excludeDirs)) (takeDirectory . filePath <$> initFiles)
+      filteredBlobs <- for packageDirs $ \dir -> do
+        let paths = filter ((dir `isPrefixOf`) . filePath) (projectFiles project)
+        traverse (readFile project) paths
+      let p = project { projectBlobs = (catMaybes $ join filteredBlobs) }
+      modules <- parseModules parser p
+      resMap <- Task.resolutionMap p
+      pure (Package.fromModules (name $ projectName p) modules resMap)
 
 -- Load the prelude
 -- Find the setup.py file in the list of projectFiles

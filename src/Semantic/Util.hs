@@ -134,16 +134,15 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
-  packages <- fmap (fmap quieterm) <$> parsePythonPackage parser Nothing project
-  forM packages $ \package -> do
-    modules <- topologicalSort <$> runImportGraphToModules proxy package
-    trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-    pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise))
-         (runReader (packageInfo package)
-         (runReader (lowerBound @Span)
-         (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-         (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-         (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
+  package <- fmap quieterm <$> parsePythonPackage parser Nothing project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (runTermEvaluator @_ @_ @(Value Precise UtilEff)
+       (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
