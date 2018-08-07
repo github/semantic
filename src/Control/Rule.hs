@@ -1,12 +1,15 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeOperators, GADTs #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 
 module Control.Rule where
 
+import Prelude hiding ((.))
 import Prologue
 
+import           Control.Arrow
+import           Control.Category
 import           Control.Monad.Effect (Eff, Effect, Effectful (..))
 import qualified Control.Monad.Effect as Eff
 import           Control.Monad.Effect.State
@@ -16,30 +19,55 @@ import           Data.Machine
 import           Data.Profunctor
 import           Data.Text (Text, intercalate, unpack)
 
--- | The fundamental data type representing a rewrite rule
--- from 'from' data to 'to' data. A Rule may never emit data,
--- or it might filter data, or it might be a 1:1 mapping from
--- input to output.
-data Rule m from to where
-  Rule :: Monad m => [Text] -> ProcessT m from to -> Rule m from to
+-- | The fundamental data type representing steps in a rewrite rule
+-- from @from@ data to @to@ data. A Rule may never emit data, or it
+-- might filter data, or it might be a 1:1 mapping from input to
+-- output. A rule can access state and other side effects through the
+-- @effs@ parameter.
+--
+-- A 'Rule' is a simple wrapper around the 'ProcessT' type from
+-- @machines@. As such, it limits the input type of tokens to the
+-- 'Is' carrier type, which might not be sufficiently flexible.
+data Rule effs from to = Rule
+  { description :: [Text]
+  , machine     :: ProcessT (Eff effs) from to
+  } deriving Functor
 
-description :: Rule m from to -> [Text]
-description (Rule d _) = d
+instance Category (Rule effs) where
+  id = Rule ["[builtin] echo"] echo
+  Rule d p . Rule d' p' = Rule (d' <> d) (p' ~> p)
 
-machine :: Rule m from to -> ProcessT m from to
-machine (Rule _ m) = m
+instance Profunctor (Rule effs) where
+  lmap f (Rule d p) = Rule d (auto f ~> p)
+  rmap = fmap
 
-instance Show (Rule m from to) where
+instance Show (Rule effs from to) where
   show = unpack . intercalate " | " . description
 
-instance Monad m => Lower (Rule m from to) where
+instance Lower (Rule effs from to) where
   lowerBound = Rule [] mempty
 
-instance Semigroup (Rule m from to) where
+instance Semigroup (Rule effs from to) where
   (Rule a c) <> (Rule b d) = Rule (a <> b) (c <> d)
 
-fromPlan :: Monad m => Text -> Plan (Is from) to () -> Rule m from to
+instance Monoid (Rule effs from to)   where
+  mempty = lowerBound
+  mappend = (<>)
+
+fromPlan :: Text -> PlanT (Is from) to (Eff effs) () -> Rule effs from to
 fromPlan desc plan = Rule [desc] (repeatedly plan)
+
+fromPlanState :: Lower state => Text -> (state -> PlanT (Is from) to (Eff effs) state) -> Rule effs from to
+fromPlanState t = Rule [t] . unfoldPlan lowerBound
+
+fromFunction :: Text -> (from -> to) -> Rule effs from to
+fromFunction t f = fromEffect t (pure . f)
+
+fromEffect :: Text -> (from -> Eff effs to) -> Rule effs from to
+fromEffect t = Rule [t] . autoT . Kleisli
+
+runRule :: Foldable f => f from -> Rule effs from to -> Eff effs [to]
+runRule inp r = runT (source inp ~> machine r)
 
 -- fromFunction :: Text -> (from -> to) -> Rule from to
 -- fromFunction t = Rule [t] . auto
