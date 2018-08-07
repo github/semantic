@@ -54,7 +54,8 @@ import           Semantic.Task as Task
 import           Text.Show.Pretty (ppShow)
 import qualified Data.ByteString.Char8 as B
 import System.FilePath.Posix ((</>), takeDirectory)
-import Data.List (isPrefixOf, isSuffixOf, partition)
+import Data.List (isPrefixOf, isSuffixOf, partition, sortBy)
+import Data.Ord (Down(..), comparing)
 import Data.Language as Language
 import Data.Blob (Blob(..))
 
@@ -279,7 +280,9 @@ parsePythonPackage parser preludeFile project = do
   (strat, _) <- runAnalysis $ (evaluate (Proxy @'Language.Python) id id (Concrete.runFunction coerce coerce . runPythonPackaging) [ setupModule ] )
   case strat of
     PythonPackage.Unknown -> do
-      p <- parseModules parser project
+      let sortedBlobs = (sortBy . comparing) (length . blobPath) (projectBlobs project)
+      trace (show (blobPath <$> sortedBlobs))
+      p <- parseModules parser (project { projectBlobs = sortedBlobs })
       let n = name (projectName project)
       resMap <- Task.resolutionMap project
       pure (Package.fromModules n p resMap)
