@@ -358,6 +358,7 @@ resumingValueError = runValueErrorWith (\ err -> trace ("ValueError: " <> pretty
   BitwiseError{}    -> pure hole
   Bitwise2Error{}   -> pure hole
   KeyValueError{}   -> pure (hole, hole)
+  ArrayError{}   -> pure lowerBound
   ArithmeticError{} -> pure hole)
 
 resumingEnvironmentError :: (Applicative (m (Hole (Maybe Name) address) value effects), Effectful (m (Hole (Maybe Name) address) value), Effects effects) => m (Hole (Maybe Name) address) value (Resumable (EnvironmentError (Hole (Maybe Name) address)) ': effects) a -> m (Hole (Maybe Name) address) value effects a
