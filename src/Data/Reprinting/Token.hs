@@ -58,6 +58,7 @@ data Context
   | Pair
   | Infix Operator
   | Imperative
+  | TopLevel
     deriving (Show, Eq)
 
 -- | A sum type representing every concievable infix operator a
