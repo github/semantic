@@ -123,7 +123,7 @@ runLoadErrorWith = runResumableWith
 throwLoadError :: Member (Resumable (BaseError (LoadError address))) effects
                => LoadError address resume
                -> Evaluator address value effects resume
-throwLoadError err = throwResumable $ BaseError lowerBound err
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ErrorContext (ModuleInfo name) emptySpan) err
 
 
 -- | An error thrown when we can't resolve a module from a qualified name.
