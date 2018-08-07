@@ -28,7 +28,7 @@ newtype Previous a = Previous (Maybe a)
   deriving (Eq, Show, Functor, Applicative, Lower)
 
 remembering :: forall effs a . Rule effs a (Previous a, a)
-remembering = fromPlanState "[builtin] remembering" $ \prev -> do
+remembering = fromStateful "[builtin] remembering" $ \prev -> do
   x <- await
   yield (prev, x)
   pure (pure @Previous x)
