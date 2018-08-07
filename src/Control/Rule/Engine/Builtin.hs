@@ -4,10 +4,15 @@ module Control.Rule.Engine.Builtin where
 
 import Control.Rule
 import Control.Monad.Reader
+import Control.Monad.Reader
 import Data.Reprinting.Token
-import Control.Monad.State
 import Data.Machine
+import qualified Data.Machine as Machine
+import Control.Monad.Effect (Eff, Member)
+import qualified Control.Monad.Effect as Eff
+import Control.Monad.Effect.State
 import Debug.Trace (traceM)
+import Data.Functor.Identity
 
 justs :: Monad m => Rule m (Maybe it) it
 justs = fromPlan "[builtin] justs" $
@@ -31,22 +36,39 @@ remembering f = Rule ["[builtin] remembering"] pipeline where
 
 data With ann from = With
   { additional :: ann
-  , wcurrent   :: ~from
+  , wcurrent   :: from
   } deriving (Show, Eq)
 
-contextuallyP :: Monad m => PlanT (Is Token) (With [Context] Token) (StateT [Context] m) ()
+contextuallyP :: (Member (State [Context]) effs)
+              => PlanT
+                 (Is Token)
+                 (With [Context] Token)
+                 (Eff effs)
+                 ()
 contextuallyP = do
   t <- await
   case t of
-    TControl (Enter e) -> modify' (e :)
-    TControl (Exit _)  -> modify' (drop 1)
+    TControl (Enter e) -> lift (modify' @[Context] (e :))
+    TControl (Exit _)  -> lift (modify' @[Context] (drop 1))
     _                  -> traceM (show t)
 
   st <- lift get
   yield (With st t)
 
-contextually :: Monad m => Rule (StateT [Context] m) Token (With [Context] Token)
+contextually :: (Member (State [Context]) effs)
+             => Rule (Eff effs) Token (With [Context] Token)
 contextually = Rule ["[builtin] contextually"] (repeatedly contextuallyP)
+
+runContextually :: Foldable f
+                => f from
+                -> ProcessT (Eff '[State [Context]]) from to
+                -> [to]
+runContextually fs m
+  = Eff.run
+  . fmap snd
+  . runState ([] :: [Context])
+  . Machine.runT
+  $ source fs ~> m
 
 -- contextually :: Monad m => Rule m Token (With [Context] Token)
 -- contextually = do
