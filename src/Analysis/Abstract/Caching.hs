@@ -7,7 +7,7 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
-import Data.Abstract.ErrorContext hiding (moduleInfo)
+import Data.Abstract.ErrorContext
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Prologue
