@@ -1,6 +1,6 @@
 {-# LANGUAGE KindSignatures, AllowAmbiguousTypes #-}
 
-module Data.Abstract.ErrorContext (
+module Data.Abstract.BaseError (
   BaseError(..)
 , throwBaseError
 )

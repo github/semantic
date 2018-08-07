@@ -1,7 +1,7 @@
 module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Environment as Env
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Number as Number

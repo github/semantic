@@ -21,7 +21,7 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Environment (Bindings, Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports

@@ -15,7 +15,7 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Abstract.Name
 import Data.Text (unpack)
 import Prologue

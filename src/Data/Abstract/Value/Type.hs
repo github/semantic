@@ -13,7 +13,7 @@ import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
-import Data.Abstract.ErrorContext
+import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
 import Prologue hiding (TypeError)
