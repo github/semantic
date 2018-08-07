@@ -37,5 +37,3 @@ instance (Eq1 exc) => Eq1 (BaseError exc) where
 instance Show1 (BaseError exc) where
   liftShowsPrec = liftShowsPrec
 
-instance Lower ErrorContext where
-  lowerBound = ErrorContext lowerBound lowerBound
