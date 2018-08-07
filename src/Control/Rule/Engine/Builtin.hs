@@ -1,18 +1,88 @@
-{-# LANGUAGE RankNTypes, DuplicateRecordFields #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MultiWayIf, RankNTypes, ScopedTypeVariables, TupleSections, TypeFamilies #-}
 
 module Control.Rule.Engine.Builtin where
 
-import Control.Rule
-import Control.Monad.Reader
-import Control.Monad.Reader
-import Data.Reprinting.Token
-import Data.Machine
-import qualified Data.Machine as Machine
-import Control.Monad.Effect (Eff, Member)
+import Prologue
+
+import Control.Arrow
+import           Control.Monad.Effect (Member)
 import qualified Control.Monad.Effect as Eff
-import Control.Monad.Effect.State
-import Debug.Trace (traceM)
-import Data.Functor.Identity
+import           Control.Monad.Effect.State
+import           Control.Monad.Trans
+import           Control.Rule
+import           Data.Machine
+import qualified Data.Machine as Machine
+import           Data.Reprinting.Token
+
+trackingContexts :: Member (State [Context]) effs
+                 => Rule effs Token (Token, [Context])
+trackingContexts = fromPlan "[builtin] trackingContexts" $ do
+  t <- await
+  let go = yield =<< ((,) <$> pure t <*> lift get)
+  case t of
+    TControl (Enter e) -> go *> lift (modify' @[Context] (e :))
+    TControl (Exit _)  -> go <* lift (modify' @[Context] (drop 1))
+    _                  -> go
+
+newtype Previous a = Previous (Maybe a)
+  deriving (Eq, Show, Functor, Applicative, Lower)
+
+remembering :: forall effs a . Rule effs a (Previous a, a)
+remembering = fromPlanState "[builtin] remembering" $ \prev -> do
+  x <- await
+  yield (prev, x)
+  pure (pure @Previous x)
+
+fixingHashes :: Rule effs (Previous (Token, [Context]), (Token, [Context])) Token
+fixingHashes = fromPlan "[builtin] fixing hashes" $ do
+  (Previous last, (current, context)) <- await
+
+  let isSeparator = fmap fst last == Just (TElement Separator)
+  -- TODO: check for trailing chunks
+
+  if
+    | listToMaybe context /= Just Associative -> yield current
+    | isNothing last -> yield current
+    | isSeparator    -> yield current
+    | otherwise      -> yield (TElement Separator) *> yield current
+
+fixingPipeline :: (Member (State [Context]) effs) => Rule effs Token Token
+fixingPipeline = trackingContexts >>> remembering >>> fixingHashes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+runContextually :: (Foldable f, effs ~ '[State [Context], State (Previous from)])
+                => f from
+                -> Rule effs from to
+                -> [to]
+runContextually fs r
+  = Eff.run
+  . fmap snd
+  . runState (lowerBound @(Previous _))
+  . fmap snd
+  . runState ([] :: [Context])
+  . Machine.runT
+  $ source fs ~> machine r
+
+{-
 
 justs :: Monad m => Rule m (Maybe it) it
 justs = fromPlan "[builtin] justs" $
@@ -59,19 +129,9 @@ contextually :: (Member (State [Context]) effs)
              => Rule (Eff effs) Token (With [Context] Token)
 contextually = Rule ["[builtin] contextually"] (repeatedly contextuallyP)
 
-runContextually :: Foldable f
-                => f from
-                -> ProcessT (Eff '[State [Context]]) from to
-                -> [to]
-runContextually fs m
-  = Eff.run
-  . fmap snd
-  . runState ([] :: [Context])
-  . Machine.runT
-  $ source fs ~> m
-
 -- contextually :: Monad m => Rule m Token (With [Context] Token)
 -- contextually = do
 --   t <- await
 
 --   fromPlan "[builtin] contextually" $ do
+-}
