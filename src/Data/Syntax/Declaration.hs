@@ -256,9 +256,7 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeAlias where
   eval TypeAlias{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasIdentifier))
-    v <- subtermValue typeAliasKind
-    addr <- lookupOrAlloc name
-    assign addr v
+    addr <- subtermAddress typeAliasKind
     bind name addr
     pure (Rval addr)
 
