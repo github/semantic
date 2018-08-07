@@ -159,7 +159,7 @@ namespaceScope heap ns@(Namespace _ _ _)
   . runAddressError
   . runState heap
   . runReader (lowerBound @Span)
-  . runReader (lowerBound @ModuleInfo)
+  . runReader (ModuleInfo "SpecHelper.hs")
   . runDeref
   $ materializeEnvironment ns
 

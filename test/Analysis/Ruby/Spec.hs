@@ -37,7 +37,7 @@ spec config = parallel $ do
 
     it "evaluates load with wrapper" $ do
       (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
-      res `shouldBe` Left (SomeExc (inject @(BaseError (EnvironmentError Precise)) (BaseError lowerBound (FreeVariable "foo"))))
+      res `shouldBe` Left (SomeExc (inject @(BaseError (EnvironmentError Precise)) (BaseError (ErrorContext (ModuleInfo "load-wrap.rb") emptySpan) (FreeVariable "foo"))))
 
     it "evaluates subclass" $ do
       (_, (heap, res)) <- evaluate ["subclass.rb"]
