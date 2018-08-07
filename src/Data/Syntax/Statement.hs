@@ -118,13 +118,11 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Assignment where
   eval Assignment{..} = do
     lhs <- subtermRef assignmentTarget
-    rhs <- subtermValue assignmentValue
+    rhs <- subtermAddress assignmentValue
 
     case lhs of
       LvalLocal nam -> do
-        addr <- lookupOrAlloc nam
-        assign addr rhs
-        bind nam addr
+        bind nam rhs
       LvalMember _ _ ->
         -- we don't yet support mutable object properties:
         pure ()
@@ -132,7 +130,7 @@ instance Evaluatable Assignment where
         -- the left hand side of the assignment expression is invalid:
         pure ()
 
-    rvalBox rhs
+    pure (Rval rhs)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
