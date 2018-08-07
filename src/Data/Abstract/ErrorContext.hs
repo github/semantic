@@ -1,11 +1,13 @@
-{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE KindSignatures, AllowAmbiguousTypes #-}
 
 module Data.Abstract.ErrorContext (
   BaseError(..)
-, ErrorContext(..)
+, throwBaseError
 )
 where
 
+import Control.Abstract.Context
+import Control.Abstract.Evaluator
 import qualified Data.Abstract.Module as M
 import qualified Data.Span as S
 import Prologue
