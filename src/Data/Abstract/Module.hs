@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Module
 ( Module(..)
 , moduleForBlob
@@ -33,7 +32,7 @@ moduleForBlob rootDir Blob{..} = Module info
 type ModulePath = FilePath
 
 newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
-  deriving (Eq, Ord, Lower)
+  deriving (Eq, Ord)
 
 instance Show ModuleInfo where
   showsPrec d = showsUnaryWith showsPrec "ModuleInfo" d . modulePath
