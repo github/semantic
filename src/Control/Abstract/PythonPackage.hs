@@ -1,21 +1,20 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators,
-             UndecidableInstances, LambdaCase, MultiWayIf #-}
+{-# LANGUAGE GADTs, LambdaCase, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
-import           Control.Abstract.Heap (deref, Allocator, Deref)
+import           Control.Abstract.Evaluator (LoopControl, Return)
+import           Control.Abstract.Heap (Allocator, Deref, deref)
 import           Control.Abstract.Value
 import           Control.Monad.Effect (Effectful (..))
-import           qualified Control.Monad.Effect as Eff
-import           Data.Abstract.Evaluatable (Evaluator, Resumable, State, put, get, Env, PackageInfo, Fresh, Trace, trace)
-import Control.Abstract.Evaluator (LoopControl, Return)
+import qualified Control.Monad.Effect as Eff
+import           Data.Abstract.Evaluatable (Env, Evaluator, Fresh, PackageInfo, Resumable, State, get, put)
 import           Data.Abstract.Module hiding (Module)
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
-import           Data.Abstract.Value.Concrete (Value(..), ValueError(..))
+import           Data.Abstract.Value.Concrete (Value (..), ValueError (..))
+import           Data.Coerce
 import qualified Data.Map as Map
 import           Prologue
-import Data.Coerce
 
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show)
@@ -27,7 +26,6 @@ runPythonPackaging :: forall effects address body a. (
                       , Member Fresh effects
                       , Coercible body (Eff.Eff effects)
                       , Member (State Strategy) effects
-                      , Member Trace effects
                       , Member (Allocator address (Value address body)) effects
                       , Member (Deref address (Value address body)) effects
                       , Member (Env address) effects
@@ -39,7 +37,7 @@ runPythonPackaging :: forall effects address body a. (
                    => Evaluator address (Value address body) effects a
                    -> Evaluator address (Value address body) effects a
 runPythonPackaging evaluator = (Eff.interpose @(Function address (Value address body)) $ \case
-  (Call callName params) -> do
+  Call callName params -> do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
         let bindings = foldr (\ (name, addr) rest -> Map.insert name addr rest) lowerBound (zip paramNames params)
@@ -51,7 +49,7 @@ runPythonPackaging evaluator = (Eff.interpose @(Function address (Value address 
                 as <- (asArray <=< deref) address
                 as' <- traverse (asString <=< deref) as
                 put (FindPackages (stripQuotes <$> as'))
-              _ -> trace "In PythonPackaging" >> put (FindPackages [])
+              _ -> put (FindPackages [])
           Just n | name "setup" == n -> do
             packageState <- get
             case packageState of
