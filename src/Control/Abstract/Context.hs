@@ -52,9 +52,7 @@ withCurrentSrcLoc :: (Effectful m, Member (Reader ModuleInfo) effects, Member (R
 withCurrentSrcLoc loc = withCurrentModule (moduleInfoFromSrcLoc loc) . withCurrentSpan (spanFromSrcLoc loc)
 
 currentErrorContext :: ( Monad (m effects), Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects) => m effects ErrorContext
-currentErrorContext = do
-  moduleInfo <- currentModule
-  ErrorContext moduleInfo <$> currentSpan
+currentErrorContext = ErrorContext <$> currentModule <*> currentSpan
 
 -- | Run an action with locally replaced 'ModuleInfo' & 'Span' derived from the Haskell call stack.
 --
