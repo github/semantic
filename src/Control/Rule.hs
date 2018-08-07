@@ -28,39 +28,55 @@ import           Data.Text (Text, intercalate, unpack)
 -- A 'Rule' is a simple wrapper around the 'ProcessT' type from
 -- @machines@. As such, it limits the input type of tokens to the
 -- 'Is' carrier type, which might not be sufficiently flexible.
+-- We may want to use 'MachineT' and make the machine's input
+-- language explicit in the type of Rule:
+-- @
+--   data GRule input effs from to = GRule
+--     { description :: [Text]
+--     , machine :: MachineT (Eff effs) (k from) to
+--     }
+--
+--   newtype Rule effs from to = Rule { unruly :: GRule Is effs from to }
+-- @
+--
+-- This would allow us to use 'T' and 'Stack' in rules, which would be
+-- pretty slick.
 data Rule effs from to = Rule
   { description :: [Text]
   , machine     :: ProcessT (Eff effs) from to
   } deriving Functor
 
--- As per the above, we may wish to do the following:
-
--- data GRule input effs from to = GRule
---   { description :: [Text]
---   , machine :: MachineT (Eff effs) (k from) to
---   }
-
--- newtype Rule effs from to = Rule { unruly :: GRule Is effs from to }
-
+-- | The identity (pass-through) rule is 'id'. To compose 'Rule's
+-- sequentially, use the `(>>>)` and `(<<<)` operators from
+-- Control.Arrow.
 instance Category (Rule effs) where
   id = Rule ["[anonymous] Rule.Category.id"] echo
   Rule d p . Rule d' p' = Rule (d' <> d) (p' ~> p)
 
+-- | You can contravariantly map over the 'from' parameter and
+-- covariantly map over the 'to' with 'lmap' and 'rmap' respectively
 instance Profunctor (Rule effs) where
   lmap f (Rule d p) = Rule d (auto f ~> p)
   rmap = fmap
 
+-- | You can use the Arrow combinators, or @-XArrows@ if you're really
+-- feeling it.
 instance Arrow (Rule effs) where
   arr = fromFunction "[anonymous] Rule.Arrow.arr"
   (Rule d a) *** (Rule d' b)
     = Rule (d <> d') (teeT zipping (auto fst ~> a) (auto snd ~> b))
 
+-- | Rules contain 'description' values. They will generally have
+-- at least one description, and will attempt, when composed, to yield
+-- a list of descriptions that describes the composition to some degree.
 instance Show (Rule effs from to) where
   show = unpack . intercalate " | " . description
 
+-- | The empty 'Rule' is 'stopped' and does not accept any input.
 instance Lower (Rule effs from to) where
-  lowerBound = Rule [] mempty
+  lowerBound = Rule ["[anonymous] lowerBound"] mempty
 
+-- | Left-to-right composition.
 instance Semigroup (Rule effs from to) where
   (Rule a c) <> (Rule b d) = Rule (a <> b) (c <> d)
 
@@ -71,9 +87,6 @@ instance Monoid (Rule effs from to)   where
 fromPlan :: Text -> PlanT (Is from) to (Eff effs) a -> Rule effs from to
 fromPlan desc plan = Rule [desc] (repeatedly plan)
 
--- This function is not possible to write yet. It will take a refactor of Rule.
--- fromPlan' :: Text -> PlanT k o (Eff effs) a -> GRule k effs from to
-
 fromStateful :: Lower state => Text -> (state -> PlanT (Is from) to (Eff effs) state) -> Rule effs from to
 fromStateful t = Rule [t] . unfoldPlan lowerBound
 
@@ -83,7 +96,7 @@ fromFunction = fromAutomaton
 fromEffect :: Text -> (from -> Eff effs to) -> Rule effs from to
 fromEffect t = fromAutomatonM t . Kleisli
 
-fromAutomaton :: (Automaton k) => Text -> k from to -> Rule effs from to
+fromAutomaton :: Automaton k => Text -> k from to -> Rule effs from to
 fromAutomaton t = Rule [t] . auto
 
 fromAutomatonM :: AutomatonM k => Text -> k (Eff effs) from to -> Rule effs from to
@@ -91,49 +104,3 @@ fromAutomatonM t = Rule [t] . autoT
 
 runRule :: Foldable f => f from -> Rule effs from to -> Eff effs [to]
 runRule inp r = runT (source inp ~> machine r)
-
--- fromFunction :: Text -> (from -> to) -> Rule from to
--- fromFunction t = Rule [t] . auto
-
--- justs :: Rule (Maybe it) it
--- justs = Rule "[builtin] justs"
-
--- fromMealy :: Text -> Plan from to () -> Rule from to
--- fromMealy t f = Rule [t] . auto $ unfoldMealy go initial where
---   initial = After Nothing (error shouldn'tHappen)
---   shouldn'tHappen = "bug: attempted to access an After before it was ready"
---   go acc from =
---     let into = acc  { current = from }
---         out  = into { previous = Just from }
---     in (f into, out)
-
-
--- remembering :: Rule effs from (After from)
--- remembering =
-
-
-
--- instance Monoid (Rule effs from to) where
---   mappend = (<>)
---   mempty  = lowerBound
-
--- -- instance Profunctor (Rule effs) where
--- --   dimap f g (Rule t m) = Rule t _
-
--- -- | This is a natural transformation between 'effs' and 'Identity'.
--- -- type Purifier effs = forall a . Eff effs a -> a
-
--- -- runRule :: Foldable f => (Eff effs a -> a) -> Rule effs from to -> f from -> [to]
--- -- runRule p (Rule _ m) s = Eff.run .  . runT $ source s ~> m
--- --p . snd . runState lowerBound . runT
-
--- inside :: (forall a . Eff old a -> Eff new a) -> Rule old from to -> Rule new from to
--- inside f (Rule d m) = Rule d (fitM f m)
-
--- toProcess :: Effect (Union effs) => Rule effs from to -> ProcessT (Eff effs) from to
--- toProcess = machine
-
--- runRuleM :: (Effect (Union effs), Effectful m, Foldable f) => Rule effs from to -> f from -> m effs [to]
--- runRuleM (Rule _ mach) src
---   = raiseEff
---   . runT $ source src ~> mach
