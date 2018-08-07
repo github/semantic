@@ -110,9 +110,7 @@ instance Evaluatable DefaultExport where
   eval (DefaultExport term) = do
     case declaredName term of
       Just name -> do
-        addr <- lookupOrAlloc name
-        v <- subtermValue term
-        assign addr v
+        addr <- subtermAddress term
         export name name Nothing
         bind name addr
       Nothing -> throwEvalError DefaultExportError

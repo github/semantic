@@ -10,7 +10,6 @@ module Control.Abstract.Heap
 , alloc
 , deref
 , assign
-, lookupOrAlloc
 , letrec
 , letrec'
 , variable
