@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
@@ -33,13 +33,27 @@ data Rule effs from to = Rule
   , machine     :: ProcessT (Eff effs) from to
   } deriving Functor
 
+-- As per the above, we may wish to do the following:
+
+-- data GRule input effs from to = GRule
+--   { description :: [Text]
+--   , machine :: MachineT (Eff effs) (k from) to
+--   }
+
+-- newtype Rule effs from to = Rule { unruly :: GRule Is effs from to }
+
 instance Category (Rule effs) where
-  id = Rule ["[builtin] echo"] echo
+  id = Rule ["[anonymous] Rule.Category.id"] echo
   Rule d p . Rule d' p' = Rule (d' <> d) (p' ~> p)
 
 instance Profunctor (Rule effs) where
   lmap f (Rule d p) = Rule d (auto f ~> p)
   rmap = fmap
+
+instance Arrow (Rule effs) where
+  arr = fromFunction "[anonymous] Rule.Arrow.arr"
+  (Rule d a) *** (Rule d' b)
+    = Rule (d <> d') (teeT zipping (auto fst ~> a) (auto snd ~> b))
 
 instance Show (Rule effs from to) where
   show = unpack . intercalate " | " . description
@@ -54,17 +68,26 @@ instance Monoid (Rule effs from to)   where
   mempty = lowerBound
   mappend = (<>)
 
-fromPlan :: Text -> PlanT (Is from) to (Eff effs) () -> Rule effs from to
+fromPlan :: Text -> PlanT (Is from) to (Eff effs) a -> Rule effs from to
 fromPlan desc plan = Rule [desc] (repeatedly plan)
 
-fromPlanState :: Lower state => Text -> (state -> PlanT (Is from) to (Eff effs) state) -> Rule effs from to
-fromPlanState t = Rule [t] . unfoldPlan lowerBound
+-- This function is not possible to write yet. It will take a refactor of Rule.
+-- fromPlan' :: Text -> PlanT k o (Eff effs) a -> GRule k effs from to
+
+fromStateful :: Lower state => Text -> (state -> PlanT (Is from) to (Eff effs) state) -> Rule effs from to
+fromStateful t = Rule [t] . unfoldPlan lowerBound
 
 fromFunction :: Text -> (from -> to) -> Rule effs from to
-fromFunction t f = fromEffect t (pure . f)
+fromFunction = fromAutomaton
 
 fromEffect :: Text -> (from -> Eff effs to) -> Rule effs from to
-fromEffect t = Rule [t] . autoT . Kleisli
+fromEffect t = fromAutomatonM t . Kleisli
+
+fromAutomaton :: (Automaton k) => Text -> k from to -> Rule effs from to
+fromAutomaton t = Rule [t] . auto
+
+fromAutomatonM :: AutomatonM k => Text -> k (Eff effs) from to -> Rule effs from to
+fromAutomatonM t = Rule [t] . autoT
 
 runRule :: Foldable f => f from -> Rule effs from to -> Eff effs [to]
 runRule inp r = runT (source inp ~> machine r)
