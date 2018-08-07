@@ -151,6 +151,10 @@ instance ( Coercible body (Eff effects)
   tuple = pure . Tuple
   array = pure . Array
 
+  asArray val
+    | Array addresses <- val = pure addresses
+    | otherwise = throwValueError $ ArrayError val
+
   klass n supers binds = do
     pure $ Class n supers binds
 
@@ -271,6 +275,7 @@ data ValueError address body resume where
   BitwiseError           :: Value address body                       -> ValueError address body (Value address body)
   Bitwise2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
   KeyValueError          :: Value address body                       -> ValueError address body (Value address body, Value address body)
+  ArrayError             :: Value address body                       -> ValueError address body [address]
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
   ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
   -- Out-of-bounds error
