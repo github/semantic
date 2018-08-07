@@ -20,6 +20,7 @@ import Data.Graph (topologicalSort)
 import Data.Language as Language
 import Data.List (uncons)
 import Data.Project
+import Data.Quieterm
 import Data.Span
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
