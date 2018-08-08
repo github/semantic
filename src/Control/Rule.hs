@@ -1,11 +1,43 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, ScopedTypeVariables #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-}
-{-# OPTIONS_GHC -Wno-unused-imports #-}
-{-# OPTIONS_GHC -Wno-missing-export-lists #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators, LambdaCase #-}
 
-module Control.Rule where
+-- | The fundamental data type representing steps in a rewrite rule
+-- from @from@ data to @to@ data. A Rule may never emit data, or it
+-- might filter data, or it might be a 1:1 mapping from input to
+-- output. A rule can access state and other side effects through the
+-- @effs@ parameter.
+--
+-- We use 'Rule's to build composable, constant-space pipelines for
+-- streams of 'Token's; during the reprinting process, various
+-- invariants may not be held over a token stream, and we can often
+-- fix these invariants with simple state/stack machines. Indeed, in
+-- this context a 'Rule' becomes a 'MachineT' with an effects list
+-- inside it. In this sense, 'Rule's are similar to Bagge & Hasu's
+-- concept of "rule-based token processors".
+--
+-- However, 'Rule's have a different purpose in the context of syntax
+-- trees, rather than token streams: they are (well, will be)
+-- convertible to a 'SubtermAlgebra' over a given 'Sum' type. In this
+-- context, they are much more similar to the @Transform@ type from
+-- the KURE rewriting system. Similarly, a 'Rule' from the matching
+-- DSL should be convertible into a 'Rule'.
 
-import Prelude hiding ((.))
+module Control.Rule
+  ( Rule
+  , description
+  , machine
+  -- * Constructing rules
+  , fromPlan
+  , fromStateful
+  , fromEffect
+  , fromAutomatonM
+  , fromAutomaton
+  , fromFunction
+  , fromMatcher
+  , toAlgebra
+  , runRule
+  ) where
+
+import Prelude hiding ((.), id)
 import Prologue
 
 import           Control.Arrow
@@ -19,24 +51,21 @@ import           Data.Machine
 import           Data.Profunctor
 import           Data.Text (Text, intercalate, unpack)
 
--- | The fundamental data type representing steps in a rewrite rule
--- from @from@ data to @to@ data. A Rule may never emit data, or it
--- might filter data, or it might be a 1:1 mapping from input to
--- output. A rule can access state and other side effects through the
--- @effs@ parameter.
---
--- A 'Rule' is a simple wrapper around the 'ProcessT' type from
+import Control.Abstract.Matching
+
+
+-- | A 'Rule' is a simple wrapper around the 'ProcessT' type from
 -- @machines@. As such, it limits the input type of tokens to the
 -- 'Is' carrier type, which might not be sufficiently flexible.
 -- We may want to use 'MachineT' and make the machine's input
 -- language explicit in the type of Rule:
 -- @
---   data GRule input effs from to = GRule
+--   data RuleC input effs from to = GRule
 --     { description :: [Text]
 --     , machine :: MachineT (Eff effs) (k from) to
 --     }
 --
---   newtype Rule effs from to = Rule { unruly :: GRule Is effs from to }
+--  type Rule = RuleC Is
 -- @
 --
 -- This would allow us to use 'T' and 'Stack' in rules, which would be
@@ -66,6 +95,10 @@ instance Arrow (Rule effs) where
   (Rule d a) *** (Rule d' b)
     = Rule (d <> d') (teeT zipping (auto fst ~> a) (auto snd ~> b))
 
+instance ArrowChoice (Rule effs) where
+  left l = fromPlan "left" go >>> rmap Left l where
+    go = await >>= either yield (const (return ()))
+
 -- | Rules contain 'description' values. They will generally have
 -- at least one description, and will attempt, when composed, to yield
 -- a list of descriptions that describes the composition to some degree.
@@ -84,6 +117,10 @@ instance Monoid (Rule effs from to)   where
   mempty = lowerBound
   mappend = (<>)
 
+-- | Build a 'Rule' from a description and a 'Plan'.  Plans allow you
+-- to 'await' zero or more values from upstream and 'yield' zero or
+-- more values downstream.  You can 'lift' effectful actions into
+-- 'PlanT'.
 fromPlan :: Text -> PlanT (Is from) to (Eff effs) a -> Rule effs from to
 fromPlan desc plan = Rule [desc] (repeatedly plan)
 
@@ -99,8 +136,20 @@ fromEffect t = fromAutomatonM t . Kleisli
 fromAutomaton :: Automaton k => Text -> k from to -> Rule effs from to
 fromAutomaton t = Rule [t] . auto
 
+fromMatcher :: Text -> Matcher from to -> Rule effs from (Either from to)
+fromMatcher t m = Rule [t] (auto go) where go x = maybe (Left x) Right (runOnce x m)
+
 fromAutomatonM :: AutomatonM k => Text -> k (Eff effs) from to -> Rule effs from to
 fromAutomatonM t = Rule [t] . autoT
+
+toAlgebra :: (Traversable (Base t), Corecursive t, Recursive t)
+          => Rule effs (Base t t) t
+          -> FAlgebra (Base t) (Eff effs t)
+toAlgebra (Rule _ m) r = do
+  inner <- sequenceA r
+  let res = supply (Just inner) m
+  let next = fromMaybe (embed inner) . listToMaybe
+  next <$> runT res
 
 runRule :: Foldable f => f from -> Rule effs from to -> Eff effs [to]
 runRule inp r = runT (source inp ~> machine r)

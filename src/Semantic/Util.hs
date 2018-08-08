@@ -2,13 +2,16 @@
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
-import Prelude hiding (readFile)
+import Prelude hiding (id, (.), readFile)
 
+import Control.Category
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
+import           Control.Abstract.Matching
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
+import           Control.Arrow
 import           Control.Rule
 import           Control.Rule.Engine.Builtin
 import           Data.Abstract.Address
@@ -20,14 +23,15 @@ import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.Coerce
-import           Data.History
 import           Data.Functor.Foldable
 import           Data.Graph (topologicalSort)
+import           Data.History
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project hiding (readFile)
 import           Data.Record
 import           Data.Sum (weaken)
+import qualified Data.Sum as Sum
 import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.Haskell.HsColour
@@ -127,6 +131,29 @@ increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Rec
 increaseNumbers p = case Sum.project (termOut p) of
   Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
   Nothing                -> Term (fmap increaseNumbers (unTerm p))
+
+
+addKVPair :: forall effs syntax ann term
+             . ( Monoid ann, Literal.Hash :< syntax, term ~ Term (Sum syntax) ann )
+          => Rule effs term term
+addKVPair = fromMatcher "hashes" (matchM prjHash target) >>> (id ||| arr injHash) where
+  prjHash :: term -> Maybe (Literal.Hash term)
+  prjHash = projectTerm
+  injHash :: Literal.Hash term -> term
+  injHash h = injectTerm (foldMap annotation h) h
+
+
+{-
+
+             Hash
+  term     /-------> refactor ------->\   term
+--------->/                           |---------->
+          \                          /
+           \------> do nothing ----->/
+             non-Hashes
+
+-}
+
 
 -- addKVPair :: forall fs fields .
 --              (Apply Functor fs, Literal.Array :< fs, Literal.Hash :< fs, Literal.TextElement :< fs, Literal.KeyValue :< fs, Literal.Float :< fs)
