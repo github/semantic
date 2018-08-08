@@ -11,6 +11,7 @@ import           qualified Control.Abstract.PythonPackage as PythonPackage
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
+import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -66,13 +67,13 @@ newtype UtilEff a = UtilEff
                        , Reader (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                        , Reader Span
                        , Reader PackageInfo
-                       , Resumable (ValueError Precise UtilEff)
-                       , Resumable (AddressError Precise (Value Precise UtilEff))
-                       , Resumable ResolutionError
-                       , Resumable EvalError
-                       , Resumable (EnvironmentError Precise)
-                       , Resumable (Unspecialized (Value Precise UtilEff))
-                       , Resumable (LoadError Precise)
+                       , Resumable (BaseError (ValueError Precise UtilEff))
+                       , Resumable (BaseError (AddressError Precise (Value Precise UtilEff)))
+                       , Resumable (BaseError ResolutionError)
+                       , Resumable (BaseError EvalError)
+                       , Resumable (BaseError (EnvironmentError Precise))
+                       , Resumable (BaseError (UnspecializedError (Value Precise UtilEff)))
+                       , Resumable (BaseError (LoadError Precise))
                        , Trace
                        , Fresh
                        , State (Heap Precise Latest (Value Precise UtilEff))

@@ -31,10 +31,13 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Roots
 import Control.Abstract.TermEvaluator
 import Data.Abstract.Configuration
+import Data.Abstract.BaseError
 import Data.Abstract.Heap
 import Data.Abstract.Live
+import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Semigroup.Reducer
+import Data.Span (Span)
 import Prologue
 
 -- | Get the current 'Configuration' with a passed-in term.
@@ -117,7 +120,9 @@ letrec' name body = do
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: ( Member (Env address) effects
-            , Member (Resumable (EnvironmentError address)) effects
+            , Member (Reader ModuleInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (BaseError (EnvironmentError address))) effects
             )
          => Name
          -> Evaluator address value effects address
@@ -177,13 +182,15 @@ runAllocator = interpret $ \ eff -> case eff of
 
 runDeref :: ( Derefable address effects
             , PureEffects effects
-            , Member (Resumable (AddressError address value)) effects
+            , Member (Reader ModuleInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (BaseError (AddressError address value))) effects
             , Member (State (Heap address (Cell address) value)) effects
             )
          => Evaluator address value (Deref address value ': effects) a
          -> Evaluator address value effects a
 runDeref = interpret $ \ eff -> case eff of
-  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr))
 
 instance PureEffect (Allocator address value)
 
@@ -210,9 +217,23 @@ instance Eq address => Eq1 (AddressError address value) where
   liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
   liftEq _ _                        _                        = False
 
+throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))) effects
+                     , Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     )
+                  => AddressError address body resume
+                  -> Evaluator address value effects resume
+throwAddressError = throwBaseError
 
-runAddressError :: (Effectful (m address value), Effects effects) => m address value (Resumable (AddressError address value) ': effects) a -> m address value effects (Either (SomeExc (AddressError address value)) a)
+runAddressError :: ( Effectful (m address value)
+                   , Effects effects
+                   )
+                => m address value (Resumable (BaseError (AddressError address value)) ': effects) a
+                -> m address value effects (Either (SomeExc (BaseError (AddressError address value))) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . AddressError address value resume -> m address value effects resume) -> m address value (Resumable (AddressError address value) ': effects) a -> m address value effects a
+runAddressErrorWith :: (Effectful (m address value), Effects effects)
+                    => (forall resume . (BaseError (AddressError address value)) resume -> m address value effects resume)
+                    -> m address value (Resumable (BaseError (AddressError address value)) ': effects) a
+                    -> m address value effects a
 runAddressErrorWith = runResumableWith

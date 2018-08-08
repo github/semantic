@@ -50,6 +50,7 @@ library
                      , Control.Abstract.Value
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
+                     , Data.Abstract.BaseError
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
                      , Data.Abstract.Declarations
