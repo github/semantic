@@ -37,31 +37,30 @@ runPythonPackaging :: forall effects address body a. (
                    => Evaluator address (Value address body) effects a
                    -> Evaluator address (Value address body) effects a
 runPythonPackaging evaluator = (Eff.interpose @(Function address (Value address body)) $ \case
-  Call callName params -> do
+  Call callName super params -> do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
         let bindings = foldr (\ (name, addr) rest -> Map.insert name addr rest) lowerBound (zip paramNames params)
+        let asStrings address = (deref >=> asArray) address >>= traverse (deref >=> asString)
 
         case name' of
           Just n | name "find_packages" == n -> do
             case Map.lookup (name "exclude") bindings of
               Just address -> do
-                as <- (asArray <=< deref) address
-                as' <- traverse (asString <=< deref) as
-                put (FindPackages (stripQuotes <$> as'))
+                as <- asStrings address
+                put (FindPackages (stripQuotes <$> as))
               _ -> put (FindPackages [])
           Just n | name "setup" == n -> do
             packageState <- get
             case packageState of
               Unknown -> case Map.lookup (name "packages") bindings of
                 Just address -> do
-                  as <- (asArray <=< deref) address
-                  as' <- traverse (asString <=< deref) as
-                  put (Packages (stripQuotes <$> as'))
+                  as <- asStrings address
+                  put (Packages (stripQuotes <$> as))
                 _ -> pure ()
               _ -> pure ()
           _ -> pure ()
       _ -> pure ()
-    call callName params
+    call callName super params
   (Function name params vars body) ->  function name params vars (raiseEff body)
   ) evaluator
