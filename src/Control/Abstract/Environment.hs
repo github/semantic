@@ -2,9 +2,9 @@
 module Control.Abstract.Environment
 ( Environment
 , Exports
-, getCtx
-, putCtx
-, withCtx
+, getEvalContext
+, putEvalContext
+, withEvalContext
 , getEnv
 , export
 , lookupEnv
@@ -30,26 +30,26 @@ import Data.Abstract.Name
 import Prologue
 
 -- | Retrieve the current execution context
-getCtx :: Member (Env address) effects => Evaluator address value effects (EvalContext address)
-getCtx = send GetCtx
+getEvalContext :: Member (Env address) effects => Evaluator address value effects (EvalContext address)
+getEvalContext = send GetCtx
 
 -- | Retrieve the current environment
 getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
-getEnv = ctxEnvironment <$> getCtx
+getEnv = ctxEnvironment <$> getEvalContext
 
 -- | Replace the execution context. This is only for use in Analysis.Abstract.Caching.
-putCtx :: Member (Env address) effects => EvalContext address -> Evaluator address value effects ()
-putCtx = send . PutCtx
+putEvalContext :: Member (Env address) effects => EvalContext address -> Evaluator address value effects ()
+putEvalContext = send . PutCtx
 
-withCtx :: Member (Env address) effects
-        => EvalContext address
-        -> Evaluator address value effects a
-        -> Evaluator address value effects a
-withCtx ctx comp = do
-  oldCtx <- getCtx
-  putCtx ctx
+withEvalContext :: Member (Env address) effects
+                => EvalContext address
+                -> Evaluator address value effects a
+                -> Evaluator address value effects a
+withEvalContext ctx comp = do
+  oldCtx <- getEvalContext
+  putEvalContext ctx
   value <- comp
-  putCtx oldCtx
+  putEvalContext oldCtx
   pure value
 
 -- | Add an export to the global export state.
@@ -77,7 +77,7 @@ close :: Member (Env address) effects => Set Name -> Evaluator address value eff
 close = send . Close
 
 self :: Member (Env address) effects => Evaluator address value effects (Maybe address)
-self = ctxSelf <$> getCtx
+self = ctxSelf <$> getEvalContext
 
 -- Effects
 
