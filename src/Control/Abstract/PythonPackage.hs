@@ -7,8 +7,7 @@ import           Control.Abstract.Heap (Allocator, Deref, deref)
 import           Control.Abstract.Value
 import           Control.Monad.Effect (Effectful (..))
 import qualified Control.Monad.Effect as Eff
-import           Data.Abstract.Evaluatable (Env, Evaluator, Fresh, PackageInfo, Resumable, State, get, put)
-import           Data.Abstract.Module hiding (Module)
+import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..), ValueError (..))
@@ -22,7 +21,7 @@ data Strategy = Unknown | Packages [Text] | FindPackages [Text]
 runPythonPackaging :: forall effects address body a. (
                       Eff.PureEffects effects
                       , Show address
-                      , Member (Resumable (ValueError address body)) effects
+                      , Member (Resumable (BaseError (ValueError address body))) effects
                       , Member Fresh effects
                       , Coercible body (Eff.Eff effects)
                       , Member (State Strategy) effects
@@ -33,6 +32,7 @@ runPythonPackaging :: forall effects address body a. (
                       , Member (Eff.Exc (Return address)) effects
                       , Member (Eff.Reader ModuleInfo) effects
                       , Member (Eff.Reader PackageInfo) effects
+                      , Member (Eff.Reader Span) effects
                       , Member (Function address (Value address body)) effects)
                    => Evaluator address (Value address body) effects a
                    -> Evaluator address (Value address body) effects a
