@@ -92,6 +92,7 @@ type Syntax = '[
   , Expression.InstanceOf
   , Expression.New
   , Expression.Await
+  , Expression.This
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -193,7 +194,6 @@ type Syntax = '[
   , TypeScript.Syntax.Annotation
   , TypeScript.Syntax.With
   , TypeScript.Syntax.ForOf
-  , TypeScript.Syntax.This
   , TypeScript.Syntax.Update
   , TypeScript.Syntax.ComputedPropertyName
   , TypeScript.Syntax.Decorator
@@ -317,7 +317,7 @@ yieldExpression :: Assignment Term
 yieldExpression = makeTerm <$> symbol Grammar.YieldExpression <*> children (Statement.Yield <$> term (expression <|> emptyTerm))
 
 this :: Assignment Term
-this = makeTerm <$> symbol Grammar.This <*> (TypeScript.Syntax.This <$ rawSource)
+this = makeTerm <$> symbol Grammar.This <*> (Expression.This <$ rawSource)
 
 regex :: Assignment Term
 regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)

@@ -42,16 +42,16 @@ data Comparator
 function :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
 function names fvs (Evaluator body) = send (Function names fvs body)
 
-call :: Member (Function address value) effects => value -> [address] -> Evaluator address value effects address
-call fn args = send (Call fn args)
+call :: Member (Function address value) effects => value -> address -> [address] -> Evaluator address value effects address
+call fn self args = send (Call fn self args)
 
 data Function address value m result where
   Function :: [Name] -> Set Name -> m address -> Function address value m value
-  Call     :: value -> [address]              -> Function address value m address
+  Call     :: value -> address -> [address]   -> Function address value m address
 
 instance PureEffect (Function address value) where
   handle handler (Request (Function name fvs body) k) = Request (Function name fvs (handler body)) (handler . k)
-  handle handler (Request (Call fn addrs)          k) = Request (Call fn addrs)                    (handler . k)
+  handle handler (Request (Call fn self addrs)     k) = Request (Call fn self addrs)               (handler . k)
 
 
 class Show value => AbstractIntro value where
@@ -218,10 +218,10 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
                     => address
                     -> Evaluator address value effects a
                     -> Evaluator address value effects a
-evaluateInScopedEnv scopedEnvTerm term = do
-  scopedEnv <- scopedEnvironment scopedEnvTerm
+evaluateInScopedEnv receiver term = do
+  scopedEnv <- scopedEnvironment receiver
   env <- maybeM getEnv scopedEnv
-  withEnv env term
+  withEvalContext (EvalContext (Just receiver) env) term
 
 
 -- | Evaluates a 'Value' returning the referenced value

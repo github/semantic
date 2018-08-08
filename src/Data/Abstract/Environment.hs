@@ -1,6 +1,7 @@
 module Data.Abstract.Environment
   ( Environment(..)
   , Bindings(..)
+  , EvalContext(..)
   , addresses
   , aliasBindings
   , allNames
@@ -53,6 +54,12 @@ instance Lower (Bindings address) where
 --   scope for "a", then the next, and so on.
 newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings address) }
   deriving (Eq, Ord)
+
+data EvalContext address = EvalContext { ctxSelf :: Maybe address, ctxEnvironment :: Environment address }
+  deriving (Eq, Ord, Show)
+
+instance Lower (EvalContext address) where
+  lowerBound = EvalContext Nothing lowerBound
 
 -- | Make and enter a new empty scope in the given environment.
 push :: Environment address -> Environment address

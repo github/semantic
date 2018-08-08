@@ -238,7 +238,7 @@ runFunction = interpret $ \case
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
-  Abstract.Call op params -> do
+  Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
