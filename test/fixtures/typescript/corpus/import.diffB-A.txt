@@ -13,9 +13,11 @@
   {+(QualifiedAliasedImport
     {+(Identifier)+})+})+}
 {+(SideEffectImport)+}
-{+(QualifiedAliasedImport{+(Identifier)+})+}
+{+(QualifiedAliasedImport
+  {+(Identifier)+})+}
 {-(Import)-}
-{-(QualifiedAliasedImport{-(Identifier)-})-}
+{-(QualifiedAliasedImport
+  {-(Identifier)-})-}
 {-(Import)-}
 {-(Import)-}
 {-(Import)-}

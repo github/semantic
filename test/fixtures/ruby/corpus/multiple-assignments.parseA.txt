@@ -37,10 +37,10 @@
   (Assignment
     (Statements
       (Send
-        (Identifier)
+        (This)
         (Identifier))
       (Send
-        (Identifier)
+        (This)
         (Identifier)))
     (Statements
       (Send
