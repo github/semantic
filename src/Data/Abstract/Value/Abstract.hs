@@ -29,7 +29,7 @@ runFunction = interpret $ \case
       Env.insert name addr <$> rest) (pure lowerBound) params
     addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
     deref addr
-  Call _ params -> do
+  Call _ _ params -> do
     traverse_ deref params
     box Abstract
 
@@ -47,6 +47,7 @@ instance AbstractIntro Abstract where
   string _   = Abstract
   float _    = Abstract
   symbol _   = Abstract
+  regex _    = Abstract
   rational _ = Abstract
   hash _     = Abstract
   kvPair _ _ = Abstract

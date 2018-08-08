@@ -401,6 +401,9 @@ instance Listable1 Expression.Subscript where
 instance Listable1 Expression.Member where
   liftTiers tiers = liftCons2 tiers tiers Expression.Member
 
+instance Listable1 Expression.This where
+  liftTiers tiers = cons0 Expression.This
+
 instance Listable1 Literal.Complex where
   liftTiers tiers = cons1 Literal.Complex
 

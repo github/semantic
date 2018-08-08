@@ -5,14 +5,14 @@
     ->(SymbolElement) }
     { (TextElement)
     ->(TextElement) })
-  {+(KeyValue
-    {+(SymbolElement)+}
-    {+(Integer)+})+}
     (KeyValue
     { (SymbolElement)
-    ->(TextElement) }
+    ->(SymbolElement) }
     { (Integer)
-    ->(Boolean) })
+    ->(Integer) })
+  {+(KeyValue
+    {+(TextElement)+}
+    {+(Boolean)+})+}
     (KeyValue
     { (SymbolElement)
     ->(SymbolElement) }
