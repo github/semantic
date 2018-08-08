@@ -1,3 +1,4 @@
+{-# LANGUAGE FunctionalDependencies, UndecidableInstances #-}
 module Control.Abstract.Primitive
   ( define
   , defineClass
@@ -5,6 +6,7 @@ module Control.Abstract.Primitive
   , builtInPrint
   , builtInExport
   , lambda
+  , Lambda(..)
   ) where
 
 import Control.Abstract.Context
@@ -60,17 +62,33 @@ defineNamespace name scope = define name $ do
   binds <- Env.head <$> locally (scope >> getEnv)
   namespace name Nothing binds
 
+-- | Construct a function from a Haskell function taking 'Name's as arguments.
+--
+-- The constructed function will have the same arity as the Haskell function. Nullary functions are constructed by providing an evaluator producing an address. Note that the constructed function must not contain free variables as they will not be captured by the closure, and/or will be garbage collected.
 lambda :: ( HasCallStack
-          , Member Fresh effects
-          , Member (Function address value) effects
+          , Lambda address value effects fn
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           )
-       => (Name -> Evaluator address value effects address)
+       => fn
        -> Evaluator address value effects value
-lambda body = withCurrentCallStack callStack $ do
-  var <- gensym
-  function Nothing [var] lowerBound (body var)
+lambda body = withCurrentCallStack callStack (lambda' [] body)
+
+-- | A class of types forming the body of 'lambda's. Note that there should in general only be two cases: a recursive case of functions taking 'Name's as parameters, and a base case of an 'Evaluator'.
+class Lambda address value effects ty | ty -> address, ty -> value, ty -> effects where
+  lambda' :: [Name]
+          -> ty
+          -> Evaluator address value effects value
+
+instance (Member Fresh effects, Lambda address value effects ret) => Lambda address value effects (Name -> ret) where
+  lambda' vars body = do
+    var <- gensym
+    lambda' (var : vars) (body var)
+  {-# INLINE lambda' #-}
+
+instance Member (Function address value) effects => Lambda address value effects (Evaluator address value effects address) where
+  lambda' vars body = function Nothing vars lowerBound body
+  {-# INLINE lambda' #-}
 
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
