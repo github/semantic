@@ -87,7 +87,7 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
           let fnCtx = EvalContext (Just self) (Env.push env)
-          withCtx fnCtx (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
+          withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
       _ -> throwValueError (CallError op) >>= box
 
 

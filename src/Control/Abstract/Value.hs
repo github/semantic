@@ -219,7 +219,7 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
 evaluateInScopedEnv receiver term = do
   scopedEnv <- scopedEnvironment receiver
   env <- maybeM getEnv scopedEnv
-  withCtx (EvalContext (Just receiver) env) term
+  withEvalContext (EvalContext (Just receiver) env) term
 
 
 -- | Evaluates a 'Value' returning the referenced value
