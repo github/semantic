@@ -200,18 +200,18 @@ message TypeScriptSyntax {
     Annotation annotation = 150;
     With with = 151;
     ForOf forOf = 152;
-    This this = 153;
-    Update update = 154;
-    ComputedPropertyName computedPropertyName = 155;
-    Decorator decorator = 156;
-    Import import = 157;
-    QualifiedAliasedImport qualifiedAliasedImport = 158;
-    SideEffectImport sideEffectImport = 159;
-    DefaultExport defaultExport = 160;
-    QualifiedExport qualifiedExport = 161;
-    QualifiedExportFrom qualifiedExportFrom = 162;
-    JavaScriptRequire javaScriptRequire = 163;
-    List list = 164;
+    Update update = 153;
+    ComputedPropertyName computedPropertyName = 154;
+    Decorator decorator = 155;
+    Import import = 156;
+    QualifiedAliasedImport qualifiedAliasedImport = 157;
+    SideEffectImport sideEffectImport = 158;
+    DefaultExport defaultExport = 159;
+    QualifiedExport qualifiedExport = 160;
+    QualifiedExportFrom qualifiedExportFrom = 161;
+    JavaScriptRequire javaScriptRequire = 162;
+    List list = 163;
+    This this = 164;
   }
 }
 
@@ -254,7 +254,8 @@ message MethodSignature {
 message InterfaceDeclaration {
   repeated TypeScriptDiff interfaceDeclarationContext = 1;
   TypeScriptDiff interfaceDeclarationIdentifier = 2;
-  TypeScriptDiff interfaceDeclarationBody = 3;
+  repeated TypeScriptDiff interfaceDeclarationSuperInterfaces = 3;
+  TypeScriptDiff interfaceDeclarationBody = 4;
 }
 
 message PublicFieldDefinition {
@@ -304,7 +305,7 @@ message Power {
 }
 
 message Negate {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message FloorDivision {
@@ -352,7 +353,7 @@ message And {
 }
 
 message Not {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message Or {
@@ -517,7 +518,7 @@ message Assignment {
 }
 
 message Break {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message Catch {
@@ -526,7 +527,7 @@ message Catch {
 }
 
 message Continue {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message DoWhile {
@@ -540,7 +541,7 @@ message Else {
 }
 
 message Finally {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message For {
@@ -573,11 +574,11 @@ message Pattern {
 }
 
 message Retry {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message Return {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message ScopeEntry {
@@ -607,7 +608,7 @@ message While {
 }
 
 message Yield {
-  TypeScriptDiff term = 1;
+  TypeScriptDiff value = 1;
 }
 
 message AccessibilityModifier {
@@ -930,8 +931,6 @@ message ForOf {
   TypeScriptDiff forOfBody = 3;
 }
 
-message This { }
-
 message Update {
   TypeScriptDiff updateSubject = 1;
 }
@@ -979,3 +978,5 @@ message JavaScriptRequire {
 message List {
   repeated TypeScriptDiff listContent = 1;
 }
+
+message This { }

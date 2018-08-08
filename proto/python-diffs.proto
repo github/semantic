@@ -195,7 +195,7 @@ message Power {
 }
 
 message Negate {
-  PythonDiff term = 1;
+  PythonDiff value = 1;
 }
 
 message FloorDivision {
@@ -209,7 +209,7 @@ message And {
 }
 
 message Not {
-  PythonDiff term = 1;
+  PythonDiff value = 1;
 }
 
 message Or {
@@ -373,7 +373,7 @@ message Assignment {
 }
 
 message Break {
-  PythonDiff term = 1;
+  PythonDiff value = 1;
 }
 
 message Catch {
@@ -382,7 +382,7 @@ message Catch {
 }
 
 message Continue {
-  PythonDiff term = 1;
+  PythonDiff value = 1;
 }
 
 message Else {
@@ -391,7 +391,7 @@ message Else {
 }
 
 message Finally {
-  PythonDiff term = 1;
+  PythonDiff value = 1;
 }
 
 message ForEach {
@@ -417,7 +417,7 @@ message NoOp {
 }
 
 message Return {
-  PythonDiff term = 1;
+  PythonDiff value = 1;
 }
 
 message Statements {
@@ -439,7 +439,7 @@ message While {
 }
 
 message Yield {
-  PythonDiff term = 1;
+  PythonDiff value = 1;
 }
 
 message Ellipsis { }
