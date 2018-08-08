@@ -101,6 +101,7 @@ evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Lang
 evalTypeScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.TypeScript) typescriptParser
 
 typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Go) goParser
+typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
 
 callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)

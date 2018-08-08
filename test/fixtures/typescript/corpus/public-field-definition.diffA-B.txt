@@ -51,21 +51,24 @@
           (TypeIdentifier))
         (Identifier)
         (Float))
-      (PublicFieldDefinition
-      {+(Identifier)+}
-        (Empty)
-      {-(Readonly)-}
-        (Annotation
-          (TypeIdentifier))
-        (Identifier)
-        (Float))
     {+(PublicFieldDefinition
       {+(Identifier)+}
-      {+(Readonly)+}
+      {+(Empty)+}
       {+(Annotation
         {+(TypeIdentifier)+})+}
       {+(Identifier)+}
-      {+(TextElement)+})+}
+      {+(Float)+})+}
+      (PublicFieldDefinition
+      {+(Identifier)+}
+      {-(Empty)-}
+        (Readonly)
+        (Annotation
+        { (TypeIdentifier)
+        ->(TypeIdentifier) })
+      { (Identifier)
+      ->(Identifier) }
+      { (Float)
+      ->(TextElement) })
     {+(PublicFieldDefinition
       {+(Empty)+}
       {+(Empty)+}

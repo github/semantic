@@ -169,7 +169,8 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Heredoc-style string literals?
 
 -- TODO: Implement Eval instance for Regex
-instance Evaluatable Regex
+instance Evaluatable Regex where
+  eval (Regex x) = rvalBox (regex x)
 
 -- Collections
 
