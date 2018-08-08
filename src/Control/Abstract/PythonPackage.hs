@@ -17,7 +17,7 @@ import qualified Data.Map as Map
 import           Prologue
 
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
-  deriving (Show)
+  deriving (Show, Eq)
 
 runPythonPackaging :: forall effects address body a. (
                       Eff.PureEffects effects
@@ -36,7 +36,7 @@ runPythonPackaging :: forall effects address body a. (
                       , Member (Function address (Value address body)) effects)
                    => Evaluator address (Value address body) effects a
                    -> Evaluator address (Value address body) effects a
-runPythonPackaging evaluator = (Eff.interpose @(Function address (Value address body)) $ \case
+runPythonPackaging = Eff.interpose @(Function address (Value address body)) $ \case
   Call callName super params -> do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
@@ -44,23 +44,18 @@ runPythonPackaging evaluator = (Eff.interpose @(Function address (Value address 
         let asStrings address = (deref >=> asArray) address >>= traverse (deref >=> asString)
 
         case name' of
-          Just n | name "find_packages" == n -> do
-            case Map.lookup (name "exclude") bindings of
-              Just address -> do
-                as <- asStrings address
-                put (FindPackages (stripQuotes <$> as))
-              _ -> put (FindPackages [])
-          Just n | name "setup" == n -> do
-            packageState <- get
-            case packageState of
-              Unknown -> case Map.lookup (name "packages") bindings of
-                Just address -> do
-                  as <- asStrings address
-                  put (Packages (stripQuotes <$> as))
-                _ -> pure ()
-              _ -> pure ()
+          Just n
+            | name "find_packages" == n -> do
+              as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "exclude") bindings)
+              put (FindPackages as)
+            | name "setup" == n -> do
+              packageState <- get
+              if packageState == Unknown then do
+                as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "packages") bindings)
+                put (Packages as)
+                else
+                  pure ()
           _ -> pure ()
       _ -> pure ()
     call callName super params
-  (Function name params vars body) ->  function name params vars (raiseEff body)
-  ) evaluator
+  Function name params vars body ->  function name params vars (raiseEff body)
