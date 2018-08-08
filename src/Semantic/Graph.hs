@@ -54,7 +54,6 @@ import           Semantic.Task as Task
 import           Text.Show.Pretty (ppShow)
 import System.FilePath.Posix ((</>), takeDirectory)
 import Data.List (isPrefixOf, isSuffixOf, sortOn)
-import Data.Ord (comparing)
 import Data.Language as Language
 import Data.Blob (Blob(..))
 

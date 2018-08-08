@@ -69,6 +69,7 @@ instance ( Member (Allocator address Abstract) effects
 
   asString _ = pure ""
   asPair _ = pure (Abstract, Abstract)
+  asArray _ = pure mempty
 
   index _ _ = box Abstract
 

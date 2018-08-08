@@ -291,6 +291,9 @@ instance ( Member (Allocator address Type) effects
     t1 <- fresh
     t2 <- fresh
     unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
+  asArray t = do
+    field <- fresh
+    unify t (Array (Var field)) $> mempty
 
   index arr sub = do
     _ <- unify sub Int
