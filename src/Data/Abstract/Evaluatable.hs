@@ -127,7 +127,7 @@ evaluate lang analyzeModule analyzeTerm runValue modules = do
           = runReader info
           . runAllocator
           . runDeref
-          . runEnv (newEnv preludeBinds)
+          . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
           . runReturn
           . runLoopControl
 
@@ -169,7 +169,7 @@ instance HasPrelude 'Ruby where
     define (name "puts") builtInPrint
 
     defineClass (name "Object") [] $ do
-      define (name "inspect") (lambda (const (box (string "<object>"))))
+      define (name "inspect") (lambda (box (string "<object>")))
 
 instance HasPrelude 'TypeScript where
   definePrelude _ =

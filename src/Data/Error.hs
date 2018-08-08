@@ -45,7 +45,7 @@ type Colourize = Bool
 formatError :: IncludeSource -> Colourize -> Blob -> Error String -> String
 formatError includeSource colourize Blob{..} Error{..}
   = ($ "")
-  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (Just blobPath) errorSpan . showString ": ")
+  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan path errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation colourize errorExpected errorActual . showChar '\n'
   . (if includeSource
     then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
@@ -55,6 +55,7 @@ formatError includeSource colourize Blob{..} Error{..}
   where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
         lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
+        path = Just $ if includeSource then blobPath else "<filtered>"
 
 withSGRCode :: Colourize -> [SGR] -> ShowS -> ShowS
 withSGRCode useColour code content =
