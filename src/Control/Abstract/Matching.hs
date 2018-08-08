@@ -12,6 +12,7 @@ module Control.Abstract.Matching
   , succeeds
   , fails
   , runMatcher
+  , runOnce
   ) where
 
 import           Data.Algebra
@@ -113,13 +114,14 @@ runMatcher :: (Alternative m, Monad m, Corecursive t, Recursive t, Foldable (Bas
 runMatcher m = para (paraMatcher m)
 
 paraMatcher :: (Alternative m, Monad m, Corecursive t, Foldable (Base t)) => Matcher t a -> RAlgebra (Base t) t (m a)
-paraMatcher m t = interp (embedTerm t) m <|> foldMapA snd t
+paraMatcher m t = runOnce (embedTerm t) m <|> foldMapA snd t
 
--- Simple interpreter.
-interp :: (Alternative m, Monad m) => t -> Matcher t a -> m a
-interp t (Choice a b) = interp t a <|> interp t b
-interp t Target       = pure t
-interp t (Match f m)  = foldMapA (`interp` m) (f t)
-interp _ (Pure a)     = pure a
-interp _ Empty        = empty
-interp t (Then m f)   = interp t m >>= interp t . f
+-- | Run one step of a 'Matcher' computation. Look at 'runMatcher' if you want something
+-- that folds over subterms.
+runOnce :: (Alternative m, Monad m) => t -> Matcher t a -> m a
+runOnce t (Choice a b) = runOnce t a <|> runOnce t b
+runOnce t Target       = pure t
+runOnce t (Match f m)  = foldMapA (`runOnce` m) (f t)
+runOnce _ (Pure a)     = pure a
+runOnce _ Empty        = empty
+runOnce t (Then m f)   = runOnce t m >>= runOnce t . f

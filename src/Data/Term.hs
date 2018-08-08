@@ -4,6 +4,8 @@ module Data.Term
 , termIn
 , termAnnotation
 , termOut
+, injectTerm
+, projectTerm
 , TermF(..)
 , termSize
 , hoistTerm
@@ -17,6 +19,7 @@ import Data.Aeson
 import Data.JSON.Fields
 import Data.Record
 import Text.Show
+import qualified Data.Sum as Sum
 import Proto3.Suite.Class
 import Proto3.Suite.DotProto
 import qualified Proto3.Wire.Encode as Encode
@@ -30,6 +33,9 @@ termAnnotation = termFAnnotation . unTerm
 
 termOut :: Term syntax ann -> syntax (Term syntax ann)
 termOut = termFOut . unTerm
+
+projectTerm :: forall f syntax ann . (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
+projectTerm = Sum.project . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable)
@@ -54,6 +60,9 @@ termSize = cata size where
 -- | Build a Term from its annotation and syntax.
 termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
 termIn = (Term .) . In
+
+injectTerm :: (f :< syntax) => ann -> f (Term (Sum syntax) ann) -> Term (Sum syntax) ann
+injectTerm a = termIn a . Sum.inject
 
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
