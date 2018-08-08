@@ -31,11 +31,11 @@
     (Identifier)
     (Statements))
   (Method
-    (Identifier)
+    (This)
     (Identifier)
     (Statements))
   (Method
-    (Identifier)
+    (This)
     (Identifier)
     (Identifier)
     (Identifier)
