@@ -1,4 +1,4 @@
-{-# LANGUAGE KindSignatures, AllowAmbiguousTypes #-}
+{-# LANGUAGE KindSignatures #-}
 
 module Data.Abstract.BaseError (
   BaseError(..)
