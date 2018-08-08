@@ -29,7 +29,7 @@ import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..)
 import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
-import Data.Abstract.BaseError
+import Data.Abstract.BaseError as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
