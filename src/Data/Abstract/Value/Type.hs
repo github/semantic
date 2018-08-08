@@ -26,6 +26,7 @@ data Type
   | Bool                -- ^ Primitive boolean type.
   | String              -- ^ Primitive string type.
   | Symbol              -- ^ Type of unique symbols.
+  | Regex               -- ^ Primitive regex type.
   | Unit                -- ^ The unit type.
   | Float               -- ^ Floating-point type.
   | Rational            -- ^ Rational type.
@@ -162,6 +163,7 @@ occur id = prune >=> \case
   Bool -> pure False
   String -> pure False
   Symbol -> pure False
+  Regex -> pure False
   Unit -> pure False
   Float -> pure False
   Rational -> pure False
@@ -247,7 +249,7 @@ runFunction = interpret $ \case
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
-  Abstract.Call op params -> do
+  Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
@@ -267,6 +269,7 @@ instance AbstractIntro Type where
   string _   = String
   float _    = Float
   symbol _   = Symbol
+  regex _    = Regex
   rational _ = Rational
   hash       = Hash
   kvPair k v = k :* v

@@ -214,8 +214,7 @@ runParser blob@Blob{..} parser = case parser of
       let term = cmarkParser blobSource
       in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser blob parser
-  where blobFields = ("path", blobPath) : languageTag
-        languageTag = pure . (,) ("language" :: String) . show $ blobLanguage
+  where languageTag = pure . (,) ("language" :: String) . show $ blobLanguage
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError (getField a) err]
@@ -235,11 +234,12 @@ runParser blob@Blob{..} parser = case parser of
                       -> assignment (Term (Sum syntaxes) (Record Assignment.Location))
                       -> Eff effs (Term (Sum syntaxes) (Record Assignment.Location))
         runAssignment assign parser assignment = do
+          config <- ask
+          let blobFields = ("path", if configLogPrintSource config then blobPath else "<filtered>") : languageTag
           ast <- runParser blob parser `catchError` \ (SomeException err) -> do
             writeStat (increment "parse.parse_failures" languageTag)
             writeLog Error "failed parsing" (("task", "parse") : blobFields)
             throwError (toException err)
-          config <- ask
           time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
