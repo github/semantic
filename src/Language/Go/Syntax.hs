@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Go.Syntax where
 
+import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
@@ -31,7 +32,8 @@ defaultAlias = name . T.pack . takeFileName . unPath
 resolveGoImport :: ( Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Package.PackageInfo) effects
-                   , Member (Resumable ResolutionError) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (BaseError ResolutionError)) effects
                    , Member Trace effects
                    )
                 => ImportPath
@@ -40,7 +42,7 @@ resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
   case paths of
-    [] -> throwResumable $ GoImportError path
+    [] -> throwResolutionError $ GoImportError path
     _ -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
   package <- T.unpack . formatName . Package.packageName <$> currentPackage
@@ -50,7 +52,7 @@ resolveGoImport (ImportPath path NonRelative) = do
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
-    _  -> throwResumable $ GoImportError path
+    _  -> throwResolutionError $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --

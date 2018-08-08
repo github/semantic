@@ -23,10 +23,13 @@ module Control.Abstract.Environment
 ) where
 
 import Control.Abstract.Evaluator
+import Data.Abstract.BaseError
 import Data.Abstract.Environment (Bindings, Environment, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports
+import Data.Abstract.Module
 import Data.Abstract.Name
+import Data.Span
 import Prologue
 
 -- | Retrieve the current execution context
@@ -114,7 +117,9 @@ runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . r
           | Exports.null ports = (binds, a)
           | otherwise          = (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds, a)
 
-handleEnv :: forall address value effects a . Effects effects => Env address (Eff (Env address ': effects)) a -> Evaluator address value (State (EvalContext address) ': State (Exports address) ': effects) a
+handleEnv :: forall address value effects a . Effects effects
+          => Env address (Eff (Env address ': effects)) a
+          -> Evaluator address value (State (EvalContext address) ': State (Exports address) ': effects) a
 handleEnv = \case
   Lookup name -> Env.lookupEnv' name . ctxEnvironment <$> get
   Bind name addr -> modify (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment))
@@ -136,11 +141,29 @@ deriving instance Show (EnvironmentError address return)
 instance Show1 (EnvironmentError address) where liftShowsPrec _ _ = showsPrec
 instance Eq1 (EnvironmentError address) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
 
-freeVariableError :: Member (Resumable (EnvironmentError address)) effects => Name -> Evaluator address value effects address
-freeVariableError = throwResumable . FreeVariable
+freeVariableError :: ( Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     , Member (Resumable (BaseError (EnvironmentError address))) effects
+                     )
+                  => Name
+                  -> Evaluator address value effects address
+freeVariableError = throwEnvironmentError . FreeVariable
 
-runEnvironmentError :: (Effectful (m address value), Effects effects) => m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects (Either (SomeExc (EnvironmentError address)) a)
+runEnvironmentError :: (Effectful (m address value), Effects effects)
+                    => m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a
+                    -> m address value effects (Either (SomeExc (BaseError (EnvironmentError address))) a)
 runEnvironmentError = runResumable
 
-runEnvironmentErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . EnvironmentError address resume -> m address value effects resume) -> m address value (Resumable (EnvironmentError address) ': effects) a -> m address value effects a
+runEnvironmentErrorWith :: (Effectful (m address value), Effects effects)
+                        => (forall resume . BaseError (EnvironmentError address) resume -> m address value effects resume)
+                        -> m address value (Resumable (BaseError (EnvironmentError address)) ': effects) a
+                        -> m address value effects a
 runEnvironmentErrorWith = runResumableWith
+
+throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError address))) effects
+                         , Member (Reader ModuleInfo) effects
+                         , Member (Reader Span) effects
+                         )
+                      => EnvironmentError address resume
+                      -> Evaluator address value effects resume
+throwEnvironmentError = throwBaseError
