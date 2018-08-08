@@ -12,7 +12,7 @@ module Data.Abstract.Value.Concrete
 
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Function(..))
-import Data.Abstract.Environment (Environment, Bindings)
+import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -79,15 +79,15 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
     moduleInfo <- currentModule
     i <- fresh
     Closure packageInfo moduleInfo params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
-  Abstract.Call op params -> do
+  Abstract.Call op self params -> do
     case op of
       Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-          let fnEnv = Env.push env
-          withEnv fnEnv (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
+          let fnCtx = EvalContext (Just self) (Env.push env)
+          withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
       _ -> throwValueError (CallError op) >>= box
 
 

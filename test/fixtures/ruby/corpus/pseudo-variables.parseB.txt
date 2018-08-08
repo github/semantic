@@ -1,5 +1,5 @@
 (Statements
-  (Identifier)
+  (This)
   (Null)
   (Boolean)
   (Boolean))
