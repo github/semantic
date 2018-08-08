@@ -7,6 +7,7 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
+import           qualified Control.Abstract.PythonPackage as PythonPackage
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
@@ -20,7 +21,7 @@ import           Data.Blob
 import           Data.Coerce
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
-import           Data.List (uncons)
+import           Data.List (uncons, sortOn)
 import           Data.Project hiding (readFile)
 import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
@@ -34,8 +35,11 @@ import           Semantic.IO as IO
 import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
-import           System.FilePath.Posix (takeDirectory)
+import           System.FilePath.Posix (takeDirectory, splitDirectories)
 import           Text.Show.Pretty (ppShow)
+import qualified Data.Map as Map
+import Data.Ord (Down(..))
+import qualified Data.List.NonEmpty as NonEmpty
 
 justEvaluating
   = runM
@@ -135,8 +139,12 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
-  package <- fmap quieterm <$> parsePythonPackage parser Nothing project
-  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  (package, strat) <- (fmap quieterm *** id) <$> parsePythonPackage parser Nothing project
+  modules <- case strat of
+    PythonPackage.Unknown -> do
+      let modules = NonEmpty.head <$> Map.elems (coerce (packageModules package))
+      pure (sortOn (length . splitDirectories . modulePath . moduleInfo) modules)
+    _ -> topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise UtilEff)
        (runReader (packageInfo package)

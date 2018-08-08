@@ -82,7 +82,7 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
     Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
   Abstract.Call op self params -> do
     case op of
-      Closure packageInfo moduleInfo name names (ClosureBody _ body) env -> do
+      Closure packageInfo moduleInfo _ names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do

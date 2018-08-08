@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators, TupleSections #-}
 module Semantic.Graph
 ( runGraph
 , runCallGraph
@@ -53,9 +53,8 @@ import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.Task as Task
 import           Text.Show.Pretty (ppShow)
 import System.FilePath.Posix ((</>), takeDirectory)
-import Data.List (isPrefixOf, isSuffixOf, sortOn)
+import Data.List (isPrefixOf, isSuffixOf)
 import Data.Language as Language
-import Data.Blob (Blob(..))
 
 data GraphType = ImportGraph | CallGraph
 
@@ -251,7 +250,7 @@ parsePythonPackage :: forall syntax fields effs term.
                    => Parser term       -- ^ A parser.
                    -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
-                   -> Eff effs (Package term)
+                   -> Eff effs (Package term, Strategy)
 parsePythonPackage parser preludeFile project = do
   prelude <- traverse (parseModule project parser) preludeFile
 
@@ -278,19 +277,16 @@ parsePythonPackage parser preludeFile project = do
   (strat, _) <- runAnalysis $ evaluate (Proxy @'Language.Python) id id (Concrete.runFunction coerce coerce . runPythonPackaging) (maybeToList prelude <> [ setupModule ])
   case strat of
     PythonPackage.Unknown -> do
-      let sortedBlobs = sortOn (length . blobPath) (projectBlobs project)
-      trace (show (blobPath <$> sortedBlobs))
-      p <- parseModules parser (project { projectBlobs = sortedBlobs })
-      let n = name (projectName project)
+      modules <- parseModules parser project
       resMap <- Task.resolutionMap project
-      pure (Package.fromModules n p resMap)
+      pure (Package.fromModules (name (projectName project)) modules resMap, strat)
     PythonPackage.Packages dirs -> do
       filteredBlobs <- for dirs $ \dir -> do
         let packageDir = projectRootDir project </> unpack dir
         let paths = filter ((packageDir `isPrefixOf`) . filePath) (projectFiles project)
         traverse (readFile project) paths
 
-      packageFromProject project filteredBlobs
+      (, strat) <$> packageFromProject project filteredBlobs
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
       let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
@@ -298,7 +294,7 @@ parsePythonPackage parser preludeFile project = do
       filteredBlobs <- for packageDirs $ \dir -> do
         let paths = filter ((dir `isPrefixOf`) . filePath) (projectFiles project)
         traverse (readFile project) paths
-      packageFromProject project filteredBlobs
+      (, strat) <$> packageFromProject project filteredBlobs
     where
       packageFromProject project filteredBlobs = do
         let p = project { projectBlobs = catMaybes $ join filteredBlobs }
