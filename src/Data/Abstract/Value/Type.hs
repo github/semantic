@@ -25,6 +25,7 @@ data Type
   | Bool                -- ^ Primitive boolean type.
   | String              -- ^ Primitive string type.
   | Symbol              -- ^ Type of unique symbols.
+  | Regex               -- ^ Primitive regex type.
   | Unit                -- ^ The unit type.
   | Float               -- ^ Floating-point type.
   | Rational            -- ^ Rational type.
@@ -153,6 +154,7 @@ occur id = prune >=> \case
   Bool -> pure False
   String -> pure False
   Symbol -> pure False
+  Regex -> pure False
   Unit -> pure False
   Float -> pure False
   Rational -> pure False
@@ -256,6 +258,7 @@ instance AbstractIntro Type where
   string _   = String
   float _    = Float
   symbol _   = Symbol
+  regex _    = Regex
   rational _ = Rational
   hash       = Hash
   kvPair k v = k :* v
