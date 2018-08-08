@@ -38,7 +38,6 @@ import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory, splitDirectories)
 import           Text.Show.Pretty (ppShow)
 import qualified Data.Map as Map
-import Data.Ord (Down(..))
 import qualified Data.List.NonEmpty as NonEmpty
 
 justEvaluating
