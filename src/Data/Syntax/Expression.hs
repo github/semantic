@@ -7,7 +7,7 @@ import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedF
 import Data.Fixed
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prologue hiding (index, Member)
+import Prologue hiding (index, Member, This)
 import Proto3.Suite.Class
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -21,8 +21,9 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
+    recv <- box unit -- TODO
     args <- traverse subtermAddress callParams
-    Rval <$> call op args
+    Rval <$> call op recv args
 
 data LessThan a = LessThan { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -496,9 +497,10 @@ instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Super
 
 data This a = This
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1)
 
 instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable This
+instance Evaluatable This where
+  eval This = Rval <$> (maybeM (box unit) =<< self)
