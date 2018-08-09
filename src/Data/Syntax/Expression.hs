@@ -7,7 +7,8 @@ import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedF
 import Data.Fixed
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prologue hiding (index, Member, This)
+import Prologue hiding (index, Member, This, null)
+import Prelude hiding (null)
 import Proto3.Suite.Class
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -297,8 +298,9 @@ instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Void
-instance Evaluatable Void
-
+instance Evaluatable Void where
+  eval (Void a) =
+    subtermValue a >> rvalBox null
 
 -- | Javascript typeof operator
 newtype Typeof a = Typeof { value :: a }
