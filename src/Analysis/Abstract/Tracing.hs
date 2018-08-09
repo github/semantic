@@ -16,16 +16,16 @@ tracingTerms :: ( Corecursive term
                 , Member (Reader (Live address)) effects
                 , Member (Env address) effects
                 , Member (State (Heap address Set value)) effects
-                , Member (Writer (trace (Configuration term address Set value))) effects
-                , Reducer (Configuration term address Set value) (trace (Configuration term address Set value))
+                , Member (Writer (trace (Configuration term address value))) effects
+                , Reducer (Configuration term address value) (trace (Configuration term address value))
                 )
-             => trace (Configuration term address Set value)
+             => trace (Configuration term address value)
              -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
              -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
 tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-trace :: Member (Writer (trace (Configuration term address Set value))) effects => trace (Configuration term address Set value) -> TermEvaluator term address value effects ()
+trace :: Member (Writer (trace (Configuration term address value))) effects => trace (Configuration term address value) -> TermEvaluator term address value effects ()
 trace = tell
 
-tracing :: (Monoid (trace (Configuration term address Set value)), Effects effects) => TermEvaluator term address value (Writer (trace (Configuration term address Set value)) ': effects) a -> TermEvaluator term address value effects (trace (Configuration term address Set value), a)
+tracing :: (Monoid (trace (Configuration term address value)), Effects effects) => TermEvaluator term address value (Writer (trace (Configuration term address value)) ': effects) a -> TermEvaluator term address value effects (trace (Configuration term address value), a)
 tracing = runWriter

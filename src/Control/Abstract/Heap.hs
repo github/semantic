@@ -40,7 +40,7 @@ import Data.Span (Span)
 import Prologue
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address Set value)) effects) => term -> TermEvaluator term address value effects (Configuration term address Set value)
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address Set value)) effects) => term -> TermEvaluator term address value effects (Configuration term address value)
 getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
 
 

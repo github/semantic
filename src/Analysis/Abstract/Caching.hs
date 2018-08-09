@@ -14,7 +14,7 @@ import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
 consultOracle :: (Cacheable term address Set value, Member (Reader (Cache term address Set value)) effects)
-              => Configuration term address Set value
+              => Configuration term address value
               -> TermEvaluator term address value effects (Set (Cached address Set value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
@@ -28,13 +28,13 @@ withOracle cache = local (const cache)
 
 -- | Look up the set of values for a given configuration in the out-cache.
 lookupCache :: (Cacheable term address Set value, Member (State (Cache term address Set value)) effects)
-            => Configuration term address Set value
+            => Configuration term address value
             -> TermEvaluator term address value effects (Maybe (Set (Cached address Set value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
 cachingConfiguration :: (Cacheable term address Set value, Member (State (Cache term address Set value)) effects, Member (State (Heap address Set value)) effects)
-                     => Configuration term address Set value
+                     => Configuration term address value
                      -> Set (Cached address Set value)
                      -> TermEvaluator term address value effects (ValueRef address)
                      -> TermEvaluator term address value effects (ValueRef address)
