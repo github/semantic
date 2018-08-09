@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Control.Abstract.Addressable
 ( Allocatable(..)
 , Derefable(..)
