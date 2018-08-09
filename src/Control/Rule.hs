@@ -142,14 +142,13 @@ fromMatcher t m = Rule [t] (auto go) where go x = maybe (Left x) Right (runOnce 
 fromAutomatonM :: AutomatonM k => Text -> k (Eff effs) from to -> Rule effs from to
 fromAutomatonM t = Rule [t] . autoT
 
-toAlgebra :: (Traversable (Base t), Corecursive t, Recursive t)
-          => Rule effs (Base t t) t
+toAlgebra :: (Traversable (Base t), Corecursive t)
+          => Rule effs t t
           -> FAlgebra (Base t) (Eff effs t)
-toAlgebra (Rule _ m) r = do
-  inner <- sequenceA r
-  let res = supply (Just inner) m
-  let next = fromMaybe (embed inner) . listToMaybe
-  next <$> runT res
+toAlgebra (Rule _ m) t = do
+  inner <- sequenceA t
+  res <- runT $ supply (Just (embed inner)) m
+  pure $ fromMaybe (embed inner) (listToMaybe res)
 
 runRule :: Foldable f => f from -> Rule effs from to -> Eff effs [to]
 runRule inp r = runT (source inp ~> machine r)
