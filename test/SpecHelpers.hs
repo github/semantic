@@ -105,7 +105,7 @@ type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise UtilEff
                               , Resumable (BaseError (LoadError Precise))
                               , Trace
                               , Fresh
-                              , State (Heap Precise Latest Val)
+                              , State (Heap Precise Set Val)
                               , Lift IO
                               ]
 type TestEvaluatingErrors = '[ BaseError (ValueError Precise UtilEff)
@@ -119,7 +119,7 @@ type TestEvaluatingErrors = '[ BaseError (ValueError Precise UtilEff)
 testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                -> IO
                  ( [String]
-                 , ( Heap Precise Latest Val
+                 , ( Heap Precise Set Val
                    , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
                             (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                    )
@@ -164,9 +164,9 @@ namespaceScope heap ns@(Namespace _ _ _)
 
 namespaceScope _ _ = Nothing
 
-derefQName :: Heap Precise (Cell Precise) (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
+derefQName :: Heap Precise Set (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
 derefQName heap names binds = go names (Env.newEnv binds)
-  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
+  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= fmap fst . Set.minView >>= case ns of
           []        -> Just
           (n2 : ns) -> namespaceScope heap >=> go (n2 :| ns)
 

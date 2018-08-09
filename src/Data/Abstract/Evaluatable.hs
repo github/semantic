@@ -17,7 +17,6 @@ module Data.Abstract.Evaluatable
 , runUnspecialized
 , runUnspecializedWith
 , throwUnspecializedError
-, Cell
 ) where
 
 import Control.Abstract hiding (Load)
@@ -79,7 +78,6 @@ evaluate :: ( AbstractValue address value valueEffects
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
-            , Foldable (Cell address)
             , FreeVariables term
             , HasPostlude lang
             , HasPrelude lang
@@ -93,9 +91,8 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
-            , Member (State (Heap address (Cell address) value)) effects
+            , Member (State (Heap address Set value)) effects
             , Member Trace effects
-            , Monoid (Cell address value)
             , Ord value
             , Recursive term
             , ValueRoots address value
