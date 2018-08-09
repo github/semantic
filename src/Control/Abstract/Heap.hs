@@ -40,20 +40,20 @@ import Data.Span (Span)
 import Prologue
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address (Cell address) value)) effects) => term -> TermEvaluator term address value effects (Configuration term address (Cell address) value)
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address Set value)) effects) => term -> TermEvaluator term address value effects (Configuration term address Set value)
 getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
 
 
 -- | Retrieve the heap.
-getHeap :: Member (State (Heap address (Cell address) value)) effects => Evaluator address value effects (Heap address (Cell address) value)
+getHeap :: Member (State (Heap address Set value)) effects => Evaluator address value effects (Heap address Set value)
 getHeap = get
 
 -- | Set the heap.
-putHeap :: Member (State (Heap address (Cell address) value)) effects => Heap address (Cell address) value -> Evaluator address value effects ()
+putHeap :: Member (State (Heap address Set value)) effects => Heap address Set value -> Evaluator address value effects ()
 putHeap = put
 
 -- | Update the heap.
-modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Heap address (Cell address) value -> Heap address (Cell address) value) -> Evaluator address value effects ()
+modifyHeap :: Member (State (Heap address Set value)) effects => (Heap address Set value -> Heap address Set value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
 box :: ( Member (Allocator address value) effects
@@ -138,12 +138,11 @@ gc roots = sendAllocator (GC roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: ( Ord address
-             , Foldable (Cell address)
              , ValueRoots address value
              )
-          => Live address                      -- ^ The set of root addresses.
-          -> Heap address (Cell address) value -- ^ The heap to trace addresses through.
-          -> Live address                      -- ^ The set of addresses reachable from the root set.
+          => Live address           -- ^ The set of root addresses.
+          -> Heap address Set value -- ^ The heap to trace addresses through.
+          -> Live address           -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
@@ -166,9 +165,7 @@ data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
 
 runAllocator :: ( Allocatable address effects
-                , Foldable (Cell address)
-                , Member (State (Heap address (Cell address) value)) effects
-                , Monoid (Cell address value)
+                , Member (State (Heap address Set value)) effects
                 , Ord value
                 , PureEffects effects
                 , ValueRoots address value
@@ -188,7 +185,7 @@ runDeref :: ( Derefable address effects
             , Member (Reader ModuleInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
-            , Member (State (Heap address (Cell address) value)) effects
+            , Member (State (Heap address Set value)) effects
             )
          => Evaluator address value (Deref address value ': effects) a
          -> Evaluator address value effects a
@@ -208,7 +205,7 @@ instance Effect (Deref address value) where
   handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
 
 data AddressError address value resume where
-  UnallocatedAddress   :: address -> AddressError address value (Cell address value)
+  UnallocatedAddress   :: address -> AddressError address value (Set value)
   UninitializedAddress :: address -> AddressError address value value
 
 deriving instance Eq address => Eq (AddressError address value resume)
