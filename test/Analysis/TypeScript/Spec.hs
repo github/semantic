@@ -46,6 +46,15 @@ spec config = parallel $ do
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 123.0)]
         other -> expectationFailure (show other)
 
+    it "evaluates sequence expressions" $ do
+      (_, (heap, res)) <- evaluate ["sequence-expression.ts"]
+      case ModuleTable.lookup "sequence-expression.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          Env.names env `shouldBe` [ "x" ]
+          (derefQName heap ("x" :| []) env) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+
+        other -> expectationFailure (show other)
+
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
