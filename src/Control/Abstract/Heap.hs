@@ -36,7 +36,6 @@ import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
-import Data.Semigroup.Reducer
 import Data.Span (Span)
 import Prologue
 
@@ -169,15 +168,19 @@ data Deref address value (m :: * -> *) return where
 runAllocator :: ( Allocatable address effects
                 , Foldable (Cell address)
                 , Member (State (Heap address (Cell address) value)) effects
+                , Monoid (Cell address value)
+                , Ord value
                 , PureEffects effects
-                , Reducer value (Cell address value)
                 , ValueRoots address value
                 )
              => Evaluator address value (Allocator address value ': effects) a
              -> Evaluator address value effects a
 runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
-  Assign addr value -> modifyHeap (heapInsert addr value)
+  Assign addr value -> do
+    heap <- getHeap
+    cell <- assignCell addr value (fromMaybe mempty (heapLookup addr heap))
+    putHeap (heapInit addr cell heap)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
 runDeref :: ( Derefable address effects
