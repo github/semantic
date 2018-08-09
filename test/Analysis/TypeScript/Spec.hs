@@ -38,7 +38,7 @@ spec config = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       (_, (_, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
-      res `shouldBe` Left (SomeExc (inject @EvalError (ExportError "foo.ts" (name "pip"))))
+      res `shouldBe` Left (SomeExc (inject @(BaseError EvalError) (BaseError (ModuleInfo "foo.ts") emptySpan (ExportError "foo.ts" (name "pip")))))
 
     it "evaluates early return statements" $ do
       (_, (heap, res)) <- evaluate ["early-return.ts"]

@@ -96,25 +96,25 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (ValueError Precise UtilEff)
-                              , Resumable (AddressError Precise Val)
-                              , Resumable ResolutionError
-                              , Resumable EvalError
-                              , Resumable (EnvironmentError Precise)
-                              , Resumable (Unspecialized Val)
-                              , Resumable (LoadError Precise)
+type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise UtilEff))
+                              , Resumable (BaseError (AddressError Precise Val))
+                              , Resumable (BaseError ResolutionError)
+                              , Resumable (BaseError EvalError)
+                              , Resumable (BaseError (EnvironmentError Precise))
+                              , Resumable (BaseError (UnspecializedError Val))
+                              , Resumable (BaseError (LoadError Precise))
                               , Trace
                               , Fresh
                               , State (Heap Precise Latest Val)
                               , Lift IO
                               ]
-type TestEvaluatingErrors = '[ ValueError Precise UtilEff
-                             , AddressError Precise Val
-                             , ResolutionError
-                             , EvalError
-                             , EnvironmentError Precise
-                             , Unspecialized Val
-                             , LoadError Precise
+type TestEvaluatingErrors = '[ BaseError (ValueError Precise UtilEff)
+                             , BaseError (AddressError Precise Val)
+                             , BaseError ResolutionError
+                             , BaseError EvalError
+                             , BaseError (EnvironmentError Precise)
+                             , BaseError (UnspecializedError Val)
+                             , BaseError (LoadError Precise)
                              ]
 testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                -> IO
@@ -157,6 +157,8 @@ namespaceScope heap ns@(Namespace _ _ _)
   . runFresh 0
   . runAddressError
   . runState heap
+  . runReader (lowerBound @Span)
+  . runReader (ModuleInfo "SpecHelper.hs")
   . runDeref
   $ materializeEnvironment ns
 
