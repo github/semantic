@@ -102,7 +102,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
       <$> graphType
       <*> switch (long "packages" <> help "Include a vertex for the package, with edges from it to each module")
       <*> serializer
-      <*> (readProjectFromPaths <|> readProjectRecursively)
+      <*> (readProjectRecursively <|> readProjectFromPaths)
     graphType =  flag  Graph.ImportGraph Graph.ImportGraph (long "imports" <> help "Compute an import graph (default)")
              <|> flag'                   Graph.CallGraph   (long "calls"   <> help "Compute a call graph")
     serializer =  flag (Task.serialize (DOT Graph.style)) (Task.serialize (DOT Graph.style)) (long "dot"  <> help "Output in DOT graph format (default)")
