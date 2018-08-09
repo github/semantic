@@ -5,6 +5,7 @@ module Control.Abstract.Evaluator.Spec
 ) where
 
 import Control.Abstract
+import Data.Abstract.BaseError
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package
@@ -36,6 +37,7 @@ evaluate
   . runFresh 0
   . runReader (PackageInfo (name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . runReader (lowerBound @Span)
   . fmap reassociate
   . runValueError
   . runEnvironmentError
@@ -59,9 +61,10 @@ newtype SpecEff a = SpecEff
                        , Env Precise
                        , Allocator Precise Val
                        , Deref Precise Val
-                       , Resumable (AddressError Precise Val)
-                       , Resumable (EnvironmentError Precise)
-                       , Resumable (ValueError Precise SpecEff)
+                       , Resumable (BaseError (AddressError Precise Val))
+                       , Resumable (BaseError (EnvironmentError Precise))
+                       , Resumable (BaseError (ValueError Precise SpecEff))
+                       , Reader Span
                        , Reader ModuleInfo
                        , Reader PackageInfo
                        , Fresh

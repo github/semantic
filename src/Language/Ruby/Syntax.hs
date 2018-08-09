@@ -3,6 +3,7 @@
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
+import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path
@@ -19,7 +20,9 @@ import           System.FilePath.Posix
 --
 -- require "json"
 resolveRubyName :: ( Member (Modules address) effects
-                   , Member (Resumable ResolutionError) effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (BaseError ResolutionError)) effects
                    )
                 => Text
                 -> Evaluator address value effects M.ModulePath
@@ -27,18 +30,20 @@ resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
   modulePath <- resolve paths
-  maybeM (throwResumable $ NotFoundError name' paths Language.Ruby) modulePath
+  maybeM (throwResolutionError $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
 resolveRubyPath :: ( Member (Modules address) effects
-                   , Member (Resumable ResolutionError) effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (BaseError ResolutionError)) effects
                    )
                 => Text
                 -> Evaluator address value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybeM (throwResumable $ NotFoundError name' [name'] Language.Ruby) modulePath
+  maybeM (throwResolutionError $ NotFoundError name' [name'] Language.Ruby) modulePath
 
 cleanNameOrPath :: Text -> String
 cleanNameOrPath = T.unpack . dropRelativePrefix . stripQuotes
@@ -107,7 +112,9 @@ instance Evaluatable Load where
 doLoad :: ( AbstractValue address value effects
           , Member (Env address) effects
           , Member (Modules address) effects
-          , Member (Resumable ResolutionError) effects
+          , Member (Reader ModuleInfo) effects
+          , Member (Reader Span) effects
+          , Member (Resumable (BaseError ResolutionError)) effects
           , Member Trace effects
           )
        => Text
