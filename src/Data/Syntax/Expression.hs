@@ -284,7 +284,9 @@ instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for SequenceExpression
-instance Evaluatable SequenceExpression
+instance Evaluatable SequenceExpression where
+  eval (SequenceExpression a b) =
+    subtermValue a >> subtermRef b
 
 
 -- | Javascript void operator
