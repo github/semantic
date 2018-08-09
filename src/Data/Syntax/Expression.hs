@@ -6,7 +6,7 @@ import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
 import Data.JSON.Fields
-import Diffing.Algorithm
+import Diffing.Algorithm hiding (Delete)
 import Prologue hiding (index, Member, This, null)
 import Prelude hiding (null)
 import Proto3.Suite.Class
@@ -273,8 +273,12 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Delete
-instance Evaluatable Delete
-
+instance Evaluatable Delete where
+  eval (Delete a) = do
+    valueRef <- subtermRef a
+    addr <- address valueRef
+    dealloc addr
+    rvalBox unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }

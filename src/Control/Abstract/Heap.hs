@@ -8,6 +8,7 @@ module Control.Abstract.Heap
 , putHeap
 , box
 , alloc
+, dealloc
 , deref
 , assign
 , letrec
@@ -16,7 +17,7 @@ module Control.Abstract.Heap
 -- * Garbage collection
 , gc
 -- * Effects
-, Allocator(..)
+, Allocator
 , runAllocator
 , Deref(..)
 , runDeref
@@ -70,6 +71,9 @@ box val = do
 
 alloc :: Member (Allocator address value) effects => Name -> Evaluator address value effects address
 alloc = sendAllocator . Alloc
+
+dealloc :: Member (Allocator address value) effects => address -> Evaluator address value effects ()
+dealloc = sendAllocator . Delete
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: Member (Deref address value) effects => address -> Evaluator address value effects value
@@ -162,6 +166,7 @@ data Allocator address value (m :: * -> *) return where
   Alloc  :: Name             -> Allocator address value m address
   Assign :: address -> value -> Allocator address value m ()
   GC     :: Live address     -> Allocator address value m ()
+  Delete :: address          -> Allocator address value m ()
 
 data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
@@ -179,6 +184,7 @@ runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
   Assign addr value -> modifyHeap (heapInsert addr value)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
+  Delete addr -> modifyHeap (heapDelete addr)
 
 runDeref :: ( Derefable address effects
             , PureEffects effects
@@ -198,6 +204,7 @@ instance Effect (Allocator address value) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
   handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (dist . (<$ c) . k)
   handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
+  handleState c dist (Request (Delete addr) k) = Request (Delete addr) (dist . (<$ c) . k)
 
 instance PureEffect (Deref address value)
 
