@@ -15,7 +15,7 @@ import Prologue
 tracingTerms :: ( Corecursive term
                 , Member (Reader (Live address)) effects
                 , Member (Env address) effects
-                , Member (State (Heap address Set value)) effects
+                , Member (State (Heap address value)) effects
                 , Member (Writer (trace (Configuration term address value))) effects
                 , Reducer (Configuration term address value) (trace (Configuration term address value))
                 )

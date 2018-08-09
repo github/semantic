@@ -100,7 +100,7 @@ runCallGraph lang includePackages modules package = do
         = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
         . graphing @_ @_ @(Maybe Name) @Monovariant
         . caching
-        . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) Set Abstract))
+        . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) Abstract))
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -204,7 +204,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': Resumable (BaseError (UnspecializedError (Value address (ImportGraphEff address outerEffects))))
                              ': Resumable (BaseError (LoadError address))
                              ': Fresh
-                             ': State (Heap address Set (Value address (ImportGraphEff address outerEffects)))
+                             ': State (Heap address (Value address (ImportGraphEff address outerEffects)))
                              ': outerEffects
                              ) a
   }

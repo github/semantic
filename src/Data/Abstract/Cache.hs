@@ -21,7 +21,7 @@ newtype Cache term address value = Cache { unCache :: Monoidal.Map (Configuratio
 
 data Cached address value = Cached
   { cachedValue :: ValueRef address
-  , cachedHeap  :: Heap address Set value
+  , cachedHeap  :: Heap address value
   }
   deriving (Eq, Ord, Show)
 
