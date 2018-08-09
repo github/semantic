@@ -288,7 +288,6 @@ instance Evaluatable SequenceExpression where
   eval (SequenceExpression a b) =
     subtermValue a >> subtermRef b
 
-
 -- | Javascript void operator
 newtype Void a = Void { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
