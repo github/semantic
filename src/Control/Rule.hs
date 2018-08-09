@@ -48,6 +48,7 @@ import           Control.Monad.Effect.State
 import           Data.Coerce
 import           Data.Functor.Identity
 import           Data.Machine
+import           Data.Machine.Runner
 import           Data.Profunctor
 import           Data.Text (Text, intercalate, unpack)
 
@@ -147,8 +148,8 @@ toAlgebra :: (Traversable (Base t), Corecursive t)
           -> FAlgebra (Base t) (Eff effs t)
 toAlgebra (Rule _ m) t = do
   inner <- sequenceA t
-  res <- runT $ supply (Just (embed inner)) m
-  pure $ fromMaybe (embed inner) (listToMaybe res)
+  res <- runT1 (source (Just (embed inner)) ~> m)
+  pure (fromMaybe (embed inner) res)
 
 runRule :: Foldable f => f from -> Rule effs from to -> Eff effs [to]
 runRule inp r = runT (source inp ~> machine r)
