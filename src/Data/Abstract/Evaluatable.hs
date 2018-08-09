@@ -40,7 +40,6 @@ import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
-import Data.Semigroup.Reducer hiding (unit)
 import Data.Sum
 import Data.Term
 import Prologue
@@ -96,8 +95,9 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
             , Member (State (Heap address (Cell address) value)) effects
             , Member Trace effects
+            , Monoid (Cell address value)
+            , Ord value
             , Recursive term
-            , Reducer value (Cell address value)
             , ValueRoots address value
             , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
             , valueEffects ~ (Function address value ': moduleEffects)
