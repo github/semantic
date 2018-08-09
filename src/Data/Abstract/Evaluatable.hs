@@ -91,7 +91,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
-            , Member (State (Heap address Set value)) effects
+            , Member (State (Heap address value)) effects
             , Member Trace effects
             , Ord value
             , Recursive term

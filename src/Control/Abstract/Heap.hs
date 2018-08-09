@@ -40,20 +40,20 @@ import Data.Span (Span)
 import Prologue
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address Set value)) effects) => term -> TermEvaluator term address value effects (Configuration term address value)
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address value)) effects) => term -> TermEvaluator term address value effects (Configuration term address value)
 getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
 
 
 -- | Retrieve the heap.
-getHeap :: Member (State (Heap address Set value)) effects => Evaluator address value effects (Heap address Set value)
+getHeap :: Member (State (Heap address value)) effects => Evaluator address value effects (Heap address value)
 getHeap = get
 
 -- | Set the heap.
-putHeap :: Member (State (Heap address Set value)) effects => Heap address Set value -> Evaluator address value effects ()
+putHeap :: Member (State (Heap address value)) effects => Heap address value -> Evaluator address value effects ()
 putHeap = put
 
 -- | Update the heap.
-modifyHeap :: Member (State (Heap address Set value)) effects => (Heap address Set value -> Heap address Set value) -> Evaluator address value effects ()
+modifyHeap :: Member (State (Heap address value)) effects => (Heap address value -> Heap address value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
 box :: ( Member (Allocator address value) effects
@@ -140,9 +140,9 @@ gc roots = sendAllocator (GC roots)
 reachable :: ( Ord address
              , ValueRoots address value
              )
-          => Live address           -- ^ The set of root addresses.
-          -> Heap address Set value -- ^ The heap to trace addresses through.
-          -> Live address           -- ^ The set of addresses reachable from the root set.
+          => Live address       -- ^ The set of root addresses.
+          -> Heap address value -- ^ The heap to trace addresses through.
+          -> Live address       -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
@@ -165,7 +165,7 @@ data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
 
 runAllocator :: ( Allocatable address effects
-                , Member (State (Heap address Set value)) effects
+                , Member (State (Heap address value)) effects
                 , Ord value
                 , PureEffects effects
                 , ValueRoots address value
@@ -185,7 +185,7 @@ runDeref :: ( Derefable address effects
             , Member (Reader ModuleInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
-            , Member (State (Heap address Set value)) effects
+            , Member (State (Heap address value)) effects
             )
          => Evaluator address value (Deref address value ': effects) a
          -> Evaluator address value effects a
