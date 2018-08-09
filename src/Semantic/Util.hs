@@ -246,7 +246,7 @@ testOverwriteFloats = do
   pure (toks, tagged)
 
 testOverwriteFloats' = do
-  res <- translating (Proxy @'Language.JSON) . fst <$> testAlgebra
+  res <- translating (Proxy @'Language.JSON) . fst <$> testOverwriteFloats
   putStrLn (either show (show . typeset) res)
 
 {-
