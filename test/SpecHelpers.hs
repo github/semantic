@@ -70,6 +70,7 @@ import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
+import qualified Data.Set as Set
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
 import Semantic.Telemetry (LogQueue, StatQueue)
@@ -142,13 +143,13 @@ testEvaluating
 type Val = Value Precise UtilEff
 
 
-deNamespace :: Heap Precise (Cell Precise) (Value Precise term)
+deNamespace :: Heap Precise (Value Precise term)
             -> Value Precise term
             -> Maybe (Name, [Name])
 deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
 deNamespace _ _                          = Nothing
 
-namespaceScope :: Heap Precise (Cell Precise) (Value Precise term)
+namespaceScope :: Heap Precise (Value Precise term)
                -> Value Precise term
                -> Maybe (Environment Precise)
 namespaceScope heap ns@(Namespace _ _ _)
