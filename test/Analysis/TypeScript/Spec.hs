@@ -52,7 +52,12 @@ spec config = parallel $ do
         Right (Just (Module _ (env, addr) :| [])) -> do
           Env.names env `shouldBe` [ "x" ]
           (derefQName heap ("x" :| []) env) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+        other -> expectationFailure (show other)
 
+    it "evaluates void expressions" $ do
+      (_, (heap, res)) <- evaluate ["void.ts"]
+      case ModuleTable.lookup "void.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Null]
         other -> expectationFailure (show other)
 
   where
