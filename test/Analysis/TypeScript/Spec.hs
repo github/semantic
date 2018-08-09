@@ -60,6 +60,15 @@ spec config = parallel $ do
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Null]
         other -> expectationFailure (show other)
 
+    it "evaluates delete" $ do
+      (_, (heap, res)) <- evaluate ["delete.ts"]
+      case ModuleTable.lookup "delete.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [Unit]
+          (derefQName heap ("x" :| []) env) `shouldBe` Nothing
+          Env.names env `shouldBe` [ "x" ]
+        other -> expectationFailure (show other)
+
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
