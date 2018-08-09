@@ -10,6 +10,7 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Hole
 import Data.Abstract.Address
 import Data.Abstract.Name
+import qualified Data.Set as Set
 import Prologue
 
 -- | Defines allocation and dereferencing of addresses.
@@ -23,6 +24,8 @@ class Addressable address effects => Allocatable address effects where
 class Addressable address effects => Derefable address effects where
   derefCell :: address -> Cell address value -> Evaluator address value effects (Maybe value)
 
+  assignCell :: Ord value => address -> value -> Cell address value -> Evaluator address value effects (Cell address value)
+
 
 -- | 'Precise' addresses are always allocated a fresh address, and dereference to the 'Latest' value written.
 instance Addressable Precise effects where
@@ -34,6 +37,8 @@ instance Member Fresh effects => Allocatable Precise effects where
 instance Derefable Precise effects where
   derefCell _ = pure . getLast . unLatest
 
+  assignCell _ value _ = pure (Latest (Last (Just value)))
+
 -- | 'Monovariant' addresses allocate one address per unique variable name, and dereference once per stored value, nondeterministically.
 instance Addressable Monovariant effects where
   type Cell Monovariant = All
@@ -43,6 +48,8 @@ instance Allocatable Monovariant effects where
 
 instance Member NonDet effects => Derefable Monovariant effects where
   derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
+
+  assignCell _ value (All values) = pure (All (Set.insert value values))
 
 -- | 'Located' addresses allocate & dereference using the underlying address, contextualizing addresses with the current 'PackageInfo' & 'ModuleInfo'.
 instance Addressable address effects => Addressable (Located address) effects where
@@ -54,6 +61,8 @@ instance (Allocatable address effects, Member (Reader ModuleInfo) effects, Membe
 instance Derefable address effects => Derefable (Located address) effects where
   derefCell (Located loc _ _ _ _) = relocate . derefCell loc
 
+  assignCell (Located loc _ _ _ _) value = relocate . assignCell loc value
+
 instance (Addressable address effects, Ord context, Show context) => Addressable (Hole context address) effects where
   type Cell (Hole context address) = Cell address
 
@@ -63,6 +72,9 @@ instance (Allocatable address effects, Ord context, Show context) => Allocatable
 instance (Derefable address effects, Ord context, Show context) => Derefable (Hole context address) effects where
   derefCell (Total loc) = relocate . derefCell loc
   derefCell (Partial _) = const (pure Nothing)
+
+  assignCell (Total loc) value = relocate . assignCell loc value
+  assignCell (Partial _) _ = pure
 
 relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
 relocate = raiseEff . lowerEff
