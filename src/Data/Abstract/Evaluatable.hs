@@ -17,7 +17,6 @@ module Data.Abstract.Evaluatable
 , runUnspecialized
 , runUnspecializedWith
 , throwUnspecializedError
-, Cell
 ) where
 
 import Control.Abstract hiding (Load)
@@ -40,7 +39,6 @@ import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
-import Data.Semigroup.Reducer hiding (unit)
 import Data.Sum
 import Data.Term
 import Prologue
@@ -80,7 +78,6 @@ evaluate :: ( AbstractValue address value valueEffects
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
-            , Foldable (Cell address)
             , FreeVariables term
             , HasPostlude lang
             , HasPrelude lang
@@ -94,10 +91,10 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
-            , Member (State (Heap address (Cell address) value)) effects
+            , Member (State (Heap address value)) effects
             , Member Trace effects
+            , Ord value
             , Recursive term
-            , Reducer value (Cell address value)
             , ValueRoots address value
             , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
             , valueEffects ~ (Function address value ': moduleEffects)
