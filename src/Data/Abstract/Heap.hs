@@ -44,7 +44,7 @@ heapRestrict :: Ord address => Heap address value -> Live address -> Heap addres
 heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
 heapDelete :: Ord address => address -> Heap address cell value -> Heap address cell value
-heapDelete addr = Heap . (Monoidal.delete addr) . unHeap
+heapDelete addr = Heap . Monoidal.delete addr . unHeap
 
 instance (Ord address, Ord value) => Reducer (address, value) (Heap address value) where
   unit = Heap . unit
