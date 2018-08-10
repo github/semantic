@@ -409,6 +409,7 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 import' :: Assignment Term
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
         <|> makeTerm <$> symbol ImportFromStatement <*> children (Python.Syntax.Import <$> importPath <*> (wildcard <|> some (aliasImportSymbol <|> importSymbol)))
+        <|> makeTerm <$> symbol FutureImportStatement <*> children (Python.Syntax.FutureImport <$> some (aliasImportSymbol <|> importSymbol))
   where
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
