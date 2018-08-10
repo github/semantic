@@ -10,8 +10,6 @@ module Data.History
 
 import Data.Record
 import Data.Range
-import Data.Span
-import Prologue
 
 -- | 'History' values, when attached to a given 'Term', describe the
 -- ways in which that term was modified during a refactoring pass, if
@@ -25,21 +23,6 @@ data History
   | Modified Range    -- ^ A 'Modified' node was not changed by a refactor, but its children may be 'Generated', 'Refactored', or 'Modified'.
   | Pristine Range    -- ^ A 'Pristine' node was not changed and has no changed (non-'Pristine') children.
   deriving (Show, Eq)
-
-instance Lower History where
-  lowerBound = Pristine lowerBound
-
-instance Semigroup History where
-  -- TODO
-  _ <> _ = Generated
-
-instance Monoid History where
-  mempty = lowerBound
-  mappend = (<>)
-
-instance Monoid (Record '[History, Span]) where
-  mempty = lowerBound
-  mappend = (<>)
 
 wasChanged :: History -> Bool
 wasChanged (Pristine _) = False
