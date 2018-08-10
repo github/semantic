@@ -446,10 +446,9 @@ expressions :: Assignment Term
 expressions = expression <|> sequenceExpression
 
 parameter :: Assignment Term
-parameter =
-      requiredParameter
-  <|> restParameter
-  <|> optionalParameter
+parameter =  requiredParameter
+         <|> restParameter
+         <|> optionalParameter
 
 accessibilityModifier' :: Assignment Term
 accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (Syntax.Identifier . name <$> source)
