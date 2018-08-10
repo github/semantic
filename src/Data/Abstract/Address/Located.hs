@@ -1,11 +1,14 @@
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Address.Located
 ( Located(..)
 ) where
 
+import Control.Abstract.Addressable
+import Control.Abstract.Context
+import Control.Abstract.Evaluator
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
-import Data.Span
 
 data Located address = Located
   { address        :: address
@@ -15,3 +18,16 @@ data Located address = Located
   , addressSpan    :: Span
   }
   deriving (Eq, Ord, Show)
+
+
+instance (Allocatable address effects, Member (Reader ModuleInfo) effects, Member (Reader PackageInfo) effects, Member (Reader Span) effects) => Allocatable (Located address) effects where
+  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule <*> pure name <*> ask)
+
+  assignCell (Located loc _ _ _ _) value = relocate . assignCell loc value
+
+instance Derefable address effects => Derefable (Located address) effects where
+  derefCell (Located loc _ _ _ _) = relocate . derefCell loc
+
+
+relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
+relocate = raiseEff . lowerEff
