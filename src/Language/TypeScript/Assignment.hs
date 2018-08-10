@@ -592,7 +592,7 @@ typeQuery :: Assignment Term
 typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (TypeScript.Syntax.TypeQuery <$> term (identifier <|> nestedIdentifier))
 
 indexTypeQuery :: Assignment Term
-indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TypeScript.Syntax.IndexTypeQuery <$> term (identifier <|> nestedIdentifier))
+indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TypeScript.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedIdentifier))
 
 thisType :: Assignment Term
 thisType = makeTerm <$> symbol Grammar.ThisType <*> (TypeScript.Syntax.ThisType <$> source)
