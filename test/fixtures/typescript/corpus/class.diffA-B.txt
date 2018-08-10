@@ -5,8 +5,8 @@
     ->(Identifier) }
       (Empty)
       (Empty))
-  { (Identifier)
-  ->(Identifier) }
+  { (TypeIdentifier)
+  ->(TypeIdentifier) }
     (ExtendsClause
     { (TypeIdentifier)
     ->(TypeIdentifier) })
