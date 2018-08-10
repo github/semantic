@@ -1,7 +1,7 @@
 (Statements
 {+(AmbientDeclaration
   {+(Class
-    {+(Identifier)+}
+    {+(TypeIdentifier)+}
     {+(PublicFieldDefinition
       {+(Empty)+}
       {+(Empty)+}
@@ -54,7 +54,7 @@
         {+(Empty)+})+})+}
     {+(InterfaceDeclaration
       {+(Empty)+}
-      {+(Identifier)+}
+      {+(TypeIdentifier)+}
       {+(ObjectType
         {+(PropertySignature
           {+(Empty)+}
@@ -64,7 +64,7 @@
           {+(Identifier)+})+})+})+}
     {+(InterfaceDeclaration
       {+(Empty)+}
-      {+(Identifier)+}
+      {+(TypeIdentifier)+}
       {+(ObjectType
         {+(PropertySignature
           {+(Empty)+}
@@ -89,16 +89,16 @@
     {-(Identifier)-})-})-}
 {-(AmbientDeclaration
   {-(Class
-    {-(Identifier)-}
+    {-(TypeIdentifier)-}
     {-(Statements)-})-})-}
 {-(AmbientDeclaration
   {-(InterfaceDeclaration
     {-(Empty)-}
-    {-(Identifier)-}
+    {-(TypeIdentifier)-}
     {-(ObjectType)-})-})-}
   (AmbientDeclaration
     (Class
-      (Identifier)
+      (TypeIdentifier)
       (Statements
         (MethodSignature
           (Empty)
