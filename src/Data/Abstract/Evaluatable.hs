@@ -76,8 +76,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 
 evaluate :: ( AbstractValue address value valueEffects
-            , Allocatable address (Reader ModuleInfo ': effects)
-            , Derefable address (Allocator address ': Reader ModuleInfo ': effects)
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
@@ -96,19 +94,19 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
             , Member (State (Heap address value)) effects
             , Member Trace effects
-            , Ord value
+            , Ord address
             , Recursive term
-            , ValueRoots address value
             , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address ': Reader ModuleInfo ': effects)
             , valueEffects ~ (Function address value ': moduleEffects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
+         -> (forall x . Evaluator address value (Deref address value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator address value (Reader ModuleInfo ': effects) x)
          -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule analyzeTerm runValue modules = do
+evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
   (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
@@ -127,8 +125,7 @@ evaluate lang analyzeModule analyzeTerm runValue modules = do
 
         runInModule preludeBinds info
           = runReader info
-          . runAllocator
-          . runDeref
+          . runAllocDeref
           . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
           . runReturn
           . runLoopControl
