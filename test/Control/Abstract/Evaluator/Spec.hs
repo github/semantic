@@ -33,7 +33,7 @@ spec = parallel $ do
 
 evaluate
   = runM
-  . runState (lowerBound @(Heap Precise Latest Val))
+  . runState (lowerBound @(Heap Precise Val))
   . runFresh 0
   . runReader (PackageInfo (name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
@@ -68,7 +68,7 @@ newtype SpecEff a = SpecEff
                        , Reader ModuleInfo
                        , Reader PackageInfo
                        , Fresh
-                       , State (Heap Precise Latest Val)
+                       , State (Heap Precise Val)
                        , Lift IO
                        ] a
   }
