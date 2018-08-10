@@ -471,9 +471,9 @@ methodDefinition = makeMethod <$>
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
 callSignatureParts :: Assignment (Term, [Term], Term)
-callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize'
- <$> (symbol Grammar.CallSignature *> children ((,,) <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))) <*> many comment)
+callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> callSignature' <*> many comment)
   where
+    callSignature' = symbol Grammar.CallSignature *> children ((,,) <$> ((term typeParameters) <|> emptyTerm) <*> formalParameters <*> ((term typeAnnotation') <|> emptyTerm))
     contextualize' (cs, (typeParams, formalParams, annotation)) = case nonEmpty cs of
       Just cs -> (makeTerm1 (Syntax.Context cs typeParams), formalParams, annotation)
       Nothing -> (typeParams, formalParams, annotation)
