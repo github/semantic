@@ -91,6 +91,11 @@ type Syntax =
    , Literal.String
    , Literal.TextElement
    , Literal.Tuple
+   , Python.Syntax.Ellipsis
+   , Python.Syntax.FutureImport
+   , Python.Syntax.Import
+   , Python.Syntax.QualifiedImport
+   , Python.Syntax.QualifiedAliasedImport
    , Python.Syntax.Redirect
    , Statement.Assignment
    , Statement.Break
@@ -108,10 +113,6 @@ type Syntax =
    , Statement.Try
    , Statement.While
    , Statement.Yield
-   , Python.Syntax.Ellipsis
-   , Python.Syntax.Import
-   , Python.Syntax.QualifiedImport
-   , Python.Syntax.QualifiedAliasedImport
    , Syntax.Context
    , Syntax.Empty
    , Syntax.Error

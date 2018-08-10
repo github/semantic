@@ -44,7 +44,6 @@ import           Proto3.Suite (Named (..), Named1 (..))
 type Syntax = '[
     Comment.Comment
   , Declaration.Function
-  , Literal.Boolean
   , Declaration.Method
   , Directive.File
   , Directive.Line
@@ -83,8 +82,10 @@ type Syntax = '[
   , Expression.Member
   , Expression.This
   , Literal.Array
+  , Literal.Boolean
   , Literal.Character
   , Literal.Complex
+  , Literal.EscapeSequence
   , Literal.Float
   , Literal.Hash
   , Literal.Integer
@@ -127,7 +128,6 @@ type Syntax = '[
   , Ruby.Syntax.Require
   , Ruby.Syntax.Send
   , []
-  , Literal.EscapeSequence
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
