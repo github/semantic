@@ -5,6 +5,7 @@ module Control.Abstract.Evaluator.Spec
 ) where
 
 import Control.Abstract
+import Data.Abstract.Address.Precise
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
