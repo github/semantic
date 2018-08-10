@@ -536,7 +536,22 @@ ty :: Assignment Term
 ty = primaryType <|> unionType <|> intersectionType <|> functionTy <|> constructorTy
 
 primaryType :: Assignment Term
-primaryType = parenthesizedTy <|> predefinedTy <|> typeIdentifier <|> nestedTypeIdentifier <|> genericType <|> typePredicate <|> objectType <|> arrayTy <|> tupleType <|> flowMaybeTy <|> typeQuery <|> indexTypeQuery <|> thisType <|> existentialType <|> literalType <|> lookupType
+primaryType =  arrayTy
+           <|> existentialType
+           <|> flowMaybeTy
+           <|> genericType
+           <|> indexTypeQuery
+           <|> literalType
+           <|> lookupType
+           <|> nestedTypeIdentifier
+           <|> objectType
+           <|> parenthesizedTy
+           <|> predefinedTy
+           <|> thisType
+           <|> tupleType
+           <|> typeIdentifier
+           <|> typePredicate
+           <|> typeQuery
 
 parenthesizedTy :: Assignment Term
 parenthesizedTy = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (TypeScript.Syntax.ParenthesizedType <$> term ty)
