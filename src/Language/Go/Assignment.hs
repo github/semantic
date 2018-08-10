@@ -274,8 +274,8 @@ imaginaryLiteral :: Assignment Term
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
 interpretedStringLiteral :: Assignment Term
-interpretedStringLiteral = makeTerm' <$> (symbol InterpretedStringLiteral) <*>
-      (children (inject . Literal.String <$> some escapeSequence) <|> inject . Literal.TextElement <$> source)
+interpretedStringLiteral = makeTerm' <$> (symbol InterpretedStringLiteral) <*> children (  (inject . Literal.String <$> some escapeSequence)
+                                                                                       <|> (inject . Literal.TextElement <$> source))
 
 escapeSequence :: Assignment Term
 escapeSequence = makeTerm <$> symbol EscapeSequence <*> (Literal.EscapeSequence <$> source)
@@ -439,10 +439,12 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
       from <- importPath <$> source
       let alias = makeTerm loc (Syntax.Identifier (defaultAlias from)) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
       pure $! Go.Syntax.QualifiedImport from alias)
-
+    interpretedStringLiteral' = symbol InterpretedStringLiteral *> children (  (inject . Literal.String <$> some escapeSequence)
+                                                                           <|> (inject . Literal.TextElement <$> source))
+    rawStringLiteral' = symbol RawStringLiteral *> (inject . Literal.TextElement <$> source)
     dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
     underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
-    importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
+    importSpec = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport <|> interpretedStringLiteral' <|> rawStringLiteral')
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
     importFromPath = symbol InterpretedStringLiteral *> (importPath <$> source)
 
