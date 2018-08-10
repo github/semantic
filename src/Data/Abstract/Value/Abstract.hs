@@ -5,6 +5,7 @@ module Data.Abstract.Value.Abstract
 ) where
 
 import Control.Abstract as Abstract
+import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Prologue
 
@@ -17,6 +18,11 @@ runFunction :: ( Member (Allocator address) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
+               , Member (Reader ModuleInfo) effects
+               , Member (Reader Span) effects
+               , Member (Resumable (BaseError (AddressError address Abstract))) effects
+               , Member (State (Heap address Abstract)) effects
+               , Ord address
                , PureEffects effects
                )
             => Evaluator address Abstract (Function address Abstract ': effects) a
@@ -57,6 +63,8 @@ instance ( Member (Allocator address) effects
          , Member (Deref address Abstract) effects
          , Member Fresh effects
          , Member NonDet effects
+         , Member (State (Heap address Abstract)) effects
+         , Ord address
          )
       => AbstractValue address Abstract effects where
   array _ = pure Abstract

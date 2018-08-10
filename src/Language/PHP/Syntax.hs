@@ -56,9 +56,12 @@ include :: ( AbstractValue address value effects
            , Member (Modules address) effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
+           , Member (Resumable (BaseError (AddressError address value))) effects
            , Member (Resumable (BaseError ResolutionError)) effects
            , Member (Resumable (BaseError (EnvironmentError address))) effects
+           , Member (State (Heap address value)) effects
            , Member Trace effects
+           , Ord address
            )
         => Subterm term (Evaluator address value effects (ValueRef address))
         -> (ModulePath -> Evaluator address value effects (ModuleResult address))

@@ -151,6 +151,8 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (Deref address value) effects
                        , Member (Env address) effects
                        , Member (Modules address) effects
+                       , Member (State (Heap address value)) effects
+                       , Ord address
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do

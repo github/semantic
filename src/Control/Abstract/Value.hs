@@ -202,6 +202,8 @@ doWhile body cond = loop $ \ continue -> body *> do
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Deref address value) effects
                  , Member (Env address) effects
+                 , Member (State (Heap address value)) effects
+                 , Ord address
                  )
               => Name
               -> address
@@ -233,7 +235,10 @@ value :: ( AbstractValue address value effects
          , Member (Env address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address value))) effects
          , Member (Resumable (BaseError (EnvironmentError address))) effects
+         , Member (State (Heap address value)) effects
+         , Ord address
          )
       => ValueRef address
       -> Evaluator address value effects value
@@ -245,7 +250,10 @@ subtermValue :: ( AbstractValue address value effects
                 , Member (Env address) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
+                , Member (Resumable (BaseError (AddressError address value))) effects
                 , Member (Resumable (BaseError (EnvironmentError address))) effects
+                , Member (State (Heap address value)) effects
+                , Ord address
                 )
              => Subterm term (Evaluator address value effects (ValueRef address))
              -> Evaluator address value effects value
@@ -279,6 +287,8 @@ subtermAddress = address <=< subtermRef
 rvalBox :: ( Member (Allocator address) effects
            , Member (Deref address value) effects
            , Member Fresh effects
+           , Member (State (Heap address value)) effects
+           , Ord address
            )
         => value
         -> Evaluator address value effects (ValueRef address)
