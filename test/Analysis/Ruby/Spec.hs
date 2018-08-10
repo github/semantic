@@ -101,7 +101,6 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
   where
-    ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate = evalRubyProject . map (fixtures <>)
     evalRubyProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Ruby) rubyParser
