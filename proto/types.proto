@@ -24,9 +24,10 @@ enum Language {
 enum VertexType {
   PACKAGE = 0;
   MODULE = 1;
-  VARIABLE = 2;
-  METHOD = 3;
-  FUNCTION = 4;
+  UNKNOWN_MODULE = 2;
+  VARIABLE = 3;
+  METHOD = 4;
+  FUNCTION = 5;
 }
 
 message BlobPair {
