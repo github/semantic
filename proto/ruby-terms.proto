@@ -150,11 +150,11 @@ message Modulo {
 }
 
 message Negate {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message Not {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message NotMatches {
@@ -206,6 +206,8 @@ message XOr {
   RubyTerm rhs = 2;
 }
 
+message This { }
+
 message Array {
   repeated RubyTerm arrayElements = 1;
 }
@@ -250,7 +252,7 @@ message String {
 }
 
 message Symbol {
-  string symbolContent = 1;
+  repeated RubyTerm symbolElements = 1;
 }
 
 message TextElement {
@@ -302,7 +304,7 @@ message Assignment {
 }
 
 message Break {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message Catch {
@@ -311,7 +313,7 @@ message Catch {
 }
 
 message Continue {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message Else {
@@ -320,7 +322,7 @@ message Else {
 }
 
 message Finally {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message ForEach {
@@ -346,11 +348,11 @@ message Pattern {
 }
 
 message Retry {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message Return {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message ScopeEntry {
@@ -376,7 +378,7 @@ message While {
 }
 
 message Yield {
-  RubyTerm term = 1;
+  RubyTerm value = 1;
 }
 
 message RubySyntax {
@@ -421,47 +423,51 @@ message RubySyntax {
     Subscript subscript = 38;
     Member member = 39;
     Array array = 40;
-    Complex complex = 41;
-    Float float = 42;
-    Hash hash = 43;
-    Integer integer = 44;
-    KeyValue keyValue = 45;
-    Null null = 46;
-    Rational rational = 47;
-    Regex regex = 48;
-    String string = 49;
-    Symbol symbol = 50;
-    TextElement textElement = 51;
-    Assignment assignment = 52;
-    Break break = 53;
-    Catch catch = 54;
-    Continue continue = 55;
-    Else else = 56;
-    Finally finally = 57;
-    ForEach forEach = 58;
-    If if = 59;
-    Match match = 60;
-    Pattern pattern = 61;
-    Retry retry = 62;
-    Return return = 63;
-    ScopeEntry scopeEntry = 64;
-    ScopeExit scopeExit = 65;
-    Statements statements = 66;
-    Try try = 67;
-    While while = 68;
-    Yield yield = 69;
-    Context context = 70;
-    Empty empty = 71;
-    Error error = 72;
-    Identifier identifier = 73;
-    Class class = 74;
-    Load load = 75;
-    LowPrecedenceAnd lowPrecedenceAnd = 76;
-    LowPrecedenceOr lowPrecedenceOr = 77;
-    Module module = 78;
-    Require require = 79;
-    Send send = 80;
-    List list = 81;
+    Character character = 41;
+    Complex complex = 42;
+    Float float = 43;
+    Hash hash = 44;
+    Integer integer = 45;
+    InterpolationElement interpolationElement = 46;
+    KeyValue keyValue = 47;
+    Null null = 48;
+    Rational rational = 49;
+    Regex regex = 50;
+    String string = 51;
+    Symbol symbol = 52;
+    SymbolElement symbolElement = 53;
+    TextElement textElement = 54;
+    Assignment assignment = 55;
+    Break break = 56;
+    Catch catch = 57;
+    Continue continue = 58;
+    Else else = 59;
+    Finally finally = 60;
+    ForEach forEach = 61;
+    If if = 62;
+    Match match = 63;
+    Pattern pattern = 64;
+    Retry retry = 65;
+    Return return = 66;
+    ScopeEntry scopeEntry = 67;
+    ScopeExit scopeExit = 68;
+    Statements statements = 69;
+    Try try = 70;
+    While while = 71;
+    Yield yield = 72;
+    Context context = 73;
+    Empty empty = 74;
+    Error error = 75;
+    Identifier identifier = 76;
+    Class class = 77;
+    Load load = 78;
+    LowPrecedenceAnd lowPrecedenceAnd = 79;
+    LowPrecedenceOr lowPrecedenceOr = 80;
+    Module module = 81;
+    Require require = 82;
+    Send send = 83;
+    List list = 84;
+    This this = 85;
   }
 }
 
