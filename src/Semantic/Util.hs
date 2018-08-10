@@ -73,14 +73,14 @@ newtype UtilEff a = UtilEff
                        , Resumable (BaseError (LoadError Precise))
                        , Trace
                        , Fresh
-                       , State (Heap Precise Latest (Value Precise UtilEff))
+                       , State (Heap Precise (Value Precise UtilEff))
                        , Lift IO
                        ] a
   }
 
 checking
   = runM @_ @IO
-  . runState (lowerBound @(Heap Monovariant All Type))
+  . runState (lowerBound @(Heap Monovariant Type))
   . runFresh 0
   . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
