@@ -135,7 +135,7 @@ instance Translate 'JSON where
       Nullity    -> pure . splice $ "null"
       Open -> case curr of
         Just List        -> pure . splice $ "["
-        Just Associative -> pure . splice $ "["
+        Just Associative -> pure . splice $ "{"
         x                -> throwError (Unexpected (show (Open, x)))
       Close -> case curr of
         Just List        -> pure . splice $ "]"
