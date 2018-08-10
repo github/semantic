@@ -194,7 +194,7 @@ addKVPair = fromPlan "addKVPair" $ do
       remark Refactored (injectTerm ann (Literal.Hash [newItem]))
       where
         newItem = termIn gen (inject (Literal.KeyValue k v))
-        k = termIn gen (inject (Literal.TextElement "added"))
+        k = termIn gen (inject (Literal.TextElement "\"added\""))
         v = termIn gen (inject (Literal.Array []))
         gen = Generated :. rtail ann
         ann = termAnnotation origTerm
