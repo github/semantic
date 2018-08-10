@@ -151,10 +151,13 @@ variable name = lookupEnv name >>= maybeM (freeVariableError name)
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: Member (Allocator address) effects
+gc :: ( Member (State (Heap address value)) effects
+      , Ord address
+      , ValueRoots address value
+      )
    => Live address                       -- ^ The set of addresses to consider rooted.
    -> Evaluator address value effects ()
-gc roots = send (GC roots)
+gc roots = modifyHeap (heapRestrict <*> reachable roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: ( Ord address
@@ -174,23 +177,18 @@ reachable roots heap = go mempty roots
 -- Effects
 
 data Allocator address (m :: * -> *) return where
-  Alloc  :: Name         -> Allocator address m address
-  GC     :: Live address -> Allocator address m ()
+  Alloc  :: Name -> Allocator address m address
 
 data Deref address value (m :: * -> *) return where
   DerefCell  :: address -> Set value          -> Deref address value m (Maybe value)
   AssignCell :: address -> value -> Set value -> Deref address value m (Set value)
 
 runAllocator :: ( Allocatable address effects
-                , Member (State (Heap address value)) effects
                 , PureEffects effects
-                , ValueRoots address value
                 )
              => Evaluator address value (Allocator address ': effects) a
              -> Evaluator address value effects a
-runAllocator = interpret $ \ eff -> case eff of
-  Alloc name -> allocCell name
-  GC roots -> modifyHeap (heapRestrict <*> reachable roots)
+runAllocator = interpret $ \ (Alloc name) -> allocCell name
 
 runDeref :: ( Derefable address effects
             , Ord value
@@ -206,7 +204,6 @@ instance PureEffect (Allocator address)
 
 instance Effect (Allocator address) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
-  handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
 
 instance PureEffect (Deref address value)
 
