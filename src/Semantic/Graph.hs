@@ -29,7 +29,9 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
-import           Data.Abstract.Address
+import           Data.Abstract.Address.Located
+import           Data.Abstract.Address.Monovariant
+import           Data.Abstract.Address.Precise
 import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module

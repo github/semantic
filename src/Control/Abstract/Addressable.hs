@@ -7,7 +7,9 @@ module Control.Abstract.Addressable
 import Control.Abstract.Context
 import Control.Abstract.Evaluator
 import Control.Abstract.Hole
-import Data.Abstract.Address
+import Data.Abstract.Address.Located
+import Data.Abstract.Address.Monovariant
+import Data.Abstract.Address.Precise
 import Data.Abstract.Name
 import qualified Data.Set as Set
 import Prologue
