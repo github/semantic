@@ -31,27 +31,29 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Roots
 import Control.Abstract.TermEvaluator
 import Data.Abstract.Configuration
+import Data.Abstract.BaseError
 import Data.Abstract.Heap
 import Data.Abstract.Live
+import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
-import Data.Semigroup.Reducer
+import Data.Span (Span)
 import Prologue
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address (Cell address) value)) effects) => term -> TermEvaluator term address value effects (Configuration term address (Cell address) value)
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address value)) effects) => term -> TermEvaluator term address value effects (Configuration term address value)
 getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
 
 
 -- | Retrieve the heap.
-getHeap :: Member (State (Heap address (Cell address) value)) effects => Evaluator address value effects (Heap address (Cell address) value)
+getHeap :: Member (State (Heap address value)) effects => Evaluator address value effects (Heap address value)
 getHeap = get
 
 -- | Set the heap.
-putHeap :: Member (State (Heap address (Cell address) value)) effects => Heap address (Cell address) value -> Evaluator address value effects ()
+putHeap :: Member (State (Heap address value)) effects => Heap address value -> Evaluator address value effects ()
 putHeap = put
 
 -- | Update the heap.
-modifyHeap :: Member (State (Heap address (Cell address) value)) effects => (Heap address (Cell address) value -> Heap address (Cell address) value) -> Evaluator address value effects ()
+modifyHeap :: Member (State (Heap address value)) effects => (Heap address value -> Heap address value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
 box :: ( Member (Allocator address value) effects
@@ -117,7 +119,9 @@ letrec' name body = do
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: ( Member (Env address) effects
-            , Member (Resumable (EnvironmentError address)) effects
+            , Member (Reader ModuleInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (BaseError (EnvironmentError address))) effects
             )
          => Name
          -> Evaluator address value effects address
@@ -134,12 +138,11 @@ gc roots = sendAllocator (GC roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: ( Ord address
-             , Foldable (Cell address)
              , ValueRoots address value
              )
-          => Live address                      -- ^ The set of root addresses.
-          -> Heap address (Cell address) value -- ^ The heap to trace addresses through.
-          -> Live address                      -- ^ The set of addresses reachable from the root set.
+          => Live address       -- ^ The set of root addresses.
+          -> Heap address value -- ^ The heap to trace addresses through.
+          -> Live address       -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
@@ -162,28 +165,32 @@ data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
 
 runAllocator :: ( Allocatable address effects
-                , Foldable (Cell address)
-                , Member (State (Heap address (Cell address) value)) effects
+                , Member (State (Heap address value)) effects
+                , Ord value
                 , PureEffects effects
-                , Reducer value (Cell address value)
                 , ValueRoots address value
                 )
              => Evaluator address value (Allocator address value ': effects) a
              -> Evaluator address value effects a
 runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
-  Assign addr value -> modifyHeap (heapInsert addr value)
+  Assign addr value -> do
+    heap <- getHeap
+    cell <- assignCell addr value (fromMaybe mempty (heapLookup addr heap))
+    putHeap (heapInit addr cell heap)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
 runDeref :: ( Derefable address effects
             , PureEffects effects
-            , Member (Resumable (AddressError address value)) effects
-            , Member (State (Heap address (Cell address) value)) effects
+            , Member (Reader ModuleInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (BaseError (AddressError address value))) effects
+            , Member (State (Heap address value)) effects
             )
          => Evaluator address value (Deref address value ': effects) a
          -> Evaluator address value effects a
 runDeref = interpret $ \ eff -> case eff of
-  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr))
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr))
 
 instance PureEffect (Allocator address value)
 
@@ -198,7 +205,7 @@ instance Effect (Deref address value) where
   handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
 
 data AddressError address value resume where
-  UnallocatedAddress   :: address -> AddressError address value (Cell address value)
+  UnallocatedAddress   :: address -> AddressError address value (Set value)
   UninitializedAddress :: address -> AddressError address value value
 
 deriving instance Eq address => Eq (AddressError address value resume)
@@ -210,9 +217,23 @@ instance Eq address => Eq1 (AddressError address value) where
   liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
   liftEq _ _                        _                        = False
 
+throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))) effects
+                     , Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     )
+                  => AddressError address body resume
+                  -> Evaluator address value effects resume
+throwAddressError = throwBaseError
 
-runAddressError :: (Effectful (m address value), Effects effects) => m address value (Resumable (AddressError address value) ': effects) a -> m address value effects (Either (SomeExc (AddressError address value)) a)
+runAddressError :: ( Effectful (m address value)
+                   , Effects effects
+                   )
+                => m address value (Resumable (BaseError (AddressError address value)) ': effects) a
+                -> m address value effects (Either (SomeExc (BaseError (AddressError address value))) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . AddressError address value resume -> m address value effects resume) -> m address value (Resumable (AddressError address value) ': effects) a -> m address value effects a
+runAddressErrorWith :: (Effectful (m address value), Effects effects)
+                    => (forall resume . (BaseError (AddressError address value)) resume -> m address value effects resume)
+                    -> m address value (Resumable (BaseError (AddressError address value)) ': effects) a
+                    -> m address value effects a
 runAddressErrorWith = runResumableWith

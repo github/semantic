@@ -13,10 +13,10 @@ module Data.Abstract.Evaluatable
 , throwEvalError
 , runEvalError
 , runEvalErrorWith
-, Unspecialized(..)
+, UnspecializedError(..)
 , runUnspecialized
 , runUnspecializedWith
-, Cell
+, throwUnspecializedError
 ) where
 
 import Control.Abstract hiding (Load)
@@ -24,10 +24,11 @@ import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Heap as X hiding (AddressError(..), runAddressError, runAddressErrorWith)
-import Control.Abstract.Modules as X (Modules, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve)
+import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
+import Data.Abstract.BaseError as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
@@ -38,7 +39,6 @@ import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
-import Data.Semigroup.Reducer hiding (unit)
 import Data.Sum
 import Data.Term
 import Prologue
@@ -58,17 +58,17 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
-          , Member (Resumable (EnvironmentError address)) effects
-          , Member (Resumable (Unspecialized value)) effects
-          , Member (Resumable EvalError) effects
-          , Member (Resumable ResolutionError) effects
+          , Member (Resumable (BaseError (EnvironmentError address))) effects
+          , Member (Resumable (BaseError (UnspecializedError value))) effects
+          , Member (Resumable (BaseError EvalError)) effects
+          , Member (Resumable (BaseError ResolutionError)) effects
           , Member Fresh effects
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do
     traverse_ subtermValue expr
-    v <- throwResumable (Unspecialized ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr ""))
+    v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
 
@@ -78,7 +78,6 @@ evaluate :: ( AbstractValue address value valueEffects
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
-            , Foldable (Cell address)
             , FreeVariables term
             , HasPostlude lang
             , HasPrelude lang
@@ -87,21 +86,21 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
-            , Member (Resumable (AddressError address value)) effects
-            , Member (Resumable (EnvironmentError address)) effects
-            , Member (Resumable EvalError) effects
-            , Member (Resumable ResolutionError) effects
-            , Member (Resumable (Unspecialized value)) effects
-            , Member (State (Heap address (Cell address) value)) effects
+            , Member (Resumable (BaseError (AddressError address value))) effects
+            , Member (Resumable (BaseError (EnvironmentError address))) effects
+            , Member (Resumable (BaseError EvalError)) effects
+            , Member (Resumable (BaseError ResolutionError)) effects
+            , Member (Resumable (BaseError (UnspecializedError value))) effects
+            , Member (State (Heap address value)) effects
             , Member Trace effects
+            , Ord value
             , Recursive term
-            , Reducer value (Cell address value)
             , ValueRoots address value
             , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
             , valueEffects ~ (Function address value ': moduleEffects)
             )
          => proxy lang
-         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)            -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
+         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
          -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
          -> [Module term]
@@ -148,7 +147,7 @@ class HasPrelude (language :: Language) where
                    , Member (Function address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
-                   , Member (Resumable (EnvironmentError address)) effects
+                   , Member (Resumable (BaseError (EnvironmentError address))) effects
                    , Member Trace effects
                    )
                 => proxy language
@@ -192,7 +191,7 @@ class HasPostlude (language :: Language) where
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects
               , Member (Reader Span) effects
-              , Member (Resumable (EnvironmentError address)) effects
+              , Member (Resumable (BaseError (EnvironmentError address))) effects
               , Member Trace effects
               )
            => proxy language
@@ -238,33 +237,51 @@ instance Eq1 EvalError where
 instance Show1 EvalError where
   liftShowsPrec _ _ = showsPrec
 
-throwEvalError :: (Effectful m, Member (Resumable EvalError) effects) => EvalError resume -> m effects resume
-throwEvalError = throwResumable
-
-runEvalError :: (Effectful m, Effects effects) => m (Resumable EvalError ': effects) a -> m effects (Either (SomeExc EvalError) a)
+runEvalError :: (Effectful m, Effects effects) => m (Resumable (BaseError EvalError) ': effects) a -> m effects (Either (SomeExc (BaseError EvalError)) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . EvalError resume -> m effects resume) -> m (Resumable EvalError ': effects) a -> m effects a
+runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError EvalError) resume -> m effects resume) -> m (Resumable (BaseError EvalError) ': effects) a -> m effects a
 runEvalErrorWith = runResumableWith
 
+throwEvalError :: ( Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError EvalError)) effects
+                  )
+               => EvalError resume
+               -> Evaluator address value effects resume
+throwEvalError = throwBaseError
 
-data Unspecialized a b where
-  Unspecialized :: String -> Unspecialized value value
 
-deriving instance Eq (Unspecialized a b)
-deriving instance Show (Unspecialized a b)
+data UnspecializedError a b where
+  UnspecializedError :: String -> UnspecializedError value value
 
-instance Eq1 (Unspecialized a) where
-  liftEq _ (Unspecialized a) (Unspecialized b) = a == b
+deriving instance Eq (UnspecializedError a b)
+deriving instance Show (UnspecializedError a b)
 
-instance Show1 (Unspecialized a) where
+instance Eq1 (UnspecializedError a) where
+  liftEq _ (UnspecializedError a) (UnspecializedError b) = a == b
+
+instance Show1 (UnspecializedError a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: (Effectful (m value), Effects effects) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: (Effectful (m value), Effects effects)
+                 => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
+                 -> m value effects (Either (SomeExc (BaseError (UnspecializedError value))) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: (Effectful (m value), Effects effects) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
+runUnspecializedWith :: (Effectful (m value), Effects effects)
+                     => (forall resume . BaseError (UnspecializedError value) resume -> m value effects resume)
+                     -> m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
+                     -> m value effects a
 runUnspecializedWith = runResumableWith
+
+throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) effects
+                           , Member (Reader ModuleInfo) effects
+                           , Member (Reader Span) effects
+                           )
+                        => UnspecializedError value resume
+                        -> Evaluator address value effects resume
+throwUnspecializedError = throwBaseError
 
 
 -- Instances

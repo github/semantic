@@ -1,19 +1,13 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address
   ( Precise (..)
   , Located (..)
-  , Latest (..)
-  , All (..)
   , Monovariant (..)
   ) where
 
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
-import Data.Monoid (Last(..))
-import Data.Semigroup.Reducer
 import Data.Span
-import Data.Set as Set
 import Prologue
 
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
@@ -40,26 +34,3 @@ data Located address = Located
   , addressSpan    :: Span
   }
   deriving (Eq, Ord, Show)
-
-
--- | A cell holding a single value. Writes will replace any prior value.
---
---   This is equivalent to 'Data.Monoid.Last', but with a 'Show' instance designed to minimize the amount of text we have to scroll past in ghci.
-newtype Latest value = Latest { unLatest :: Last value }
-  deriving (Eq, Foldable, Functor, Lower, Monoid, Semigroup, Ord, Traversable)
-
-instance Reducer value (Latest value) where
-  unit = Latest . unit . Just
-
-instance Show value => Show (Latest value) where
-  showsPrec d = showsPrec d . getLast . unLatest
-
-
--- | A cell holding all values written to its address.
---
---   This is equivalent to 'Set', but with a 'Show' instance designed to minimize the amount of text we have to scroll past in ghci.
-newtype All value = All { unAll :: Set value }
-  deriving (Eq, Foldable, Lower, Monoid, Ord, Reducer value, Semigroup)
-
-instance Show value => Show (All value) where
-  showsPrec d = showsPrec d . Set.toList . unAll

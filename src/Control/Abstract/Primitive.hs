@@ -15,6 +15,7 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import qualified Data.Abstract.Environment as Env
+import Data.Abstract.BaseError
 import Data.Abstract.Name
 import Data.Text (unpack)
 import Prologue
@@ -87,7 +88,7 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
   {-# INLINE lambda' #-}
 
 instance Member (Function address value) effects => Lambda address value effects (Evaluator address value effects address) where
-  lambda' vars body = function vars lowerBound body
+  lambda' vars = function vars lowerBound
   {-# INLINE lambda' #-}
 
 builtInPrint :: ( AbstractValue address value effects
@@ -99,7 +100,7 @@ builtInPrint :: ( AbstractValue address value effects
                 , Member (Function address value) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
-                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Resumable (BaseError (EnvironmentError address))) effects
                 , Member Trace effects
                 )
              => Evaluator address value effects value
@@ -114,7 +115,7 @@ builtInExport :: ( AbstractValue address value effects
                  , Member (Function address value) effects
                  , Member (Reader ModuleInfo) effects
                  , Member (Reader Span) effects
-                 , Member (Resumable (EnvironmentError address)) effects
+                 , Member (Resumable (BaseError (EnvironmentError address))) effects
                  )
               => Evaluator address value effects value
 builtInExport = lambda (\ v -> do

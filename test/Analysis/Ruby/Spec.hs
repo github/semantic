@@ -36,7 +36,7 @@ spec config = parallel $ do
 
     it "evaluates load with wrapper" $ do
       (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
-      res `shouldBe` Left (SomeExc (inject @(EnvironmentError Precise) (FreeVariable "foo")))
+      res `shouldBe` Left (SomeExc (inject @(BaseError (EnvironmentError Precise)) (BaseError (ModuleInfo "load-wrap.rb") emptySpan (FreeVariable "foo"))))
 
     it "evaluates subclass" $ do
       (_, (heap, res)) <- evaluate ["subclass.rb"]
@@ -101,7 +101,6 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
   where
-    ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate = evalRubyProject . map (fixtures <>)
     evalRubyProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Ruby) rubyParser
