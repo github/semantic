@@ -804,8 +804,16 @@ shorthandPropertyIdentifier :: Assignment Term
 shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment Term
-requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term (identifier <|> destructuringPattern <|> this) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
+requiredParameter = makeRequiredParameter
+                 <$> symbol Grammar.RequiredParameter
+                 <*> children ( (,,,,)
+                             <$> (term accessibilityModifier' <|> emptyTerm)
+                             <*> (term readonly' <|> emptyTerm)
+                             <*> term (identifier <|> destructuringPattern <|> this)
+                             <*> (term typeAnnotation' <|> emptyTerm)
+                             <*> (term expression <|> emptyTerm))
+  where
+    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
 
 restParameter :: Assignment Term
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> term identifier <*> (term typeAnnotation' <|> emptyTerm))
