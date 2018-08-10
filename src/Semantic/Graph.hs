@@ -116,7 +116,7 @@ runCallGraph lang includePackages modules package = do
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm Abstract.runFunction modules))
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (runAllocator . runDeref) Abstract.runFunction modules))
 
 runImportGraphToModuleInfos :: forall effs lang term.
                   ( Declarations term
@@ -183,7 +183,7 @@ runImportGraph lang (package :: Package term) f =
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id (runAllocator . runDeref) (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 newtype ImportGraphEff address outerEffects a = ImportGraphEff
   { runImportGraphEff :: Eff (  Function address (Value address (ImportGraphEff address outerEffects))
