@@ -129,6 +129,8 @@ type Syntax =
    , Type.Pointer
    , Type.Slice
    , []
+   , Literal.String
+   , Literal.EscapeSequence
    ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
@@ -272,7 +274,11 @@ imaginaryLiteral :: Assignment Term
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
 interpretedStringLiteral :: Assignment Term
-interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
+interpretedStringLiteral = makeTerm' <$> (symbol InterpretedStringLiteral) <*>
+      (children (inject . Literal.String <$> some escapeSequence) <|> inject . Literal.TextElement <$> source)
+
+escapeSequence :: Assignment Term
+escapeSequence = makeTerm <$> symbol EscapeSequence <*> (Literal.EscapeSequence <$> source)
 
 intLiteral :: Assignment Term
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
