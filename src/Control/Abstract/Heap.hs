@@ -57,6 +57,7 @@ modifyHeap :: Member (State (Heap address value)) effects => (Heap address value
 modifyHeap = modify'
 
 box :: ( Member (Allocator address value) effects
+       , Member (Deref address value) effects
        , Member Fresh effects
        )
     => value
@@ -76,7 +77,7 @@ deref = send . Deref
 
 
 -- | Write a value to the given address in the 'Allocator'.
-assign :: Member (Allocator address value) effects
+assign :: Member (Deref address value) effects
        => address
        -> value
        -> Evaluator address value effects ()
@@ -93,6 +94,7 @@ lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
 letrec :: ( Member (Allocator address value) effects
+          , Member (Deref address value) effects
           , Member (Env address) effects
           )
        => Name
@@ -158,15 +160,14 @@ sendAllocator = send
 
 data Allocator address value (m :: * -> *) return where
   Alloc  :: Name             -> Allocator address value m address
-  Assign :: address -> value -> Allocator address value m ()
   GC     :: Live address     -> Allocator address value m ()
 
 data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
+  Assign :: address -> value -> Deref address value m ()
 
 runAllocator :: ( Allocatable address effects
                 , Member (State (Heap address value)) effects
-                , Ord value
                 , PureEffects effects
                 , ValueRoots address value
                 )
@@ -174,35 +175,36 @@ runAllocator :: ( Allocatable address effects
              -> Evaluator address value effects a
 runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
-  Assign addr value -> do
-    heap <- getHeap
-    cell <- assignCell addr value (fromMaybe mempty (heapLookup addr heap))
-    putHeap (heapInit addr cell heap)
   GC roots -> modifyHeap (heapRestrict <*> reachable roots)
 
 runDeref :: ( Derefable address effects
-            , PureEffects effects
             , Member (Reader ModuleInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
             , Member (State (Heap address value)) effects
+            , Ord value
+            , PureEffects effects
             )
          => Evaluator address value (Deref address value ': effects) a
          -> Evaluator address value effects a
 runDeref = interpret $ \ eff -> case eff of
   Deref addr -> heapLookup addr <$> get >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr))
+  Assign addr value -> do
+    heap <- getHeap
+    cell <- assignCell addr value (fromMaybe mempty (heapLookup addr heap))
+    putHeap (heapInit addr cell heap)
 
 instance PureEffect (Allocator address value)
 
 instance Effect (Allocator address value) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
-  handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (dist . (<$ c) . k)
   handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
 
 instance PureEffect (Deref address value)
 
 instance Effect (Deref address value) where
   handleState c dist (Request (Deref addr) k) = Request (Deref addr) (dist . (<$ c) . k)
+  handleState c dist (Request (Assign addr value) k) = Request (Assign addr value) (dist . (<$ c) . k)
 
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Set value)

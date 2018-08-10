@@ -200,8 +200,8 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue address value effects
+                 , Member (Deref address value) effects
                  , Member (Env address) effects
-                 , Member (Allocator address value) effects
                  )
               => Name
               -> address
@@ -277,6 +277,7 @@ subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: ( Member (Allocator address value) effects
+           , Member (Deref address value) effects
            , Member Fresh effects
            )
         => value

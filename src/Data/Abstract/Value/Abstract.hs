@@ -54,8 +54,9 @@ instance AbstractIntro Abstract where
   null       = Abstract
 
 instance ( Member (Allocator address Abstract) effects
-         , Member NonDet effects
+         , Member (Deref address Abstract) effects
          , Member Fresh effects
+         , Member NonDet effects
          )
       => AbstractValue address Abstract effects where
   array _ = pure Abstract
