@@ -127,6 +127,7 @@ type Syntax = '[
   , Ruby.Syntax.Require
   , Ruby.Syntax.Send
   , []
+  , Literal.EscapeSequence
   ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
@@ -270,7 +271,7 @@ literal =
   where
     string :: Assignment Term
     string = makeTerm' <$> (symbol String <|> symbol BareString) <*>
-      (children (inject . Literal.String <$> some interpolation) <|> inject . Literal.TextElement <$> source)
+      (children (inject . Literal.String <$> some (interpolation <|> escapeSequence)) <|> inject . Literal.TextElement <$> source)
 
     symbol' :: Assignment Term
     symbol' = makeTerm' <$> (symbol Symbol <|> symbol Symbol' <|> symbol BareSymbol) <*>
@@ -279,9 +280,12 @@ literal =
 interpolation :: Assignment Term
 interpolation = makeTerm <$> symbol Interpolation <*> children (Literal.InterpolationElement <$> expression)
 
+escapeSequence :: Assignment Term
+escapeSequence = makeTerm <$> symbol EscapeSequence <*> (Literal.EscapeSequence <$> source)
+
 heredoc :: Assignment Term
 heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
-       <|> makeTerm <$> symbol HeredocBody <*> children (some (interpolation <|> heredocEnd))
+       <|> makeTerm <$> symbol HeredocBody <*> children (some (interpolation <|> escapeSequence <|> heredocEnd))
   where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 beginBlock :: Assignment Term

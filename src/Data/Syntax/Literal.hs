@@ -130,6 +130,17 @@ instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
+-- | A sequence of textual contents within a string literal.
+newtype EscapeSequence a = EscapeSequence { value :: Text }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+
+instance Eq1 EscapeSequence where liftEq = genericLiftEq
+instance Ord1 EscapeSequence where liftCompare = genericLiftCompare
+instance Show1 EscapeSequence where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for EscapeSequence
+instance Evaluatable EscapeSequence
+
 data Null a = Null
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
