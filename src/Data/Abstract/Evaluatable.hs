@@ -53,6 +53,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
+          , Member Fresh effects
           , Member (Function address value) effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
@@ -62,7 +63,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError (UnspecializedError value))) effects
           , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable (BaseError ResolutionError)) effects
-          , Member Fresh effects
           , Member Trace effects
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
