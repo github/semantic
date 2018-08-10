@@ -454,7 +454,7 @@ indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.S
 methodDeclaration :: Assignment Term
 methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> (term expression <|> emptyTerm) <*> (term block <|> emptyTerm))
   where
-    receiver = symbol ParameterList *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
+    receiver = symbol ParameterList *> children expressions
     mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
 
 methodSpec :: Assignment Term
