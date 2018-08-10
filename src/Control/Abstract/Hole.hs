@@ -4,6 +4,8 @@ module Control.Abstract.Hole
   , toMaybe
   ) where
 
+import Control.Abstract.Addressable
+import Control.Abstract.Evaluator
 import Prologue
 
 class AbstractHole a where
@@ -19,3 +21,17 @@ instance Lower context => AbstractHole (Hole context a) where
 toMaybe :: Hole context a -> Maybe a
 toMaybe (Partial _) = Nothing
 toMaybe (Total a)   = Just a
+
+
+instance (Allocatable address effects, Ord context, Show context) => Allocatable (Hole context address) effects where
+  allocCell name = relocate (Total <$> allocCell name)
+
+  assignCell (Total loc) value = relocate . assignCell loc value
+  assignCell (Partial _) _ = pure
+
+instance (Derefable address effects, Ord context, Show context) => Derefable (Hole context address) effects where
+  derefCell (Total loc) = relocate . derefCell loc
+  derefCell (Partial _) = const (pure Nothing)
+
+relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
+relocate = raiseEff . lowerEff
