@@ -26,6 +26,8 @@ define :: ( HasCallStack
           , Member (Env address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
+          , Member (State (Heap address value)) effects
+          , Ord address
           )
        => Name
        -> Evaluator address value effects value
@@ -42,6 +44,8 @@ defineClass :: ( AbstractValue address value effects
                , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
+               , Member (State (Heap address value)) effects
+               , Ord address
                )
             => Name
             -> [address]
@@ -58,6 +62,8 @@ defineNamespace :: ( AbstractValue address value effects
                    , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
+                   , Member (State (Heap address value)) effects
+                   , Ord address
                    )
                 => Name
                 -> Evaluator address value effects a
@@ -103,8 +109,11 @@ builtInPrint :: ( AbstractValue address value effects
                 , Member (Function address value) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
+                , Member (Resumable (BaseError (AddressError address value))) effects
                 , Member (Resumable (BaseError (EnvironmentError address))) effects
+                , Member (State (Heap address value)) effects
                 , Member Trace effects
+                , Ord address
                 )
              => Evaluator address value effects value
 builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit)
@@ -118,7 +127,10 @@ builtInExport :: ( AbstractValue address value effects
                  , Member (Function address value) effects
                  , Member (Reader ModuleInfo) effects
                  , Member (Reader Span) effects
+                 , Member (Resumable (BaseError (AddressError address value))) effects
                  , Member (Resumable (BaseError (EnvironmentError address))) effects
+                 , Member (State (Heap address value)) effects
+                 , Ord address
                  )
               => Evaluator address value effects value
 builtInExport = lambda (\ v -> do

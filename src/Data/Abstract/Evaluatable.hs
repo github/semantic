@@ -59,11 +59,14 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
+          , Member (Resumable (BaseError (AddressError address value))) effects
           , Member (Resumable (BaseError (EnvironmentError address))) effects
           , Member (Resumable (BaseError (UnspecializedError value))) effects
           , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable (BaseError ResolutionError)) effects
+          , Member (State (Heap address value)) effects
           , Member Trace effects
+          , Ord address
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do
@@ -147,8 +150,11 @@ class HasPrelude (language :: Language) where
                    , Member (Function address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
+                   , Member (Resumable (BaseError (AddressError address value))) effects
                    , Member (Resumable (BaseError (EnvironmentError address))) effects
+                   , Member (State (Heap address value)) effects
                    , Member Trace effects
+                   , Ord address
                    )
                 => proxy language
                 -> Evaluator address value effects ()

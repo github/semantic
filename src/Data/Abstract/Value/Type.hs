@@ -236,7 +236,10 @@ runFunction :: ( Member (Allocator address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError TypeError)) effects
+               , Member (Resumable (BaseError (AddressError address Type))) effects
+               , Member (State (Heap address Type)) effects
                , Member (State TypeMap) effects
+               , Ord address
                , PureEffects effects
                )
             => Evaluator address Type (Abstract.Function address Type ': effects) a
@@ -283,8 +286,11 @@ instance ( Member (Allocator address) effects
          , Member NonDet effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address Type))) effects
          , Member (Resumable (BaseError TypeError)) effects
+         , Member (State (Heap address Type)) effects
          , Member (State TypeMap) effects
+         , Ord address
          )
       => AbstractValue address Type effects where
   array fields = do
