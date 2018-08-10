@@ -1,4 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address
   ( Precise (..)
   , Located (..)
