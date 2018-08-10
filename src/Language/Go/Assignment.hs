@@ -274,7 +274,7 @@ imaginaryLiteral :: Assignment Term
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
 interpretedStringLiteral :: Assignment Term
-interpretedStringLiteral = makeTerm' <$> (symbol InterpretedStringLiteral) <*>
+interpretedStringLiteral = makeTerm' <$> symbol InterpretedStringLiteral <*>
       (children (inject . Literal.String <$> some escapeSequence) <|> inject . Literal.TextElement <$> source)
 
 escapeSequence :: Assignment Term
