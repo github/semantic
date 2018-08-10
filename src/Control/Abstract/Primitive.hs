@@ -88,7 +88,7 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
   {-# INLINE lambda' #-}
 
 instance Member (Function address value) effects => Lambda address value effects (Evaluator address value effects address) where
-  lambda' vars body = function vars lowerBound body
+  lambda' vars = function vars lowerBound
   {-# INLINE lambda' #-}
 
 builtInPrint :: ( AbstractValue address value effects

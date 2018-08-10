@@ -57,7 +57,6 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
   where
-    ns n = Just . Latest . Last . Just . Namespace n
     fixtures = "test/fixtures/python/analysis/"
     evaluate = evalPythonProject . map (fixtures <>)
     evalPythonProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.Python) pythonParser
