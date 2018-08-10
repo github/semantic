@@ -10,6 +10,7 @@ import           Control.Abstract
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
+import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -63,24 +64,24 @@ newtype UtilEff address rest a = UtilEff
                       ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                       ': Reader Span
                       ': Reader PackageInfo
-                      ': Resumable (ValueError address (UtilEff address rest))
-                      ': Resumable (AddressError address (Value address (UtilEff address rest)))
-                      ': Resumable ResolutionError
-                      ': Resumable EvalError
-                      ': Resumable (EnvironmentError address)
-                      ': Resumable (Unspecialized (Value address (UtilEff address rest)))
-                      ': Resumable (LoadError address)
+                      ': Resumable (BaseError (ValueError address (UtilEff address rest)))
+                      ': Resumable (BaseError (AddressError address (Value address (UtilEff address rest))))
+                      ': Resumable (BaseError ResolutionError)
+                      ': Resumable (BaseError EvalError)
+                      ': Resumable (BaseError (EnvironmentError address))
+                      ': Resumable (BaseError (UnspecializedError (Value address (UtilEff address rest))))
+                      ': Resumable (BaseError (LoadError address))
                       ': Fresh
-                      ': State (Heap address Latest (Value address (UtilEff address rest)))
+                      ': State (Heap address (Value address (UtilEff address rest)))
                       ': rest
                       ) a
   }
 
 checking
   = runM @_ @IO
-  . runState (lowerBound @(Heap Monovariant All Type))
-  . runFresh 0
   . runPrintingTrace
+  . runState (lowerBound @(Heap Monovariant Type))
+  . runFresh 0
   . runTermEvaluator @_ @Monovariant @Type
   . caching
   . providingLiveSet
@@ -94,7 +95,7 @@ checking
   . runTypes
 
 evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser
-evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)       rubyParser
 evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
 evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser

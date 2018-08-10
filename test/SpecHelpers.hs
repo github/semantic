@@ -70,6 +70,7 @@ import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
+import qualified Data.Set as Set
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
 import Semantic.Telemetry (LogQueue, StatQueue)
@@ -96,31 +97,30 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects
-  = '[ Resumable (ValueError Precise (UtilEff Precise '[Trace, Lift IO]))
-     , Resumable (AddressError Precise Val)
-     , Resumable ResolutionError
-     , Resumable EvalError
-     , Resumable (EnvironmentError Precise)
-     , Resumable (Unspecialized Val)
-     , Resumable (LoadError Precise)
-     , Fresh
-     , State (Heap Precise Latest Val)
-     , Trace
-     , Lift IO
-     ]
-type TestEvaluatingErrors = '[ ValueError Precise (UtilEff Precise '[Trace, Lift IO])
-                             , AddressError Precise Val
-                             , ResolutionError
-                             , EvalError
-                             , EnvironmentError Precise
-                             , Unspecialized Val
-                             , LoadError Precise
+type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (UtilEff Precise '[Trace, Lift IO])))
+                              , Resumable (BaseError (AddressError Precise Val))
+                              , Resumable (BaseError ResolutionError)
+                              , Resumable (BaseError EvalError)
+                              , Resumable (BaseError (EnvironmentError Precise))
+                              , Resumable (BaseError (UnspecializedError Val))
+                              , Resumable (BaseError (LoadError Precise))
+                              , Fresh
+                              , State (Heap Precise Val)
+                              , Trace
+                              , Lift IO
+                              ]
+type TestEvaluatingErrors = '[ BaseError (ValueError Precise (UtilEff Precise '[Trace, Lift IO]))
+                             , BaseError (AddressError Precise Val)
+                             , BaseError ResolutionError
+                             , BaseError EvalError
+                             , BaseError (EnvironmentError Precise)
+                             , BaseError (UnspecializedError Val)
+                             , BaseError (LoadError Precise)
                              ]
 testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                -> IO
                  ( [String]
-                 , ( Heap Precise Latest Val
+                 , ( Heap Precise Val
                    , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
                             (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
                    )
@@ -142,13 +142,13 @@ testEvaluating
 type Val = Value Precise (UtilEff Precise '[Trace, Lift IO])
 
 
-deNamespace :: Heap Precise (Cell Precise) (Value Precise term)
+deNamespace :: Heap Precise (Value Precise term)
             -> Value Precise term
             -> Maybe (Name, [Name])
 deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
 deNamespace _ _                          = Nothing
 
-namespaceScope :: Heap Precise (Cell Precise) (Value Precise term)
+namespaceScope :: Heap Precise (Value Precise term)
                -> Value Precise term
                -> Maybe (Environment Precise)
 namespaceScope heap ns@(Namespace _ _ _)
@@ -157,14 +157,16 @@ namespaceScope heap ns@(Namespace _ _ _)
   . runFresh 0
   . runAddressError
   . runState heap
+  . runReader (lowerBound @Span)
+  . runReader (ModuleInfo "SpecHelper.hs")
   . runDeref
   $ materializeEnvironment ns
 
 namespaceScope _ _ = Nothing
 
-derefQName :: Heap Precise (Cell Precise) (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
+derefQName :: Heap Precise (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
 derefQName heap names binds = go names (Env.newEnv binds)
-  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
+  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= fmap fst . Set.minView >>= case ns of
           []        -> Just
           (n2 : ns) -> namespaceScope heap >=> go (n2 :| ns)
 
