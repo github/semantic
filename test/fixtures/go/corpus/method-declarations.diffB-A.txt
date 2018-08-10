@@ -8,14 +8,14 @@
     (Statements))
   (Method
     (Empty)
-    (Identifier)
+    (Statements
+      (Identifier))
   { (Identifier)
   ->(Identifier) }
     (Statements)
     (Empty))
   (Method
-    (Statements
-      (Identifier))
+    (Identifier)
     (Statements
       (Identifier)
     { (Identifier)
@@ -27,8 +27,7 @@
     ->(Identifier) })
     (Statements))
   (Method
-    (Statements
-      (Identifier))
+    (Identifier)
     (Statements
       (Identifier)
       (Pointer
@@ -75,17 +74,6 @@
             {+(Identifier)+})+}) })
         (Empty))))
   (Method
-    (Statements)
-    (Statements
-    { (Identifier)
-    ->(Identifier) }
-      (Pointer
-        (Identifier)))
-    (Identifier)
-    (Statements
-      (Identifier)
-    { (Identifier)
-    ->(Identifier) })
     (Statements
       (Assignment
         (MemberAccess
@@ -100,10 +88,20 @@
         (Times
           (MemberAccess
             (Identifier))
-          (Identifier)))))
-  (Method
+          (Identifier))))
     (Statements
-      (Identifier))
+    { (Identifier)
+    ->(Identifier) }
+      (Pointer
+        (Identifier)))
+    (Identifier)
+    (Statements
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) })
+    (Empty))
+  (Method
+    (Identifier)
     (Statements
       (Identifier)
       (Pointer

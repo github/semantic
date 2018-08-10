@@ -1,11 +1,14 @@
 (Statements
-  (Tuple
-  {-(Identifier)-}
-    (Identifier)
+{+(Tuple
   {+(Identifier)+}
-  {+(Identifier)+})
+  {+(Identifier)+}
+  {+(Identifier)+})+}
   (Tuple
   {-(Identifier)-}
     (Identifier)
-    (Identifier))
-{+(Identifier)+})
+  {+(Identifier)+})
+{+(Identifier)+}
+{-(Tuple
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(Identifier)-})-})
