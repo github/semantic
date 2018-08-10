@@ -228,7 +228,7 @@ instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
-runFunction :: ( Member (Allocator address Type) effects
+runFunction :: ( Member (Allocator address) effects
                , Member (Deref address Type) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
@@ -277,7 +277,7 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address Type) effects
+instance ( Member (Allocator address) effects
          , Member (Deref address Type) effects
          , Member Fresh effects
          , Member NonDet effects

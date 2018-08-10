@@ -61,7 +61,7 @@ instance Ord address => ValueRoots address (Value address body) where
     | otherwise                = mempty
 
 
-runFunction :: ( Member (Allocator address (Value address body)) effects
+runFunction :: ( Member (Allocator address) effects
                , Member (Deref address (Value address body)) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
@@ -136,7 +136,7 @@ materializeEnvironment val = do
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
-         , Member (Allocator address (Value address body)) effects
+         , Member (Allocator address) effects
          , Member (Deref address (Value address body)) effects
          , Member (Env address) effects
          , Member (Exc (LoopControl address)) effects

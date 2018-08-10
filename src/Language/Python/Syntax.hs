@@ -147,7 +147,7 @@ instance Evaluatable Import where
 
 -- Evaluate a qualified import
 evalQualifiedImport :: ( AbstractValue address value effects
-                       , Member (Allocator address value) effects
+                       , Member (Allocator address) effects
                        , Member (Deref address value) effects
                        , Member (Env address) effects
                        , Member (Modules address) effects

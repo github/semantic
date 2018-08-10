@@ -56,7 +56,7 @@ putHeap = put
 modifyHeap :: Member (State (Heap address value)) effects => (Heap address value -> Heap address value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
-box :: ( Member (Allocator address value) effects
+box :: ( Member (Allocator address) effects
        , Member (Deref address value) effects
        , Member Fresh effects
        )
@@ -68,8 +68,8 @@ box val = do
   assign addr val
   pure addr
 
-alloc :: Member (Allocator address value) effects => Name -> Evaluator address value effects address
-alloc = sendAllocator . Alloc
+alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
+alloc = send . Alloc
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: Member (Deref address value) effects => address -> Evaluator address value effects value
@@ -85,7 +85,7 @@ assign address = send . Assign address
 
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( Member (Allocator address value) effects
+lookupOrAlloc :: ( Member (Allocator address) effects
                  , Member (Env address) effects
                  )
               => Name
@@ -93,7 +93,7 @@ lookupOrAlloc :: ( Member (Allocator address value) effects
 lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
-letrec :: ( Member (Allocator address value) effects
+letrec :: ( Member (Allocator address) effects
           , Member (Deref address value) effects
           , Member (Env address) effects
           )
@@ -107,7 +107,7 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( Member (Allocator address value) effects
+letrec' :: ( Member (Allocator address) effects
            , Member (Env address) effects
            )
         => Name
@@ -133,10 +133,10 @@ variable name = lookupEnv name >>= maybeM (freeVariableError name)
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: Member (Allocator address value) effects
+gc :: Member (Allocator address) effects
    => Live address                       -- ^ The set of addresses to consider rooted.
    -> Evaluator address value effects ()
-gc roots = sendAllocator (GC roots)
+gc roots = send (GC roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: ( Ord address
@@ -155,12 +155,9 @@ reachable roots heap = go mempty roots
 
 -- Effects
 
-sendAllocator :: Member (Allocator address value) effects => Allocator address value (Eff effects) return -> Evaluator address value effects return
-sendAllocator = send
-
-data Allocator address value (m :: * -> *) return where
-  Alloc  :: Name             -> Allocator address value m address
-  GC     :: Live address     -> Allocator address value m ()
+data Allocator address (m :: * -> *) return where
+  Alloc  :: Name             -> Allocator address m address
+  GC     :: Live address     -> Allocator address m ()
 
 data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
@@ -171,7 +168,7 @@ runAllocator :: ( Allocatable address effects
                 , PureEffects effects
                 , ValueRoots address value
                 )
-             => Evaluator address value (Allocator address value ': effects) a
+             => Evaluator address value (Allocator address ': effects) a
              -> Evaluator address value effects a
 runAllocator = interpret $ \ eff -> case eff of
   Alloc name -> allocCell name
@@ -194,9 +191,9 @@ runDeref = interpret $ \ eff -> case eff of
     cell <- assignCell addr value (fromMaybe mempty (heapLookup addr heap))
     putHeap (heapInit addr cell heap)
 
-instance PureEffect (Allocator address value)
+instance PureEffect (Allocator address)
 
-instance Effect (Allocator address value) where
+instance Effect (Allocator address) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
   handleState c dist (Request (GC roots) k) = Request (GC roots) (dist . (<$ c) . k)
 

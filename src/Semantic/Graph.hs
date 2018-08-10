@@ -191,7 +191,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': Exc (Return address)
                              ': Env address
                              ': Deref address (Value address (ImportGraphEff address outerEffects))
-                             ': Allocator address (Value address (ImportGraphEff address outerEffects))
+                             ': Allocator address
                              ': Reader ModuleInfo
                              ': Reader Span
                              ': Reader PackageInfo

@@ -48,7 +48,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
   eval :: ( AbstractValue address value effects
           , Declarations term
           , FreeVariables term
-          , Member (Allocator address value) effects
+          , Member (Allocator address) effects
           , Member (Deref address value) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
@@ -74,7 +74,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 evaluate :: ( AbstractValue address value valueEffects
             , Allocatable address (Reader ModuleInfo ': effects)
-            , Derefable address (Allocator address value ': Reader ModuleInfo ': effects)
+            , Derefable address (Allocator address ': Reader ModuleInfo ': effects)
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
@@ -96,7 +96,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Ord value
             , Recursive term
             , ValueRoots address value
-            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
+            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address ': Reader ModuleInfo ': effects)
             , valueEffects ~ (Function address value ': moduleEffects)
             )
          => proxy lang
@@ -140,7 +140,7 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue address value effects
                    , HasCallStack
-                   , Member (Allocator address value) effects
+                   , Member (Allocator address) effects
                    , Member (Deref address value) effects
                    , Member (Env address) effects
                    , Member Fresh effects
@@ -185,7 +185,7 @@ instance HasPrelude 'JavaScript where
 class HasPostlude (language :: Language) where
   postlude :: ( AbstractValue address value effects
               , HasCallStack
-              , Member (Allocator address value) effects
+              , Member (Allocator address) effects
               , Member (Deref address value) effects
               , Member (Env address) effects
               , Member Fresh effects
