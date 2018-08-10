@@ -156,8 +156,8 @@ reachable roots heap = go mempty roots
 -- Effects
 
 data Allocator address (m :: * -> *) return where
-  Alloc  :: Name             -> Allocator address m address
-  GC     :: Live address     -> Allocator address m ()
+  Alloc  :: Name         -> Allocator address m address
+  GC     :: Live address -> Allocator address m ()
 
 data Deref address value (m :: * -> *) return where
   Deref  :: address          -> Deref address value m value
