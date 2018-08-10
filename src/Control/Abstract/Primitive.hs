@@ -22,6 +22,7 @@ import Prologue
 
 define :: ( HasCallStack
           , Member (Allocator address value) effects
+          , Member (Deref address value) effects
           , Member (Env address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
@@ -37,6 +38,7 @@ define name def = withCurrentCallStack callStack $ do
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
                , Member (Allocator address value) effects
+               , Member (Deref address value) effects
                , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
@@ -52,6 +54,7 @@ defineClass name superclasses body = define name $ do
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator address value) effects
+                   , Member (Deref address value) effects
                    , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects

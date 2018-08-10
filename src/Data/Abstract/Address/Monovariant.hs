@@ -20,7 +20,7 @@ instance Show Monovariant where
 instance Allocatable Monovariant effects where
   allocCell = pure . Monovariant
 
-  assignCell _ value values = pure (Set.insert value values)
-
 instance Member NonDet effects => Derefable Monovariant effects where
   derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
+
+  assignCell _ value values = pure (Set.insert value values)

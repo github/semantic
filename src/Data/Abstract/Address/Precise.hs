@@ -19,7 +19,7 @@ instance Show Precise where
 instance Member Fresh effects => Allocatable Precise effects where
   allocCell _ = Precise <$> fresh
 
-  assignCell _ value _ = pure (Set.singleton value)
-
 instance Derefable Precise effects where
   derefCell _ = pure . fmap fst . Set.minView
+
+  assignCell _ value _ = pure (Set.singleton value)

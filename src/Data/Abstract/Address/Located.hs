@@ -23,10 +23,10 @@ data Located address = Located
 instance (Allocatable address effects, Member (Reader ModuleInfo) effects, Member (Reader PackageInfo) effects, Member (Reader Span) effects) => Allocatable (Located address) effects where
   allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule <*> pure name <*> ask)
 
-  assignCell (Located loc _ _ _ _) value = relocate . assignCell loc value
-
 instance Derefable address effects => Derefable (Located address) effects where
   derefCell (Located loc _ _ _ _) = relocate . derefCell loc
+
+  assignCell (Located loc _ _ _ _) value = relocate . assignCell loc value
 
 
 relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
