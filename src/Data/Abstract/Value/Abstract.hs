@@ -12,7 +12,7 @@ data Abstract = Abstract
   deriving (Eq, Ord, Show)
 
 
-runFunction :: ( Member (Allocator address Abstract) effects
+runFunction :: ( Member (Allocator address) effects
                , Member (Deref address Abstract) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
@@ -53,7 +53,7 @@ instance AbstractIntro Abstract where
   kvPair _ _ = Abstract
   null       = Abstract
 
-instance ( Member (Allocator address Abstract) effects
+instance ( Member (Allocator address) effects
          , Member (Deref address Abstract) effects
          , Member Fresh effects
          , Member NonDet effects

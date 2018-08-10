@@ -59,7 +59,7 @@ newtype UtilEff a = UtilEff
                        , Exc (Return Precise)
                        , Env Precise
                        , Deref Precise (Value Precise UtilEff)
-                       , Allocator Precise (Value Precise UtilEff)
+                       , Allocator Precise
                        , Reader ModuleInfo
                        , Modules Precise
                        , Reader (ModuleTable (NonEmpty (Module (ModuleResult Precise))))

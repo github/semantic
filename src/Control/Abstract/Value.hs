@@ -276,7 +276,7 @@ subtermAddress :: ( AbstractValue address value effects
 subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: ( Member (Allocator address value) effects
+rvalBox :: ( Member (Allocator address) effects
            , Member (Deref address value) effects
            , Member Fresh effects
            )
