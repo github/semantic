@@ -137,8 +137,8 @@ fromEffect t = fromAutomatonM t . Kleisli
 fromAutomaton :: Automaton k => Text -> k from to -> Rule effs from to
 fromAutomaton t = Rule [t] . auto
 
-fromMatcher :: Text -> Matcher from to -> Rule effs from (Either from to)
-fromMatcher t m = Rule [t] (auto go) where go x = maybe (Left x) Right (runOnce x m)
+fromMatcher :: Text -> Matcher from to -> Rule effs from (Either from (from, to))
+fromMatcher t m = Rule [t] (auto go) where go x = maybe (Left x) (\y -> Right (x, y)) (runOnce x m)
 
 fromAutomatonM :: AutomatonM k => Text -> k (Eff effs) from to -> Rule effs from to
 fromAutomatonM t = Rule [t] . autoT
