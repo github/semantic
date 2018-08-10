@@ -8,9 +8,7 @@
     (Statements
       (Assignment
         (Identifier)
-      { (TextElement)
-      ->(TextElement) })
+        (TextElement))
       (Assignment
         (Identifier)
-      { (TextElement)
-      ->(TextElement) }))))
+        (TextElement)))))

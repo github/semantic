@@ -19,15 +19,12 @@
           (Slice
             (Identifier))
           (Statements
-          { (TextElement)
-          ->(TextElement) })))
+            (TextElement))))
       (Assignment
         (Identifier)
         (Composite
           (Slice
             (Identifier))
           (Statements
-          { (TextElement)
-          ->(TextElement) }
-          { (TextElement)
-          ->(TextElement) }))))))
+            (TextElement)
+            (TextElement)))))))
