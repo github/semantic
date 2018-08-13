@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Control.Abstract.Hole
   ( AbstractHole (..)
   , Hole (..)
@@ -6,6 +7,7 @@ module Control.Abstract.Hole
 
 import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Prologue
 
 class AbstractHole a where
@@ -35,3 +37,15 @@ instance (Derefable address effects, Ord context, Show context) => Derefable (Ho
 
 relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
 relocate = raiseEff . lowerEff
+
+
+runAllocator :: PureEffects effects
+             => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator address value effects x)
+             -> Evaluator (Hole context address) value (Allocator (Hole context address) ': effects) a
+             -> Evaluator (Hole context address) value effects a
+runAllocator handler = interpret (handleAllocator handler)
+
+handleAllocator :: (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator address value effects x)
+                -> Allocator (Hole context address) (Eff (Allocator (Hole context address) ': effects)) a
+                -> Evaluator (Hole context address) value effects a
+handleAllocator handler (Alloc name) = relocate (Total <$> handler (Alloc name))
