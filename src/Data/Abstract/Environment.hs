@@ -31,7 +31,7 @@ import           Prelude hiding (head, lookup)
 import           Prologue
 
 -- $setup
--- >>> import Data.Abstract.Address
+-- >>> import Data.Abstract.Address.Precise
 -- >>> let bright = push (insertEnv (name "foo") (Precise 0) lowerBound)
 -- >>> let shadowed = insertEnv (name "foo") (Precise 1) bright
 

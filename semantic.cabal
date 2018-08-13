@@ -35,7 +35,6 @@ library
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
-                     , Control.Abstract.Addressable
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
@@ -48,7 +47,10 @@ library
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
                      -- Datatypes for abstract interpretation
-                     , Data.Abstract.Address
+                     , Data.Abstract.Address.Hole
+                     , Data.Abstract.Address.Located
+                     , Data.Abstract.Address.Monovariant
+                     , Data.Abstract.Address.Precise
                      , Data.Abstract.BaseError
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration

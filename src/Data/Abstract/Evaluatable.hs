@@ -23,7 +23,7 @@ import Control.Abstract hiding (Load)
 import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnvironmentErrorWith)
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
-import Control.Abstract.Heap as X hiding (AddressError(..), runAddressError, runAddressErrorWith)
+import Control.Abstract.Heap as X hiding (runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Function(..))
 import Data.Abstract.Declarations as X
@@ -48,22 +48,25 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
   eval :: ( AbstractValue address value effects
           , Declarations term
           , FreeVariables term
-          , Member (Allocator address value) effects
-          , Member (Deref address value) effects
+          , Member (Allocator address) effects
+          , Member (Deref value) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
+          , Member Fresh effects
           , Member (Function address value) effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
+          , Member (Resumable (BaseError (AddressError address value))) effects
           , Member (Resumable (BaseError (EnvironmentError address))) effects
           , Member (Resumable (BaseError (UnspecializedError value))) effects
           , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable (BaseError ResolutionError)) effects
-          , Member Fresh effects
+          , Member (State (Heap address value)) effects
           , Member Trace effects
+          , Ord address
           )
        => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
   eval expr = do
@@ -73,8 +76,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 
 evaluate :: ( AbstractValue address value valueEffects
-            , Allocatable address (Reader ModuleInfo ': effects)
-            , Derefable address (Allocator address value ': Reader ModuleInfo ': effects)
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
@@ -93,19 +94,19 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
             , Member (State (Heap address value)) effects
             , Member Trace effects
-            , Ord value
+            , Ord address
             , Recursive term
-            , ValueRoots address value
-            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address value ': Reader ModuleInfo ': effects)
+            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref value ': Allocator address ': Reader ModuleInfo ': effects)
             , valueEffects ~ (Function address value ': moduleEffects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
+         -> (forall x . Evaluator address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator address value (Reader ModuleInfo ': effects) x)
          -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule analyzeTerm runValue modules = do
+evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
   (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
@@ -124,8 +125,7 @@ evaluate lang analyzeModule analyzeTerm runValue modules = do
 
         runInModule preludeBinds info
           = runReader info
-          . runAllocator
-          . runDeref
+          . runAllocDeref
           . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
           . runReturn
           . runLoopControl
@@ -140,15 +140,18 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue address value effects
                    , HasCallStack
-                   , Member (Allocator address value) effects
-                   , Member (Deref address value) effects
+                   , Member (Allocator address) effects
+                   , Member (Deref value) effects
                    , Member (Env address) effects
                    , Member Fresh effects
                    , Member (Function address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
+                   , Member (Resumable (BaseError (AddressError address value))) effects
                    , Member (Resumable (BaseError (EnvironmentError address))) effects
+                   , Member (State (Heap address value)) effects
                    , Member Trace effects
+                   , Ord address
                    )
                 => proxy language
                 -> Evaluator address value effects ()
@@ -185,8 +188,8 @@ instance HasPrelude 'JavaScript where
 class HasPostlude (language :: Language) where
   postlude :: ( AbstractValue address value effects
               , HasCallStack
-              , Member (Allocator address value) effects
-              , Member (Deref address value) effects
+              , Member (Allocator address) effects
+              , Member (Deref value) effects
               , Member (Env address) effects
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects
