@@ -29,7 +29,10 @@ runAllocator :: ( Member Fresh effects
                 )
              => Evaluator Precise value (Allocator Precise ': effects) a
              -> Evaluator Precise value effects a
-runAllocator = interpret $ \ (Alloc _) -> Precise <$> fresh
+runAllocator = interpret handleAllocator
+
+handleAllocator :: Member Fresh effects => Allocator Precise (Eff (Allocator Precise ': effects)) a -> Evaluator Precise value effects a
+handleAllocator (Alloc _) = Precise <$> fresh
 
 runDeref :: PureEffects effects
          => Evaluator Precise value (Deref Precise value ': effects) a
