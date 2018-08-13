@@ -17,15 +17,12 @@ module Control.Abstract.Heap
 , gc
 -- * Effects
 , Allocator(..)
-, runAllocator
 , Deref(..)
-, runDeref
 , AddressError(..)
 , runAddressError
 , runAddressErrorWith
 ) where
 
-import Control.Abstract.Addressable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
@@ -182,23 +179,6 @@ data Allocator address (m :: * -> *) return where
 data Deref address value (m :: * -> *) return where
   DerefCell  :: address -> Set value          -> Deref address value m (Maybe value)
   AssignCell :: address -> value -> Set value -> Deref address value m (Set value)
-
-runAllocator :: ( Allocatable address effects
-                , PureEffects effects
-                )
-             => Evaluator address value (Allocator address ': effects) a
-             -> Evaluator address value effects a
-runAllocator = interpret $ \ (Alloc name) -> allocCell name
-
-runDeref :: ( Derefable address effects
-            , Ord value
-            , PureEffects effects
-            )
-         => Evaluator address value (Deref address value ': effects) a
-         -> Evaluator address value effects a
-runDeref = interpret $ \ eff -> case eff of
-  DerefCell addr cell -> derefCell addr cell
-  AssignCell addr value cell -> assignCell addr value cell
 
 instance PureEffect (Allocator address)
 
