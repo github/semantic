@@ -39,7 +39,16 @@ runAllocator :: ( Member (Reader ModuleInfo) effects
              => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator address value effects x)
              -> Evaluator (Located address) value (Allocator (Located address) ': effects) a
              -> Evaluator (Located address) value effects a
-runAllocator handler = interpret $ \ (Alloc name) -> relocate (Located <$> handler (Alloc name) <*> currentPackage <*> currentModule <*> pure name <*> ask)
+runAllocator handler = interpret (handleAllocator handler)
+
+handleAllocator :: ( Member (Reader ModuleInfo) effects
+                   , Member (Reader PackageInfo) effects
+                   , Member (Reader Span) effects
+                   )
+                => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator address value effects x)
+                -> Allocator (Located address) (Eff (Allocator (Located address) ': effects)) a
+                -> Evaluator (Located address) value effects a
+handleAllocator handler (Alloc name) = relocate (Located <$> handler (Alloc name) <*> currentPackage <*> currentModule <*> pure name <*> ask)
 
 runDeref :: PureEffects effects
          => (forall x. Deref address value (Eff (Deref address value ': effects)) x -> Evaluator address value effects x)
