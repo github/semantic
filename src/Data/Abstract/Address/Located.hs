@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Located
 ( Located(..)
 ) where
@@ -40,3 +40,11 @@ runAllocator :: ( Member (Reader ModuleInfo) effects
              -> Evaluator (Located address) value (Allocator (Located address) ': effects) a
              -> Evaluator (Located address) value effects a
 runAllocator handler = interpret $ \ (Alloc name) -> relocate (Located <$> handler (Alloc name) <*> currentPackage <*> currentModule <*> pure name <*> ask)
+
+runDeref :: PureEffects effects
+         => (forall x. Deref address value (Eff (Deref address value ': effects)) x -> Evaluator address value effects x)
+         -> Evaluator (Located address) value (Deref (Located address) value ': effects) a
+         -> Evaluator (Located address) value effects a
+runDeref handler = interpret $ \case
+  DerefCell  Located{..}       cell -> relocate (handler (DerefCell  address       cell))
+  AssignCell Located{..} value cell -> relocate (handler (AssignCell address value cell))
