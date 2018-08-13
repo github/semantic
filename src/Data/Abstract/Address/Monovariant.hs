@@ -39,6 +39,12 @@ runDeref :: ( Member NonDet effects
             )
          => Evaluator Monovariant value (Deref Monovariant value ': effects) a
          -> Evaluator Monovariant value effects a
-runDeref = interpret $ \case
-  DerefCell  _       cell -> traverse (foldMapA pure) (nonEmpty (toList cell))
-  AssignCell _ value cell -> pure (Set.insert value cell)
+runDeref = interpret handleDeref
+
+handleDeref :: ( Member NonDet effects
+               , Ord value
+               )
+            => Deref Monovariant value (Eff (Deref Monovariant value ': effects)) a
+            -> Evaluator Monovariant value effects a
+handleDeref (DerefCell  _       cell) = traverse (foldMapA pure) (nonEmpty (toList cell))
+handleDeref (AssignCell _ value cell) = pure (Set.insert value cell)
