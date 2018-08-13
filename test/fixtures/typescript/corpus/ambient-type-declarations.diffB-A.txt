@@ -2,7 +2,7 @@
 {+(AmbientDeclaration
   {+(TypeAlias
     {+(Empty)+}
-    {+(Identifier)+}
+    {+(TypeIdentifier)+}
     {+(Union
       {+(Union
         {+(Union
@@ -19,7 +19,7 @@
             {+(TypeIdentifier)+})+})+})+})+})+})+}
 {-(TypeAlias
   {-(Empty)-}
-  {-(Identifier)-}
+  {-(TypeIdentifier)-}
   {-(Union
     {-(Union
       {-(Union

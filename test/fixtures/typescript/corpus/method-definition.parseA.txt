@@ -1,6 +1,6 @@
 (Statements
   (Class
-    (Identifier)
+    (TypeIdentifier)
     (Method
       (Identifier)
       (Empty)

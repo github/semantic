@@ -2,15 +2,11 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements
       (Assignment
         (Identifier)
-      { (TextElement)
-      ->(TextElement) })
+        (TextElement))
       (Assignment
         (Identifier)
-      { (TextElement)
-      ->(TextElement) }))))
+        (TextElement)))))

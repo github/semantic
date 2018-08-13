@@ -10,14 +10,14 @@
     ->(SymbolElement) }
     { (Integer)
     ->(Integer) })
-  {+(KeyValue
-    {+(TextElement)+}
-    {+(Boolean)+})+}
     (KeyValue
     { (SymbolElement)
-    ->(SymbolElement) }
+    ->(TextElement) }
     { (Boolean)
-    ->(Integer) }))
+    ->(Boolean) })
+  {+(KeyValue
+    {+(SymbolElement)+}
+    {+(Integer)+})+})
 {+(Hash)+}
 {+(Hash
   {+(Context

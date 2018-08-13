@@ -2,9 +2,7 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements
       (Type
         (Identifier)
@@ -16,13 +14,11 @@
         (Identifier)
         (Function
           (Statements
-            (Statements
-              (Identifier))
-            (Statements
-              (Identifier)))
+            (Identifier))
+          (Statements
+            (Identifier))
           (Statements
             (Statements
               (Identifier))
             (Statements
-              (Identifier)))
-          (Empty))))))
+              (Identifier))))))))
