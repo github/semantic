@@ -5,7 +5,7 @@
         (Identifier)
         (Empty)
         (Empty)))
-    (Identifier)
+    (TypeIdentifier)
     (ObjectType
       (PropertySignature
         (Empty)

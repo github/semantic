@@ -2,19 +2,15 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements))
   (Method
-    (Empty)
+    (Statements
+      (Identifier))
     (Identifier)
-    (Identifier)
-    (Statements)
     (Empty))
   (Method
-    (Statements
-      (Identifier))
+    (Identifier)
     (Statements
       (Identifier)
       (Identifier))
@@ -24,14 +20,12 @@
       (Identifier))
     (Statements))
   (Method
-    (Statements
-      (Identifier))
+    (Identifier)
     (Statements
       (Identifier)
       (Pointer
         (Identifier)))
     (Identifier)
-    (Statements)
     (Return
       (Call
         (MemberAccess
@@ -49,15 +43,6 @@
               (Identifier))))
         (Empty))))
   (Method
-    (Statements)
-    (Statements
-      (Identifier)
-      (Pointer
-        (Identifier)))
-    (Identifier)
-    (Statements
-      (Identifier)
-      (Identifier))
     (Statements
       (Assignment
         (MemberAccess
@@ -72,10 +57,18 @@
         (Times
           (MemberAccess
             (Identifier))
-          (Identifier)))))
-  (Method
+          (Identifier))))
     (Statements
+      (Identifier)
+      (Pointer
+        (Identifier)))
+    (Identifier)
+    (Statements
+      (Identifier)
       (Identifier))
+    (Empty))
+  (Method
+    (Identifier)
     (Statements
       (Identifier)
       (Pointer

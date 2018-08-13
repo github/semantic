@@ -80,33 +80,34 @@ message PythonSyntax {
     String string = 45;
     TextElement textElement = 46;
     Tuple tuple = 47;
-    Redirect redirect = 48;
-    Assignment assignment = 49;
-    Break break = 50;
-    Catch catch = 51;
-    Continue continue = 52;
-    Else else = 53;
-    Finally finally = 54;
-    ForEach forEach = 55;
-    If if = 56;
-    Let let = 57;
-    NoOp noOp = 58;
-    Return return = 59;
-    Statements statements = 60;
-    Throw throw = 61;
-    Try try = 62;
-    While while = 63;
-    Yield yield = 64;
-    Ellipsis ellipsis = 65;
-    Import import = 66;
-    QualifiedImport qualifiedImport = 67;
-    QualifiedAliasedImport qualifiedAliasedImport = 68;
-    Context context = 69;
-    Empty empty = 70;
-    Error error = 71;
-    Identifier identifier = 72;
-    Annotation annotation = 73;
-    List list = 74;
+    Ellipsis ellipsis = 48;
+    FutureImport futureImport = 49;
+    Import import = 50;
+    QualifiedImport qualifiedImport = 51;
+    QualifiedAliasedImport qualifiedAliasedImport = 52;
+    Redirect redirect = 53;
+    Assignment assignment = 54;
+    Break break = 55;
+    Catch catch = 56;
+    Continue continue = 57;
+    Else else = 58;
+    Finally finally = 59;
+    ForEach forEach = 60;
+    If if = 61;
+    Let let = 62;
+    NoOp noOp = 63;
+    Return return = 64;
+    Statements statements = 65;
+    Throw throw = 66;
+    Try try = 67;
+    While while = 68;
+    Yield yield = 69;
+    Context context = 70;
+    Empty empty = 71;
+    Error error = 72;
+    Identifier identifier = 73;
+    Annotation annotation = 74;
+    List list = 75;
   }
 }
 
@@ -422,6 +423,10 @@ message Ellipsis { }
 message Import {
   QualifiedName importFrom = 1;
   repeated Alias importSymbols = 2;
+}
+
+message FutureImport {
+  repeated Alias futureImportSymbols = 1;
 }
 
 message QualifiedImport {

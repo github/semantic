@@ -2,9 +2,7 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements
       (TypeSwitch
         (Statements
