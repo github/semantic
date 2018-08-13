@@ -1,11 +1,9 @@
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Located
 ( Located(..)
 ) where
 
-import Control.Abstract.Addressable
-import Control.Abstract.Context
-import Control.Abstract.Evaluator
+import Control.Abstract
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
@@ -31,3 +29,14 @@ instance Derefable address effects => Derefable (Located address) effects where
 
 relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
 relocate = raiseEff . lowerEff
+
+
+runAllocator :: ( Member (Reader ModuleInfo) effects
+                , Member (Reader PackageInfo) effects
+                , Member (Reader Span) effects
+                , PureEffects effects
+                )
+             => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator address value effects x)
+             -> Evaluator (Located address) value (Allocator (Located address) ': effects) a
+             -> Evaluator (Located address) value effects a
+runAllocator handler = interpret $ \ (Alloc name) -> relocate (Located <$> handler (Alloc name) <*> currentPackage <*> currentModule <*> pure name <*> ask)
