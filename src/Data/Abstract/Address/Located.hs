@@ -46,13 +46,13 @@ handleAllocator :: ( Member (Reader ModuleInfo) effects
 handleAllocator handler (Alloc name) = relocate (Located <$> handler (Alloc name) <*> currentPackage <*> currentModule <*> pure name <*> ask)
 
 runDeref :: PureEffects effects
-         => (forall x. Deref address value (Eff (Deref address value ': effects)) x -> Evaluator address value effects x)
-         -> Evaluator (Located address) value (Deref (Located address) value ': effects) a
+         => (forall x. Deref value (Eff (Deref value ': effects)) x -> Evaluator address value effects x)
+         -> Evaluator (Located address) value (Deref value ': effects) a
          -> Evaluator (Located address) value effects a
 runDeref handler = interpret (handleDeref handler)
 
-handleDeref :: (forall x. Deref address value (Eff (Deref address value ': effects)) x -> Evaluator address value effects x)
-            -> Deref (Located address) value (Eff (Deref (Located address) value ': effects)) a
+handleDeref :: (forall x. Deref value (Eff (Deref value ': effects)) x -> Evaluator address value effects x)
+            -> Deref value (Eff (Deref value ': effects)) a
             -> Evaluator (Located address) value effects a
-handleDeref handler (DerefCell  Located{..}       cell) = relocate (handler (DerefCell  address       cell))
-handleDeref handler (AssignCell Located{..} value cell) = relocate (handler (AssignCell address value cell))
+handleDeref handler (DerefCell        cell) = relocate (handler (DerefCell        cell))
+handleDeref handler (AssignCell value cell) = relocate (handler (AssignCell value cell))

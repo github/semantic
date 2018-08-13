@@ -14,7 +14,7 @@ data Abstract = Abstract
 
 
 runFunction :: ( Member (Allocator address) effects
-               , Member (Deref address Abstract) effects
+               , Member (Deref Abstract) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
@@ -60,7 +60,7 @@ instance AbstractIntro Abstract where
   null       = Abstract
 
 instance ( Member (Allocator address) effects
-         , Member (Deref address Abstract) effects
+         , Member (Deref Abstract) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (State (Heap address Abstract)) effects

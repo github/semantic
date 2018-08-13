@@ -58,7 +58,7 @@ newtype UtilEff a = UtilEff
                        , Exc (LoopControl Precise)
                        , Exc (Return Precise)
                        , Env Precise
-                       , Deref Precise (Value Precise UtilEff)
+                       , Deref (Value Precise UtilEff)
                        , Allocator Precise
                        , Reader ModuleInfo
                        , Modules Precise

@@ -30,10 +30,10 @@ handleAllocator :: Member Fresh effects => Allocator Precise (Eff (Allocator Pre
 handleAllocator (Alloc _) = Precise <$> fresh
 
 runDeref :: PureEffects effects
-         => Evaluator Precise value (Deref Precise value ': effects) a
+         => Evaluator Precise value (Deref value ': effects) a
          -> Evaluator Precise value effects a
 runDeref = interpret handleDeref
 
-handleDeref :: Deref Precise value (Eff (Deref Precise value ': effects)) a -> Evaluator Precise value effects a
-handleDeref (DerefCell  _       cell) = pure (fst <$> Set.minView cell)
-handleDeref (AssignCell _ value _)    = pure (Set.singleton value)
+handleDeref :: Deref value (Eff (Deref value ': effects)) a -> Evaluator Precise value effects a
+handleDeref (DerefCell        cell) = pure (fst <$> Set.minView cell)
+handleDeref (AssignCell value _)    = pure (Set.singleton value)

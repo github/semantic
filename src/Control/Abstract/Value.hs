@@ -200,7 +200,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue address value effects
-                 , Member (Deref address value) effects
+                 , Member (Deref value) effects
                  , Member (Env address) effects
                  , Member (State (Heap address value)) effects
                  , Ord address
@@ -231,7 +231,7 @@ evaluateInScopedEnv receiver term = do
 
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
-         , Member (Deref address value) effects
+         , Member (Deref value) effects
          , Member (Env address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
@@ -246,7 +246,7 @@ value = deref <=< address
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
-                , Member (Deref address value) effects
+                , Member (Deref value) effects
                 , Member (Env address) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
@@ -285,7 +285,7 @@ subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: ( Member (Allocator address) effects
-           , Member (Deref address value) effects
+           , Member (Deref value) effects
            , Member Fresh effects
            , Member (State (Heap address value)) effects
            , Ord address

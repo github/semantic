@@ -22,7 +22,7 @@ import Prologue
 
 define :: ( HasCallStack
           , Member (Allocator address) effects
-          , Member (Deref address value) effects
+          , Member (Deref value) effects
           , Member (Env address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
@@ -40,7 +40,7 @@ define name def = withCurrentCallStack callStack $ do
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
                , Member (Allocator address) effects
-               , Member (Deref address value) effects
+               , Member (Deref value) effects
                , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
@@ -58,7 +58,7 @@ defineClass name superclasses body = define name $ do
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator address) effects
-                   , Member (Deref address value) effects
+                   , Member (Deref value) effects
                    , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
@@ -103,7 +103,7 @@ instance Member (Function address value) effects => Lambda address value effects
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
                 , Member (Allocator address) effects
-                , Member (Deref address value) effects
+                , Member (Deref value) effects
                 , Member (Env address) effects
                 , Member Fresh effects
                 , Member (Function address value) effects
@@ -121,7 +121,7 @@ builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpa
 builtInExport :: ( AbstractValue address value effects
                  , HasCallStack
                  , Member (Allocator address) effects
-                 , Member (Deref address value) effects
+                 , Member (Deref value) effects
                  , Member (Env address) effects
                  , Member Fresh effects
                  , Member (Function address value) effects
