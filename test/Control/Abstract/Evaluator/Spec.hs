@@ -61,7 +61,7 @@ newtype SpecEff a = SpecEff
                        , Exc (Return Precise)
                        , Env Precise
                        , Allocator Precise
-                       , Deref Precise Val
+                       , Deref Val
                        , Resumable (BaseError (AddressError Precise Val))
                        , Resumable (BaseError (EnvironmentError Precise))
                        , Resumable (BaseError (ValueError Precise SpecEff))
