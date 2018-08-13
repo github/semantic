@@ -229,7 +229,7 @@ instance Ord address => ValueRoots address Type where
 
 
 runFunction :: ( Member (Allocator address) effects
-               , Member (Deref address Type) effects
+               , Member (Deref Type) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
@@ -281,7 +281,7 @@ instance AbstractIntro Type where
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Member (Allocator address) effects
-         , Member (Deref address Type) effects
+         , Member (Deref Type) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Reader ModuleInfo) effects

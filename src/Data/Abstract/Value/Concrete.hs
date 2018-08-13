@@ -62,7 +62,7 @@ instance Ord address => ValueRoots address (Value address body) where
 
 
 runFunction :: ( Member (Allocator address) effects
-               , Member (Deref address (Value address body)) effects
+               , Member (Deref (Value address body)) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
@@ -115,7 +115,7 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
-materializeEnvironment :: ( Member (Deref address (Value address body)) effects
+materializeEnvironment :: ( Member (Deref (Value address body)) effects
                           , Member (Reader ModuleInfo) effects
                           , Member (Reader Span) effects
                           , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
@@ -145,7 +145,7 @@ materializeEnvironment val = do
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Member (Allocator address) effects
-         , Member (Deref address (Value address body)) effects
+         , Member (Deref (Value address body)) effects
          , Member (Env address) effects
          , Member (Exc (LoopControl address)) effects
          , Member (Exc (Return address)) effects

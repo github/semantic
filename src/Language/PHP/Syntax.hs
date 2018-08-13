@@ -51,7 +51,7 @@ resolvePHPName n = do
         toName = T.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue address value effects
-           , Member (Deref address value) effects
+           , Member (Deref value) effects
            , Member (Env address) effects
            , Member (Modules address) effects
            , Member (Reader ModuleInfo) effects

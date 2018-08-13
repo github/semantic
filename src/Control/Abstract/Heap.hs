@@ -54,7 +54,7 @@ modifyHeap :: Member (State (Heap address value)) effects => (Heap address value
 modifyHeap = modify'
 
 box :: ( Member (Allocator address) effects
-       , Member (Deref address value) effects
+       , Member (Deref value) effects
        , Member Fresh effects
        , Member (State (Heap address value)) effects
        , Ord address
@@ -71,7 +71,7 @@ alloc :: Member (Allocator address) effects => Name -> Evaluator address value e
 alloc = send . Alloc
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
-deref :: ( Member (Deref address value) effects
+deref :: ( Member (Deref value) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (AddressError address value))) effects
@@ -80,11 +80,11 @@ deref :: ( Member (Deref address value) effects
          )
       => address
       -> Evaluator address value effects value
-deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . DerefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr))
+deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress addr))
 
 
 -- | Write a value to the given address in the 'Allocator'.
-assign :: ( Member (Deref address value) effects
+assign :: ( Member (Deref value) effects
           , Member (State (Heap address value)) effects
           , Ord address
           )
@@ -93,7 +93,7 @@ assign :: ( Member (Deref address value) effects
        -> Evaluator address value effects ()
 assign addr value = do
   heap <- getHeap
-  cell <- send (AssignCell addr value (fromMaybe lowerBound (heapLookup addr heap)))
+  cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)))
   putHeap (heapInit addr cell heap)
 
 
@@ -107,7 +107,7 @@ lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 
 letrec :: ( Member (Allocator address) effects
-          , Member (Deref address value) effects
+          , Member (Deref value) effects
           , Member (Env address) effects
           , Member (State (Heap address value)) effects
           , Ord address
@@ -176,20 +176,20 @@ reachable roots heap = go mempty roots
 data Allocator address (m :: * -> *) return where
   Alloc  :: Name -> Allocator address m address
 
-data Deref address value (m :: * -> *) return where
-  DerefCell  :: address -> Set value          -> Deref address value m (Maybe value)
-  AssignCell :: address -> value -> Set value -> Deref address value m (Set value)
+data Deref value (m :: * -> *) return where
+  DerefCell  :: Set value          -> Deref value m (Maybe value)
+  AssignCell :: value -> Set value -> Deref value m (Set value)
 
 instance PureEffect (Allocator address)
 
 instance Effect (Allocator address) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
 
-instance PureEffect (Deref address value)
+instance PureEffect (Deref value)
 
-instance Effect (Deref address value) where
-  handleState c dist (Request (DerefCell addr cell) k) = Request (DerefCell addr cell) (dist . (<$ c) . k)
-  handleState c dist (Request (AssignCell addr value cell) k) = Request (AssignCell addr value cell) (dist . (<$ c) . k)
+instance Effect (Deref value) where
+  handleState c dist (Request (DerefCell cell) k) = Request (DerefCell cell) (dist . (<$ c) . k)
+  handleState c dist (Request (AssignCell value cell) k) = Request (AssignCell  value cell) (dist . (<$ c) . k)
 
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Set value)

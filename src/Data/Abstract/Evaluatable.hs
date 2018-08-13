@@ -49,7 +49,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Declarations term
           , FreeVariables term
           , Member (Allocator address) effects
-          , Member (Deref address value) effects
+          , Member (Deref value) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
@@ -96,13 +96,13 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member Trace effects
             , Ord address
             , Recursive term
-            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref address value ': Allocator address ': Reader ModuleInfo ': effects)
+            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref value ': Allocator address ': Reader ModuleInfo ': effects)
             , valueEffects ~ (Function address value ': moduleEffects)
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
          -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
-         -> (forall x . Evaluator address value (Deref address value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator address value (Reader ModuleInfo ': effects) x)
+         -> (forall x . Evaluator address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator address value (Reader ModuleInfo ': effects) x)
          -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
@@ -141,7 +141,7 @@ class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator address) effects
-                   , Member (Deref address value) effects
+                   , Member (Deref value) effects
                    , Member (Env address) effects
                    , Member Fresh effects
                    , Member (Function address value) effects
@@ -189,7 +189,7 @@ class HasPostlude (language :: Language) where
   postlude :: ( AbstractValue address value effects
               , HasCallStack
               , Member (Allocator address) effects
-              , Member (Deref address value) effects
+              , Member (Deref value) effects
               , Member (Env address) effects
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects
