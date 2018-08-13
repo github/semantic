@@ -48,7 +48,6 @@ type Syntax =
    , Declaration.Comprehension
    , Declaration.Decorator
    , Declaration.Function
-   , Declaration.Variable
    , Expression.Plus
    , Expression.Minus
    , Expression.Times

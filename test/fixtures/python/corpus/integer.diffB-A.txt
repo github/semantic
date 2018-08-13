@@ -8,9 +8,9 @@
 {+(Integer)+}
 {+(Negate
   {+(Integer)+})+}
+{+(Integer)+}
 { (Integer)
 ->(Integer) }
-{+(Integer)+}
 {+(Integer)+}
 {+(Integer)+}
 {+(Integer)+}
