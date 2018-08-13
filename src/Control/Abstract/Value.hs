@@ -200,8 +200,10 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue address value effects
+                 , Member (Deref value) effects
                  , Member (Env address) effects
-                 , Member (Allocator address value) effects
+                 , Member (State (Heap address value)) effects
+                 , Ord address
                  )
               => Name
               -> address
@@ -229,11 +231,14 @@ evaluateInScopedEnv receiver term = do
 
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
-         , Member (Deref address value) effects
+         , Member (Deref value) effects
          , Member (Env address) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address value))) effects
          , Member (Resumable (BaseError (EnvironmentError address))) effects
+         , Member (State (Heap address value)) effects
+         , Ord address
          )
       => ValueRef address
       -> Evaluator address value effects value
@@ -241,11 +246,14 @@ value = deref <=< address
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
-                , Member (Deref address value) effects
+                , Member (Deref value) effects
                 , Member (Env address) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
+                , Member (Resumable (BaseError (AddressError address value))) effects
                 , Member (Resumable (BaseError (EnvironmentError address))) effects
+                , Member (State (Heap address value)) effects
+                , Ord address
                 )
              => Subterm term (Evaluator address value effects (ValueRef address))
              -> Evaluator address value effects value
@@ -276,8 +284,11 @@ subtermAddress :: ( AbstractValue address value effects
 subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: ( Member (Allocator address value) effects
+rvalBox :: ( Member (Allocator address) effects
+           , Member (Deref value) effects
            , Member Fresh effects
+           , Member (State (Heap address value)) effects
+           , Ord address
            )
         => value
         -> Evaluator address value effects (ValueRef address)

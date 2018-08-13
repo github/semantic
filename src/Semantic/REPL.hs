@@ -6,7 +6,7 @@ module Semantic.REPL
 
 import Control.Abstract hiding (Continue, List, string)
 import Control.Monad.IO.Class
-import Data.Abstract.Address
+import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
@@ -104,7 +104,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . runReader (lowerBound @Span)
     . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
     . raiseHandler (runModules (ModuleTable.modulePaths (packageModules (snd <$> package))))
-    $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Concrete.runFunction coerce coerce) modules
+    $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Precise.runAllocator . Precise.runDeref) (Concrete.runFunction coerce coerce) modules
 
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without

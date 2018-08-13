@@ -4,16 +4,16 @@
       (Identifier)))
   (AmbientDeclaration
     (Class
-      (Identifier)
+      (TypeIdentifier)
       (Statements)))
   (AmbientDeclaration
     (InterfaceDeclaration
       (Empty)
-      (Identifier)
+      (TypeIdentifier)
       (ObjectType)))
   (AmbientDeclaration
     (Class
-      (Identifier)
+      (TypeIdentifier)
       (Statements
         (MethodSignature
           (Empty)
