@@ -469,9 +469,9 @@ instance Eq1 Await where liftEq = genericLiftEq
 instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Await
-instance Evaluatable Await
-
+instance Evaluatable Await where
+  eval (Await a) = subtermValue a >> subtermRef a
+    -- Rval <$> (subtermAddress a >>= runReturn) - this doesn't work
 
 -- | An object constructor call in Javascript, Java, etc.
 newtype New a = New { newSubject :: [a] }
