@@ -190,20 +190,20 @@ addKVPair = fromPlan "addKVPair" $ do
   where
     injKVPair :: (term, Literal.Hash term) -> term
     injKVPair (origTerm, Literal.Hash xs) =
-      -- remark Refactored (termIn (termAnnotation origTerm) (inject (Literal.Hash (xs <> [newItem]))))
-      remark Refactored (injectTerm ann (Literal.Hash [newItem]))
+      remark Refactored (injectTerm ann (Literal.Hash (xs <> [newItem])))
       where
-        newItem = termIn gen (inject (Literal.KeyValue k v))
-        k = termIn gen (inject (Literal.TextElement "\"added\""))
-        v = termIn gen (inject (Literal.Array []))
-        gen = Generated :. rtail ann
+        newItem = termIn ann (inject (Literal.KeyValue k v))
+        k = termIn ann (inject (Literal.TextElement "\"added\""))
+        v = termIn ann (inject (Literal.Array []))
         ann = termAnnotation origTerm
 
 testAddKVPair = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ ensureAccurateHistory <$> cata (toAlgebra (addKVPair . findHashes)) (mark Pristine tree)
+  tagged <- runM $ {- ensureAccurateHistory <$> -} cata (toAlgebra (addKVPair . findHashes)) (markUnmodified tree)
   let toks = tokenizing src tagged
   pure (toks, tagged)
+  -- (_, toks) <- runM . runState (lowerBound @[Context]) $ runT (source (tokenizing src tagged) ~> machine fixingPipeline)
+  -- pure (Sequence.fromList toks, tagged)
 
 testAddKVPair' = do
   res <- translating (Proxy @'Language.JSON) . fst <$> testAddKVPair
@@ -242,7 +242,7 @@ overwriteFloats = fromPlan "overwritingFloats" $ do
 
 testOverwriteFloats = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ ensureAccurateHistory <$> cata (toAlgebra (overwriteFloats . findFloats)) (mark Pristine tree)
+  tagged <- runM $ {- ensureAccurateHistory <$> -} cata (toAlgebra (overwriteFloats . findFloats)) (markUnmodified tree)
   let toks = tokenizing src tagged
   pure (toks, tagged)
 
@@ -288,7 +288,7 @@ testJSONFile = do
 testTokenizer = do
   (src, tree) <- testJSONFile
 
-  let tagged = ensureAccurateHistory $ renameKey (mark Pristine tree)
+  let tagged = ensureAccurateHistory $ renameKey (markUnmodified tree)
   let toks = tokenizing src tagged
   pure (toks, tagged)
 

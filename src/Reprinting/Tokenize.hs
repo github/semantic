@@ -64,34 +64,19 @@ within c r = control (Enter c) *> r <* control (Exit c)
 ignore :: a -> Tokenizer ()
 ignore = const (pure ())
 
--- | An instance of the 'Tokenize' typeclass describes how
--- to emit tokens based on the 'History' value of the supplied
--- constructor in its AST context.
+-- | An instance of the 'Tokenize' typeclass describes how to emit tokens to
+-- pretty print the value of the supplied constructor in its AST context.
 class (Show1 constr, Traversable constr) => Tokenize constr where
-  -- | Corresponds to 'Generated'. Should emit control and data tokens.
-  whenGenerated :: FAlgebra constr (Tokenizer ())
-
-  -- | Corresponds to 'Refactored'. Should emit control and data tokens.
-  -- You can often defined this as 'whenGenerated'.
-  whenRefactored :: FAlgebra constr (Tokenizer ())
-
-  -- | Corresponds to 'Modified'. Should emit control tokens only.
-  -- Defaults to 'sequenceA_', which is a suitable definition for
-  -- nodes with no children.
-  whenModified :: FAlgebra constr (Tokenizer ())
-  whenModified = sequenceA_
+  -- | Should emit control and data tokens.
+  prettyPrint :: FAlgebra constr (Tokenizer ())
 
 -- | Sums of reprintable terms are reprintable.
 instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Tokenize fs) => Tokenize (Sum fs) where
-  whenGenerated = apply @Tokenize whenGenerated
-  whenRefactored = apply @Tokenize whenRefactored
-  whenModified = apply @Tokenize whenModified
+  prettyPrint = apply @Tokenize prettyPrint
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
 instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize (TermF a (Record fields)) where
-  whenGenerated t = into t (whenGenerated (termFOut t))
-  whenRefactored t = into t (whenRefactored (termFOut t))
-  whenModified t = into t (whenModified (termFOut t))
+  prettyPrint t = into t (prettyPrint (termFOut t))
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
@@ -145,10 +130,10 @@ strategize new = do
     control (Change new)
     modify' (set strategy new)
 
--- | A subterm algebra that implements the /Scrap Your Reprinter/
--- algorithm.  Whereas /SYR/ uses a zipper to do a top-down
--- depth-first rightward traversal of a tree, we use a subterm algebra
--- over a monad, which performs the same task.
+-- | A subterm algebra that implements the /Scrap Your Reprinter/ algorithm.
+-- Whereas /SYR/ uses a zipper to do a top-down depth-first rightward traversal
+-- of a tree, we use a subterm algebra over a monad, which performs the same
+-- task.
 descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
 descend t = do
   let into' s = into (subterm s) (subtermRef s)
@@ -156,21 +141,28 @@ descend t = do
   h <- asks _history
   let next = fmap into' t
   case h of
-    Pristine _ -> pure ()
-    Generated -> do
-      strategize PrettyPrinting
-      whenGenerated next
-      strategize Reprinting
+    Unmodified _ -> do
+      log "Unmodified"
+      sequenceA_ next
 
-    Modified _ -> whenModified next
     Refactored r -> do
-      crs <- gets _cursor
-      src <- asks _source
-      let delimiter = Range crs (start r)
-      log ("slicing: " <> show delimiter)
-      chunk (slice delimiter src)
-      modify (set cursor (start r))
-      strategize PrettyPrinting
-      whenRefactored next
-      strategize Reprinting
-      modify (set cursor (end r))
+      strat <- gets _strategy
+      case strat of
+        PrettyPrinting -> do
+          log "Refactored - PrettyPrinting"
+          prettyPrint next
+        Reprinting -> do
+          log "Refactored - Reprinting"
+          crs <- gets _cursor
+          src <- asks _source
+          let delimiter = Range crs (start r)
+          log ("slicing: " <> show delimiter)
+          chunk (slice delimiter src)
+          modify (set cursor (start r))
+
+          strategize PrettyPrinting
+          prettyPrint next
+          strategize Reprinting
+
+          log ("reset cursor: " <> show (end r))
+          modify (set cursor (end r))
