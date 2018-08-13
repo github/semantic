@@ -32,14 +32,6 @@ instance Ord1 Debugger where liftCompare = genericLiftCompare
 instance Show1 Debugger where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Debugger
 
-data This a = This
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
-
-instance Eq1 This where liftEq = genericLiftEq
-instance Ord1 This where liftCompare = genericLiftCompare
-instance Show1 This where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable This
-
 data Super a = Super
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
 

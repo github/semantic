@@ -38,70 +38,70 @@ message PythonSyntax {
     Comprehension comprehension = 3;
     Decorator decorator = 4;
     Function function = 5;
-    Variable variable = 6;
-    Plus plus = 7;
-    Minus minus = 8;
-    Times times = 9;
-    DividedBy dividedBy = 10;
-    Modulo modulo = 11;
-    Power power = 12;
-    Negate negate = 13;
-    FloorDivision floorDivision = 14;
-    And and = 15;
-    Not not = 16;
-    Or or = 17;
-    XOr xOr = 18;
-    BAnd bAnd = 19;
-    BOr bOr = 20;
-    BXOr bXOr = 21;
-    LShift lShift = 22;
-    RShift rShift = 23;
-    Complement complement = 24;
-    Call call = 25;
-    LessThan lessThan = 26;
-    LessThanEqual lessThanEqual = 27;
-    GreaterThan greaterThan = 28;
-    GreaterThanEqual greaterThanEqual = 29;
-    Equal equal = 30;
-    StrictEqual strictEqual = 31;
-    Comparison comparison = 32;
-    Enumeration enumeration = 33;
-    ScopeResolution scopeResolution = 34;
-    MemberAccess memberAccess = 35;
-    Subscript subscript = 36;
-    Member member = 37;
-    Array array = 38;
-    Boolean boolean = 39;
-    Float float = 40;
-    Hash hash = 41;
-    Integer integer = 42;
-    KeyValue keyValue = 43;
-    Null null = 44;
-    Set set = 45;
-    String string = 46;
-    TextElement textElement = 47;
-    Tuple tuple = 48;
-    Redirect redirect = 49;
-    Assignment assignment = 50;
-    Break break = 51;
-    Catch catch = 52;
-    Continue continue = 53;
-    Else else = 54;
-    Finally finally = 55;
-    ForEach forEach = 56;
-    If if = 57;
-    Let let = 58;
-    NoOp noOp = 59;
-    Return return = 60;
-    Statements statements = 61;
-    Throw throw = 62;
-    Try try = 63;
-    While while = 64;
-    Yield yield = 65;
-    Ellipsis ellipsis = 66;
-    Import import = 67;
-    QualifiedImport qualifiedImport = 68;
-    QualifiedAliasedImport qualifiedAliasedImport = 69;
+    Plus plus = 6;
+    Minus minus = 7;
+    Times times = 8;
+    DividedBy dividedBy = 9;
+    Modulo modulo = 10;
+    Power power = 11;
+    Negate negate = 12;
+    FloorDivision floorDivision = 13;
+    And and = 14;
+    Not not = 15;
+    Or or = 16;
+    XOr xOr = 17;
+    BAnd bAnd = 18;
+    BOr bOr = 19;
+    BXOr bXOr = 20;
+    LShift lShift = 21;
+    RShift rShift = 22;
+    Complement complement = 23;
+    Call call = 24;
+    LessThan lessThan = 25;
+    LessThanEqual lessThanEqual = 26;
+    GreaterThan greaterThan = 27;
+    GreaterThanEqual greaterThanEqual = 28;
+    Equal equal = 29;
+    StrictEqual strictEqual = 30;
+    Comparison comparison = 31;
+    Enumeration enumeration = 32;
+    ScopeResolution scopeResolution = 33;
+    MemberAccess memberAccess = 34;
+    Subscript subscript = 35;
+    Member member = 36;
+    Array array = 37;
+    Boolean boolean = 38;
+    Float float = 39;
+    Hash hash = 40;
+    Integer integer = 41;
+    KeyValue keyValue = 42;
+    Null null = 43;
+    Set set = 44;
+    String string = 45;
+    TextElement textElement = 46;
+    Tuple tuple = 47;
+    Ellipsis ellipsis = 48;
+    FutureImport futureImport = 49;
+    Import import = 50;
+    QualifiedImport qualifiedImport = 51;
+    QualifiedAliasedImport qualifiedAliasedImport = 52;
+    Redirect redirect = 53;
+    Assignment assignment = 54;
+    Break break = 55;
+    Catch catch = 56;
+    Continue continue = 57;
+    Else else = 58;
+    Finally finally = 59;
+    ForEach forEach = 60;
+    If if = 61;
+    Let let = 62;
+    NoOp noOp = 63;
+    Return return = 64;
+    Statements statements = 65;
+    Throw throw = 66;
+    Try try = 67;
+    While while = 68;
+    Yield yield = 69;
     Context context = 70;
     Empty empty = 71;
     Error error = 72;
@@ -140,12 +140,6 @@ message Function {
   PythonTerm functionBody = 4;
 }
 
-message Variable {
-  PythonTerm variableName = 1;
-  PythonTerm variableType = 2;
-  PythonTerm variableValue = 3;
-}
-
 message Plus {
   PythonTerm lhs = 1;
   PythonTerm rhs = 2;
@@ -177,7 +171,7 @@ message Power {
 }
 
 message Negate {
-  PythonTerm term = 1;
+  PythonTerm value = 1;
 }
 
 message FloorDivision {
@@ -191,7 +185,7 @@ message And {
 }
 
 message Not {
-  PythonTerm term = 1;
+  PythonTerm value = 1;
 }
 
 message Or {
@@ -355,7 +349,7 @@ message Assignment {
 }
 
 message Break {
-  PythonTerm term = 1;
+  PythonTerm value = 1;
 }
 
 message Catch {
@@ -364,7 +358,7 @@ message Catch {
 }
 
 message Continue {
-  PythonTerm term = 1;
+  PythonTerm value = 1;
 }
 
 message Else {
@@ -373,7 +367,7 @@ message Else {
 }
 
 message Finally {
-  PythonTerm term = 1;
+  PythonTerm value = 1;
 }
 
 message ForEach {
@@ -399,7 +393,7 @@ message NoOp {
 }
 
 message Return {
-  PythonTerm term = 1;
+  PythonTerm value = 1;
 }
 
 message Statements {
@@ -421,7 +415,7 @@ message While {
 }
 
 message Yield {
-  PythonTerm term = 1;
+  PythonTerm value = 1;
 }
 
 message Ellipsis { }
@@ -429,6 +423,10 @@ message Ellipsis { }
 message Import {
   QualifiedName importFrom = 1;
   repeated Alias importSymbols = 2;
+}
+
+message FutureImport {
+  repeated Alias futureImportSymbols = 1;
 }
 
 message QualifiedImport {

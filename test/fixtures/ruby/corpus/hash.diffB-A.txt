@@ -5,19 +5,19 @@
     ->(SymbolElement) }
     { (TextElement)
     ->(TextElement) })
-  {+(KeyValue
-    {+(SymbolElement)+}
-    {+(Integer)+})+}
-    (KeyValue
-    { (SymbolElement)
-    ->(TextElement) }
-    { (Integer)
-    ->(Boolean) })
     (KeyValue
     { (SymbolElement)
     ->(SymbolElement) }
+    { (Integer)
+    ->(Integer) })
+    (KeyValue
+    { (SymbolElement)
+    ->(TextElement) }
     { (Boolean)
-    ->(Integer) }))
+    ->(Boolean) })
+  {+(KeyValue
+    {+(SymbolElement)+}
+    {+(Integer)+})+})
 {+(Hash)+}
 {+(Hash
   {+(Context

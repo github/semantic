@@ -3,6 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Python.Syntax where
 
+import           Data.Abstract.BaseError
 import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -66,7 +67,8 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 --     `parent/three/__init__.py` respectively.
 resolvePythonModules :: ( Member (Modules address) effects
                         , Member (Reader ModuleInfo) effects
-                        , Member (Resumable ResolutionError) effects
+                        , Member (Reader Span) effects
+                        , Member (Resumable (BaseError ResolutionError)) effects
                         , Member Trace effects
                         )
                      => QualifiedName
@@ -94,7 +96,7 @@ resolvePythonModules q = do
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybeM (throwResumable $ NotFoundError path searchPaths Language.Python) modulePath
+      maybeM (throwResolutionError $ NotFoundError path searchPaths Language.Python) modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).
@@ -106,6 +108,15 @@ data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FutureImport where liftEq = genericLiftEq
+instance Ord1 FutureImport where liftCompare = genericLiftCompare
+instance Show1 FutureImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FutureImport where
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
   deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON)
@@ -145,9 +156,12 @@ instance Evaluatable Import where
 
 -- Evaluate a qualified import
 evalQualifiedImport :: ( AbstractValue address value effects
-                       , Member (Allocator address value) effects
+                       , Member (Allocator address) effects
+                       , Member (Deref value) effects
                        , Member (Env address) effects
                        , Member (Modules address) effects
+                       , Member (State (Heap address value)) effects
+                       , Ord address
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do

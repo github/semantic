@@ -1,0 +1,10 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Statements
+        (Variable
+          (Array
+            (Empty)
+            (Int))
+          (Identifier))))))

@@ -1,0 +1,26 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+        {+(Call
+          {+(MemberAccess
+            {+(Identifier)+})+}
+          {+(Lambda
+            {+(Identifier)+}
+            {+(LambdaBody
+              {+(Call
+                {+(MemberAccess
+                  {+(MemberAccess
+                    {+(Identifier)+})+})+}
+                {+(TextElement)+}
+                {+(Empty)+})+})+})+}
+          {+(Empty)+})+}
+        {-(Lambda
+          {-(Identifier)-}
+          {-(LambdaBody
+            {-(Identifier)-})-})-})))))

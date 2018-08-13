@@ -26,5 +26,5 @@
           {-(ShorthandPropertyIdentifier)-}
           {-(ShorthandPropertyIdentifier)-})-})-})-})
   ->(Class
-    {+(Identifier)+}
+    {+(TypeIdentifier)+}
     {+(Statements)+}) }))

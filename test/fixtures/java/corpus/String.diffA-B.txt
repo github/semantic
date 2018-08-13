@@ -1,0 +1,23 @@
+(Statements
+  (Class
+    (AccessibilityModifier)
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Statements
+          (Statements
+            (Assignment
+              (Variable
+                (Identifier)
+              { (Identifier)
+              ->(Identifier) })
+            { (TextElement)
+            ->(Call
+              {+(MemberAccess
+                {+(Identifier)+})+}
+              {+(TextElement)+}
+              {+(Identifier)+}
+              {+(Empty)+}) })))))))

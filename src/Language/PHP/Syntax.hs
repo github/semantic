@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.PHP.Syntax where
 
-import           Control.Abstract.Modules
+import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
@@ -38,23 +38,30 @@ instance Evaluatable VariableName
 -- were defined inside that function.
 
 resolvePHPName :: ( Member (Modules address) effects
-                  , Member (Resumable ResolutionError) effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError ResolutionError)) effects
                   )
                => T.Text
                -> Evaluator address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybeM (throwResumable $ NotFoundError name [name] Language.PHP) modulePath
+  maybeM (throwResolutionError $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
         toName = T.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue address value effects
-           , Member (Deref address value) effects
+           , Member (Deref value) effects
            , Member (Env address) effects
            , Member (Modules address) effects
-           , Member (Resumable ResolutionError) effects
-           , Member (Resumable (EnvironmentError address)) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (Reader Span) effects
+           , Member (Resumable (BaseError (AddressError address value))) effects
+           , Member (Resumable (BaseError ResolutionError)) effects
+           , Member (Resumable (BaseError (EnvironmentError address))) effects
+           , Member (State (Heap address value)) effects
            , Member Trace effects
+           , Ord address
            )
         => Subterm term (Evaluator address value effects (ValueRef address))
         -> (ModulePath -> Evaluator address value effects (ModuleResult address))
@@ -375,12 +382,12 @@ instance Evaluatable Namespace where
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (n:x:xs) = do
-        name <- maybeM (throwResumable NoNameError) n
+        name <- maybeM (throwEvalError NoNameError) n
         letrec' name $ \addr ->
           box =<< makeNamespace name addr Nothing (void $ go (x:xs))
       -- The last name creates a closure over the namespace body.
       go [n] = do
-        name <- maybeM (throwResumable NoNameError) n
+        name <- maybeM (throwEvalError NoNameError) n
         letrec' name $ \addr ->
           box =<< makeNamespace name addr Nothing (void $ subtermAddress namespaceBody)
       -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php

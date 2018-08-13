@@ -2,12 +2,9 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements))
   (Function
-    (Empty)
     (Identifier)
     (Variadic
       (Pointer
@@ -15,19 +12,16 @@
       (Identifier))
     (Statements))
   (Function
-    (Empty)
     (Identifier)
     (Variadic
       (Identifier)
       (Empty))
     (Statements))
   (Function
-    (Empty)
     (Identifier)
     (Statements
-      (Statements
-        (Identifier))
-      (Variadic
-        (Identifier)
-        (Empty)))
+      (Identifier))
+    (Variadic
+      (Identifier)
+      (Empty))
     (Statements)))

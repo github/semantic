@@ -5,6 +5,7 @@ module Data.Abstract.Value.Abstract
 ) where
 
 import Control.Abstract as Abstract
+import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Prologue
 
@@ -12,11 +13,16 @@ data Abstract = Abstract
   deriving (Eq, Ord, Show)
 
 
-runFunction :: ( Member (Allocator address Abstract) effects
-               , Member (Deref address Abstract) effects
+runFunction :: ( Member (Allocator address) effects
+               , Member (Deref Abstract) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
+               , Member (Reader ModuleInfo) effects
+               , Member (Reader Span) effects
+               , Member (Resumable (BaseError (AddressError address Abstract))) effects
+               , Member (State (Heap address Abstract)) effects
+               , Ord address
                , PureEffects effects
                )
             => Evaluator address Abstract (Function address Abstract ': effects) a
@@ -29,7 +35,7 @@ runFunction = interpret $ \case
       Env.insert name addr <$> rest) (pure lowerBound) params
     addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
     deref addr
-  Call _ params -> do
+  Call _ _ params -> do
     traverse_ deref params
     box Abstract
 
@@ -47,14 +53,18 @@ instance AbstractIntro Abstract where
   string _   = Abstract
   float _    = Abstract
   symbol _   = Abstract
+  regex _    = Abstract
   rational _ = Abstract
   hash _     = Abstract
   kvPair _ _ = Abstract
   null       = Abstract
 
-instance ( Member (Allocator address Abstract) effects
-         , Member NonDet effects
+instance ( Member (Allocator address) effects
+         , Member (Deref Abstract) effects
          , Member Fresh effects
+         , Member NonDet effects
+         , Member (State (Heap address Abstract)) effects
+         , Ord address
          )
       => AbstractValue address Abstract effects where
   array _ = pure Abstract

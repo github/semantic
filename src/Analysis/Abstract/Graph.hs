@@ -18,7 +18,9 @@ module Analysis.Abstract.Graph
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
-import           Data.Abstract.Address
+import           Data.Abstract.Address.Hole
+import           Data.Abstract.Address.Located
+import           Data.Abstract.BaseError
 import           Data.Abstract.Ref
 import           Data.Abstract.Declarations
 import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
@@ -60,10 +62,11 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Member (Reader ModuleInfo) effects
+                 , Member (Reader Span) effects
                  , Member (Env (Hole context (Located address))) effects
                  , Member (State (Graph Vertex)) effects
                  , Member (State (Map (Hole context (Located address)) Vertex)) effects
-                 , Member (Resumable (EnvironmentError (Hole context (Located address)))) effects
+                 , Member (Resumable (BaseError (EnvironmentError (Hole context (Located address))))) effects
                  , AbstractValue (Hole context (Located address)) value effects
                  , Member (Reader Vertex) effects
                  , HasField fields Span
