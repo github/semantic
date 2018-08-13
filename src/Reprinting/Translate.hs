@@ -54,8 +54,8 @@ data Indent = Space | Tab deriving (Eq, Show)
 
 -- | Indentation/spacing directives.
 data Layout
-  = Hard Int Indent
-  | Soft
+  = HardWrap Int Indent
+  | SoftWrap
   | Don't
     deriving (Eq, Show)
 
@@ -128,29 +128,35 @@ instance Translate 'JSON where
         then throwError (InvalidContext curr c (st ^. contexts))
         else pure (over contexts tail st)
 
-  onElement c st = let curr = current st in
+  onElement c st = let curr = current st in do
+    let should = st ^. needsLayout
     case c of
       Fragment f -> pure . splice $ f
       Truth t    -> pure . splice $ if t then "true" else "false"
       Nullity    -> pure . splice $ "null"
-      Open -> case curr of
-        Just List        -> pure . splice $ "["
-        Just Associative -> pure . splice $ "{"
-        x                -> throwError (Unexpected (show (Open, x)))
-      Close -> case curr of
-        Just List        -> pure . splice $ "]"
-        Just Associative -> pure . splice $ "}"
-        x                -> throwError (Unexpected (show (Close, x)))
+      Open -> do
+        let i = Directive $ if should then HardWrap 2 Space else Don't
+        case curr of
+          Just List        -> pure . splice $ "["
+          Just Associative -> pure ["{", i]
+          x                -> throwError (Unexpected (show (Open, x)))
+      Close -> do
+        let i = Directive $ if should then HardWrap 0 Space else Don't
+        case curr of
+          Just List        -> pure . splice $ "]"
+          Just Associative -> pure [i, "}"]
+          x                -> throwError (Unexpected (show (Close, x)))
       Separator  -> do
-        let should = st ^. needsLayout
+        -- let should = st ^. needsLayout
         let curr = current st
 
+        -- let i = Directive Don't
         let i = Directive $
               case (curr, should) of
                 (_, False)            -> Don't
-                (Just List, _)        -> Soft
-                (Just Associative, _) -> Hard 4 Space
-                (Just Pair, _)        -> Soft
+                (Just List, _)        -> SoftWrap
+                (Just Associative, _) -> HardWrap 2 Space
+                (Just Pair, _)        -> SoftWrap
                 _                     -> Don't
 
         case curr of
