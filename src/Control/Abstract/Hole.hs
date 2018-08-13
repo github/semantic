@@ -49,3 +49,17 @@ handleAllocator :: (forall x. Allocator address (Eff (Allocator address ': effec
                 -> Allocator (Hole context address) (Eff (Allocator (Hole context address) ': effects)) a
                 -> Evaluator (Hole context address) value effects a
 handleAllocator handler (Alloc name) = relocate (Total <$> handler (Alloc name))
+
+runDeref :: PureEffects effects
+         => (forall x. Deref address value (Eff (Deref address value ': effects)) x -> Evaluator address value effects x)
+         -> Evaluator (Hole context address) value (Deref (Hole context address) value ': effects) a
+         -> Evaluator (Hole context address) value effects a
+runDeref handler = interpret (handleDeref handler)
+
+handleDeref :: (forall x. Deref address value (Eff (Deref address value ': effects)) x -> Evaluator address value effects x)
+            -> Deref (Hole context address) value (Eff (Deref (Hole context address) value ': effects)) a
+            -> Evaluator (Hole context address) value effects a
+handleDeref handler (DerefCell  (Total address)       cell) = relocate (handler (DerefCell  address       cell))
+handleDeref _       (DerefCell  (Partial _)           _)    = pure Nothing
+handleDeref handler (AssignCell (Total address) value cell) = relocate (handler (AssignCell address value cell))
+handleDeref _       (AssignCell (Partial _)     _     cell) = pure cell
