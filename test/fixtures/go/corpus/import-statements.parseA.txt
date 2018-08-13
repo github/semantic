@@ -8,7 +8,5 @@
       (Identifier))
     (Comment))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements)))

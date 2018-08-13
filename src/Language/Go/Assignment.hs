@@ -129,6 +129,8 @@ type Syntax =
    , Type.Pointer
    , Type.Slice
    , []
+   , Literal.String
+   , Literal.EscapeSequence
    ]
 
 type Term = Term.Term (Sum Syntax) (Record Location)
@@ -272,7 +274,11 @@ imaginaryLiteral :: Assignment Term
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
 interpretedStringLiteral :: Assignment Term
-interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
+interpretedStringLiteral = makeTerm' <$> symbol InterpretedStringLiteral <*> children (  (inject . Literal.String <$> some escapeSequence)
+                                                                                     <|> (inject . Literal.TextElement <$> source))
+
+escapeSequence :: Assignment Term
+escapeSequence = makeTerm <$> symbol EscapeSequence <*> (Literal.EscapeSequence <$> source)
 
 intLiteral :: Assignment Term
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
@@ -324,7 +330,8 @@ fieldDeclarationList :: Assignment Term
 fieldDeclarationList = symbol FieldDeclarationList *> children expressions
 
 functionType :: Assignment Term
-functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> manyTerm parameters <*> (expression <|> emptyTerm))
+functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> params <*> (expression <|> emptyTerm))
+  where params = symbol ParameterList *> children (manyTerm expression)
 
 implicitLengthArrayType :: Assignment Term
 implicitLengthArrayType = makeTerm <$> symbol ImplicitLengthArrayType <*> children (Type.Array Nothing <$> expression)
@@ -414,9 +421,12 @@ fallThroughStatement :: Assignment Term
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment Term
-functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> manyTerm parameters <*> (term types <|> term identifier <|> term returnParameters <|> emptyTerm) <*> (term block <|> emptyTerm))
+functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> params <*> returnTypes <*> (term block <|> emptyTerm))
   where
-    mkFunctionDeclaration name' params' types' block' = Declaration.Function [types'] name' params' block'
+    returnTypes =  pure <$> (term types <|> term identifier <|> term returnParameters)
+               <|> pure []
+    params = symbol ParameterList *> children (manyTerm expression)
+    mkFunctionDeclaration name' params' types' block' = Declaration.Function types' name' params' block'
     returnParameters = makeTerm <$> symbol ParameterList <*> children (manyTerm expression)
 
 importDeclaration :: Assignment Term
@@ -433,10 +443,12 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
       from <- importPath <$> source
       let alias = makeTerm loc (Syntax.Identifier (defaultAlias from)) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
       pure $! Go.Syntax.QualifiedImport from alias)
-
+    interpretedStringLiteral' = symbol InterpretedStringLiteral *> children (  (inject . Literal.String <$> some escapeSequence)
+                                                                           <|> (inject . Literal.TextElement <$> source))
+    rawStringLiteral' = symbol RawStringLiteral *> (inject . Literal.TextElement <$> source)
     dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
     underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
-    importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
+    importSpec = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport <|> interpretedStringLiteral' <|> rawStringLiteral')
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
     importFromPath = symbol InterpretedStringLiteral *> (importPath <$> source)
 
@@ -444,15 +456,20 @@ indexExpression :: Assignment Term
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment Term
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <|> emptyTerm) <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> params <*> returnParameters <*> (term block <|> emptyTerm))
   where
-    receiver = symbol ParameterList *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
-    mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
+    params = symbol ParameterList *> children (manyTerm expression)
+    receiver = symbol ParameterList *> children expressions
+    mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method type'' receiver' name' parameters' body'
+    returnParameters = (symbol ParameterList *> children (manyTerm expression))
+                    <|> pure <$> expression
+                    <|> pure []
 
 methodSpec :: Assignment Term
-methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> parameters <*> (expression <|> emptyTerm))
+methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> params <*> (expression <|> emptyTerm))
   where
-    mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' [params]
+    params = symbol ParameterList *> children (manyTerm expression)
+    mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' params
 
 methodSpecList :: Assignment Term
 methodSpecList = symbol MethodSpecList *> children expressions

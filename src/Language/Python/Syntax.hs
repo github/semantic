@@ -109,6 +109,15 @@ instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
+newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 FutureImport where liftEq = genericLiftEq
+instance Ord1 FutureImport where liftCompare = genericLiftCompare
+instance Show1 FutureImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FutureImport where
+
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
   deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON)
 
@@ -147,9 +156,12 @@ instance Evaluatable Import where
 
 -- Evaluate a qualified import
 evalQualifiedImport :: ( AbstractValue address value effects
-                       , Member (Allocator address value) effects
+                       , Member (Allocator address) effects
+                       , Member (Deref value) effects
                        , Member (Env address) effects
                        , Member (Modules address) effects
+                       , Member (State (Heap address value)) effects
+                       , Ord address
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do

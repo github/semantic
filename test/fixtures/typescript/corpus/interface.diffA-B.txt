@@ -6,8 +6,8 @@
       {-(Identifier)-}
       {-(Empty)-}
       {-(Empty)-})-})-}
-  { (Identifier)
-  ->(Identifier) }
+  { (TypeIdentifier)
+  ->(TypeIdentifier) }
     (ObjectType
       (PropertySignature
         (Empty)

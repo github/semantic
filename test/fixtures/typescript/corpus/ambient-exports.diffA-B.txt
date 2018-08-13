@@ -1,7 +1,7 @@
 (Statements
   (DefaultExport
   { (Class
-    {-(Identifier)-}
+    {-(TypeIdentifier)-}
     {-(Statements)-})
   ->(Function
     {+(Empty)+}
