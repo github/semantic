@@ -1,10 +1,9 @@
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Monovariant
 ( Monovariant(..)
 ) where
 
-import Control.Abstract.Addressable
-import Control.Monad.Effect.NonDet
+import Control.Abstract
 import Data.Abstract.Name
 import qualified Data.Set as Set
 import Prologue
@@ -24,3 +23,19 @@ instance Member NonDet effects => Derefable Monovariant effects where
   derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
 
   assignCell _ value values = pure (Set.insert value values)
+
+
+runAllocator :: PureEffects effects
+             => Evaluator Monovariant value (Allocator Monovariant ': effects) a
+             -> Evaluator Monovariant value effects a
+runAllocator = interpret $ \ (Alloc name) -> pure (Monovariant name)
+
+runDeref :: ( Member NonDet effects
+            , Ord value
+            , PureEffects effects
+            )
+         => Evaluator Monovariant value (Deref Monovariant value ': effects) a
+         -> Evaluator Monovariant value effects a
+runDeref = interpret $ \case
+  DerefCell  _       cell -> traverse (foldMapA pure) (nonEmpty (toList cell))
+  AssignCell _ value cell -> pure (Set.insert value cell)
