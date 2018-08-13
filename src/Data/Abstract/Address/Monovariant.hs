@@ -20,15 +20,6 @@ instance Show Monovariant where
   showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
 
 
-instance Allocatable Monovariant effects where
-  allocCell = pure . Monovariant
-
-instance Member NonDet effects => Derefable Monovariant effects where
-  derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
-
-  assignCell _ value values = pure (Set.insert value values)
-
-
 runAllocator :: PureEffects effects
              => Evaluator Monovariant value (Allocator Monovariant ': effects) a
              -> Evaluator Monovariant value effects a
