@@ -44,7 +44,6 @@ import           Proto3.Suite (Named (..), Named1 (..))
 type Syntax = '[
     Comment.Comment
   , Declaration.Function
-  , Literal.Boolean
   , Declaration.Method
   , Directive.File
   , Directive.Line
@@ -81,9 +80,12 @@ type Syntax = '[
   , Expression.ScopeResolution
   , Expression.Subscript
   , Expression.Member
+  , Expression.This
   , Literal.Array
+  , Literal.Boolean
   , Literal.Character
   , Literal.Complex
+  , Literal.EscapeSequence
   , Literal.Float
   , Literal.Hash
   , Literal.Integer
@@ -181,6 +183,7 @@ expressionChoices =
   , parseError
   , rescue
   , scopeResolution
+  , self
   , singletonClass
   , singletonMethod
   , subscript
@@ -220,7 +223,6 @@ identifier =
   <|> mk ClassVariable
   <|> mk GlobalVariable
   <|> mk Operator
-  <|> mk Self
   <|> mk Super
   <|> mk Setter
   <|> mk SplatArgument
@@ -239,6 +241,9 @@ identifier =
           if ident `elem` locals
             then pure identTerm
             else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
+
+self :: Assignment Term
+self = makeTerm <$> symbol Self <*> (Expression.This <$ source)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment Term
@@ -266,7 +271,7 @@ literal =
   where
     string :: Assignment Term
     string = makeTerm' <$> (symbol String <|> symbol BareString) <*>
-      (children (inject . Literal.String <$> some interpolation) <|> inject . Literal.TextElement <$> source)
+      (children (inject . Literal.String <$> some (interpolation <|> escapeSequence)) <|> inject . Literal.TextElement <$> source)
 
     symbol' :: Assignment Term
     symbol' = makeTerm' <$> (symbol Symbol <|> symbol Symbol' <|> symbol BareSymbol) <*>
@@ -275,9 +280,12 @@ literal =
 interpolation :: Assignment Term
 interpolation = makeTerm <$> symbol Interpolation <*> children (Literal.InterpolationElement <$> expression)
 
+escapeSequence :: Assignment Term
+escapeSequence = makeTerm <$> symbol EscapeSequence <*> (Literal.EscapeSequence <$> source)
+
 heredoc :: Assignment Term
 heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
-       <|> makeTerm <$> symbol HeredocBody <*> children (some (interpolation <|> heredocEnd))
+       <|> makeTerm <$> symbol HeredocBody <*> children (some (interpolation <|> escapeSequence <|> heredocEnd))
   where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 beginBlock :: Assignment Term

@@ -9,7 +9,7 @@ import Prologue
 
 -- | An analysis performing GC after every instruction.
 collectingTerms :: ( Member (Reader (Live address)) effects
-                   , Member (Allocator address value) effects
+                   , Member (State (Heap address value)) effects
                    , Ord address
                    , ValueRoots address value
                    )

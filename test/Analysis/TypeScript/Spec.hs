@@ -38,7 +38,7 @@ spec config = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       (_, (_, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
-      res `shouldBe` Left (SomeExc (inject @EvalError (ExportError "foo.ts" (name "pip"))))
+      res `shouldBe` Left (SomeExc (inject @(BaseError EvalError) (BaseError (ModuleInfo "foo.ts") emptySpan (ExportError "foo.ts" (name "pip")))))
 
     it "evaluates early return statements" $ do
       (_, (heap, res)) <- evaluate ["early-return.ts"]
@@ -46,7 +46,30 @@ spec config = parallel $ do
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 123.0)]
         other -> expectationFailure (show other)
 
+    it "evaluates sequence expressions" $ do
+      (_, (heap, res)) <- evaluate ["sequence-expression.ts"]
+      case ModuleTable.lookup "sequence-expression.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          Env.names env `shouldBe` [ "x" ]
+          (derefQName heap ("x" :| []) env) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+        other -> expectationFailure (show other)
+
+    it "evaluates void expressions" $ do
+      (_, (heap, res)) <- evaluate ["void.ts"]
+      case ModuleTable.lookup "void.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Null]
+        other -> expectationFailure (show other)
+
+    it "evaluates delete" $ do
+      (_, (heap, res)) <- evaluate ["delete.ts"]
+      case ModuleTable.lookup "delete.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [Unit]
+          (derefQName heap ("x" :| []) env) `shouldBe` Nothing
+          Env.names env `shouldBe` [ "x" ]
+        other -> expectationFailure (show other)
+
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
-    evalTypeScriptProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.TypeScript) typescriptParser Language.TypeScript
+    evalTypeScriptProject = testEvaluating <=< evaluateProject' config (Proxy :: Proxy 'Language.TypeScript) typescriptParser

@@ -7,34 +7,35 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
+import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
-consultOracle :: (Cacheable term address (Cell address) value, Member (Reader (Cache term address (Cell address) value)) effects)
-              => Configuration term address (Cell address) value
-              -> TermEvaluator term address value effects (Set (Cached address (Cell address) value))
+consultOracle :: (Cacheable term address value, Member (Reader (Cache term address value)) effects)
+              => Configuration term address value
+              -> TermEvaluator term address value effects (Set (Cached address value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
-withOracle :: Member (Reader (Cache term address (Cell address) value)) effects
-           => Cache term address (Cell address) value
+withOracle :: Member (Reader (Cache term address value)) effects
+           => Cache term address value
            -> TermEvaluator term address value effects a
            -> TermEvaluator term address value effects a
 withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Cacheable term address (Cell address) value, Member (State (Cache term address (Cell address) value)) effects)
-            => Configuration term address (Cell address) value
-            -> TermEvaluator term address value effects (Maybe (Set (Cached address (Cell address) value)))
+lookupCache :: (Cacheable term address value, Member (State (Cache term address value)) effects)
+            => Configuration term address value
+            -> TermEvaluator term address value effects (Maybe (Set (Cached address value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term address (Cell address) value, Member (State (Cache term address (Cell address) value)) effects, Member (State (Heap address (Cell address) value)) effects)
-                     => Configuration term address (Cell address) value
-                     -> Set (Cached address (Cell address) value)
+cachingConfiguration :: (Cacheable term address value, Member (State (Cache term address value)) effects, Member (State (Heap address value)) effects)
+                     => Configuration term address value
+                     -> Set (Cached address value)
                      -> TermEvaluator term address value effects (ValueRef address)
                      -> TermEvaluator term address value effects (ValueRef address)
 cachingConfiguration configuration values action = do
@@ -42,27 +43,27 @@ cachingConfiguration configuration values action = do
   result <- Cached <$> action <*> TermEvaluator getHeap
   cachedValue result <$ modify' (cacheInsert configuration result)
 
-putCache :: Member (State (Cache term address (Cell address) value)) effects
-         => Cache term address (Cell address) value
+putCache :: Member (State (Cache term address value)) effects
+         => Cache term address value
          -> TermEvaluator term address value effects ()
 putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-isolateCache :: Member (State (Cache term address (Cell address) value)) effects
+isolateCache :: Member (State (Cache term address value)) effects
              => TermEvaluator term address value effects a
-             -> TermEvaluator term address value effects (Cache term address (Cell address) value)
+             -> TermEvaluator term address value effects (Cache term address value)
 isolateCache action = putCache lowerBound *> action *> get
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
-cachingTerms :: ( Cacheable term address (Cell address) value
+cachingTerms :: ( Cacheable term address value
                 , Corecursive term
                 , Member NonDet effects
-                , Member (Reader (Cache term address (Cell address) value)) effects
+                , Member (Reader (Cache term address value)) effects
                 , Member (Reader (Live address)) effects
-                , Member (State (Cache term address (Cell address) value)) effects
+                , Member (State (Cache term address value)) effects
                 , Member (Env address) effects
-                , Member (State (Heap address (Cell address) value)) effects
+                , Member (State (Heap address value)) effects
                 )
              => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
              -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
@@ -76,15 +77,17 @@ cachingTerms recur term = do
       cachingConfiguration c pairs (recur term)
 
 convergingModules :: ( AbstractValue address value effects
-                     , Cacheable term address (Cell address) value
+                     , Cacheable term address value
                      , Member Fresh effects
                      , Member NonDet effects
-                     , Member (Reader (Cache term address (Cell address) value)) effects
+                     , Member (Reader (Cache term address value)) effects
                      , Member (Reader (Live address)) effects
-                     , Member (Resumable (EnvironmentError address)) effects
-                     , Member (State (Cache term address (Cell address) value)) effects
+                     , Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     , Member (Resumable (BaseError (EnvironmentError address))) effects
+                     , Member (State (Cache term address value)) effects
                      , Member (Env address) effects
-                     , Member (State (Heap address (Cell address) value)) effects
+                     , Member (State (Heap address value)) effects
                      , Effects effects
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects address)
@@ -93,8 +96,8 @@ convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   cache <- converge lowerBound (\ prevCache -> isolateCache $ do
-    TermEvaluator (putHeap (configurationHeap        c))
-    TermEvaluator (putEnv  (configurationEnvironment c))
+    TermEvaluator (putHeap        (configurationHeap    c))
+    TermEvaluator (putEvalContext (configurationContext c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
@@ -121,11 +124,11 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address (Cell address) value)) effects) => t (Cached address (Cell address) value) -> TermEvaluator term address value effects (ValueRef address)
+scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address value)) effects) => t (Cached address value) -> TermEvaluator term address value effects (ValueRef address)
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 
-caching :: Effects effects => TermEvaluator term address value (NonDet ': Reader (Cache term address (Cell address) value) ': State (Cache term address (Cell address) value) ': effects) a -> TermEvaluator term address value effects (Cache term address (Cell address) value, [a])
+caching :: Effects effects => TermEvaluator term address value (NonDet ': Reader (Cache term address value) ': State (Cache term address value) ': effects) a -> TermEvaluator term address value effects (Cache term address value, [a])
 caching
   = runState lowerBound
   . runReader lowerBound

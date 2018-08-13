@@ -1,0 +1,17 @@
+(Statements
+  (Class
+    (Identifier)
+    (Statements
+      (Method
+        (Void)
+        (Empty)
+        (Identifier)
+        (Annotation
+          (Identifier)
+          (GenericType
+            (Identifier)
+            (Identifier)))
+        (Statements
+          (Context
+            (Comment)
+            (Empty)))))))

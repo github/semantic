@@ -10,22 +10,25 @@ module Control.Abstract.Modules
 , Modules(..)
 , runModules
 , LoadError(..)
-, moduleNotFound
 , runLoadError
 , runLoadErrorWith
+, throwLoadError
 , ResolutionError(..)
 , runResolutionError
 , runResolutionErrorWith
+, throwResolutionError
 , ModuleTable
 ) where
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment
+import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Set as Set
+import Data.Span
 import Prologue
 import System.FilePath.Posix (takeDirectory)
 
@@ -73,14 +76,14 @@ sendModules :: Member (Modules address) effects => Modules address (Eff effects)
 sendModules = send
 
 runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
-              , Member (Resumable (LoadError address)) effects
+              , Member (Resumable (BaseError (LoadError address))) effects
               , PureEffects effects
               )
            => Set ModulePath
            -> Evaluator address value (Modules address ': effects) a
            -> Evaluator address value effects a
 runModules paths = interpret $ \case
-  Load   name   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable >>= maybeM (moduleNotFound name)
+  Load   name   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name <$> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name))
   Lookup path   -> fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path <$> askModuleTable
   Resolve names -> pure (find (`Set.member` paths) names)
   List dir      -> pure (filter ((dir ==) . takeDirectory) (toList paths))
@@ -97,23 +100,30 @@ instance Semigroup (Merging address) where
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError address resume where
-  ModuleNotFound :: ModulePath -> LoadError address (ModuleResult address)
+  ModuleNotFoundError :: ModulePath -> LoadError address (ModuleResult address)
 
 deriving instance Eq (LoadError address resume)
 deriving instance Show (LoadError address resume)
 instance Show1 (LoadError address) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (LoadError address) where
-  liftEq _ (ModuleNotFound a) (ModuleNotFound b) = a == b
+  liftEq _ (ModuleNotFoundError a) (ModuleNotFoundError b) = a == b
 
-moduleNotFound :: Member (Resumable (LoadError address)) effects => ModulePath -> Evaluator address value effects (ModuleResult address)
-moduleNotFound = throwResumable . ModuleNotFound
-
-runLoadError :: (Effectful (m address value), Effects effects) => m address value (Resumable (LoadError address) ': effects) a -> m address value effects (Either (SomeExc (LoadError address)) a)
+runLoadError :: (Effectful (m address value), Effects effects)
+             => m address value (Resumable (BaseError (LoadError address)) ': effects) a
+             -> m address value effects (Either (SomeExc (BaseError (LoadError address))) a)
 runLoadError = runResumable
 
-runLoadErrorWith :: (Effectful (m address value), Effects effects) => (forall resume . LoadError address resume -> m address value effects resume) -> m address value (Resumable (LoadError address) ': effects) a -> m address value effects a
+runLoadErrorWith :: (Effectful (m address value), Effects effects)
+                 => (forall resume . (BaseError (LoadError address)) resume -> m address value effects resume)
+                 -> m address value (Resumable (BaseError (LoadError address)) ': effects) a
+                 -> m address value effects a
 runLoadErrorWith = runResumableWith
+
+throwLoadError :: Member (Resumable (BaseError (LoadError address))) effects
+               => LoadError address resume
+               -> Evaluator address value effects resume
+throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name) emptySpan err
 
 
 -- | An error thrown when we can't resolve a module from a qualified name.
@@ -133,8 +143,21 @@ instance Eq1 ResolutionError where
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
 
-runResolutionError :: (Effectful m, Effects effects) => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
+runResolutionError :: (Effectful m, Effects effects)
+                   => m (Resumable (BaseError ResolutionError) ': effects) a
+                   -> m effects (Either (SomeExc (BaseError ResolutionError)) a)
 runResolutionError = runResumable
 
-runResolutionErrorWith :: (Effectful m, Effects effects) => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
+runResolutionErrorWith :: (Effectful m, Effects effects)
+                       => (forall resume . (BaseError ResolutionError) resume -> m effects resume)
+                       -> m (Resumable (BaseError ResolutionError) ': effects) a
+                       -> m effects a
 runResolutionErrorWith = runResumableWith
+
+throwResolutionError :: ( Member (Reader ModuleInfo) effects
+                        , Member (Reader Span) effects
+                        , Member (Resumable (BaseError ResolutionError)) effects
+                        )
+                     => ResolutionError resume
+                     -> Evaluator address value effects resume
+throwResolutionError = throwBaseError

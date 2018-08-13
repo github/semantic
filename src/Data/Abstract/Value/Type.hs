@@ -13,6 +13,7 @@ import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
+import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
 import Prologue hiding (TypeError)
@@ -25,6 +26,7 @@ data Type
   | Bool                -- ^ Primitive boolean type.
   | String              -- ^ Primitive string type.
   | Symbol              -- ^ Type of unique symbols.
+  | Regex               -- ^ Primitive regex type.
   | Unit                -- ^ The unit type.
   | Float               -- ^ Floating-point type.
   | Rational            -- ^ Rational type.
@@ -83,11 +85,19 @@ instance Ord1  TypeError where
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
-runTypeError :: (Effectful m, Effects effects) => m (Resumable TypeError ': effects) a -> m effects (Either (SomeExc TypeError) a)
+runTypeError :: (Effectful m, Effects effects) => m (Resumable (BaseError TypeError) ': effects) a -> m effects (Either (SomeExc (BaseError TypeError)) a)
 runTypeError = runResumable
 
-runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . TypeError resume -> m effects resume) -> m (Resumable TypeError ': effects) a -> m effects a
+runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError TypeError) resume -> m effects resume) -> m (Resumable (BaseError TypeError) ': effects) a -> m effects a
 runTypeErrorWith = runResumableWith
+
+throwTypeError :: ( Member (Resumable (BaseError TypeError)) effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  )
+               => TypeError resume
+               -> Evaluator address value effects resume
+throwTypeError = throwBaseError
 
 runTypeMap :: ( Effectful m
               , Effects effects
@@ -99,15 +109,15 @@ runTypeMap = raiseHandler (runState emptyTypeMap >=> pure . snd)
 runTypes :: ( Effectful m
             , Effects effects
             )
-         => m (Resumable TypeError ': State TypeMap ': effects) a
-         -> m effects (Either (SomeExc TypeError) a)
+         => m (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
+         -> m effects (Either (SomeExc (BaseError TypeError)) a)
 runTypes = runTypeMap . runTypeError
 
 runTypesWith :: ( Effectful m
                 , Effects effects
                 )
-             => (forall resume . TypeError resume -> m (State TypeMap ': effects) resume)
-             -> m (Resumable TypeError ': State TypeMap ': effects) a
+             => (forall resume . (BaseError TypeError) resume -> m (State TypeMap ': effects) resume)
+             -> m (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
              -> m effects a
 runTypesWith with = runTypeMap . runTypeErrorWith with
 
@@ -153,6 +163,7 @@ occur id = prune >=> \case
   Bool -> pure False
   String -> pure False
   Symbol -> pure False
+  Regex -> pure False
   Unit -> pure False
   Float -> pure False
   Rational -> pure False
@@ -171,31 +182,31 @@ occur id = prune >=> \case
     eitherM f (a, b) = (||) <$> f a <*> f b
 
 -- | Substitutes a type variable name for another type
-substitute :: ( Effectful m
-              , Monad (m effects)
-              , Member (Resumable TypeError) effects
+substitute :: ( Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Member (Resumable (BaseError TypeError)) effects
               , Member (State TypeMap) effects
               )
            => TName
            -> Type
-           -> m effects Type
+           -> Evaluator address value effects Type
 substitute id ty = do
   infiniteType <- occur id ty
   ty <- if infiniteType
-    then throwResumable (InfiniteType (Var id) ty)
+    then throwTypeError (InfiniteType (Var id) ty)
     else pure ty
   modifyTypeMap (Map.insert id ty)
   pure ty
 
 -- | Unify two 'Type's.
-unify :: ( Effectful m
-         , Monad (m effects)
-         , Member (Resumable TypeError) effects
+unify :: ( Member (Reader ModuleInfo) effects
+         , Member (Reader Span) effects
+         , Member (Resumable (BaseError TypeError)) effects
          , Member (State TypeMap) effects
          )
       => Type
       -> Type
-      -> m effects Type
+      -> Evaluator address value effects Type
 unify a b = do
   a' <- prune a
   b' <- prune b
@@ -211,19 +222,24 @@ unify a b = do
     (a1 :+ b1, a2 :+ b2) -> (:+) <$> unify a1 a2 <*> unify b1 b2
     (a1 :* b1, a2 :* b2) -> (:*) <$> unify a1 a2 <*> unify b1 b2
     (t1, t2) | t1 == t2 -> pure t2
-    _ -> throwResumable (UnificationError a b)
+    _ -> throwTypeError (UnificationError a b)
 
 instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
-runFunction :: ( Member (Allocator address Type) effects
-               , Member (Deref address Type) effects
+runFunction :: ( Member (Allocator address) effects
+               , Member (Deref Type) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
-               , Member (Resumable TypeError) effects
+               , Member (Reader ModuleInfo) effects
+               , Member (Reader Span) effects
+               , Member (Resumable (BaseError TypeError)) effects
+               , Member (Resumable (BaseError (AddressError address Type))) effects
+               , Member (State (Heap address Type)) effects
                , Member (State TypeMap) effects
+               , Ord address
                , PureEffects effects
                )
             => Evaluator address Type (Abstract.Function address Type ': effects) a
@@ -236,14 +252,14 @@ runFunction = interpret $ \case
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
-  Abstract.Call op params -> do
+  Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
     unified <- op `unify` needed
     case unified of
       _ :-> ret -> box ret
-      actual    -> throwResumable (UnificationError needed actual) >>= box
+      actual    -> throwTypeError (UnificationError needed actual) >>= box
 
 
 instance AbstractHole Type where
@@ -256,6 +272,7 @@ instance AbstractIntro Type where
   string _   = String
   float _    = Float
   symbol _   = Symbol
+  regex _    = Regex
   rational _ = Rational
   hash       = Hash
   kvPair k v = k :* v
@@ -263,12 +280,17 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address Type) effects
-         , Member (Deref address Type) effects
+instance ( Member (Allocator address) effects
+         , Member (Deref Type) effects
          , Member Fresh effects
          , Member NonDet effects
-         , Member (Resumable TypeError) effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address Type))) effects
+         , Member (Resumable (BaseError TypeError)) effects
+         , Member (State (Heap address Type)) effects
          , Member (State TypeMap) effects
+         , Ord address
          )
       => AbstractValue address Type effects where
   array fields = do

@@ -23,10 +23,13 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Environment as Env
+import Data.Abstract.BaseError
+import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
+import Data.Span
 import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
@@ -42,16 +45,16 @@ data Comparator
 function :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
 function names fvs (Evaluator body) = send (Function names fvs body)
 
-call :: Member (Function address value) effects => value -> [address] -> Evaluator address value effects address
-call fn args = send (Call fn args)
+call :: Member (Function address value) effects => value -> address -> [address] -> Evaluator address value effects address
+call fn self args = send (Call fn self args)
 
 data Function address value m result where
   Function :: [Name] -> Set Name -> m address -> Function address value m value
-  Call     :: value -> [address]              -> Function address value m address
+  Call     :: value -> address -> [address]   -> Function address value m address
 
 instance PureEffect (Function address value) where
   handle handler (Request (Function name fvs body) k) = Request (Function name fvs (handler body)) (handler . k)
-  handle handler (Request (Call fn addrs)          k) = Request (Call fn addrs)                    (handler . k)
+  handle handler (Request (Call fn self addrs)     k) = Request (Call fn self addrs)               (handler . k)
 
 
 class Show value => AbstractIntro value where
@@ -68,6 +71,9 @@ class Show value => AbstractIntro value where
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
   symbol :: Text -> value
+
+  -- | Construct an abstract regex value.
+  regex :: Text -> value
 
   -- | Construct an abstract integral value.
   integer :: Integer -> value
@@ -86,7 +92,6 @@ class Show value => AbstractIntro value where
 
   -- | Construct the nil/null datatype.
   null :: value
-
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
@@ -195,8 +200,10 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue address value effects
+                 , Member (Deref value) effects
                  , Member (Env address) effects
-                 , Member (Allocator address value) effects
+                 , Member (State (Heap address value)) effects
+                 , Ord address
                  )
               => Name
               -> address
@@ -216,17 +223,22 @@ evaluateInScopedEnv :: ( AbstractValue address value effects
                     => address
                     -> Evaluator address value effects a
                     -> Evaluator address value effects a
-evaluateInScopedEnv scopedEnvTerm term = do
-  scopedEnv <- scopedEnvironment scopedEnvTerm
+evaluateInScopedEnv receiver term = do
+  scopedEnv <- scopedEnvironment receiver
   env <- maybeM getEnv scopedEnv
-  withEnv env term
+  withEvalContext (EvalContext (Just receiver) env) term
 
 
 -- | Evaluates a 'Value' returning the referenced value
 value :: ( AbstractValue address value effects
-         , Member (Deref address value) effects
+         , Member (Deref value) effects
          , Member (Env address) effects
-         , Member (Resumable (EnvironmentError address)) effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address value))) effects
+         , Member (Resumable (BaseError (EnvironmentError address))) effects
+         , Member (State (Heap address value)) effects
+         , Ord address
          )
       => ValueRef address
       -> Evaluator address value effects value
@@ -234,9 +246,14 @@ value = deref <=< address
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects
-                , Member (Deref address value) effects
+                , Member (Deref value) effects
                 , Member (Env address) effects
-                , Member (Resumable (EnvironmentError address)) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Member (Resumable (BaseError (AddressError address value))) effects
+                , Member (Resumable (BaseError (EnvironmentError address))) effects
+                , Member (State (Heap address value)) effects
+                , Ord address
                 )
              => Subterm term (Evaluator address value effects (ValueRef address))
              -> Evaluator address value effects value
@@ -245,7 +262,9 @@ subtermValue = value <=< subtermRef
 -- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue address value effects
            , Member (Env address) effects
-           , Member (Resumable (EnvironmentError address)) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (Reader Span) effects
+           , Member (Resumable (BaseError (EnvironmentError address))) effects
            )
         => ValueRef address
         -> Evaluator address value effects address
@@ -256,15 +275,20 @@ address (Rval addr) = pure addr
 -- | Evaluates a 'Subterm' to the address of its rval
 subtermAddress :: ( AbstractValue address value effects
                   , Member (Env address) effects
-                  , Member (Resumable (EnvironmentError address)) effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError (EnvironmentError address))) effects
                   )
                => Subterm term (Evaluator address value effects (ValueRef address))
                -> Evaluator address value effects address
 subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: ( Member (Allocator address value) effects
+rvalBox :: ( Member (Allocator address) effects
+           , Member (Deref value) effects
            , Member Fresh effects
+           , Member (State (Heap address value)) effects
+           , Ord address
            )
         => value
         -> Evaluator address value effects (ValueRef address)

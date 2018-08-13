@@ -92,6 +92,7 @@ type Syntax = '[
   , Expression.InstanceOf
   , Expression.New
   , Expression.Await
+  , Expression.This
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -193,7 +194,6 @@ type Syntax = '[
   , TypeScript.Syntax.Annotation
   , TypeScript.Syntax.With
   , TypeScript.Syntax.ForOf
-  , TypeScript.Syntax.This
   , TypeScript.Syntax.Update
   , TypeScript.Syntax.ComputedPropertyName
   , TypeScript.Syntax.Decorator
@@ -317,7 +317,7 @@ yieldExpression :: Assignment Term
 yieldExpression = makeTerm <$> symbol Grammar.YieldExpression <*> children (Statement.Yield <$> term (expression <|> emptyTerm))
 
 this :: Assignment Term
-this = makeTerm <$> symbol Grammar.This <*> (TypeScript.Syntax.This <$ rawSource)
+this = makeTerm <$> symbol Grammar.This <*> (Expression.This <$ rawSource)
 
 regex :: Assignment Term
 regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)
@@ -329,7 +329,7 @@ anonymousClass :: Assignment Term
 anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class [] <$> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractClass :: Assignment Term
-abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TypeScript.Syntax.AbstractClass <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TypeScript.Syntax.AbstractClass <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractMethodSignature :: Assignment Term
 abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignature <*> children ((,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
@@ -384,7 +384,7 @@ identifier :: Assignment Term
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
 
 class' :: Assignment Term
-class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term identifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term typeIdentifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
   where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators <> typeParams) expression classHeritage statements)
 
 object :: Assignment Term
@@ -446,10 +446,9 @@ expressions :: Assignment Term
 expressions = expression <|> sequenceExpression
 
 parameter :: Assignment Term
-parameter =
-      requiredParameter
-  <|> restParameter
-  <|> optionalParameter
+parameter =  requiredParameter
+         <|> restParameter
+         <|> optionalParameter
 
 accessibilityModifier' :: Assignment Term
 accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (Syntax.Identifier . name <$> source)
@@ -471,9 +470,9 @@ methodDefinition = makeMethod <$>
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
 callSignatureParts :: Assignment (Term, [Term], Term)
-callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize'
- <$> (symbol Grammar.CallSignature *> children ((,,) <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))) <*> many comment)
+callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> callSignature' <*> many comment)
   where
+    callSignature' = symbol Grammar.CallSignature *> children ((,,) <$> (term typeParameters <|> emptyTerm) <*> formalParameters <*> (term typeAnnotation' <|> emptyTerm))
     contextualize' (cs, (typeParams, formalParams, annotation)) = case nonEmpty cs of
       Just cs -> (makeTerm1 (Syntax.Context cs typeParams), formalParams, annotation)
       Nothing -> (typeParams, formalParams, annotation)
@@ -536,7 +535,22 @@ ty :: Assignment Term
 ty = primaryType <|> unionType <|> intersectionType <|> functionTy <|> constructorTy
 
 primaryType :: Assignment Term
-primaryType = parenthesizedTy <|> predefinedTy <|> typeIdentifier <|> nestedTypeIdentifier <|> genericType <|> typePredicate <|> objectType <|> arrayTy <|> tupleType <|> flowMaybeTy <|> typeQuery <|> indexTypeQuery <|> thisType <|> existentialType <|> literalType <|> lookupType
+primaryType =  arrayTy
+           <|> existentialType
+           <|> flowMaybeTy
+           <|> genericType
+           <|> indexTypeQuery
+           <|> literalType
+           <|> lookupType
+           <|> nestedTypeIdentifier
+           <|> objectType
+           <|> parenthesizedTy
+           <|> predefinedTy
+           <|> thisType
+           <|> tupleType
+           <|> typeIdentifier
+           <|> typePredicate
+           <|> typeQuery
 
 parenthesizedTy :: Assignment Term
 parenthesizedTy = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (TypeScript.Syntax.ParenthesizedType <$> term ty)
@@ -569,7 +583,7 @@ arrayTy :: Assignment Term
 arrayTy = makeTerm <$> symbol Grammar.ArrayType <*> children (TypeScript.Syntax.ArrayType <$> term ty)
 
 lookupType :: Assignment Term
-lookupType = makeTerm <$> symbol Grammar.LookupType <*> children (TypeScript.Syntax.LookupType <$> term (identifier <|> nestedTypeIdentifier) <*> term ty)
+lookupType = makeTerm <$> symbol Grammar.LookupType <*> children (TypeScript.Syntax.LookupType <$> term (typeIdentifier <|> nestedTypeIdentifier) <*> term ty)
 
 flowMaybeTy :: Assignment Term
 flowMaybeTy = makeTerm <$> symbol Grammar.FlowMaybeType <*> children (TypeScript.Syntax.FlowMaybeType <$> term primaryType)
@@ -578,7 +592,7 @@ typeQuery :: Assignment Term
 typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (TypeScript.Syntax.TypeQuery <$> term (identifier <|> nestedIdentifier))
 
 indexTypeQuery :: Assignment Term
-indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TypeScript.Syntax.IndexTypeQuery <$> term (identifier <|> nestedIdentifier))
+indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TypeScript.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedIdentifier))
 
 thisType :: Assignment Term
 thisType = makeTerm <$> symbol Grammar.ThisType <*> (TypeScript.Syntax.ThisType <$> source)
@@ -743,7 +757,7 @@ declaration = everything
       ]
 
 typeAliasDeclaration :: Assignment Term
-typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> term ty)
+typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> term ty)
   where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAlias [typeParams] identifier body)
 
 enumDeclaration :: Assignment Term
@@ -753,7 +767,7 @@ enumAssignment :: Assignment Term
 enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statement.Assignment [] <$> term propertyName <*> term expression)
 
 interfaceDeclaration :: Assignment Term
-interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> optional (term extendsClause) <*> term objectType)
+interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> term typeIdentifier <*> (term typeParameters <|> emptyTerm) <*> optional (term extendsClause) <*> term objectType)
   where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Declaration.InterfaceDeclaration [typeParams] identifier (toList clause) objectType)
 
 ambientDeclaration :: Assignment Term
@@ -790,8 +804,16 @@ shorthandPropertyIdentifier :: Assignment Term
 shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment Term
-requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term (identifier <|> destructuringPattern <|> this) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
+requiredParameter = makeRequiredParameter
+                 <$> symbol Grammar.RequiredParameter
+                 <*> children ( (,,,,)
+                             <$> (term accessibilityModifier' <|> emptyTerm)
+                             <*> (term readonly' <|> emptyTerm)
+                             <*> term (identifier <|> destructuringPattern <|> this)
+                             <*> (term typeAnnotation' <|> emptyTerm)
+                             <*> (term expression <|> emptyTerm))
+  where
+    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
 
 restParameter :: Assignment Term
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> term identifier <*> (term typeAnnotation' <|> emptyTerm))

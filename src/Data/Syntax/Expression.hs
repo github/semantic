@@ -6,8 +6,9 @@ import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
 import Data.JSON.Fields
-import Diffing.Algorithm
-import Prologue hiding (index, Member)
+import Diffing.Algorithm hiding (Delete)
+import Prologue hiding (index, Member, This, null)
+import Prelude hiding (null)
 import Proto3.Suite.Class
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -21,8 +22,9 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
+    recv <- box unit -- TODO
     args <- traverse subtermAddress callParams
-    Rval <$> call op args
+    Rval <$> call op recv args
 
 data LessThan a = LessThan { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -271,8 +273,12 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Delete
-instance Evaluatable Delete
-
+instance Evaluatable Delete where
+  eval (Delete a) = do
+    valueRef <- subtermRef a
+    addr <- address valueRef
+    dealloc addr
+    rvalBox unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
@@ -283,8 +289,9 @@ instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for SequenceExpression
-instance Evaluatable SequenceExpression
-
+instance Evaluatable SequenceExpression where
+  eval (SequenceExpression a b) =
+    subtermValue a >> subtermRef b
 
 -- | Javascript void operator
 newtype Void a = Void { value :: a }
@@ -295,8 +302,9 @@ instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Void
-instance Evaluatable Void
-
+instance Evaluatable Void where
+  eval (Void a) =
+    subtermValue a >> rvalBox null
 
 -- | Javascript typeof operator
 newtype Typeof a = Typeof { value :: a }
@@ -392,7 +400,7 @@ instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 -- TODO return a special LvalSubscript instance here
 instance Evaluatable Subscript where
   eval (Subscript l [r]) = Rval <$> join (index <$> subtermValue l <*> subtermValue r)
-  eval (Subscript _ _)   = rvalBox =<< throwResumable (Unspecialized "Eval unspecialized for subscript with slices")
+  eval (Subscript _ _)   = rvalBox =<< throwUnspecializedError (UnspecializedError "Eval unspecialized for subscript with slices")
 
 data Member a = Member { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -496,9 +504,10 @@ instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Super
 
 data This a = This
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1)
 
 instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable This
+instance Evaluatable This where
+  eval This = Rval <$> (maybeM (box unit) =<< self)

@@ -1,0 +1,13 @@
+(Statements
+  (InterfaceDeclaration
+    (Identifier)
+    (Statements
+      (Statements
+        (Assignment
+          (Variable
+            (Identifier)
+            (Identifier))
+          (Integer)))))
+  (Context
+    (Comment)
+    (Empty)))

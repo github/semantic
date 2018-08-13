@@ -5,6 +5,8 @@ module Control.Abstract.Evaluator.Spec
 ) where
 
 import Control.Abstract
+import Data.Abstract.Address.Precise as Precise
+import Data.Abstract.BaseError
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package
@@ -25,22 +27,24 @@ spec = parallel $ do
   it "calls functions" $ do
     (_, expected) <- evaluate $ do
       identity <- function [name "x"] lowerBound (variable (name "x"))
+      recv <- box unit
       addr <- box (integer 123)
-      call identity [addr]
+      call identity recv [addr]
     expected `shouldBe` Right (Value.Integer (Number.Integer 123))
 
 evaluate
   = runM
-  . runState (lowerBound @(Heap Precise Latest Val))
+  . runState (lowerBound @(Heap Precise Val))
   . runFresh 0
   . runReader (PackageInfo (name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . runReader (lowerBound @Span)
   . fmap reassociate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . runDeref
-  . runAllocator @Precise @_ @Val
+  . Precise.runDeref @_ @Val
+  . Precise.runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
@@ -56,15 +60,16 @@ newtype SpecEff a = SpecEff
                        , Exc (LoopControl Precise)
                        , Exc (Return Precise)
                        , Env Precise
-                       , Allocator Precise Val
-                       , Deref Precise Val
-                       , Resumable (AddressError Precise Val)
-                       , Resumable (EnvironmentError Precise)
-                       , Resumable (ValueError Precise SpecEff)
+                       , Allocator Precise
+                       , Deref Val
+                       , Resumable (BaseError (AddressError Precise Val))
+                       , Resumable (BaseError (EnvironmentError Precise))
+                       , Resumable (BaseError (ValueError Precise SpecEff))
+                       , Reader Span
                        , Reader ModuleInfo
                        , Reader PackageInfo
                        , Fresh
-                       , State (Heap Precise Latest Val)
+                       , State (Heap Precise Val)
                        , Lift IO
                        ] a
   }
