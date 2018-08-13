@@ -19,15 +19,6 @@ instance Show Precise where
   showsPrec d = showsUnaryWith showsPrec "Precise" d . unPrecise
 
 
-instance Member Fresh effects => Allocatable Precise effects where
-  allocCell _ = Precise <$> fresh
-
-instance Derefable Precise effects where
-  derefCell _ = pure . fmap fst . Set.minView
-
-  assignCell _ value _ = pure (Set.singleton value)
-
-
 runAllocator :: ( Member Fresh effects
                 , PureEffects effects
                 )
