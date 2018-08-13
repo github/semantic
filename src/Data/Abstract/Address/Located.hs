@@ -1,6 +1,10 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Located
 ( Located(..)
+, runAllocator
+, handleAllocator
+, runDeref
+, handleDeref
 ) where
 
 import Control.Abstract

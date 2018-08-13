@@ -5,7 +5,7 @@ module Control.Abstract.Evaluator.Spec
 ) where
 
 import Control.Abstract
-import Data.Abstract.Address.Precise
+import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
@@ -43,8 +43,8 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . runDeref
-  . runAllocator @Precise
+  . Precise.runDeref
+  . Precise.runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
