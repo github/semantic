@@ -1,10 +1,9 @@
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Precise
 ( Precise(..)
 ) where
 
-import Control.Abstract.Addressable
-import Control.Monad.Effect.Fresh
+import Control.Abstract
 import qualified Data.Set as Set
 import Prologue
 
@@ -23,3 +22,18 @@ instance Derefable Precise effects where
   derefCell _ = pure . fmap fst . Set.minView
 
   assignCell _ value _ = pure (Set.singleton value)
+
+
+runAllocator :: ( Member Fresh effects
+                , PureEffects effects
+                )
+             => Evaluator Precise value (Allocator Precise ': effects) a
+             -> Evaluator Precise value effects a
+runAllocator = interpret $ \ (Alloc _) -> Precise <$> fresh
+
+runDeref :: PureEffects effects
+         => Evaluator Precise value (Deref Precise value ': effects) a
+         -> Evaluator Precise value effects a
+runDeref = interpret $ \case
+  DerefCell  _       cell -> pure (fst <$> Set.minView cell)
+  AssignCell _ value _    -> pure (Set.singleton value)
