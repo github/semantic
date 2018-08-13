@@ -37,6 +37,8 @@ handleAllocator (Alloc _) = Precise <$> fresh
 runDeref :: PureEffects effects
          => Evaluator Precise value (Deref Precise value ': effects) a
          -> Evaluator Precise value effects a
-runDeref = interpret $ \case
-  DerefCell  _       cell -> pure (fst <$> Set.minView cell)
-  AssignCell _ value _    -> pure (Set.singleton value)
+runDeref = interpret handleDeref
+
+handleDeref :: Deref Precise value (Eff (Deref Precise value ': effects)) a -> Evaluator Precise value effects a
+handleDeref (DerefCell  _       cell) = pure (fst <$> Set.minView cell)
+handleDeref (AssignCell _ value _)    = pure (Set.singleton value)
