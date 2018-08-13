@@ -9,7 +9,8 @@ import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
-import           Data.Abstract.Address
+import           Data.Abstract.Address.Monovariant as Monovariant
+import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -57,8 +58,8 @@ newtype UtilEff address rest a = UtilEff
                       ': Exc (LoopControl address)
                       ': Exc (Return address)
                       ': Env address
-                      ': Deref address (Value address (UtilEff address rest))
-                      ': Allocator address (Value address (UtilEff address rest))
+                      ': Deref (Value address (UtilEff address rest))
+                      ': Allocator address
                       ': Reader ModuleInfo
                       ': Modules address
                       ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
@@ -129,7 +130,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runFunction coerce coerce) modules))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
@@ -140,7 +141,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans Type.runFunction modules)))))
+       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) Type.runFunction modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term

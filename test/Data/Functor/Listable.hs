@@ -281,6 +281,9 @@ instance Listable1 Literal.Null where
 instance Listable1 Literal.TextElement where
   liftTiers tiers = cons1 Literal.TextElement
 
+instance Listable1 Literal.EscapeSequence where
+  liftTiers tiers = cons1 Literal.EscapeSequence
+
 instance Listable1 Literal.InterpolationElement where
   liftTiers tiers = liftCons1 tiers Literal.InterpolationElement
 
@@ -420,7 +423,7 @@ instance Listable1 Literal.String where
   liftTiers tiers = liftCons1 (liftTiers tiers) Literal.String
 
 instance Listable1 Literal.Symbol where
-  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Symbol 
+  liftTiers tiers = liftCons1 (liftTiers tiers) Literal.Symbol
 
 instance Listable1 Literal.SymbolElement where
   liftTiers tiers = cons1 Literal.SymbolElement

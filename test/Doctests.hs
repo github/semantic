@@ -6,7 +6,7 @@ import System.Environment
 import Test.DocTest
 
 defaultFiles =
-  [ "src/Data/Abstract/Address.hs"
+  [ "src/Data/Abstract/Address/Precise.hs"
   , "src/Data/Abstract/Environment.hs"
   , "src/Data/Abstract/Name.hs"
   , "src/Data/Graph.hs"

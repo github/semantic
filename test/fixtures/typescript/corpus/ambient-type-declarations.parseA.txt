@@ -2,7 +2,7 @@
   (AmbientDeclaration
     (TypeAlias
       (Empty)
-      (Identifier)
+      (TypeIdentifier)
       (Union
         (Union
           (Union

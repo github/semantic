@@ -2,9 +2,7 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements
       (TypeSwitch
         (Statements
@@ -59,8 +57,7 @@
               (MemberAccess
                 (Identifier))
               (Statements
-              { (TextElement)
-              ->(TextElement) }
+                (TextElement)
               {+(Times
                 {+(Identifier)+}
                 {+(Integer)+})+}
@@ -75,8 +72,7 @@
               (MemberAccess
                 (Identifier))
               (Statements
-              { (TextElement)
-              ->(TextElement) }
+                (TextElement)
               {+(DividedBy
                 {+(Integer)+}
                 {+(Identifier)+})+}
