@@ -28,7 +28,10 @@ instance Member NonDet effects => Derefable Monovariant effects where
 runAllocator :: PureEffects effects
              => Evaluator Monovariant value (Allocator Monovariant ': effects) a
              -> Evaluator Monovariant value effects a
-runAllocator = interpret $ \ (Alloc name) -> pure (Monovariant name)
+runAllocator = interpret handleAllocator
+
+handleAllocator :: Allocator Monovariant (Eff (Allocator Monovariant ': effects)) a -> Evaluator Monovariant value effects a
+handleAllocator (Alloc name) = pure (Monovariant name)
 
 runDeref :: ( Member NonDet effects
             , Ord value
