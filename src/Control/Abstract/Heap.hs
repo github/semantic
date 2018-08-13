@@ -8,6 +8,7 @@ module Control.Abstract.Heap
 , putHeap
 , box
 , alloc
+, dealloc
 , deref
 , assign
 , letrec
@@ -69,6 +70,9 @@ box val = do
 
 alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
 alloc = send . Alloc
+
+dealloc :: (Member (State (Heap address value)) effects, Ord address) => address -> Evaluator address value effects ()
+dealloc addr = modifyHeap (heapDelete addr)
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: ( Member (Deref value) effects
@@ -174,7 +178,7 @@ reachable roots heap = go mempty roots
 -- Effects
 
 data Allocator address (m :: * -> *) return where
-  Alloc  :: Name -> Allocator address m address
+  Alloc   :: Name    -> Allocator address m address
 
 data Deref value (m :: * -> *) return where
   DerefCell  :: Set value          -> Deref value m (Maybe value)

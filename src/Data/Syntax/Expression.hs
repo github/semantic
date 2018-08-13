@@ -6,8 +6,9 @@ import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
 import Data.JSON.Fields
-import Diffing.Algorithm
-import Prologue hiding (index, Member, This)
+import Diffing.Algorithm hiding (Delete)
+import Prologue hiding (index, Member, This, null)
+import Prelude hiding (null)
 import Proto3.Suite.Class
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -272,8 +273,12 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Delete
-instance Evaluatable Delete
-
+instance Evaluatable Delete where
+  eval (Delete a) = do
+    valueRef <- subtermRef a
+    addr <- address valueRef
+    dealloc addr
+    rvalBox unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
@@ -284,8 +289,9 @@ instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for SequenceExpression
-instance Evaluatable SequenceExpression
-
+instance Evaluatable SequenceExpression where
+  eval (SequenceExpression a b) =
+    subtermValue a >> subtermRef b
 
 -- | Javascript void operator
 newtype Void a = Void { value :: a }
@@ -296,8 +302,9 @@ instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Void
-instance Evaluatable Void
-
+instance Evaluatable Void where
+  eval (Void a) =
+    subtermValue a >> rvalBox null
 
 -- | Javascript typeof operator
 newtype Typeof a = Typeof { value :: a }
