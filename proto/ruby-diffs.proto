@@ -234,6 +234,10 @@ message Boolean {
   bool booleanContent = 1;
 }
 
+message Character {
+  string characterContent = 1;
+}
+
 message Complex {
   string value = 1;
 }
@@ -248,6 +252,10 @@ message Hash {
 
 message Integer {
   string integerContent = 1;
+}
+
+message InterpolationElement {
+  RubyDiff interpolationBody = 1;
 }
 
 message KeyValue {
@@ -271,6 +279,10 @@ message String {
 
 message Symbol {
   repeated RubyDiff symbolElements = 1;
+}
+
+message SymbolElement {
+  string symbolContent = 1;
 }
 
 message TextElement {
