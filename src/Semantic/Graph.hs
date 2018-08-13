@@ -29,10 +29,10 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
-import           Data.Abstract.Address.Hole
-import           Data.Abstract.Address.Located
-import           Data.Abstract.Address.Monovariant
-import           Data.Abstract.Address.Precise
+import           Data.Abstract.Address.Hole as Hole
+import           Data.Abstract.Address.Located as Located
+import           Data.Abstract.Address.Monovariant as Monovariant
+import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -117,7 +117,10 @@ runCallGraph lang includePackages modules package = do
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm (runAllocator . runDeref) Abstract.runFunction modules))
+      runAddressEffects
+        = Hole.runAllocator (Located.handleAllocator Monovariant.handleAllocator)
+        . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects Abstract.runFunction modules))
 
 runImportGraphToModuleInfos :: forall effs lang term.
                   ( Declarations term
@@ -184,7 +187,10 @@ runImportGraph lang (package :: Package term) f =
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id (runAllocator . runDeref) (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+      runAddressEffects
+        = Hole.runAllocator Precise.handleAllocator
+        . Hole.runDeref Precise.handleDeref
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 newtype ImportGraphEff address outerEffects a = ImportGraphEff
   { runImportGraphEff :: Eff (  Function address (Value address (ImportGraphEff address outerEffects))

@@ -1,6 +1,10 @@
 {-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Monovariant
 ( Monovariant(..)
+, runAllocator
+, handleAllocator
+, runDeref
+, handleDeref
 ) where
 
 import Control.Abstract

@@ -2,6 +2,10 @@
 module Data.Abstract.Address.Hole
 ( Hole(..)
 , toMaybe
+, runAllocator
+, handleAllocator
+, runDeref
+, handleDeref
 ) where
 
 import Control.Abstract
