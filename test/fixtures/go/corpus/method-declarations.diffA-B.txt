@@ -2,17 +2,13 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements))
   (Method
-    (Empty)
     (Statements
       (Identifier))
   { (Identifier)
   ->(Identifier) }
-    (Statements)
     (Empty))
   (Method
     (Identifier)
@@ -34,7 +30,6 @@
         (Identifier)))
   { (Identifier)
   ->(Identifier) }
-    (Statements)
     (Return
       (Call
         (MemberAccess
