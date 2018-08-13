@@ -234,7 +234,15 @@ message Boolean {
   bool booleanContent = 1;
 }
 
+message Character {
+  string characterContent = 1;
+}
+
 message Complex {
+  string value = 1;
+}
+
+message EscapeSequence {
   string value = 1;
 }
 
@@ -248,6 +256,10 @@ message Hash {
 
 message Integer {
   string integerContent = 1;
+}
+
+message InterpolationElement {
+  RubyDiff interpolationBody = 1;
 }
 
 message KeyValue {
@@ -271,6 +283,10 @@ message String {
 
 message Symbol {
   repeated RubyDiff symbolElements = 1;
+}
+
+message SymbolElement {
+  string symbolContent = 1;
 }
 
 message TextElement {
@@ -403,89 +419,90 @@ message RubySyntax {
   oneof syntax {
     Comment comment = 1;
     Function function = 2;
-    Boolean boolean = 3;
-    Method method = 4;
-    File file = 5;
-    Line line = 6;
-    Plus plus = 7;
-    Minus minus = 8;
-    Times times = 9;
-    DividedBy dividedBy = 10;
-    Modulo modulo = 11;
-    Power power = 12;
-    Negate negate = 13;
-    FloorDivision floorDivision = 14;
-    BAnd bAnd = 15;
-    BOr bOr = 16;
-    BXOr bXOr = 17;
-    LShift lShift = 18;
-    RShift rShift = 19;
-    Complement complement = 20;
-    And and = 21;
-    Not not = 22;
-    Or or = 23;
-    XOr xOr = 24;
-    Call call = 25;
-    LessThan lessThan = 26;
-    LessThanEqual lessThanEqual = 27;
-    GreaterThan greaterThan = 28;
-    GreaterThanEqual greaterThanEqual = 29;
-    Equal equal = 30;
-    StrictEqual strictEqual = 31;
-    Comparison comparison = 32;
-    Enumeration enumeration = 33;
-    Matches matches = 34;
-    NotMatches notMatches = 35;
-    MemberAccess memberAccess = 36;
-    ScopeResolution scopeResolution = 37;
-    Subscript subscript = 38;
-    Member member = 39;
+    Method method = 3;
+    File file = 4;
+    Line line = 5;
+    Plus plus = 6;
+    Minus minus = 7;
+    Times times = 8;
+    DividedBy dividedBy = 9;
+    Modulo modulo = 10;
+    Power power = 11;
+    Negate negate = 12;
+    FloorDivision floorDivision = 13;
+    BAnd bAnd = 14;
+    BOr bOr = 15;
+    BXOr bXOr = 16;
+    LShift lShift = 17;
+    RShift rShift = 18;
+    Complement complement = 19;
+    And and = 20;
+    Not not = 21;
+    Or or = 22;
+    XOr xOr = 23;
+    Call call = 24;
+    LessThan lessThan = 25;
+    LessThanEqual lessThanEqual = 26;
+    GreaterThan greaterThan = 27;
+    GreaterThanEqual greaterThanEqual = 28;
+    Equal equal = 29;
+    StrictEqual strictEqual = 30;
+    Comparison comparison = 31;
+    Enumeration enumeration = 32;
+    Matches matches = 33;
+    NotMatches notMatches = 34;
+    MemberAccess memberAccess = 35;
+    ScopeResolution scopeResolution = 36;
+    Subscript subscript = 37;
+    Member member = 38;
+    This this = 39;
     Array array = 40;
-    Character character = 41;
-    Complex complex = 42;
-    Float float = 43;
-    Hash hash = 44;
-    Integer integer = 45;
-    InterpolationElement interpolationElement = 46;
-    KeyValue keyValue = 47;
-    Null null = 48;
-    Rational rational = 49;
-    Regex regex = 50;
-    String string = 51;
-    Symbol symbol = 52;
-    SymbolElement symbolElement = 53;
-    TextElement textElement = 54;
-    Assignment assignment = 55;
-    Break break = 56;
-    Catch catch = 57;
-    Continue continue = 58;
-    Else else = 59;
-    Finally finally = 60;
-    ForEach forEach = 61;
-    If if = 62;
-    Match match = 63;
-    Pattern pattern = 64;
-    Retry retry = 65;
-    Return return = 66;
-    ScopeEntry scopeEntry = 67;
-    ScopeExit scopeExit = 68;
-    Statements statements = 69;
-    Try try = 70;
-    While while = 71;
-    Yield yield = 72;
-    Context context = 73;
-    Empty empty = 74;
-    Error error = 75;
-    Identifier identifier = 76;
-    Class class = 77;
-    Load load = 78;
-    LowPrecedenceAnd lowPrecedenceAnd = 79;
-    LowPrecedenceOr lowPrecedenceOr = 80;
-    Module module = 81;
-    Require require = 82;
-    Send send = 83;
-    List list = 84;
-    This this = 85;
+    Boolean boolean = 41;
+    Character character = 42;
+    Complex complex = 43;
+    EscapeSequence escapeSequence = 44;
+    Float float = 45;
+    Hash hash = 46;
+    Integer integer = 47;
+    InterpolationElement interpolationElement = 48;
+    KeyValue keyValue = 49;
+    Null null = 50;
+    Rational rational = 51;
+    Regex regex = 52;
+    String string = 53;
+    Symbol symbol = 54;
+    SymbolElement symbolElement = 55;
+    TextElement textElement = 56;
+    Assignment assignment = 57;
+    Break break = 58;
+    Catch catch = 59;
+    Continue continue = 60;
+    Else else = 61;
+    Finally finally = 62;
+    ForEach forEach = 63;
+    If if = 64;
+    Match match = 65;
+    Pattern pattern = 66;
+    Retry retry = 67;
+    Return return = 68;
+    ScopeEntry scopeEntry = 69;
+    ScopeExit scopeExit = 70;
+    Statements statements = 71;
+    Try try = 72;
+    While while = 73;
+    Yield yield = 74;
+    Context context = 75;
+    Empty empty = 76;
+    Error error = 77;
+    Identifier identifier = 78;
+    Class class = 79;
+    Load load = 80;
+    LowPrecedenceAnd lowPrecedenceAnd = 81;
+    LowPrecedenceOr lowPrecedenceOr = 82;
+    Module module = 83;
+    Require require = 84;
+    Send send = 85;
+    List list = 86;
   }
 }
 
