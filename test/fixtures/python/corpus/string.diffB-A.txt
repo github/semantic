@@ -1,9 +1,9 @@
 (Statements
 {-(TextElement)-}
   (TextElement)
-{+(TextElement)+}
 { (TextElement)
 ->(TextElement) }
+{+(TextElement)+}
 {+(TextElement)+}
 {+(TextElement)+}
 {+(TextElement)+}
