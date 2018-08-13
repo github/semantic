@@ -209,8 +209,7 @@ instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Error
 
 instance Tokenize Error where
-  whenGenerated = ignore
-  whenRefactored = ignore
+  prettyPrint = ignore
 
 instance Named String where
   nameOf _ = "string"

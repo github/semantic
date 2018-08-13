@@ -34,8 +34,7 @@ instance Evaluatable Boolean where
   eval (Boolean x) = rvalBox (boolean x)
 
 instance Tokenize Boolean where
-  whenGenerated  = yield . Truth . booleanContent
-  whenRefactored = whenGenerated
+  prettyPrint = yield . Truth . booleanContent
 
 -- Numeric
 
@@ -66,10 +65,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 instance Tokenize Data.Syntax.Literal.Float where
-  whenRefactored = whenGenerated
-
-  whenGenerated =
-    yield . Fragment . floatContent
+  prettyPrint = yield . Fragment . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -143,8 +139,7 @@ instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
 instance Tokenize TextElement where
-  whenRefactored = whenGenerated
-  whenGenerated = yield . Fragment . textElementContent
+  prettyPrint = yield . Fragment . textElementContent
 
 data Null a = Null
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -156,9 +151,7 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Null where eval _ = rvalBox null
 
 instance Tokenize Null where
-  whenGenerated _ = yield Nullity
-  whenRefactored  = ignore
-  whenModified    = ignore
+  prettyPrint _ = yield Nullity
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -205,10 +198,7 @@ instance Evaluatable Array where
   eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
 instance Tokenize Array where
-  whenModified = within List . sequenceA_
-  whenRefactored = within List . sequenceA_
-
-  whenGenerated t = within List $
+  prettyPrint t = within List $
     let withCommas = intersperse (yield Separator) (toList t)
     in yield Open *> sequenceA_ withCommas *> yield Close
 
@@ -223,10 +213,9 @@ instance Evaluatable Hash where
   eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
 instance Tokenize Hash where
-  whenRefactored  = whenModified
-  whenModified    = within Associative . sequenceA_
-  whenGenerated t = within Associative $
-    yield Open *> sequenceA_ t *> yield Close
+  prettyPrint t = within Associative $
+    let withCommas = intersperse (yield Separator) (toList t)
+    in yield Open *> sequenceA_ withCommas *> yield Close
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -240,11 +229,8 @@ instance Evaluatable KeyValue where
     rvalBox =<< (kvPair <$> key <*> value)
 
 instance Tokenize KeyValue where
-  whenGenerated (KeyValue k v) = within Pair $
+  prettyPrint (KeyValue k v) = within Pair $
     k *> yield Separator *> v
-
-  whenModified = within Pair . sequenceA_
-  whenRefactored = whenModified
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
