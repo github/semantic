@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Located
 ( Located(..)
 ) where

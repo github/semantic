@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Precise
 ( Precise(..)
 ) where
