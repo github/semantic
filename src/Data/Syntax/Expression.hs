@@ -363,6 +363,13 @@ instance Eq1 LShift where liftEq = genericLiftEq
 instance Ord1 LShift where liftCompare = genericLiftCompare
 instance Show1 LShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LShift where
+  eval (LShift a b) = do
+    a' <- subtermValue a
+    trace "hello"
+    b' <- subtermValue b
+    liftBitwise2 shiftL' a' b' >>= rvalBox
+    where
+      shiftL' a b = shiftL a (fromIntegral (toInteger b))
 
 data RShift a = RShift { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -370,7 +377,7 @@ data RShift a = RShift { left :: a, right :: a }
 instance Eq1 RShift where liftEq = genericLiftEq
 instance Ord1 RShift where liftCompare = genericLiftCompare
 instance Show1 RShift where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable RShift where
+instance Evaluatable RShift
 
 data UnsignedRShift a = UnsignedRShift { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -387,7 +394,7 @@ instance Eq1 Complement where liftEq = genericLiftEq
 instance Ord1 Complement where liftCompare = genericLiftCompare
 instance Show1 Complement where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Complement where
+instance Evaluatable Complement
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
