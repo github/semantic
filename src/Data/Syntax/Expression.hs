@@ -338,6 +338,11 @@ instance Eq1 BAnd where liftEq = genericLiftEq
 instance Ord1 BAnd where liftCompare = genericLiftCompare
 instance Show1 BAnd where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BAnd where
+  eval (BAnd a b) = do
+    a' <- subtermValue a
+    b' <- subtermValue b
+    liftBitwise2 (.&.) a' b' >>= rvalBox 
+
 
 data BXOr a = BXOr { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
