@@ -4,6 +4,7 @@ module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
+import Data.Bits
 import Data.Fixed
 import Data.JSON.Fields
 import Diffing.Algorithm hiding (Delete)
@@ -325,6 +326,10 @@ instance Eq1 BOr where liftEq = genericLiftEq
 instance Ord1 BOr where liftCompare = genericLiftCompare
 instance Show1 BOr where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BOr where
+  eval (BOr a b) = do
+    a' <- subtermValue a
+    b' <- subtermValue b
+    liftBitwise2 (.|.) a' b' >>= rvalBox
 
 data BAnd a = BAnd { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -470,7 +475,7 @@ instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Improve this to model asynchrony or capture some data suggesting async calls are not a problem.
---       We are currently dealing with an asynchronous construct synchronously. 
+--       We are currently dealing with an asynchronous construct synchronously.
 instance Evaluatable Await where
   eval (Await a) = subtermRef a
 
