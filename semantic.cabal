@@ -310,12 +310,10 @@ test-suite test
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , algebraic-graphs
-                     , array
                      , async
                      , base
                      , bifunctors
                      , bytestring
-                     , comonad
                      , containers
                      , effects
                      , fastsum
@@ -368,7 +366,6 @@ test-suite doctests
   ghc-options:         -dynamic -threaded -j
   build-depends:       base
                      , doctest
-                     , QuickCheck
 
 benchmark evaluation
   hs-source-dirs:      bench
