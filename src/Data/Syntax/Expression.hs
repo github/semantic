@@ -469,9 +469,10 @@ instance Eq1 Await where liftEq = genericLiftEq
 instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Improve this to model asynchrony or capture some data suggesting async calls are not a problem.
+--       We are currently dealing with an asynchronous construct synchronously. 
 instance Evaluatable Await where
-  eval (Await a) = subtermValue a >> subtermRef a
-    -- Rval <$> (subtermAddress a >>= runReturn) - this doesn't work
+  eval (Await a) = subtermRef a
 
 -- | An object constructor call in Javascript, Java, etc.
 newtype New a = New { newSubject :: [a] }
