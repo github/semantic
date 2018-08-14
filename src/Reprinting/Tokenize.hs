@@ -76,7 +76,7 @@ instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
 instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize (TermF a (Record fields)) where
-  prettyPrint t = into t (prettyPrint (termFOut t))
+  prettyPrint t = withHistory t (prettyPrint (termFOut t))
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
@@ -86,27 +86,32 @@ tokenizing s t = let h = getField (termAnnotation t) in
   . fmap fst
   . runWriter
   . fmap snd
-  . runState (RPState 0 Reprinting)
-  . runReader (RPContext s h)
+  . runState (RPState 0)
+  . runReader (RPContext s h Reprinting)
   $ foldSubterms descend t *> finish
 
 -- Private interfaces
 
-data RPState = RPState
+newtype RPState = RPState
   { _cursor   :: Int -- from SYR, used to slice and dice a 'Source' (mutates)
-  , _strategy :: Strategy
   } deriving (Show, Eq)
 
 cursor :: Lens' RPState Int
-cursor = lens _cursor (\s c -> s { _cursor = c})
+cursor = lens _cursor (\s c -> s { _cursor = c })
 
-strategy :: Lens' RPState Strategy
-strategy = lens _strategy (\s t -> s { _strategy = t})
+strategy :: Lens' RPContext Strategy
+strategy = lens _strategy (\s t -> s { _strategy = t })
 
 data RPContext = RPContext
   { _source  :: Source
   , _history :: History
+  , _strategy :: Strategy
   } deriving (Show, Eq)
+
+data Strategy
+  = Reprinting
+  | PrettyPrinting
+    deriving (Eq, Show)
 
 history :: Lens' RPContext History
 history = lens _history (\c h -> c { _history = h })
@@ -120,49 +125,28 @@ finish = do
   src <- asks _source
   chunk (dropSource crs src)
 
-into :: (Annotated t (Record fields), HasField fields History) => t -> Tokenizer a -> Tokenizer a
-into x = local (set history (getField (annotation x)))
+withHistory :: (Annotated t (Record fields), HasField fields History) => t -> Tokenizer a -> Tokenizer a
+withHistory x = local (set history (getField (annotation x)))
 
-strategize :: Strategy -> Tokenizer ()
-strategize new = do
-  strat <- gets _strategy
-  when (strat /= new) $ do
-    control (Change new)
-    modify' (set strategy new)
+withStrategy :: Strategy -> Tokenizer a -> Tokenizer a
+withStrategy x = local (set strategy x)
 
--- | A subterm algebra that implements the /Scrap Your Reprinter/ algorithm.
--- Whereas /SYR/ uses a zipper to do a top-down depth-first rightward traversal
--- of a tree, we use a subterm algebra over a monad, which performs the same
--- task.
+-- | A subterm algebra inspired by the /Scrap Your Reprinter/ algorithm.
 descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
 descend t = do
-  let into' s = into (subterm s) (subtermRef s)
   log (showsPrec1 0 (() <$ t) "")
-  h <- asks _history
-  let next = fmap into' t
-  case h of
-    Unmodified _ -> do
-      log "Unmodified"
-      sequenceA_ next
-
-    Refactored r -> do
-      strat <- gets _strategy
-      case strat of
-        PrettyPrinting -> do
-          log "Refactored - PrettyPrinting"
-          prettyPrint next
-        Reprinting -> do
-          log "Refactored - Reprinting"
-          crs <- gets _cursor
-          src <- asks _source
-          let delimiter = Range crs (start r)
-          log ("slicing: " <> show delimiter)
-          chunk (slice delimiter src)
-          modify (set cursor (start r))
-
-          strategize PrettyPrinting
-          prettyPrint next
-          strategize Reprinting
-
-          log ("reset cursor: " <> show (end r))
-          modify (set cursor (end r))
+  hist <- asks _history
+  strat <- asks _strategy
+  let into s = withHistory (subterm s) (subtermRef s)
+  case (hist, strat) of
+    (Unmodified _, _) -> traverse_ into t
+    (Refactored _, PrettyPrinting) -> prettyPrint (fmap into t)
+    (Refactored r, Reprinting) -> do
+      crs <- gets _cursor
+      src <- asks _source
+      let delimiter = Range crs (start r)
+      log ("slicing: " <> show delimiter)
+      chunk (slice delimiter src)
+      modify (set cursor (start r))
+      prettyPrint (fmap (withStrategy PrettyPrinting . into) t)
+      modify (set cursor (end r))

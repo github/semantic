@@ -98,13 +98,9 @@ translating prox =
 
 -- Private interfaces
 
-data JSONState = JSONState
+newtype JSONState = JSONState
   { _contexts    :: [Context]
-  , _needsLayout :: Bool
   } deriving (Eq, Show)
-
-needsLayout :: Lens' JSONState Bool
-needsLayout = lens _needsLayout (\s l -> s { _needsLayout = l})
 
 contexts :: Lens' JSONState [Context]
 contexts = lens _contexts (\s cs -> s { _contexts = cs })
@@ -113,15 +109,13 @@ current :: JSONState -> Maybe Context
 current s = s ^? contexts._head
 
 instance Lower JSONState where
-  lowerBound = JSONState [] False
+  lowerBound = JSONState []
 
 instance Translate 'JSON where
   type Stack 'JSON = JSONState
 
   onControl t st = case t of
-    Log _ -> pure st
-    Change PrettyPrinting -> pure (set needsLayout True st)
-    Change Reprinting     -> pure (set needsLayout False st)
+    Log _   -> pure st
     Enter c -> pure (over contexts (c:) st)
     Exit c  -> let curr = current st in
       if curr /= Just c
@@ -129,35 +123,29 @@ instance Translate 'JSON where
         else pure (over contexts tail st)
 
   onElement c st = let curr = current st in do
-    let should = st ^. needsLayout
     case c of
       Fragment f -> pure . splice $ f
       Truth t    -> pure . splice $ if t then "true" else "false"
       Nullity    -> pure . splice $ "null"
       Open -> do
-        let i = Directive $ if should then HardWrap 2 Space else Don't
         case curr of
           Just List        -> pure . splice $ "["
-          Just Associative -> pure ["{", i]
+          Just Associative -> pure ["{", Directive (HardWrap 2 Space)]
           x                -> throwError (Unexpected (show (Open, x)))
       Close -> do
-        let i = Directive $ if should then HardWrap 0 Space else Don't
         case curr of
           Just List        -> pure . splice $ "]"
-          Just Associative -> pure [i, "}"]
+          Just Associative -> pure [Directive (HardWrap 0 Space), "}"]
           x                -> throwError (Unexpected (show (Close, x)))
       Separator  -> do
-        -- let should = st ^. needsLayout
         let curr = current st
 
-        -- let i = Directive Don't
         let i = Directive $
-              case (curr, should) of
-                (_, False)            -> Don't
-                (Just List, _)        -> SoftWrap
-                (Just Associative, _) -> HardWrap 2 Space
-                (Just Pair, _)        -> SoftWrap
-                _                     -> Don't
+              case curr of
+                Just List        -> SoftWrap
+                Just Associative -> HardWrap 2 Space
+                Just Pair        -> SoftWrap
+                _                -> Don't
 
         case curr of
           Just List        -> pure [",", i]
