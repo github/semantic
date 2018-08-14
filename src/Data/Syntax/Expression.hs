@@ -341,7 +341,7 @@ instance Evaluatable BAnd where
   eval (BAnd a b) = do
     a' <- subtermValue a
     b' <- subtermValue b
-    liftBitwise2 (.&.) a' b' >>= rvalBox 
+    liftBitwise2 (.&.) a' b' >>= rvalBox
 
 
 data BXOr a = BXOr { left :: a, right :: a }
@@ -351,6 +351,10 @@ instance Eq1 BXOr where liftEq = genericLiftEq
 instance Ord1 BXOr where liftCompare = genericLiftCompare
 instance Show1 BXOr where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BXOr where
+  eval (BXOr a b) = do
+    a' <- subtermValue a
+    b' <- subtermValue b
+    liftBitwise2 xor a' b' >>= rvalBox
 
 data LShift a = LShift { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
