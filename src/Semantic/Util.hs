@@ -331,8 +331,8 @@ changeKV :: forall effs syntax ann fields term
          => Rule effs (Either term (term, Literal.KeyValue term)) term
 changeKV = fromFunction "changeKV" $ either id injKV
   where injKV :: (term, Literal.KeyValue term) -> term
-        injKV (term, Literal.KeyValue{..}) = case projectTerm keyValueValue of
-          Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue key (newArray elems))))
+        injKV (term, Literal.KeyValue k v) = case projectTerm v of
+          Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue k (newArray elems))))
           _ -> term
           where newArray xs = termIn ann (inject (Literal.Array (xs <> [float])))
                 float = termIn ann (inject (Literal.Float "4"))
