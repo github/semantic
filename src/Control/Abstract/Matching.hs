@@ -93,11 +93,11 @@ match :: (f :< fs)
       => (f (Term (Sum fs) ann) -> b)
       -> Matcher b a
       -> Matcher (Term (Sum fs) ann) a
-match f = Match (fmap f . project . termOut)
+match f = Match (fmap f . projectTerm)
 
 -- | @narrow'@ attempts to project a union-type target to a more specific type.
 narrow' :: (f :< fs) => Matcher (Term (Sum fs) ann) (Maybe (f (Term (Sum fs) ann)))
-narrow' = fmap (project . termOut) Target
+narrow' = fmap projectTerm Target
 
 -- | 'narrow' behaves as @narrow'@, but fails if the target cannot be thus projected.
 narrow :: (f :< fs) => Matcher (Term (Sum fs) ann) (f (Term (Sum fs) ann))
