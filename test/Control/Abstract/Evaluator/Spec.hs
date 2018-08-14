@@ -1,7 +1,6 @@
 {-# LANGUAGE TypeOperators #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
-, SpecEff(..)
 ) where
 
 import Control.Abstract
