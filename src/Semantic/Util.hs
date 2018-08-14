@@ -40,6 +40,7 @@ import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
+import           Matching.Core
 import           Parsing.Parser
 import           Prologue hiding (weaken)
 import           Refactoring.Core
@@ -132,171 +133,6 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
 
-renameKey :: (Literal.TextElement :< fs, Literal.KeyValue :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
-renameKey p = case Sum.project (termOut p) of
-  Just (Literal.KeyValue k v)
-    | Just (Literal.TextElement x) <- Sum.project (termOut k)
-    , x == "\"foo\""
-    -> let newKey = termIn (termAnnotation k) (inject (Literal.TextElement "\"fooA\""))
-       in remark Refactored (termIn (termAnnotation p) (inject (Literal.KeyValue newKey v)))
-  _ -> Term (fmap renameKey (unTerm p))
-
-arrayMatcher :: forall fs ann term . (Literal.Array :< fs, term ~ Term (Sum fs) ann)
-            => Matcher term (Literal.Array term)
-arrayMatcher = matchM hash target
-  where hash :: term -> Maybe (Literal.Array term)
-        hash = projectTerm
-
-increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
-increaseNumbers p = case Sum.project (termOut p) of
-  Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
-  Nothing                -> Term (fmap increaseNumbers (unTerm p))
-
-hashMatcher :: forall fs ann term . (Literal.Hash :< fs, term ~ Term (Sum fs) ann)
-            => Matcher term (Literal.Hash term)
-hashMatcher = matchM hash target
-  where hash :: term -> Maybe (Literal.Hash term)
-        hash = projectTerm
-
-testHashMatcher = do
-  (src, tree) <- testJSONFile
-  runMatcher hashMatcher tree
-
-findHashes :: ( Apply Functor syntax
-              , Apply Foldable syntax
-              , Literal.Hash :< syntax
-              , term ~ Term (Sum syntax) ann
-              )
-           => Rule eff term (Either term (term, Literal.Hash term))
-findHashes = fromMatcher "findHashes" hashMatcher
-
-addKVPair :: forall effs syntax ann fields term
-             . ( Apply Functor syntax
-               , Apply Foldable syntax
-               , Literal.Float :< syntax
-               , Literal.Hash :< syntax
-               , Literal.Array :< syntax
-               , Literal.TextElement :< syntax
-               , Literal.KeyValue :< syntax
-               , ann ~ Record (History ': fields)
-               , term ~ Term (Sum syntax) ann
-               )
-           => Rule effs (Either term (term, Literal.Hash term)) term
-addKVPair = fromPlan "addKVPair" $ do
-  t <- await
-  Data.Machine.yield (either id injKVPair t)
-  where
-    injKVPair :: (term, Literal.Hash term) -> term
-    injKVPair (origTerm, Literal.Hash xs) =
-      remark Refactored (injectTerm ann (Literal.Hash (xs <> [newItem])))
-      where
-        newItem = termIn ann (inject (Literal.KeyValue k v))
-        k = termIn ann (inject (Literal.TextElement "\"added\""))
-        v = termIn ann (inject (Literal.Array []))
-        ann = termAnnotation origTerm
-
-testAddKVPair = do
-  (src, tree) <- testJSONFile
-  tagged <- runM $ {- ensureAccurateHistory <$> -} cata (toAlgebra (addKVPair . findHashes)) (markUnmodified tree)
-  let toks = tokenizing src tagged
-  pure (toks, tagged)
-  -- (_, toks) <- runM . runState (lowerBound @[Context]) $ runT (source (tokenizing src tagged) ~> machine fixingPipeline)
-  -- pure (Sequence.fromList toks, tagged)
-
-testAddKVPair' = do
-  res <- translating (Proxy @'Language.JSON) . fst <$> testAddKVPair
-  putStrLn (either show (show . typeset) res)
-
-floatMatcher :: forall fs ann term . (Literal.Float :< fs, term ~ Term (Sum fs) ann)
-             => Matcher term (Literal.Float term)
-floatMatcher = matchM float target
-  where float :: term -> Maybe (Literal.Float term)
-        float = projectTerm
-
-testFloatMatcher = do
-  (src, tree) <- testJSONFile
-  runMatcher floatMatcher tree
-
-findFloats :: ( Apply Functor syntax
-              , Apply Foldable syntax
-              , Literal.Float :< syntax
-              , term ~ Term (Sum syntax) ann
-              )
-           => Rule effs term (Either term (term, Literal.Float term))
-findFloats = fromMatcher "test" floatMatcher
-
-overwriteFloats :: forall effs syntax ann fields term . ( Apply Functor syntax
-               , Apply Foldable syntax
-               , Literal.Float :< syntax
-               , ann ~ Record (History ': fields)
-               , term ~ Term (Sum syntax) ann
-               )
-           => Rule effs (Either term (term, Literal.Float term)) term
-overwriteFloats = fromPlan "overwritingFloats" $ do
-  t <- await
-  Data.Machine.yield (either id injFloat t)
-  where injFloat :: (term, Literal.Float term) -> term
-        injFloat (term, _) = remark Refactored (termIn (termAnnotation term) (inject (Literal.Float "0")))
-
-testOverwriteFloats = do
-  (src, tree) <- testJSONFile
-  tagged <- runM $ {- ensureAccurateHistory <$> -} cata (toAlgebra (overwriteFloats . findFloats)) (markUnmodified tree)
-  let toks = tokenizing src tagged
-  pure (toks, tagged)
-
-testOverwriteFloats' = do
-  res <- translating (Proxy @'Language.JSON) . fst <$> testOverwriteFloats
-  putStrLn (either show (show . typeset) res)
-
-{-
-
-             Hash
-  term     /-------> refactor ------->\   term
---------->/                           |---------->
-          \                          /
-           \------> do nothing ----->/
-             non-Hashes
-
--}
-
-
--- addKVPair :: forall fs fields .
---              (Apply Functor fs, Literal.Array :< fs, Literal.Hash :< fs, Literal.TextElement :< fs, Literal.KeyValue :< fs, Literal.Float :< fs)
---           => Term (Sum fs) (Record (History ': fields))
---           -> Term (Sum fs) (Record (History ': fields))
--- addKVPair p = case Sum.project (termOut p) of
---   Just (Literal.Hash h) -> termIn (Data.History.overwrite Modified (rhead (termAnnotation p)) :. rtail (annotation p)) (addToHash h)
---   Nothing -> Term (fmap addKVPair (unTerm p))
---   where
---     addToHash :: [Term (Sum fs) (Record (History : fields))] -> Sum fs (Term (Sum fs) (Record (History : fields)))
---     addToHash pairs = inject . Literal.Hash $ (pairs ++ [newItem])
---     newItem :: Term (Sum fs) (Record (History : fields))
---     newItem = termIn gen (inject (Literal.KeyValue fore aft))
---     fore = termIn gen (inject (Literal.TextElement "fore"))
---     aft = termIn gen (inject (Literal.TextElement "aft"))
---     gen = Generated :. rtail (annotation p)
---     item = inject (Literal.KeyValue (inject (Literal.TextElement "added")) (inject (Literal.Array [])))
-
-testJSONFile = do
-  let path = "test/fixtures/javascript/reprinting/map.json"
-  src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
-  tree <- parseFile jsonParser path
-  pure (src, tree)
-
-testTokenizer = do
-  (src, tree) <- testJSONFile
-
-  let tagged = ensureAccurateHistory $ renameKey (markUnmodified tree)
-  let toks = tokenizing src tagged
-  pure (toks, tagged)
-
-testTranslator = translating (Proxy @'Language.JSON) . fst <$> testTokenizer
-
-testTypeSet = do
-  res <- testTranslator
-  putStrLn (either show (show . typeset) res)
-
-
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
   evaluateProject' (TaskConfig config logger statter) proxy parser paths
@@ -343,3 +179,171 @@ reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeE
 
 prettyShow :: Show a => a -> IO ()
 prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow
+
+
+--
+-- Code rewriting experiments
+--
+
+testJSONFile = do
+  let path = "test/fixtures/javascript/reprinting/map.json"
+  src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
+  tree <- parseFile jsonParser path
+  pure (src, tree)
+
+renameKey :: (Literal.TextElement :< fs, Literal.KeyValue :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
+renameKey p = case projectTerm p of
+  Just (Literal.KeyValue k v)
+    | Just (Literal.TextElement x) <- Sum.project (termOut k)
+    , x == "\"foo\""
+    -> let newKey = termIn (termAnnotation k) (inject (Literal.TextElement "\"fooA\""))
+       in remark Refactored (termIn (termAnnotation p) (inject (Literal.KeyValue newKey v)))
+  _ -> Term (fmap renameKey (unTerm p))
+
+testRenameKey = do
+  (src, tree) <- testJSONFile
+  let tagged = renameKey (mark Unmodified tree)
+  let toks = tokenizing src tagged
+  pure (toks, tagged)
+
+testRenameKey' = do
+  res <- translating (Proxy @'Language.JSON) . fst <$> testRenameKey
+  putStrLn (either show (show . typeset) res)
+
+increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
+increaseNumbers p = case Sum.project (termOut p) of
+  Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
+  Nothing                -> Term (fmap increaseNumbers (unTerm p))
+
+findHashes :: ( Apply Functor syntax
+              , Apply Foldable syntax
+              , Literal.Hash :< syntax
+              , term ~ Term (Sum syntax) ann
+              )
+           => Rule eff term (Either term (term, Literal.Hash term))
+findHashes = fromMatcher "findHashes" matchHash
+
+addKVPair :: forall effs syntax ann fields term
+             . ( Apply Functor syntax
+               , Apply Foldable syntax
+               , Literal.Float :< syntax
+               , Literal.Hash :< syntax
+               , Literal.Array :< syntax
+               , Literal.TextElement :< syntax
+               , Literal.KeyValue :< syntax
+               , ann ~ Record (History ': fields)
+               , term ~ Term (Sum syntax) ann
+               )
+           => Rule effs (Either term (term, Literal.Hash term)) term
+addKVPair = fromPlan "addKVPair" $ do
+  t <- await
+  Data.Machine.yield (either id injKVPair t)
+  where
+    injKVPair :: (term, Literal.Hash term) -> term
+    injKVPair (origTerm, Literal.Hash xs) =
+      remark Refactored (injectTerm ann (Literal.Hash (xs <> [newItem])))
+      where
+        newItem = termIn ann (inject (Literal.KeyValue k v))
+        k = termIn ann (inject (Literal.TextElement "\"added\""))
+        v = termIn ann (inject (Literal.Array []))
+        ann = termAnnotation origTerm
+
+testAddKVPair = do
+  (src, tree) <- testJSONFile
+  tagged <- runM $ cata (toAlgebra (addKVPair . findHashes)) (mark Unmodified tree)
+  let toks = tokenizing src tagged
+  pure (toks, tagged)
+
+testAddKVPair' = do
+  res <- translating (Proxy @'Language.JSON) . fst <$> testAddKVPair
+  putStrLn (either show (show . typeset) res)
+
+testFloatMatcher = do
+  (src, tree) <- testJSONFile
+  runMatcher matchFloat tree
+
+findFloats :: ( Apply Functor syntax
+              , Apply Foldable syntax
+              , Literal.Float :< syntax
+              , term ~ Term (Sum syntax) ann
+              )
+           => Rule effs term (Either term (term, Literal.Float term))
+findFloats = fromMatcher "test" matchFloat
+
+overwriteFloats :: forall effs syntax ann fields term . ( Apply Functor syntax
+               , Apply Foldable syntax
+               , Literal.Float :< syntax
+               , ann ~ Record (History ': fields)
+               , term ~ Term (Sum syntax) ann
+               )
+           => Rule effs (Either term (term, Literal.Float term)) term
+overwriteFloats = fromPlan "overwritingFloats" $ do
+  t <- await
+  Data.Machine.yield (either id injFloat t)
+  where injFloat :: (term, Literal.Float term) -> term
+        injFloat (term, _) = remark Refactored (termIn (termAnnotation term) (inject (Literal.Float "0")))
+
+testOverwriteFloats = do
+  (src, tree) <- testJSONFile
+  tagged <- runM $ cata (toAlgebra (overwriteFloats . findFloats)) (mark Unmodified tree)
+  let toks = tokenizing src tagged
+  pure (toks, tagged)
+
+testOverwriteFloats' = do
+  res <- translating (Proxy @'Language.JSON) . fst <$> testOverwriteFloats
+  putStrLn (either show (show . typeset) res)
+
+
+kvMatcher :: forall fs ann term
+           . ( Literal.KeyValue :< fs
+             , Literal.Array :< fs
+             , Literal.TextElement :< fs
+             , term ~ Term (Sum fs) ann)
+          => Text -> Matcher term (Literal.KeyValue term)
+kvMatcher name = matchM kv target <* matchKey where
+  matchKey
+    = match Literal.key $
+        match Literal.textElementContent $
+          ensure (== name)
+  kv :: term -> Maybe (Literal.KeyValue term)
+  kv = projectTerm
+
+findKV :: ( Apply Functor syntax
+           , Apply Foldable syntax
+           , Literal.KeyValue :< syntax
+           , Literal.Array :< syntax
+           , Literal.TextElement :< syntax
+           , term ~ Term (Sum syntax) ann
+           )
+        => Text -> Rule effs term (Either term (term, Literal.KeyValue term))
+findKV name = fromMatcher "findKV" (kvMatcher name)
+
+changeKV :: forall effs syntax ann fields term
+          . ( Apply Functor syntax
+            , Apply Foldable syntax
+            , Literal.KeyValue :< syntax
+            , Literal.Array :< syntax
+            , Literal.Float :< syntax
+            , Literal.TextElement :< syntax
+            , ann ~ Record (History ': fields)
+            , term ~ Term (Sum syntax) ann
+            )
+         => Rule effs (Either term (term, Literal.KeyValue term)) term
+changeKV = fromFunction "changeKV" $ either id injKV
+  where injKV :: (term, Literal.KeyValue term) -> term
+        injKV (term, Literal.KeyValue{..}) = case projectTerm keyValueValue of
+          Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue key (newArray elems))))
+          _ -> term
+          where newArray xs = termIn ann (inject (Literal.Array (xs <> [float])))
+                float = termIn ann (inject (Literal.Float "4"))
+                ann = termAnnotation term
+
+testChangeKV = do
+  (src, tree) <- testJSONFile
+  tagged <- runM $ cata (toAlgebra (changeKV . findKV "\"bar\"")) (mark Unmodified tree)
+  let toks = tokenizing src tagged
+  pure (toks, tagged)
+
+testChangeKV' = do
+  res <- translating (Proxy @'Language.JSON) . fst <$> testChangeKV
+  putStrLn (either show (show . typeset) res)
