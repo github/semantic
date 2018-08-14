@@ -4,7 +4,6 @@ module Data.Reprinting.Token
   , Control (..)
   , Context (..)
   , Operator (..)
-  , Strategy (..)
   ) where
 
 import Data.Text (Text)
@@ -40,12 +39,6 @@ data Control
   = Enter Context
   | Exit Context
   | Log String
-  | Change Strategy
-    deriving (Eq, Show)
-
-data Strategy
-  = Reprinting
-  | PrettyPrinting
     deriving (Eq, Show)
 
 -- | A 'Context' represents a scope in which other tokens can be
