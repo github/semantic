@@ -121,6 +121,8 @@ class AbstractIntro value => AbstractValue address value effects where
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
                -> (value -> value -> Evaluator address value effects value)
 
+  unsignedRShift :: value -> value -> Evaluator address value effects value
+
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   tuple :: [address] -> Evaluator address value effects value
 
