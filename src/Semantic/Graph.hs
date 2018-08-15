@@ -8,7 +8,7 @@ module Semantic.Graph
 , GraphType(..)
 , Graph
 , Vertex
-, ImportGraphEff(..)
+, ConcreteEff(..)
 , style
 , parsePackage
 , withTermSpans
@@ -185,7 +185,7 @@ runImportGraph lang (package :: Package term) f =
         . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
+        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
       runAddressEffects
@@ -193,25 +193,25 @@ runImportGraph lang (package :: Package term) f =
         . Hole.runDeref Precise.handleDeref
   in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
-newtype ImportGraphEff address outerEffects a = ImportGraphEff
-  { runImportGraphEff :: Eff (  ValueEffects  address (Value address (ImportGraphEff address outerEffects))
-                             (  ModuleEffects address (Value address (ImportGraphEff address outerEffects))
-                             (  Reader Span
-                             ': Reader PackageInfo
-                             ': Modules address
-                             ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                             ': State (Graph ModuleInfo)
-                             ': Resumable (BaseError (ValueError address (ImportGraphEff address outerEffects)))
-                             ': Resumable (BaseError (AddressError address (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable (BaseError ResolutionError)
-                             ': Resumable (BaseError EvalError)
-                             ': Resumable (BaseError (EnvironmentError address))
-                             ': Resumable (BaseError (UnspecializedError (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable (BaseError (LoadError address))
-                             ': Fresh
-                             ': State (Heap address (Value address (ImportGraphEff address outerEffects)))
-                             ': outerEffects
-                             ))) a
+newtype ConcreteEff address outerEffects a = ConcreteEff
+  { runConcreteEff :: Eff (  ValueEffects  address (Value address (ConcreteEff address outerEffects))
+                          (  ModuleEffects address (Value address (ConcreteEff address outerEffects))
+                          (  Reader Span
+                          ': Reader PackageInfo
+                          ': Modules address
+                          ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+                          ': State (Graph ModuleInfo)
+                          ': Resumable (BaseError (ValueError address (ConcreteEff address outerEffects)))
+                          ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address outerEffects))))
+                          ': Resumable (BaseError ResolutionError)
+                          ': Resumable (BaseError EvalError)
+                          ': Resumable (BaseError (EnvironmentError address))
+                          ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address outerEffects))))
+                          ': Resumable (BaseError (LoadError address))
+                          ': Fresh
+                          ': State (Heap address (Value address (ConcreteEff address outerEffects)))
+                          ': outerEffects
+                          ))) a
   }
 
 
