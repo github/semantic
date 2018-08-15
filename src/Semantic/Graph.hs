@@ -194,14 +194,9 @@ runImportGraph lang (package :: Package term) f =
   in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 newtype ImportGraphEff address outerEffects a = ImportGraphEff
-  { runImportGraphEff :: Eff (  ValueEffects address (Value address (ImportGraphEff address outerEffects))
-                             (  Exc (LoopControl address)
-                             ': Exc (Return address)
-                             ': Env address
-                             ': Deref (Value address (ImportGraphEff address outerEffects))
-                             ': Allocator address
-                             ': Reader ModuleInfo
-                             ': Reader Span
+  { runImportGraphEff :: Eff (  ValueEffects  address (Value address (ImportGraphEff address outerEffects))
+                             (  ModuleEffects address (Value address (ImportGraphEff address outerEffects))
+                             (  Reader Span
                              ': Reader PackageInfo
                              ': Modules address
                              ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
@@ -216,7 +211,7 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
                              ': Fresh
                              ': State (Heap address (Value address (ImportGraphEff address outerEffects)))
                              ': outerEffects
-                             )) a
+                             ))) a
   }
 
 
