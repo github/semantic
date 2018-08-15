@@ -16,11 +16,13 @@ import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
+import Data.Bits
 import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
+import Data.Word
 import Prologue
 
 data Value address body
@@ -260,6 +262,16 @@ instance ( Coercible body (Eff effects)
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
+
+  unsignedRShift left right
+    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair =
+      if i >= 0 then pure . integer $ ourShift (fromIntegral i) (fromIntegral j)
+      else throwValueError (Bitwise2Error left right)
+    | otherwise = throwValueError (Bitwise2Error left right)
+      where
+        pair = (left, right)
+        ourShift :: Word64 -> Int -> Integer
+        ourShift a b = toInteger (shiftR a b)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> deref value

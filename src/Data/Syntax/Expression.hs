@@ -396,6 +396,7 @@ instance Evaluatable UnsignedRShift where
     a' <- subtermValue a
     b' <- subtermValue b
     unsignedRShift a' b' >>= rvalBox
+    -- This isn't working for JavaScript
 
 newtype Complement a = Complement { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -408,7 +409,6 @@ instance Evaluatable Complement where
   eval (Complement a) = do
     a' <- subtermValue a
     liftBitwise complement a' >>= rvalBox
-    -- TODO: Differentiate between signed and unsigned
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
