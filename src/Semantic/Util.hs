@@ -56,10 +56,10 @@ justEvaluating
 newtype UtilEff address rest a = UtilEff
   { runUtilEff :: Eff (  ValueEffects  address (Value address (UtilEff address rest))
                       (  ModuleEffects address (Value address (UtilEff address rest))
-                      (  Modules address
-                      ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                      ': Reader Span
+                      (  Reader Span
                       ': Reader PackageInfo
+                      ': Modules address
+                      ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                       ': Resumable (BaseError (ValueError address (UtilEff address rest)))
                       ': Resumable (BaseError (AddressError address (Value address (UtilEff address rest))))
                       ': Resumable (BaseError ResolutionError)
@@ -121,10 +121,10 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
-       (runReader (packageInfo package)
-       (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
        (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runFunction coerce coerce) modules))))))
 
 
