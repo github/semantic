@@ -537,7 +537,8 @@ data Super a = Super
 instance Eq1 Super where liftEq = genericLiftEq
 instance Ord1 Super where liftCompare = genericLiftCompare
 instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Super
+instance Evaluatable Super where
+  eval Super = Rval <$> (maybeM (box unit) =<< self)
 
 data This a = This
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1)
