@@ -133,7 +133,7 @@ withStrategy x = local (set strategy x)
 -- | A subterm algebra inspired by the /Scrap Your Reprinter/ algorithm.
 descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
 descend t = do
-  log (showsPrec1 0 (() <$ t) "")
+  -- log (showsPrec1 0 (() <$ t) "")
   hist <- asks _history
   strat <- asks _strategy
   let into s = withHistory (subterm s) (subtermRef s)
