@@ -54,14 +54,9 @@ justEvaluating
   . runValueError
 
 newtype UtilEff address rest a = UtilEff
-  { runUtilEff :: Eff (  ValueEffects address (Value address (UtilEff address rest))
-                      (  Exc (LoopControl address)
-                      ': Exc (Return address)
-                      ': Env address
-                      ': Deref (Value address (UtilEff address rest))
-                      ': Allocator address
-                      ': Reader ModuleInfo
-                      ': Modules address
+  { runUtilEff :: Eff (  ValueEffects  address (Value address (UtilEff address rest))
+                      (  ModuleEffects address (Value address (UtilEff address rest))
+                      (  Modules address
                       ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
                       ': Reader Span
                       ': Reader PackageInfo
@@ -75,7 +70,7 @@ newtype UtilEff address rest a = UtilEff
                       ': Fresh
                       ': State (Heap address (Value address (UtilEff address rest)))
                       ': rest
-                      )) a
+                      ))) a
   }
 
 checking
