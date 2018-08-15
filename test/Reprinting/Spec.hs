@@ -11,6 +11,7 @@ import Data.Algebra
 import Reprinting.Tokenize
 import Reprinting.Pipeline
 import Data.Sum
+import Data.Foldable
 import Semantic.IO
 import Data.Blob
 
@@ -26,29 +27,29 @@ spec = describe "reprinting" $ do
   describe "tokenization" $ do
 
     it "should pass over a pristine tree" $ do
-      let tagged = mark Pristine tree
+      let tagged = mark Unmodified tree
       let toks = tokenizing src tagged
       toks `shouldBe` [Chunk src]
 
     it "should emit control tokens but only 1 chunk for a wholly-modified tree" $ do
-      let toks = tokenizing src (mark Modified tree)
-      forM_ @[] [List, Associative] $ \t -> do
-        toks `shouldSatisfy` (elem (TControl (Enter t)))
-        toks `shouldSatisfy` (elem (TControl (Exit t)))
+      let toks = tokenizing src (mark Refactored tree)
+      for_ @[] [List, Associative] $ \t -> do
+        toks `shouldSatisfy` elem (TControl (Enter t))
+        toks `shouldSatisfy` elem (TControl (Exit t))
 
   describe "pipeline" $ do
     it "should roundtrip exactly over a pristine tree" $ do
-      let tagged = mark Pristine tree
+      let tagged = mark Unmodified tree
       let printed = runReprinter (Proxy @'Language.JSON) src tagged
       printed `shouldBe` Right src
 
     it "should roundtrip exactly over a wholly-modified tree" $ do
-      let tagged = mark Modified tree
+      let tagged = mark Refactored tree
       let printed = runReprinter (Proxy @'Language.JSON) src tagged
       printed `shouldBe` Right src
 
     it "should be able to parse the output of a refactor" $ do
-      let tagged = increaseNumbers (mark Modified tree)
+      let tagged = increaseNumbers (mark Refactored tree)
       let (Right printed) = runReprinter (Proxy @'Language.JSON) src tagged
       tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
-      length tree `shouldSatisfy` (/= 0)
+      length tree' `shouldSatisfy` (/= 0)
