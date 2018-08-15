@@ -81,6 +81,8 @@ instance ( Member (Allocator address Abstract) effects
   liftBitwise _ _ = pure Abstract
   liftBitwise2 _ _ _ = pure Abstract
 
+  unsignedRShift _ _ = pure Abstract
+
   liftComparison _ _ _ = pure Abstract
 
   loop f = f empty
