@@ -3,6 +3,7 @@ module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , ModuleEffects
+, ValueEffects
 , evaluate
 , traceResolve
 -- * Preludes
@@ -85,6 +86,10 @@ type ModuleEffects address value rest
   ': Reader ModuleInfo
   ': rest
 
+type ValueEffects address value rest
+  =  Function address value
+  ': rest
+
 evaluate :: ( AbstractValue address value valueEffects
             , Declarations term
             , Effects effects
@@ -107,7 +112,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Ord address
             , Recursive term
             , moduleEffects ~ ModuleEffects address value effects
-            , valueEffects ~ (Function address value ': moduleEffects)
+            , valueEffects ~ ValueEffects address value moduleEffects
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
