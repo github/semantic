@@ -399,7 +399,11 @@ instance Eq1 Complement where liftEq = genericLiftEq
 instance Ord1 Complement where liftCompare = genericLiftCompare
 instance Show1 Complement where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Complement
+instance Evaluatable Complement where
+  eval (Complement a) = do
+    a' <- subtermValue a
+    liftBitwise complement a' >>= rvalBox
+    -- TODO: fix this; it's currently incrementing instead of producing complement
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
