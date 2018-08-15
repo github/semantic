@@ -73,6 +73,7 @@ import qualified Data.ByteString as B
 import qualified Data.Set as Set
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
+import Semantic.Graph (ConcreteEff)
 import Semantic.Telemetry (LogQueue, StatQueue)
 import System.Exit (die)
 import Control.Exception (displayException)
