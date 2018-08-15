@@ -365,7 +365,6 @@ instance Show1 LShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LShift where
   eval (LShift a b) = do
     a' <- subtermValue a
-    trace "hello"
     b' <- subtermValue b
     liftBitwise2 shiftL' a' b' >>= rvalBox
     where
@@ -377,7 +376,13 @@ data RShift a = RShift { left :: a, right :: a }
 instance Eq1 RShift where liftEq = genericLiftEq
 instance Ord1 RShift where liftCompare = genericLiftCompare
 instance Show1 RShift where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable RShift
+instance Evaluatable RShift where
+  eval (RShift a b) = do
+    a' <- subtermValue a
+    b' <- subtermValue b
+    liftBitwise2 shiftR' a' b' >>= rvalBox
+    where
+      shiftR' a b = shiftR a (fromIntegral (toInteger b))
 
 data UnsignedRShift a = UnsignedRShift { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
