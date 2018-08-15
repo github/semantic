@@ -52,6 +52,7 @@ instance Lower (Bindings address) where
 instance Show address => Show (Bindings address) where
   showsPrec d = showsUnaryWith showsPrec "Bindings" d . pairs
 
+
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.

@@ -52,4 +52,4 @@ instance (Ord address, Ord value) => Reducer (address, value) (Heap address valu
   snoc (Heap heap) (addr, a) = Heap (snoc heap (addr, a))
 
 instance (Show address, Show value) => Show (Heap address value) where
-  showsPrec d = showsUnaryWith showsPrec "Heap" d . Monoidal.pairs . unHeap
+  showsPrec d = showsUnaryWith showsPrec "Heap" d . map (second toList) . Monoidal.pairs . unHeap
