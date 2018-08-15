@@ -11,6 +11,7 @@ import Diffing.Algorithm hiding (Delete)
 import Prologue hiding (index, Member, This, null)
 import Prelude hiding (null)
 import Proto3.Suite.Class
+import Data.Word
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -391,6 +392,10 @@ instance Eq1 UnsignedRShift where liftEq = genericLiftEq
 instance Ord1 UnsignedRShift where liftCompare = genericLiftCompare
 instance Show1 UnsignedRShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable UnsignedRShift where
+  eval (UnsignedRShift a b) = do
+    a' <- subtermValue a
+    b' <- subtermValue b
+    unsignedRShift a' b' >>= rvalBox
 
 newtype Complement a = Complement { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
