@@ -11,7 +11,6 @@ import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
-import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -52,26 +51,6 @@ justEvaluating
   . runResolutionError
   . runAddressError
   . runValueError
-
-newtype UtilEff address rest a = UtilEff
-  { runUtilEff :: Eff (  ValueEffects  address (Value address (UtilEff address rest))
-                      (  ModuleEffects address (Value address (UtilEff address rest))
-                      (  Reader Span
-                      ': Reader PackageInfo
-                      ': Modules address
-                      ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                      ': Resumable (BaseError (ValueError address (UtilEff address rest)))
-                      ': Resumable (BaseError (AddressError address (Value address (UtilEff address rest))))
-                      ': Resumable (BaseError ResolutionError)
-                      ': Resumable (BaseError EvalError)
-                      ': Resumable (BaseError (EnvironmentError address))
-                      ': Resumable (BaseError (UnspecializedError (Value address (UtilEff address rest))))
-                      ': Resumable (BaseError (LoadError address))
-                      ': Fresh
-                      ': State (Heap address (Value address (UtilEff address rest)))
-                      ': rest
-                      ))) a
-  }
 
 checking
   = runM @_ @IO
@@ -120,7 +99,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
+  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise _))
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (runReader (packageInfo package)
