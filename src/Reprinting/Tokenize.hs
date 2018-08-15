@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 
 module Reprinting.Tokenize
   ( module Data.Reprinting.Token
@@ -21,7 +21,6 @@ module Reprinting.Tokenize
 import Prelude hiding (fail, log)
 import Prologue hiding (Element)
 
-import Control.Monad
 import Control.Monad.Effect
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Reader
