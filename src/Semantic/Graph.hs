@@ -204,7 +204,6 @@ type ConcreteEffects address rest
   ': Resumable (BaseError (LoadError address))
   ': Fresh
   ': State (Heap address (Value address (ConcreteEff address rest)))
-  ': State (Graph ModuleInfo)
   ': rest
 
 newtype ConcreteEff address outerEffects a = ConcreteEff
