@@ -171,9 +171,10 @@ runImportGraph :: forall effs lang term vertex.
                -> Eff effs (Graph vertex)
 runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
-      extractGraph (_, (graph, _)) = graph >>= f
+      extractGraph (graph, _) = graph >>= f
       runImportGraphAnalysis
         = runState lowerBound
+        . runState lowerBound
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -182,7 +183,6 @@ runImportGraph lang (package :: Package term) f =
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) effs))
@@ -198,7 +198,6 @@ type ConcreteEffects address rest
   ': Reader PackageInfo
   ': Modules address
   ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-  ': State (Graph ModuleInfo)
   ': Resumable (BaseError (ValueError address (ConcreteEff address rest)))
   ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
   ': Resumable (BaseError ResolutionError)
@@ -208,6 +207,7 @@ type ConcreteEffects address rest
   ': Resumable (BaseError (LoadError address))
   ': Fresh
   ': State (Heap address (Value address (ConcreteEff address rest)))
+  ': State (Graph ModuleInfo)
   ': rest
 
 newtype ConcreteEff address outerEffects a = ConcreteEff
