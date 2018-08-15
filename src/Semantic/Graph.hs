@@ -123,35 +123,33 @@ runCallGraph lang includePackages modules package = do
         . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects Abstract.runFunction modules))
 
-runImportGraphToModuleInfos ::
-                  ( Declarations term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasPrelude lang
-                  , HasPostlude lang
-                  , Member Trace effs
-                  , Recursive term
-                  , Effects effs
-                  )
-               => Proxy lang
-               -> Package term
-               -> Eff effs (Graph Vertex)
+runImportGraphToModuleInfos :: ( Declarations term
+                               , Evaluatable (Base term)
+                               , FreeVariables term
+                               , HasPrelude lang
+                               , HasPostlude lang
+                               , Member Trace effs
+                               , Recursive term
+                               , Effects effs
+                               )
+                            => Proxy lang
+                            -> Package term
+                            -> Eff effs (Graph Vertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraphToModules ::
-                  ( Declarations term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasPrelude lang
-                  , HasPostlude lang
-                  , Member Trace effs
-                  , Recursive term
-                  , Effects effs
-                  )
-               => Proxy lang
-               -> Package term
-               -> Eff effs (Graph (Module term))
+runImportGraphToModules :: ( Declarations term
+                           , Evaluatable (Base term)
+                           , FreeVariables term
+                           , HasPrelude lang
+                           , HasPostlude lang
+                           , Member Trace effs
+                           , Recursive term
+                           , Effects effs
+                           )
+                        => Proxy lang
+                        -> Package term
+                        -> Eff effs (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
 
