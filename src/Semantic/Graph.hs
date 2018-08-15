@@ -123,7 +123,7 @@ runCallGraph lang includePackages modules package = do
         . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects Abstract.runFunction modules))
 
-runImportGraphToModuleInfos :: forall effs lang term.
+runImportGraphToModuleInfos ::
                   ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
@@ -139,7 +139,7 @@ runImportGraphToModuleInfos :: forall effs lang term.
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraphToModules :: forall effs lang term.
+runImportGraphToModules ::
                   ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
@@ -155,8 +155,7 @@ runImportGraphToModules :: forall effs lang term.
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraph :: forall effs lang term vertex.
-                  ( Declarations term
+runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
