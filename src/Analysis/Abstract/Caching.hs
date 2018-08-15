@@ -5,9 +5,12 @@ module Analysis.Abstract.Caching
 , caching
 ) where
 
+import Analysis.Abstract.Configuration
 import Control.Abstract
 import Data.Abstract.Cache
 import Data.Abstract.BaseError
+import Data.Abstract.Environment
+import Data.Abstract.Heap
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Prologue

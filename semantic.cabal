@@ -21,6 +21,7 @@ library
                      -- Analyses & term annotations
                        Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
+                     , Analysis.Abstract.Configuration
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
