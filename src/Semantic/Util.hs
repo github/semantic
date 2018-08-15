@@ -54,8 +54,8 @@ justEvaluating
   . runValueError
 
 newtype UtilEff address rest a = UtilEff
-  { runUtilEff :: Eff (  Function address (Value address (UtilEff address rest))
-                      ': Exc (LoopControl address)
+  { runUtilEff :: Eff (  ValueEffects address (Value address (UtilEff address rest))
+                      (  Exc (LoopControl address)
                       ': Exc (Return address)
                       ': Env address
                       ': Deref (Value address (UtilEff address rest))
@@ -75,7 +75,7 @@ newtype UtilEff address rest a = UtilEff
                       ': Fresh
                       ': State (Heap address (Value address (UtilEff address rest)))
                       ': rest
-                      ) a
+                      )) a
   }
 
 checking
