@@ -193,25 +193,27 @@ runImportGraph lang (package :: Package term) f =
         . Hole.runDeref Precise.handleDeref
   in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
+type ConcreteEffects address rest
+  =  Reader Span
+  ': Reader PackageInfo
+  ': Modules address
+  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+  ': State (Graph ModuleInfo)
+  ': Resumable (BaseError (ValueError address (ConcreteEff address rest)))
+  ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
+  ': Resumable (BaseError ResolutionError)
+  ': Resumable (BaseError EvalError)
+  ': Resumable (BaseError (EnvironmentError address))
+  ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address rest))))
+  ': Resumable (BaseError (LoadError address))
+  ': Fresh
+  ': State (Heap address (Value address (ConcreteEff address rest)))
+  ': rest
+
 newtype ConcreteEff address outerEffects a = ConcreteEff
-  { runConcreteEff :: Eff (  ValueEffects  address (Value address (ConcreteEff address outerEffects))
-                          (  ModuleEffects address (Value address (ConcreteEff address outerEffects))
-                          (  Reader Span
-                          ': Reader PackageInfo
-                          ': Modules address
-                          ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                          ': State (Graph ModuleInfo)
-                          ': Resumable (BaseError (ValueError address (ConcreteEff address outerEffects)))
-                          ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address outerEffects))))
-                          ': Resumable (BaseError ResolutionError)
-                          ': Resumable (BaseError EvalError)
-                          ': Resumable (BaseError (EnvironmentError address))
-                          ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address outerEffects))))
-                          ': Resumable (BaseError (LoadError address))
-                          ': Fresh
-                          ': State (Heap address (Value address (ConcreteEff address outerEffects)))
-                          ': outerEffects
-                          ))) a
+  { runConcreteEff :: Eff (ValueEffects  address (Value address (ConcreteEff address outerEffects))
+                          (ModuleEffects address (Value address (ConcreteEff address outerEffects))
+                          (ConcreteEffects address outerEffects))) a
   }
 
 
