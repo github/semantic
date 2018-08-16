@@ -129,6 +129,7 @@ library
                      , Language.Haskell.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
+                     , Language.JSON.Translate
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax
