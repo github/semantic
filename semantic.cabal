@@ -35,7 +35,6 @@ library
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
-                     , Control.Abstract.Addressable
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
@@ -48,7 +47,10 @@ library
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
                      -- Datatypes for abstract interpretation
-                     , Data.Abstract.Address
+                     , Data.Abstract.Address.Hole
+                     , Data.Abstract.Address.Located
+                     , Data.Abstract.Address.Monovariant
+                     , Data.Abstract.Address.Precise
                      , Data.Abstract.BaseError
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
@@ -162,6 +164,7 @@ library
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Parse
+                     , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Telemetry
@@ -200,6 +203,7 @@ library
                      , gitrev
                      , Glob
                      , hashable
+                     , haskeline
                      , hscolour
                      , http-client
                      , http-client-tls
@@ -308,12 +312,10 @@ test-suite test
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , algebraic-graphs
-                     , array
                      , async
                      , base
                      , bifunctors
                      , bytestring
-                     , comonad
                      , containers
                      , effects
                      , fastsum
@@ -366,7 +368,6 @@ test-suite doctests
   ghc-options:         -dynamic -threaded -j
   build-depends:       base
                      , doctest
-                     , QuickCheck
 
 benchmark evaluation
   hs-source-dirs:      bench

@@ -228,15 +228,18 @@ instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
-runFunction :: ( Member (Allocator address Type) effects
-               , Member (Deref address Type) effects
+runFunction :: ( Member (Allocator address) effects
+               , Member (Deref Type) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError TypeError)) effects
+               , Member (Resumable (BaseError (AddressError address Type))) effects
+               , Member (State (Heap address Type)) effects
                , Member (State TypeMap) effects
+               , Ord address
                , PureEffects effects
                )
             => Evaluator address Type (Abstract.Function address Type ': effects) a
@@ -277,14 +280,17 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address Type) effects
-         , Member (Deref address Type) effects
+instance ( Member (Allocator address) effects
+         , Member (Deref Type) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address Type))) effects
          , Member (Resumable (BaseError TypeError)) effects
+         , Member (State (Heap address Type)) effects
          , Member (State TypeMap) effects
+         , Ord address
          )
       => AbstractValue address Type effects where
   array fields = do
