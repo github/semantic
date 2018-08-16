@@ -8,6 +8,7 @@ module Semantic.Config
   , debugOptions
   , lookupStatsAddr
   , withHaystackFromConfig
+  , logOptionsFromConfig
   , withLoggerFromConfig
   , withStatterFromConfig
   , withTelemetry
@@ -93,19 +94,23 @@ withTelemetry config action =
   withStatterFromConfig config $ \statter ->
     action (TelemetryQueues logger statter haystack)
 
+logOptionsFromConfig :: Config -> LogOptions
+logOptionsFromConfig Config{..} = LogOptions
+  { logOptionsLevel     = optionsLogLevel configOptions
+  , logOptionsFormatter = configLogFormatter
+  , logOptionsContext   = logOptionsContext' configIsTerminal
+  }
+  where logOptionsContext' = \case
+          False -> [ ("app", configAppName)
+                   , ("pid", show configProcessID)
+                   , ("hostname", configHostName)
+                   , ("sha", buildSHA)
+                   ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
+          _ -> []
+
+
 withLoggerFromConfig :: Config -> (LogQueue -> IO c) -> IO c
-withLoggerFromConfig Config{..} = withLogger opts configMaxTelemetyQueueSize
-  where opts = LogOptions { logOptionsLevel     = optionsLogLevel configOptions
-                          , logOptionsFormatter = configLogFormatter
-                          , logOptionsContext   = logOptionsContext' configIsTerminal
-                          }
-        logOptionsContext' = \case
-                            False -> [ ("app", configAppName)
-                                     , ("pid", show configProcessID)
-                                     , ("hostname", configHostName)
-                                     , ("sha", buildSHA)
-                                     ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
-                            _ -> []
+withLoggerFromConfig config = withLogger (logOptionsFromConfig config) (configMaxTelemetyQueueSize config)
 
 
 withHaystackFromConfig :: Config -> Haystack.ErrorLogger -> (HaystackQueue -> IO c) -> IO c
