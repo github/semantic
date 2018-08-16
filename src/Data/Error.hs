@@ -4,15 +4,15 @@ module Data.Error
   , formatError
   , makeError
   , showExpectation
+  , showExcerpt
   , withSGRCode
   ) where
 
 import Prologue
 
-import Data.ByteString (isSuffixOf)
-import Data.ByteString.Char8 (pack, unpack)
+import Data.ByteString.Char8 (unpack)
 import Data.Ix (inRange)
-import Data.List (intersperse)
+import Data.List (intersperse, isSuffixOf)
 import System.Console.ANSI
 
 import Data.Blob
@@ -43,19 +43,29 @@ type Colourize = Bool
 
 -- | Format an 'Error', optionally with reference to the source where it occurred.
 formatError :: IncludeSource -> Colourize -> Blob -> Error String -> String
-formatError includeSource colourize Blob{..} Error{..}
+formatError includeSource colourize blob@Blob{..} Error{..}
   = ($ "")
   $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan path errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation colourize errorExpected errorActual . showChar '\n'
-  . (if includeSource
-    then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
-       . showString (replicate (succ (posColumn (spanStart errorSpan) + lineNumberDigits)) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showChar '^' . showChar '\n')
-    else id)
+  . (if includeSource then showExcerpt colourize errorSpan blob else id)
   . showCallStack colourize callStack . showChar '\n'
-  where context = maybe "\n" (sourceBytes . sconcat) (nonEmpty [ fromUTF8 (pack (showLineNumber i)) <> fromUTF8 ": " <> l | (i, l) <- zip [1..] (sourceLines blobSource), inRange (posLine (spanStart errorSpan) - 2, posLine (spanStart errorSpan)) i ])
+  where
+    path = Just $ if includeSource then blobPath else "<filtered>"
+
+showExcerpt :: Colourize -> Span -> Blob -> ShowS
+showExcerpt colourize Span{..} Blob{..}
+  = showString context . (if "\n" `isSuffixOf` context then id else showChar '\n')
+  . showString (replicate (caretPaddingWidth + lineNumberDigits) ' ') . withSGRCode colourize [SetColor Foreground Vivid Green] (showString caret) . showChar '\n'
+  where context = fold contextLines
+        contextLines = [ showLineNumber i <> ": " <> unpack (sourceBytes l)
+                       | (i, l) <- zip [1..] (sourceLines blobSource)
+                       , inRange (posLine spanStart - 2, posLine spanStart) i
+                       ]
         showLineNumber n = let s = show n in replicate (lineNumberDigits - length s) ' ' <> s
-        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine (spanStart errorSpan)) :: Double)))
-        path = Just $ if includeSource then blobPath else "<filtered>"
+        lineNumberDigits = succ (floor (logBase 10 (fromIntegral (posLine spanStart) :: Double)))
+        caretPaddingWidth = succ (posColumn spanStart)
+        caret | posLine spanStart == posLine spanEnd = replicate (max 1 (posColumn spanEnd - posColumn spanStart)) '^'
+              | otherwise                            = "^..."
 
 withSGRCode :: Colourize -> [SGR] -> ShowS -> ShowS
 withSGRCode useColour code content =
