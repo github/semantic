@@ -1,13 +1,17 @@
-{-# LANGUAGE FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, OverloadedLists,
-             ScopedTypeVariables, TupleSections, TypeFamilyDependencies, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, OverloadedLists,
+             ScopedTypeVariables, TupleSections, TypeFamilyDependencies, TypeApplications, TypeOperators #-}
 
 module Reprinting.Translate
   ( Translate (..)
+  , Translation (..)
   , TranslationException (..)
   , Splice (..)
   , Layout (..)
   , Indent (..)
   , translating
+
+  , emit
+  , splice
   ) where
 
 import Prologue hiding (Element)
@@ -24,6 +28,64 @@ import           Lens.Micro
 import           Data.Language
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
+
+
+class Translation (lang :: Language) where
+  translation :: (Element -> [Context] -> Translator ()) -> Element -> [Context] -> Translator ()
+
+type Translator = Eff '[State [Context], Writer (Seq Splice), Exc TranslationException]
+
+translating' :: forall lang . (Translation lang) => Seq Token -> Either TranslationException (Seq Splice)
+translating' tokens
+  = run
+  . Exc.runError
+  . fmap fst
+  . runWriter
+  . fmap snd
+  . runState mempty
+  $ translate @lang tokens
+
+translate :: forall lang . (Translation lang) => Seq Token -> Translator ()
+translate = traverse_ step where
+  step :: Token -> Translator ()
+  step t = case t of
+    Chunk source -> emit $ splice (Source.toText source)
+
+    TControl ctl -> case ctl of
+      Log _   -> pure mempty
+      Enter c -> enterContext c
+      Exit c  -> exitContext c
+
+    TElement content -> get >>= translation @lang defaultTranslation content
+
+defaultTranslation :: Element -> [Context] -> Translator ()
+defaultTranslation content context = case (content, context) of
+  (Fragment f, _)      -> emit $ splice f
+
+  (Open, List:_)         -> emit $ splice "["
+  (Open, Associative:_)  -> emit $ splice "{"
+
+  (Close, List:_)        -> emit $ splice "]"
+  (Close, Associative:_) -> emit $ splice "}"
+
+  (Separator, List:_)       -> emit $ splice ","
+  (Separator, Associative:_) -> emit $ splice ":"
+  _ -> Exc.throwError (Unexpected "invalid context")
+
+emit :: Seq Splice -> Translator ()
+emit = tell
+
+enterContext :: Context -> Translator ()
+enterContext c = modify' (c :)
+
+exitContext :: Context -> Translator ()
+exitContext c = do
+  current <- get
+  case current of
+    (x:xs) | x == c -> modify' (const xs)
+    _ -> Exc.throwError (Unexpected "invalid context")
+
+
 
 -- | Once the 'Tokenize' algebra has yielded a sequence of tokens,
 -- we need to apply per-language interpretation to each token so as to
