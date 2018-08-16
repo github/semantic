@@ -29,7 +29,10 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
-import           Data.Abstract.Address
+import           Data.Abstract.Address.Hole as Hole
+import           Data.Abstract.Address.Located as Located
+import           Data.Abstract.Address.Monovariant as Monovariant
+import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -38,6 +41,7 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runFunction, runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
+import           Data.Blob
 import           Data.Coerce
 import           Data.Graph
 import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
@@ -63,11 +67,11 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
          -> Eff effs (Graph Vertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- parsePackage parser project
+    package <- fmap snd <$> parsePackage parser project
     runImportGraphToModuleInfos lang package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- parsePackage parser project
+    package <- fmap snd <$> parsePackage parser project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
@@ -114,7 +118,10 @@ runCallGraph lang includePackages modules package = do
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm Abstract.runFunction modules))
+      runAddressEffects
+        = Hole.runAllocator (Located.handleAllocator Monovariant.handleAllocator)
+        . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects Abstract.runFunction modules))
 
 runImportGraphToModuleInfos :: forall effs lang term.
                   ( Declarations term
@@ -181,15 +188,18 @@ runImportGraph lang (package :: Package term) f =
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+      runAddressEffects
+        = Hole.runAllocator Precise.handleAllocator
+        . Hole.runDeref Precise.handleDeref
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 newtype ImportGraphEff address outerEffects a = ImportGraphEff
   { runImportGraphEff :: Eff (  Function address (Value address (ImportGraphEff address outerEffects))
                              ': Exc (LoopControl address)
                              ': Exc (Return address)
                              ': Env address
-                             ': Deref address (Value address (ImportGraphEff address outerEffects))
-                             ': Allocator address (Value address (ImportGraphEff address outerEffects))
+                             ': Deref (Value address (ImportGraphEff address outerEffects))
+                             ': Allocator address
                              ': Reader ModuleInfo
                              ': Reader Span
                              ': Reader PackageInfo
@@ -214,8 +224,8 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
 parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
-             -> Eff effs (Package term)
-parsePackage parser project@Project{..} = do
+             -> Eff effs (Package (Blob, term))
+parsePackage parser project = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
   let pkg = Package.fromModules n p resMap
@@ -224,17 +234,13 @@ parsePackage parser project@Project{..} = do
   where
     n = name (projectName project)
 
-    -- | Parse all files in a project into 'Module's.
-    parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
+    parseModules parser p = distributeFor (projectFiles p) (parseModule p parser)
 
--- | Parse a file into a 'Module'.
-parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
-parseModule proj parser file = do
-  mBlob <- readFile proj file
-  case mBlob of
-    Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
-    Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
+    parseModule proj parser file = do
+      mBlob <- readFile proj file
+      case mBlob of
+        Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
+        Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects

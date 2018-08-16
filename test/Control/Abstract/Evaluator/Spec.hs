@@ -1,10 +1,10 @@
 {-# LANGUAGE TypeOperators #-}
 module Control.Abstract.Evaluator.Spec
 ( spec
-, SpecEff(..)
 ) where
 
 import Control.Abstract
+import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
@@ -42,8 +42,8 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . runDeref
-  . runAllocator @Precise @_ @Val
+  . Precise.runDeref @_ @Val
+  . Precise.runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
@@ -59,8 +59,8 @@ newtype SpecEff a = SpecEff
                        , Exc (LoopControl Precise)
                        , Exc (Return Precise)
                        , Env Precise
-                       , Allocator Precise Val
-                       , Deref Precise Val
+                       , Allocator Precise
+                       , Deref Val
                        , Resumable (BaseError (AddressError Precise Val))
                        , Resumable (BaseError (EnvironmentError Precise))
                        , Resumable (BaseError (ValueError Precise SpecEff))

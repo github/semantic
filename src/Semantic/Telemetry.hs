@@ -42,7 +42,7 @@ module Semantic.Telemetry
 , writeLog
 , writeStat
 , time
-, Telemetry
+, Telemetry(..)
 , runTelemetry
 , ignoreTelemetry
 ) where

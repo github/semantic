@@ -90,6 +90,11 @@ type Syntax =
    , Literal.String
    , Literal.TextElement
    , Literal.Tuple
+   , Python.Syntax.Ellipsis
+   , Python.Syntax.FutureImport
+   , Python.Syntax.Import
+   , Python.Syntax.QualifiedImport
+   , Python.Syntax.QualifiedAliasedImport
    , Python.Syntax.Redirect
    , Statement.Assignment
    , Statement.Break
@@ -107,10 +112,6 @@ type Syntax =
    , Statement.Try
    , Statement.While
    , Statement.Yield
-   , Python.Syntax.Ellipsis
-   , Python.Syntax.Import
-   , Python.Syntax.QualifiedImport
-   , Python.Syntax.QualifiedAliasedImport
    , Syntax.Context
    , Syntax.Empty
    , Syntax.Error
@@ -407,6 +408,7 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 import' :: Assignment Term
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
         <|> makeTerm <$> symbol ImportFromStatement <*> children (Python.Syntax.Import <$> importPath <*> (wildcard <|> some (aliasImportSymbol <|> importSymbol)))
+        <|> makeTerm <$> symbol FutureImportStatement <*> children (Python.Syntax.FutureImport <$> some (aliasImportSymbol <|> importSymbol))
   where
     -- `import a as b`
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)

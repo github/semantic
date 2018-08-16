@@ -9,7 +9,8 @@ import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
-import           Data.Abstract.Address
+import           Data.Abstract.Address.Monovariant as Monovariant
+import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -40,9 +41,9 @@ import           Text.Show.Pretty (ppShow)
 
 justEvaluating
   = runM
+  . runPrintingTrace
   . runState lowerBound
   . runFresh 0
-  . runPrintingTrace
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -52,37 +53,36 @@ justEvaluating
   . runAddressError
   . runValueError
 
-newtype UtilEff a = UtilEff
-  { runUtilEff :: Eff '[ Function Precise (Value Precise UtilEff)
-                       , Exc (LoopControl Precise)
-                       , Exc (Return Precise)
-                       , Env Precise
-                       , Deref Precise (Value Precise UtilEff)
-                       , Allocator Precise (Value Precise UtilEff)
-                       , Reader ModuleInfo
-                       , Modules Precise
-                       , Reader (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
-                       , Reader Span
-                       , Reader PackageInfo
-                       , Resumable (BaseError (ValueError Precise UtilEff))
-                       , Resumable (BaseError (AddressError Precise (Value Precise UtilEff)))
-                       , Resumable (BaseError ResolutionError)
-                       , Resumable (BaseError EvalError)
-                       , Resumable (BaseError (EnvironmentError Precise))
-                       , Resumable (BaseError (UnspecializedError (Value Precise UtilEff)))
-                       , Resumable (BaseError (LoadError Precise))
-                       , Trace
-                       , Fresh
-                       , State (Heap Precise (Value Precise UtilEff))
-                       , Lift IO
-                       ] a
+newtype UtilEff address rest a = UtilEff
+  { runUtilEff :: Eff (  Function address (Value address (UtilEff address rest))
+                      ': Exc (LoopControl address)
+                      ': Exc (Return address)
+                      ': Env address
+                      ': Deref (Value address (UtilEff address rest))
+                      ': Allocator address
+                      ': Reader ModuleInfo
+                      ': Modules address
+                      ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+                      ': Reader Span
+                      ': Reader PackageInfo
+                      ': Resumable (BaseError (ValueError address (UtilEff address rest)))
+                      ': Resumable (BaseError (AddressError address (Value address (UtilEff address rest))))
+                      ': Resumable (BaseError ResolutionError)
+                      ': Resumable (BaseError EvalError)
+                      ': Resumable (BaseError (EnvironmentError address))
+                      ': Resumable (BaseError (UnspecializedError (Value address (UtilEff address rest))))
+                      ': Resumable (BaseError (LoadError address))
+                      ': Fresh
+                      ': State (Heap address (Value address (UtilEff address rest)))
+                      ': rest
+                      ) a
   }
 
 checking
   = runM @_ @IO
+  . runPrintingTrace
   . runState (lowerBound @(Heap Monovariant Type))
   . runFresh 0
-  . runPrintingTrace
   . runTermEvaluator @_ @Monovariant @Type
   . caching
   . providingLiveSet
@@ -96,7 +96,7 @@ checking
   . runTypes
 
 evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser
-evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)       rubyParser
 evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
 evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser
@@ -107,7 +107,7 @@ typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Lan
 
 callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)
-  package <- parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+  package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
@@ -122,26 +122,26 @@ data TaskConfig = TaskConfig Config LogQueue StatQueue
 
 evaluateProject' (TaskConfig config logger statter) proxy parser paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
   blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)
-  package <- fmap quieterm <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
+  package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise UtilEff)
+  pure (runTermEvaluator @_ @_ @(Value Precise (UtilEff Precise _))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (Concrete.runFunction coerce coerce) modules))))))
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runFunction coerce coerce) modules))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path (Language.reflect proxy) []
-  package <- fmap quieterm <$> parsePackage parser project
+  package <- fmap (quieterm . snd) <$> parsePackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   pure (runReader (packageInfo package)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans Type.runFunction modules)))))
+       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) Type.runFunction modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term

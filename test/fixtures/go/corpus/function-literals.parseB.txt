@@ -2,22 +2,19 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Assignment
       (Identifier)
       (Function
-        (Empty)
-        (Empty)
-        (Statements
-          (Identifier)
-          (Identifier))
         (Statements
           (Statements
             (Identifier))
           (Statements
             (Identifier)))
+        (Empty)
+        (Statements
+          (Identifier)
+          (Identifier))
         (Return
           (Statements
             (Integer)

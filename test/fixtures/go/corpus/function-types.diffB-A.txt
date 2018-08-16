@@ -2,9 +2,7 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements
       (Type
       { (Identifier)
@@ -19,18 +17,16 @@
       { (Identifier)
       ->(Identifier) }
         (Function
+        {-(Statements
+          {-(Identifier)-})-}
           (Statements
-          {-(Statements
-            {-(Identifier)-})-}
-            (Statements
-              (Identifier))
-          {+(Statements
-            {+(Identifier)+})+})
+            (Identifier))
+        {+(Statements
+          {+(Identifier)+})+}
           (Statements
             (Statements
             {+(Identifier)+}
             {-(BidirectionalChannel
               {-(Identifier)-})-})
             (Statements
-              (Identifier)))
-          (Empty))))))
+              (Identifier))))))))

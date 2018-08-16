@@ -15,7 +15,5 @@
   {-(QualifiedImport
     {-(Identifier)-})-})
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements)))

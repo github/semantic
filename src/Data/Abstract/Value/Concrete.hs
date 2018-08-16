@@ -63,14 +63,18 @@ instance Ord address => ValueRoots address (Value address body) where
     | otherwise                = mempty
 
 
-runFunction :: ( Member (Allocator address (Value address body)) effects
+runFunction :: ( Member (Allocator address) effects
+               , Member (Deref (Value address body)) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader PackageInfo) effects
                , Member (Reader Span) effects
+               , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                , Member (Resumable (BaseError (ValueError address body))) effects
+               , Member (State (Heap address (Value address body))) effects
+               , Ord address
                , PureEffects effects
                )
             => (body address -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) address)
@@ -113,7 +117,12 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
-materializeEnvironment :: ( Member (Deref address (Value address body)) effects
+materializeEnvironment :: ( Member (Deref (Value address body)) effects
+                          , Member (Reader ModuleInfo) effects
+                          , Member (Reader Span) effects
+                          , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
+                          , Member (State (Heap address (Value address body))) effects
+                          , Ord address
                           )
                        => Value address body
                        -> Evaluator address (Value address body) effects (Maybe (Environment address))
@@ -137,8 +146,8 @@ materializeEnvironment val = do
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
-         , Member (Allocator address (Value address body)) effects
-         , Member (Deref address (Value address body)) effects
+         , Member (Allocator address) effects
+         , Member (Deref (Value address body)) effects
          , Member (Env address) effects
          , Member (Exc (LoopControl address)) effects
          , Member (Exc (Return address)) effects
@@ -147,6 +156,9 @@ instance ( Coercible body (Eff effects)
          , Member (Reader PackageInfo) effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (ValueError address body))) effects
+         , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
+         , Member (State (Heap address (Value address body))) effects
+         , Ord address
          , Show address
          )
       => AbstractValue address (Value address body) effects where
