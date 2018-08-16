@@ -41,6 +41,7 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runFunction, runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
+import           Data.Blob
 import           Data.Coerce
 import           Data.Graph
 import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
@@ -66,11 +67,11 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
          -> Eff effs (Graph Vertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- parsePackage parser project
+    package <- fmap snd <$> parsePackage parser project
     runImportGraphToModuleInfos lang package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- parsePackage parser project
+    package <- fmap snd <$> parsePackage parser project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
@@ -223,8 +224,8 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
 parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
-             -> Eff effs (Package term)
-parsePackage parser project@Project{..} = do
+             -> Eff effs (Package (Blob, term))
+parsePackage parser project = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
   let pkg = Package.fromModules n p resMap
@@ -233,17 +234,13 @@ parsePackage parser project@Project{..} = do
   where
     n = name (projectName project)
 
-    -- | Parse all files in a project into 'Module's.
-    parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
+    parseModules parser p = distributeFor (projectFiles p) (parseModule p parser)
 
--- | Parse a file into a 'Module'.
-parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
-parseModule proj parser file = do
-  mBlob <- readFile proj file
-  case mBlob of
-    Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
-    Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
+    parseModule proj parser file = do
+      mBlob <- readFile proj file
+      case mBlob of
+        Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
+        Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
