@@ -49,31 +49,34 @@ translate :: forall lang . (Translation lang) => Seq Token -> Translator ()
 translate = traverse_ step where
   step :: Token -> Translator ()
   step t = case t of
-    Chunk source -> emit $ splice (Source.toText source)
-
-    TControl ctl -> case ctl of
+    Chunk source     -> emit (Source.toText source)
+    TElement content -> get >>= translation @lang defaultTranslation content
+    TControl ctl     -> case ctl of
       Log _   -> pure mempty
       Enter c -> enterContext c
       Exit c  -> exitContext c
 
-    TElement content -> get >>= translation @lang defaultTranslation content
-
 defaultTranslation :: Element -> [Context] -> Translator ()
 defaultTranslation content context = case (content, context) of
-  (Fragment f, _)      -> emit $ splice f
+  (Fragment f, _) -> emit f
 
-  (Open, List:_)         -> emit $ splice "["
-  (Open, Associative:_)  -> emit $ splice "{"
+  (Truth t, _) -> emit $ if t then "true" else "false"
+  (Nullity, _) -> emit "null"
 
-  (Close, List:_)        -> emit $ splice "]"
-  (Close, Associative:_) -> emit $ splice "}"
+  (Open, List:_)        -> emit "["
+  (Open, Associative:_) -> emit "{"
 
-  (Separator, List:_)       -> emit $ splice ","
-  (Separator, Associative:_) -> emit $ splice ":"
+  (Close, List:_)        -> emit "]"
+  (Close, Associative:_) -> emit "}"
+
+  (Separator, List:_)        -> emit ","
+  (Separator, Associative:_) -> emit ","
+  (Separator, Pair:_)        -> emit ":"
+
   _ -> Exc.throwError (Unexpected "invalid context")
 
-emit :: Seq Splice -> Translator ()
-emit = tell
+emit :: Text -> Translator ()
+emit = tell . splice
 
 enterContext :: Context -> Translator ()
 enterContext c = modify' (c :)
