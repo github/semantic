@@ -52,9 +52,9 @@ translating = flattened <~ autoT (Kleisli step) where
   translate el c = let emit = pure . splice el c in case (el, c) of
     (Fragment f, _) -> emit f
 
-    (Truth True, _)  -> emit "true"
-    (Truth False, _) -> emit "false"
-    (Nullity, _)     -> emit "null"
+    (Truth True, _)  -> emit "True"
+    (Truth False, _) -> emit "False"
+    (Nullity, _)     -> emit "Null"
 
     (Open, Just List)        -> emit "["
     (Open, Just Associative) -> emit "{"
