@@ -56,6 +56,7 @@ import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show.Pretty (ppShow)
 import Language.JSON.Translate
+import Reprinting.Pipeline
 
 justEvaluating
   = runM
@@ -348,3 +349,7 @@ testChangeKV = do
 testChangeKV' = do
   res <- translating @'Language.JSON prettyJSON . fst <$> testChangeKV
   putStrLn (either show (show . typeset) res)
+
+testPipeline = do
+  (src, tree) <- testJSONFile
+  pure $ runPipeline @'Language.JSON prettyJSON src (mark Refactored tree)

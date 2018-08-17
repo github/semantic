@@ -68,7 +68,7 @@ stages of the pipeline follows:
 -}
 
 {-# LANGUAGE AllowAmbiguousTypes, TypeApplications, ScopedTypeVariables, RankNTypes #-}
-module Reprinting.Pipeline ( runReprinter ) where
+module Reprinting.Pipeline ( runReprinter, runPipeline ) where
 
 import Prologue
 
@@ -80,15 +80,56 @@ import Reprinting.Translate
 import Reprinting.Typeset
 import Data.Record
 import Data.Term
-import Data.Source
+import qualified Data.Source as Source
+
+import Control.Monad.Effect as Effect
+import qualified Control.Monad.Effect.Exception as Exc
+import           Control.Monad.Effect.State
+import Control.Monad.Effect.Reader
+import           Control.Monad.Effect.Writer
+import Control.Rule
+import Control.Arrow
+import           Data.Machine hiding (Source)
+import           Data.Machine.Runner
+
+import           Data.Reprinting.Token
+import           Data.Sequence (singleton)
+
 
 -- | Given a 'Proxy' corresponding to the language of the provided
 -- 'Term' and the original 'Source' from which the provided 'Term' was
 -- passed, run the reprinting pipeline.
-runReprinter :: forall lang config fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang config)
-             => Source
+runReprinter :: forall lang config fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang config TranslatorEffs)
+             => Source.Source
              -> config
              -> Term a (Record fields)
-             -> Either TranslationException Source
+             -> Either TranslationException Source.Source
 runReprinter s config = fmap go . translating @lang config . tokenizing s
-  where go = fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset
+  where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset
+
+-- type PipelineEffs = '[Reader RPContext, State RPState, State [Context], Writer (Seq Splice), Exc TranslationException]
+
+runPipeline :: forall lang config fields a effs .
+  ( Show (Record fields)
+  , Tokenize a
+  , HasField fields History
+  , Translation lang config TranslatorEffs)
+            => config
+            -> Source.Source
+            -> Term a (Record fields)
+            -> Either TranslationException Source.Source
+runPipeline config s tree
+  = fmap go
+  . Effect.run
+  . Exc.runError
+  . fmap fst
+  . runWriter
+  . fmap snd
+  . runState (mempty :: [Context])
+  -- . runTranslatingEffs
+  . runT $ source (tokenizing s tree) ~>
+      machine (translatingRule @lang config)
+      -- machine (typeSettingRule) ~>
+      -- machine (prettyPrintingRule)
+
+  where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset

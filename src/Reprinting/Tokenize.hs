@@ -7,6 +7,7 @@ module Reprinting.Tokenize
   , remark
     -- * The Reprinter monad
   , Tokenizer
+  , TokenizerEffs
   , yield
   , control
   , within
@@ -14,13 +15,18 @@ module Reprinting.Tokenize
   , ignore
   -- * Tokenize interface
   , Tokenize (..)
+  -- , RPState (..)
+  -- , RPContext (..)
+  -- , Strategy (..)
   -- * Invocation/results
   , tokenizing
+  -- , tokenizingRule
   ) where
 
 import Prelude hiding (fail, log)
 import Prologue hiding (Element)
 
+import Control.Rule
 import Control.Monad.Effect
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Reader
@@ -40,6 +46,8 @@ import Data.Reprinting.Token
 -- consumer. Its primary interface is through the 'Tokenize'
 -- typeclass.
 type Tokenizer = Eff '[Reader RPContext, State RPState, Writer (Seq Token)]
+
+type TokenizerEffs = '[Reader RPContext, State RPState, Writer (Seq Token)]
 
 -- | Yield an 'Element' token in a 'Tokenizer' context.
 yield :: Element -> Tokenizer ()
@@ -88,6 +96,23 @@ tokenizing s t = let h = getField (termAnnotation t) in
   . runState (RPState 0)
   . runReader (RPContext s h Reprinting)
   $ foldSubterms descend t *> finish
+
+-- tokenizingRule ::
+--   ( Show (Record fields)
+--   , Tokenize a
+--   , HasField fields History
+--   , Member (Reader RPContext) effs
+--   , Member (State RPState) effs
+--   ) =>
+--   Source -> Rule effs (Term a (Record fields)) Token
+-- tokenizingRule s = fromEffect "tokenizing" (tokenize s)
+--
+-- tokenize ::
+--   ( Member (Reader RPContext) effs
+--   , Member (State RPState) effs
+--   ) =>
+--   Source -> Term a (Record fields) -> Eff effs Token
+-- tokenize = undefined
 
 -- Private interfaces
 

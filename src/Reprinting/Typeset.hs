@@ -1,7 +1,13 @@
-module Reprinting.Typeset (typeset) where
+module Reprinting.Typeset
+  ( typeset
+  , typeSettingRule
+  , prettyPrintingRule
+  ) where
 
 import Prologue
 
+import Control.Rule
+import Data.Source
 import Data.Text.Prettyprint.Doc
 import Reprinting.Translate
 
@@ -14,3 +20,11 @@ typeset = foldMap go where
   go (Directive Don't)          = mempty
   space Space = " "
   space Tab   = "\t"
+
+
+typeSettingRule :: Rule effs Splice (Doc a)
+typeSettingRule = undefined
+
+
+prettyPrintingRule :: Rule effs (Doc a) Source
+prettyPrintingRule = undefined
