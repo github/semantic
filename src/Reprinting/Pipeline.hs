@@ -99,7 +99,7 @@ import           Data.Sequence (singleton)
 -- | Given a 'Proxy' corresponding to the language of the provided
 -- 'Term' and the original 'Source' from which the provided 'Term' was
 -- passed, run the reprinting pipeline.
-runReprinter :: forall lang config fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang config TranslatorEffs)
+runReprinter :: forall lang config fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang config)
              => Source.Source
              -> config
              -> Term a (Record fields)
@@ -109,27 +109,24 @@ runReprinter s config = fmap go . translating @lang config . tokenizing s
 
 -- type PipelineEffs = '[Reader RPContext, State RPState, State [Context], Writer (Seq Splice), Exc TranslationException]
 
-runPipeline :: forall lang config fields a effs .
+runPipeline :: forall lang config fields a .
   ( Show (Record fields)
   , Tokenize a
   , HasField fields History
-  , Translation lang config TranslatorEffs)
-            => config
-            -> Source.Source
-            -> Term a (Record fields)
-            -> Either TranslationException Source.Source
+  , Translation lang config
+  )
+  => config
+  -> Source.Source
+  -> Term a (Record fields)
+  -> Either TranslationException Source.Source
 runPipeline config s tree
   = fmap go
   . Effect.run
   . Exc.runError
-  . fmap fst
-  . runWriter
   . fmap snd
   . runState (mempty :: [Context])
-  -- . runTranslatingEffs
-  . runT $ source (tokenizing s tree) ~>
-      machine (translatingRule @lang config)
-      -- machine (typeSettingRule) ~>
-      -- machine (prettyPrintingRule)
-
-  where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset
+  . foldT $ source (tokenizing s tree)
+      ~> machine (translatingRule @lang config)
+      ~> flattened
+      ~> machine (typeSettingRule)
+  where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions

@@ -1,7 +1,6 @@
 module Reprinting.Typeset
   ( typeset
   , typeSettingRule
-  , prettyPrintingRule
   ) where
 
 import Prologue
@@ -21,10 +20,13 @@ typeset = foldMap go where
   space Space = " "
   space Tab   = "\t"
 
-
 typeSettingRule :: Rule effs Splice (Doc a)
-typeSettingRule = undefined
-
-
-prettyPrintingRule :: Rule effs (Doc a) Source
-prettyPrintingRule = undefined
+typeSettingRule = fromFunction "typesetting" go where
+  go :: Splice -> Doc a
+  go (Insert t)                 = pretty t
+  go (Directive SoftWrap)       = softline
+  go (Directive (HardWrap 0 _)) = line
+  go (Directive (HardWrap i t)) = line <> stimes i (space t)
+  go (Directive Don't)          = mempty
+  space Space = " "
+  space Tab   = "\t"

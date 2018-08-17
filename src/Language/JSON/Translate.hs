@@ -19,24 +19,22 @@ data JSONTypeSetting = JSONTypeSetting { jsonPrettyPrint :: Bool }
 prettyJSON :: JSONTypeSetting
 prettyJSON = JSONTypeSetting True
 
-instance ( Member (State [Context]) effs
-         , Member (Writer (Seq Splice)) effs
-         , Member (Exc TranslationException) effs
-         ) => Translation 'JSON JSONTypeSetting effs where
+instance Translation 'JSON JSONTypeSetting where
   translation _ _ content context = case (content, context) of
-    (Fragment f, _) -> emit f
+    (Fragment f, _) -> Right $ splice f
 
-    (Truth t, _) -> emit $ if t then "true" else "false"
-    (Nullity, _) -> emit "null"
+    (Truth True, _)  -> Right $ splice "true"
+    (Truth False, _) -> Right $ splice "false"
+    (Nullity, _)     -> Right $ splice "null"
 
-    (Open, List:_)        -> emit "["
-    (Open, Associative:_) -> emit "{"
+    (Open, List:_)        -> Right $ splice "["
+    (Open, Associative:_) -> Right $ splice "{"
 
-    (Close, List:_)        -> emit "]"
-    (Close, Associative:_) -> emit "}"
+    (Close, List:_)        -> Right $ splice "]"
+    (Close, Associative:_) -> Right $ splice "}"
 
-    (Separator, List:_)        -> emit ","
-    (Separator, Associative:_) -> emit ","
-    (Separator, Pair:_)        -> emit ":"
+    (Separator, List:_)        -> Right $ splice ","
+    (Separator, Associative:_) -> Right $ splice ","
+    (Separator, Pair:_)        -> Right $ splice ":"
 
-    _ -> Exc.throwError (Unexpected "invalid context")
+    _ -> Left "JSON translate failed, unknown context"
