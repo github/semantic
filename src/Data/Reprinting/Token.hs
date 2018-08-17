@@ -16,7 +16,6 @@ import Data.Source (Source)
 
 
 
-
 -- | 'Token' encapsulates 'Element' and 'Control' tokens, as well as sliced
 -- portions of the original 'Source' for a given AST.
 data Token

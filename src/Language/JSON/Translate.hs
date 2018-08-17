@@ -1,17 +1,8 @@
-{-# LANGUAGE UndecidableInstances #-}
 module Language.JSON.Translate where
 
-import qualified Control.Monad.Effect.Exception as Exc
-import           Data.Language
-import           Data.Reprinting.Token
-import           Prologue
-import           Reprinting.Translate
-import           Reprinting.Pipeline
-
-import           Control.Monad.Effect.Exception (Exc)
-import           Control.Monad.Effect.State
-import           Control.Monad.Effect.Writer
-
+import Data.Language
+import Data.Reprinting.Token
+import Reprinting.Translate
 
 data JSONTypeSetting = JSONTypeSetting { jsonPrettyPrint :: Bool }
   deriving (Eq, Show)
