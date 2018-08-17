@@ -24,8 +24,10 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
+import qualified Data.ByteString.Char8 as BC
 import           Data.Blob
 import           Data.Coerce
+import qualified Data.Source as Source
 import           Data.Graph (topologicalSort)
 import           Data.History
 import qualified Data.Language as Language
@@ -296,55 +298,57 @@ testJSONFile = do
 --   putStrLn (either show (show . typeset) res)
 
 
-kvMatcher :: forall fs ann term
-           . ( Literal.KeyValue :< fs
-             , Literal.Array :< fs
-             , Literal.TextElement :< fs
-             , term ~ Term (Sum fs) ann)
-          => Text -> Matcher term (Literal.KeyValue term)
-kvMatcher name = matchM kv target <* matchKey where
-  matchKey
-    = match Literal.key $
-        match Literal.textElementContent $
-          ensure (== name)
-  kv :: term -> Maybe (Literal.KeyValue term)
-  kv = projectTerm
-
-findKV :: ( Apply Functor syntax
-           , Apply Foldable syntax
-           , Literal.KeyValue :< syntax
-           , Literal.Array :< syntax
-           , Literal.TextElement :< syntax
-           , term ~ Term (Sum syntax) ann
-           )
-        => Text -> Rule effs term (Either term (term, Literal.KeyValue term))
-findKV name = fromMatcher "findKV" (kvMatcher name)
-
-changeKV :: forall effs syntax ann fields term
-          . ( Apply Functor syntax
-            , Apply Foldable syntax
-            , Literal.KeyValue :< syntax
-            , Literal.Array :< syntax
-            , Literal.Float :< syntax
-            , Literal.TextElement :< syntax
-            , ann ~ Record (History ': fields)
-            , term ~ Term (Sum syntax) ann
-            )
-         => Rule effs (Either term (term, Literal.KeyValue term)) term
-changeKV = fromFunction "changeKV" $ either id injKV
-  where injKV :: (term, Literal.KeyValue term) -> term
-        injKV (term, Literal.KeyValue k v) = case projectTerm v of
-          Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue k (newArray elems))))
-          _ -> term
-          where newArray xs = termIn ann (inject (Literal.Array (xs <> [float])))
-                float = termIn ann (inject (Literal.Float "4"))
-                ann = termAnnotation term
-
-testChangeKV = do
-  (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (changeKV . findKV "\"bar\"")) (mark Unmodified tree)
-  pure $ runReprinter @'Language.JSON prettyJSON src tagged
+-- kvMatcher :: forall fs ann term
+--            . ( Literal.KeyValue :< fs
+--              , Literal.Array :< fs
+--              , Literal.TextElement :< fs
+--              , term ~ Term (Sum fs) ann)
+--           => Text -> Matcher term (Literal.KeyValue term)
+-- kvMatcher name = matchM kv target <* matchKey where
+--   matchKey
+--     = match Literal.key $
+--         match Literal.textElementContent $
+--           ensure (== name)
+--   kv :: term -> Maybe (Literal.KeyValue term)
+--   kv = projectTerm
+--
+-- findKV :: ( Apply Functor syntax
+--            , Apply Foldable syntax
+--            , Literal.KeyValue :< syntax
+--            , Literal.Array :< syntax
+--            , Literal.TextElement :< syntax
+--            , term ~ Term (Sum syntax) ann
+--            )
+--         => Text -> Rule effs term (Either term (term, Literal.KeyValue term))
+-- findKV name = fromMatcher "findKV" (kvMatcher name)
+--
+-- changeKV :: forall effs syntax ann fields term
+--           . ( Apply Functor syntax
+--             , Apply Foldable syntax
+--             , Literal.KeyValue :< syntax
+--             , Literal.Array :< syntax
+--             , Literal.Float :< syntax
+--             , Literal.TextElement :< syntax
+--             , ann ~ Record (History ': fields)
+--             , term ~ Term (Sum syntax) ann
+--             )
+--          => Rule effs (Either term (term, Literal.KeyValue term)) term
+-- changeKV = fromFunction "changeKV" $ either id injKV
+--   where injKV :: (term, Literal.KeyValue term) -> term
+--         injKV (term, Literal.KeyValue k v) = case projectTerm v of
+--           Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue k (newArray elems))))
+--           _ -> term
+--           where newArray xs = termIn ann (inject (Literal.Array (xs <> [float])))
+--                 float = termIn ann (inject (Literal.Float "4"))
+--                 ann = termAnnotation term
+--
+-- testChangeKV = do
+--   (src, tree) <- testJSONFile
+--   tagged <- runM $ cata (toAlgebra (changeKV . findKV "\"bar\"")) (mark Unmodified tree)
+--   pure $ runReprinter @'Language.JSON prettyJSON src tagged
 
 testPipeline = do
   (src, tree) <- testJSONFile
-  pure $ runReprinter @'Language.JSON prettyJSON src (mark Refactored tree)
+  printToTerm $ runReprinter src translatingJSON (mark Refactored tree)
+
+printToTerm res = either (putStrLn . show) (BC.putStr . Source.sourceBytes) res

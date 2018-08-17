@@ -77,6 +77,7 @@ import           Control.Rule
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
 import           Data.Record
+import Data.Sequence
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 import           Data.Term
@@ -85,28 +86,32 @@ import           Data.Text.Prettyprint.Doc.Render.Text
 import           Reprinting.Tokenize
 import           Reprinting.Translate
 import           Reprinting.Typeset
+import Control.Arrow
 
 
 -- | Given the language of the provided 'Term' and the original 'Source' from
 -- which the provided 'Term' was passed, run the reprinting pipeline.
-runReprinter :: forall lang opts fields a .
+runReprinter ::
   ( Show (Record fields)
   , Tokenize a
   , HasField fields History
-  , Translation lang opts
+  -- , Member (State [Context]) effs
+  -- , Member (Exc TranslationException) effs
   )
-  => opts
-  -> Source.Source
+  => Source.Source
+  -> Rule TranslatingEffs Splice (Seq Splice)
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
-runReprinter opts s tree
+runReprinter s additionalRules tree
   = fmap go
   . Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
   . foldT $ source (tokenizing s tree)
-      ~> machine (translating @lang opts)
+      ~> machine translating
+      ~> flattened
+      ~> machine additionalRules
       ~> flattened
       ~> machine typesetting
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions

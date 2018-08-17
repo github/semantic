@@ -10,11 +10,9 @@ import Data.Text (Text)
 import Data.Source (Source)
 
 
--- language agnostic -> language specific -> formatting whitespace
--- tokenize          -> translate         -> typeset
--- Seq Token         -> Seq Splice        -> Doc
-
-
+-- language agnostic -> CToken -> SToken -> language specific -> formatting whitespace
+-- tokenize          -> CToken -> SToken -> translate         -> typeset
+-- Seq Token         -> CToken -> SToken -> Seq Splice        -> Doc
 
 -- | 'Token' encapsulates 'Element' and 'Control' tokens, as well as sliced
 -- portions of the original 'Source' for a given AST.

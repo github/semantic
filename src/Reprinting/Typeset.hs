@@ -17,7 +17,8 @@ typesetting = fromFunction "typesetting" step
 
 step :: Splice -> Doc a
 step (Directive Don't)          = mempty
-step (Insert t)                 = pretty t
+step (Original   t)             = pretty t
+step (Insert _ _ t)             = pretty t
 step (Directive SoftWrap)       = softline
 step (Directive (HardWrap 0 _)) = line
 step (Directive (HardWrap i t)) = line <> stimes i (space t)
