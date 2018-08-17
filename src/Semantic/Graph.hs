@@ -8,7 +8,7 @@ module Semantic.Graph
 , GraphType(..)
 , Graph
 , Vertex
-, ImportGraphEff(..)
+, ConcreteEff(..)
 , style
 , parsePackage
 , withTermSpans
@@ -123,40 +123,37 @@ runCallGraph lang includePackages modules package = do
         . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects Abstract.runFunction modules))
 
-runImportGraphToModuleInfos :: forall effs lang term.
-                  ( Declarations term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasPrelude lang
-                  , HasPostlude lang
-                  , Member Trace effs
-                  , Recursive term
-                  , Effects effs
-                  )
-               => Proxy lang
-               -> Package term
-               -> Eff effs (Graph Vertex)
+runImportGraphToModuleInfos :: ( Declarations term
+                               , Evaluatable (Base term)
+                               , FreeVariables term
+                               , HasPrelude lang
+                               , HasPostlude lang
+                               , Member Trace effs
+                               , Recursive term
+                               , Effects effs
+                               )
+                            => Proxy lang
+                            -> Package term
+                            -> Eff effs (Graph Vertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraphToModules :: forall effs lang term.
-                  ( Declarations term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasPrelude lang
-                  , HasPostlude lang
-                  , Member Trace effs
-                  , Recursive term
-                  , Effects effs
-                  )
-               => Proxy lang
-               -> Package term
-               -> Eff effs (Graph (Module term))
+runImportGraphToModules :: ( Declarations term
+                           , Evaluatable (Base term)
+                           , FreeVariables term
+                           , HasPrelude lang
+                           , HasPostlude lang
+                           , Member Trace effs
+                           , Recursive term
+                           , Effects effs
+                           )
+                        => Proxy lang
+                        -> Package term
+                        -> Eff effs (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraph :: forall effs lang term vertex.
-                  ( Declarations term
+runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
@@ -171,9 +168,10 @@ runImportGraph :: forall effs lang term vertex.
                -> Eff effs (Graph vertex)
 runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
-      extractGraph (_, (graph, _)) = graph >>= f
+      extractGraph (graph, _) = graph >>= f
       runImportGraphAnalysis
         = runState lowerBound
+        . runState lowerBound
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -182,10 +180,9 @@ runImportGraph lang (package :: Package term) f =
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
+        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
         . runReader (packageInfo package)
         . runReader lowerBound
       runAddressEffects
@@ -193,30 +190,26 @@ runImportGraph lang (package :: Package term) f =
         . Hole.runDeref Precise.handleDeref
   in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
-newtype ImportGraphEff address outerEffects a = ImportGraphEff
-  { runImportGraphEff :: Eff (  Function address (Value address (ImportGraphEff address outerEffects))
-                             ': Exc (LoopControl address)
-                             ': Exc (Return address)
-                             ': Env address
-                             ': Deref (Value address (ImportGraphEff address outerEffects))
-                             ': Allocator address
-                             ': Reader ModuleInfo
-                             ': Reader Span
-                             ': Reader PackageInfo
-                             ': Modules address
-                             ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                             ': State (Graph ModuleInfo)
-                             ': Resumable (BaseError (ValueError address (ImportGraphEff address outerEffects)))
-                             ': Resumable (BaseError (AddressError address (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable (BaseError ResolutionError)
-                             ': Resumable (BaseError EvalError)
-                             ': Resumable (BaseError (EnvironmentError address))
-                             ': Resumable (BaseError (UnspecializedError (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable (BaseError (LoadError address))
-                             ': Fresh
-                             ': State (Heap address (Value address (ImportGraphEff address outerEffects)))
-                             ': outerEffects
-                             ) a
+type ConcreteEffects address rest
+  =  Reader Span
+  ': Reader PackageInfo
+  ': Modules address
+  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+  ': Resumable (BaseError (ValueError address (ConcreteEff address rest)))
+  ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
+  ': Resumable (BaseError ResolutionError)
+  ': Resumable (BaseError EvalError)
+  ': Resumable (BaseError (EnvironmentError address))
+  ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address rest))))
+  ': Resumable (BaseError (LoadError address))
+  ': Fresh
+  ': State (Heap address (Value address (ConcreteEff address rest)))
+  ': rest
+
+newtype ConcreteEff address outerEffects a = ConcreteEff
+  { runConcreteEff :: Eff (ValueEffects  address (Value address (ConcreteEff address outerEffects))
+                          (ModuleEffects address (Value address (ConcreteEff address outerEffects))
+                          (ConcreteEffects address outerEffects))) a
   }
 
 
