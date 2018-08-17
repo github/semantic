@@ -73,6 +73,7 @@ import qualified Data.ByteString as B
 import qualified Data.Set as Set
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
+import Semantic.Graph (ConcreteEff)
 import Semantic.Telemetry (LogQueue, StatQueue)
 import System.Exit (die)
 import Control.Exception (displayException)
@@ -97,7 +98,7 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (UtilEff Precise '[Trace, Lift IO])))
+type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO])))
                               , Resumable (BaseError (AddressError Precise Val))
                               , Resumable (BaseError ResolutionError)
                               , Resumable (BaseError EvalError)
@@ -109,7 +110,7 @@ type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (UtilEf
                               , Trace
                               , Lift IO
                               ]
-type TestEvaluatingErrors = '[ BaseError (ValueError Precise (UtilEff Precise '[Trace, Lift IO]))
+type TestEvaluatingErrors = '[ BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO]))
                              , BaseError (AddressError Precise Val)
                              , BaseError ResolutionError
                              , BaseError EvalError
@@ -137,9 +138,9 @@ testEvaluating
   . runEvalError
   . runResolutionError
   . runAddressError
-  . runValueError @_ @Precise @(UtilEff Precise _)
+  . runValueError @_ @Precise @(ConcreteEff Precise _)
 
-type Val = Value Precise (UtilEff Precise '[Trace, Lift IO])
+type Val = Value Precise (ConcreteEff Precise '[Trace, Lift IO])
 
 
 deNamespace :: Heap Precise (Value Precise term)
