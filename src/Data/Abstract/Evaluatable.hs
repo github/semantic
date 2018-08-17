@@ -2,6 +2,8 @@
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
+, ModuleEffects
+, ValueEffects
 , evaluate
 , traceResolve
 -- * Preludes
@@ -75,6 +77,19 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     rvalBox v
 
 
+type ModuleEffects address value rest
+  =  Exc (LoopControl address)
+  ': Exc (Return address)
+  ': Env address
+  ': Deref value
+  ': Allocator address
+  ': Reader ModuleInfo
+  ': rest
+
+type ValueEffects address value rest
+  =  Function address value
+  ': rest
+
 evaluate :: ( AbstractValue address value valueEffects
             , Declarations term
             , Effects effects
@@ -96,8 +111,8 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member Trace effects
             , Ord address
             , Recursive term
-            , moduleEffects ~ (Exc (LoopControl address) ': Exc (Return address) ': Env address ': Deref value ': Allocator address ': Reader ModuleInfo ': effects)
-            , valueEffects ~ (Function address value ': moduleEffects)
+            , moduleEffects ~ ModuleEffects address value effects
+            , valueEffects ~ ValueEffects address value moduleEffects
             )
          => proxy lang
          -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
