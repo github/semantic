@@ -7,24 +7,29 @@ import Data.Reprinting.Splice
 import Reprinting.Translate
 import Data.Sequence hiding (fromFunction)
 import           Data.Machine
+import           Control.Monad.Effect (Eff)
 
-data JSONTypeSetting = JSONTypeSetting { jsonPrettyPrint :: Bool }
+data JSONBeautyOpts = JSONBeautyOpts { jsonPrettyPrint :: Bool }
   deriving (Eq, Show)
 
-prettyJSON :: JSONTypeSetting
-prettyJSON = JSONTypeSetting True
+defaultBeautyOpts :: JSONBeautyOpts
+defaultBeautyOpts = JSONBeautyOpts True
 
-translatingJSON :: Rule eff Splice (Seq Splice)
-translatingJSON = fromFunction "translatingJSON" step where
+translatingJSON :: ProcessT (Eff effs) Splice Splice
+translatingJSON = flattened <~ auto step where
+  step :: Splice -> Seq Splice
   step (Insert el@(Truth True) c _) = splice el c "True"
   step x = pure x
 
-beautifyingJSON :: JSONTypeSetting -> Rule eff Splice (Seq Splice)
-beautifyingJSON _ = fromFunction "beautifyingJSON" step where
-  step s@(Insert Open (Just List) _) = s <| directive (HardWrap 2 Space)
+beautifyingJSON :: JSONBeautyOpts -> ProcessT (Eff effs) Splice Splice
+beautifyingJSON _ = flattened <~ auto step where
+  step :: Splice -> Seq Splice
+  step s@(Insert Open  (Just Associative) _) = s <| directive (HardWrap 2 Space)
+  step s@(Insert Close (Just Associative) _) = directive (HardWrap 0 Space) |> s
+  step x = pure x
 
-minimizingJSON :: Rule eff Token (Seq Splice)
-minimizingJSON = undefined
+-- minimizingJSON :: Rule eff Token (Seq Splice)
+-- minimizingJSON = undefined
 
 -- instance Translation 'JSON JSONTypeSetting where
 --   translation _ JSONTypeSetting{..} content context = undefined -- case (content, context) of

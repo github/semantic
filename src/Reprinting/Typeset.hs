@@ -8,12 +8,14 @@ import Prologue
 import Control.Rule
 import Data.Text.Prettyprint.Doc
 import Reprinting.Translate
+import Data.Machine
+import           Control.Monad.Effect (Eff)
 
 typeset :: Seq Splice -> Doc a
 typeset = foldMap step
 
-typesetting :: Rule effs Splice (Doc a)
-typesetting = fromFunction "typesetting" step
+typesetting :: ProcessT (Eff effs) Splice (Doc a)
+typesetting = auto step
 
 step :: Splice -> Doc a
 step (Directive Don't)          = mempty

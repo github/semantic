@@ -118,6 +118,7 @@ instance Monoid (Rule effs from to)   where
   mempty = lowerBound
   mappend = (<>)
 
+
 -- | Build a 'Rule' from a description and a 'Plan'.  Plans allow you
 -- to 'await' zero or more values from upstream and 'yield' zero or
 -- more values downstream.  You can 'lift' effectful actions into
