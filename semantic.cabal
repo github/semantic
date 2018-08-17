@@ -21,7 +21,6 @@ library
                      -- Analyses & term annotations
                        Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
-                     , Analysis.Abstract.Configuration
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
@@ -36,6 +35,7 @@ library
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
+                     , Control.Abstract.Configuration
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
