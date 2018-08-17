@@ -1,3 +1,4 @@
+{-# LANGUAGE UndecidableInstances #-}
 module Language.JSON.Translate where
 
 import qualified Control.Monad.Effect.Exception as Exc
@@ -5,6 +6,11 @@ import           Data.Language
 import           Data.Reprinting.Token
 import           Prologue
 import           Reprinting.Translate
+import           Reprinting.Pipeline
+
+import           Control.Monad.Effect.Exception (Exc)
+import           Control.Monad.Effect.State
+import           Control.Monad.Effect.Writer
 
 
 data JSONTypeSetting = JSONTypeSetting { jsonPrettyPrint :: Bool }
@@ -13,7 +19,10 @@ data JSONTypeSetting = JSONTypeSetting { jsonPrettyPrint :: Bool }
 prettyJSON :: JSONTypeSetting
 prettyJSON = JSONTypeSetting True
 
-instance Translation 'JSON JSONTypeSetting where
+instance ( Member (State [Context]) effs
+         , Member (Writer (Seq Splice)) effs
+         , Member (Exc TranslationException) effs
+         ) => Translation 'JSON JSONTypeSetting effs where
   translation _ _ content context = case (content, context) of
     (Fragment f, _) -> emit f
 
