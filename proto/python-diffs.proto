@@ -30,25 +30,6 @@ message PythonDiff {
   }
 }
 
-message QualifiedName {
-  oneof sum {
-    QualifiedName qualifiedName = 1;
-    RelativeQualifiedName relativeQualifiedName = 2;
-  }
-  message QualifiedName {
-    repeated string paths = 1;
-  }
-  message RelativeQualifiedName {
-    string path = 1;
-    QualifiedName maybeQualifiedName = 2;
-  }
-}
-
-message Alias {
-  bytes aliasValue = 1;
-  bytes aliasName = 2;
-}
-
 message PythonSyntax {
   oneof syntax {
     Comment comment = 1;
@@ -156,12 +137,6 @@ message Function {
   PythonDiff functionName = 2;
   repeated PythonDiff functionParameters = 3;
   PythonDiff functionBody = 4;
-}
-
-message Variable {
-  PythonDiff variableName = 1;
-  PythonDiff variableType = 2;
-  PythonDiff variableValue = 3;
 }
 
 message Plus {
@@ -361,6 +336,26 @@ message Tuple {
   repeated PythonDiff tupleContents = 1;
 }
 
+message Ellipsis { }
+
+message FutureImport {
+  repeated Alias futureImportSymbols = 1;
+}
+
+message Import {
+  QualifiedName importFrom = 1;
+  repeated Alias importSymbols = 2;
+}
+
+message QualifiedImport {
+  repeated string qualifiedImportFrom = 1;
+}
+
+message QualifiedAliasedImport {
+  QualifiedName qualifiedAliasedImportFrom = 1;
+  PythonDiff qualifiedAliasedImportAlias = 2;
+}
+
 message Redirect {
   PythonDiff lhs = 1;
   PythonDiff rhs = 2;
@@ -442,26 +437,6 @@ message Yield {
   PythonDiff value = 1;
 }
 
-message Ellipsis { }
-
-message Import {
-  QualifiedName importFrom = 1;
-  repeated Alias importSymbols = 2;
-}
-
-message FutureImport {
-  repeated Alias futureImportSymbols = 1;
-}
-
-message QualifiedImport {
-  repeated string qualifiedImportFrom = 1;
-}
-
-message QualifiedAliasedImport {
-  QualifiedName qualifiedAliasedImportFrom = 1;
-  PythonDiff qualifiedAliasedImportAlias = 2;
-}
-
 message Context {
   repeated PythonDiff contextTerms = 1;
   PythonDiff contextSubject = 2;
@@ -487,4 +462,23 @@ message Annotation {
 
 message List {
   repeated PythonDiff listContent = 1;
+}
+
+message QualifiedName {
+  oneof sum {
+    QualifiedName qualifiedName = 1;
+    RelativeQualifiedName relativeQualifiedName = 2;
+  }
+  message QualifiedName {
+    repeated string paths = 1;
+  }
+  message RelativeQualifiedName {
+    string path = 1;
+    QualifiedName maybeQualifiedName = 2;
+  }
+}
+
+message Alias {
+  bytes aliasValue = 1;
+  bytes aliasName = 2;
 }
