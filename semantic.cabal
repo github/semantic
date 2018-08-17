@@ -96,6 +96,7 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Reprinting.Token
+                     , Data.Reprinting.Splice
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Source

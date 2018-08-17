@@ -6,8 +6,15 @@ import           Data.Reprinting.Token
 import           Prologue
 import           Reprinting.Translate
 
-instance Translation 'JSON where
-  translation _ content context = case (content, context) of
+
+data JSONTypeSetting = JSONTypeSetting { jsonPrettyPrint :: Bool }
+  deriving (Eq, Show)
+
+prettyJSON :: JSONTypeSetting
+prettyJSON = JSONTypeSetting True
+
+instance Translation 'JSON JSONTypeSetting where
+  translation _ _ content context = case (content, context) of
     (Fragment f, _) -> emit f
 
     (Truth t, _) -> emit $ if t then "true" else "false"
