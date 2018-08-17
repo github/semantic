@@ -349,6 +349,6 @@ testJSONFile = do
 
 testPipeline = do
   (src, tree) <- testJSONFile
-  printToTerm $ runReprinter src (translatingJSON ~> beautifyingJSON defaultBeautyOpts) (mark Refactored tree)
+  printToTerm $ runReprinter src defaultJSONPipeline (mark Refactored tree)
 
 printToTerm res = either (putStrLn . show) (BC.putStr . Source.sourceBytes) res

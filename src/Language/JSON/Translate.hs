@@ -15,10 +15,17 @@ data JSONBeautyOpts = JSONBeautyOpts { jsonPrettyPrint :: Bool }
 defaultBeautyOpts :: JSONBeautyOpts
 defaultBeautyOpts = JSONBeautyOpts True
 
+
+defaultJSONPipeline :: ProcessT (Eff effs) Splice Splice
+defaultJSONPipeline
+  = translatingJSON
+  ~> beautifyingJSON defaultBeautyOpts
+
+
 translatingJSON :: ProcessT (Eff effs) Splice Splice
 translatingJSON = flattened <~ auto step where
   step :: Splice -> Seq Splice
-  step (Insert el@(Truth True) c _) = splice el c "True"
+  step (Insert el@(Truth True) c _) = splice el c "true"
   step x = pure x
 
 beautifyingJSON :: JSONBeautyOpts -> ProcessT (Eff effs) Splice Splice
