@@ -67,6 +67,7 @@ stages of the pipeline follows:
 
 -}
 
+{-# LANGUAGE AllowAmbiguousTypes, TypeApplications, ScopedTypeVariables, RankNTypes #-}
 module Reprinting.Pipeline ( runReprinter ) where
 
 import Prologue
@@ -84,10 +85,9 @@ import Data.Source
 -- | Given a 'Proxy' corresponding to the language of the provided
 -- 'Term' and the original 'Source' from which the provided 'Term' was
 -- passed, run the reprinting pipeline.
-runReprinter :: (Show (Record fields), Tokenize a, HasField fields History, Translate lang, Lower (Stack lang))
-             => Proxy lang
-             -> Source
+runReprinter :: forall lang fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang)
+             => Source
              -> Term a (Record fields)
              -> Either TranslationException Source
-runReprinter prox s = fmap go . translating prox . tokenizing s
+runReprinter s = fmap go . translating @lang . tokenizing s
   where go = fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset
