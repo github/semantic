@@ -55,6 +55,7 @@ import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show.Pretty (ppShow)
+import Language.JSON.Translate
 
 justEvaluating
   = runM
@@ -207,7 +208,7 @@ testRenameKey = do
   pure (toks, tagged)
 
 testRenameKey' = do
-  res <- translating (Proxy @'Language.JSON) . fst <$> testRenameKey
+  res <- translating @'Language.JSON . fst <$> testRenameKey
   putStrLn (either show (show . typeset) res)
 
 increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
@@ -255,7 +256,7 @@ testAddKVPair = do
   pure (toks, tagged)
 
 testAddKVPair' = do
-  res <- translating (Proxy @'Language.JSON) . fst <$> testAddKVPair
+  res <- translating @'Language.JSON . fst <$> testAddKVPair
   putStrLn (either show (show . typeset) res)
 
 testFloatMatcher = do
@@ -290,7 +291,7 @@ testOverwriteFloats = do
   pure (toks, tagged)
 
 testOverwriteFloats' = do
-  res <- translating (Proxy @'Language.JSON) . fst <$> testOverwriteFloats
+  res <- translating @'Language.JSON . fst <$> testOverwriteFloats
   putStrLn (either show (show . typeset) res)
 
 
@@ -345,5 +346,5 @@ testChangeKV = do
   pure (toks, tagged)
 
 testChangeKV' = do
-  res <- translating (Proxy @'Language.JSON) . fst <$> testChangeKV
+  res <- translating @'Language.JSON . fst <$> testChangeKV
   putStrLn (either show (show . typeset) res)
