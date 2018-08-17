@@ -2,15 +2,12 @@
              ScopedTypeVariables, TupleSections, TypeFamilyDependencies, TypeApplications, TypeOperators #-}
 
 module Reprinting.Translate
-  -- ( Translate
-  -- , Translation (..)
   ( TranslationException (..)
   , TranslatingEffs
   , Splice (..)
   , Layout (..)
   , Indent (..)
   , translating
-
   , splice
   ) where
 
@@ -25,18 +22,25 @@ import           Data.Language
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
+import Data.Machine
+import           Control.Arrow
 
 
 type TranslatingEffs = '[State [Context], Exc TranslationException]
 
--- type Translate a = a -> Element -> [Context] -> Either String (Seq Splice)
 
--- class Translation (lang :: Language) a where
---   translation :: Translate a -> Translate a
+translating ::
+  ( Member (State [Context]) effs
+  , Member (Exc TranslationException) effs
+  )
+  => ProcessT (Eff effs) Token Splice
+translating = flattened <~ autoT (Kleisli step) where
 
-translating :: ( Member (State [Context]) effs , Member (Exc TranslationException) effs )
-  => Rule effs Token (Seq Splice)
-translating = fromEffect "translating" step where
+  step ::
+    ( Member (State [Context]) effs
+    , Member (Exc TranslationException) effs
+    )
+    => Token -> Eff effs (Seq Splice)
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
     TElement el  -> get >>= translate el . listToMaybe

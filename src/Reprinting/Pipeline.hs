@@ -95,23 +95,19 @@ runReprinter ::
   ( Show (Record fields)
   , Tokenize a
   , HasField fields History
-  -- , Member (State [Context]) effs
-  -- , Member (Exc TranslationException) effs
   )
   => Source.Source
-  -> Rule TranslatingEffs Splice (Seq Splice)
+  -> ProcessT (Eff TranslatingEffs) Splice Splice
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
-runReprinter s additionalRules tree
+runReprinter s languageRules tree
   = fmap go
   . Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
   . foldT $ source (tokenizing s tree)
-      ~> machine translating
-      ~> flattened
-      ~> machine additionalRules
-      ~> flattened
-      ~> machine typesetting
+      ~> translating
+      ~> languageRules
+      ~> typesetting
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
