@@ -2,79 +2,68 @@
              ScopedTypeVariables, TupleSections, TypeFamilyDependencies, TypeApplications, TypeOperators #-}
 
 module Reprinting.Translate
-  ( Translate (..)
-  , Translation (..)
-  , TranslationException (..)
+  -- ( Translate
+  -- , Translation (..)
+  ( TranslationException (..)
+  , TranslatingEffs
   , Splice (..)
   , Layout (..)
   , Indent (..)
   , translating
+
   , splice
   ) where
 
 import Prologue hiding (Element)
-import Control.Rule
+
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception (Exc)
 import qualified Control.Monad.Effect.Exception as Exc
 import           Control.Monad.Effect.State
-import           Control.Monad.Effect.Writer
+import           Control.Rule
 import           Data.Language
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
-import           Data.Sequence (singleton)
 import qualified Data.Source as Source
 
-type Translate a = a -> Element -> [Context] -> Either String (Seq Splice)
 
-class Translation (lang :: Language) a where
-  translation :: Translate a -> Translate a
+type TranslatingEffs = '[State [Context], Exc TranslationException]
 
-translating :: forall lang a effs .
-  ( Translation lang a
-  , Member (State [Context]) effs
-  , Member (Exc TranslationException) effs
-  ) =>
-  a -> Rule effs Token (Seq Splice)
-translating config = fromEffect "translating" (step @lang config)
+-- type Translate a = a -> Element -> [Context] -> Either String (Seq Splice)
 
-step :: forall lang a effs .
-  ( Translation lang a
-  , Member (State [Context]) effs
-  , Member (Exc TranslationException) effs
-  ) =>
-  a -> Token -> Eff effs (Seq Splice)
-step config t = case t of
-  Chunk source     -> pure $ splice (Source.toText source)
-  TElement content -> do
-    context <- get
-    let eitherSlices = translation @lang defaultTranslation config content context
-    either (Exc.throwError . Unexpected) pure eitherSlices
-  TControl ctl     -> case ctl of
-    Log _   -> pure mempty
-    Enter c -> enterContext c *> pure mempty
-    Exit c  -> exitContext c *> pure mempty
+-- class Translation (lang :: Language) a where
+--   translation :: Translate a -> Translate a
 
-  where
-    defaultTranslation :: Translate a
-    defaultTranslation _ content context = case (content, context) of
-      (Fragment f, _) -> Right $ splice f
+translating :: ( Member (State [Context]) effs , Member (Exc TranslationException) effs )
+  => Rule effs Token (Seq Splice)
+translating = fromEffect "translating" step where
+  step t = case t of
+    Chunk source -> pure $ copy (Source.toText source)
+    TElement el  -> get >>= translate el . listToMaybe
+    TControl ctl -> case ctl of
+      Log _   -> pure mempty
+      Enter c -> enterContext c *> pure mempty
+      Exit c  -> exitContext c *> pure mempty
 
-      (Truth True, _)  -> Right $ splice "true"
-      (Truth False, _) -> Right $ splice "false"
-      (Nullity, _)     -> Right $ splice "null"
+  translate el c = let emit = pure . splice el c in case (el, c) of
+    (Fragment f, _) -> emit f
 
-      (Open, List:_)        -> Right $ splice "["
-      (Open, Associative:_) -> Right $ splice "{"
+    (Truth True, _)  -> emit "true"
+    (Truth False, _) -> emit "false"
+    (Nullity, _)     -> emit "null"
 
-      (Close, List:_)        -> Right $ splice "]"
-      (Close, Associative:_) -> Right $ splice "}"
+    (Open, Just List)        -> emit "["
+    (Open, Just Associative) -> emit "{"
 
-      (Separator, List:_)        -> Right $ splice ","
-      (Separator, Associative:_) -> Right $ splice ","
-      (Separator, Pair:_)        -> Right $ splice ":"
+    (Close, Just List)        -> emit "]"
+    (Close, Just Associative) -> emit "}"
 
-      _ -> Left "defaulTranslate failed, unknown context"
+    (Separator, Just List)        -> emit ","
+    (Separator, Just Associative) -> emit ","
+    (Separator, Just Pair)        -> emit ":"
+
+    -- TODO: Maybe put an error token in the stream instead?
+    _ -> Exc.throwError (Unexpected "don't know how to translate")
 
 enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
 enterContext c = modify' (c :)
