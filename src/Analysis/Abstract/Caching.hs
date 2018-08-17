@@ -5,7 +5,7 @@ module Analysis.Abstract.Caching
 , caching
 ) where
 
-import Analysis.Abstract.Configuration
+import Control.Abstract.Configuration
 import Control.Abstract
 import Data.Abstract.Cache
 import Data.Abstract.BaseError
