@@ -11,7 +11,6 @@ import Diffing.Algorithm hiding (Delete)
 import Prologue hiding (index, Member, This, null)
 import Prelude hiding (null)
 import Proto3.Suite.Class
-import Data.Word
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
