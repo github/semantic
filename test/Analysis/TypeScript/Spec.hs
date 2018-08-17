@@ -69,6 +69,12 @@ spec config = parallel $ do
           Env.names env `shouldBe` [ "x" ]
         other -> expectationFailure (show other)
 
+      it "evaluates await statements" $ do
+        (_, (heap, res)) <- evaluate ["await.ts"]
+        case ModuleTable.lookup "await.ts" <$> res of
+          Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 20.0)]
+          other -> expectationFailure (show other)
+
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)
