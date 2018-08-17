@@ -85,9 +85,10 @@ import Data.Source
 -- | Given a 'Proxy' corresponding to the language of the provided
 -- 'Term' and the original 'Source' from which the provided 'Term' was
 -- passed, run the reprinting pipeline.
-runReprinter :: forall lang fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang)
+runReprinter :: forall lang config fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang config)
              => Source
+             -> config
              -> Term a (Record fields)
              -> Either TranslationException Source
-runReprinter s = fmap go . translating @lang . tokenizing s
+runReprinter s config = fmap go . translating @lang config . tokenizing s
   where go = fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset

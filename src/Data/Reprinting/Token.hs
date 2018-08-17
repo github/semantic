@@ -7,14 +7,18 @@ module Data.Reprinting.Token
   ) where
 
 import Data.Text (Text)
-
 import Data.Source (Source)
+
+
+-- language agnostic -> language specific -> formatting whitespace
+-- tokenize          -> translate         -> typeset
+-- Seq Token         -> Seq Splice        -> Doc
 
 -- | 'Token' encapsulates 'Element' and 'Control' tokens, as well as sliced
 -- portions of the original 'Source' for a given AST.
 data Token
-  = Chunk Source
-  | TElement Element
+  = Chunk Source     -- original 'Source' from AST, unmodified by pipeline.
+  | TElement Element --
   | TControl Control
     deriving (Show, Eq)
 

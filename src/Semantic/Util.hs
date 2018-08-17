@@ -208,7 +208,7 @@ testRenameKey = do
   pure (toks, tagged)
 
 testRenameKey' = do
-  res <- translating @'Language.JSON . fst <$> testRenameKey
+  res <- translating @'Language.JSON prettyJSON . fst <$> testRenameKey
   putStrLn (either show (show . typeset) res)
 
 increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
@@ -256,7 +256,7 @@ testAddKVPair = do
   pure (toks, tagged)
 
 testAddKVPair' = do
-  res <- translating @'Language.JSON . fst <$> testAddKVPair
+  res <- translating @'Language.JSON prettyJSON . fst <$> testAddKVPair
   putStrLn (either show (show . typeset) res)
 
 testFloatMatcher = do
@@ -291,7 +291,7 @@ testOverwriteFloats = do
   pure (toks, tagged)
 
 testOverwriteFloats' = do
-  res <- translating @'Language.JSON . fst <$> testOverwriteFloats
+  res <- translating @'Language.JSON prettyJSON . fst <$> testOverwriteFloats
   putStrLn (either show (show . typeset) res)
 
 
@@ -346,5 +346,5 @@ testChangeKV = do
   pure (toks, tagged)
 
 testChangeKV' = do
-  res <- translating @'Language.JSON . fst <$> testChangeKV
+  res <- translating @'Language.JSON prettyJSON . fst <$> testChangeKV
   putStrLn (either show (show . typeset) res)
