@@ -15,12 +15,8 @@ module Reprinting.Tokenize
   , ignore
   -- * Tokenize interface
   , Tokenize (..)
-  -- , RPState (..)
-  -- , RPContext (..)
-  -- , Strategy (..)
   -- * Invocation/results
   , tokenizing
-  -- , tokenizingRule
   ) where
 
 import Prelude hiding (fail, log)
@@ -96,23 +92,6 @@ tokenizing s t = let h = getField (termAnnotation t) in
   . runState (RPState 0)
   . runReader (RPContext s h Reprinting)
   $ foldSubterms descend t *> finish
-
--- tokenizingRule ::
---   ( Show (Record fields)
---   , Tokenize a
---   , HasField fields History
---   , Member (Reader RPContext) effs
---   , Member (State RPState) effs
---   ) =>
---   Source -> Rule effs (Term a (Record fields)) Token
--- tokenizingRule s = fromEffect "tokenizing" (tokenize s)
---
--- tokenize ::
---   ( Member (Reader RPContext) effs
---   , Member (State RPState) effs
---   ) =>
---   Source -> Term a (Record fields) -> Eff effs Token
--- tokenize = undefined
 
 -- Private interfaces
 

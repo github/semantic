@@ -68,65 +68,45 @@ stages of the pipeline follows:
 -}
 
 {-# LANGUAGE AllowAmbiguousTypes, TypeApplications, ScopedTypeVariables, RankNTypes #-}
-module Reprinting.Pipeline ( runReprinter, runPipeline ) where
+module Reprinting.Pipeline ( runReprinter ) where
 
-import Prologue
-
-import Data.Text.Prettyprint.Doc
-import Data.Text.Prettyprint.Doc.Render.Text
-
-import Reprinting.Tokenize
-import Reprinting.Translate
-import Reprinting.Typeset
-import Data.Record
-import Data.Term
-import qualified Data.Source as Source
-
-import Control.Monad.Effect as Effect
+import           Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.Exception as Exc
 import           Control.Monad.Effect.State
-import Control.Monad.Effect.Reader
-import           Control.Monad.Effect.Writer
-import Control.Rule
-import Control.Arrow
+import           Control.Rule
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
-
+import           Data.Record
 import           Data.Reprinting.Token
-import           Data.Sequence (singleton)
+import qualified Data.Source as Source
+import           Data.Term
+import           Data.Text.Prettyprint.Doc
+import           Data.Text.Prettyprint.Doc.Render.Text
+import           Reprinting.Tokenize
+import           Reprinting.Translate
+import           Reprinting.Typeset
 
 
--- | Given a 'Proxy' corresponding to the language of the provided
--- 'Term' and the original 'Source' from which the provided 'Term' was
--- passed, run the reprinting pipeline.
-runReprinter :: forall lang config fields a . (Show (Record fields), Tokenize a, HasField fields History, Translation lang config)
-             => Source.Source
-             -> config
-             -> Term a (Record fields)
-             -> Either TranslationException Source.Source
-runReprinter s config = fmap go . translating @lang config . tokenizing s
-  where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions . typeset
-
--- type PipelineEffs = '[Reader RPContext, State RPState, State [Context], Writer (Seq Splice), Exc TranslationException]
-
-runPipeline :: forall lang config fields a .
+-- | Given the language of the provided 'Term' and the original 'Source' from
+-- which the provided 'Term' was passed, run the reprinting pipeline.
+runReprinter :: forall lang opts fields a .
   ( Show (Record fields)
   , Tokenize a
   , HasField fields History
-  , Translation lang config
+  , Translation lang opts
   )
-  => config
+  => opts
   -> Source.Source
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
-runPipeline config s tree
+runReprinter opts s tree
   = fmap go
   . Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
   . foldT $ source (tokenizing s tree)
-      ~> machine (translatingRule @lang config)
+      ~> machine (translating @lang opts)
       ~> flattened
-      ~> machine (typeSettingRule)
+      ~> machine typesetting
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions

@@ -2,20 +2,13 @@
              ScopedTypeVariables, TupleSections, TypeFamilyDependencies, TypeApplications, TypeOperators #-}
 
 module Reprinting.Translate
-  ( -- Translate (..)
-    Translation (..)
+  ( Translate (..)
+  , Translation (..)
   , TranslationException (..)
-  , TranslatorEffs
   , Splice (..)
   , Layout (..)
   , Indent (..)
-
   , translating
-  -- , runTranslatingEffs
-  , translatingRule
-  , translate
-
-  , emit
   , splice
   ) where
 
@@ -32,54 +25,31 @@ import           Data.Reprinting.Token
 import           Data.Sequence (singleton)
 import qualified Data.Source as Source
 
-
 type Translate a = a -> Element -> [Context] -> Either String (Seq Splice)
 
 class Translation (lang :: Language) a where
   translation :: Translate a -> Translate a
 
--- type Translator = Eff '[State [Context], Writer (Seq Splice), Exc TranslationException]
-type TranslatorEffs = '[State [Context], Exc TranslationException]
-
-translating :: forall lang a .
-  ( Translation lang a )
-  => a -> Seq Token -> Either TranslationException (Seq Splice)
-translating config tokens = undefined
-  -- = run
-  -- . Exc.runError
-  -- . fmap fst
-  -- . runWriter
-  -- . fmap snd
-  -- . runState (mempty :: [Context])
-  -- $ traverse_ (oldtranslate @lang config) tokens
-
--- runTranslatingEffs :: (Effectful m) => Eff TranslatorEffs () -> m '[] (Either TranslationException (Seq Splice))
--- runTranslatingEffs = undefined
---   = Exc.runError
---   . fmap fst
---   . runWriter
---   . fmap snd
---   . runState (mempty :: [Context])
-
-translatingRule :: forall lang a effs .
+translating :: forall lang a effs .
   ( Translation lang a
   , Member (State [Context]) effs
   , Member (Exc TranslationException) effs
   ) =>
   a -> Rule effs Token (Seq Splice)
-translatingRule config = fromEffect "translating" (translate @lang config)
+translating config = fromEffect "translating" (step @lang config)
 
-translate :: forall lang a effs .
+step :: forall lang a effs .
   ( Translation lang a
   , Member (State [Context]) effs
   , Member (Exc TranslationException) effs
   ) =>
   a -> Token -> Eff effs (Seq Splice)
-translate config t = case t of
+step config t = case t of
   Chunk source     -> pure $ splice (Source.toText source)
   TElement content -> do
-    a <- get
-    either (Exc.throwError . Unexpected) pure (translation @lang defaultTranslation config content a)
+    context <- get
+    let eitherSlices = translation @lang defaultTranslation config content context
+    either (Exc.throwError . Unexpected) pure eitherSlices
   TControl ctl     -> case ctl of
     Log _   -> pure mempty
     Enter c -> enterContext c *> pure mempty
@@ -87,36 +57,24 @@ translate config t = case t of
 
   where
     defaultTranslation :: Translate a
-    defaultTranslation _ content context = undefined -- case (content, context) of
-  --     (Fragment f, _) -> emit f
-  --
-  --     (Truth True, _)  -> emit "true"
-  --     (Truth False, _) -> emit "false"
-  --     (Nullity, _)     -> emit "null"
-  --
-  --     (Open, List:_)        -> emit "["
-  --     (Open, Associative:_) -> emit "{"
-  --
-  --     (Close, List:_)        -> emit "]"
-  --     (Close, Associative:_) -> emit "}"
-  --
-  --     (Separator, List:_)        -> emit ","
-  --     (Separator, Associative:_) -> emit ","
-  --     (Separator, Pair:_)        -> emit ":"
-  --
-  --     _ -> Exc.throwError (Unexpected "invalid context")
+    defaultTranslation _ content context = case (content, context) of
+      (Fragment f, _) -> Right $ splice f
 
--- translatingRule' :: forall lang a effs .
---   ( Translation lang a
---   , Member (State [Context]) effs
---   , Member (Writer (Seq Splice)) effs
---   , Member (Exc TranslationException) effs
---   ) =>
---   a -> Rule effs (Seq Token) (Seq Splice)
--- translatingRule' config = fromEffect "translating" (translate @lang config)
+      (Truth True, _)  -> Right $ splice "true"
+      (Truth False, _) -> Right $ splice "false"
+      (Nullity, _)     -> Right $ splice "null"
 
-emit :: (Member (Writer (Seq Splice)) effs) => Text -> Eff effs ()
-emit = tell . splice
+      (Open, List:_)        -> Right $ splice "["
+      (Open, Associative:_) -> Right $ splice "{"
+
+      (Close, List:_)        -> Right $ splice "]"
+      (Close, Associative:_) -> Right $ splice "}"
+
+      (Separator, List:_)        -> Right $ splice ","
+      (Separator, Associative:_) -> Right $ splice ","
+      (Separator, Pair:_)        -> Right $ splice ":"
+
+      _ -> Left "defaulTranslate failed, unknown context"
 
 enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
 enterContext c = modify' (c :)
@@ -127,7 +85,6 @@ exitContext c = do
   case current of
     (x:xs) | x == c -> modify' (const xs)
     _ -> Exc.throwError (Unexpected "invalid context")
-
 
 -- | Represents failure occurring in a 'Concrete' machine.
 data TranslationException

@@ -1,32 +1,26 @@
 module Reprinting.Typeset
   ( typeset
-  , typeSettingRule
+  , typesetting
   ) where
 
 import Prologue
 
 import Control.Rule
-import Data.Source
 import Data.Text.Prettyprint.Doc
 import Reprinting.Translate
 
 typeset :: Seq Splice -> Doc a
-typeset = foldMap go where
-  go (Insert t)                 = pretty t
-  go (Directive SoftWrap)       = softline
-  go (Directive (HardWrap 0 _)) = line
-  go (Directive (HardWrap i t)) = line <> stimes i (space t)
-  go (Directive Don't)          = mempty
-  space Space = " "
-  space Tab   = "\t"
+typeset = foldMap step
 
-typeSettingRule :: Rule effs Splice (Doc a)
-typeSettingRule = fromFunction "typesetting" go where
-  go :: Splice -> Doc a
-  go (Insert t)                 = pretty t
-  go (Directive SoftWrap)       = softline
-  go (Directive (HardWrap 0 _)) = line
-  go (Directive (HardWrap i t)) = line <> stimes i (space t)
-  go (Directive Don't)          = mempty
-  space Space = " "
-  space Tab   = "\t"
+typesetting :: Rule effs Splice (Doc a)
+typesetting = fromFunction "typesetting" step
+
+step :: Splice -> Doc a
+step (Directive Don't)          = mempty
+step (Insert t)                 = pretty t
+step (Directive SoftWrap)       = softline
+step (Directive (HardWrap 0 _)) = line
+step (Directive (HardWrap i t)) = line <> stimes i (space t)
+  where
+    space Space = " "
+    space Tab   = "\t"
