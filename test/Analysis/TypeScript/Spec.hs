@@ -68,12 +68,12 @@ spec config = parallel $ do
           (derefQName heap ("x" :| []) env) `shouldBe` Nothing
           Env.names env `shouldBe` [ "x" ]
         other -> expectationFailure (show other)
-    -- 
-    -- it "evaluates BOr statements" $ do
-    --   (_, (heap, res)) <- evaluate ["bor.ts"]
-    --   case ModuleTable.lookup "bor.ts" <$> res of
-    --     Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 3.0)]
-    --     other -> expectationFailure (show other)
+
+    it "evaluates BOr statements" $ do
+      (_, (heap, res)) <- evaluate ["bor.ts"]
+      case ModuleTable.lookup "bor.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 3)]
+        other -> expectationFailure (show other)
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
