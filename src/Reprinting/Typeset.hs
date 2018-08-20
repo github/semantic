@@ -5,21 +5,19 @@ module Reprinting.Typeset
 
 import Prologue
 
-import Control.Rule
-import Data.Text.Prettyprint.Doc
-import Reprinting.Translate
 import Data.Machine
-import           Control.Monad.Effect (Eff)
+import Data.Reprinting.Splice
+import Data.Text.Prettyprint.Doc
 
 typeset :: Seq Splice -> Doc a
 typeset = foldMap step
 
-typesetting :: ProcessT (Eff effs) Splice (Doc a)
+typesetting :: Monad m => ProcessT m Splice (Doc a)
 typesetting = auto step
 
 step :: Splice -> Doc a
 step (Directive Don't)          = mempty
-step (Original   t)             = pretty t
+step (Original t  )             = pretty t
 step (Insert _ _ t)             = pretty t
 step (Directive SoftWrap)       = softline
 step (Directive (HardWrap 0 _)) = line
