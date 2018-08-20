@@ -20,6 +20,7 @@ data History
 mark :: Functor f => (Range -> History) -> f (Record (Range ': fields)) -> f (Record (History ': fields))
 mark f = fmap go where go (r :. a) = f r :. a
 
+-- | Change the 'History' annotation on a 'Term'.
 remark :: Functor f => (Range -> History) -> f (Record (History ': fields)) -> f (Record (History ': fields))
 remark f = fmap go where
   go (r :. a) = x :. a where
