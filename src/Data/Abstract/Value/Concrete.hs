@@ -19,7 +19,7 @@ import qualified Data.Abstract.Number as Number
 import Data.Bits
 import Data.Coerce
 import Data.List (genericIndex, genericLength)
-import Data.Scientific (Scientific)
+import Data.Scientific (Scientific, coefficient)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Data.Word
@@ -158,6 +158,7 @@ instance ( Coercible body (Eff effects)
          , Member (Resumable (BaseError (ValueError address body))) effects
          , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
          , Member (State (Heap address (Value address body))) effects
+         , Member Trace effects
          , Ord address
          , Show address
          )
@@ -272,6 +273,7 @@ instance ( Coercible body (Eff effects)
 
   liftBitwise2 operator left right
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
+    | (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- pair = pure . integer $ operator (coefficient (normalize i)) (coefficient (normalize j))
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
