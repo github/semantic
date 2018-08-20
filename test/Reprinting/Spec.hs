@@ -14,6 +14,7 @@ import Data.Sum
 import Data.Foldable
 import Semantic.IO
 import Data.Blob
+import Language.JSON.Translate
 
 spec :: Spec
 spec = describe "reprinting" $ do
@@ -40,16 +41,16 @@ spec = describe "reprinting" $ do
   describe "pipeline" $ do
     it "should roundtrip exactly over a pristine tree" $ do
       let tagged = mark Unmodified tree
-      let printed = runReprinter (Proxy @'Language.JSON) src tagged
+      let printed = runReprinter src defaultJSONPipeline tagged
       printed `shouldBe` Right src
 
     it "should roundtrip exactly over a wholly-modified tree" $ do
       let tagged = mark Refactored tree
-      let printed = runReprinter (Proxy @'Language.JSON) src tagged
+      let printed = runReprinter src defaultJSONPipeline tagged
       printed `shouldBe` Right src
 
     it "should be able to parse the output of a refactor" $ do
       let tagged = increaseNumbers (mark Refactored tree)
-      let (Right printed) = runReprinter (Proxy @'Language.JSON) src tagged
+      let (Right printed) = runReprinter src defaultJSONPipeline tagged
       tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
       length tree' `shouldSatisfy` (/= 0)
