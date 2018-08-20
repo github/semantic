@@ -100,7 +100,7 @@ runReprinter ::
   , HasField fields History
   )
   => Source.Source
-  -> ProcessT (Eff TranslatingEffs) Splice Splice
+  -> ProcessT Translator Splice Splice
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
 runReprinter s languageRules tree
