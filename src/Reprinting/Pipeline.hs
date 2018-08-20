@@ -92,8 +92,8 @@ import           Reprinting.Translate
 import           Reprinting.Typeset
 
 
--- | Given the language of the provided 'Term' and the original 'Source' from
--- which the provided 'Term' was passed, run the reprinting pipeline.
+-- | Run the reprinting pipeline given the original 'Source', a language
+-- specific machine (`ProcessT`) and the provided 'Term'.
 runReprinter ::
   ( Show (Record fields)
   , Tokenize a
@@ -103,14 +103,14 @@ runReprinter ::
   -> ProcessT Translator Splice Splice
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
-runReprinter s languageRules tree
+runReprinter src languageSubPipeline tree
   = fmap go
   . Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
-  . foldT $ source (tokenizing s tree)
+  . foldT $ source (tokenizing src tree)
       ~> translating
-      ~> languageRules
+      ~> languageSubPipeline
       ~> typesetting
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
