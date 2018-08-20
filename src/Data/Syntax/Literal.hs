@@ -34,7 +34,7 @@ instance Evaluatable Boolean where
   eval (Boolean x) = rvalBox (boolean x)
 
 instance Tokenize Boolean where
-  prettyPrint = yield . Truth . booleanContent
+  tokenize = yield . Truth . booleanContent
 
 -- Numeric
 
@@ -65,7 +65,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 instance Tokenize Data.Syntax.Literal.Float where
-  prettyPrint = yield . Fragment . floatContent
+  tokenize = yield . Fragment . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -139,7 +139,7 @@ instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
 instance Tokenize TextElement where
-  prettyPrint = yield . Fragment . textElementContent
+  tokenize = yield . Fragment . textElementContent
 
 -- | A sequence of textual contents within a string literal.
 newtype EscapeSequence a = EscapeSequence { value :: Text }
@@ -162,7 +162,7 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Null where eval _ = rvalBox null
 
 instance Tokenize Null where
-  prettyPrint _ = yield Nullity
+  tokenize _ = yield Nullity
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -210,7 +210,7 @@ instance Evaluatable Array where
   eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
 instance Tokenize Array where
-  prettyPrint t = within List $
+  tokenize t = within List $
     let withCommas = intersperse (yield Separator) (toList t)
     in yield Open *> sequenceA_ withCommas *> yield Close
 
@@ -225,7 +225,7 @@ instance Evaluatable Hash where
   eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
 instance Tokenize Hash where
-  prettyPrint t = within Associative $
+  tokenize t = within Associative $
     let withCommas = intersperse (yield Separator) (toList t)
     in yield Open *> sequenceA_ withCommas *> yield Close
 
@@ -241,7 +241,7 @@ instance Evaluatable KeyValue where
     rvalBox =<< (kvPair <$> key <*> value)
 
 instance Tokenize KeyValue where
-  prettyPrint (KeyValue k v) = within Pair $
+  tokenize (KeyValue k v) = within Pair $
     k *> yield Separator *> v
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
