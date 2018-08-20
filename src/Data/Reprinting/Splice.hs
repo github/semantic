@@ -1,25 +1,34 @@
-module Data.Reprinting.Splice where
+module Data.Reprinting.Splice
+  ( Splice(..)
+  , Layout(..)
+  , Indent(..)
+  , copy
+  , splice
+  , directive
+  ) where
 
-import Data.Sequence (singleton)
-import Data.String
-import Prologue hiding (Element)
-import Data.Sequence
 import Data.Reprinting.Token
+import Data.Sequence (singleton)
+import Prologue hiding (Element)
 
--- | The simplest possible representation of concrete syntax: either
--- it's a run of literal text or information about whitespace.
+-- | The final representation of concrete syntax in the reprinting pipeline.
+-- 'Inserts' have access to the original 'Element' and 'Context' for ease of
+-- writing additional steps in the reprinting pipeline.
 data Splice
-  = Insert Element (Maybe Context) Text
+  = Insert Element [Context] Text -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`.
   | Original Text
   | Directive Layout
     deriving (Eq, Show)
 
+-- | Copy in some original, un-refactored 'Text'.
 copy :: Text -> Seq Splice
 copy = singleton . Original
 
-splice :: Element -> Maybe Context -> Text -> Seq Splice
+-- | Construct a splice to insert.
+splice :: Element -> [Context] -> Text -> Seq Splice
 splice el c = singleton . Insert el c
 
+-- | Construct a layout directive.
 directive :: Layout -> Seq Splice
 directive = singleton . Directive
 
@@ -32,6 +41,5 @@ data Layout
 
 -- | Indentation types. This will eventually be moved into the rules engine.
 data Indent = Space | Tab deriving (Eq, Show)
-
 
 -- instance IsString Splice where fromString = Insert . fromString
