@@ -65,6 +65,12 @@ stages of the pipeline follows:
   └───────────────┴──────────────────────────────────┴────────────────────┘
 @
 
+                                       | - extensible, add more steps here...    - |
+                                       |                                           |
+language agnostic -> language agnostic | -> language specific -> language specific | -> language agnostic
+tokenize          -> splice            | -> translate         -> format            | -> typeset
+Seq Token         -> Seq Splice        | -> Seq Splice        -> Seq Splice        | -> Doc
+
 -}
 
 {-# LANGUAGE AllowAmbiguousTypes, TypeApplications, ScopedTypeVariables, RankNTypes #-}
@@ -73,11 +79,9 @@ module Reprinting.Pipeline ( runReprinter ) where
 import           Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.Exception as Exc
 import           Control.Monad.Effect.State
-import           Control.Rule
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
 import           Data.Record
-import Data.Sequence
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 import           Data.Term
@@ -86,7 +90,6 @@ import           Data.Text.Prettyprint.Doc.Render.Text
 import           Reprinting.Tokenize
 import           Reprinting.Translate
 import           Reprinting.Typeset
-import Control.Arrow
 
 
 -- | Given the language of the provided 'Term' and the original 'Source' from
