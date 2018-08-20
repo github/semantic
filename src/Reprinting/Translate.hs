@@ -13,17 +13,15 @@ module Reprinting.Translate
 
 import Prologue hiding (Element)
 
+import           Control.Arrow
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception (Exc)
 import qualified Control.Monad.Effect.Exception as Exc
 import           Control.Monad.Effect.State
-import           Control.Rule
-import           Data.Language
+import           Data.Machine
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
-import Data.Machine
-import           Control.Arrow
 
 
 type TranslatingEffs = '[State [Context], Exc TranslationException]
@@ -43,13 +41,13 @@ translating = flattened <~ autoT (Kleisli step) where
     => Token -> Eff effs (Seq Splice)
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
-    TElement el  -> get >>= translate el . listToMaybe
+    TElement el  -> get >>= translate el
     TControl ctl -> case ctl of
       Log _   -> pure mempty
       Enter c -> enterContext c *> pure mempty
       Exit c  -> exitContext c *> pure mempty
 
-  translate el c = let emit = pure . splice el c in case (el, c) of
+  translate el cs = let emit = pure . splice el cs in case (el, listToMaybe cs) of
     (Fragment f, _) -> emit f
 
     (Truth True, _)  -> emit "True"
