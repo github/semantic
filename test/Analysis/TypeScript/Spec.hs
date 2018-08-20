@@ -72,8 +72,21 @@ spec config = parallel $ do
     it "evaluates BOr statements" $ do
       (_, (heap, res)) <- evaluate ["bor.ts"]
       case ModuleTable.lookup "bor.ts" <$> res of
-        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 3)]
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
         other -> expectationFailure (show other)
+
+    it "evaluates BAnd statements" $ do
+      (_, (heap, res)) <- evaluate ["band.ts"]
+      case ModuleTable.lookup "band.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 0)]
+        other -> expectationFailure (show other)
+
+    it "evaluates BXOr statements" $ do
+      (_, (heap, res)) <- evaluate ["bxor.ts"]
+      case ModuleTable.lookup "bxor.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
+        other -> expectationFailure (show other)
+
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
