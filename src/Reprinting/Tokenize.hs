@@ -66,15 +66,15 @@ ignore = const (pure ())
 -- pretty print the value of the supplied constructor in its AST context.
 class (Show1 constr, Traversable constr) => Tokenize constr where
   -- | Should emit control and data tokens.
-  prettyPrint :: FAlgebra constr (Tokenizer ())
+  tokenize :: FAlgebra constr (Tokenizer ())
 
 -- | Sums of reprintable terms are reprintable.
 instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Tokenize fs) => Tokenize (Sum fs) where
-  prettyPrint = apply @Tokenize prettyPrint
+  tokenize = apply @Tokenize tokenize
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
 instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize (TermF a (Record fields)) where
-  prettyPrint t = withHistory t (prettyPrint (termFOut t))
+  tokenize t = withHistory t (tokenize (termFOut t))
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
@@ -138,7 +138,7 @@ descend t = do
   let into s = withHistory (subterm s) (subtermRef s)
   case (hist, strat) of
     (Unmodified _, _) -> traverse_ into t
-    (Refactored _, PrettyPrinting) -> prettyPrint (fmap into t)
+    (Refactored _, PrettyPrinting) -> tokenize (fmap into t)
     (Refactored r, Reprinting) -> do
       crs <- gets _cursor
       src <- asks _source
@@ -146,5 +146,5 @@ descend t = do
       log ("slicing: " <> show delimiter)
       chunk (slice delimiter src)
       modify (set cursor (start r))
-      prettyPrint (fmap (withStrategy PrettyPrinting . into) t)
+      tokenize (fmap (withStrategy PrettyPrinting . into) t)
       modify (set cursor (end r))
