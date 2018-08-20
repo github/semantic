@@ -229,7 +229,6 @@ library
                      , parsers
                      , prettyprinter
                      , pretty-show
-                     , profunctors
                      , recursion-schemes
                      , reducers
                      , scientific
