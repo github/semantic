@@ -12,7 +12,7 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token
 import Data.Sequence
 
-data JSONBeautyOpts = JSONBeautyOpts { jsonPrettyPrint :: Bool }
+newtype JSONBeautyOpts = JSONBeautyOpts { jsonPrettyPrint :: Bool }
   deriving (Eq, Show)
 
 defaultBeautyOpts :: JSONBeautyOpts

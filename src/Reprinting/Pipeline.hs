@@ -73,7 +73,7 @@ Seq Token         -> Seq Splice        | -> Seq Splice        -> Seq Splice     
 
 -}
 
-{-# LANGUAGE AllowAmbiguousTypes, TypeApplications, ScopedTypeVariables, RankNTypes #-}
+{-# LANGUAGE AllowAmbiguousTypes, ScopedTypeVariables, RankNTypes #-}
 module Reprinting.Pipeline ( runReprinter ) where
 
 import           Control.Monad.Effect as Effect
