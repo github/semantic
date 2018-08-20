@@ -69,6 +69,14 @@ spec config = parallel $ do
           Env.names env `shouldBe` [ "x" ]
         other -> expectationFailure (show other)
 
+    it "evaluates await" $ do
+      (_, (heap, res)) <- evaluate ["await.ts"]
+      case ModuleTable.lookup "await.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          Env.names env `shouldBe` [ "f2" ]
+          (derefQName heap ("y" :| []) env) `shouldBe` Nothing
+        other -> expectationFailure (show other)
+
     it "evaluates BOr statements" $ do
       (_, (heap, res)) <- evaluate ["bor.ts"]
       case ModuleTable.lookup "bor.ts" <$> res of
