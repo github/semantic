@@ -12,7 +12,6 @@ import           Control.Abstract.Matching
 import           Control.Category
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
-import           Control.Rule
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError (..))
@@ -30,6 +29,7 @@ import           Data.History
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Machine
+import           Data.Machine.Runner
 import           Data.Project hiding (readFile)
 import           Data.Quieterm (quieterm)
 import           Data.Record
@@ -208,9 +208,6 @@ increaseNumbers p = case Sum.project (termOut p) of
   Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
   Nothing                -> Term (fmap increaseNumbers (unTerm p))
 
-findHashes :: (Literal.Hash :< syntax , term ~ Term (Sum syntax) ann) => Rule eff term (Either term (term, Literal.Hash term))
-findHashes = fromMatcher "findHashes" matchHash
-
 addKVPair :: forall effs syntax ann fields term .
   ( Apply Functor syntax
   , Literal.Hash :< syntax
@@ -220,8 +217,8 @@ addKVPair :: forall effs syntax ann fields term .
   , ann ~ Record (History ': fields)
   , term ~ Term (Sum syntax) ann
   ) =>
-  Rule effs (Either term (term, Literal.Hash term)) term
-addKVPair = fromPlan "addKVPair" $ do
+  ProcessT (Eff effs) (Either term (term, Literal.Hash term)) term
+addKVPair = repeatedly $ do
   t <- await
   Data.Machine.yield (either id injKVPair t)
   where
@@ -236,11 +233,8 @@ addKVPair = fromPlan "addKVPair" $ do
 
 testAddKVPair = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (addKVPair . findHashes)) (mark Unmodified tree)
+  tagged <- runM $ cata (toAlgebra (addKVPair <~ fromMatcher matchHash)) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
-
-findFloats :: ( Literal.Float :< syntax , term ~ Term (Sum syntax) ann ) => Rule effs term (Either term (term, Literal.Float term))
-findFloats = fromMatcher "test" matchFloat
 
 overwriteFloats :: forall effs syntax ann fields term .
   ( Apply Functor syntax
@@ -248,8 +242,8 @@ overwriteFloats :: forall effs syntax ann fields term .
   , ann ~ Record (History ': fields)
   , term ~ Term (Sum syntax) ann
   ) =>
-  Rule effs (Either term (term, Literal.Float term)) term
-overwriteFloats = fromPlan "overwritingFloats" $ do
+  ProcessT (Eff effs) (Either term (term, Literal.Float term)) term
+overwriteFloats = repeatedly $ do
   t <- await
   Data.Machine.yield (either id injFloat t)
   where injFloat :: (term, Literal.Float term) -> term
@@ -257,7 +251,7 @@ overwriteFloats = fromPlan "overwritingFloats" $ do
 
 testOverwriteFloats = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (overwriteFloats . findFloats)) (mark Unmodified tree)
+  tagged <- runM $ cata (toAlgebra (overwriteFloats <~ fromMatcher matchFloat)) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 findKV ::
@@ -265,8 +259,8 @@ findKV ::
   , Literal.TextElement :< syntax
   , term ~ Term (Sum syntax) ann
   ) =>
-  Text -> Rule effs term (Either term (term, Literal.KeyValue term))
-findKV name = fromMatcher "findKV" (kvMatcher name)
+  Text -> ProcessT (Eff effs) term (Either term (term, Literal.KeyValue term))
+findKV name = fromMatcher (kvMatcher name)
 
 kvMatcher :: forall fs ann term .
   ( Literal.KeyValue :< fs
@@ -288,8 +282,8 @@ changeKV :: forall effs syntax ann fields term .
   , ann ~ Record (History ': fields)
   , term ~ Term (Sum syntax) ann
   ) =>
-  Rule effs (Either term (term, Literal.KeyValue term)) term
-changeKV = fromFunction "changeKV" $ either id injKV
+  ProcessT (Eff effs) (Either term (term, Literal.KeyValue term)) term
+changeKV = auto $ either id injKV
   where
     injKV :: (term, Literal.KeyValue term) -> term
     injKV (term, Literal.KeyValue k v) = case projectTerm v of
@@ -301,7 +295,7 @@ changeKV = fromFunction "changeKV" $ either id injKV
 
 testChangeKV = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (changeKV . findKV "\"bar\"")) (mark Unmodified tree)
+  tagged <- runM $ cata (toAlgebra (changeKV <~ findKV "\"bar\"")) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 testPipeline = do
@@ -309,3 +303,16 @@ testPipeline = do
   printToTerm $ runReprinter src defaultJSONPipeline (mark Refactored tree)
 
 printToTerm res = either (putStrLn . show) (BC.putStr . Source.sourceBytes) res
+
+-- Temporary, until new KURE system lands.
+fromMatcher :: Matcher from to -> ProcessT (Eff effs) from (Either from (from, to))
+fromMatcher m = auto go where go x = maybe (Left x) (\y -> Right (x, y)) (runOnce x m)
+
+-- Turn a 'ProccessT' into an FAlgebra.
+toAlgebra :: (Traversable (Base t), Corecursive t)
+          => ProcessT (Eff effs) t t
+          -> FAlgebra (Base t) (Eff effs t)
+toAlgebra m t = do
+  inner <- sequenceA t
+  res <- runT1 (source (Just (embed inner)) ~> m)
+  pure (fromMaybe (embed inner) res)
