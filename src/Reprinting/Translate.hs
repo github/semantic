@@ -1,5 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, FunctionalDependencies, GeneralizedNewtypeDeriving, KindSignatures, LambdaCase, OverloadedLists,
-             ScopedTypeVariables, TupleSections, TypeFamilyDependencies, TypeApplications, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, OverloadedLists, ScopedTypeVariables, TypeFamilyDependencies, TypeOperators #-}
 
 module Reprinting.Translate
   ( TranslationException (..)
@@ -41,8 +40,8 @@ translating = flattened <~ autoT (Kleisli step) where
     TElement el  -> get >>= translate el
     TControl ctl -> case ctl of
       Log _   -> pure mempty
-      Enter c -> enterContext c *> pure mempty
-      Exit c  -> exitContext c *> pure mempty
+      Enter c -> enterContext c $> mempty
+      Exit c  -> exitContext c $> mempty
 
   translate el cs = let emit = pure . splice el cs in case (el, listToMaybe cs) of
     (Fragment f, _) -> emit f

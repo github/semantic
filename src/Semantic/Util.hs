@@ -270,7 +270,7 @@ kvMatcher :: forall fs ann term .
   Text -> Matcher term (Literal.KeyValue term)
 kvMatcher name = matchM projectTerm target <* matchKey where
   matchKey
-    = match Literal.key $
+    = match Literal.key .
         match Literal.textElementContent $
           ensure (== name)
 
@@ -302,7 +302,7 @@ testPipeline = do
   (src, tree) <- testJSONFile
   printToTerm $ runReprinter src defaultJSONPipeline (mark Refactored tree)
 
-printToTerm res = either (putStrLn . show) (BC.putStr . Source.sourceBytes) res
+printToTerm = either (putStrLn . show) (BC.putStr . Source.sourceBytes)
 
 -- Temporary, until new KURE system lands.
 fromMatcher :: Matcher from to -> ProcessT (Eff effs) from (Either from (from, to))
