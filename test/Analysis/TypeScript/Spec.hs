@@ -87,9 +87,9 @@ spec config = parallel $ do
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
         other -> expectationFailure (show other)
 
-    it "evaluates LShift statements" $ do
-      (_, (heap, res)) <- evaluate ["lshift.ts"]
-      case ModuleTable.lookup "lshift.ts" <$> res of
+    it "evaluates RShift statements" $ do
+      (_, (heap, res)) <- evaluate ["rshift.ts"]
+      case ModuleTable.lookup "rshift.ts" <$> res of
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 4)]
         other -> expectationFailure (show other)
 
