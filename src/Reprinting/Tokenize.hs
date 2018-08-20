@@ -7,7 +7,6 @@ module Reprinting.Tokenize
   , remark
     -- * The Reprinter monad
   , Tokenizer
-  , TokenizerEffs
   , yield
   , control
   , within
@@ -22,28 +21,24 @@ module Reprinting.Tokenize
 import Prelude hiding (fail, log)
 import Prologue hiding (Element)
 
-import Control.Rule
 import Control.Monad.Effect
-import Control.Monad.Effect.State
 import Control.Monad.Effect.Reader
+import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
-import Data.Sequence (singleton)
-import Lens.Micro
-
 import Data.History
 import Data.Range
 import Data.Record
+import Data.Reprinting.Token
+import Data.Sequence (singleton)
 import Data.Source
 import Data.Term
-import Data.Reprinting.Token
+import Lens.Micro
 
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
 -- consumer. Its primary interface is through the 'Tokenize'
 -- typeclass.
 type Tokenizer = Eff '[Reader RPContext, State RPState, Writer (Seq Token)]
-
-type TokenizerEffs = '[Reader RPContext, State RPState, Writer (Seq Token)]
 
 -- | Yield an 'Element' token in a 'Tokenizer' context.
 yield :: Element -> Tokenizer ()
