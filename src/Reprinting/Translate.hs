@@ -3,10 +3,9 @@
 
 module Reprinting.Translate
   ( TranslationException (..)
-  , TranslatingEffs
+  , Translator
   , Splice (..)
   , Layout (..)
-  , Indent (..)
   , translating
   , splice
   ) where
@@ -23,9 +22,7 @@ import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 
-
-type TranslatingEffs = '[State [Context], Exc TranslationException]
-
+type Translator = Eff '[State [Context], Exc TranslationException]
 
 translating ::
   ( Member (State [Context]) effs
@@ -54,10 +51,10 @@ translating = flattened <~ autoT (Kleisli step) where
     (Truth False, _) -> emit "False"
     (Nullity, _)     -> emit "Null"
 
-    (Open, Just List)        -> emit "["
-    (Open, Just Associative) -> emit "{"
-
+    (Open,  Just List)        -> emit "["
     (Close, Just List)        -> emit "]"
+
+    (Open,  Just Associative) -> emit "{"
     (Close, Just Associative) -> emit "}"
 
     (Separator, Just List)        -> emit ","
@@ -65,7 +62,7 @@ translating = flattened <~ autoT (Kleisli step) where
     (Separator, Just Pair)        -> emit ":"
 
     -- TODO: Maybe put an error token in the stream instead?
-    _ -> Exc.throwError (Unexpected "don't know how to translate")
+    _ -> Exc.throwError (NoTranslation el cs)
 
 enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
 enterContext c = modify' (c :)
@@ -75,12 +72,14 @@ exitContext c = do
   current <- get
   case current of
     (x:xs) | x == c -> modify' (const xs)
-    _ -> Exc.throwError (Unexpected "invalid context")
+    cs -> Exc.throwError (InvalidContext c cs)
 
 -- | Represents failure occurring in a 'Concrete' machine.
 data TranslationException
-  = InvalidContext (Maybe Context) Context [Context]
+  = InvalidContext Context [Context]
   -- ^ Thrown if an unbalanced 'Enter'/'Exit' pair is encountered.
+  | NoTranslation Element [Context]
+  -- ^ Thrown if no translation found for a given element.
   | Unexpected String
   -- ^ Catch-all exception for unexpected tokens.
     deriving (Eq, Show)
