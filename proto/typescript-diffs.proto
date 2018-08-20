@@ -30,22 +30,6 @@ message TypeScriptDiff {
   }
 }
 
-message Alias {
-  bytes aliasValue = 1;
-  bytes aliasName = 2;
-}
-
-message ImportPath {
-  string unPath = 1;
-  IsRelative pathIsRelative = 2;
-}
-
-enum IsRelative {
-  Unknown = 0;
-  Relative = 1;
-  NonRelative = 2;
-}
-
 message TypeScriptSyntax {
   oneof syntax {
     Comment comment = 1;
@@ -819,10 +803,6 @@ message AbstractClass {
   TypeScriptDiff classBody = 4;
 }
 
-message ExtendsClause {
-  repeated TypeScriptDiff extendsClauses = 1;
-}
-
 message ImplementsClause {
   repeated TypeScriptDiff implementsClauseTypes = 1;
 }
@@ -896,6 +876,10 @@ message AmbientDeclaration {
 message EnumDeclaration {
   TypeScriptDiff enumDeclarationIdentifier = 1;
   repeated TypeScriptDiff enumDeclarationBody = 2;
+}
+
+message ExtendsClause {
+  repeated TypeScriptDiff extendsClauses = 1;
 }
 
 message AmbientFunction {
@@ -979,4 +963,20 @@ message JavaScriptRequire {
 
 message List {
   repeated TypeScriptDiff listContent = 1;
+}
+
+message Alias {
+  bytes aliasValue = 1;
+  bytes aliasName = 2;
+}
+
+message ImportPath {
+  string unPath = 1;
+  IsRelative pathIsRelative = 2;
+}
+
+enum IsRelative {
+  Unknown = 0;
+  Relative = 1;
+  NonRelative = 2;
 }

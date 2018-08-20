@@ -12,11 +12,11 @@ import           Semantic.Task (withOptions)
 import           Semantic.Util hiding (evalRubyProject, evalPythonProject, evaluateProject)
 
 -- Duplicating this stuff from Util to shut off the logging
-evalRubyProject   = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)   rubyParser   Language.Ruby
-evalPythonProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python) pythonParser Language.Python
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Ruby)       rubyParser
+evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
 
-evaluateProject proxy parser lang paths = withOptions defaultOptions $ \ config logger statter ->
-  evaluateProject' (TaskConfig config logger statter) proxy parser lang paths
+evaluateProject proxy parser paths = withOptions defaultOptions $ \ config logger statter ->
+  evaluateProject' (TaskConfig config logger statter) proxy parser paths
 
 -- We use `fmap show` to ensure that all the parts of the result of evaluation are
 -- evaluated themselves. While an NFData instance is the most morally correct way
@@ -30,10 +30,10 @@ rbEval :: FilePath -> Benchmarkable
 rbEval p = whnfIO . fmap show . evalRubyProject $ ["bench/bench-fixtures/ruby/" <> p]
 
 pyCall :: FilePath -> Benchmarkable
-pyCall p = whnfIO $ callGraphProject pythonParser (Proxy @'Language.Python) Language.Python defaultOptions ["bench/bench-fixtures/python/" <> p]
+pyCall p = whnfIO $ callGraphProject pythonParser (Proxy @'Language.Python) defaultOptions ["bench/bench-fixtures/python/" <> p]
 
 rbCall :: FilePath -> Benchmarkable
-rbCall p = whnfIO $ callGraphProject rubyParser (Proxy @'Language.Ruby) Language.Ruby defaultOptions ["bench/bench-fixtures/ruby/" <> p]
+rbCall p = whnfIO $ callGraphProject rubyParser (Proxy @'Language.Ruby) defaultOptions ["bench/bench-fixtures/ruby/" <> p]
 
 main :: IO ()
 main = defaultMain
