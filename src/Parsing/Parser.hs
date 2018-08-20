@@ -21,6 +21,7 @@ module Parsing.Parser
 , markdownParser
 , pythonParser
 , rubyParser
+, miniRubyParser
 , typescriptParser
 , phpParser
 , haskellParser
@@ -158,6 +159,9 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
+
+miniRubyParser :: Parser Ruby.MiniTerm
+miniRubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.miniAssignment
 
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
