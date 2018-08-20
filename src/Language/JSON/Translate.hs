@@ -47,9 +47,15 @@ translatingJSON = flattened <~ auto step where
 beautifyingJSON :: Monad m => JSONBeautyOpts -> ProcessT m Splice Splice
 beautifyingJSON _ = flattened <~ auto step where
   step :: Splice -> Seq Splice
-  step s@(Insert Open  (Associative:_) _) = s <| directive (HardWrap 2 Space)
-  step s@(Insert Close (Associative:_) _) = directive (HardWrap 0 Space) |> s
-  step x = pure x
+  step s@(Insert el cs _) = case (el, listToMaybe cs) of
+    (Open,  Just Associative) -> s <| directives [HardWrap, Indent]
+    (Close, Just Associative) -> directive HardWrap |> s
+
+    (Separator, Just List)        -> s <| directive Space
+    (Separator, Just Pair)        -> s <| directive Space
+    (Separator, Just Associative) -> s <| directives [HardWrap, Indent]
+    _ -> pure s
+  step s = pure s
 
 -- TODO: Could implement other steps like minimizing or uglifing.
 -- minimizingJSON :: Rule eff Token (Seq Splice)
