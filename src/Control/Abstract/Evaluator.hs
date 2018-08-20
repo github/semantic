@@ -23,6 +23,7 @@ import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
 import Control.Monad.Effect.State     as X
 import Control.Monad.Effect.Trace     as X
+import Control.Monad.IO.Class
 import Prologue hiding (MonadError(..))
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
@@ -34,6 +35,7 @@ newtype Evaluator address value effects a = Evaluator { runEvaluator :: Eff effe
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluator address value effects)
+deriving instance Member (Lift IO) effects => MonadIO (Evaluator address value effects)
 
 -- Effects
 

@@ -173,6 +173,7 @@ library
                      , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Parse
+                     , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task
                      , Semantic.Telemetry
@@ -211,6 +212,7 @@ library
                      , gitrev
                      , Glob
                      , hashable
+                     , haskeline
                      , hscolour
                      , http-client
                      , http-client-tls
@@ -324,12 +326,10 @@ test-suite test
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , algebraic-graphs
-                     , array
                      , async
                      , base
                      , bifunctors
                      , bytestring
-                     , comonad
                      , containers
                      , effects
                      , fastsum
@@ -382,7 +382,6 @@ test-suite doctests
   ghc-options:         -dynamic -threaded -j
   build-depends:       base
                      , doctest
-                     , QuickCheck
 
 benchmark evaluation
   hs-source-dirs:      bench
