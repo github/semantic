@@ -12,12 +12,6 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token
 import Data.Sequence
 
-newtype JSONBeautyOpts = JSONBeautyOpts { jsonPrettyPrint :: Bool }
-  deriving (Eq, Show)
-
-defaultBeautyOpts :: JSONBeautyOpts
-defaultBeautyOpts = JSONBeautyOpts True
-
 defaultJSONPipeline :: Monad m => ProcessT m Splice Splice
 defaultJSONPipeline
   = translatingJSON
@@ -43,6 +37,14 @@ translatingJSON = flattened <~ auto step where
     _ -> txt
 
   step x = pure x
+
+-- | TODO: Fill out and implement configurable options like indentation count,
+-- tabs vs. spaces, etc.
+data JSONBeautyOpts = JSONBeautyOpts { jsonIndent :: Int, jsonUseTabs :: Bool }
+  deriving (Eq, Show)
+
+defaultBeautyOpts :: JSONBeautyOpts
+defaultBeautyOpts = JSONBeautyOpts 2 False
 
 beautifyingJSON :: Monad m => JSONBeautyOpts -> ProcessT m Splice Splice
 beautifyingJSON _ = flattened <~ auto step where
