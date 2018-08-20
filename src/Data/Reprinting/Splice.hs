@@ -1,14 +1,14 @@
 module Data.Reprinting.Splice
   ( Splice(..)
   , Layout(..)
-  , Indent(..)
   , copy
   , splice
   , directive
+  , directives
   ) where
 
 import Data.Reprinting.Token
-import Data.Sequence (singleton)
+import Data.Sequence (singleton, fromList)
 import Prologue hiding (Element)
 
 -- | The final representation of concrete syntax in the reprinting pipeline.
@@ -32,14 +32,14 @@ splice el c = singleton . Insert el c
 directive :: Layout -> Seq Splice
 directive = singleton . Directive
 
+-- | Construct multiple layout directives.
+directives :: [Layout] -> Seq Splice
+directives = fromList . fmap Directive
+
 -- | Indentation/spacing directives.
 data Layout
-  = HardWrap Int Indent
+  = HardWrap
   | SoftWrap
-  | Don't
+  | Space
+  | Indent
     deriving (Eq, Show)
-
--- | Indentation types. This will eventually be moved into the rules engine.
-data Indent = Space | Tab deriving (Eq, Show)
-
--- instance IsString Splice where fromString = Insert . fromString
