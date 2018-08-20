@@ -46,10 +46,6 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
-                     -- Interfaces to the process-based rule engine
-                     , Control.Rule
-                     , Control.Rule.Engine
-                     , Control.Rule.Engine.Builtin
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Located
@@ -157,7 +153,6 @@ library
                      , Parsing.Parser
                      , Parsing.TreeSitter
                      , Paths_semantic
-                     , Refactoring.Core
                      -- Rendering formats
                      , Rendering.Graph
                      , Rendering.JSON
