@@ -16,6 +16,7 @@ typesetting :: Monad m => ProcessT m Splice (Doc a)
 typesetting = auto step
 
 step :: Splice -> Doc a
+step (Unhandled _ _)      = mempty -- TODO: Do we drop uhandled splices at this point?
 step (Original t  )       = pretty t
 step (Insert _ _ t)       = pretty t
 step (Directive SoftWrap) = softline
