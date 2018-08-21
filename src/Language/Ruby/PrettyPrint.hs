@@ -1,5 +1,5 @@
-module Language.Ruby.Translate
-  ( translatingRuby
+module Language.Ruby.PrettyPrint
+  ( prettyPrintingRuby
   ) where
 
 import Data.Machine
@@ -8,11 +8,11 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token
 import Data.Sequence (Seq)
 
-translatingRuby :: Monad m => ProcessT m Splice Splice
-translatingRuby = flattened <~ auto step where
+prettyPrintingRuby :: Monad m => ProcessT m Splice Splice
+prettyPrintingRuby = flattened <~ auto step where
 
 step :: Splice -> Seq Splice
-step s@(Unhandled el cs) = case (el, cs) of
+step s@(Raw el cs) = case (el, cs) of
   (TOpen,  TMethod:_)  -> emit "def" <> layout Space
   (TClose, TMethod:xs) -> endContext (depth xs) <> emit "end"
 
