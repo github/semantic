@@ -22,6 +22,7 @@ step s@(Unhandled el cs) = case (el, cs) of
   (TClose, TParams:TFunction:_) -> emit "|"
   (TClose, TFunction:xs) -> endContext (depth xs) <> emit "end"
 
+  -- TODO: Parens for calls are a style choice, make configurable.
   (TOpen,  TParams:_) -> emit "("
   (TSep,   TParams:_) -> emit "," <> layout Space
   (TClose, TParams:_) -> emit ")"
