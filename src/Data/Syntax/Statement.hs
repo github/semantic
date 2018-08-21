@@ -5,12 +5,14 @@ module Data.Syntax.Statement where
 import Data.Abstract.Evaluatable
 import Data.Aeson (ToJSON1 (..))
 import Data.JSON.Fields
+import Data.List (intersperse)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Diffing.Algorithm
 import Prelude
 import Prologue
 import Proto3.Suite.Class
+import Reprinting.Tokenize
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
@@ -27,6 +29,9 @@ instance ToJSON1 Statements
 
 instance Evaluatable Statements where
   eval (Statements xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
+
+instance Tokenize Statements where
+  tokenize = imperative_ . sep
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }

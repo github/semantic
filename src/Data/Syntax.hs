@@ -166,6 +166,9 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Identifier where
   eval (Identifier name) = pure (LvalLocal name)
 
+instance Tokenize Identifier where
+  tokenize = yield . Fragment . formatName . Data.Syntax.name
+
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
 
@@ -197,6 +200,9 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
   eval _ = rvalBox unit
+
+instance Tokenize Empty where
+  tokenize = ignore
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
@@ -299,3 +305,6 @@ instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
   eval Context{..} = subtermRef contextSubject
+
+instance Tokenize Context where
+  tokenize Context{..} = for_ contextTerms (\c -> c *> yield Separator) *> contextSubject

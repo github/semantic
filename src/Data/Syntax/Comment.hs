@@ -7,6 +7,7 @@ import Data.JSON.Fields
 import Diffing.Algorithm
 import Prologue
 import Proto3.Suite.Class
+import Reprinting.Tokenize as Token
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: Text }
@@ -18,6 +19,9 @@ instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Comment where
   eval _ = rvalBox unit
+
+instance Tokenize Comment where
+  tokenize = yield . Fragment . commentContent
 
 -- TODO: nested comment types
 -- TODO: documentation comment types
