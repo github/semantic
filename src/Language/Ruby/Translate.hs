@@ -13,18 +13,24 @@ translatingRuby = flattened <~ auto step where
 
 step :: Splice -> Seq Splice
 step s@(Unhandled el cs) = case (el, cs) of
-  (Open,  (Declaration DeclMethod):_) -> emit "def" <> directive Space
-  (Close, (Declaration DeclMethod):_) -> emit "end"
-  (Open,  (List:(Declaration DeclMethod):_)) -> emit "("
-  (Close, (List:(Declaration DeclMethod):_)) -> emit ")"
+  (TOpen,  TMethod:_) -> emit "def" <> layout Space
+  (TClose, TMethod:_) -> emit "end"
 
-  (Open,      Imperative:xs) -> stimesMonoid (n xs) (directives [HardWrap, Indent])
-  (Separator, Imperative:xs) -> stimesMonoid (n xs) (directives [HardWrap, Indent])
-  (Close,     Imperative:_)  -> directive HardWrap
+  (TOpen,  TParams:TMethod:_) -> emit "("
+  (TSep,   TParams:TMethod:_) -> emit "," <> layout Space
+  (TClose, TParams:TMethod:_) -> emit ")"
+
+  (TOpen,  Imperative:xs) -> indented (n xs)
+  (TSep,   Imperative:xs) -> indented (n xs)
+  (TClose, Imperative:_)  -> layout HardWrap
+
+  -- (TOpen, TComment:_) -> layout HardWrap
+  -- (TSep, TComment:_) -> layout HardWrap
 
   _ -> pure s
 
   where
+    indented times = stimesMonoid times (layouts [HardWrap, Indent])
     emit = splice el cs
     n = length . filter (== Imperative)
 
