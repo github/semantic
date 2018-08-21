@@ -13,8 +13,12 @@ module Reprinting.Tokenize
   , log
   , ignore
 
-  , sep
+  , sep_
+  , sepTrailing_
+  , surround_
   , list_
+  , hash_
+  , pair_
   , imperative_
 
   -- * Tokenize interface
@@ -63,16 +67,37 @@ log = control . Log
 within :: Context -> Tokenizer () -> Tokenizer ()
 within c r = control (Enter c) *> r <* control (Exit c)
 
-sep :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
-sep t = intersperse (yield Separator) (toList t)
+-- | Emit a sequence of tokens interspersed with 'TSep'.
+sep_ :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
+sep_ = intersperse (yield TSep) . toList
 
-list_ :: Foldable t => t (Tokenizer a) -> Tokenizer ()
-list_ xs = within List $ yield Open *> sequenceA_ xs *> yield Close
+-- | Emit a sequence of tokens each with trailing 'TSep'.
+sepTrailing_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+sepTrailing_ = traverse_ (\x -> void x *> yield TSep)
 
-imperative_ :: Foldable t => t (Tokenizer a) -> Tokenizer ()
-imperative_ xs = within Imperative $ yield Open *> sequenceA_ xs *> yield Close
+-- | Emit a sequence of tokens with appropriate 'TOpen', 'TClose' tokens
+-- surrounding.
+surround_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+surround_ xs = yield TOpen *> void (sequenceA_ xs) *> yield TClose
 
+-- | Emit a sequence of tokens within a 'TList' Context with appropriate 'TOpen',
+-- 'TClose' tokens surrounding.
+list_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+list_ = within TList . surround_ . sep_
 
+-- | Emit a sequence of tokens within an THash Context with appropriate
+-- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
+hash_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+hash_ = within THash . surround_ . sep_
+
+-- | Emit key value tokens with a 'TSep' within an TPair Context
+pair_ :: Tokenizer () -> Tokenizer () -> Tokenizer ()
+pair_ k v = within TPair $ void k *> yield TSep *> v
+
+-- | Emit a sequence of tokens within an Imperative Context with appropriate
+-- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
+imperative_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+imperative_ = within Imperative . surround_ . sep_
 
 -- | Shortcut for @const (pure ())@, useful for when no action
 -- should be taken.
@@ -94,7 +119,7 @@ instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize
   tokenize t = withHistory t (tokenize (termFOut t))
 
 instance Tokenize [] where
-  tokenize = imperative_ . sep
+  tokenize = imperative_
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
