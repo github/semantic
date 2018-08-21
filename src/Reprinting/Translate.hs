@@ -24,17 +24,10 @@ import qualified Data.Source as Source
 
 type Translator = Eff '[State [Context], Exc TranslationException]
 
-translating ::
-  ( Member (State [Context]) effs
-  , Member (Exc TranslationException) effs
-  )
+translating :: (Member (State [Context]) effs, Member (Exc TranslationException) effs)
   => ProcessT (Eff effs) Token Splice
 translating = flattened <~ autoT (Kleisli step) where
-
-  step ::
-    ( Member (State [Context]) effs
-    , Member (Exc TranslationException) effs
-    )
+  step :: (Member (State [Context]) effs, Member (Exc TranslationException) effs)
     => Token -> Eff effs (Seq Splice)
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
@@ -43,15 +36,16 @@ translating = flattened <~ autoT (Kleisli step) where
       Log _   -> pure mempty
       Enter c -> enterContext c $> mempty
       Exit c  -> exitContext c $> mempty
-
   spliceFragments el cs = case el of
     Fragment f -> pure (splice el cs f)
     _ -> pure (unhandled el cs)
 
-enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
+enterContext :: (Member (State [Context]) effs)
+  => Context -> Eff effs ()
 enterContext c = modify' (c :)
 
-exitContext :: (Member (State [Context]) effs, Member (Exc TranslationException) effs) => Context -> Eff effs ()
+exitContext :: (Member (State [Context]) effs, Member (Exc TranslationException) effs)
+  => Context -> Eff effs ()
 exitContext c = do
   current <- get
   case current of
