@@ -19,16 +19,16 @@ data Splice
   = Insert Element [Context] Text -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`.
   | Original Text                 -- ^ Verbatim copy of original 'Text' (un-refactored).
   | Directive Layout              -- ^ Positional information (whitespace).
-  | Unhandled Element [Context]   -- ^ To be handled further down the pipeline.
+  | Raw Element [Context]         -- ^ To be handled further down the pipeline.
     deriving (Eq, Show)
 
 -- | Copy along some original, un-refactored 'Text'.
 copy :: Text -> Seq Splice
 copy = singleton . Original
 
--- | Construct an 'Unhandled' splice.
+-- | Construct an 'Raw' splice.
 unhandled :: Element -> [Context] -> Seq Splice
-unhandled el = singleton . Unhandled el
+unhandled el = singleton . Raw el
 
 -- | Construct a splice to insert.
 splice :: Element -> [Context] -> Text -> Seq Splice

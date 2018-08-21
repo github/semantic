@@ -55,7 +55,7 @@ exitContext c = do
 raisingUnhandled :: (Member (Exc TranslationException) effs)
   => ProcessT (Eff effs) Splice Splice
 raisingUnhandled = autoT (Kleisli step) where
-  step (Unhandled el cs) = Exc.throwError (NoTranslation el cs)
+  step (Raw el cs) = Exc.throwError (NoTranslation el cs)
   step s = pure s
 
 -- | Represents failure occurring in a 'Concrete' machine.

@@ -39,8 +39,8 @@ import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
-import           Language.JSON.Translate
-import           Language.Ruby.Translate
+import           Language.JSON.PrettyPrint
+import           Language.Ruby.PrettyPrint
 import           Matching.Core
 import           Parsing.Parser
 import           Prologue hiding (weaken)
@@ -165,7 +165,7 @@ testRubyFile = do
 
 testRubyPipeline = do
   (src, tree) <- testRubyFile
-  printToTerm $ runReprinter src translatingRuby (mark Refactored tree)
+  printToTerm $ runReprinter src prettyPrintingRuby (mark Refactored tree)
 
 testRubyPipeline' = do
   (src, tree) <- testRubyFile
@@ -173,7 +173,7 @@ testRubyPipeline' = do
 
 testRubyPipeline'' = do
   (src, tree) <- testRubyFile
-  pure $ runTranslating src (mark Refactored tree)
+  pure $ runTranslating src echo (mark Refactored tree)
 
 testJSONPipeline = do
   (src, tree) <- testJSONFile

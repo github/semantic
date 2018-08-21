@@ -42,34 +42,55 @@ details of actually pretty-printing text).  A representation of the
 stages of the pipeline follows:
 
 @
-  ┌───────────────┬──────────────────────────────────┬────────────────────┐
-  │    Module     │           Description            │     Generality     │
-  ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │    Tokenize   │  A subterm algebra converting    │  Language─agnostic │
-  │               │  terms to a stream of tokens.    │                    │
-  ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │   Translate   │  A stack machine interface       │  Language─specific │
-  │               │  through which tokens are        │                    │
-  │               │  interpreted to target           │                    │
-  │               │  different languages.            │                    │
-  ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │    Rules      │  A rules engine that informs     │  Language─specific │
-  │(unimplemented)│  interpreted Tokens how to lay   │  Project─specific  │
-  │               │  themselves out on the page      │                    │
-  │               │  with appropriate indentation.   │                    │
-  ├───────────────┼──────────────────────────────────┼────────────────────┤
-  │    Typeset    │ A simple function informing the  │  Language─agnostic │
-  │               │ prettyprinting library how to    │                    │
-  │               │ render laid─out tokens into an   │                    │
-  │               │ aesthetically pleasing document. │                    │
-  └───────────────┴──────────────────────────────────┴────────────────────┘
-@
 
-                                       | - extensible, add more steps here...    - |
-                                       |                                           |
-language agnostic -> language agnostic | -> language specific -> language specific | -> language agnostic
-tokenize          -> splice            | -> translate         -> format            | -> typeset
-Seq Token         -> Seq Splice        | -> Seq Splice        -> Seq Splice        | -> Doc
+[Start]
+  The Pipeline starts with a tree, where terms are annotated with 'History' to
+  denote what's been refactored.
+    |
+    | AST
+    |
+    v
+[Tokenize]
+  A subterm algebra converting a tree (terms) to a stream of tokens.
+  (Language-agnostic)
+    |
+    | Seq Token
+    |
+    v
+[Translate]
+  A stack machine interface through which tokens are interpreted to splices
+  (with context). A splice is a concrete representation of syntax, to which
+  additional language specific transformations can be applied.
+  (Language-agnostic)
+    |
+    | Seq Splice
+    |
+    v
+[PrettyPrint] --> <Format> --> <Beautify> --> <...>
+  A language specific stack machine interface allowing further refinement of the
+  sequence of splices. Language machines should emit specific keywords,
+  punctutation, and layout rules. Additional steps can be added for project
+  specific style, formatting, and even post-processing (minimizers, etc).
+  (Language-specific, Project-specific)
+    |
+    | Seq Splice
+    |
+    v
+[Typeset]
+  A stack machine that converts splices to a Doc. (Language-agnostic)
+    |
+    | Doc
+    |
+    v
+[Print]
+  A simple function that produces 'Text' or 'Source' with the desired layout
+  settings from a 'Doc'. (Language-agnostic)
+    |
+    | Text
+    |
+    v
+
+@
 
 -}
 
@@ -116,6 +137,7 @@ runReprinter src languageSubPipeline tree
       ~> typesetting
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
 
+-- | Run the reprinting pipeline up to tokenizing.
 runTokenizing ::
   ( Show (Record fields)
   , Tokenize a
@@ -127,17 +149,21 @@ runTokenizing ::
 runTokenizing src tree
   = Data.Machine.run $ source (tokenizing src tree)
 
+-- | Run the reprinting pipeline up to translating.
 runTranslating ::
   ( Show (Record fields)
   , Tokenize a
   , HasField fields History
   )
   => Source.Source
+  -> ProcessT Translator Splice Splice
   -> Term a (Record fields)
   -> Either TranslationException [Splice]
-runTranslating src tree
+runTranslating src printing tree
   = Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
-  . runT $ source (tokenizing src tree) ~> translating
+  . runT $ source (tokenizing src tree)
+      ~> translating
+      ~> printing

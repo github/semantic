@@ -126,11 +126,11 @@ library
                      , Language.Haskell.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
-                     , Language.JSON.Translate
+                     , Language.JSON.PrettyPrint
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax
-                     , Language.Ruby.Translate
+                     , Language.Ruby.PrettyPrint
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Resolution

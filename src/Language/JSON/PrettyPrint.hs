@@ -1,7 +1,7 @@
-module Language.JSON.Translate
+module Language.JSON.PrettyPrint
   ( defaultBeautyOpts
   , defaultJSONPipeline
-  , translatingJSON
+  , prettyPrintingJSON
   , beautifyingJSON
   ) where
 
@@ -14,13 +14,13 @@ import Data.Sequence
 
 defaultJSONPipeline :: Monad m => ProcessT m Splice Splice
 defaultJSONPipeline
-  = translatingJSON
+  = prettyPrintingJSON
   ~> beautifyingJSON defaultBeautyOpts
 
-translatingJSON :: Monad m => ProcessT m Splice Splice
-translatingJSON = flattened <~ auto step where
+prettyPrintingJSON :: Monad m => ProcessT m Splice Splice
+prettyPrintingJSON = flattened <~ auto step where
   step :: Splice -> Seq Splice
-  step s@(Unhandled el cs ) =
+  step s@(Raw el cs ) =
     let emit = splice el cs
     in case (el, listToMaybe cs) of
       (Truth True, _)  -> emit "true"
