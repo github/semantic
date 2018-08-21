@@ -1,5 +1,5 @@
 module Semantic.Env
-  ( envLookupInt
+  ( envLookupNum
   , envLookupString
   ) where
 
@@ -11,8 +11,7 @@ import Text.Read (readMaybe)
 envLookupString :: MonadIO io => String -> String -> io String
 envLookupString defaultVal k = liftIO $ fromMaybe defaultVal <$> lookupEnv k
 
-envLookupInt :: MonadIO io => Int -> String -> io Int
-envLookupInt defaultVal k = liftIO $ parse <$> lookupEnv k
-  where parse x | Just s <- x
-                    , Just p <- readMaybe s = p
-                    | otherwise = defaultVal
+envLookupNum :: (Read a, MonadIO io, Num a) => a -> String -> io a
+envLookupNum defaultVal k = liftIO $ parse <$> lookupEnv k
+  where parse x | Just s <- x, Just p <- readMaybe s = p
+                | otherwise = defaultVal
