@@ -96,8 +96,8 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
     it "evaluates LShift statements" $ do
-      (_, (heap, res)) <- evaluate ["Lshift.ts"]
-      case ModuleTable.lookup "rshift.ts" <$> res of
+      (_, (heap, res)) <- evaluate ["lshift.ts"]
+      case ModuleTable.lookup "lshift.ts" <$> res of
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 4)]
         other -> expectationFailure (show other)
 
@@ -105,6 +105,12 @@ spec config = parallel $ do
       (_, (heap, res)) <- evaluate ["rshift.ts"]
       case ModuleTable.lookup "rshift.ts" <$> res of
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 0)]
+        other -> expectationFailure (show other)
+
+    it "evaluates Complement statements" $ do
+      (_, (heap, res)) <- evaluate ["complement.ts"]
+      case ModuleTable.lookup "complement.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer (-2))]
         other -> expectationFailure (show other)
 
 
