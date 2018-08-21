@@ -307,4 +307,4 @@ instance Evaluatable Context where
   eval Context{..} = subtermRef contextSubject
 
 instance Tokenize Context where
-  tokenize Context{..} = for_ contextTerms (\c -> c *> yield Separator) *> contextSubject
+  tokenize Context{..} = sequenceA_ contextTerms *> contextSubject
