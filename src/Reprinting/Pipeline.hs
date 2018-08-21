@@ -74,7 +74,7 @@ Seq Token         -> Seq Splice        | -> Seq Splice        -> Seq Splice     
 -}
 
 {-# LANGUAGE AllowAmbiguousTypes, ScopedTypeVariables, RankNTypes #-}
-module Reprinting.Pipeline ( runReprinter, runTokenizing ) where
+module Reprinting.Pipeline ( runReprinter, runTokenizing, runTranslating ) where
 
 import           Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.Exception as Exc
@@ -126,3 +126,18 @@ runTokenizing ::
   -> [Token]
 runTokenizing src tree
   = Data.Machine.run $ source (tokenizing src tree)
+
+runTranslating ::
+  ( Show (Record fields)
+  , Tokenize a
+  , HasField fields History
+  )
+  => Source.Source
+  -> Term a (Record fields)
+  -> Either TranslationException [Splice]
+runTranslating src tree
+  = Effect.run
+  . Exc.runError
+  . fmap snd
+  . runState (mempty :: [Context])
+  . runT $ source (tokenizing src tree) ~> translating
