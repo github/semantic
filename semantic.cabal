@@ -130,6 +130,7 @@ library
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax
+                     , Language.Ruby.Translate
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Resolution
