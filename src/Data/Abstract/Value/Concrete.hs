@@ -282,6 +282,9 @@ instance ( Coercible body (Eff effects)
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair =
       if i >= 0 then pure . integer $ ourShift (fromIntegral i) (fromIntegral j)
       else throwValueError (Bitwise2Error left right)
+    | (Float (Number.Decimal i), Float (Number.Decimal j)) <- pair =
+      if i >= 0 then pure . integer $ ourShift (fromInteger (coefficient (normalize i))) (fromInteger (coefficient (normalize j)))
+      else throwValueError (Bitwise2Error left right)
     | otherwise = throwValueError (Bitwise2Error left right)
       where
         pair = (left, right)
