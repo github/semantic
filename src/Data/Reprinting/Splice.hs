@@ -2,6 +2,7 @@ module Data.Reprinting.Splice
   ( Splice(..)
   , Layout(..)
   , copy
+  , unhandled
   , splice
   , directive
   , directives
@@ -18,11 +19,15 @@ data Splice
   = Insert Element [Context] Text -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`.
   | Original Text
   | Directive Layout
+  | Unhandled Element [Context]
     deriving (Eq, Show)
 
 -- | Copy in some original, un-refactored 'Text'.
 copy :: Text -> Seq Splice
 copy = singleton . Original
+
+unhandled :: Element -> [Context] -> Seq Splice
+unhandled el = singleton . Unhandled el
 
 -- | Construct a splice to insert.
 splice :: Element -> [Context] -> Text -> Seq Splice
