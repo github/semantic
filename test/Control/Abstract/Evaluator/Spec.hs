@@ -6,6 +6,7 @@ module Control.Abstract.Evaluator.Spec
 import Control.Abstract
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.BaseError
+import Data.Abstract.Environment
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package

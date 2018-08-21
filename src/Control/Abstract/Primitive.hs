@@ -9,6 +9,7 @@ module Control.Abstract.Primitive
   , Lambda(..)
   ) where
 
+import Data.Abstract.Environment
 import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator

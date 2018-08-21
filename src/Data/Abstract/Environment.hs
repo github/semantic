@@ -1,7 +1,10 @@
+{-# LANGUAGE GADTs #-}
+
 module Data.Abstract.Environment
   ( Environment(..)
   , Bindings(..)
   , EvalContext(..)
+  , EnvironmentError(..)
   , addresses
   , aliasBindings
   , allNames
@@ -61,6 +64,15 @@ newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings 
 
 data EvalContext address = EvalContext { ctxSelf :: Maybe address, ctxEnvironment :: Environment address }
   deriving (Eq, Ord, Show)
+
+-- | Errors involving the environment.
+data EnvironmentError address return where
+  FreeVariable :: Name -> EnvironmentError address address
+
+deriving instance Eq (EnvironmentError address return)
+deriving instance Show (EnvironmentError address return)
+instance Show1 (EnvironmentError address) where liftShowsPrec _ _ = showsPrec
+instance Eq1 (EnvironmentError address) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
 
 instance Lower (EvalContext address) where
   lowerBound = EvalContext Nothing lowerBound
