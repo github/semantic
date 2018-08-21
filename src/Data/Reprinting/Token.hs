@@ -25,9 +25,9 @@ data Element
   = Fragment Text -- ^ A literal chunk of text.
   | Truth Bool    -- ^ A boolean value.
   | Nullity       -- ^ @null@ or @nil@ or some other zero value.
-  | Separator     -- ^ Some sort of delimiter, interpreted in some 'Context'.
-  | Open          -- ^ The beginning of some 'Context', such as an @[@ or @{@.
-  | Close         -- ^ The opposite of 'Open'.
+  | TSep          -- ^ Some sort of delimiter, interpreted in some 'Context'.
+  | TOpen         -- ^ The beginning of some 'Context', such as an @[@ or @{@.
+  | TClose        -- ^ The opposite of 'TOpen'.
     deriving (Eq, Show)
 
 -- | 'Control' tokens describe information about some AST's context.
@@ -41,16 +41,18 @@ data Control
     deriving (Eq, Show)
 
 -- | A 'Context' represents a scope in which other tokens can be
--- interpreted. For example, in the 'Imperative' context a 'Separator'
+-- interpreted. For example, in the 'Imperative' context a 'TSep'
 -- could be a semicolon or newline, whereas in a 'List' context a
--- 'Separator' is probably going to be a comma.
+-- 'TSep' is probably going to be a comma.
 data Context
-  = List
-  | Associative
-  | Pair
+  = TList
+  | THash
+  | TPair
+  | TMethod
+  | TParams
+  | TComment
   | Infix Operator
   | Imperative
-  | TopLevel
     deriving (Show, Eq)
 
 -- | A sum type representing every concievable infix operator a
