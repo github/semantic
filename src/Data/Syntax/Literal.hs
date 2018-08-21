@@ -51,6 +51,9 @@ instance Evaluatable Data.Syntax.Literal.Integer where
   eval (Data.Syntax.Literal.Integer x) =
     rvalBox =<< (integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x))
 
+instance Tokenize Data.Syntax.Literal.Integer where
+  tokenize = yield . Fragment . integerContent
+
 -- | A literal float of unspecified width.
 
 newtype Float a = Float { floatContent :: Text }
