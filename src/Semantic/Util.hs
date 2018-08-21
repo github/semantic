@@ -167,6 +167,20 @@ testRubyPipeline = do
   (src, tree) <- testRubyFile
   printToTerm $ runReprinter src translatingRuby (mark Refactored tree)
 
+testRubyPipeline' = do
+  (src, tree) <- testRubyFile
+  pure $ runTokenizing src (mark Refactored tree)
+
+testRubyPipeline'' = do
+  (src, tree) <- testRubyFile
+  pure $ runTranslating src (mark Refactored tree)
+
+testJSONPipeline = do
+  (src, tree) <- testJSONFile
+  printToTerm $ runReprinter src defaultJSONPipeline (mark Refactored tree)
+
+printToTerm = either (putStrLn . show) (BC.putStr . Source.sourceBytes)
+
 testJSONFile = do
   let path = "test/fixtures/javascript/reprinting/map.json"
   src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
@@ -281,12 +295,6 @@ testChangeKV = do
   (src, tree) <- testJSONFile
   tagged <- runM $ cata (toAlgebra (changeKV <~ findKV "\"bar\"")) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
-
-testPipeline = do
-  (src, tree) <- testJSONFile
-  printToTerm $ runReprinter src defaultJSONPipeline (mark Refactored tree)
-
-printToTerm = either (putStrLn . show) (BC.putStr . Source.sourceBytes)
 
 -- Temporary, until new KURE system lands.
 fromMatcher :: Matcher from to -> ProcessT (Eff effs) from (Either from (from, to))
