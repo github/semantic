@@ -13,8 +13,8 @@ module Reprinting.Tokenize
   , log
   , ignore
 
-  , sep_
-  , sepTrailing_
+  , sep
+  , sepTrailing
   , surround_
   , list_
   , hash_
@@ -68,36 +68,36 @@ within :: Context -> Tokenizer () -> Tokenizer ()
 within c r = control (Enter c) *> r <* control (Exit c)
 
 -- | Emit a sequence of tokens interspersed with 'TSep'.
-sep_ :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
-sep_ = intersperse (yield TSep) . toList
+sep :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
+sep = intersperse (yield TSep) . toList
 
 -- | Emit a sequence of tokens each with trailing 'TSep'.
-sepTrailing_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-sepTrailing_ = traverse_ (\x -> void x *> yield TSep)
+sepTrailing :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
+sepTrailing = foldr (\x acc -> x : yield TSep : acc) mempty
 
--- | Emit a sequence of tokens with appropriate 'TOpen', 'TClose' tokens
--- surrounding.
-surround_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-surround_ xs = yield TOpen *> void (sequenceA_ xs) *> yield TClose
+-- | Emit a sequence of tokens within the given context with appropriate
+-- 'TOpen', 'TClose' tokens surrounding.
+surround_ :: Foldable t => Context -> t (Tokenizer ()) -> Tokenizer ()
+surround_ c xs = within c $ yield TOpen *> sequenceA_ xs <* yield TClose
 
 -- | Emit a sequence of tokens within a 'TList' Context with appropriate 'TOpen',
 -- 'TClose' tokens surrounding.
 list_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-list_ = within TList . surround_ . sep_
+list_ = surround_ TList . sep
 
--- | Emit a sequence of tokens within an THash Context with appropriate
+-- | Emit a sequence of tokens within a 'THash' Context with appropriate
 -- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
 hash_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-hash_ = within THash . surround_ . sep_
+hash_ = surround_ THash . sep
 
 -- | Emit key value tokens with a 'TSep' within an TPair Context
 pair_ :: Tokenizer () -> Tokenizer () -> Tokenizer ()
-pair_ k v = within TPair $ void k *> yield TSep *> v
+pair_ k v = within TPair $ k *> yield TSep <* v
 
 -- | Emit a sequence of tokens within an Imperative Context with appropriate
 -- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
 imperative_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-imperative_ = within Imperative . surround_ . sep_
+imperative_ = surround_ Imperative . sep
 
 -- | Shortcut for @const (pure ())@, useful for when no action
 -- should be taken.

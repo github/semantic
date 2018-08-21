@@ -63,7 +63,7 @@ instance Tokenize Method where
   tokenize Method{..} = within TMethod $ do
     yield TOpen
     methodName
-    within TParams $ surround_ (sep_ methodParameters)
+    surround_ TParams (sep methodParameters)
     methodBody
     yield TClose
 
