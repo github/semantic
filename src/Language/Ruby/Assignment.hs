@@ -169,7 +169,7 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
         --   s <- rawSource
         --   guard (s == "load")
         --   (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
-        nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
+        -- nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
     args :: Assignment [MiniTerm]
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
