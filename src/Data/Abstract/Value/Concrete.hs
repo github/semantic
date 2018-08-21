@@ -269,7 +269,7 @@ instance ( Coercible body (Eff effects)
 
   liftBitwise operator target
     | Integer (Number.Integer i) <- target = pure . integer $ operator i
-    | Float (Number.Decimal i) <- target = pure . integer $ operator (coefficient i)
+    | Float (Number.Decimal i) <- target = pure . integer $ operator (coefficient (normalize i))
     | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
