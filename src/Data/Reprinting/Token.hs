@@ -50,7 +50,6 @@ data Context
   | TPair
   | TMethod
   | TParams
-  | TComment
   | Infix Operator
   | Imperative
     deriving (Show, Eq)
