@@ -12,6 +12,11 @@ module Reprinting.Tokenize
   , within
   , log
   , ignore
+
+  , sep
+  , list_
+  , imperative_
+
   -- * Tokenize interface
   , Tokenize (..)
   -- * Invocation/results
@@ -26,6 +31,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
 import Data.History
+import Data.List (intersperse)
 import Data.Range
 import Data.Record
 import Data.Reprinting.Token
@@ -57,6 +63,17 @@ log = control . Log
 within :: Context -> Tokenizer () -> Tokenizer ()
 within c r = control (Enter c) *> r <* control (Exit c)
 
+sep :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
+sep t = intersperse (yield Separator) (toList t)
+
+list_ :: Foldable t => t (Tokenizer a) -> Tokenizer ()
+list_ xs = within List $ yield Open *> sequenceA_ xs *> yield Close
+
+imperative_ :: Foldable t => t (Tokenizer a) -> Tokenizer ()
+imperative_ xs = within Imperative $ yield Open *> sequenceA_ xs *> yield Close
+
+
+
 -- | Shortcut for @const (pure ())@, useful for when no action
 -- should be taken.
 ignore :: a -> Tokenizer ()
@@ -75,6 +92,9 @@ instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
 instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize (TermF a (Record fields)) where
   tokenize t = withHistory t (tokenize (termFOut t))
+
+instance Tokenize [] where
+  tokenize = imperative_ . sep
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
