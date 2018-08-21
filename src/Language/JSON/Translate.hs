@@ -20,21 +20,23 @@ defaultJSONPipeline
 translatingJSON :: Monad m => ProcessT m Splice Splice
 translatingJSON = flattened <~ auto step where
   step :: Splice -> Seq Splice
-  step (Insert el cs txt) = splice el cs $ case (el, listToMaybe cs) of
-    (Truth True, _)  -> "true"
-    (Truth False, _) -> "false"
-    (Nullity, _)     -> "null"
+  step s@(Unhandled el cs ) =
+    let emit = splice el cs
+    in case (el, listToMaybe cs) of
+      (Truth True, _)  -> emit "true"
+      (Truth False, _) -> emit "false"
+      (Nullity, _)     -> emit "null"
 
-    (Open,  Just List) -> "["
-    (Close, Just List) -> "]"
-    (Open,  Just Associative) -> "{"
-    (Close, Just Associative) -> "}"
+      (Open,  Just List) -> emit "["
+      (Close, Just List) -> emit "]"
+      (Open,  Just Associative) -> emit "{"
+      (Close, Just Associative) -> emit "}"
 
-    (Separator, Just List) -> ","
-    (Separator, Just Pair) -> ":"
-    (Separator, Just Associative) -> ","
+      (Separator, Just List) -> emit ","
+      (Separator, Just Pair) -> emit ":"
+      (Separator, Just Associative) -> emit ","
 
-    _ -> txt
+      _ -> pure s
 
   step x = pure x
 
