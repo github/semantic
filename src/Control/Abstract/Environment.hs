@@ -13,18 +13,21 @@ module Control.Abstract.Environment
 , locally
 , close
 , self
+, letrec
+, letrec'
+, variable
 -- * Effects
 , Env(..)
 , runEnv
-, EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
 , runEnvironmentErrorWith
 ) where
 
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Data.Abstract.BaseError
-import Data.Abstract.Environment (Bindings, Environment, EvalContext(..))
+import Data.Abstract.Environment (Bindings, Environment, EvalContext(..), EnvironmentError(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports
 import Data.Abstract.Module
@@ -37,7 +40,8 @@ getEvalContext :: Member (Env address) effects => Evaluator address value effect
 getEvalContext = send GetCtx
 
 -- | Retrieve the current environment
-getEnv :: Member (Env address) effects => Evaluator address value effects (Environment address)
+getEnv :: Member (Env address) effects
+       => Evaluator address value effects (Environment address)
 getEnv = ctxEnvironment <$> getEvalContext
 
 -- | Replace the execution context. This is only for use in Analysis.Abstract.Caching.
@@ -81,6 +85,51 @@ close = send . Close
 
 self :: Member (Env address) effects => Evaluator address value effects (Maybe address)
 self = ctxSelf <$> getEvalContext
+
+-- | Look up or allocate an address for a 'Name'.
+lookupOrAlloc :: ( Member (Allocator address) effects
+                 , Member (Env address) effects
+                 )
+              => Name
+              -> Evaluator address value effects address
+lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
+
+letrec :: ( Member (Allocator address) effects
+          , Member (Deref value) effects
+          , Member (Env address) effects
+          , Member (State (Heap address value)) effects
+          , Ord address
+          )
+       => Name
+       -> Evaluator address value effects value
+       -> Evaluator address value effects (value, address)
+letrec name body = do
+  addr <- lookupOrAlloc name
+  v <- locally (bind name addr *> body)
+  assign addr v
+  pure (v, addr)
+
+-- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
+letrec' :: ( Member (Allocator address) effects
+           , Member (Env address) effects
+           )
+        => Name
+        -> (address -> Evaluator address value effects a)
+        -> Evaluator address value effects a
+letrec' name body = do
+  addr <- lookupOrAlloc name
+  v <- locally (body addr)
+  v <$ bind name addr
+
+-- | Look up and dereference the given 'Name', throwing an exception for free variables.
+variable :: ( Member (Env address) effects
+            , Member (Reader ModuleInfo) effects
+            , Member (Reader Span) effects
+            , Member (Resumable (BaseError (EnvironmentError address))) effects
+            )
+         => Name
+         -> Evaluator address value effects address
+variable name = lookupEnv name >>= maybeM (freeVariableError name)
 
 -- Effects
 
@@ -131,15 +180,6 @@ handleEnv = \case
   GetCtx -> get
   PutCtx e -> put e
   Export name alias addr -> modify (Exports.insert name alias addr)
-
--- | Errors involving the environment.
-data EnvironmentError address return where
-  FreeVariable :: Name -> EnvironmentError address address
-
-deriving instance Eq (EnvironmentError address return)
-deriving instance Show (EnvironmentError address return)
-instance Show1 (EnvironmentError address) where liftShowsPrec _ _ = showsPrec
-instance Eq1 (EnvironmentError address) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
 
 freeVariableError :: ( Member (Reader ModuleInfo) effects
                      , Member (Reader Span) effects
