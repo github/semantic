@@ -6,6 +6,7 @@ module Reprinting.Translate
   , Splice (..)
   , Layout (..)
   , translating
+  , raisingUnhandled
   , splice
   ) where
 
@@ -37,31 +38,15 @@ translating = flattened <~ autoT (Kleisli step) where
     => Token -> Eff effs (Seq Splice)
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
-    TElement el  -> get >>= translate el
+    TElement el  -> get >>= spliceFragments el
     TControl ctl -> case ctl of
       Log _   -> pure mempty
       Enter c -> enterContext c $> mempty
       Exit c  -> exitContext c $> mempty
 
-  translate el cs = let emit = pure . splice el cs in case (el, listToMaybe cs) of
-    (Fragment f, _) -> emit f
-
-    (Truth True, _)  -> emit "True"
-    (Truth False, _) -> emit "False"
-    (Nullity, _)     -> emit "Null"
-
-    (Open,  Just List)        -> emit "["
-    (Close, Just List)        -> emit "]"
-
-    (Open,  Just Associative) -> emit "{"
-    (Close, Just Associative) -> emit "}"
-
-    (Separator, Just List)        -> emit ","
-    (Separator, Just Associative) -> emit ","
-    (Separator, Just Pair)        -> emit ":"
-
-    -- TODO: Maybe put an error token in the stream instead?
-    _ -> Exc.throwError (NoTranslation el cs)
+  spliceFragments el cs = case el of
+    Fragment f -> pure (splice el cs f)
+    _ -> pure (unhandled el cs)
 
 enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
 enterContext c = modify' (c :)
@@ -72,6 +57,12 @@ exitContext c = do
   case current of
     (x:xs) | x == c -> modify' (const xs)
     cs -> Exc.throwError (InvalidContext c cs)
+
+raisingUnhandled :: (Member (Exc TranslationException) effs)
+  => ProcessT (Eff effs) Splice Splice
+raisingUnhandled = autoT (Kleisli step) where
+  step (Unhandled el cs) = Exc.throwError (NoTranslation el cs)
+  step s = pure s
 
 -- | Represents failure occurring in a 'Concrete' machine.
 data TranslationException
