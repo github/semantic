@@ -4,8 +4,8 @@ module Data.Reprinting.Splice
   , copy
   , unhandled
   , splice
-  , directive
-  , directives
+  , layout
+  , layouts
   ) where
 
 import Data.Reprinting.Token
@@ -14,18 +14,19 @@ import Prologue hiding (Element)
 
 -- | The final representation of concrete syntax in the reprinting pipeline.
 -- 'Inserts' have access to the original 'Element' and 'Context' for ease of
--- writing additional steps in the reprinting pipeline.
+-- writing additional formatting steps in the reprinting pipeline.
 data Splice
   = Insert Element [Context] Text -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`.
-  | Original Text
-  | Directive Layout
-  | Unhandled Element [Context]
+  | Original Text                 -- ^ Verbatim copy of original 'Text' (un-refactored).
+  | Directive Layout              -- ^ Positional information (whitespace).
+  | Unhandled Element [Context]   -- ^ To be handled further down the pipeline.
     deriving (Eq, Show)
 
--- | Copy in some original, un-refactored 'Text'.
+-- | Copy along some original, un-refactored 'Text'.
 copy :: Text -> Seq Splice
 copy = singleton . Original
 
+-- | Construct an 'Unhandled' splice.
 unhandled :: Element -> [Context] -> Seq Splice
 unhandled el = singleton . Unhandled el
 
@@ -33,15 +34,15 @@ unhandled el = singleton . Unhandled el
 splice :: Element -> [Context] -> Text -> Seq Splice
 splice el c = singleton . Insert el c
 
--- | Construct a layout directive.
-directive :: Layout -> Seq Splice
-directive = singleton . Directive
+-- | Construct a layout.
+layout :: Layout -> Seq Splice
+layout = singleton . Directive
 
--- | Construct multiple layout directives.
-directives :: [Layout] -> Seq Splice
-directives = fromList . fmap Directive
+-- | Construct multiple layouts.
+layouts :: [Layout] -> Seq Splice
+layouts = fromList . fmap Directive
 
--- | Indentation/spacing directives.
+-- | Indentation/spacing layouts.
 data Layout
   = HardWrap
   | SoftWrap
