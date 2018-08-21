@@ -51,7 +51,7 @@ type MiniSyntax = '[
     Literal.Integer
   , Comment.Comment
   , Declaration.Method
-  -- , Declaration.Function
+  , Declaration.Function
   -- , Expression.Call
   , Ruby.Syntax.Send
   -- , Ruby.Syntax.Load
@@ -73,11 +73,12 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
     expression = term . handleError $
       choice [ number
              , identifier
-             , method ]
-             -- , methodCall ]
+             , method
+             , methodCall ]
 
+    -- NOTE: Important that we don't flatten out the Imperative for single item lists
     expressions :: Assignment MiniTerm
-    expressions = makeTerm'' <$> location <*> many expression
+    expressions = makeTerm <$> location <*> many expression
 
     number :: Assignment MiniTerm
     number = makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
@@ -152,7 +153,7 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
     methodCall :: Assignment MiniTerm
     methodCall = makeTerm' <$> symbol MethodCall <*> children send -- (require <|> load <|> send)
       where
-        send = inject <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> pure Nothing {- optional block -})
+        send = inject <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
 
         funcCall = Ruby.Syntax.Send Nothing <$> selector <*> args
         regularCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> selector) <*> args
@@ -173,12 +174,12 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
     args :: Assignment [MiniTerm]
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
 
-    -- block :: Assignment MiniTerm
-    -- block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
-    --      <|> makeTerm <$> symbol Block <*> scopedBlockChildren
-    --   where scopedBlockChildren = withExtendedScope blockChildren
-    --         blockChildren = children (Declaration.Function [] <$> emptyTerm <*> params <*> expressions)
-    --         params = symbol BlockParameters *> children (many parameter) <|> pure []
+    block :: Assignment MiniTerm
+    block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
+         <|> makeTerm <$> symbol Block <*> scopedBlockChildren
+      where scopedBlockChildren = withExtendedScope blockChildren
+            blockChildren = children (Declaration.Function [] <$> emptyTerm <*> params <*> expressions)
+            params = symbol BlockParameters *> children (many parameter) <|> pure []
 
     comment :: Assignment MiniTerm
     comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)

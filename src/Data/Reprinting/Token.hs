@@ -49,6 +49,8 @@ data Context
   | THash
   | TPair
   | TMethod
+  | TFunction
+  | TCall
   | TParams
   | Infix Operator
   | Imperative

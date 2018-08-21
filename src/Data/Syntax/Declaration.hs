@@ -32,6 +32,14 @@ instance Evaluatable Function where
     pure (Rval addr)
     where paramNames = foldMap (maybeToList . declaredName . subterm)
 
+instance Tokenize Function where
+  tokenize Function{..} = within TFunction $ do
+    yield TOpen
+    functionName
+    surround_ TParams (sep functionParameters)
+    functionBody
+    yield TClose
+
 instance Declarations1 Function where
   liftDeclaredName declaredName = declaredName . functionName
 

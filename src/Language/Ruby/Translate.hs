@@ -16,15 +16,23 @@ step s@(Unhandled el cs) = case (el, cs) of
   (TOpen,  TMethod:_)  -> emit "def" <> layout Space
   (TClose, TMethod:xs) -> endContext (depth xs) <> emit "end"
 
-  (TOpen,  TParams:TMethod:_) -> emit "("
-  (TSep,   TParams:TMethod:_) -> emit "," <> layout Space
-  (TClose, TParams:TMethod:_) -> emit ")"
+  -- TODO: do..end vs {..} should be configurable.
+  (TOpen,  TFunction:_) -> layout Space <> emit "do" <> layout Space
+  (TOpen,  TParams:TFunction:_) -> emit "|"
+  (TClose, TParams:TFunction:_) -> emit "|"
+  (TClose, TFunction:xs) -> endContext (depth xs) <> emit "end"
+
+  (TOpen,  TParams:_) -> emit "("
+  (TSep,   TParams:_) -> emit "," <> layout Space
+  (TClose, TParams:_) -> emit ")"
 
   (TOpen,  Imperative:[]) -> mempty
   (TOpen,  Imperative:xs) -> layout HardWrap <> indent (depth xs)
   (TSep,   Imperative:xs) -> layout HardWrap <> indent (depth xs)
   (TClose, Imperative:[]) -> layout HardWrap
   (TClose, Imperative:xs) -> indent (pred (depth xs))
+
+  (TSep, TCall:_) -> emit "."
 
   _ -> pure s
 
