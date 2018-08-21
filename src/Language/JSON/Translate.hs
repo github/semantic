@@ -27,14 +27,14 @@ translatingJSON = flattened <~ auto step where
       (Truth False, _) -> emit "false"
       (Nullity, _)     -> emit "null"
 
-      (Open,  Just List) -> emit "["
-      (Close, Just List) -> emit "]"
-      (Open,  Just Associative) -> emit "{"
-      (Close, Just Associative) -> emit "}"
+      (TOpen,  Just TList) -> emit "["
+      (TClose, Just TList) -> emit "]"
+      (TOpen,  Just THash) -> emit "{"
+      (TClose, Just THash) -> emit "}"
 
-      (Separator, Just List) -> emit ","
-      (Separator, Just Pair) -> emit ":"
-      (Separator, Just Associative) -> emit ","
+      (TSep, Just TList) -> emit ","
+      (TSep, Just TPair) -> emit ":"
+      (TSep, Just THash) -> emit ","
 
       _ -> pure s
 
@@ -52,12 +52,12 @@ beautifyingJSON :: Monad m => JSONBeautyOpts -> ProcessT m Splice Splice
 beautifyingJSON _ = flattened <~ auto step where
   step :: Splice -> Seq Splice
   step s@(Insert el cs _) = case (el, listToMaybe cs) of
-    (Open,  Just Associative) -> s <| directives [HardWrap, Indent]
-    (Close, Just Associative) -> directive HardWrap |> s
+    (TOpen,  Just THash) -> s <| layouts [HardWrap, Indent]
+    (TClose, Just THash) -> layout HardWrap |> s
 
-    (Separator, Just List)        -> s <| directive Space
-    (Separator, Just Pair)        -> s <| directive Space
-    (Separator, Just Associative) -> s <| directives [HardWrap, Indent]
+    (TSep, Just TList)        -> s <| layout Space
+    (TSep, Just TPair)        -> s <| layout Space
+    (TSep, Just THash) -> s <| layouts [HardWrap, Indent]
     _ -> pure s
   step s = pure s
 
