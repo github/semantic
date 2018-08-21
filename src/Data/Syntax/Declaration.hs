@@ -9,6 +9,7 @@ import qualified Data.Set as Set
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
+import           Reprinting.Tokenize
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1)
@@ -57,6 +58,14 @@ instance Evaluatable Method where
     bind name addr
     pure (Rval addr)
     where paramNames = foldMap (maybeToList . declaredName . subterm)
+
+instance Tokenize Method where
+  tokenize Method{..} = within TMethod $ do
+    yield TOpen
+    methodName
+    within TParams $ surround_ (sep_ methodParameters)
+    methodBody
+    yield TClose
 
 instance Declarations1 Method where
   liftDeclaredName declaredName = declaredName . methodName
