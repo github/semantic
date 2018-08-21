@@ -40,6 +40,7 @@ import           Data.Term
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Language.JSON.Translate
+import           Language.Ruby.Translate
 import           Matching.Core
 import           Parsing.Parser
 import           Prologue hiding (weaken)
@@ -155,6 +156,16 @@ prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . p
 --
 -- Code rewriting experiments
 --
+
+testRubyFile = do
+  let path = "test/fixtures/ruby/reprinting/function.rb"
+  src  <- blobSource <$> readBlobFromPath (File path Language.Ruby)
+  tree <- parseFile miniRubyParser path
+  pure (src, tree)
+
+testRubyPipeline = do
+  (src, tree) <- testRubyFile
+  printToTerm $ runReprinter src translatingRuby (mark Refactored tree)
 
 testJSONFile = do
   let path = "test/fixtures/javascript/reprinting/map.json"
