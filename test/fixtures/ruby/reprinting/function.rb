@@ -3,5 +3,5 @@ def foo(x)
 end
 
 5.times do |i|
-  i
+  puts i
 end
