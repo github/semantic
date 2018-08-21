@@ -1,5 +1,7 @@
-def foo(x, y)
-  def bar(); end
+def foo(x)
   x
-  5
+end
+
+5.times do |i|
+  i
 end
