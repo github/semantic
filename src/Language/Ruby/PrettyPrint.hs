@@ -8,6 +8,7 @@ import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token
 
+-- | Print Ruby syntax.
 printingRuby :: (Member (Exc TranslationException) effs) => ProcessT (Eff effs) Datum Splice
 printingRuby = flattened <~ autoT (Kleisli step) where
   step (Original txt)   = pure $ emit txt
