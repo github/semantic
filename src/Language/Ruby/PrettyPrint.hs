@@ -1,54 +1,44 @@
-module Language.Ruby.PrettyPrint
-  ( prettyPrintingRuby
-  ) where
+module Language.Ruby.PrettyPrint ( printingRuby ) where
 
+import Control.Arrow
+import Control.Monad.Effect
+import Control.Monad.Effect.Exception (Exc, throwError)
 import Data.Machine
-import Data.Semigroup (stimes)
+import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token
-import Data.Sequence (Seq)
 
-prettyPrintingRuby :: Monad m => ProcessT m Splice Splice
-prettyPrintingRuby = flattened <~ auto step where
+printingRuby :: (Member (Exc TranslationException) effs) => ProcessT (Eff effs) Datum Splice
+printingRuby = flattened <~ autoT (Kleisli step) where
+  step (Original txt)   = pure $ emit txt
+  step (Insert _ _ txt) = pure $ emit txt
+  step (Raw el cs)      =  case (el, cs) of
+    (TOpen,  TMethod:_)  -> pure $ emit "def" <> space
+    (TClose, TMethod:xs) -> pure $ endContext (depth xs) <> emit "end"
 
-step :: Splice -> Seq Splice
-step s@(Raw el cs) = case (el, cs) of
-  (TOpen,  TMethod:_)  -> emit "def" <> layout Space
-  (TClose, TMethod:xs) -> endContext (depth xs) <> emit "end"
+    -- TODO: do..end vs {..} should be configurable.
+    (TOpen,  TFunction:_) -> pure $ space <> emit "do" <> space
+    (TOpen,  TParams:TFunction:_) -> pure $ emit "|"
+    (TClose, TParams:TFunction:_) -> pure $ emit "|"
+    (TClose, TFunction:xs) -> pure $ endContext (depth xs) <> emit "end"
 
-  -- TODO: do..end vs {..} should be configurable.
-  (TOpen,  TFunction:_) -> layout Space <> emit "do" <> layout Space
-  (TOpen,  TParams:TFunction:_) -> emit "|"
-  (TClose, TParams:TFunction:_) -> emit "|"
-  (TClose, TFunction:xs) -> endContext (depth xs) <> emit "end"
+    -- TODO: Parens for calls are a style choice, make configurable.
+    (TOpen,  TParams:_) -> pure $ emit "("
+    (TSep,   TParams:_) -> pure $ emit "," <> space
+    (TClose, TParams:_) -> pure $ emit ")"
 
-  -- TODO: Parens for calls are a style choice, make configurable.
-  (TOpen,  TParams:_) -> emit "("
-  (TSep,   TParams:_) -> emit "," <> layout Space
-  (TClose, TParams:_) -> emit ")"
+    (TOpen,  Imperative:[]) -> pure $ mempty
+    (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
+    (TSep,   Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
+    (TClose, Imperative:[]) -> pure $ layout HardWrap
+    (TClose, Imperative:xs) -> pure $ indent (pred (depth xs))
 
-  (TOpen,  Imperative:[]) -> mempty
-  (TOpen,  Imperative:xs) -> layout HardWrap <> indent (depth xs)
-  (TSep,   Imperative:xs) -> layout HardWrap <> indent (depth xs)
-  (TClose, Imperative:[]) -> layout HardWrap
-  (TClose, Imperative:xs) -> indent (pred (depth xs))
+    (TSep, TCall:_) -> pure $ emit "."
 
-  (TSep, TCall:_) -> emit "."
+    _ -> throwError (NoTranslation el cs)
 
-  _ -> pure s
-
-  where
-    endContext times = layout HardWrap <> indent (pred times)
-    emit = splice el cs
-
-step x = pure x
+  endContext times = layout HardWrap <> indent (pred times)
 
 -- | Depth of imperative scope.
 depth :: [Context] -> Int
 depth = length . filter (== Imperative)
-
--- | Indent n times.
-indent :: Integral b => b -> Seq Splice
-indent times
-  | times > 0 = stimes times (layout Indent)
-  | otherwise = mempty
