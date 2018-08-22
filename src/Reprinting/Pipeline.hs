@@ -99,6 +99,7 @@ module Reprinting.Pipeline
   ( runReprinter
   , runTokenizing
   , runContextualizing
+  , runTranslating
   ) where
 
 import           Control.Monad.Effect as Effect
@@ -170,3 +171,21 @@ runContextualizing src tree
   . runState (mempty :: [Context])
   . runT $ source (tokenizing src tree)
       ~> contextualizing
+
+runTranslating ::
+  ( Show (Record fields)
+  , Tokenize a
+  , HasField fields History
+  )
+  => Source.Source
+  -> ProcessT Translator Datum Splice
+  -> Term a (Record fields)
+  -> Either TranslationException [Splice]
+runTranslating src translating tree
+  = Effect.run
+  . Exc.runError
+  . fmap snd
+  . runState (mempty :: [Context])
+  . runT $ source (tokenizing src tree)
+      ~> contextualizing
+      ~> translating
