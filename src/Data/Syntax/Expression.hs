@@ -273,7 +273,6 @@ instance Eq1 Delete where liftEq = genericLiftEq
 instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Delete
 instance Evaluatable Delete where
   eval (Delete a) = do
     valueRef <- subtermRef a
@@ -289,7 +288,6 @@ instance Eq1 SequenceExpression where liftEq = genericLiftEq
 instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for SequenceExpression
 instance Evaluatable SequenceExpression where
   eval (SequenceExpression a b) =
     subtermValue a >> subtermRef b
@@ -302,7 +300,6 @@ instance Eq1 Void where liftEq = genericLiftEq
 instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Void
 instance Evaluatable Void where
   eval (Void a) =
     subtermValue a >> rvalBox null
@@ -527,8 +524,9 @@ instance Eq1 Cast where liftEq = genericLiftEq
 instance Ord1 Cast where liftCompare = genericLiftCompare
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Cast
-instance Evaluatable Cast
+-- TODO: This isn't actually casting anything; we need to be able to extract a type from a subterm and implement a subtyping relation.
+instance Evaluatable Cast where
+  eval (Cast value type') = subtermRef value
 
 data Super a = Super
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
