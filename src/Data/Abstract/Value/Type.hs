@@ -343,3 +343,5 @@ instance ( Member (Allocator address) effects
     _                 -> unify left right $> Bool
 
   loop f = f empty
+
+  castToInteger t = unify t (Int :+ Float :+ Rational) $> Int

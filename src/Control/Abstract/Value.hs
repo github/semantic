@@ -97,6 +97,10 @@ class Show value => AbstractIntro value where
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class AbstractIntro value => AbstractValue address value effects where
+  -- | Cast numbers to integers
+  castToInteger :: value -> Evaluator address value effects value
+
+
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
                -> (value -> Evaluator address value effects value)
