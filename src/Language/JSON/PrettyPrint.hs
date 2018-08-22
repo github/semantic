@@ -16,12 +16,14 @@ import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token
 
+-- | Default printing pipeline for JSON.
 defaultJSONPipeline :: (Member (Exc TranslationException) effs)
   => ProcessT (Eff effs) Datum Splice
 defaultJSONPipeline
   = printingJSON
   ~> beautifyingJSON defaultBeautyOpts
 
+-- | Print JSON syntax.
 printingJSON :: Monad m => ProcessT m Datum Datum
 printingJSON = flattened <~ auto step where
   step :: Datum -> Seq Datum
@@ -45,7 +47,7 @@ printingJSON = flattened <~ auto step where
 
   step x = pure x
 
--- | TODO: Fill out and implement configurable options like indentation count,
+-- TODO: Fill out and implement configurable options like indentation count,
 -- tabs vs. spaces, etc.
 data JSONBeautyOpts = JSONBeautyOpts { jsonIndent :: Int, jsonUseTabs :: Bool }
   deriving (Eq, Show)
@@ -53,6 +55,7 @@ data JSONBeautyOpts = JSONBeautyOpts { jsonIndent :: Int, jsonUseTabs :: Bool }
 defaultBeautyOpts :: JSONBeautyOpts
 defaultBeautyOpts = JSONBeautyOpts 2 False
 
+-- | Produce JSON with configurable whitespace and layout.
 beautifyingJSON :: (Member (Exc TranslationException) effs)
   => JSONBeautyOpts -> ProcessT (Eff effs) Datum Splice
 beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
@@ -66,6 +69,7 @@ beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
     (TSep, Just THash)   -> emit txt <> layouts [HardWrap, Indent]
     _ -> emit txt
 
+-- | Produce whitespace minimal JSON.
 minimizingJSON :: (Member (Exc TranslationException) effs)
   => ProcessT (Eff effs) Datum Splice
 minimizingJSON = flattened <~ autoT (Kleisli step) where

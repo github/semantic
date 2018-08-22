@@ -46,14 +46,15 @@ indent times
   | times > 0 = stimes times (layout Indent)
   | otherwise = mempty
 
--- | An intermediate representation ....
--- The final representation of concrete syntax in the reprinting pipeline.
--- 'Inserts' have access to the original 'Element' and 'Context' for ease of
--- writing additional formatting steps in the reprinting pipeline.
+-- | An intermediate representation of concrete syntax in the reprinting pipeline.
 data Datum
-  = Original Text                 -- ^ Verbatim copy of original 'Text' (un-refactored).
-  | Insert Element [Context] Text -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`.
-  | Raw Element [Context]         -- ^ To be handled further down the pipeline.
+  = Original Text
+  -- ^ Verbatim copy of original 'Text' (un-refactored).
+  | Insert Element [Context] Text
+  -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`
+  -- allowing later steps to re-write.
+  | Raw Element [Context]
+  -- ^ To be handled further down the pipeline.
   deriving (Eq, Show)
 
 -- | Copy along some original, un-refactored 'Text'.
