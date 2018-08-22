@@ -95,3 +95,5 @@ instance ( Member (Allocator address) effects
   liftComparison _ _ _ = pure Abstract
 
   loop f = f empty
+
+  castToInteger _ = pure Abstract

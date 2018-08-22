@@ -19,7 +19,7 @@ import qualified Data.Abstract.Number as Number
 import Data.Bits
 import Data.Coerce
 import Data.List (genericIndex, genericLength)
-import Data.Scientific (Scientific, coefficient)
+import Data.Scientific (Scientific, coefficient, normalize)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Data.Word
@@ -269,21 +269,16 @@ instance ( Coercible body (Eff effects)
 
   liftBitwise operator target
     | Integer (Number.Integer i) <- target = pure . integer $ operator i
-    | Float (Number.Decimal i) <- target = pure . integer $ operator (coefficient (normalize i))
     | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair = pure . integer $ operator i j
-    | (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- pair = pure . integer $ operator (coefficient (normalize i)) (coefficient (normalize j))
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
   unsignedRShift left right
     | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair =
       if i >= 0 then pure . integer $ ourShift (fromIntegral i) (fromIntegral j)
-      else throwValueError (Bitwise2Error left right)
-    | (Float (Number.Decimal i), Float (Number.Decimal j)) <- pair =
-      if i >= 0 then pure . integer $ ourShift (fromInteger (coefficient (normalize i))) (fromInteger (coefficient (normalize j)))
       else throwValueError (Bitwise2Error left right)
     | otherwise = throwValueError (Bitwise2Error left right)
       where
@@ -296,6 +291,8 @@ instance ( Coercible body (Eff effects)
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
     Continue _  -> loop x)
 
+  castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
+  castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError address body resume where

@@ -327,8 +327,8 @@ instance Ord1 BOr where liftCompare = genericLiftCompare
 instance Show1 BOr where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BOr where
   eval (BOr a b) = do
-    a' <- subtermValue a
-    b' <- subtermValue b
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
     liftBitwise2 (.|.) a' b' >>= rvalBox
 
 data BAnd a = BAnd { left :: a, right :: a }
@@ -339,8 +339,8 @@ instance Ord1 BAnd where liftCompare = genericLiftCompare
 instance Show1 BAnd where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BAnd where
   eval (BAnd a b) = do
-    a' <- subtermValue a
-    b' <- subtermValue b
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
     liftBitwise2 (.&.) a' b' >>= rvalBox
 
 
@@ -352,8 +352,8 @@ instance Ord1 BXOr where liftCompare = genericLiftCompare
 instance Show1 BXOr where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BXOr where
   eval (BXOr a b) = do
-    a' <- subtermValue a
-    b' <- subtermValue b
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
     liftBitwise2 xor a' b' >>= rvalBox
 
 data LShift a = LShift { left :: a, right :: a }
@@ -364,8 +364,8 @@ instance Ord1 LShift where liftCompare = genericLiftCompare
 instance Show1 LShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LShift where
   eval (LShift a b) = do
-    a' <- subtermValue a
-    b' <- subtermValue b
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
     liftBitwise2 shiftL' a' b' >>= rvalBox
     where
       shiftL' a b = shiftL a (fromIntegral (toInteger b))
@@ -378,8 +378,8 @@ instance Ord1 RShift where liftCompare = genericLiftCompare
 instance Show1 RShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable RShift where
   eval (RShift a b) = do
-    a' <- subtermValue a
-    b' <- subtermValue b
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
     liftBitwise2 shiftR' a' b' >>= rvalBox
     where
       shiftR' a b = shiftR a (fromIntegral (toInteger b))
@@ -392,8 +392,8 @@ instance Ord1 UnsignedRShift where liftCompare = genericLiftCompare
 instance Show1 UnsignedRShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable UnsignedRShift where
   eval (UnsignedRShift a b) = do
-    a' <- subtermValue a
-    b' <- subtermValue b
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
     unsignedRShift a' b' >>= rvalBox
     -- This isn't working for JavaScript
 
@@ -406,7 +406,7 @@ instance Show1 Complement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Complement where
   eval (Complement a) = do
-    a' <- subtermValue a
+    a' <- subtermValue a >>= castToInteger
     liftBitwise complement a' >>= rvalBox
 
 -- | Member Access (e.g. a.b)
