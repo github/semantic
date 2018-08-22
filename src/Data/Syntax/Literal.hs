@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
-import           Data.Abstract.Evaluatable hiding (Close)
+import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
 import qualified Data.Text as T

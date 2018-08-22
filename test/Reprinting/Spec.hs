@@ -14,7 +14,7 @@ import Data.Sum
 import Data.Foldable
 import Semantic.IO
 import Data.Blob
-import Language.JSON.Translate
+import Language.JSON.PrettyPrint
 
 spec :: Spec
 spec = describe "reprinting" $ do
@@ -34,7 +34,7 @@ spec = describe "reprinting" $ do
 
     it "should emit control tokens but only 1 chunk for a wholly-modified tree" $ do
       let toks = tokenizing src (mark Refactored tree)
-      for_ @[] [List, THash] $ \t -> do
+      for_ @[] [TList, THash] $ \t -> do
         toks `shouldSatisfy` elem (TControl (Enter t))
         toks `shouldSatisfy` elem (TControl (Exit t))
 

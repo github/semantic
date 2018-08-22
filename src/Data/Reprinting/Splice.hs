@@ -5,12 +5,10 @@ module Data.Reprinting.Splice
   , layouts
   , space
   , indent
-
   , Datum(..)
   , copy
   , insert
   , raw
-
   , Whitespace(..)
   ) where
 

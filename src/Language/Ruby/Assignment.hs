@@ -45,6 +45,8 @@ import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Prologue hiding (for)
 import           Proto3.Suite (Named (..), Named1 (..))
 
+-- TODO: Only needed for as long as we carry around a mini ruby syntax.
+{-# ANN module ("HLint: ignore Reduce duplication" :: String) #-}
 
 -- | Small version of Ruby syntax for testing the code rewriting pipeline.
 type MiniSyntax = '[

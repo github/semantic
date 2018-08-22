@@ -73,7 +73,7 @@ data SomeAnalysisParser typeclasses ann where
                         , HasPrelude lang
                         , HasPostlude lang
                         )
-                     => Parser (Term (Sum fs) ann) -- A parser.
+                     => Parser (Term (Sum fs) ann) -- ^ A parser.
                      -> Proxy lang
                      -> SomeAnalysisParser typeclasses ann
 
@@ -86,9 +86,9 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                       , ApplyAll' typeclasses TypeScript.Syntax
                       , ApplyAll' typeclasses Haskell.Syntax
                       )
-                   => proxy typeclasses                                -- A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                                         -- The 'Language' to select.
-                   -> SomeAnalysisParser typeclasses (Record Location) -- A 'SomeAnalysisParser' abstracting the syntax type to be produced.
+                   => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                                         -- ^ The 'Language' to select.
+                   -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
 someAnalysisParser _ Java       = SomeAnalysisParser javaParser       (Proxy :: Proxy 'Java)
@@ -106,9 +106,9 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))                           -- A parser producing AST.
-                   -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- An assignment from AST onto 'Term's.
-                   -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
+                   => Parser (Term ast (Node grammar))                         -- ^ A parser producing AST.
+                   -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (Term (Sum fs) (Record Location))                 -- ^ A parser producing 'Term's.
   DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
                       => Parser (AST [] grammar)
                       -> Deterministic.Assignment grammar (Term (Sum syntaxes) (Record Location))
