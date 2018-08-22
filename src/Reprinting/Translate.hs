@@ -27,14 +27,14 @@ translating ::
 translating = flattened <~ autoT (Kleisli step) where
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
-    TElement el  -> get >>= spliceFragments el
+    TElement el  -> get >>= pure . spliceFragments el
     TControl ctl -> case ctl of
       Log _   -> pure mempty
       Enter c -> enterContext c $> mempty
       Exit c  -> exitContext c $> mempty
   spliceFragments el cs = case el of
-    Fragment f -> pure (insert el cs f)
-    _ -> pure (raw el cs)
+    Fragment f -> insert el cs f
+    _ -> raw el cs
 
 enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
 enterContext c = modify' (c :)
