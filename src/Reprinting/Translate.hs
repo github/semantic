@@ -2,7 +2,7 @@
 
 module Reprinting.Translate
   ( Translator
-  , translating
+  , contextualizing
   ) where
 
 import Prologue hiding (Element)
@@ -20,12 +20,14 @@ import qualified Data.Source as Source
 
 type Translator = Eff '[State [Context], Exc TranslationException]
 
-translating ::
+-- | Prepare for language specific translation by contextualizing 'Token's to
+-- 'Datum's.
+contextualizing ::
   ( Member (State [Context]) effs
   , Member (Exc TranslationException) effs
   )
   => ProcessT (Eff effs) Token Datum
-translating = flattened <~ autoT (Kleisli step) where
+contextualizing = flattened <~ autoT (Kleisli step) where
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
     TElement el  -> toDatum el <$> get

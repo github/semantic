@@ -171,7 +171,7 @@ testRubyPipeline' = do
 
 testRubyPipeline'' = do
   (src, tree) <- testRubyFile
-  pure $ runTranslating src (mark Refactored tree)
+  pure $ runContextualizing src (mark Refactored tree)
 
 testJSONPipeline = do
   (src, tree) <- testJSONFile
