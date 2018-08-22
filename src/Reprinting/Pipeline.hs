@@ -73,7 +73,7 @@ stages of the pipeline follows:
   specific style, formatting, and even post-processing (minimizers, etc).
   (Language-specific, Project-specific)
     |
-    | Seq Datum
+    | Seq Splice
     |
     v
 [Typeset]

@@ -1,6 +1,4 @@
-module Data.Reprinting.Errors
-  ( TranslationException (..)
-  ) where
+module Data.Reprinting.Errors ( TranslationException (..) ) where
 
 import Data.Reprinting.Token
 

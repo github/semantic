@@ -28,10 +28,10 @@ printingRuby = flattened <~ autoT (Kleisli step) where
     (TSep,   TParams:_) -> pure $ emit "," <> space
     (TClose, TParams:_) -> pure $ emit ")"
 
-    (TOpen,  Imperative:[]) -> pure $ mempty
+    (TOpen,  [Imperative]) -> pure mempty
     (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
     (TSep,   Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
-    (TClose, Imperative:[]) -> pure $ layout HardWrap
+    (TClose, [Imperative]) -> pure $ layout HardWrap
     (TClose, Imperative:xs) -> pure $ indent (pred (depth xs))
 
     (TSep, TCall:_) -> pure $ emit "."

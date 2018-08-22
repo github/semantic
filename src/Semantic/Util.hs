@@ -1,4 +1,3 @@
--- {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
@@ -103,7 +102,6 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   pure (x, (() <$) <$> modules)
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
-
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
