@@ -63,7 +63,7 @@ stages of the pipeline follows:
   additional language specific transformations can be applied.
   (Language-agnostic)
     |
-    | Seq Splice
+    | Seq Datum
     |
     v
 [PrettyPrint] --> <Format> --> <Beautify> --> <...>
@@ -73,7 +73,7 @@ stages of the pipeline follows:
   specific style, formatting, and even post-processing (minimizers, etc).
   (Language-specific, Project-specific)
     |
-    | Seq Splice
+    | Seq Datum
     |
     v
 [Typeset]
@@ -95,7 +95,11 @@ stages of the pipeline follows:
 -}
 
 {-# LANGUAGE AllowAmbiguousTypes, ScopedTypeVariables, RankNTypes #-}
-module Reprinting.Pipeline ( runReprinter, runTokenizing, runTranslating ) where
+module Reprinting.Pipeline
+  ( runReprinter
+  , runTokenizing
+  , runTranslating
+  ) where
 
 import           Control.Monad.Effect as Effect
 import qualified Control.Monad.Effect.Exception as Exc
@@ -103,6 +107,8 @@ import           Control.Monad.Effect.State
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
 import           Data.Record
+import           Data.Reprinting.Errors
+import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 import           Data.Term
@@ -121,7 +127,7 @@ runReprinter ::
   , HasField fields History
   )
   => Source.Source
-  -> ProcessT Translator Splice Splice
+  -> ProcessT Translator Datum Splice
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
 runReprinter src languageSubPipeline tree
@@ -133,7 +139,6 @@ runReprinter src languageSubPipeline tree
   . foldT $ source (tokenizing src tree)
       ~> translating
       ~> languageSubPipeline
-      ~> raisingUnhandled
       ~> typesetting
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
 
@@ -156,14 +161,12 @@ runTranslating ::
   , HasField fields History
   )
   => Source.Source
-  -> ProcessT Translator Splice Splice
   -> Term a (Record fields)
-  -> Either TranslationException [Splice]
-runTranslating src printing tree
+  -> Either TranslationException [Datum]
+runTranslating src tree
   = Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
   . runT $ source (tokenizing src tree)
       ~> translating
-      ~> printing

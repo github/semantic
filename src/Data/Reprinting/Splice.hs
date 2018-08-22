@@ -1,11 +1,17 @@
 module Data.Reprinting.Splice
   ( Splice(..)
-  , Layout(..)
-  , copy
-  , unhandled
-  , splice
+  , emit
   , layout
   , layouts
+  , space
+  , indent
+
+  , Datum(..)
+  , copy
+  , insert
+  , raw
+
+  , Whitespace(..)
   ) where
 
 import Data.Reprinting.Token
@@ -13,39 +19,59 @@ import Data.Sequence (singleton, fromList)
 import Prologue hiding (Element)
 
 -- | The final representation of concrete syntax in the reprinting pipeline.
--- 'Inserts' have access to the original 'Element' and 'Context' for ease of
--- writing additional formatting steps in the reprinting pipeline.
 data Splice
-  = Insert Element [Context] Text -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`.
-  | Original Text                 -- ^ Verbatim copy of original 'Text' (un-refactored).
-  | Directive Layout              -- ^ Positional information (whitespace).
-  | Raw Element [Context]         -- ^ To be handled further down the pipeline.
-    deriving (Eq, Show)
+  = Emit Text
+  | Layout Whitespace
+  deriving (Eq, Show)
 
--- | Copy along some original, un-refactored 'Text'.
-copy :: Text -> Seq Splice
-copy = singleton . Original
+-- | Emit some 'Text' as a 'Splice'.
+emit :: Text -> Seq Splice
+emit = singleton . Emit
 
--- | Construct an 'Raw' splice.
-unhandled :: Element -> [Context] -> Seq Splice
-unhandled el = singleton . Raw el
-
--- | Construct a splice to insert.
-splice :: Element -> [Context] -> Text -> Seq Splice
-splice el c = singleton . Insert el c
-
--- | Construct a layout.
-layout :: Layout -> Seq Splice
-layout = singleton . Directive
+-- | Construct a layout 'Splice'.
+layout :: Whitespace -> Seq Splice
+layout = singleton . Layout
 
 -- | Construct multiple layouts.
-layouts :: [Layout] -> Seq Splice
-layouts = fromList . fmap Directive
+layouts :: [Whitespace] -> Seq Splice
+layouts = fromList . fmap Layout
 
--- | Indentation/spacing layouts.
-data Layout
+-- | Single space.
+space :: Seq Splice
+space = layout Space
+
+-- | Indent n times.
+indent :: Integral b => b -> Seq Splice
+indent times
+  | times > 0 = stimes times (layout Indent)
+  | otherwise = mempty
+
+-- | An intermediate representation ....
+-- The final representation of concrete syntax in the reprinting pipeline.
+-- 'Inserts' have access to the original 'Element' and 'Context' for ease of
+-- writing additional formatting steps in the reprinting pipeline.
+data Datum
+  = Original Text                 -- ^ Verbatim copy of original 'Text' (un-refactored).
+  | Insert Element [Context] Text -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`.
+  | Raw Element [Context]         -- ^ To be handled further down the pipeline.
+  deriving (Eq, Show)
+
+-- | Copy along some original, un-refactored 'Text'.
+copy :: Text -> Seq Datum
+copy = singleton . Original
+
+-- | Construct an 'Insert' datum.
+insert :: Element -> [Context] -> Text -> Seq Datum
+insert el c = singleton . Insert el c
+
+-- | Construct an 'Raw' splice.
+raw :: Element -> [Context] -> Seq Datum
+raw el = singleton . Raw el
+
+-- | Indentation, spacing, and other whitespace.
+data Whitespace
   = HardWrap
   | SoftWrap
   | Space
   | Indent
-    deriving (Eq, Show)
+  deriving (Eq, Show)

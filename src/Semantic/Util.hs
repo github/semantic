@@ -165,7 +165,7 @@ testRubyFile = do
 
 testRubyPipeline = do
   (src, tree) <- testRubyFile
-  printToTerm $ runReprinter src prettyPrintingRuby (mark Refactored tree)
+  printToTerm $ runReprinter src printingRuby (mark Refactored tree)
 
 testRubyPipeline' = do
   (src, tree) <- testRubyFile
@@ -173,7 +173,7 @@ testRubyPipeline' = do
 
 testRubyPipeline'' = do
   (src, tree) <- testRubyFile
-  pure $ runTranslating src echo (mark Refactored tree)
+  pure $ runTranslating src (mark Refactored tree)
 
 testJSONPipeline = do
   (src, tree) <- testJSONFile

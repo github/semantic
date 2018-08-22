@@ -91,6 +91,7 @@ library
                      , Data.Quieterm
                      , Data.Range
                      , Data.Record
+                     , Data.Reprinting.Errors
                      , Data.Reprinting.Token
                      , Data.Reprinting.Splice
                      , Data.Semigroup.App
