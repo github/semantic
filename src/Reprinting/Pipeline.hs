@@ -98,7 +98,7 @@ stages of the pipeline follows:
 module Reprinting.Pipeline
   ( runReprinter
   , runTokenizing
-  , runTranslating
+  , runContextualizing
   ) where
 
 import           Control.Monad.Effect as Effect
@@ -130,15 +130,15 @@ runReprinter ::
   -> ProcessT Translator Datum Splice
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
-runReprinter src languageSubPipeline tree
+runReprinter src translating tree
   = fmap go
   . Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
   . foldT $ source (tokenizing src tree)
+      ~> contextualizing
       ~> translating
-      ~> languageSubPipeline
       ~> typesetting
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
 
@@ -154,8 +154,8 @@ runTokenizing ::
 runTokenizing src tree
   = Data.Machine.run $ source (tokenizing src tree)
 
--- | Run the reprinting pipeline up to translating.
-runTranslating ::
+-- | Run the reprinting pipeline up to contextualizing.
+runContextualizing ::
   ( Show (Record fields)
   , Tokenize a
   , HasField fields History
@@ -163,10 +163,10 @@ runTranslating ::
   => Source.Source
   -> Term a (Record fields)
   -> Either TranslationException [Datum]
-runTranslating src tree
+runContextualizing src tree
   = Effect.run
   . Exc.runError
   . fmap snd
   . runState (mempty :: [Context])
   . runT $ source (tokenizing src tree)
-      ~> translating
+      ~> contextualizing
