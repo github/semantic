@@ -1,5 +1,4 @@
 {-# LANGUAGE GADTs, LambdaCase, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators #-}
-
 module Control.Abstract.Modules
 ( ModuleResult
 , lookupModule
