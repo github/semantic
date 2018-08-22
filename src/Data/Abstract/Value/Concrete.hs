@@ -293,6 +293,7 @@ instance ( Coercible body (Eff effects)
 
   castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
   castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
+  castToInteger i = throwValueError (NumericError i)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError address body resume where
