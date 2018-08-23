@@ -9,6 +9,4 @@ data TranslationException
   -- ^ Thrown if an unbalanced 'Enter'/'Exit' pair is encountered.
   | NoTranslation Element [Context]
   -- ^ Thrown if no translation found for a given element.
-  | Unexpected String
-  -- ^ Catch-all exception for unexpected tokens.
     deriving (Eq, Show)
