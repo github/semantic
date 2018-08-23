@@ -108,6 +108,10 @@ runBoolean = interpret $ \case
   Abstract.Boolean b          -> pure $! Boolean b
   Abstract.AsBool (Boolean b) -> pure b
   Abstract.AsBool other       -> throwValueError $! BoolError other
+  Abstract.Disjunction a b    -> do
+    a' <- runBoolean (Evaluator a)
+    a'' <- runBoolean (asBool a')
+    if a'' then pure a' else runBoolean (Evaluator b)
 
 
 instance AbstractHole (Value address body) where
