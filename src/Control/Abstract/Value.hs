@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types #-}
+{-# LANGUAGE GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -71,6 +71,16 @@ data Function address value m result where
 instance PureEffect (Function address value) where
   handle handler (Request (Function name fvs body) k) = Request (Function name fvs (handler body)) (handler . k)
   handle handler (Request (Call fn self addrs)     k) = Request (Call fn self addrs)               (handler . k)
+
+
+data Boolean value (m :: * -> *) result where
+  Boolean :: Bool  -> Boolean value m value
+  AsBool  :: value -> Boolean value m Bool
+
+instance PureEffect (Boolean value)
+instance Effect (Boolean value) where
+  handleState state handler (Request (Boolean b) k) = Request (Boolean b) (handler . (<$ state) . k)
+  handleState state handler (Request (AsBool v)  k) = Request (AsBool v)  (handler . (<$ state) . k)
 
 
 class Show value => AbstractIntro value where
