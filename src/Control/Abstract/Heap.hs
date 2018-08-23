@@ -3,7 +3,6 @@ module Control.Abstract.Heap
 ( Heap
 , Configuration(..)
 , Live
-, getConfiguration
 , getHeap
 , putHeap
 , box
@@ -11,9 +10,6 @@ module Control.Abstract.Heap
 , dealloc
 , deref
 , assign
-, letrec
-, letrec'
-, variable
 -- * Garbage collection
 , gc
 -- * Effects
@@ -24,10 +20,8 @@ module Control.Abstract.Heap
 , runAddressErrorWith
 ) where
 
-import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
-import Control.Abstract.TermEvaluator
 import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import Data.Abstract.Heap
@@ -36,11 +30,6 @@ import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Span (Span)
 import Prologue
-
--- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address value)) effects) => term -> TermEvaluator term address value effects (Configuration term address value)
-getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
-
 
 -- | Retrieve the heap.
 getHeap :: Member (State (Heap address value)) effects => Evaluator address value effects (Heap address value)
@@ -99,54 +88,6 @@ assign addr value = do
   heap <- getHeap
   cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)))
   putHeap (heapInit addr cell heap)
-
-
--- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( Member (Allocator address) effects
-                 , Member (Env address) effects
-                 )
-              => Name
-              -> Evaluator address value effects address
-lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
-
-
-letrec :: ( Member (Allocator address) effects
-          , Member (Deref value) effects
-          , Member (Env address) effects
-          , Member (State (Heap address value)) effects
-          , Ord address
-          )
-       => Name
-       -> Evaluator address value effects value
-       -> Evaluator address value effects (value, address)
-letrec name body = do
-  addr <- lookupOrAlloc name
-  v <- locally (bind name addr *> body)
-  assign addr v
-  pure (v, addr)
-
--- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( Member (Allocator address) effects
-           , Member (Env address) effects
-           )
-        => Name
-        -> (address -> Evaluator address value effects a)
-        -> Evaluator address value effects a
-letrec' name body = do
-  addr <- lookupOrAlloc name
-  v <- locally (body addr)
-  v <$ bind name addr
-
-
--- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Env address) effects
-            , Member (Reader ModuleInfo) effects
-            , Member (Reader Span) effects
-            , Member (Resumable (BaseError (EnvironmentError address))) effects
-            )
-         => Name
-         -> Evaluator address value effects address
-variable name = lookupEnv name >>= maybeM (freeVariableError name)
 
 
 -- Garbage collection
