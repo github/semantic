@@ -392,7 +392,6 @@ instance Evaluatable UnsignedRShift where
     a' <- subtermValue a >>= castToInteger
     b' <- subtermValue b >>= castToInteger
     unsignedRShift a' b' >>= rvalBox
-    -- This isn't working for JavaScript
 
 newtype Complement a = Complement { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
