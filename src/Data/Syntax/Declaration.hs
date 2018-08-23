@@ -33,12 +33,10 @@ instance Evaluatable Function where
     where paramNames = foldMap (maybeToList . declaredName . subterm)
 
 instance Tokenize Function where
-  tokenize Function{..} = within TFunction $ do
-    yield TOpen
+  tokenize Function{..} = within' TFunction $ do
     functionName
-    surround_ TParams (sep functionParameters)
+    within' TParams $ sequenceA_ (sep functionParameters)
     functionBody
-    yield TClose
 
 instance Declarations1 Function where
   liftDeclaredName declaredName = declaredName . functionName
@@ -68,12 +66,10 @@ instance Evaluatable Method where
     where paramNames = foldMap (maybeToList . declaredName . subterm)
 
 instance Tokenize Method where
-  tokenize Method{..} = within TMethod $ do
-    yield TOpen
+  tokenize Method{..} = within' TMethod $ do
     methodName
-    surround_ TParams (sep methodParameters)
+    within' TParams $ sequenceA_ (sep methodParameters)
     methodBody
-    yield TClose
 
 instance Declarations1 Method where
   liftDeclaredName declaredName = declaredName . methodName

@@ -10,17 +10,15 @@ module Reprinting.Tokenize
   , yield
   , control
   , within
+  , within'
   , log
   , ignore
-
   , sep
   , sepTrailing
-  , surround_
-  , list_
-  , hash_
-  , pair_
-  , imperative_
-
+  , list
+  , hash
+  , pair
+  , imperative
   -- * Tokenize interface
   , Tokenize (..)
   -- * Invocation/results
@@ -28,7 +26,7 @@ module Reprinting.Tokenize
   ) where
 
 import Prelude hiding (fail, log)
-import Prologue hiding (Element)
+import Prologue hiding (hash, Element)
 
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
@@ -66,6 +64,10 @@ log = control . Log
 within :: Context -> Tokenizer () -> Tokenizer ()
 within c r = control (Enter c) *> r <* control (Exit c)
 
+-- | Like 'within', but adds 'TOpen' and 'TClose' elements around the action.
+within' :: Context -> Tokenizer () -> Tokenizer ()
+within' c x = within c $ yield TOpen *> x <* yield TClose
+
 -- | Emit a sequence of tokens interspersed with 'TSep'.
 sep :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
 sep = intersperse (yield TSep) . toList
@@ -74,29 +76,24 @@ sep = intersperse (yield TSep) . toList
 sepTrailing :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
 sepTrailing = foldr (\x acc -> x : yield TSep : acc) mempty
 
--- | Emit a sequence of tokens within the given context with appropriate
--- 'TOpen', 'TClose' tokens surrounding.
-surround_ :: Foldable t => Context -> t (Tokenizer ()) -> Tokenizer ()
-surround_ c xs = within c $ yield TOpen *> sequenceA_ xs <* yield TClose
-
 -- | Emit a sequence of tokens within a 'TList' Context with appropriate 'TOpen',
 -- 'TClose' tokens surrounding.
-list_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-list_ = surround_ TList . sep
+list :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+list = within' TList . sequenceA_ . sep
 
 -- | Emit a sequence of tokens within a 'THash' Context with appropriate
 -- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
-hash_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-hash_ = surround_ THash . sep
+hash :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+hash = within' THash . sequenceA_ . sep
 
 -- | Emit key value tokens with a 'TSep' within an TPair Context
-pair_ :: Tokenizer () -> Tokenizer () -> Tokenizer ()
-pair_ k v = within TPair $ k *> yield TSep <* v
+pair :: Tokenizer () -> Tokenizer () -> Tokenizer ()
+pair k v = within TPair $ k *> yield TSep <* v
 
 -- | Emit a sequence of tokens within an Imperative Context with appropriate
 -- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
-imperative_ :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-imperative_ = surround_ Imperative . sep
+imperative :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
+imperative = within' Imperative . sequenceA_ . sep
 
 -- | Shortcut for @const (pure ())@, useful for when no action
 -- should be taken.
@@ -118,7 +115,7 @@ instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize
   tokenize t = withHistory t (tokenize (termFOut t))
 
 instance Tokenize [] where
-  tokenize = imperative_
+  tokenize = imperative
 
 -- | The top-level function. Pass in a 'Source' and a 'Term' and
 -- you'll get out a 'Seq' of 'Token's for later processing.
