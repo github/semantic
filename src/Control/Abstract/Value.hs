@@ -4,6 +4,7 @@ module Control.Abstract.Value
 , AbstractIntro(..)
 , Comparator(..)
 -- * Value effects
+-- $valueEffects
 , function
 , call
 , Function(..)
@@ -45,6 +46,17 @@ data Comparator
 
 
 -- Value effects
+
+-- $valueEffects
+-- Value effects are effects modelling the /introduction/ & /elimination/ of some specific kind of value.
+--
+-- Modelling each of these as effects has several advantages∷
+--
+-- * It is strictly more flexible than modelling them as methods in a typeclass, as effect list–indexed typeclasses must be constrained at every list of effects at which they can be applied, whereas effect membership constraints can be deduced recursively (i.e. if @X@ is constrained to be a member of @effects@, it is automatically deducible that it is also a member of @Y \': effects@).
+-- * It offers us the potential of specializing the handlers on a language-by-language basis without the need for extra type parameters (albeit at the cost of automatic selection).
+-- * Finally, it should eventually allow us to customize _which_ value effects are available for a given language; e.g. a language without OO features would not require OO value effects. (This would also rely on 'Evaluatable' instances being able to specify membership constraints, which is not currently possible.)
+--
+-- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
 function :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
 function names fvs (Evaluator body) = send (Function names fvs body)
