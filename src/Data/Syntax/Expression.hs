@@ -4,6 +4,7 @@ module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
+import Data.Bits
 import Data.Fixed
 import Data.JSON.Fields
 import Diffing.Algorithm hiding (Delete)
@@ -272,7 +273,6 @@ instance Eq1 Delete where liftEq = genericLiftEq
 instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Delete
 instance Evaluatable Delete where
   eval (Delete a) = do
     valueRef <- subtermRef a
@@ -288,7 +288,6 @@ instance Eq1 SequenceExpression where liftEq = genericLiftEq
 instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for SequenceExpression
 instance Evaluatable SequenceExpression where
   eval (SequenceExpression a b) =
     subtermValue a >> subtermRef b
@@ -301,7 +300,6 @@ instance Eq1 Void where liftEq = genericLiftEq
 instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Void
 instance Evaluatable Void where
   eval (Void a) =
     subtermValue a >> rvalBox null
@@ -325,6 +323,10 @@ instance Eq1 BOr where liftEq = genericLiftEq
 instance Ord1 BOr where liftCompare = genericLiftCompare
 instance Show1 BOr where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BOr where
+  eval (BOr a b) = do
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
+    liftBitwise2 (.|.) a' b' >>= rvalBox
 
 data BAnd a = BAnd { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -333,6 +335,11 @@ instance Eq1 BAnd where liftEq = genericLiftEq
 instance Ord1 BAnd where liftCompare = genericLiftCompare
 instance Show1 BAnd where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BAnd where
+  eval (BAnd a b) = do
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
+    liftBitwise2 (.&.) a' b' >>= rvalBox
+
 
 data BXOr a = BXOr { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -341,6 +348,10 @@ instance Eq1 BXOr where liftEq = genericLiftEq
 instance Ord1 BXOr where liftCompare = genericLiftCompare
 instance Show1 BXOr where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable BXOr where
+  eval (BXOr a b) = do
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
+    liftBitwise2 xor a' b' >>= rvalBox
 
 data LShift a = LShift { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -349,6 +360,12 @@ instance Eq1 LShift where liftEq = genericLiftEq
 instance Ord1 LShift where liftCompare = genericLiftCompare
 instance Show1 LShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable LShift where
+  eval (LShift a b) = do
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
+    liftBitwise2 shiftL' a' b' >>= rvalBox
+    where
+      shiftL' a b = shiftL a (fromIntegral (toInteger b))
 
 data RShift a = RShift { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -357,6 +374,12 @@ instance Eq1 RShift where liftEq = genericLiftEq
 instance Ord1 RShift where liftCompare = genericLiftCompare
 instance Show1 RShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable RShift where
+  eval (RShift a b) = do
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
+    liftBitwise2 shiftR' a' b' >>= rvalBox
+    where
+      shiftR' a b = shiftR a (fromIntegral (toInteger b))
 
 data UnsignedRShift a = UnsignedRShift { left :: a, right :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -365,6 +388,10 @@ instance Eq1 UnsignedRShift where liftEq = genericLiftEq
 instance Ord1 UnsignedRShift where liftCompare = genericLiftCompare
 instance Show1 UnsignedRShift where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable UnsignedRShift where
+  eval (UnsignedRShift a b) = do
+    a' <- subtermValue a >>= castToInteger
+    b' <- subtermValue b >>= castToInteger
+    unsignedRShift a' b' >>= rvalBox
 
 newtype Complement a = Complement { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -374,6 +401,9 @@ instance Ord1 Complement where liftCompare = genericLiftCompare
 instance Show1 Complement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Complement where
+  eval (Complement a) = do
+    a' <- subtermValue a >>= castToInteger
+    liftBitwise complement a' >>= rvalBox
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
@@ -469,9 +499,10 @@ instance Eq1 Await where liftEq = genericLiftEq
 instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Await
-instance Evaluatable Await
-
+-- TODO: Improve this to model asynchrony or capture some data suggesting async calls are not a problem.
+--       We are currently dealing with an asynchronous construct synchronously.
+instance Evaluatable Await where
+  eval (Await a) = subtermRef a
 
 -- | An object constructor call in Javascript, Java, etc.
 newtype New a = New { newSubject :: [a] }
@@ -492,7 +523,6 @@ instance Eq1 Cast where liftEq = genericLiftEq
 instance Ord1 Cast where liftCompare = genericLiftCompare
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Cast
 instance Evaluatable Cast
 
 data Super a = Super
@@ -501,7 +531,8 @@ data Super a = Super
 instance Eq1 Super where liftEq = genericLiftEq
 instance Ord1 Super where liftCompare = genericLiftCompare
 instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Super
+instance Evaluatable Super where
+  eval Super = Rval <$> (maybeM (box unit) =<< self)
 
 data This a = This
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1)
