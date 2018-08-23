@@ -16,8 +16,7 @@ data History
   -- ^ A 'Refactored' node was changed by a refactor but still has
   -- (possibly-inaccurate) position information.
   | Unmodified Range
-  -- ^ An 'Unmodified' node was not changed, but maybe have 'Refactored'
-  -- children.
+  -- ^ An 'Unmodified' node was not changed, but may have 'Refactored' children.
   deriving (Show, Eq)
 
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
