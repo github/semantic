@@ -2,6 +2,7 @@
 module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runFunction
+, runBoolean
 ) where
 
 import Control.Abstract as Abstract
@@ -39,6 +40,15 @@ runFunction = interpret $ \case
     traverse_ deref params
     box Abstract
 
+runBoolean :: ( Member NonDet effects
+              , PureEffects effects
+              )
+           => Evaluator address Abstract (Boolean Abstract ': effects) a
+           -> Evaluator address Abstract effects a
+runBoolean = interpret $ \case
+  Boolean _ -> pure Abstract
+  AsBool  _ -> pure True <|> pure False
+
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
@@ -49,7 +59,6 @@ instance AbstractHole Abstract where
 instance AbstractIntro Abstract where
   unit       = Abstract
   integer _  = Abstract
-  boolean _  = Abstract
   string _   = Abstract
   float _    = Abstract
   symbol _   = Abstract
@@ -80,9 +89,6 @@ instance ( Member (Allocator address) effects
   asPair _ = pure (Abstract, Abstract)
 
   index _ _ = box Abstract
-
-  ifthenelse _ if' else' = if' <|> else'
-  disjunction = (<|>)
 
   liftNumeric _ _ = pure Abstract
   liftNumeric2 _ _ _ = pure Abstract

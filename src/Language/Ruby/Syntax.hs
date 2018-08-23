@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Ruby.Syntax where
 
+import           Control.Abstract.Value (Boolean)
 import           Control.Monad (unless)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
@@ -81,7 +82,7 @@ instance Evaluatable Require where
     bindAll importedEnv
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: ( AbstractValue address value effects
+doRequire :: ( Member (Boolean value) effects
              , Member (Modules address) effects
              )
           => M.ModulePath
@@ -89,8 +90,8 @@ doRequire :: ( AbstractValue address value effects
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> (, boolean True) . fst <$> load path
-    Just (env, _) -> pure (env, boolean False)
+    Nothing       -> (,) . fst <$> load path <*> boolean True
+    Just (env, _) -> (env,) <$> boolean False
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
@@ -109,7 +110,7 @@ instance Evaluatable Load where
     shouldWrap <- subtermValue wrap >>= asBool
     rvalBox =<< doLoad path shouldWrap
 
-doLoad :: ( AbstractValue address value effects
+doLoad :: ( Member (Boolean value) effects
           , Member (Env address) effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
@@ -125,7 +126,7 @@ doLoad path shouldWrap = do
   traceResolve path path'
   importedEnv <- fst <$> load path'
   unless shouldWrap $ bindAll importedEnv
-  pure (boolean Prelude.True) -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
+  boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
 
