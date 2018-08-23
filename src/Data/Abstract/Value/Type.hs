@@ -340,6 +340,8 @@ instance ( Member (Allocator address) effects
   liftBitwise _ = unify Int
   liftBitwise2 _ t1 t2   = unify Int t1 >>= flip unify t2
 
+  unsignedRShift t1 t2 = unify Int t2 *> unify Int t1
+
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
     (Int, Float) ->                     pure Bool
@@ -350,3 +352,5 @@ instance ( Member (Allocator address) effects
     _                 -> unify left right $> Bool
 
   loop f = f empty
+
+  castToInteger t = unify t (Int :+ Float :+ Rational) $> Int

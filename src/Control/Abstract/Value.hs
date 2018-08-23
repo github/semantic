@@ -142,6 +142,10 @@ class Show value => AbstractIntro value where
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class AbstractIntro value => AbstractValue address value effects where
+  -- | Cast numbers to integers
+  castToInteger :: value -> Evaluator address value effects value
+
+
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
                -> (value -> Evaluator address value effects value)
@@ -165,6 +169,8 @@ class AbstractIntro value => AbstractValue address value effects where
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
                -> (value -> value -> Evaluator address value effects value)
+
+  unsignedRShift :: value -> value -> Evaluator address value effects value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   tuple :: [address] -> Evaluator address value effects value
