@@ -524,9 +524,7 @@ instance Eq1 Cast where liftEq = genericLiftEq
 instance Ord1 Cast where liftCompare = genericLiftCompare
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: This isn't actually casting anything; we need to be able to extract a type from a subterm and implement a subtyping relation.
-instance Evaluatable Cast where
-  eval (Cast value type') = subtermRef value
+instance Evaluatable Cast
 
 data Super a = Super
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
