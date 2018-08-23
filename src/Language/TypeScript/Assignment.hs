@@ -295,7 +295,8 @@ awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Expr
 
 unaryExpression :: Assignment Term
 unaryExpression = symbol Grammar.UnaryExpression >>= \ loc ->
-  makeTerm loc . Expression.Not <$> children ((symbol AnonTilde <|> symbol AnonBang) *> term expression)
+  makeTerm loc . Expression.Not <$> children (symbol AnonBang *> term expression)
+  <|> makeTerm loc . Expression.Complement <$> children (symbol AnonTilde *> term expression)
   <|> makeTerm loc . Expression.Negate <$> children ((symbol AnonMinus <|> symbol AnonPlus) *> term expression)
   <|> makeTerm loc . Expression.Typeof <$> children (symbol AnonTypeof *> term expression)
   <|> makeTerm loc . Expression.Void <$> children (symbol AnonVoid *> term expression)
