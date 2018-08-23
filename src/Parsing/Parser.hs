@@ -73,7 +73,7 @@ data SomeAnalysisParser typeclasses ann where
                         , HasPrelude lang
                         , HasPostlude lang
                         )
-                     => Parser (Term (Sum fs) ann) -- ^ A parser.
+                     => Parser (Term (Sum fs) ann)
                      -> Proxy lang
                      -> SomeAnalysisParser typeclasses ann
 
