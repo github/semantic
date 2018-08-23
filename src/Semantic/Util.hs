@@ -296,7 +296,7 @@ testChangeKV = do
 
 -- Temporary, until new KURE system lands.
 fromMatcher :: Matcher from to -> ProcessT (Eff effs) from (Either from (from, to))
-fromMatcher m = auto go where go x = maybe (Left x) (\y -> Right (x, y)) (runOnce x m)
+fromMatcher m = auto go where go x = maybe (Left x) (\y -> Right (x, y)) (stepMatcher x m)
 
 -- Turn a 'ProccessT' into an FAlgebra.
 toAlgebra :: (Traversable (Base t), Corecursive t)
