@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, Rank2Types #-}
+{-# LANGUAGE GADTs, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
