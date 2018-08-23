@@ -63,7 +63,7 @@ stages of the pipeline follows:
   additional language specific transformations can be applied.
   (Language-agnostic)
     |
-    | Seq Datum
+    | Seq Fragment
     |
     v
 [PrettyPrint] --> <Format> --> <Beautify> --> <...>
@@ -128,7 +128,7 @@ runReprinter ::
   , HasField fields History
   )
   => Source.Source
-  -> ProcessT Translator Datum Splice
+  -> ProcessT Translator Fragment Splice
   -> Term a (Record fields)
   -> Either TranslationException Source.Source
 runReprinter src translating tree
@@ -163,7 +163,7 @@ runContextualizing ::
   )
   => Source.Source
   -> Term a (Record fields)
-  -> Either TranslationException [Datum]
+  -> Either TranslationException [Fragment]
 runContextualizing src tree
   = Effect.run
   . Exc.runError
@@ -178,7 +178,7 @@ runTranslating ::
   , HasField fields History
   )
   => Source.Source
-  -> ProcessT Translator Datum Splice
+  -> ProcessT Translator Fragment Splice
   -> Term a (Record fields)
   -> Either TranslationException [Splice]
 runTranslating src translating tree

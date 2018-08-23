@@ -21,24 +21,24 @@ import qualified Data.Source as Source
 type Translator = Eff '[State [Context], Exc TranslationException]
 
 -- | Prepare for language specific translation by contextualizing 'Token's to
--- 'Datum's.
+-- 'Fragment's.
 contextualizing ::
   ( Member (State [Context]) effs
   , Member (Exc TranslationException) effs
   )
-  => ProcessT (Eff effs) Token Datum
+  => ProcessT (Eff effs) Token Fragment
 contextualizing = flattened <~ autoT (Kleisli step) where
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
-    TElement el  -> toDatum el <$> get
+    TElement el  -> toFragment el <$> get
     TControl ctl -> case ctl of
       Log _   -> pure mempty
       Enter c -> enterContext c $> mempty
       Exit c  -> exitContext c $> mempty
 
-  toDatum el cs = case el of
+  toFragment el cs = case el of
     Fragment f -> insert el cs f
-    _ -> raw el cs
+    _ -> defer el cs
 
   enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
   enterContext c = modify' (c :)
