@@ -12,7 +12,7 @@ import Data.Source (Source)
 -- | 'Token' encapsulates 'Element' and 'Control' tokens, as well as sliced
 -- portions of the original 'Source' for a given AST.
 data Token
-  = Chunk Source     -- ^ Original 'Source' from AST, unmodified.
+  = Chunk Source     -- ^ Verbatim 'Source' from AST, unmodified.
   | TElement Element -- ^ Content token to be rendered.
   | TControl Control -- ^ AST's context.
     deriving (Show, Eq)

@@ -18,16 +18,16 @@ import Data.Reprinting.Token
 
 -- | Default printing pipeline for JSON.
 defaultJSONPipeline :: (Member (Exc TranslationException) effs)
-  => ProcessT (Eff effs) Datum Splice
+  => ProcessT (Eff effs) Fragment Splice
 defaultJSONPipeline
   = printingJSON
   ~> beautifyingJSON defaultBeautyOpts
 
 -- | Print JSON syntax.
-printingJSON :: Monad m => ProcessT m Datum Datum
+printingJSON :: Monad m => ProcessT m Fragment Fragment
 printingJSON = flattened <~ auto step where
-  step :: Datum -> Seq Datum
-  step s@(Raw el cs ) =
+  step :: Fragment -> Seq Fragment
+  step s@(Defer el cs ) =
     let ins = insert el cs
     in case (el, listToMaybe cs) of
       (Truth True, _)  -> ins "true"
@@ -57,11 +57,11 @@ defaultBeautyOpts = JSONBeautyOpts 2 False
 
 -- | Produce JSON with configurable whitespace and layout.
 beautifyingJSON :: (Member (Exc TranslationException) effs)
-  => JSONBeautyOpts -> ProcessT (Eff effs) Datum Splice
+  => JSONBeautyOpts -> ProcessT (Eff effs) Fragment Splice
 beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
-  step (Raw el cs)        = throwError (NoTranslation el cs)
-  step (Original txt)     = pure $ emit txt
-  step (Insert el cs txt) = pure $ case (el, listToMaybe cs) of
+  step (Defer el cs)   = throwError (NoTranslation el cs)
+  step (Verbatim txt)  = pure $ emit txt
+  step (New el cs txt) = pure $ case (el, listToMaybe cs) of
     (TOpen,  Just THash) -> emit txt <> layouts [HardWrap, Indent]
     (TClose, Just THash) -> layout HardWrap <> emit txt
     (TSep, Just TList)   -> emit txt <> space
@@ -71,8 +71,8 @@ beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
 
 -- | Produce whitespace minimal JSON.
 minimizingJSON :: (Member (Exc TranslationException) effs)
-  => ProcessT (Eff effs) Datum Splice
+  => ProcessT (Eff effs) Fragment Splice
 minimizingJSON = flattened <~ autoT (Kleisli step) where
-  step (Raw el cs)      = throwError (NoTranslation el cs)
-  step (Original txt)   = pure $ emit txt
-  step (Insert _ _ txt) = pure $ emit txt
+  step (Defer el cs)  = throwError (NoTranslation el cs)
+  step (Verbatim txt) = pure $ emit txt
+  step (New _ _ txt)  = pure $ emit txt

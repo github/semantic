@@ -5,10 +5,10 @@ module Data.Reprinting.Splice
   , layouts
   , space
   , indent
-  , Datum(..)
+  , Fragment(..)
   , copy
   , insert
-  , raw
+  , defer
   , Whitespace(..)
   ) where
 
@@ -45,27 +45,27 @@ indent times
   | otherwise = mempty
 
 -- | An intermediate representation of concrete syntax in the reprinting pipeline.
-data Datum
-  = Original Text
+data Fragment
+  = Verbatim Text
   -- ^ Verbatim copy of original 'Text' (un-refactored).
-  | Insert Element [Context] Text
+  | New Element [Context] Text
   -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`
   -- allowing later steps to re-write.
-  | Raw Element [Context]
+  | Defer Element [Context]
   -- ^ To be handled further down the pipeline.
   deriving (Eq, Show)
 
 -- | Copy along some original, un-refactored 'Text'.
-copy :: Text -> Seq Datum
-copy = singleton . Original
+copy :: Text -> Seq Fragment
+copy = singleton . Verbatim
 
--- | Construct an 'Insert' datum.
-insert :: Element -> [Context] -> Text -> Seq Datum
-insert el c = singleton . Insert el c
+-- | Construct an 'New' datum.
+insert :: Element -> [Context] -> Text -> Seq Fragment
+insert el c = singleton . New el c
 
--- | Construct an 'Raw' splice.
-raw :: Element -> [Context] -> Seq Datum
-raw el = singleton . Raw el
+-- | Construct an 'Defer' splice.
+defer :: Element -> [Context] -> Seq Fragment
+defer el = singleton . Defer el
 
 -- | Indentation, spacing, and other whitespace.
 data Whitespace

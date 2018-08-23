@@ -9,11 +9,11 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token
 
 -- | Print Ruby syntax.
-printingRuby :: (Member (Exc TranslationException) effs) => ProcessT (Eff effs) Datum Splice
+printingRuby :: (Member (Exc TranslationException) effs) => ProcessT (Eff effs) Fragment Splice
 printingRuby = flattened <~ autoT (Kleisli step) where
-  step (Original txt)   = pure $ emit txt
-  step (Insert _ _ txt) = pure $ emit txt
-  step (Raw el cs)      =  case (el, cs) of
+  step (Verbatim txt) = pure $ emit txt
+  step (New _ _ txt)  = pure $ emit txt
+  step (Defer el cs)  =  case (el, cs) of
     (TOpen,  TMethod:_)  -> pure $ emit "def" <> space
     (TClose, TMethod:xs) -> pure $ endContext (depth xs) <> emit "end"
 
