@@ -8,7 +8,11 @@ module Control.Abstract.Value
 , function
 , call
 , Function(..)
+, boolean
 , asBool
+, ifthenelse
+, disjunction
+, Boolean(..)
 , while
 , doWhile
 , forLoop
@@ -74,6 +78,24 @@ instance PureEffect (Function address value) where
   handle handler (Request (Call fn self addrs)     k) = Request (Call fn self addrs)               (handler . k)
 
 
+-- | Construct a boolean value in the abstract domain.
+boolean :: Member (Boolean value) effects => Bool -> Evaluator address value effects value
+boolean = send . Boolean
+
+-- | Extract a 'Bool' from a given value.
+asBool :: Member (Boolean value) effects => value -> Evaluator address value effects Bool
+asBool = send . AsBool
+
+-- | Eliminate boolean values. TODO: s/boolean/truthy
+ifthenelse :: Member (Boolean value) effects => value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
+ifthenelse v t e = asBool v >>= \ c -> if c then t else e
+
+-- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
+disjunction :: Member (Boolean value) effects => Evaluator address value effects value -> Evaluator address value effects value -> Evaluator address value effects value
+disjunction a b = do
+  a' <- a
+  ifthenelse a' (pure a') b
+
 data Boolean value (m :: * -> *) result where
   Boolean :: Bool  -> Boolean value m value
   AsBool  :: value -> Boolean value m Bool
@@ -88,9 +110,6 @@ class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: value
-
-  -- | Construct an abstract boolean value.
-  boolean :: Bool -> value
 
   -- | Construct an abstract string value.
   string :: Text -> value
@@ -160,12 +179,6 @@ class AbstractIntro value => AbstractValue address value effects where
   -- | Extract a 'Text' from a given value.
   asString :: value -> Evaluator address value effects Text
 
-  -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
-
-  -- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
-  disjunction :: Evaluator address value effects value -> Evaluator address value effects value -> Evaluator address value effects value
-
   -- | @index x i@ computes @x[i]@, with zero-indexing.
   index :: value -> value -> Evaluator address value effects address
 
@@ -192,12 +205,9 @@ class AbstractIntro value => AbstractValue address value effects where
   loop :: (Evaluator address value effects value -> Evaluator address value effects value) -> Evaluator address value effects value
 
 
--- | Extract a 'Bool' from a given value.
-asBool :: AbstractValue address value effects => value -> Evaluator address value effects Bool
-asBool value = ifthenelse value (pure True) (pure False)
-
 -- | C-style for loops.
 forLoop :: ( AbstractValue address value effects
+           , Member (Boolean value) effects
            , Member (Env address) effects
            )
         => Evaluator address value effects value -- ^ Initial statement
@@ -209,7 +219,7 @@ forLoop initial cond step body =
   locally (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
-while :: AbstractValue address value effects
+while :: (AbstractValue address value effects, Member (Boolean value) effects)
       => Evaluator address value effects value
       -> Evaluator address value effects value
       -> Evaluator address value effects value
@@ -218,7 +228,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) (pure unit)
 
 -- | Do-while loop, built on top of while.
-doWhile :: AbstractValue address value effects
+doWhile :: (AbstractValue address value effects, Member (Boolean value) effects)
         => Evaluator address value effects value
         -> Evaluator address value effects value
         -> Evaluator address value effects value
