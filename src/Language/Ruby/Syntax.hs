@@ -70,7 +70,7 @@ instance Tokenize Send where
   tokenize Send{..} = within TCall $ do
     maybe (pure ()) (\r -> r *> yield TSep) sendReceiver
     fromMaybe (pure ()) sendSelector
-    surround_ TParams (sep sendArgs)
+    within' TParams $ sequenceA_ (sep sendArgs)
     fromMaybe (pure ()) sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }

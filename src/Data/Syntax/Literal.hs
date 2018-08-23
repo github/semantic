@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable as Eval
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
 import qualified Data.Text as T
@@ -11,7 +11,7 @@ import           Numeric.Exts
 import           Prelude hiding (Float, null)
 import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
-import           Reprinting.Tokenize
+import           Reprinting.Tokenize as Tok
 import           Text.Read (readMaybe)
 
 -- Boolean
@@ -212,7 +212,7 @@ instance Evaluatable Array where
   eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
 instance Tokenize Array where
-  tokenize = list_ . arrayElements
+  tokenize = list . arrayElements
 
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -222,10 +222,10 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Hash where
-  eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
+  eval t = rvalBox =<< (Eval.hash <$> traverse (subtermValue >=> asPair) (hashElements t))
 
 instance Tokenize Hash where
-  tokenize = hash_ . hashElements
+  tokenize = Tok.hash . hashElements
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -239,7 +239,7 @@ instance Evaluatable KeyValue where
     rvalBox =<< (kvPair <$> key <*> value)
 
 instance Tokenize KeyValue where
-  tokenize (KeyValue k v) = pair_ k v
+  tokenize (KeyValue k v) = pair k v
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
