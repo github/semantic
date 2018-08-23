@@ -3,6 +3,7 @@ module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
 , Comparator(..)
+-- * Value effects
 , function
 , call
 , Function(..)
@@ -41,6 +42,9 @@ import Prologue hiding (TypeError)
 data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
+
+
+-- Value effects
 
 function :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
 function names fvs (Evaluator body) = send (Function names fvs body)
