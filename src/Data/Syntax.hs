@@ -215,6 +215,7 @@ instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Error
 
 instance Tokenize Error where
+  -- TODO: Considering producing comments like "ERROR: due to.." instead of ignoring.
   tokenize = ignore
 
 instance Named String where
