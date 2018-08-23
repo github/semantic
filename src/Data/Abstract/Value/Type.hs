@@ -272,8 +272,9 @@ runBoolean :: ( Member NonDet effects
            => Evaluator address Type (Abstract.Boolean Type ': effects) a
            -> Evaluator address Type effects a
 runBoolean = interpret $ \case
-  Abstract.Boolean _ -> pure Bool
-  Abstract.AsBool  t -> unify t Bool *> (pure True <|> pure False)
+  Abstract.Boolean _         -> pure Bool
+  Abstract.AsBool  t         -> unify t Bool *> (pure True <|> pure False)
+  Abstract.Disjunction t1 t2 -> (runBoolean (Evaluator t1) >>= unify Bool) <|> (runBoolean (Evaluator t2) >>= unify Bool)
 
 
 instance AbstractHole Type where

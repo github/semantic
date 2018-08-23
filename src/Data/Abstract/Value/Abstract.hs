@@ -46,8 +46,9 @@ runBoolean :: ( Member NonDet effects
            => Evaluator address Abstract (Boolean Abstract ': effects) a
            -> Evaluator address Abstract effects a
 runBoolean = interpret $ \case
-  Boolean _ -> pure Abstract
-  AsBool  _ -> pure True <|> pure False
+  Boolean _       -> pure Abstract
+  AsBool  _       -> pure True <|> pure False
+  Disjunction a b -> runBoolean (Evaluator (a <|> b))
 
 
 instance Ord address => ValueRoots address Abstract where

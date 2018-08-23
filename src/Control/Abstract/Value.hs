@@ -92,18 +92,17 @@ ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 
 -- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
 disjunction :: Member (Boolean value) effects => Evaluator address value effects value -> Evaluator address value effects value -> Evaluator address value effects value
-disjunction a b = do
-  a' <- a
-  ifthenelse a' (pure a') b
+disjunction (Evaluator a) (Evaluator b) = send (Disjunction a b)
 
-data Boolean value (m :: * -> *) result where
-  Boolean :: Bool  -> Boolean value m value
-  AsBool  :: value -> Boolean value m Bool
+data Boolean value m result where
+  Boolean     :: Bool  -> Boolean value m value
+  AsBool      :: value -> Boolean value m Bool
+  Disjunction :: m value -> m value -> Boolean value m value
 
-instance PureEffect (Boolean value)
-instance Effect (Boolean value) where
-  handleState state handler (Request (Boolean b) k) = Request (Boolean b) (handler . (<$ state) . k)
-  handleState state handler (Request (AsBool v)  k) = Request (AsBool v)  (handler . (<$ state) . k)
+instance PureEffect (Boolean value) where
+  handle handler (Request (Boolean b)        k) = Request (Boolean b) (handler . k)
+  handle handler (Request (AsBool v)         k) = Request (AsBool v)  (handler . k)
+  handle handler (Request (Disjunction a b)  k) = Request (Disjunction (handler a) (handler b))  (handler . k)
 
 
 class Show value => AbstractIntro value where
