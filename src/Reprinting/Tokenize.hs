@@ -42,7 +42,6 @@ import Data.Reprinting.Token
 import Data.Sequence (singleton)
 import Data.Source
 import Data.Term
-import Lens.Micro
 
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
@@ -139,11 +138,8 @@ newtype RPState = RPState
   { _cursor   :: Int -- from SYR, used to slice and dice a 'Source' (mutates)
   } deriving (Show, Eq)
 
-cursor :: Lens' RPState Int
-cursor = lens _cursor (\s c -> s { _cursor = c })
-
-strategy :: Lens' RPContext Strategy
-strategy = lens _strategy (\s t -> s { _strategy = t })
+setCursor :: Int -> RPState -> RPState
+setCursor c s = s { _cursor = c }
 
 data RPContext = RPContext
   { _source  :: Source
@@ -156,8 +152,11 @@ data Strategy
   | PrettyPrinting
     deriving (Eq, Show)
 
-history :: Lens' RPContext History
-history = lens _history (\c h -> c { _history = h })
+setStrategy :: Strategy -> RPContext -> RPContext
+setStrategy s c = c { _strategy = s }
+
+setHistory :: History -> RPContext -> RPContext
+setHistory h c = c { _history = h }
 
 chunk :: Source -> Tokenizer ()
 chunk = tell . singleton . Chunk
@@ -169,10 +168,10 @@ finish = do
   chunk (dropSource crs src)
 
 withHistory :: (Annotated t (Record fields), HasField fields History) => t -> Tokenizer a -> Tokenizer a
-withHistory x = local (set history (getField (annotation x)))
+withHistory x = local (setHistory (getField (annotation x)))
 
 withStrategy :: Strategy -> Tokenizer a -> Tokenizer a
-withStrategy x = local (set strategy x)
+withStrategy x = local (setStrategy x)
 
 -- | A subterm algebra inspired by the /Scrap Your Reprinter/ algorithm.
 descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
@@ -190,6 +189,6 @@ descend t = do
       let delimiter = Range crs (start r)
       log ("slicing: " <> show delimiter)
       chunk (slice delimiter src)
-      modify (set cursor (start r))
+      modify' (setCursor (start r))
       tokenize (fmap (withStrategy PrettyPrinting . into) t)
-      modify (set cursor (end r))
+      modify' (setCursor (end r))

@@ -223,7 +223,6 @@ library
                      , kdt
                      , machines
                      , mersenne-random-pure64
-                     , microlens
                      , mtl
                      , network
                      , network-uri
