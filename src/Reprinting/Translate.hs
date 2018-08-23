@@ -52,4 +52,4 @@ contextualizing = flattened <~ autoT (Kleisli step) where
     current <- get
     case current of
       (x:xs) | x == c -> modify' (const xs)
-      cs -> Exc.throwError (InvalidContext c cs)
+      cs -> Exc.throwError (UnbalancedPair c cs)
