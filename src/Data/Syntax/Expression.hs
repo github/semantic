@@ -128,7 +128,7 @@ instance Evaluatable Plus where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
 
 instance Tokenize Plus where
-  tokenize Plus{..} = within' (TInfixL Add 6) $ lhs *> yield TSep <* rhs
+  tokenize Plus{..} = within' (TInfixL Add 6) $ lhs *> yield TSym <* rhs
 
 data Minus a = Minus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -153,7 +153,7 @@ instance Evaluatable Times where
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
 
 instance Tokenize Times where
-  tokenize Times{..} = within' (TInfixL Mult 7) $ lhs *> yield TSep <* rhs
+  tokenize Times{..} = within' (TInfixL Mult 7) $ lhs *> yield TSym <* rhs
 
 data DividedBy a = DividedBy { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

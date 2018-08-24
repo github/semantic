@@ -26,6 +26,7 @@ data Element
   | Truth Bool    -- ^ A boolean value.
   | Nullity       -- ^ @null@ or @nil@ or some other zero value.
   | TSep          -- ^ Some sort of delimiter, interpreted in some 'Context'.
+  | TSym          -- ^ Some sort of symbol, interpreted in some 'Context'.
   | TOpen         -- ^ The beginning of some 'Context', such as an @[@ or @{@.
   | TClose        -- ^ The opposite of 'TOpen'.
     deriving (Eq, Show)

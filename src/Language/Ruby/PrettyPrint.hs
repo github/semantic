@@ -33,8 +33,8 @@ step (Defer el cs)  = case (el, cs) of
   (TClose, TParams:_) -> pure $ emit ")"
 
   (TOpen,  TInfixL _ p:xs)   -> emitIf (p < prec xs) "("
-  (TSep,   TInfixL Add _:_)  -> pure $ space <> emit "+" <> space
-  (TSep,   TInfixL Mult _:_) -> pure $ space <> emit "*" <> space
+  (TSym,   TInfixL Add _:_)  -> pure $ space <> emit "+" <> space
+  (TSym,   TInfixL Mult _:_) -> pure $ space <> emit "*" <> space
   (TClose, TInfixL _ p:xs)   -> emitIf (p < prec xs) ")"
 
   (TOpen,  [Imperative])  -> pure mempty
