@@ -4,13 +4,14 @@ module Data.Abstract.Value.Concrete
   , ValueError (..)
   , ClosureBody (..)
   , runFunction
+  , runBoolean
   , materializeEnvironment
   , runValueError
   , runValueErrorWith
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Function(..))
+import Control.Abstract hiding (Boolean(..), Function(..))
 import Data.Abstract.BaseError
 import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
@@ -98,6 +99,22 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
           withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
       _ -> throwValueError (CallError op) >>= box
 
+runBoolean :: ( Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Member (Resumable (BaseError (ValueError address body))) effects
+              , PureEffects effects
+              )
+           => Evaluator address (Value address body) (Abstract.Boolean (Value address body) ': effects) a
+           -> Evaluator address (Value address body) effects a
+runBoolean = interpret $ \case
+  Abstract.Boolean b          -> pure $! Boolean b
+  Abstract.AsBool (Boolean b) -> pure b
+  Abstract.AsBool other       -> throwValueError $! BoolError other
+  Abstract.Disjunction a b    -> do
+    a' <- runBoolean (Evaluator a)
+    a'' <- runBoolean (asBool a')
+    if a'' then pure a' else runBoolean (Evaluator b)
+
 
 instance AbstractHole (Value address body) where
   hole = Hole
@@ -105,7 +122,6 @@ instance AbstractHole (Value address body) where
 instance Show address => AbstractIntro (Value address body) where
   unit     = Unit
   integer  = Integer . Number.Integer
-  boolean  = Boolean
   string   = String
   float    = Float . Number.Decimal
   symbol   = Symbol
@@ -147,6 +163,7 @@ materializeEnvironment val = do
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
          , Member (Allocator address) effects
+         , Member (Abstract.Boolean (Value address body)) effects
          , Member (Deref (Value address body)) effects
          , Member (Env address) effects
          , Member (Exc (LoopControl address)) effects
@@ -191,14 +208,6 @@ instance ( Coercible body (Eff effects)
   asString v
     | String n <- v = pure n
     | otherwise     = throwValueError $ StringError v
-
-  ifthenelse cond if' else' = do
-    bool <- case cond of { Boolean b -> pure b ; _ -> throwValueError (BoolError cond) }
-    if bool then if' else else'
-
-  disjunction a b = do
-    a' <- a
-    ifthenelse a' (pure a') b
 
 
   index = go where
@@ -251,14 +260,14 @@ instance ( Coercible body (Eff effects)
     | (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- pair = go i j
     | (String  i,                  String  j)                  <- pair = go i j
     | (Boolean i,                  Boolean j)                  <- pair = go i j
-    | (Unit,                       Unit)                       <- pair = pure $ boolean True
+    | (Unit,                       Unit)                       <- pair = boolean True
     | otherwise = throwValueError (ComparisonError left right)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue address (Value address body) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
+        go :: (AbstractValue address (Value address body) effects, Member (Abstract.Boolean (Value address body)) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
         go l r = case comparator of
-          Concrete f  -> pure $ boolean (f l r)
+          Concrete f  -> boolean (f l r)
           Generalized -> pure $ integer (orderingToInt (compare l r))
 
         -- Map from [LT, EQ, GT] to [-1, 0, 1]
