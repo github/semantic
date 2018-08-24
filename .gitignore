@@ -1,5 +1,6 @@
 .DS_Store
 
+.docsets
 .stack-work
 .stack-work-profiling
 profiles

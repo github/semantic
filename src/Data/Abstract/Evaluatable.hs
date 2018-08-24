@@ -27,7 +27,7 @@ import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnviron
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Heap as X hiding (runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
-import Control.Abstract.Value as X hiding (Function(..))
+import Control.Abstract.Value as X hiding (Boolean(..), Function(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.BaseError as X
@@ -51,6 +51,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Declarations term
           , FreeVariables term
           , Member (Allocator address) effects
+          , Member (Boolean value) effects
           , Member (Deref value) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
@@ -88,6 +89,7 @@ type ModuleEffects address value rest
 
 type ValueEffects address value rest
   =  Function address value
+  ': Boolean value
   ': rest
 
 evaluate :: ( AbstractValue address value valueEffects
