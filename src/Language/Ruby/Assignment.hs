@@ -56,7 +56,7 @@ type MiniSyntax = '[
   , Declaration.Function
   -- , Expression.Call
   , Expression.Plus
-  -- , Expression.Minus
+  , Expression.Minus
   , Expression.Times
   , Ruby.Syntax.Send
   -- , Ruby.Syntax.Load
@@ -194,7 +194,7 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
     binary :: Assignment MiniTerm
     binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
       [ (inject .) . Expression.Plus              <$ symbol AnonPlus
-      -- , (inject .) . Expression.Minus             <$ symbol AnonMinus'
+      , (inject .) . Expression.Minus             <$ symbol AnonMinus'
       , (inject .) . Expression.Times             <$ symbol AnonStar'
       ])
 

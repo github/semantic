@@ -32,10 +32,11 @@ step (Defer el cs)  = case (el, cs) of
   (TSep,   TParams:_) -> pure $ emit "," <> space
   (TClose, TParams:_) -> pure $ emit ")"
 
-  (TOpen,  TInfixL _ p:xs)   -> emitIf (p < prec xs) "("
-  (TSym,   TInfixL Add _:_)  -> pure $ space <> emit "+" <> space
-  (TSym,   TInfixL Mult _:_) -> pure $ space <> emit "*" <> space
-  (TClose, TInfixL _ p:xs)   -> emitIf (p < prec xs) ")"
+  (TOpen,  TInfixL _ p:xs)       -> emitIf (p < prec xs) "("
+  (TSym,   TInfixL Add _:_)      -> pure $ space <> emit "+" <> space
+  (TSym,   TInfixL Multiply _:_) -> pure $ space <> emit "*" <> space
+  (TSym,   TInfixL Subtract _:_) -> pure $ space <> emit "-" <> space
+  (TClose, TInfixL _ p:xs)       -> emitIf (p < prec xs) ")"
 
   (TOpen,  [Imperative])  -> pure mempty
   (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
