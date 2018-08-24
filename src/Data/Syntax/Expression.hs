@@ -152,6 +152,9 @@ instance Evaluatable Times where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
 
+instance Tokenize Times where
+  tokenize Times{..} = within' (TInfixL Mult 7) $ lhs *> yield TSep <* rhs
+
 data DividedBy a = DividedBy { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 

@@ -61,4 +61,5 @@ data Context
 -- and given appropriate precedence.
 data Operator
   = Add
+  | Mult
     deriving (Show, Eq)

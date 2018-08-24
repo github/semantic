@@ -32,9 +32,10 @@ step (Defer el cs)  = case (el, cs) of
   (TSep,   TParams:_) -> pure $ emit "," <> space
   (TClose, TParams:_) -> pure $ emit ")"
 
-  (TOpen,  (TInfixL Add p):xs) -> pure $ if p < (prec xs) then emit "(" else mempty
+  (TOpen,  (TInfixL _ p):xs)   -> emitIf (p < (prec xs)) "("
   (TSep,   (TInfixL Add _):_)  -> pure $ space <> emit "+" <> space
-  (TClose, (TInfixL Add p):xs) -> pure $ if p < (prec xs) then emit ")" else mempty
+  (TSep,   (TInfixL Mult _):_) -> pure $ space <> emit "*" <> space
+  (TClose, (TInfixL _ p):xs)   -> emitIf (p < (prec xs)) ")"
 
   (TOpen,  [Imperative])  -> pure mempty
   (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
@@ -46,7 +47,9 @@ step (Defer el cs)  = case (el, cs) of
 
   _ -> throwError (NoTranslation el cs)
 
-  where endContext times = layout HardWrap <> indent (pred times)
+  where
+    emitIf predicate txt = pure $ if predicate then emit txt else mempty
+    endContext times = layout HardWrap <> indent (pred times)
 
 -- Example of what writing a plan style machine looks like
 -- printingRuby' :: (Member (Exc TranslationException) effs) => MachineT (Eff effs) (Is Fragment) Splice
