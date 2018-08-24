@@ -185,6 +185,7 @@ library
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
                      , Semantic.Util
+                     , Semantic.Util.Rewriting
                      , Semantic.Version
                      -- Serialization
                      , Serializing.DOT
