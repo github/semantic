@@ -55,6 +55,9 @@ type MiniSyntax = '[
   , Declaration.Method
   , Declaration.Function
   -- , Expression.Call
+  , Expression.Plus
+  -- , Expression.Minus
+  -- , Expression.Times
   , Ruby.Syntax.Send
   -- , Ruby.Syntax.Load
   -- , Ruby.Syntax.Require
@@ -73,8 +76,9 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
   where
     expression :: Assignment MiniTerm
     expression = term . handleError $
-      choice [ number
+      choice [ binary
              , identifier
+             , number
              , method
              , methodCall ]
 
@@ -183,10 +187,26 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
             blockChildren = children (Declaration.Function [] <$> emptyTerm <*> params <*> expressions)
             params = symbol BlockParameters *> children (many parameter) <|> pure []
 
+    binary :: Assignment MiniTerm
+    binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
+      [ (inject .) . Expression.Plus              <$ symbol AnonPlus
+      -- , (inject .) . Expression.Minus             <$ symbol AnonMinus'
+      -- , (inject .) . Expression.Times             <$ symbol AnonStar'
+      ])
+
     comment :: Assignment MiniTerm
     comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+
     term :: Assignment MiniTerm -> Assignment MiniTerm
     term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+
+    -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
+    infixTerm :: Assignment MiniTerm
+              -> Assignment MiniTerm
+              -> [Assignment (MiniTerm -> MiniTerm -> Sum MiniSyntax MiniTerm)]
+              -> Assignment (Sum MiniSyntax MiniTerm)
+    infixTerm = infixContext comment
+
 
 -- | The type of Ruby syntax.
 type Syntax = '[

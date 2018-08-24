@@ -11,6 +11,7 @@ import Diffing.Algorithm hiding (Delete)
 import Prologue hiding (index, Member, This, null)
 import Prelude hiding (null)
 import Proto3.Suite.Class
+import Reprinting.Tokenize
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -125,6 +126,9 @@ instance Show1 Plus where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Plus where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
+
+instance Tokenize Plus where
+  tokenize Plus{..} = within' (TInfixL Add 6) $ lhs *> yield TSep <* rhs
 
 data Minus a = Minus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
