@@ -187,7 +187,7 @@ runTaskF = interpret $ \ task -> case task of
   Semantic.Task.Diff terms -> pure (diffTermPair terms)
   Render renderer input -> pure (renderer input)
   Serialize format input -> do
-    formatStyle <- asks (bool Colourful Plain . configIsTerminal)
+    formatStyle <- asks (bool Plain Colourful . configIsTerminal)
     pure (runSerialize formatStyle format input)
 
 
