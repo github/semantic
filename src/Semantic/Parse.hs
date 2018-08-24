@@ -13,6 +13,7 @@ import Analysis.PackageDef (HasPackageDef)
 import Data.AST
 import Data.Blob
 import Data.JSON.Fields
+import Data.Quieterm
 import Data.Record
 import Data.Term
 import Parsing.Parser
@@ -30,7 +31,7 @@ import qualified Language.Python.Assignment as Python
 runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs (render . renderJSONTerm) >=> serialize JSON
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
-runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show))
+runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show . quieterm))
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
