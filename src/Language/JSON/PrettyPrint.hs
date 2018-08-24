@@ -27,7 +27,7 @@ defaultJSONPipeline
 printingJSON :: Monad m => ProcessT m Fragment Fragment
 printingJSON = flattened <~ auto step where
   step :: Fragment -> Seq Fragment
-  step s@(Defer el cs ) =
+  step s@(Defer el cs) =
     let ins = insert el cs
     in case (el, listToMaybe cs) of
       (Truth True, _)  -> ins "true"
