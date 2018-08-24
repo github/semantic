@@ -57,7 +57,7 @@ type MiniSyntax = '[
   -- , Expression.Call
   , Expression.Plus
   -- , Expression.Minus
-  -- , Expression.Times
+  , Expression.Times
   , Ruby.Syntax.Send
   -- , Ruby.Syntax.Load
   -- , Ruby.Syntax.Require
@@ -80,11 +80,15 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
              , identifier
              , number
              , method
-             , methodCall ]
+             , methodCall
+             , parenthesizedExpressions ]
 
     -- NOTE: Important that we don't flatten out the Imperative for single item lists
     expressions :: Assignment MiniTerm
     expressions = makeTerm <$> location <*> many expression
+
+    parenthesizedExpressions :: Assignment MiniTerm
+    parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
 
     number :: Assignment MiniTerm
     number = makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
@@ -191,7 +195,7 @@ miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Stateme
     binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
       [ (inject .) . Expression.Plus              <$ symbol AnonPlus
       -- , (inject .) . Expression.Minus             <$ symbol AnonMinus'
-      -- , (inject .) . Expression.Times             <$ symbol AnonStar'
+      , (inject .) . Expression.Times             <$ symbol AnonStar'
       ])
 
     comment :: Assignment MiniTerm
