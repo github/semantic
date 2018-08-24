@@ -30,20 +30,20 @@ printingJSON = flattened <~ auto step where
   step s@(Defer el cs) =
     let ins = insert el cs
     in case (el, listToMaybe cs) of
-      (Truth True, _)  -> ins "true"
-      (Truth False, _) -> ins "false"
-      (Nullity, _)     -> ins "null"
+      (Truth True, _)      -> ins "true"
+      (Truth False, _)     -> ins "false"
+      (Nullity, _)         -> ins "null"
 
       (TOpen,  Just TList) -> ins "["
       (TClose, Just TList) -> ins "]"
       (TOpen,  Just THash) -> ins "{"
       (TClose, Just THash) -> ins "}"
 
-      (TSep, Just TList) -> ins ","
-      (TSep, Just TPair) -> ins ":"
-      (TSep, Just THash) -> ins ","
+      (TSep, Just TList)   -> ins ","
+      (TSep, Just TPair)   -> ins ":"
+      (TSep, Just THash)   -> ins ","
 
-      _ -> pure s
+      _                    -> pure s
 
   step x = pure x
 
@@ -67,7 +67,7 @@ beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
     (TSep, Just TList)   -> emit txt <> space
     (TSep, Just TPair)   -> emit txt <> space
     (TSep, Just THash)   -> emit txt <> layouts [HardWrap, Indent]
-    _ -> emit txt
+    _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.
 minimizingJSON :: (Member (Exc TranslationException) effs)

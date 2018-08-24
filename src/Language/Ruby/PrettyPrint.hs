@@ -22,10 +22,10 @@ step (Defer el cs)  = case (el, cs) of
   (TClose, TMethod:xs) -> pure $ endContext (depth xs) <> emit "end"
 
   -- TODO: do..end vs {..} should be configurable.
-  (TOpen,  TFunction:_) -> pure $ space <> emit "do" <> space
+  (TOpen,  TFunction:_)         -> pure $ space <> emit "do" <> space
   (TOpen,  TParams:TFunction:_) -> pure $ emit "|"
   (TClose, TParams:TFunction:_) -> pure $ emit "|"
-  (TClose, TFunction:xs) -> pure $ endContext (depth xs) <> emit "end"
+  (TClose, TFunction:xs)        -> pure $ endContext (depth xs) <> emit "end"
 
   -- TODO: Parens for calls are a style choice, make configurable.
   (TOpen,  TParams:_) -> pure $ emit "("
