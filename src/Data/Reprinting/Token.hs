@@ -62,5 +62,6 @@ data Context
 -- and given appropriate precedence.
 data Operator
   = Add
-  | Mult
+  | Multiply
+  | Subtract
     deriving (Show, Eq)

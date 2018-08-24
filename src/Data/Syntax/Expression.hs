@@ -141,6 +141,9 @@ instance Evaluatable Minus where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
 
+instance Tokenize Minus where
+  tokenize Minus{..} = within' (TInfixL Subtract 6) $ lhs *> yield TSym <* rhs
+
 data Times a = Times { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
@@ -153,7 +156,7 @@ instance Evaluatable Times where
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
 
 instance Tokenize Times where
-  tokenize Times{..} = within' (TInfixL Mult 7) $ lhs *> yield TSym <* rhs
+  tokenize Times{..} = within' (TInfixL Multiply 7) $ lhs *> yield TSym <* rhs
 
 data DividedBy a = DividedBy { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
