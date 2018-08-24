@@ -52,7 +52,7 @@ data Context
   | TFunction
   | TCall
   | TParams
-  | Infix Operator
+  | TInfixL Operator Int
   | Imperative
     deriving (Show, Eq)
 
