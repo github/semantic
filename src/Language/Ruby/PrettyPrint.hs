@@ -12,7 +12,7 @@ import Data.Reprinting.Token as Token
 
 -- | Print Ruby syntax.
 printingRuby :: (Member (Exc TranslationException) effs) => ProcessT (Eff effs) Fragment Splice
-printingRuby = flattened <~ autoT (Kleisli step) where
+printingRuby = flattened <~ autoT (Kleisli step)
 
 step :: (Member (Exc TranslationException) effs) => Fragment -> Eff effs (Seq Splice)
 step (Verbatim txt) = pure $ emit txt
@@ -32,10 +32,10 @@ step (Defer el cs)  = case (el, cs) of
   (TSep,   TParams:_) -> pure $ emit "," <> space
   (TClose, TParams:_) -> pure $ emit ")"
 
-  (TOpen,  (TInfixL _ p):xs)   -> emitIf (p < (prec xs)) "("
-  (TSep,   (TInfixL Add _):_)  -> pure $ space <> emit "+" <> space
-  (TSep,   (TInfixL Mult _):_) -> pure $ space <> emit "*" <> space
-  (TClose, (TInfixL _ p):xs)   -> emitIf (p < (prec xs)) ")"
+  (TOpen,  TInfixL _ p:xs)   -> emitIf (p < prec xs) "("
+  (TSep,   TInfixL Add _:_)  -> pure $ space <> emit "+" <> space
+  (TSep,   TInfixL Mult _:_) -> pure $ space <> emit "*" <> space
+  (TClose, TInfixL _ p:xs)   -> emitIf (p < prec xs) ")"
 
   (TOpen,  [Imperative])  -> pure mempty
   (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
@@ -62,7 +62,7 @@ step (Defer el cs)  = case (el, cs) of
 
 prec :: [Context] -> Int
 prec cs = case filter isInfix cs of
-  ((TInfixL _ n):_) -> n
+  (TInfixL _ n:_) -> n
   _ -> 0
   where isInfix (TInfixL _ _) = True
         isInfix _             = False
