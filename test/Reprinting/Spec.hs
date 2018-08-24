@@ -13,6 +13,7 @@ import Reprinting.Pipeline
 import Data.Sum
 import Data.Foldable
 import Semantic.IO
+import Semantic.Util.Rewriting hiding (parseFile)
 import Data.Blob
 import Language.JSON.PrettyPrint
 import Language.Ruby.PrettyPrint
