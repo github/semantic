@@ -38,7 +38,7 @@ contextualizing = flattened <~ autoT (Kleisli step) where
 
   toFragment el cs = case el of
     Fragment f -> insert el cs f
-    _ -> defer el cs
+    _          -> defer el cs
 
   enterContext :: (Member (State [Context]) effs) => Context -> Eff effs ()
   enterContext c = modify' (c :)
@@ -52,4 +52,4 @@ contextualizing = flattened <~ autoT (Kleisli step) where
     current <- get
     case current of
       (x:xs) | x == c -> modify' (const xs)
-      cs -> Exc.throwError (UnbalancedPair c cs)
+      cs              -> Exc.throwError (UnbalancedPair c cs)
