@@ -71,12 +71,14 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
          -> Project
          -> Eff effs (Graph Vertex)
 runGraph ImportGraph _ project
-  | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- fmap snd <$> parsePackage parser project
-    runImportGraphToModuleInfos lang package
+  | SomeAnalysisParser parser (lang' :: Proxy lang) <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
+    let parse = if (projectLanguage project) == Language.Python then parsePythonPackage parser else (fmap (fmap snd) . parsePackage parser)
+    package <- parse project
+    runImportGraphToModuleInfos lang' package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- fmap snd <$> parsePackage parser project
+    let parse = if (projectLanguage project) == Language.Python then parsePythonPackage parser else (fmap (fmap snd) . parsePackage parser)
+    package <- parse project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
@@ -258,15 +260,9 @@ parsePythonPackage :: forall syntax fields effs term.
                    , (Show (Record fields))
                    , Effects effs)
                    => Parser term       -- ^ A parser.
-                   -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
-                   -> Eff effs (Package term, Strategy)
-parsePythonPackage parser preludeFile project = do
-  prelude <- traverse (parseModule project parser) preludeFile
-
-  setupFile <- maybeM (error "no setup.py found in project") (find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project))
-  setupModule <- parseModule project parser setupFile
-
+                   -> Eff effs (Package term)
+parsePythonPackage parser project = do
   let runAnalysis = runEvaluator
         . runState PythonPackage.Unknown
         . runState lowerBound
@@ -286,19 +282,23 @@ parsePythonPackage parser preludeFile project = do
       runAddressEffects
         = Hole.runAllocator (Precise.handleAllocator)
         . Hole.runDeref (Precise.handleDeref)
-  (strat, _) <- runAnalysis $ evaluate (Proxy @'Language.Python) id id runAddressEffects (Concrete.runBoolean . Concrete.runFunction coerce coerce . runPythonPackaging) (maybeToList prelude <> [ setupModule ])
+
+  strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
+    Just setupFile -> do
+      setupModule <- parseModule project parser setupFile
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id runAddressEffects (Concrete.runBoolean . Concrete.runFunction coerce coerce . runPythonPackaging) [ setupModule ])
+    Nothing -> pure PythonPackage.Unknown
   case strat of
     PythonPackage.Unknown -> do
       modules <- parseModules parser project
       resMap <- Task.resolutionMap project
-      pure (Package.fromModules (name (projectName project)) modules resMap, strat)
+      pure (Package.fromModules (name (projectName project)) modules resMap)
     PythonPackage.Packages dirs -> do
       filteredBlobs <- for dirs $ \dir -> do
         let packageDir = projectRootDir project </> unpack dir
         let paths = filter ((packageDir `isPrefixOf`) . filePath) (projectFiles project)
         traverse (readFile project) paths
-
-      (, strat) <$> packageFromProject project filteredBlobs
+      packageFromProject project filteredBlobs
     PythonPackage.FindPackages excludeDirs -> do
       trace "In Graph.FindPackages"
       let initFiles = filter (("__init__.py" `isSuffixOf`) . filePath) (projectFiles project)
@@ -306,7 +306,7 @@ parsePythonPackage parser preludeFile project = do
       filteredBlobs <- for packageDirs $ \dir -> do
         let paths = filter ((dir `isPrefixOf`) . filePath) (projectFiles project)
         traverse (readFile project) paths
-      (, strat) <$> packageFromProject project filteredBlobs
+      packageFromProject project filteredBlobs
     where
       packageFromProject project filteredBlobs = do
         let p = project { projectBlobs = catMaybes $ join filteredBlobs }

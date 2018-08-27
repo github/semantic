@@ -113,14 +113,10 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
-  (package, strat) <- first (fmap quieterm) <$> parsePythonPackage parser Nothing project
-  modules <- case strat of
-    PythonPackage.Unknown -> do
-      let modules = NonEmpty.head <$> Map.elems (coerce (packageModules package))
-      pure (sortOn (length . splitDirectories . modulePath . moduleInfo) modules)
-    _ -> topologicalSort <$> runImportGraphToModules proxy package
+  package <- fmap quieterm <$> parsePythonPackage parser project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise '[Trace, Lift IO]))
+  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise '[Trace]))
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (runReader (packageInfo package)
