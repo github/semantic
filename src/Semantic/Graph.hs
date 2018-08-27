@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators, TupleSections #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Graph
 ( runGraph
 , runCallGraph
@@ -72,12 +72,12 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
          -> Eff effs (Graph Vertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser (lang' :: Proxy lang) <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    let parse = if (projectLanguage project) == Language.Python then parsePythonPackage parser else (fmap (fmap snd) . parsePackage parser)
+    let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
     package <- parse project
     runImportGraphToModuleInfos lang' package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    let parse = if (projectLanguage project) == Language.Python then parsePythonPackage parser else (fmap (fmap snd) . parsePackage parser)
+    let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
     package <- parse project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
@@ -274,8 +274,8 @@ parsePythonPackage parser project = do
         . runReader (PackageInfo (name "setup") lowerBound)
         . runReader lowerBound
       runAddressEffects
-        = Hole.runAllocator (Precise.handleAllocator)
-        . Hole.runDeref (Precise.handleDeref)
+        = Hole.runAllocator Precise.handleAllocator
+        . Hole.runDeref Precise.handleDeref
 
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do

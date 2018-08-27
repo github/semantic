@@ -7,7 +7,6 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
-import           qualified Control.Abstract.PythonPackage as PythonPackage
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address.Monovariant as Monovariant
@@ -22,7 +21,7 @@ import           Data.Blob
 import           Data.Coerce
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
-import           Data.List (uncons, sortOn)
+import           Data.List (uncons)
 import           Data.Project hiding (readFile)
 import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
@@ -36,10 +35,8 @@ import           Semantic.IO as IO
 import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
-import           System.FilePath.Posix (takeDirectory, splitDirectories)
+import           System.FilePath.Posix (takeDirectory)
 import           Text.Show.Pretty (ppShow)
-import qualified Data.Map as Map
-import qualified Data.List.NonEmpty as NonEmpty
 
 justEvaluating
   = runM
