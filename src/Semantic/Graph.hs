@@ -41,7 +41,7 @@ import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
-import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runFunction, runValueErrorWith)
+import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runBoolean, runFunction, runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.Coerce
@@ -126,7 +126,7 @@ runCallGraph lang includePackages modules package = do
       runAddressEffects
         = Hole.runAllocator (Located.handleAllocator Monovariant.handleAllocator)
         . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects Abstract.runFunction modules))
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects (Abstract.runBoolean . Abstract.runFunction) modules))
 
 runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
@@ -193,7 +193,7 @@ runImportGraph lang (package :: Package term) f =
       runAddressEffects
         = Hole.runAllocator Precise.handleAllocator
         . Hole.runDeref Precise.handleDeref
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runBoolean . Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 type ConcreteEffects address rest
   =  Reader Span
@@ -280,13 +280,13 @@ parsePythonPackage parser preludeFile project = do
         . resumingValueError
         . runReader lowerBound
         . runModules lowerBound
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) (State Strategy ': effs)))
+        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
         . runReader (PackageInfo (name "setup") lowerBound)
         . runReader lowerBound
       runAddressEffects
         = Hole.runAllocator (Precise.handleAllocator)
         . Hole.runDeref (Precise.handleDeref)
-  (strat, _) <- runAnalysis $ evaluate (Proxy @'Language.Python) id id runAddressEffects (Concrete.runFunction coerce coerce . runPythonPackaging) (maybeToList prelude <> [ setupModule ])
+  (strat, _) <- runAnalysis $ evaluate (Proxy @'Language.Python) id id runAddressEffects (Concrete.runBoolean . Concrete.runFunction coerce coerce . runPythonPackaging) (maybeToList prelude <> [ setupModule ])
   case strat of
     PythonPackage.Unknown -> do
       modules <- parseModules parser project

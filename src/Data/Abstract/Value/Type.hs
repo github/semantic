@@ -7,10 +7,11 @@ module Data.Abstract.Value.Type
   , runTypesWith
   , unify
   , runFunction
+  , runBoolean
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Function(..), raiseHandler)
+import Control.Abstract hiding (Boolean(..), Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
@@ -261,6 +262,20 @@ runFunction = interpret $ \case
       _ :-> ret -> box ret
       actual    -> throwTypeError (UnificationError needed actual) >>= box
 
+runBoolean :: ( Member NonDet effects
+              , Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Member (Resumable (BaseError TypeError)) effects
+              , Member (State TypeMap) effects
+              , PureEffects effects
+              )
+           => Evaluator address Type (Abstract.Boolean Type ': effects) a
+           -> Evaluator address Type effects a
+runBoolean = interpret $ \case
+  Abstract.Boolean _         -> pure Bool
+  Abstract.AsBool  t         -> unify t Bool *> (pure True <|> pure False)
+  Abstract.Disjunction t1 t2 -> (runBoolean (Evaluator t1) >>= unify Bool) <|> (runBoolean (Evaluator t2) >>= unify Bool)
+
 
 instance AbstractHole Type where
   hole = Hole
@@ -268,7 +283,6 @@ instance AbstractHole Type where
 instance AbstractIntro Type where
   unit       = Unit
   integer _  = Int
-  boolean _  = Bool
   string _   = String
   float _    = Float
   symbol _   = Symbol
@@ -319,11 +333,6 @@ instance ( Member (Allocator address) effects
     field <- fresh
     _ <- unify (Array (Var field)) arr
     box (Var field)
-
-  ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
-  disjunction a b = do
-    a' <- a
-    unify a' Bool *> (pure a' <|> b)
 
   liftNumeric _ = unify (Int :+ Float :+ Rational)
   liftNumeric2 _ left right = case (left, right) of

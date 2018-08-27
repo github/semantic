@@ -29,7 +29,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
-  eval (Boolean x) = rvalBox (boolean x)
+  eval (Boolean x) = boolean x >>= rvalBox
 
 -- Numeric
 
