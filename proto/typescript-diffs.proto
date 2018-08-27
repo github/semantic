@@ -30,22 +30,6 @@ message TypeScriptDiff {
   }
 }
 
-message Alias {
-  bytes aliasValue = 1;
-  bytes aliasName = 2;
-}
-
-message ImportPath {
-  string unPath = 1;
-  IsRelative pathIsRelative = 2;
-}
-
-enum IsRelative {
-  Unknown = 0;
-  Relative = 1;
-  NonRelative = 2;
-}
-
 message TypeScriptSyntax {
   oneof syntax {
     Comment comment = 1;
@@ -99,119 +83,119 @@ message TypeScriptSyntax {
     InstanceOf instanceOf = 49;
     New new = 50;
     Await await = 51;
-    Array array = 52;
-    Boolean boolean = 53;
-    Float float = 54;
-    Hash hash = 55;
-    Integer integer = 56;
-    KeyValue keyValue = 57;
-    Null null = 58;
-    String string = 59;
-    TextElement textElement = 60;
-    Regex regex = 61;
-    Assignment assignment = 62;
-    Break break = 63;
-    Catch catch = 64;
-    Continue continue = 65;
-    DoWhile doWhile = 66;
-    Else else = 67;
-    Finally finally = 68;
-    For for = 69;
-    ForEach forEach = 70;
-    If if = 71;
-    Match match = 72;
-    Pattern pattern = 73;
-    Retry retry = 74;
-    Return return = 75;
-    ScopeEntry scopeEntry = 76;
-    ScopeExit scopeExit = 77;
-    Statements statements = 78;
-    Throw throw = 79;
-    Try try = 80;
-    While while = 81;
-    Yield yield = 82;
-    AccessibilityModifier accessibilityModifier = 83;
-    Empty empty = 84;
-    Error error = 85;
-    Identifier identifier = 86;
-    Context context = 87;
-    Readonly readonly = 88;
-    TypeParameters typeParameters = 89;
-    TypeParameter typeParameter = 90;
-    Constraint constraint = 91;
-    ParenthesizedType parenthesizedType = 92;
-    DefaultType defaultType = 93;
-    PredefinedType predefinedType = 94;
-    TypeIdentifier typeIdentifier = 95;
-    NestedIdentifier nestedIdentifier = 96;
-    NestedTypeIdentifier nestedTypeIdentifier = 97;
-    GenericType genericType = 98;
-    TypeArguments typeArguments = 99;
-    TypePredicate typePredicate = 100;
-    CallSignature callSignature = 101;
-    ConstructSignature constructSignature = 102;
-    ArrayType arrayType = 103;
-    LookupType lookupType = 104;
-    FlowMaybeType flowMaybeType = 105;
-    TypeQuery typeQuery = 106;
-    IndexTypeQuery indexTypeQuery = 107;
-    ThisType thisType = 108;
-    ExistentialType existentialType = 109;
-    AbstractMethodSignature abstractMethodSignature = 110;
-    IndexSignature indexSignature = 111;
-    ObjectType objectType = 112;
-    LiteralType literalType = 113;
-    Union union = 114;
-    Intersection intersection = 115;
-    Module module = 116;
-    InternalModule internalModule = 117;
-    FunctionType functionType = 118;
-    Tuple tuple = 119;
-    Constructor constructor = 120;
-    TypeAssertion typeAssertion = 121;
-    ImportAlias importAlias = 122;
-    Debugger debugger = 123;
-    ShorthandPropertyIdentifier shorthandPropertyIdentifier = 124;
-    Super super = 125;
-    Undefined undefined = 126;
-    ClassHeritage classHeritage = 127;
-    AbstractClass abstractClass = 128;
-    ImplementsClause implementsClause = 129;
-    JsxElement jsxElement = 130;
-    JsxSelfClosingElement jsxSelfClosingElement = 131;
-    JsxOpeningElement jsxOpeningElement = 132;
-    JsxText jsxText = 133;
-    JsxClosingElement jsxClosingElement = 134;
-    JsxExpression jsxExpression = 135;
-    JsxAttribute jsxAttribute = 136;
-    JsxFragment jsxFragment = 137;
-    JsxNamespaceName jsxNamespaceName = 138;
-    OptionalParameter optionalParameter = 139;
-    RequiredParameter requiredParameter = 140;
-    RestParameter restParameter = 141;
-    PropertySignature propertySignature = 142;
-    AmbientDeclaration ambientDeclaration = 143;
-    EnumDeclaration enumDeclaration = 144;
-    ExtendsClause extendsClause = 145;
-    AmbientFunction ambientFunction = 146;
-    ImportRequireClause importRequireClause = 147;
-    ImportClause importClause = 148;
-    LabeledStatement labeledStatement = 149;
-    Annotation annotation = 150;
-    With with = 151;
-    ForOf forOf = 152;
-    Update update = 153;
-    ComputedPropertyName computedPropertyName = 154;
-    Decorator decorator = 155;
-    Import import = 156;
-    QualifiedAliasedImport qualifiedAliasedImport = 157;
-    SideEffectImport sideEffectImport = 158;
-    DefaultExport defaultExport = 159;
-    QualifiedExport qualifiedExport = 160;
-    QualifiedExportFrom qualifiedExportFrom = 161;
-    JavaScriptRequire javaScriptRequire = 162;
-    List list = 163;
-    This this = 164;
+    This this = 52;
+    Array array = 53;
+    Boolean boolean = 54;
+    Float float = 55;
+    Hash hash = 56;
+    Integer integer = 57;
+    KeyValue keyValue = 58;
+    Null null = 59;
+    String string = 60;
+    TextElement textElement = 61;
+    Regex regex = 62;
+    Assignment assignment = 63;
+    Break break = 64;
+    Catch catch = 65;
+    Continue continue = 66;
+    DoWhile doWhile = 67;
+    Else else = 68;
+    Finally finally = 69;
+    For for = 70;
+    ForEach forEach = 71;
+    If if = 72;
+    Match match = 73;
+    Pattern pattern = 74;
+    Retry retry = 75;
+    Return return = 76;
+    ScopeEntry scopeEntry = 77;
+    ScopeExit scopeExit = 78;
+    Statements statements = 79;
+    Throw throw = 80;
+    Try try = 81;
+    While while = 82;
+    Yield yield = 83;
+    AccessibilityModifier accessibilityModifier = 84;
+    Empty empty = 85;
+    Error error = 86;
+    Identifier identifier = 87;
+    Context context = 88;
+    Readonly readonly = 89;
+    TypeParameters typeParameters = 90;
+    TypeParameter typeParameter = 91;
+    Constraint constraint = 92;
+    ParenthesizedType parenthesizedType = 93;
+    DefaultType defaultType = 94;
+    PredefinedType predefinedType = 95;
+    TypeIdentifier typeIdentifier = 96;
+    NestedIdentifier nestedIdentifier = 97;
+    NestedTypeIdentifier nestedTypeIdentifier = 98;
+    GenericType genericType = 99;
+    TypeArguments typeArguments = 100;
+    TypePredicate typePredicate = 101;
+    CallSignature callSignature = 102;
+    ConstructSignature constructSignature = 103;
+    ArrayType arrayType = 104;
+    LookupType lookupType = 105;
+    FlowMaybeType flowMaybeType = 106;
+    TypeQuery typeQuery = 107;
+    IndexTypeQuery indexTypeQuery = 108;
+    ThisType thisType = 109;
+    ExistentialType existentialType = 110;
+    AbstractMethodSignature abstractMethodSignature = 111;
+    IndexSignature indexSignature = 112;
+    ObjectType objectType = 113;
+    LiteralType literalType = 114;
+    Union union = 115;
+    Intersection intersection = 116;
+    Module module = 117;
+    InternalModule internalModule = 118;
+    FunctionType functionType = 119;
+    Tuple tuple = 120;
+    Constructor constructor = 121;
+    TypeAssertion typeAssertion = 122;
+    ImportAlias importAlias = 123;
+    Debugger debugger = 124;
+    ShorthandPropertyIdentifier shorthandPropertyIdentifier = 125;
+    Super super = 126;
+    Undefined undefined = 127;
+    ClassHeritage classHeritage = 128;
+    AbstractClass abstractClass = 129;
+    ImplementsClause implementsClause = 130;
+    JsxElement jsxElement = 131;
+    JsxSelfClosingElement jsxSelfClosingElement = 132;
+    JsxOpeningElement jsxOpeningElement = 133;
+    JsxText jsxText = 134;
+    JsxClosingElement jsxClosingElement = 135;
+    JsxExpression jsxExpression = 136;
+    JsxAttribute jsxAttribute = 137;
+    JsxFragment jsxFragment = 138;
+    JsxNamespaceName jsxNamespaceName = 139;
+    OptionalParameter optionalParameter = 140;
+    RequiredParameter requiredParameter = 141;
+    RestParameter restParameter = 142;
+    PropertySignature propertySignature = 143;
+    AmbientDeclaration ambientDeclaration = 144;
+    EnumDeclaration enumDeclaration = 145;
+    ExtendsClause extendsClause = 146;
+    AmbientFunction ambientFunction = 147;
+    ImportRequireClause importRequireClause = 148;
+    ImportClause importClause = 149;
+    LabeledStatement labeledStatement = 150;
+    Annotation annotation = 151;
+    With with = 152;
+    ForOf forOf = 153;
+    Update update = 154;
+    ComputedPropertyName computedPropertyName = 155;
+    Decorator decorator = 156;
+    Import import = 157;
+    QualifiedAliasedImport qualifiedAliasedImport = 158;
+    SideEffectImport sideEffectImport = 159;
+    DefaultExport defaultExport = 160;
+    QualifiedExport qualifiedExport = 161;
+    QualifiedExportFrom qualifiedExportFrom = 162;
+    JavaScriptRequire javaScriptRequire = 163;
+    List list = 164;
   }
 }
 
@@ -471,6 +455,8 @@ message New {
 message Await {
   TypeScriptDiff awaitSubject = 1;
 }
+
+message This { }
 
 message Array {
   repeated TypeScriptDiff arrayElements = 1;
@@ -817,10 +803,6 @@ message AbstractClass {
   TypeScriptDiff classBody = 4;
 }
 
-message ExtendsClause {
-  repeated TypeScriptDiff extendsClauses = 1;
-}
-
 message ImplementsClause {
   repeated TypeScriptDiff implementsClauseTypes = 1;
 }
@@ -894,6 +876,10 @@ message AmbientDeclaration {
 message EnumDeclaration {
   TypeScriptDiff enumDeclarationIdentifier = 1;
   repeated TypeScriptDiff enumDeclarationBody = 2;
+}
+
+message ExtendsClause {
+  repeated TypeScriptDiff extendsClauses = 1;
 }
 
 message AmbientFunction {
@@ -979,4 +965,18 @@ message List {
   repeated TypeScriptDiff listContent = 1;
 }
 
-message This { }
+message Alias {
+  bytes aliasValue = 1;
+  bytes aliasName = 2;
+}
+
+message ImportPath {
+  string unPath = 1;
+  IsRelative pathIsRelative = 2;
+}
+
+enum IsRelative {
+  Unknown = 0;
+  Relative = 1;
+  NonRelative = 2;
+}

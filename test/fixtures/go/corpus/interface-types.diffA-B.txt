@@ -2,9 +2,7 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements
       (Statements
         (Type
@@ -44,5 +42,4 @@
               (MethodSignature
                 (Empty)
               { (Identifier)
-              ->(Identifier) }
-                (Statements)))))))))
+              ->(Identifier) }))))))))

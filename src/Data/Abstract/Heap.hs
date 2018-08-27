@@ -4,6 +4,7 @@ module Data.Abstract.Heap
   , heapLookup
   , heapLookupAll
   , heapInsert
+  , heapDelete
   , heapInit
   , heapSize
   , heapRestrict
@@ -42,6 +43,8 @@ heapSize = Monoidal.size . unHeap
 heapRestrict :: Ord address => Heap address value -> Live address -> Heap address value
 heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
+heapDelete :: Ord address => address -> Heap address value -> Heap address value
+heapDelete addr = Heap . Monoidal.delete addr . unHeap
 
 instance (Ord address, Ord value) => Reducer (address, value) (Heap address value) where
   unit = Heap . unit
@@ -49,4 +52,4 @@ instance (Ord address, Ord value) => Reducer (address, value) (Heap address valu
   snoc (Heap heap) (addr, a) = Heap (snoc heap (addr, a))
 
 instance (Show address, Show value) => Show (Heap address value) where
-  showsPrec d = showsUnaryWith showsPrec "Heap" d . Monoidal.pairs . unHeap
+  showsPrec d = showsUnaryWith showsPrec "Heap" d . map (second toList) . Monoidal.pairs . unHeap

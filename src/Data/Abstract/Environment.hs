@@ -1,7 +1,10 @@
+{-# LANGUAGE GADTs #-}
+
 module Data.Abstract.Environment
   ( Environment(..)
   , Bindings(..)
   , EvalContext(..)
+  , EnvironmentError(..)
   , addresses
   , aliasBindings
   , allNames
@@ -31,13 +34,13 @@ import           Prelude hiding (head, lookup)
 import           Prologue
 
 -- $setup
--- >>> import Data.Abstract.Address
+-- >>> import Data.Abstract.Address.Precise
 -- >>> let bright = push (insertEnv (name "foo") (Precise 0) lowerBound)
 -- >>> let shadowed = insertEnv (name "foo") (Precise 1) bright
 
 -- | A map of names to values. Represents a single scope level of an environment chain.
 newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
 
 instance Semigroup (Bindings address) where
   (<>) (Bindings a) (Bindings b) = Bindings (a <> b)
@@ -49,6 +52,10 @@ instance Monoid (Bindings address) where
 instance Lower (Bindings address) where
   lowerBound = mempty
 
+instance Show address => Show (Bindings address) where
+  showsPrec d = showsUnaryWith showsPrec "Bindings" d . pairs
+
+
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
@@ -57,6 +64,15 @@ newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings 
 
 data EvalContext address = EvalContext { ctxSelf :: Maybe address, ctxEnvironment :: Environment address }
   deriving (Eq, Ord, Show)
+
+-- | Errors involving the environment.
+data EnvironmentError address return where
+  FreeVariable :: Name -> EnvironmentError address address
+
+deriving instance Eq (EnvironmentError address return)
+deriving instance Show (EnvironmentError address return)
+instance Show1 (EnvironmentError address) where liftShowsPrec _ _ = showsPrec
+instance Eq1 (EnvironmentError address) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
 
 instance Lower (EvalContext address) where
   lowerBound = EvalContext Nothing lowerBound

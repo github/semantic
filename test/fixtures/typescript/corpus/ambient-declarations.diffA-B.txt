@@ -4,8 +4,8 @@
     {+(Identifier)+})+})+}
   (AmbientDeclaration
     (Class
-    { (Identifier)
-    ->(Identifier) }
+    { (TypeIdentifier)
+    ->(TypeIdentifier) }
     { (PublicFieldDefinition
       {-(Empty)-}
       {-(Empty)-}
@@ -23,7 +23,7 @@
       {-(Empty)-})-})
   ->(InterfaceDeclaration
     {+(Empty)+}
-    {+(Identifier)+}
+    {+(TypeIdentifier)+}
     {+(ObjectType)+}) })
 {-(AmbientDeclaration
   {-(AmbientFunction
@@ -63,7 +63,7 @@
         {-(Empty)-})-})-}
     {-(InterfaceDeclaration
       {-(Empty)-}
-      {-(Identifier)-}
+      {-(TypeIdentifier)-}
       {-(ObjectType
         {-(PropertySignature
           {-(Empty)-}
@@ -73,7 +73,7 @@
           {-(Identifier)-})-})-})-}
     {-(InterfaceDeclaration
       {-(Empty)-}
-      {-(Identifier)-}
+      {-(TypeIdentifier)-}
       {-(ObjectType
         {-(PropertySignature
           {-(Empty)-}
@@ -95,7 +95,7 @@
           {-(Identifier)-})-})-})-})-})-}
   (AmbientDeclaration
     (Class
-      (Identifier)
+      (TypeIdentifier)
       (Statements
         (MethodSignature
           (Empty)

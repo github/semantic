@@ -46,6 +46,74 @@ spec config = parallel $ do
         Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 123.0)]
         other -> expectationFailure (show other)
 
+    it "evaluates sequence expressions" $ do
+      (_, (heap, res)) <- evaluate ["sequence-expression.ts"]
+      case ModuleTable.lookup "sequence-expression.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          Env.names env `shouldBe` [ "x" ]
+          (derefQName heap ("x" :| []) env) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+        other -> expectationFailure (show other)
+
+    it "evaluates void expressions" $ do
+      (_, (heap, res)) <- evaluate ["void.ts"]
+      case ModuleTable.lookup "void.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Null]
+        other -> expectationFailure (show other)
+
+    it "evaluates delete" $ do
+      (_, (heap, res)) <- evaluate ["delete.ts"]
+      case ModuleTable.lookup "delete.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          heapLookupAll addr heap `shouldBe` Just [Unit]
+          (derefQName heap ("x" :| []) env) `shouldBe` Nothing
+          Env.names env `shouldBe` [ "x" ]
+        other -> expectationFailure (show other)
+
+    it "evaluates await" $ do
+      (_, (heap, res)) <- evaluate ["await.ts"]
+      case ModuleTable.lookup "await.ts" <$> res of
+        Right (Just (Module _ (env, addr) :| [])) -> do
+          Env.names env `shouldBe` [ "f2" ]
+          (derefQName heap ("y" :| []) env) `shouldBe` Nothing
+        other -> expectationFailure (show other)
+
+    it "evaluates BOr statements" $ do
+      (_, (heap, res)) <- evaluate ["bor.ts"]
+      case ModuleTable.lookup "bor.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
+        other -> expectationFailure (show other)
+
+    it "evaluates BAnd statements" $ do
+      (_, (heap, res)) <- evaluate ["band.ts"]
+      case ModuleTable.lookup "band.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 0)]
+        other -> expectationFailure (show other)
+
+    it "evaluates BXOr statements" $ do
+      (_, (heap, res)) <- evaluate ["bxor.ts"]
+      case ModuleTable.lookup "bxor.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
+        other -> expectationFailure (show other)
+
+    it "evaluates LShift statements" $ do
+      (_, (heap, res)) <- evaluate ["lshift.ts"]
+      case ModuleTable.lookup "lshift.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 4)]
+        other -> expectationFailure (show other)
+
+    it "evaluates RShift statements" $ do
+      (_, (heap, res)) <- evaluate ["rshift.ts"]
+      case ModuleTable.lookup "rshift.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 0)]
+        other -> expectationFailure (show other)
+
+    it "evaluates Complement statements" $ do
+      (_, (heap, res)) <- evaluate ["complement.ts"]
+      case ModuleTable.lookup "complement.ts" <$> res of
+        Right (Just (Module _ (_, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer (-2))]
+        other -> expectationFailure (show other)
+
+
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate = evalTypeScriptProject . map (fixtures <>)

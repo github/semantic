@@ -2,24 +2,18 @@
   (Package
     (Identifier))
   (Function
-    (Empty)
     (Identifier)
-    (Statements)
     (Statements))
   (Function
-    (Empty)
   { (Identifier)
   ->(Identifier) }
-    (Statements)
     (Call
       (Identifier)
       (Statements)
       (Empty)))
   (Function
-    (Empty)
   { (Identifier)
   ->(Identifier) }
-    (Statements)
     (Statements
       (Call
         (Identifier)
@@ -30,10 +24,8 @@
         (Statements)
         (Empty))))
   (Function
-    (Empty)
   { (Identifier)
   ->(Identifier) }
-    (Statements)
     (Statements
       (Call
         (Identifier)

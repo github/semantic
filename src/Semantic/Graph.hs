@@ -8,7 +8,7 @@ module Semantic.Graph
 , GraphType(..)
 , Graph
 , Vertex
-, ImportGraphEff(..)
+, ConcreteEff(..)
 , style
 , parsePackage
 , parsePythonPackage
@@ -31,7 +31,10 @@ import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
 import           Control.Abstract.PythonPackage as PythonPackage
-import           Data.Abstract.Address
+import           Data.Abstract.Address.Hole as Hole
+import           Data.Abstract.Address.Located as Located
+import           Data.Abstract.Address.Monovariant as Monovariant
+import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError(..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -40,6 +43,7 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runFunction, runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
+import           Data.Blob
 import           Data.Coerce
 import           Data.Graph
 import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
@@ -68,11 +72,11 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
          -> Eff effs (Graph Vertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- parsePackage parser project
+    package <- fmap snd <$> parsePackage parser project
     runImportGraphToModuleInfos lang package
 runGraph CallGraph includePackages project
   | SomeAnalysisParser parser lang <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
-    package <- parsePackage parser project
+    package <- fmap snd <$> parsePackage parser project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
@@ -119,42 +123,42 @@ runCallGraph lang includePackages modules package = do
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm Abstract.runFunction modules))
+      runAddressEffects
+        = Hole.runAllocator (Located.handleAllocator Monovariant.handleAllocator)
+        . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects Abstract.runFunction modules))
 
-runImportGraphToModuleInfos :: forall effs lang term.
-                  ( Declarations term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasPrelude lang
-                  , HasPostlude lang
-                  , Member Trace effs
-                  , Recursive term
-                  , Effects effs
-                  )
-               => Proxy lang
-               -> Package term
-               -> Eff effs (Graph Vertex)
+runImportGraphToModuleInfos :: ( Declarations term
+                               , Evaluatable (Base term)
+                               , FreeVariables term
+                               , HasPrelude lang
+                               , HasPostlude lang
+                               , Member Trace effs
+                               , Recursive term
+                               , Effects effs
+                               )
+                            => Proxy lang
+                            -> Package term
+                            -> Eff effs (Graph Vertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraphToModules :: forall effs lang term.
-                  ( Declarations term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , HasPrelude lang
-                  , HasPostlude lang
-                  , Member Trace effs
-                  , Recursive term
-                  , Effects effs
-                  )
-               => Proxy lang
-               -> Package term
-               -> Eff effs (Graph (Module term))
+runImportGraphToModules :: ( Declarations term
+                           , Evaluatable (Base term)
+                           , FreeVariables term
+                           , HasPrelude lang
+                           , HasPostlude lang
+                           , Member Trace effs
+                           , Recursive term
+                           , Effects effs
+                           )
+                        => Proxy lang
+                        -> Package term
+                        -> Eff effs (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
 
-runImportGraph :: forall effs lang term vertex.
-                  ( Declarations term
+runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
@@ -169,9 +173,10 @@ runImportGraph :: forall effs lang term vertex.
                -> Eff effs (Graph vertex)
 runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
-      extractGraph (_, (graph, _)) = graph >>= f
+      extractGraph (graph, _) = graph >>= f
       runImportGraphAnalysis
         = runState lowerBound
+        . runState lowerBound
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -180,38 +185,36 @@ runImportGraph lang (package :: Package term) f =
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runState lowerBound
         . runReader lowerBound
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) effs))
+        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
         . runReader (packageInfo package)
         . runReader lowerBound
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+      runAddressEffects
+        = Hole.runAllocator Precise.handleAllocator
+        . Hole.runDeref Precise.handleDeref
+  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
-newtype ImportGraphEff address outerEffects a = ImportGraphEff
-  { runImportGraphEff :: Eff (  Function address (Value address (ImportGraphEff address outerEffects))
-                             ': Exc (LoopControl address)
-                             ': Exc (Return address)
-                             ': Env address
-                             ': Deref address (Value address (ImportGraphEff address outerEffects))
-                             ': Allocator address (Value address (ImportGraphEff address outerEffects))
-                             ': Reader ModuleInfo
-                             ': Reader Span
-                             ': Reader PackageInfo
-                             ': Modules address
-                             ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                             ': State (Graph ModuleInfo)
-                             ': Resumable (BaseError (ValueError address (ImportGraphEff address outerEffects)))
-                             ': Resumable (BaseError (AddressError address (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable (BaseError ResolutionError)
-                             ': Resumable (BaseError EvalError)
-                             ': Resumable (BaseError (EnvironmentError address))
-                             ': Resumable (BaseError (UnspecializedError (Value address (ImportGraphEff address outerEffects))))
-                             ': Resumable (BaseError (LoadError address))
-                             ': Fresh
-                             ': State (Heap address (Value address (ImportGraphEff address outerEffects)))
-                             ': outerEffects
-                             ) a
+type ConcreteEffects address rest
+  =  Reader Span
+  ': Reader PackageInfo
+  ': Modules address
+  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+  ': Resumable (BaseError (ValueError address (ConcreteEff address rest)))
+  ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
+  ': Resumable (BaseError ResolutionError)
+  ': Resumable (BaseError EvalError)
+  ': Resumable (BaseError (EnvironmentError address))
+  ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address rest))))
+  ': Resumable (BaseError (LoadError address))
+  ': Fresh
+  ': State (Heap address (Value address (ConcreteEff address rest)))
+  ': rest
+
+newtype ConcreteEff address outerEffects a = ConcreteEff
+  { runConcreteEff :: Eff (ValueEffects  address (Value address (ConcreteEff address outerEffects))
+                          (ModuleEffects address (Value address (ConcreteEff address outerEffects))
+                          (ConcreteEffects address outerEffects))) a
   }
 
 
@@ -219,8 +222,8 @@ newtype ImportGraphEff address outerEffects a = ImportGraphEff
 parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
-             -> Eff effs (Package term)
-parsePackage parser project@Project{..} = do
+             -> Eff effs (Package (Blob, term))
+parsePackage parser project = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
   let pkg = Package.fromModules n p resMap
@@ -228,6 +231,12 @@ parsePackage parser project@Project{..} = do
 
   where
     n = name (projectName project)
+    parseModules parser p = distributeFor (projectFiles p) (parseModule p parser)
+    parseModule proj parser file = do
+      mBlob <- readFile proj file
+      case mBlob of
+        Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (blob, ) <$> parse parser blob
+        Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
 -- | Parse all files in a project into 'Module's.
 parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
@@ -269,13 +278,15 @@ parsePythonPackage parser preludeFile project = do
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runState lowerBound
         . runReader lowerBound
         . runModules lowerBound
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ImportGraphEff (Hole (Maybe Name) Precise) (State Strategy ': effs)))
+        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) (State Strategy ': effs)))
         . runReader (PackageInfo (name "setup") lowerBound)
         . runReader lowerBound
-  (strat, _) <- runAnalysis $ evaluate (Proxy @'Language.Python) id id (Concrete.runFunction coerce coerce . runPythonPackaging) (maybeToList prelude <> [ setupModule ])
+      runAddressEffects
+        = Hole.runAllocator (Precise.handleAllocator)
+        . Hole.runDeref (Precise.handleDeref)
+  (strat, _) <- runAnalysis $ evaluate (Proxy @'Language.Python) id id runAddressEffects (Concrete.runFunction coerce coerce . runPythonPackaging) (maybeToList prelude <> [ setupModule ])
   case strat of
     PythonPackage.Unknown -> do
       modules <- parseModules parser project
@@ -303,8 +314,6 @@ parsePythonPackage parser preludeFile project = do
         resMap <- Task.resolutionMap p
         pure (Package.fromModules (name $ projectName p) modules resMap)
 
--- | Parse a file into a 'Module'.
-parseModule :: (Member (Exc SomeException) effs, Member Task effs) => Project -> Parser term -> File -> Eff effs (Module term)
 parseModule proj parser file = do
   mBlob <- readFile proj file
   case mBlob of

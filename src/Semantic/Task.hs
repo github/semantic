@@ -39,6 +39,8 @@ module Semantic.Task
 , runTaskWithOptions
 , withOptions
 , runTaskWithConfig
+, runTraceInTelemetry
+, runTaskF
 -- * Re-exports
 , Distribute
 , Eff

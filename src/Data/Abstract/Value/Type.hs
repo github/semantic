@@ -228,15 +228,18 @@ instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
-runFunction :: ( Member (Allocator address Type) effects
-               , Member (Deref address Type) effects
+runFunction :: ( Member (Allocator address) effects
+               , Member (Deref Type) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError TypeError)) effects
+               , Member (Resumable (BaseError (AddressError address Type))) effects
+               , Member (State (Heap address Type)) effects
                , Member (State TypeMap) effects
+               , Ord address
                , PureEffects effects
                )
             => Evaluator address Type (Abstract.Function address Type ': effects) a
@@ -277,14 +280,17 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address Type) effects
-         , Member (Deref address Type) effects
+instance ( Member (Allocator address) effects
+         , Member (Deref Type) effects
          , Member Fresh effects
          , Member NonDet effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address Type))) effects
          , Member (Resumable (BaseError TypeError)) effects
+         , Member (State (Heap address Type)) effects
          , Member (State TypeMap) effects
+         , Ord address
          )
       => AbstractValue address Type effects where
   array fields = do
@@ -328,6 +334,8 @@ instance ( Member (Allocator address Type) effects
   liftBitwise _ = unify Int
   liftBitwise2 _ t1 t2   = unify Int t1 >>= flip unify t2
 
+  unsignedRShift t1 t2 = unify Int t2 *> unify Int t1
+
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
     (Int, Float) ->                     pure Bool
@@ -338,3 +346,5 @@ instance ( Member (Allocator address Type) effects
     _                 -> unify left right $> Bool
 
   loop f = f empty
+
+  castToInteger t = unify t (Int :+ Float :+ Rational) $> Int
