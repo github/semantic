@@ -31,11 +31,11 @@ data Fragment
 copy :: Text -> Seq Fragment
 copy = singleton . Verbatim
 
--- | Construct an 'New' datum.
+-- | Insert some new 'Text'.
 insert :: Element -> [Context] -> Text -> Seq Fragment
 insert el c = singleton . New el c
 
--- | Construct an 'Defer' splice.
+-- | Defer processing an element to a later stage.
 defer :: Element -> [Context] -> Seq Fragment
 defer el = singleton . Defer el
 
