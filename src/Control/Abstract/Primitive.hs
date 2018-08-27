@@ -9,6 +9,7 @@ module Control.Abstract.Primitive
   , Lambda(..)
   ) where
 
+import Data.Abstract.Environment
 import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
@@ -21,10 +22,13 @@ import Data.Text (unpack)
 import Prologue
 
 define :: ( HasCallStack
-          , Member (Allocator address value) effects
+          , Member (Allocator address) effects
+          , Member (Deref value) effects
           , Member (Env address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
+          , Member (State (Heap address value)) effects
+          , Ord address
           )
        => Name
        -> Evaluator address value effects value
@@ -36,10 +40,13 @@ define name def = withCurrentCallStack callStack $ do
 
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
-               , Member (Allocator address value) effects
+               , Member (Allocator address) effects
+               , Member (Deref value) effects
                , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
+               , Member (State (Heap address value)) effects
+               , Ord address
                )
             => Name
             -> [address]
@@ -51,10 +58,13 @@ defineClass name superclasses body = define name $ do
 
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
-                   , Member (Allocator address value) effects
+                   , Member (Allocator address) effects
+                   , Member (Deref value) effects
                    , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
+                   , Member (State (Heap address value)) effects
+                   , Ord address
                    )
                 => Name
                 -> Evaluator address value effects a
@@ -93,29 +103,35 @@ instance Member (Function address value) effects => Lambda address value effects
 
 builtInPrint :: ( AbstractValue address value effects
                 , HasCallStack
-                , Member (Allocator address value) effects
-                , Member (Deref address value) effects
+                , Member (Allocator address) effects
+                , Member (Deref value) effects
                 , Member (Env address) effects
                 , Member Fresh effects
                 , Member (Function address value) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
+                , Member (Resumable (BaseError (AddressError address value))) effects
                 , Member (Resumable (BaseError (EnvironmentError address))) effects
+                , Member (State (Heap address value)) effects
                 , Member Trace effects
+                , Ord address
                 )
              => Evaluator address value effects value
 builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit)
 
 builtInExport :: ( AbstractValue address value effects
                  , HasCallStack
-                 , Member (Allocator address value) effects
-                 , Member (Deref address value) effects
+                 , Member (Allocator address) effects
+                 , Member (Deref value) effects
                  , Member (Env address) effects
                  , Member Fresh effects
                  , Member (Function address value) effects
                  , Member (Reader ModuleInfo) effects
                  , Member (Reader Span) effects
+                 , Member (Resumable (BaseError (AddressError address value))) effects
                  , Member (Resumable (BaseError (EnvironmentError address))) effects
+                 , Member (State (Heap address value)) effects
+                 , Ord address
                  )
               => Evaluator address value effects value
 builtInExport = lambda (\ v -> do

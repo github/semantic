@@ -20,13 +20,17 @@ data Strategy = Unknown | Packages [Text] | FindPackages [Text]
 
 runPythonPackaging :: forall effects address body a. (
                       Eff.PureEffects effects
+                      , Ord address
                       , Show address
+                      , Member Trace effects
+                      , Member (State (Heap address (Value address body))) effects
+                      , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                       , Member (Resumable (BaseError (ValueError address body))) effects
                       , Member Fresh effects
                       , Coercible body (Eff.Eff effects)
                       , Member (State Strategy) effects
-                      , Member (Allocator address (Value address body)) effects
-                      , Member (Deref address (Value address body)) effects
+                      , Member (Allocator address) effects
+                      , Member (Deref (Value address body)) effects
                       , Member (Env address) effects
                       , Member (Eff.Exc (LoopControl address)) effects
                       , Member (Eff.Exc (Return address)) effects

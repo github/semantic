@@ -22,7 +22,7 @@ import Control.Abstract
 import Control.Arrow ((&&&))
 import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
 import Control.Monad ((>=>))
-import Data.Abstract.Address as X
+import Data.Abstract.Address.Precise as X
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X
@@ -73,6 +73,7 @@ import qualified Data.ByteString as B
 import qualified Data.Set as Set
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
+import Semantic.Graph (ConcreteEff)
 import Semantic.Telemetry (LogQueue, StatQueue)
 import System.Exit (die)
 import Control.Exception (displayException)
@@ -97,19 +98,19 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise UtilEff))
+type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO])))
                               , Resumable (BaseError (AddressError Precise Val))
                               , Resumable (BaseError ResolutionError)
                               , Resumable (BaseError EvalError)
                               , Resumable (BaseError (EnvironmentError Precise))
                               , Resumable (BaseError (UnspecializedError Val))
                               , Resumable (BaseError (LoadError Precise))
-                              , Trace
                               , Fresh
                               , State (Heap Precise Val)
+                              , Trace
                               , Lift IO
                               ]
-type TestEvaluatingErrors = '[ BaseError (ValueError Precise UtilEff)
+type TestEvaluatingErrors = '[ BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO]))
                              , BaseError (AddressError Precise Val)
                              , BaseError ResolutionError
                              , BaseError EvalError
@@ -127,10 +128,9 @@ testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonE
                  )
 testEvaluating
   = runM
-  . fmap (\ (heap, (traces, res)) -> (traces, (heap, res)))
+  . runReturningTrace
   . runState lowerBound
   . runFresh 0
-  . runReturningTrace
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -138,9 +138,9 @@ testEvaluating
   . runEvalError
   . runResolutionError
   . runAddressError
-  . runValueError @_ @Precise @UtilEff
+  . runValueError @_ @Precise @(ConcreteEff Precise _)
 
-type Val = Value Precise UtilEff
+type Val = Value Precise (ConcreteEff Precise '[Trace, Lift IO])
 
 
 deNamespace :: Heap Precise (Value Precise term)

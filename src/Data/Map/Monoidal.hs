@@ -6,6 +6,7 @@ module Data.Map.Monoidal
 , singleton
 , size
 , insert
+, delete
 , filterWithKey
 , pairs
 , keys
@@ -34,6 +35,9 @@ size = Map.size . unMap
 
 insert :: Ord key => key -> value -> Map key value -> Map key value
 insert key value = Map . Map.insert key value . unMap
+
+delete :: Ord key => key -> Map key value -> Map key value
+delete key = Map . Map.delete key . unMap
 
 filterWithKey :: (key -> value -> Bool) -> Map key value -> Map key value
 filterWithKey f = Map . Map.filterWithKey f . unMap

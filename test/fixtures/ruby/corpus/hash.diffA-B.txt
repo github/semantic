@@ -10,12 +10,11 @@
     ->(SymbolElement) }
     { (Integer)
     ->(Integer) })
-  {+(KeyValue
-    {+(SymbolElement)+}
-    {+(Boolean)+})+}
-  {-(KeyValue
-    {-(TextElement)-}
-    {-(Boolean)-})-}
+    (KeyValue
+    { (TextElement)
+    ->(SymbolElement) }
+    { (Boolean)
+    ->(Boolean) })
   {-(KeyValue
     {-(SymbolElement)-}
     {-(Integer)-})-})

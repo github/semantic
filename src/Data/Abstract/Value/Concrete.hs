@@ -16,11 +16,13 @@ import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
+import Data.Bits
 import Data.Coerce
 import Data.List (genericIndex, genericLength)
-import Data.Scientific (Scientific)
+import Data.Scientific (Scientific, coefficient, normalize)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
+import Data.Word
 import Prologue
 
 data Value address body
@@ -61,14 +63,18 @@ instance Ord address => ValueRoots address (Value address body) where
     | otherwise                = mempty
 
 
-runFunction :: ( Member (Allocator address (Value address body)) effects
+runFunction :: ( Member (Allocator address) effects
+               , Member (Deref (Value address body)) effects
                , Member (Env address) effects
                , Member (Exc (Return address)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader PackageInfo) effects
                , Member (Reader Span) effects
+               , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                , Member (Resumable (BaseError (ValueError address body))) effects
+               , Member (State (Heap address (Value address body))) effects
+               , Ord address
                , PureEffects effects
                )
             => (body address -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) address)
@@ -111,7 +117,12 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
-materializeEnvironment :: ( Member (Deref address (Value address body)) effects
+materializeEnvironment :: ( Member (Deref (Value address body)) effects
+                          , Member (Reader ModuleInfo) effects
+                          , Member (Reader Span) effects
+                          , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
+                          , Member (State (Heap address (Value address body))) effects
+                          , Ord address
                           )
                        => Value address body
                        -> Evaluator address (Value address body) effects (Maybe (Environment address))
@@ -135,8 +146,8 @@ materializeEnvironment val = do
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
-         , Member (Allocator address (Value address body)) effects
-         , Member (Deref address (Value address body)) effects
+         , Member (Allocator address) effects
+         , Member (Deref (Value address body)) effects
          , Member (Env address) effects
          , Member (Exc (LoopControl address)) effects
          , Member (Exc (Return address)) effects
@@ -145,6 +156,10 @@ instance ( Coercible body (Eff effects)
          , Member (Reader PackageInfo) effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (ValueError address body))) effects
+         , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
+         , Member (State (Heap address (Value address body))) effects
+         , Member Trace effects
+         , Ord address
          , Show address
          )
       => AbstractValue address (Value address body) effects where
@@ -265,11 +280,24 @@ instance ( Coercible body (Eff effects)
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
+  unsignedRShift left right
+    | (Integer (Number.Integer i), Integer (Number.Integer j)) <- pair =
+      if i >= 0 then pure . integer $ ourShift (fromIntegral i) (fromIntegral j)
+      else throwValueError (Bitwise2Error left right)
+    | otherwise = throwValueError (Bitwise2Error left right)
+      where
+        pair = (left, right)
+        ourShift :: Word64 -> Int -> Integer
+        ourShift a b = toInteger (shiftR a b)
+
   loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> deref value
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
     Continue _  -> loop x)
 
+  castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
+  castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
+  castToInteger i = throwValueError (NumericError i)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError address body resume where

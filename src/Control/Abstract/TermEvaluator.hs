@@ -13,6 +13,7 @@ import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
 import Control.Monad.Effect.State     as X
 import Control.Monad.Effect.Trace     as X
+import Control.Monad.IO.Class
 import Prologue
 
 -- | Evaluators specialized to some specific term type.
@@ -22,6 +23,7 @@ newtype TermEvaluator term address value effects a = TermEvaluator { runTermEval
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (TermEvaluator term address value effects)
+deriving instance Member (Lift IO) effects => MonadIO (TermEvaluator term address value effects)
 
 
 raiseHandler :: (Evaluator address value effects a -> Evaluator address value effects' a') -> (TermEvaluator term address value effects a -> TermEvaluator term address value effects' a')
