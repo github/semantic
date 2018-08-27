@@ -18,13 +18,13 @@ import           Data.Reprinting.Token
 import           Data.Reprinting.Errors
 import qualified Data.Source as Source
 
-type Translator = Eff '[State [Context], Exc TranslationException]
+type Translator = Eff '[State [Context], Exc TranslationError]
 
 -- | Prepare for language specific translation by contextualizing 'Token's to
 -- 'Fragment's.
 contextualizing ::
   ( Member (State [Context]) effs
-  , Member (Exc TranslationException) effs
+  , Member (Exc TranslationError) effs
   )
   => ProcessT (Eff effs) Token Fragment
 contextualizing = flattened <~ autoT (Kleisli step) where
@@ -45,7 +45,7 @@ contextualizing = flattened <~ autoT (Kleisli step) where
 
   exitContext ::
     ( Member (State [Context]) effs
-    , Member (Exc TranslationException) effs
+    , Member (Exc TranslationError) effs
     )
     => Context -> Eff effs ()
   exitContext c = do

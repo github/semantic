@@ -130,7 +130,7 @@ runReprinter ::
   => Source.Source
   -> ProcessT Translator Fragment Splice
   -> Term a (Record fields)
-  -> Either TranslationException Source.Source
+  -> Either TranslationError Source.Source
 runReprinter src translating tree
   = fmap go
   . Effect.run
@@ -163,7 +163,7 @@ runContextualizing ::
   )
   => Source.Source
   -> Term a (Record fields)
-  -> Either TranslationException [Fragment]
+  -> Either TranslationError [Fragment]
 runContextualizing src tree
   = Effect.run
   . Exc.runError
@@ -180,7 +180,7 @@ runTranslating ::
   => Source.Source
   -> ProcessT Translator Fragment Splice
   -> Term a (Record fields)
-  -> Either TranslationException [Splice]
+  -> Either TranslationError [Splice]
 runTranslating src translating tree
   = Effect.run
   . Exc.runError

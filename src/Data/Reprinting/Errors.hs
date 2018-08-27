@@ -1,10 +1,10 @@
-module Data.Reprinting.Errors ( TranslationException (..) ) where
+module Data.Reprinting.Errors ( TranslationError (..) ) where
 
 import Data.Reprinting.Token
 
 -- | Represents failure occurring in a 'Concrete' machine during the translation
 -- phases of the reprinting pipeline.
-data TranslationException
+data TranslationError
   = UnbalancedPair Context [Context]
   -- ^ Thrown if an unbalanced 'Enter'/'Exit' pair is encountered.
   | NoTranslation Element [Context]
