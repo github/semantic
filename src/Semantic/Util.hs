@@ -86,6 +86,8 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
+evaluatePythonProject = evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
+
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
 -- Evaluate a project consisting of the listed paths.
@@ -100,6 +102,18 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise _))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (runReader (packageInfo package)
+       (runReader (lowerBound @Span)
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runFunction coerce coerce) modules))))))
+
+evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
+  project <- readProject Nothing path lang []
+  package <- fmap quieterm <$> parsePythonPackage parser project
+  modules <- topologicalSort <$> runImportGraphToModules proxy package
+  trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
+  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise '[Trace]))
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (runReader (packageInfo package)

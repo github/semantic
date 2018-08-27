@@ -246,7 +246,7 @@ runFunction :: ( Member (Allocator address) effects
             => Evaluator address Type (Abstract.Function address Type ': effects) a
             -> Evaluator address Type effects a
 runFunction = interpret $ \case
-  Abstract.Function params _ body -> do
+  Abstract.Function _ params _ body -> do
     (env, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
@@ -324,6 +324,9 @@ instance ( Member (Allocator address) effects
     t1 <- fresh
     t2 <- fresh
     unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
+  asArray t = do
+    field <- fresh
+    unify t (Array (Var field)) $> mempty
 
   index arr sub = do
     _ <- unify sub Int

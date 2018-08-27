@@ -48,7 +48,6 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
-
 -- Value effects
 
 -- $valueEffects
@@ -63,20 +62,19 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: Member (Function address value) effects => [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
-function names fvs (Evaluator body) = send (Function names fvs body)
+function :: Member (Function address value) effects => Maybe Name -> [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
+function name params fvs (Evaluator body) = send (Function name params fvs body)
 
 call :: Member (Function address value) effects => value -> address -> [address] -> Evaluator address value effects address
 call fn self args = send (Call fn self args)
 
 data Function address value m result where
-  Function :: [Name] -> Set Name -> m address -> Function address value m value
+  Function :: Maybe Name -> [Name] -> Set Name -> m address -> Function address value m value
   Call     :: value -> address -> [address]   -> Function address value m address
 
 instance PureEffect (Function address value) where
-  handle handler (Request (Function name fvs body) k) = Request (Function name fvs (handler body)) (handler . k)
-  handle handler (Request (Call fn self addrs)     k) = Request (Call fn self addrs)               (handler . k)
-
+  handle handler (Request (Function name params fvs body) k) = Request (Function name params fvs (handler body)) (handler . k)
+  handle handler (Request (Call fn self addrs)            k) = Request (Call fn self addrs)                      (handler . k)
 
 -- | Construct a boolean value in the abstract domain.
 boolean :: Member (Boolean value) effects => Bool -> Evaluator address value effects value
@@ -177,6 +175,8 @@ class AbstractIntro value => AbstractValue address value effects where
 
   -- | Construct an array of zero or more values.
   array :: [address] -> Evaluator address value effects value
+
+  asArray :: value -> Evaluator address value effects [address]
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator address value effects (value, value)
@@ -310,9 +310,9 @@ address :: ( AbstractValue address value effects
            )
         => ValueRef address
         -> Evaluator address value effects address
-address (LvalLocal var) = variable var
+address (LvalLocal var)       = variable var
 address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
-address (Rval addr) = pure addr
+address (Rval addr)           = pure addr
 
 -- | Evaluates a 'Subterm' to the address of its rval
 subtermAddress :: ( AbstractValue address value effects
