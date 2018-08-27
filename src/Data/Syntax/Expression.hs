@@ -261,7 +261,7 @@ instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Not where
   eval t = rvalBox =<< go (fmap subtermValue t) where
-    go (Not a) = a >>= fmap (boolean . not) . asBool
+    go (Not a) = a >>= asBool >>= boolean . not
 
 data XOr a = XOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -273,7 +273,7 @@ instance Show1 XOr where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable XOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
   eval t = rvalBox =<< go (fmap subtermValue t) where
-    go (XOr a b) = boolean <$> liftA2 (/=) (a >>= asBool) (b >>= asBool)
+    go (XOr a b) = liftA2 (/=) (a >>= asBool) (b >>= asBool) >>= boolean
 
 -- | Javascript delete operator
 newtype Delete a = Delete { value :: a }

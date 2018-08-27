@@ -105,7 +105,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (runReader (packageInfo package)
        (runReader (lowerBound @Span)
-       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runFunction coerce coerce) modules))))))
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runFunction coerce coerce) modules))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
@@ -116,7 +116,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) Type.runFunction modules)))))
+       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (Type.runBoolean . Type.runFunction) modules)))))
 
 
 parseFile :: Parser term -> FilePath -> IO term

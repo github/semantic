@@ -53,6 +53,7 @@ message ParseTreeResponse {
     TypeScriptResponse typescript = 3;
     PythonResponse python = 4;
   }
+  DebugInfo error_info = 5;
 }
 
 message RubyResponse {
@@ -78,6 +79,7 @@ message SummarizeDiffRequest  {
 message SummarizeDiffResponse {
   repeated DiffSummary changes = 1;
   repeated ParseError errors = 2;
+  DebugInfo error_info = 3;
 }
 
 message DiffTreeRequest  {
@@ -90,6 +92,7 @@ message DiffTreeResponse {
     PythonDiffResponse python = 2;
     TypeScriptDiffResponse typescript = 3;
   }
+  DebugInfo error_info = 4;
 }
 
 message RubyDiffResponse {

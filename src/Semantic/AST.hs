@@ -33,5 +33,5 @@ data ASTFormat = SExpression | JSON | Show
 
 runASTParse :: (Member Distribute effects, Member (Exc SomeException) effects, Member Task effects) => ASTFormat -> [Blob] -> Eff effects F.Builder
 runASTParse SExpression = distributeFoldMap (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow)))
-runASTParse Show        = distributeFoldMap (astParseBlob >=> withSomeAST (serialize F.Show))
+runASTParse Show        = distributeFoldMap (astParseBlob >=> withSomeAST (serialize F.Show . fmap nodeSymbol))
 runASTParse JSON        = distributeFoldMap (\ blob -> astParseBlob blob >>= withSomeAST (render (renderJSONAST blob))) >=> serialize F.JSON
