@@ -1,7 +1,6 @@
 module Language.Ruby.PrettyPrint ( printingRuby ) where
 
 import Control.Arrow
--- import Control.Monad.Trans
 import Control.Monad.Effect
 import Control.Monad.Effect.Exception (Exc, throwError)
 import Data.Machine
@@ -51,15 +50,6 @@ step (Defer el cs)  = case (el, cs) of
   where
     emitIf predicate txt = pure $ if predicate then emit txt else mempty
     endContext times = layout HardWrap <> indent (pred times)
-
--- Example of what writing a plan style machine looks like
--- printingRuby' :: (Member (Exc TranslationError) effs) => MachineT (Eff effs) (Is Fragment) Splice
--- printingRuby' = flattened <~ repeatedly plan where
---   plan :: (Member (Exc TranslationError) effs) =>  PlanT (Is Fragment) (Seq Splice) (Eff effs) ()
---   plan = do
---     frag <- await
---     x <- lift (step frag)
---     yield x
 
 prec :: [Context] -> Int
 prec cs = case filter isInfix cs of
