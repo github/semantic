@@ -29,7 +29,7 @@ runFunction :: ( Member (Allocator address) effects
             => Evaluator address Abstract (Function address Abstract ': effects) a
             -> Evaluator address Abstract effects a
 runFunction = interpret $ \case
-  Function params _ body -> do
+  Function _ params _ body -> do
     env <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract
@@ -88,6 +88,7 @@ instance ( Member (Allocator address) effects
 
   asString _ = pure ""
   asPair _ = pure (Abstract, Abstract)
+  asArray _ = pure mempty
 
   index _ _ = box Abstract
 
