@@ -233,15 +233,9 @@ parsePackage parser project = do
 
   where
     n = name (projectName project)
-    parseModules parser p = distributeFor (projectFiles p) (parseModule p parser)
-    parseModule proj parser file = do
-      mBlob <- readFile proj file
-      case mBlob of
-        Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (blob, ) <$> parse parser blob
-        Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
 -- | Parse all files in a project into 'Module's.
-parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module term]
+parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module (Blob, term)]
 parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
 
@@ -285,12 +279,12 @@ parsePythonPackage parser project = do
 
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
-      setupModule <- parseModule project parser setupFile
+      setupModule <- fmap snd <$> parseModule project parser setupFile
       fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id runAddressEffects (Concrete.runBoolean . Concrete.runFunction coerce coerce . runPythonPackaging) [ setupModule ])
     Nothing -> pure PythonPackage.Unknown
   case strat of
     PythonPackage.Unknown -> do
-      modules <- parseModules parser project
+      modules <- fmap (fmap snd) <$> parseModules parser project
       resMap <- Task.resolutionMap project
       pure (Package.fromModules (name (projectName project)) modules resMap)
     PythonPackage.Packages dirs -> do
@@ -310,14 +304,19 @@ parsePythonPackage parser project = do
     where
       packageFromProject project filteredBlobs = do
         let p = project { projectBlobs = catMaybes $ join filteredBlobs }
-        modules <- parseModules parser p
+        modules <- fmap (fmap snd) <$> parseModules parser p
         resMap <- Task.resolutionMap p
         pure (Package.fromModules (name $ projectName p) modules resMap)
 
+parseModule :: (Member (Exc SomeException) effs, Member Task effs)
+            => Project
+            -> Parser term
+            -> File
+            -> Eff effs (Module (Blob, term))
 parseModule proj parser file = do
   mBlob <- readFile proj file
   case mBlob of
-    Just blob -> moduleForBlob (Just (projectRootDir proj)) blob <$> parse parser blob
+    Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
     Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
 withTermSpans :: ( HasField fields Span
