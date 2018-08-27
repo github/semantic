@@ -20,6 +20,7 @@ module Parsing.Parser
 , jsonASTParser
 , markdownParser
 , pythonParser
+, miniPythonParser
 , rubyParser
 , miniRubyParser
 , typescriptParser
@@ -48,6 +49,8 @@ import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.MiniRuby.Assignment as MiniRuby
+import qualified Language.MiniPython.Assignment as MiniPython
 import qualified Language.TypeScript.Assignment as TypeScript
 import           Prologue
 import           TreeSitter.Go
@@ -160,14 +163,17 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-miniRubyParser :: Parser Ruby.MiniTerm
-miniRubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.miniAssignment
+miniRubyParser :: Parser MiniRuby.MiniTerm
+miniRubyParser = AssignmentParser (ASTParser tree_sitter_ruby) MiniRuby.miniAssignment
 
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+
+miniPythonParser :: Parser MiniPython.MiniTerm
+miniPythonParser = AssignmentParser (ASTParser tree_sitter_python) MiniPython.miniAssignment
 
 javaParser :: Parser Java.Term
 javaParser = AssignmentParser javaASTParser Java.assignment
