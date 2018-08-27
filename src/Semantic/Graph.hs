@@ -35,18 +35,21 @@ import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Located as Located
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
-import           Data.Abstract.BaseError (BaseError(..))
+import           Data.Abstract.BaseError (BaseError (..))
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
-import           Data.Abstract.Value.Concrete as Concrete (Value, ValueError (..), runBoolean, runFunction, runValueErrorWith)
+import           Data.Abstract.Value.Concrete as Concrete
+    (Value, ValueError (..), runBoolean, runFunction, runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.Coerce
 import           Data.Graph
 import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
+import           Data.Language as Language
+import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
 import           Data.Record
 import           Data.Term
@@ -56,10 +59,8 @@ import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..), TypeError (..))
 import           Semantic.Task as Task
+import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
-import System.FilePath.Posix ((</>), takeDirectory)
-import Data.List (isPrefixOf, isSuffixOf)
-import Data.Language as Language
 
 data GraphType = ImportGraph | CallGraph
 
@@ -408,7 +409,7 @@ resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" b
   BitwiseError{}    -> pure hole
   Bitwise2Error{}   -> pure hole
   KeyValueError{}   -> pure (hole, hole)
-  ArrayError{}   -> pure lowerBound
+  ArrayError{}      -> pure lowerBound
   ArithmeticError{} -> pure hole)
 
 resumingEnvironmentError :: ( Monad (m (Hole (Maybe Name) address) value effects)
@@ -429,7 +430,7 @@ resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                   -> m address Type effects a
 resumingTypeError = runTypesWith (\ baseError -> traceError "TypeError" baseError *> case baseErrorException baseError of
   UnificationError l r -> pure l <|> pure r
-  InfiniteType _ r -> pure r)
+  InfiniteType _ r     -> pure r)
 
 prettyShow :: Show a => a -> String
 prettyShow = hscolour TTY defaultColourPrefs False False "" False . ppShow
