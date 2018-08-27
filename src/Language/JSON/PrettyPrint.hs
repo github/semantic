@@ -17,7 +17,7 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token
 
 -- | Default printing pipeline for JSON.
-defaultJSONPipeline :: (Member (Exc TranslationException) effs)
+defaultJSONPipeline :: (Member (Exc TranslationError) effs)
   => ProcessT (Eff effs) Fragment Splice
 defaultJSONPipeline
   = printingJSON
@@ -56,7 +56,7 @@ defaultBeautyOpts :: JSONBeautyOpts
 defaultBeautyOpts = JSONBeautyOpts 2 False
 
 -- | Produce JSON with configurable whitespace and layout.
-beautifyingJSON :: (Member (Exc TranslationException) effs)
+beautifyingJSON :: (Member (Exc TranslationError) effs)
   => JSONBeautyOpts -> ProcessT (Eff effs) Fragment Splice
 beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
   step (Defer el cs)   = throwError (NoTranslation el cs)
@@ -70,7 +70,7 @@ beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
     _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.
-minimizingJSON :: (Member (Exc TranslationException) effs)
+minimizingJSON :: (Member (Exc TranslationError) effs)
   => ProcessT (Eff effs) Fragment Splice
 minimizingJSON = flattened <~ autoT (Kleisli step) where
   step (Defer el cs)  = throwError (NoTranslation el cs)

@@ -11,10 +11,10 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token as Token
 
 -- | Print Ruby syntax.
-printingRuby :: (Member (Exc TranslationException) effs) => ProcessT (Eff effs) Fragment Splice
+printingRuby :: (Member (Exc TranslationError) effs) => ProcessT (Eff effs) Fragment Splice
 printingRuby = flattened <~ autoT (Kleisli step)
 
-step :: (Member (Exc TranslationException) effs) => Fragment -> Eff effs (Seq Splice)
+step :: (Member (Exc TranslationError) effs) => Fragment -> Eff effs (Seq Splice)
 step (Verbatim txt) = pure $ emit txt
 step (New _ _ txt)  = pure $ emit txt
 step (Defer el cs)  = case (el, cs) of
@@ -53,9 +53,9 @@ step (Defer el cs)  = case (el, cs) of
     endContext times = layout HardWrap <> indent (pred times)
 
 -- Example of what writing a plan style machine looks like
--- printingRuby' :: (Member (Exc TranslationException) effs) => MachineT (Eff effs) (Is Fragment) Splice
+-- printingRuby' :: (Member (Exc TranslationError) effs) => MachineT (Eff effs) (Is Fragment) Splice
 -- printingRuby' = flattened <~ repeatedly plan where
---   plan :: (Member (Exc TranslationException) effs) =>  PlanT (Is Fragment) (Seq Splice) (Eff effs) ()
+--   plan :: (Member (Exc TranslationError) effs) =>  PlanT (Is Fragment) (Seq Splice) (Eff effs) ()
 --   plan = do
 --     frag <- await
 --     x <- lift (step frag)
