@@ -68,8 +68,8 @@ defaultConfig options@Options{..} = do
   isTerminal <- hIsTerminalDevice stderr
   haystackURL <- lookupEnv "HAYSTACK_URL"
   (statsHost, statsPort) <- lookupStatsAddr
-  size <- envLookupInt 1000 "MAX_TELEMETRY_QUEUE_SIZE"
-  parseTimeout <- envLookupInt 10000 "TREE_SITTER_PARSE_TIMEOUT" -- Default is 10 seconds
+  size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
+  parseTimeout <- envLookupNum 10000 "TREE_SITTER_PARSE_TIMEOUT" -- Default is 10 seconds
   pure Config
     { configAppName = "semantic"
     , configHostName = hostName
