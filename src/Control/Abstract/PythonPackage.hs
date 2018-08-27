@@ -23,6 +23,7 @@ runPythonPackaging :: forall effects address body a. (
                       , Ord address
                       , Show address
                       , Member Trace effects
+                      , Member (Boolean (Value address body)) effects
                       , Member (State (Heap address (Value address body))) effects
                       , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                       , Member (Resumable (BaseError (ValueError address body))) effects

@@ -3,10 +3,16 @@ module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
 , Comparator(..)
+-- * Value effects
+-- $valueEffects
 , function
 , call
 , Function(..)
+, boolean
 , asBool
+, ifthenelse
+, disjunction
+, Boolean(..)
 , while
 , doWhile
 , forLoop
@@ -42,6 +48,20 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
+-- Value effects
+
+-- $valueEffects
+-- Value effects are effects modelling the /introduction/ & /elimination/ of some specific kind of value.
+--
+-- Modelling each of these as effects has several advantages∷
+--
+-- * It is strictly more flexible than modelling them as methods in a typeclass, as effect list–indexed typeclasses must be constrained at every list of effects at which they can be applied, whereas effect membership constraints can be deduced recursively (i.e. if @X@ is constrained to be a member of @effects@, it is automatically deducible that it is also a member of @Y \': effects@).
+-- * It offers us the potential of specializing the handlers on a language-by-language basis without the need for extra type parameters (albeit at the cost of automatic selection).
+-- * It offers us the potential of fine-grained specialization of the abstract domain, enabling convenient, piecemeal customization of the domain, and even semi-abstract domains.
+-- * Finally, it should eventually allow us to customize _which_ value effects are available for a given language; e.g. a language without OO features would not require OO value effects. (This would also rely on 'Evaluatable' instances being able to specify membership constraints, which is not currently possible.)
+--
+-- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
+
 function :: Member (Function address value) effects => Maybe Name -> [Name] -> Set Name -> Evaluator address value effects address -> Evaluator address value effects value
 function name params fvs (Evaluator body) = send (Function name params fvs body)
 
@@ -56,13 +76,37 @@ instance PureEffect (Function address value) where
   handle handler (Request (Function name params fvs body) k) = Request (Function name params fvs (handler body)) (handler . k)
   handle handler (Request (Call fn self addrs)            k) = Request (Call fn self addrs)                      (handler . k)
 
+-- | Construct a boolean value in the abstract domain.
+boolean :: Member (Boolean value) effects => Bool -> Evaluator address value effects value
+boolean = send . Boolean
+
+-- | Extract a 'Bool' from a given value.
+asBool :: Member (Boolean value) effects => value -> Evaluator address value effects Bool
+asBool = send . AsBool
+
+-- | Eliminate boolean values. TODO: s/boolean/truthy
+ifthenelse :: Member (Boolean value) effects => value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
+ifthenelse v t e = asBool v >>= \ c -> if c then t else e
+
+-- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
+disjunction :: Member (Boolean value) effects => Evaluator address value effects value -> Evaluator address value effects value -> Evaluator address value effects value
+disjunction (Evaluator a) (Evaluator b) = send (Disjunction a b)
+
+data Boolean value m result where
+  Boolean     :: Bool  -> Boolean value m value
+  AsBool      :: value -> Boolean value m Bool
+  Disjunction :: m value -> m value -> Boolean value m value
+
+instance PureEffect (Boolean value) where
+  handle handler (Request (Boolean b)        k) = Request (Boolean b) (handler . k)
+  handle handler (Request (AsBool v)         k) = Request (AsBool v)  (handler . k)
+  handle handler (Request (Disjunction a b)  k) = Request (Disjunction (handler a) (handler b))  (handler . k)
+
+
 class Show value => AbstractIntro value where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: value
-
-  -- | Construct an abstract boolean value.
-  boolean :: Bool -> value
 
   -- | Construct an abstract string value.
   string :: Text -> value
@@ -140,12 +184,6 @@ class AbstractIntro value => AbstractValue address value effects where
   -- | Extract a 'Text' from a given value.
   asString :: value -> Evaluator address value effects Text
 
-  -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
-
-  -- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
-  disjunction :: Evaluator address value effects value -> Evaluator address value effects value -> Evaluator address value effects value
-
   -- | @index x i@ computes @x[i]@, with zero-indexing.
   index :: value -> value -> Evaluator address value effects address
 
@@ -172,12 +210,9 @@ class AbstractIntro value => AbstractValue address value effects where
   loop :: (Evaluator address value effects value -> Evaluator address value effects value) -> Evaluator address value effects value
 
 
--- | Extract a 'Bool' from a given value.
-asBool :: AbstractValue address value effects => value -> Evaluator address value effects Bool
-asBool value = ifthenelse value (pure True) (pure False)
-
 -- | C-style for loops.
 forLoop :: ( AbstractValue address value effects
+           , Member (Boolean value) effects
            , Member (Env address) effects
            )
         => Evaluator address value effects value -- ^ Initial statement
@@ -189,7 +224,7 @@ forLoop initial cond step body =
   locally (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
-while :: AbstractValue address value effects
+while :: (AbstractValue address value effects, Member (Boolean value) effects)
       => Evaluator address value effects value
       -> Evaluator address value effects value
       -> Evaluator address value effects value
@@ -198,7 +233,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) (pure unit)
 
 -- | Do-while loop, built on top of while.
-doWhile :: AbstractValue address value effects
+doWhile :: (AbstractValue address value effects, Member (Boolean value) effects)
         => Evaluator address value effects value
         -> Evaluator address value effects value
         -> Evaluator address value effects value
