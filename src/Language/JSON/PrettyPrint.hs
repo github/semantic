@@ -62,11 +62,11 @@ beautifyingJSON _ = autoT (Kleisli step) ~> flattened where
   step (Defer el cs)   = throwError (NoTranslation el cs)
   step (Verbatim txt)  = pure $ emit txt
   step (New el cs txt) = pure $ case (el, listToMaybe cs) of
-    (TOpen,  Just THash) -> emit txt <> layouts [HardWrap, Indent]
+    (TOpen,  Just THash) -> emit txt <> layouts [HardWrap, Indent 2 Spaces]
     (TClose, Just THash) -> layout HardWrap <> emit txt
     (TSep, Just TList)   -> emit txt <> space
     (TSep, Just TPair)   -> emit txt <> space
-    (TSep, Just THash)   -> emit txt <> layouts [HardWrap, Indent]
+    (TSep, Just THash)   -> emit txt <> layouts [HardWrap, Indent 2 Spaces]
     _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.

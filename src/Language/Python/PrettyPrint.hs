@@ -4,10 +4,11 @@ import Control.Arrow
 import Control.Monad.Effect
 import Control.Monad.Effect.Exception (Exc, throwError)
 import Data.Machine
-import Data.Sequence (Seq)
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token as Token
+import Data.Semigroup (stimes)
+import Data.Sequence (Seq)
 
 -- | Print Python syntax.
 printingPython :: (Member (Exc TranslationError) effs) => ProcessT (Eff effs) Fragment Splice
@@ -34,7 +35,7 @@ step (Defer el cs)  = case (el, cs) of
   (TOpen,  TIf:_)  -> pure $ emit "if" <> space
   (TThen,  TIf:_)  -> pure $ emit ":"
   (TElse,  TIf:xs) -> pure $ endContext (depth xs) <> emit "else:"
-  (TClose, TIf:xs) -> pure $ endContext (depth xs)
+  (TClose, TIf:xs) -> pure mempty
 
   -- Booleans
   (Truth True,  _) -> pure $ emit "True"
@@ -57,7 +58,7 @@ step (Defer el cs)  = case (el, cs) of
   (TClose, [Imperative])  -> pure $ layout HardWrap -- but end the program with a newline.
   (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
   (TSep,   Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
-  (TClose, Imperative:xs) -> pure $ indent (pred (depth xs))
+  (TClose, Imperative:xs) -> pure mempty -- $ indent (pred (depth xs))
 
   _ -> throwError (NoTranslation el cs)
 
@@ -75,3 +76,9 @@ prec cs = case filter isInfix cs of
 -- | Depth of imperative scope.
 depth :: [Context] -> Int
 depth = length . filter (== Imperative)
+
+-- | Indent n times.
+indent :: Integral b => b -> Seq Splice
+indent times
+  | times > 0 = stimes times (layout (Indent 4 Spaces))
+  | otherwise = mempty
