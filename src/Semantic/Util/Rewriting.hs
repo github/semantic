@@ -21,12 +21,35 @@ import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.JSON.PrettyPrint
 import           Language.Ruby.PrettyPrint
+import           Language.Python.PrettyPrint
 import           Matching.Core
 import           Parsing.Parser
 import           Prologue hiding (weaken)
 import           Reprinting.Pipeline
 import           Semantic.IO as IO
 import           Semantic.Task
+
+testPythonFile = do
+  let path = "test/fixtures/python/reprinting/functions.py"
+  src  <- blobSource <$> readBlobFromPath (File path Language.Python)
+  tree <- parseFile miniPythonParser path
+  pure (src, tree)
+
+testPythonPipeline = do
+  (src, tree) <- testPythonFile
+  printToTerm $ runReprinter src printingPython (mark Refactored tree)
+
+testPythonPipeline' = do
+  (src, tree) <- testPythonFile
+  pure $ runTokenizing src (mark Refactored tree)
+
+testPythonPipeline'' = do
+  (src, tree) <- testPythonFile
+  pure $ runContextualizing src (mark Refactored tree)
+
+testPythonPipeline''' = do
+  (src, tree) <- testPythonFile
+  pure $ runTranslating src printingPython (mark Refactored tree)
 
 testRubyFile = do
   let path = "test/fixtures/ruby/reprinting/infix.rb"
