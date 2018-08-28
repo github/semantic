@@ -11,7 +11,7 @@ import Data.Reprinting.Token as Token
 
 -- | Print Ruby syntax.
 printingRuby :: (Member (Exc TranslationError) effs) => ProcessT (Eff effs) Fragment Splice
-printingRuby = flattened <~ autoT (Kleisli step)
+printingRuby = autoT (Kleisli step) ~> flattened
 
 step :: (Member (Exc TranslationError) effs) => Fragment -> Eff effs (Seq Splice)
 step (Verbatim txt) = pure $ emit txt

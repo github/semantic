@@ -27,7 +27,7 @@ contextualizing ::
   , Member (Exc TranslationError) effs
   )
   => ProcessT (Eff effs) Token Fragment
-contextualizing = flattened <~ autoT (Kleisli step) where
+contextualizing = autoT (Kleisli step) ~> flattened where
   step t = case t of
     Chunk source -> pure $ copy (Source.toText source)
     TElement el  -> toFragment el <$> get
