@@ -8,8 +8,8 @@ module Data.Reprinting.Splice
   , layout
   , layouts
   , space
-  , indent
   , Whitespace(..)
+  , Indentation(..)
   ) where
 
 import Data.Reprinting.Token
@@ -61,16 +61,13 @@ layouts = fromList . fmap Layout
 space :: Seq Splice
 space = layout Space
 
--- | Indent n times.
-indent :: Integral b => b -> Seq Splice
-indent times
-  | times > 0 = stimes times (layout Indent)
-  | otherwise = mempty
-
 -- | Indentation, spacing, and other whitespace.
 data Whitespace
   = HardWrap
   | SoftWrap
   | Space
-  | Indent
+  | Indent Int Indentation
+  deriving (Eq, Show)
+
+data Indentation = Tabs | Spaces
   deriving (Eq, Show)

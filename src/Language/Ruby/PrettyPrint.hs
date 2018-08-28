@@ -8,6 +8,7 @@ import Data.Sequence (Seq)
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token as Token
+import Data.Semigroup (stimes)
 
 -- | Print Ruby syntax.
 printingRuby :: (Member (Exc TranslationError) effs) => ProcessT (Eff effs) Fragment Splice
@@ -61,3 +62,9 @@ prec cs = case filter isInfix cs of
 -- | Depth of imperative scope.
 depth :: [Context] -> Int
 depth = length . filter (== Imperative)
+
+-- | Indent n times.
+indent :: Integral b => b -> Seq Splice
+indent times
+  | times > 0 = stimes times (layout (Indent 2 Spaces))
+  | otherwise = mempty
