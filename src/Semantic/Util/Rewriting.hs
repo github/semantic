@@ -125,7 +125,7 @@ addKVPair = repeatedly $ do
 
 testAddKVPair = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (addKVPair <~ fromMatcher matchHash)) (mark Unmodified tree)
+  tagged <- runM $ cata (toAlgebra (fromMatcher matchHash ~> addKVPair)) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 overwriteFloats :: forall effs syntax ann fields term .
@@ -143,7 +143,7 @@ overwriteFloats = repeatedly $ do
 
 testOverwriteFloats = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (overwriteFloats <~ fromMatcher matchFloat)) (mark Unmodified tree)
+  tagged <- runM $ cata (toAlgebra (fromMatcher matchFloat ~> overwriteFloats)) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 findKV ::
@@ -187,7 +187,7 @@ changeKV = auto $ either id injKV
 
 testChangeKV = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (changeKV <~ findKV "\"bar\"")) (mark Unmodified tree)
+  tagged <- runM $ cata (toAlgebra (findKV "\"bar\"" ~> changeKV)) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 -- Temporary, until new KURE system lands.

@@ -25,7 +25,7 @@ defaultJSONPipeline
 
 -- | Print JSON syntax.
 printingJSON :: Monad m => ProcessT m Fragment Fragment
-printingJSON = flattened <~ auto step where
+printingJSON = auto step ~> flattened where
   step :: Fragment -> Seq Fragment
   step s@(Defer el cs) =
     let ins = insert el cs
@@ -58,7 +58,7 @@ defaultBeautyOpts = JSONBeautyOpts 2 False
 -- | Produce JSON with configurable whitespace and layout.
 beautifyingJSON :: (Member (Exc TranslationError) effs)
   => JSONBeautyOpts -> ProcessT (Eff effs) Fragment Splice
-beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
+beautifyingJSON _ = autoT (Kleisli step) ~> flattened where
   step (Defer el cs)   = throwError (NoTranslation el cs)
   step (Verbatim txt)  = pure $ emit txt
   step (New el cs txt) = pure $ case (el, listToMaybe cs) of
@@ -72,7 +72,7 @@ beautifyingJSON _ = flattened <~ autoT (Kleisli step) where
 -- | Produce whitespace minimal JSON.
 minimizingJSON :: (Member (Exc TranslationError) effs)
   => ProcessT (Eff effs) Fragment Splice
-minimizingJSON = flattened <~ autoT (Kleisli step) where
+minimizingJSON = autoT (Kleisli step) ~> flattened where
   step (Defer el cs)  = throwError (NoTranslation el cs)
   step (Verbatim txt) = pure $ emit txt
   step (New _ _ txt)  = pure $ emit txt
