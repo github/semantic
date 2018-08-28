@@ -35,7 +35,7 @@ step (Defer el cs)  = case (el, cs) of
   (TOpen,  TIf:_)  -> pure $ emit "if" <> space
   (TThen,  TIf:_)  -> pure $ emit ":"
   (TElse,  TIf:xs) -> pure $ endContext (depth xs) <> emit "else:"
-  (TClose, TIf:xs) -> pure mempty
+  (TClose, TIf:_)  -> pure mempty
 
   -- Booleans
   (Truth True,  _) -> pure $ emit "True"
@@ -58,7 +58,7 @@ step (Defer el cs)  = case (el, cs) of
   (TClose, [Imperative])  -> pure $ layout HardWrap -- but end the program with a newline.
   (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
   (TSep,   Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
-  (TClose, Imperative:xs) -> pure mempty -- $ indent (pred (depth xs))
+  (TClose, Imperative:_)  -> pure mempty
 
   _ -> throwError (NoTranslation el cs)
 
