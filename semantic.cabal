@@ -147,6 +147,7 @@ library
                      , Language.PHP.Syntax
                      , Language.Python.Assignment
                      , Language.Python.Grammar
+                     , Language.Python.PrettyPrint
                      , Language.Python.Syntax
                      , Language.Java.Assignment
                      , Language.Java.Grammar
