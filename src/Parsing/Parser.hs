@@ -172,8 +172,8 @@ phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
-miniPythonParser :: Parser MiniPython.MiniTerm
-miniPythonParser = AssignmentParser (ASTParser tree_sitter_python) MiniPython.miniAssignment
+miniPythonParser :: Parser MiniPython.Term
+miniPythonParser = AssignmentParser (ASTParser tree_sitter_python) MiniPython.assignment
 
 javaParser :: Parser Java.Term
 javaParser = AssignmentParser javaASTParser Java.assignment
