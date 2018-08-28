@@ -133,8 +133,8 @@ library
                      , Language.MiniPython.Assignment
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
-                     , Language.Ruby.Syntax
                      , Language.Ruby.PrettyPrint
+                     , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Resolution
