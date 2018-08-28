@@ -45,6 +45,14 @@ instance Evaluatable If where
     bool <- subtermValue cond
     Rval <$> ifthenelse bool (subtermAddress if') (subtermAddress else')
 
+instance Tokenize If where
+  tokenize If{..} = within' TIf $ do
+    ifCondition
+    yield TThen
+    ifThenBody
+    yield TElse
+    ifElseBody
+
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -194,6 +202,9 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
   eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
+
+instance Tokenize Return where
+  tokenize (Return x) = within' TReturn x
 
 newtype Yield a = Yield { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

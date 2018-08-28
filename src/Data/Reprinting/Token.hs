@@ -27,6 +27,8 @@ data Element
   | Nullity       -- ^ @null@ or @nil@ or some other zero value.
   | TSep          -- ^ Some sort of delimiter, interpreted in some 'Context'.
   | TSym          -- ^ Some sort of symbol, interpreted in some 'Context'.
+  | TThen
+  | TElse
   | TOpen         -- ^ The beginning of some 'Context', such as an @[@ or @{@.
   | TClose        -- ^ The opposite of 'TOpen'.
     deriving (Eq, Show)
@@ -53,6 +55,8 @@ data Context
   | TFunction
   | TCall
   | TParams
+  | TReturn
+  | TIf
   | TInfixL Operator Int
   | Imperative
     deriving (Show, Eq)

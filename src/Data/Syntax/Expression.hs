@@ -28,6 +28,13 @@ instance Evaluatable Call where
     args <- traverse subtermAddress callParams
     Rval <$> call op recv args
 
+instance Tokenize Call where
+  tokenize Call{..} = within TCall $ do
+    -- TODO: callContext
+    callFunction
+    within' TParams $ sequenceA_ (sep callParams)
+    callBlock
+
 data LessThan a = LessThan { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
