@@ -3,16 +3,15 @@
 module Language.MiniRuby.Assignment
 (
 -- Small version of Ruby to enable internal framework development.
-  miniAssignment
-, MiniSyntax
-, MiniTerm
+  assignment
+, Syntax
+, Term
 ) where
 
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
 import           Data.List (elem)
-import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Record
 import           Data.Sum
 import           Data.Syntax
@@ -30,19 +29,16 @@ import           Data.Syntax
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
-import qualified Data.Diff as Diff
 import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import           Prologue hiding (for)
-import           Proto3.Suite (Named (..), Named1 (..))
 
 -- | Small version of Ruby syntax for testing the code rewriting pipeline.
-type MiniSyntax =
+type Syntax =
   '[ Comment.Comment
    , Declaration.Function
    , Declaration.Method
@@ -59,13 +55,13 @@ type MiniSyntax =
    , []
    ]
 
-type MiniTerm = Term.Term (Sum MiniSyntax) (Record Location)
+type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
 
-miniAssignment :: Assignment MiniTerm
-miniAssignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
+assignment :: Assignment Term
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Statement.Statements <$> many expression) <|> parseError
 
-expression :: Assignment MiniTerm
+expression :: Assignment Term
 expression = term . handleError $
   choice [ binary
          , identifier
@@ -75,16 +71,16 @@ expression = term . handleError $
          , parenthesizedExpressions ]
 
 -- NOTE: Important that we don't flatten out the Imperative for single item lists
-expressions :: Assignment MiniTerm
+expressions :: Assignment Term
 expressions = makeTerm <$> location <*> many expression
 
-parenthesizedExpressions :: Assignment MiniTerm
+parenthesizedExpressions :: Assignment Term
 parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
 
-number :: Assignment MiniTerm
+number :: Assignment Term
 number = makeTerm <$> symbol Grammar.Integer <*> (Literal.Integer <$> source)
 
-identifier :: Assignment MiniTerm
+identifier :: Assignment Term
 identifier =
       vcallOrLocal
   <|> mk Constant
@@ -107,12 +103,12 @@ identifier =
         then pure identTerm
         else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
-method :: Assignment MiniTerm
+method :: Assignment Term
 method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method [] <$> emptyTerm <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
-methodSelector :: Assignment MiniTerm
+methodSelector :: Assignment Term
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
   where
     symbols = symbol Identifier
@@ -121,7 +117,7 @@ methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> sourc
           <|> symbol Setter
           <|> symbol Super -- TODO(@charliesome): super calls are *not* method calls and need to be assigned into their own syntax terms
 
-parameter :: Assignment MiniTerm
+parameter :: Assignment Term
 parameter = postContextualize comment (term uncontextualizedParameter)
   where
     uncontextualizedParameter =
@@ -145,13 +141,13 @@ parameter = postContextualize comment (term uncontextualizedParameter)
     keywordParameter = symbol KeywordParameter *> children (lhsIdent <* optional expression)
     optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
-lhsIdent :: Assignment MiniTerm
+lhsIdent :: Assignment Term
 lhsIdent = do
   (loc, ident, locals) <- identWithLocals
   putLocals (ident : locals)
   pure $ makeTerm loc (Syntax.Identifier (name ident))
 
-methodCall :: Assignment MiniTerm
+methodCall :: Assignment Term
 methodCall = makeTerm' <$> symbol MethodCall <*> children send -- (require <|> load <|> send)
   where
     send = inject <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
@@ -172,34 +168,34 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children send -- (require <|> l
     --   (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (Ruby.Syntax.Load <$> expression <*> optional expression)
     -- nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
-args :: Assignment [MiniTerm]
+args :: Assignment [Term]
 args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
 
-block :: Assignment MiniTerm
+block :: Assignment Term
 block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
      <|> makeTerm <$> symbol Block <*> scopedBlockChildren
   where scopedBlockChildren = withExtendedScope blockChildren
         blockChildren = children (Declaration.Function [] <$> emptyTerm <*> params <*> expressions)
         params = symbol BlockParameters *> children (many parameter) <|> pure []
 
-binary :: Assignment MiniTerm
+binary :: Assignment Term
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
   [ (inject .) . Expression.Plus              <$ symbol AnonPlus
   , (inject .) . Expression.Minus             <$ symbol AnonMinus'
   , (inject .) . Expression.Times             <$ symbol AnonStar'
   ])
 
-comment :: Assignment MiniTerm
+comment :: Assignment Term
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
-term :: Assignment MiniTerm -> Assignment MiniTerm
+term :: Assignment Term -> Assignment Term
 term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: Assignment MiniTerm
-          -> Assignment MiniTerm
-          -> [Assignment (MiniTerm -> MiniTerm -> Sum MiniSyntax MiniTerm)]
-          -> Assignment (Sum MiniSyntax MiniTerm)
+infixTerm :: Assignment Term
+          -> Assignment Term
+          -> [Assignment (Term -> Term -> Sum Syntax Term)]
+          -> Assignment (Sum Syntax Term)
 infixTerm = infixContext comment
 
 withExtendedScope :: Assignment a -> Assignment a
