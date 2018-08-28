@@ -17,7 +17,7 @@ The reprinter was designed with the following goals in mind:
   should draw its representation from the original source file,
   rather than being explicitly pretty-printed. The only nodes
   that do not consult the original document are those that were
-  created /ex nihilo/ during a refactoring operation.
+  synthesized during a refactoring operation.
 * Generality: each syntax node should have one and only one
   declaration that describes how reprinting takes place. No node
   should be concerned with language-specific syntactic issues.
@@ -25,7 +25,7 @@ The reprinter was designed with the following goals in mind:
   information about parenthesization of binary operators.
   Binary operators should report their precedence and the
   pipeline should insert parentheses as necessary.
-* Component-orientation: each stage in the reprinting pipeline
+* Modularity: each stage in the reprinting pipeline
   should be testable independently.
 * Time/space efficiency: the reprinting algorithm should scale
   to trees with hundreds of thousands of nodes without linear
@@ -46,6 +46,7 @@ stages of the pipeline follows:
 [Start]
   The Pipeline starts with a tree, where terms are annotated with 'History' to
   denote what's been refactored.
+  (Language-agnostic)
     |
     | AST
     |
