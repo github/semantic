@@ -30,7 +30,7 @@ import           Semantic.IO as IO
 import           Semantic.Task
 
 testPythonFile = do
-  let path = "test/fixtures/python/reprinting/functions.py"
+  let path = "test/fixtures/python/reprinting/function.py"
   src  <- blobSource <$> readBlobFromPath (File path Language.Python)
   tree <- parseFile miniPythonParser path
   pure (src, tree)
