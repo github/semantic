@@ -130,6 +130,7 @@ library
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
                      , Language.MiniRuby.Assignment
+                     , Language.MiniPython.Assignment
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
                      , Language.Ruby.Syntax
