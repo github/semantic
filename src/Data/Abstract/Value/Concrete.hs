@@ -27,7 +27,7 @@ import Data.Word
 import Prologue
 
 data Value address body
-  = Closure PackageInfo ModuleInfo [Name] (ClosureBody address body) (Environment address)
+  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (ClosureBody address body) (Environment address)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -60,7 +60,7 @@ instance Show (ClosureBody address body) where
 
 instance Ord address => ValueRoots address (Value address body) where
   valueRoots v
-    | Closure _ _ _ _ env <- v = Env.addresses env
+    | Closure _ _ _ _ _ env <- v = Env.addresses env
     | otherwise                = mempty
 
 
@@ -83,14 +83,14 @@ runFunction :: ( Member (Allocator address) effects
             -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
             -> Evaluator address (Value address body) effects a
 runFunction toEvaluator fromEvaluator = interpret $ \case
-  Abstract.Function params fvs body -> do
+  Abstract.Function name params fvs body -> do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
+    Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
   Abstract.Call op self params -> do
     case op of
-      Closure packageInfo moduleInfo names (ClosureBody _ body) env -> do
+      Closure packageInfo moduleInfo _ names (ClosureBody _ body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
@@ -186,6 +186,10 @@ instance ( Coercible body (Eff effects)
 
   tuple = pure . Tuple
   array = pure . Array
+
+  asArray val
+    | Array addresses <- val = pure addresses
+    | otherwise = throwValueError $ ArrayError val
 
   klass n supers binds = do
     pure $ Class n supers binds
@@ -317,6 +321,7 @@ data ValueError address body resume where
   BitwiseError           :: Value address body                       -> ValueError address body (Value address body)
   Bitwise2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
   KeyValueError          :: Value address body                       -> ValueError address body (Value address body, Value address body)
+  ArrayError             :: Value address body                       -> ValueError address body [address]
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
   ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
   -- Out-of-bounds error
