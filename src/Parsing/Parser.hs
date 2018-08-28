@@ -163,8 +163,8 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-miniRubyParser :: Parser MiniRuby.MiniTerm
-miniRubyParser = AssignmentParser (ASTParser tree_sitter_ruby) MiniRuby.miniAssignment
+miniRubyParser :: Parser MiniRuby.Term
+miniRubyParser = AssignmentParser (ASTParser tree_sitter_ruby) MiniRuby.assignment
 
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
