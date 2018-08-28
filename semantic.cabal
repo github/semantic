@@ -44,6 +44,7 @@ library
                      , Control.Abstract.Matching
                      , Control.Abstract.Modules
                      , Control.Abstract.Primitive
+                     , Control.Abstract.PythonPackage
                      , Control.Abstract.Roots
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
