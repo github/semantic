@@ -77,22 +77,3 @@ spec = describe "reprinting" $ do
         printed `shouldBe` expected
         tree' <- runTask (parse miniRubyParser (Blob printed expectedPath Language.Ruby))
         length tree' `shouldSatisfy` (/= 0)
-
-  context "Python" $ do
-    let dir = "test/fixtures/python/reprinting"
-    let path = dir </> "function.py"
-    let expectedPath = dir </> "function.out.py"
-    (src, tree, expected) <- runIO $ do
-      expected  <- blobSource <$> readBlobFromPath (File expectedPath Language.Python)
-      src  <- blobSource <$> readBlobFromPath (File path Language.Python)
-      tree <- parseFile miniPythonParser path
-      pure (src, tree, expected)
-
-    describe "pipeline" $ do
-
-      it "should roundtrip over a wholly-modified tree" $ do
-        let tagged = mark Refactored tree
-        let (Right printed) = runReprinter src printingPython tagged
-        printed `shouldBe` expected
-        tree' <- runTask (parse miniPythonParser (Blob printed expectedPath Language.Python))
-        length tree' `shouldSatisfy` (/= 0)
