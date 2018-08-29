@@ -58,6 +58,7 @@ message ParseTreeResponse {
 
 message RubyResponse {
   repeated ruby_terms.RubyTerm terms = 1;
+  repeated DebugInfo errors = 2;
 }
 
 message JSONResponse {
