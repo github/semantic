@@ -29,9 +29,6 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Python.Assignment as Python
 
--- import Data.Aeson
--- import qualified Rendering.JSON as J
-
 runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs renderJSONError (render . renderJSONTerm) >=> serialize JSON
 runParse SExpressionTermRenderer      = withParsedBlobs (\_ _ -> mempty) (const (serialize (SExpression ByConstructorName)))
@@ -39,10 +36,10 @@ runParse ShowTermRenderer             = withParsedBlobs (\_ _ -> mempty) (const 
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\_ _ -> mempty) (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (\_ _ -> mempty) (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
-runRubyParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum Ruby.Syntax) ()]
-runRubyParse = flip distributeFor (\ blob -> do
-    term <- parse rubyParser blob
-    pure (() <$ term))
+runRubyParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => [Blob] -> Eff effs [Either String (Term (Sum Ruby.Syntax) ())]
+runRubyParse = flip distributeFor $ \ blob ->
+    (Right . (() <$) <$> parse rubyParser blob) `catchError` \(SomeException e) ->
+      pure $ Left (show e)
 
 runTypeScriptParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum TypeScript.Syntax) ()]
 runTypeScriptParse = flip distributeFor (\ blob -> do
