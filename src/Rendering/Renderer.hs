@@ -11,6 +11,7 @@ module Rendering.Renderer
 , renderSymbolTerms
 , renderToSymbols
 , renderTreeGraph
+, renderJSONError
 , Summaries(..)
 , TOCSummary(..)
 , SymbolFields(..)
