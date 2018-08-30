@@ -18,6 +18,7 @@ import GHC.TypeLits
 import Diffing.Algorithm hiding (Empty)
 import Prelude
 import Prologue
+import Reprinting.Tokenize hiding (Context, Element)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
@@ -165,6 +166,9 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Identifier where
   eval (Identifier name) = pure (LvalLocal name)
 
+instance Tokenize Identifier where
+  tokenize = yield . Fragment . formatName . Data.Syntax.name
+
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
 
@@ -197,6 +201,9 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 instance Evaluatable Empty where
   eval _ = rvalBox unit
 
+instance Tokenize Empty where
+  tokenize = ignore
+
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -206,6 +213,10 @@ instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Error
+
+instance Tokenize Error where
+  -- TODO: Considering producing comments like "ERROR: due to.." instead of ignoring.
+  tokenize = ignore
 
 instance Named String where
   nameOf _ = "string"
@@ -295,3 +306,6 @@ instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
   eval Context{..} = subtermRef contextSubject
+
+instance Tokenize Context where
+  tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

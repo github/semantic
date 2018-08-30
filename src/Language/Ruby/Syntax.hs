@@ -14,6 +14,7 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
+import           Reprinting.Tokenize
 import           System.FilePath.Posix
 
 
@@ -65,6 +66,13 @@ instance Evaluatable Send where
     func <- deref =<< evaluateInScopedEnv recv sel
     args <- traverse subtermAddress sendArgs
     Rval <$> call func recv args -- TODO pass through sendBlock
+
+instance Tokenize Send where
+  tokenize Send{..} = within TCall $ do
+    maybe (pure ()) (\r -> r *> yield TSep) sendReceiver
+    fromMaybe (pure ()) sendSelector
+    within' TParams $ sequenceA_ (sep sendArgs)
+    fromMaybe (pure ()) sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
