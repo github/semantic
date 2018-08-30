@@ -5,6 +5,7 @@ module Rendering.JSON
 , renderJSONTerm
 , renderJSONAST
 , renderSymbolTerms
+, renderJSONError
 , SomeJSON(..)
 ) where
 
@@ -43,7 +44,6 @@ instance ToJSON JSONStat where
   toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs)))
   toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs))))
 
-
 -- | Render a term to a value representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
 renderJSONTerm blob content = JSON [ SomeJSON (JSONTerm blob content) ]
@@ -71,6 +71,11 @@ instance ToJSON a => ToJSON (JSONAST a) where
 renderSymbolTerms :: ToJSON a => [a] -> JSON "files" SomeJSON
 renderSymbolTerms = JSON . map SomeJSON
 
+renderJSONError :: Blob -> String -> JSON "trees" SomeJSON
+renderJSONError Blob{..} e = JSON [ SomeJSON (object [ "error" .= err ]) ]
+  where err = object [ "message" .= e
+                     , "path" .= blobPath
+                     , "language" .= blobLanguage ]
 
 data SomeJSON where
   SomeJSON :: ToJSON a => a -> SomeJSON
