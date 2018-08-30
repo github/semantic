@@ -44,9 +44,6 @@ instance ToJSON JSONStat where
   toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs)))
   toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs))))
 
-newtype JSONError = JSONError { jsonError :: String }
-  deriving (Eq, Show)
-
 -- | Render a term to a value representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
 renderJSONTerm blob content = JSON [ SomeJSON (JSONTerm blob content) ]
