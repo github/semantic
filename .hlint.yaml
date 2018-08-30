@@ -48,6 +48,7 @@
 # Terms
 - warning: {lhs: termFAnnotation . unTerm, rhs: termAnnotation, name: Use termAnnotation}
 - warning: {lhs: termFOut . unTerm, rhs: termOut, name: Use termOut}
+- warning: {lhs: project . termOut, rhs: projectTerm, name: Use projectTerm}
 
 # Conveniences
 - warning: {lhs: maybe a pure, rhs: maybeM a, name: Use maybeM}
