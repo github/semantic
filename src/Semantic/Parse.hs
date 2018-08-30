@@ -36,25 +36,28 @@ runParse ShowTermRenderer             = withParsedBlobs (\_ _ -> mempty) (const 
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\_ _ -> mempty) (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (\_ _ -> mempty) (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
-runRubyParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => [Blob] -> Eff effs [Either String (Term (Sum Ruby.Syntax) ())]
-runRubyParse = flip distributeFor $ \ blob ->
-    (Right . (() <$) <$> parse rubyParser blob) `catchError` \(SomeException e) ->
-      pure $ Left (show e)
+-- NB: Our gRPC interface requires concrete 'Term's for each language to know
+-- how to encode messages, so we have dedicated functions for parsing each
+-- supported language.
+runRubyParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
+  => [Blob] -> Eff effs [Either SomeException (Term (Sum Ruby.Syntax) ())]
+runRubyParse = flip distributeFor $ \blob ->
+    (Right . (() <$) <$> parse rubyParser blob) `catchError` (pure . Left)
 
-runTypeScriptParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum TypeScript.Syntax) ()]
-runTypeScriptParse = flip distributeFor (\ blob -> do
-    term <- parse typescriptParser blob
-    pure (() <$ term))
+runTypeScriptParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
+  => [Blob] -> Eff effs [Either SomeException (Term (Sum TypeScript.Syntax) ())]
+runTypeScriptParse = flip distributeFor $ \blob -> do
+    (Right . (() <$) <$> parse typescriptParser blob) `catchError` (pure . Left)
 
-runPythonParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum Python.Syntax) ()]
-runPythonParse = flip distributeFor (\ blob -> do
-    term <- parse pythonParser blob
-    pure (() <$ term))
+runPythonParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
+  => [Blob] -> Eff effs [Either SomeException (Term (Sum Python.Syntax) ())]
+runPythonParse = flip distributeFor $ \blob -> do
+    (Right . (() <$) <$> parse pythonParser blob) `catchError` (pure . Left)
 
-runJSONParse :: (Member Distribute effs, Member Task effs) => [Blob] -> Eff effs [Term (Sum JSON.Syntax) ()]
-runJSONParse = flip distributeFor (\ blob -> do
-    term <- parse jsonParser blob
-    pure (() <$ term))
+runJSONParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
+  => [Blob] -> Eff effs [Either SomeException (Term (Sum JSON.Syntax) ())]
+runJSONParse = flip distributeFor $ \blob -> do
+    (Right . (() <$) <$> parse jsonParser blob) `catchError` (pure . Left)
 
 withParsedBlobs ::
   ( Member Distribute effs
