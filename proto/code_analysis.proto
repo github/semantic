@@ -36,8 +36,11 @@ service CodeAnalysis {
   // Calculate an import graph for a project.
   rpc GraphImports (ImportGraphRequest) returns (ImportGraphResponse);
 
+  // Calculate a call graph for a project.
   rpc GraphCalls (CallGraphRequest) returns (CallGraphResponse);
 
+  // Status and Health
+  //
   // Check health & status of the service.
   rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
 }
@@ -63,14 +66,17 @@ message RubyResponse {
 
 message JSONResponse {
   repeated json_terms.JSONTerm terms = 1;
+  repeated DebugInfo errors = 2;
 }
 
 message TypeScriptResponse {
   repeated typescript_terms.TypeScriptTerm terms = 1;
+  repeated DebugInfo errors = 2;
 }
 
 message PythonResponse {
   repeated python_terms.PythonTerm terms = 1;
+  repeated DebugInfo errors = 2;
 }
 
 message SummarizeDiffRequest  {
