@@ -11,10 +11,13 @@ import SpecHelpers
 spec :: Spec
 spec = parallel $ do
   describe "parseBlob" $ do
-    it "throws if given an unknown language" $ do
-      runTask (runParse SExpressionTermRenderer [methodsBlob { blobLanguage = Unknown }]) `shouldThrow` (\ code -> case code of
-        ExitFailure 1 -> True
-        _ -> False)
+    it "returns error if given an unknown language (json)" $ do
+      output <- fmap runBuilder . runTask $ runParse JSONTermRenderer [ methodsBlob { blobLanguage = Unknown } ]
+      output `shouldBe` "{\"trees\":[{\"error\":{\"path\":\"methods.rb\",\"language\":\"Unknown\",\"message\":\"NoLanguageForBlob \\\"methods.rb\\\"\"}}]}\n"
+
+    it "drops results for sexpression output" $ do
+      output <- fmap runBuilder . runTask $ runParse SExpressionTermRenderer [ methodsBlob { blobLanguage = Unknown } ]
+      output `shouldBe` ""
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTask $ runParse SExpressionTermRenderer [methodsBlob]
