@@ -58,22 +58,3 @@ spec = describe "reprinting" $ do
         let (Right printed) = runReprinter src defaultJSONPipeline tagged
         tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
         length tree' `shouldSatisfy` (/= 0)
-
-  context "Ruby" $ do
-    let dir = "test/fixtures/ruby/reprinting"
-    let path = dir </> "function.rb"
-    let expectedPath = dir </> "function.out.rb"
-    (src, tree, expected) <- runIO $ do
-      expected  <- blobSource <$> readBlobFromPath (File expectedPath Language.Ruby)
-      src  <- blobSource <$> readBlobFromPath (File path Language.Ruby)
-      tree <- parseFile miniRubyParser path
-      pure (src, tree, expected)
-
-    describe "pipeline" $ do
-
-      it "should roundtrip over a wholly-modified tree" $ do
-        let tagged = mark Refactored tree
-        let (Right printed) = runReprinter src printingRuby tagged
-        printed `shouldBe` expected
-        tree' <- runTask (parse miniRubyParser (Blob printed expectedPath Language.Ruby))
-        length tree' `shouldSatisfy` (/= 0)
