@@ -8,6 +8,7 @@ import Diffing.Algorithm
 import Prelude hiding (Bool, Float, Int, Double)
 import Prologue hiding (Map)
 import Proto3.Suite.Class
+import Reprinting.Tokenize
 
 data Array a = Array { arraySize :: !(Maybe a), arrayElementType :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -31,6 +32,11 @@ instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Specialize Evaluatable for Type to unify the inferred type of the subject with the specified type
 instance Evaluatable Annotation where
   eval Annotation{annotationSubject = Subterm _ action} = action
+
+instance Tokenize Annotation where
+  -- FIXME: This ignores annotationType.
+  -- TODO: Not sure what this should look like yet
+  tokenize Annotation{..} = annotationSubject
 
 
 data Function a = Function { functionParameters :: ![a], functionReturn :: !a }
