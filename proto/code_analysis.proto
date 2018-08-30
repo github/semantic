@@ -9,7 +9,6 @@ import "typescript_term.proto";
 import "typescript_diff.proto";
 import "python_term.proto";
 import "python_diff.proto";
-
 import "types.proto";
 import "error_details.proto";
 
