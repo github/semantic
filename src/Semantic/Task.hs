@@ -65,6 +65,7 @@ import           Data.Bool
 import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
+import           Data.Language (Language)
 import           Data.Record
 import           Data.Source (Source)
 import           Data.Sum
@@ -195,7 +196,8 @@ runTaskF = interpret $ \ task -> case task of
 logError :: Member Telemetry effs => Config -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Config{..} level blob err = writeLog level (Error.formatError configLogPrintSource configIsTerminal blob err)
 
-data ParserCancelled = ParserTimedOut deriving (Show, Typeable)
+data ParserCancelled = ParserTimedOut FilePath Language
+  deriving (Show, Typeable)
 
 instance Exception ParserCancelled
 
@@ -206,7 +208,7 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.tree_sitter_ast_parse" languageTag $ do
       config <- ask
       parseToAST (configTreeSitterParseTimeout config) language blob
-        >>= maybeM (throwError (SomeException ParserTimedOut))
+        >>= maybeM (throwError (SomeException (ParserTimedOut blobPath blobLanguage)))
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser assignment
   DeterministicParser parser assignment -> runAssignment Deterministic.assign parser assignment
