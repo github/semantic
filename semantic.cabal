@@ -84,6 +84,7 @@ library
                      , Data.Graph
                      , Data.Graph.Adjacency
                      , Data.Graph.Vertex
+                     , Data.History
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
@@ -92,6 +93,9 @@ library
                      , Data.Quieterm
                      , Data.Range
                      , Data.Record
+                     , Data.Reprinting.Errors
+                     , Data.Reprinting.Token
+                     , Data.Reprinting.Splice
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Source
@@ -125,8 +129,12 @@ library
                      , Language.Haskell.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
+                     , Language.JSON.PrettyPrint
+                     , Language.MiniRuby.Assignment
+                     , Language.MiniPython.Assignment
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
+                     , Language.Ruby.PrettyPrint
                      , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
@@ -140,10 +148,12 @@ library
                      , Language.PHP.Syntax
                      , Language.Python.Assignment
                      , Language.Python.Grammar
+                     , Language.Python.PrettyPrint
                      , Language.Python.Syntax
                      , Language.Java.Assignment
                      , Language.Java.Grammar
                      , Language.Java.Syntax
+                     , Matching.Core
                      , Numeric.Exts
                      -- Parser glue
                      , Parsing.CMark
@@ -156,6 +166,10 @@ library
                      , Rendering.Renderer
                      , Rendering.Symbol
                      , Rendering.TOC
+                     , Reprinting.Tokenize
+                     , Reprinting.Translate
+                     , Reprinting.Typeset
+                     , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic.AST
                      , Semantic.CLI
@@ -175,6 +189,7 @@ library
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
                      , Semantic.Util
+                     , Semantic.Util.Rewriting
                      , Semantic.Version
                      -- Serialization
                      , Serializing.DOT
@@ -211,6 +226,7 @@ library
                      , http-client-tls
                      , http-types
                      , kdt
+                     , machines
                      , mersenne-random-pure64
                      , mtl
                      , network
@@ -218,6 +234,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , prettyprinter
                      , pretty-show
                      , recursion-schemes
                      , reducers
@@ -305,6 +322,7 @@ test-suite test
                      , Matching.Go.Spec
                      , Numeric.Spec
                      , Proto3.Roundtrip
+                     , Reprinting.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec

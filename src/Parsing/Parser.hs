@@ -20,7 +20,9 @@ module Parsing.Parser
 , jsonASTParser
 , markdownParser
 , pythonParser
+, miniPythonParser
 , rubyParser
+, miniRubyParser
 , typescriptParser
 , phpParser
 , haskellParser
@@ -47,6 +49,8 @@ import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.MiniRuby.Assignment as MiniRuby
+import qualified Language.MiniPython.Assignment as MiniPython
 import qualified Language.TypeScript.Assignment as TypeScript
 import           Prologue
 import           TreeSitter.Go
@@ -87,7 +91,7 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                       )
                    => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                                         -- ^ The 'Language' to select.
-                   -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
+                   -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
 someAnalysisParser _ Java       = SomeAnalysisParser javaParser       (Proxy :: Proxy 'Java)
@@ -105,9 +109,9 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))                           -- A parser producing AST.
-                   -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- An assignment from AST onto 'Term's.
-                   -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
+                   => Parser (Term ast (Node grammar))                         -- ^ A parser producing AST.
+                   -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (Term (Sum fs) (Record Location))                 -- ^ A parser producing 'Term's.
   DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
                       => Parser (AST [] grammar)
                       -> Deterministic.Assignment grammar (Term (Sum syntaxes) (Record Location))
@@ -159,11 +163,17 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
+miniRubyParser :: Parser MiniRuby.Term
+miniRubyParser = AssignmentParser (ASTParser tree_sitter_ruby) MiniRuby.assignment
+
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+
+miniPythonParser :: Parser MiniPython.Term
+miniPythonParser = AssignmentParser (ASTParser tree_sitter_python) MiniPython.assignment
 
 javaParser :: Parser Java.Term
 javaParser = AssignmentParser javaASTParser Java.assignment
