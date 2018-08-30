@@ -12,6 +12,7 @@ module Control.Abstract.Matching
   , succeeds
   , fails
   , runMatcher
+  , stepMatcher
   ) where
 
 import           Data.Algebra
@@ -92,11 +93,11 @@ match :: (f :< fs)
       => (f (Term (Sum fs) ann) -> b)
       -> Matcher b a
       -> Matcher (Term (Sum fs) ann) a
-match f = Match (fmap f . project . termOut)
+match f = Match (fmap f . projectTerm)
 
 -- | @narrow'@ attempts to project a union-type target to a more specific type.
 narrow' :: (f :< fs) => Matcher (Term (Sum fs) ann) (Maybe (f (Term (Sum fs) ann)))
-narrow' = fmap (project . termOut) Target
+narrow' = fmap projectTerm Target
 
 -- | 'narrow' behaves as @narrow'@, but fails if the target cannot be thus projected.
 narrow :: (f :< fs) => Matcher (Term (Sum fs) ann) (f (Term (Sum fs) ann))
@@ -113,13 +114,14 @@ runMatcher :: (Alternative m, Monad m, Corecursive t, Recursive t, Foldable (Bas
 runMatcher m = para (paraMatcher m)
 
 paraMatcher :: (Alternative m, Monad m, Corecursive t, Foldable (Base t)) => Matcher t a -> RAlgebra (Base t) t (m a)
-paraMatcher m t = interp (embedTerm t) m <|> foldMapA snd t
+paraMatcher m t = stepMatcher (embedTerm t) m <|> foldMapA snd t
 
--- Simple interpreter.
-interp :: (Alternative m, Monad m) => t -> Matcher t a -> m a
-interp t (Choice a b) = interp t a <|> interp t b
-interp t Target       = pure t
-interp t (Match f m)  = foldMapA (`interp` m) (f t)
-interp _ (Pure a)     = pure a
-interp _ Empty        = empty
-interp t (Then m f)   = interp t m >>= interp t . f
+-- | Run one step of a 'Matcher' computation. Look at 'runMatcher' if you want something
+-- that folds over subterms.
+stepMatcher :: (Alternative m, Monad m) => t -> Matcher t a -> m a
+stepMatcher t (Choice a b) = stepMatcher t a <|> stepMatcher t b
+stepMatcher t Target       = pure t
+stepMatcher t (Match f m)  = foldMapA (`stepMatcher` m) (f t)
+stepMatcher _ (Pure a)     = pure a
+stepMatcher _ Empty        = empty
+stepMatcher t (Then m f)   = stepMatcher t m >>= stepMatcher t . f
