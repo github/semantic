@@ -2,13 +2,14 @@ syntax = "proto3";
 
 package github.semantic;
 
-import "ruby-terms.proto";
-import "ruby-diffs.proto";
-import "json-terms.proto";
-import "typescript-terms.proto";
-import "typescript-diffs.proto";
-import "python-terms.proto";
-import "python-diffs.proto";
+import "ruby_term.proto";
+import "ruby_diff.proto";
+import "json_term.proto";
+import "typescript_term.proto";
+import "typescript_diff.proto";
+import "python_term.proto";
+import "python_diff.proto";
+
 import "types.proto";
 import "error_details.proto";
 
@@ -60,22 +61,22 @@ message ParseTreeResponse {
 }
 
 message RubyResponse {
-  repeated ruby_terms.RubyTerm terms = 1;
+  repeated rubyterm.RubyTerm terms = 1;
   repeated DebugInfo errors = 2;
 }
 
 message JSONResponse {
-  repeated json_terms.JSONTerm terms = 1;
+  repeated jsonterm.JSONTerm terms = 1;
   repeated DebugInfo errors = 2;
 }
 
 message TypeScriptResponse {
-  repeated typescript_terms.TypeScriptTerm terms = 1;
+  repeated typescriptterm.TypeScriptTerm terms = 1;
   repeated DebugInfo errors = 2;
 }
 
 message PythonResponse {
-  repeated python_terms.PythonTerm terms = 1;
+  repeated pythonterm.PythonTerm terms = 1;
   repeated DebugInfo errors = 2;
 }
 
@@ -103,15 +104,15 @@ message DiffTreeResponse {
 }
 
 message RubyDiffResponse {
-  repeated ruby_diffs.RubyDiff diffs = 1;
+  repeated rubydiff.RubyDiff diffs = 1;
 }
 
 message PythonDiffResponse {
-  repeated python_diffs.PythonDiff diffs = 1;
+  repeated pythondiff.PythonDiff diffs = 1;
 }
 
 message TypeScriptDiffResponse {
-  repeated typescript_diffs.TypeScriptDiff diffs = 1;
+  repeated typescriptdiff.TypeScriptDiff diffs = 1;
 }
 
 message CallGraphRequest {
