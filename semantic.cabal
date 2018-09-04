@@ -62,6 +62,7 @@ library
                      , Data.Abstract.Exports
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
+                     , Data.Abstract.Frame
                      , Data.Abstract.Live
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
@@ -245,6 +246,7 @@ library
                      , tree-sitter-ruby
                      , tree-sitter-typescript
                      , tree-sitter-java
+                     , type-combinators
   default-language:    Haskell2010
   default-extensions:  DataKinds
                      , DeriveFoldable
