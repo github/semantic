@@ -47,9 +47,8 @@ deriving instance Show (DiffRenderer output)
 data TermRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
   JSONTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
-
+  -- | Render to JSON as an adjacency list represenation.
   JSONAdjTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
-
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of symbols.
