@@ -83,10 +83,10 @@ instance ToJSON (TaggedVertex ()) where
                , "term"  .= vertexTermName ]
                <> toJSONFields vertexRange
                <> toJSONFields vertexSpan
-  -- toEncoding TaggedVertex{..}
-  --   = pairs (  "id"    .= T.pack (show vertexId)
-  --           <> "name"  .= vertexTermName
-  --           <> toJSONFields vertexRange )
+  toEncoding TaggedVertex{..}
+    = pairs ( fold ( "id"    .= T.pack (show vertexId)
+                   : "name"  .= vertexTermName
+                   : toJSONFields vertexRange ) )
 
 instance JSONVertex (TaggedVertex ()) where
   jsonVertexId = T.pack . show . vertexId
