@@ -1,8 +1,8 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns, ScopedTypeVariables, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, ViewPatterns #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable as Eval
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
 import qualified Data.Text as T
@@ -11,6 +11,7 @@ import           Numeric.Exts
 import           Prelude hiding (Float, null)
 import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
+import           Reprinting.Tokenize as Tok
 import           Text.Read (readMaybe)
 
 -- Boolean
@@ -31,6 +32,9 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Boolean where
   eval (Boolean x) = boolean x >>= rvalBox
 
+instance Tokenize Boolean where
+  tokenize = yield . Truth . booleanContent
+
 -- Numeric
 
 -- | A literal integer of unspecified width. No particular base is implied.
@@ -46,6 +50,9 @@ instance Evaluatable Data.Syntax.Literal.Integer where
   eval (Data.Syntax.Literal.Integer x) =
     rvalBox =<< (integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x))
 
+instance Tokenize Data.Syntax.Literal.Integer where
+  tokenize = yield . Fragment . integerContent
+
 -- | A literal float of unspecified width.
 
 newtype Float a = Float { floatContent :: Text }
@@ -58,6 +65,9 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
+
+instance Tokenize Data.Syntax.Literal.Float where
+  tokenize = yield . Fragment . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -130,6 +140,9 @@ instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
+instance Tokenize TextElement where
+  tokenize = yield . Fragment . textElementContent
+
 -- | A sequence of textual contents within a string literal.
 newtype EscapeSequence a = EscapeSequence { value :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -149,6 +162,9 @@ instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Null where eval _ = rvalBox null
+
+instance Tokenize Null where
+  tokenize _ = yield Nullity
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -195,6 +211,9 @@ instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Array where
   eval (Array a) = rvalBox =<< array =<< traverse subtermAddress a
 
+instance Tokenize Array where
+  tokenize = list . arrayElements
+
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
 
@@ -203,7 +222,10 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Hash where
-  eval t = rvalBox =<< (hash <$> traverse (subtermValue >=> asPair) (hashElements t))
+  eval t = rvalBox =<< (Eval.hash <$> traverse (subtermValue >=> asPair) (hashElements t))
+
+instance Tokenize Hash where
+  tokenize = Tok.hash . hashElements
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -215,6 +237,9 @@ instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable KeyValue where
   eval (fmap subtermValue -> KeyValue{..}) =
     rvalBox =<< (kvPair <$> key <*> value)
+
+instance Tokenize KeyValue where
+  tokenize (KeyValue k v) = pair k v
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
