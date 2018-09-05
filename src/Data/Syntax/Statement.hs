@@ -11,6 +11,7 @@ import Diffing.Algorithm
 import Prelude
 import Prologue
 import Proto3.Suite.Class
+import Reprinting.Tokenize
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
@@ -28,6 +29,9 @@ instance ToJSON1 Statements
 instance Evaluatable Statements where
   eval (Statements xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
+instance Tokenize Statements where
+  tokenize = imperative
+
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -40,6 +44,14 @@ instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
     Rval <$> ifthenelse bool (subtermAddress if') (subtermAddress else')
+
+instance Tokenize If where
+  tokenize If{..} = within' TIf $ do
+    ifCondition
+    yield TThen
+    ifThenBody
+    yield TElse
+    ifElseBody
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -190,6 +202,9 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
   eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
+
+instance Tokenize Return where
+  tokenize (Return x) = within' TReturn x
 
 newtype Yield a = Yield { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

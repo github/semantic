@@ -11,6 +11,7 @@ import Diffing.Algorithm hiding (Delete)
 import Prologue hiding (index, Member, This, null)
 import Prelude hiding (null)
 import Proto3.Suite.Class
+import Reprinting.Tokenize
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -26,6 +27,13 @@ instance Evaluatable Call where
     recv <- box unit -- TODO
     args <- traverse subtermAddress callParams
     Rval <$> call op recv args
+
+instance Tokenize Call where
+  tokenize Call{..} = within TCall $ do
+    -- TODO: callContext
+    callFunction
+    within' TParams $ sequenceA_ (sep callParams)
+    callBlock
 
 data LessThan a = LessThan { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -126,6 +134,9 @@ instance Evaluatable Plus where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
 
+instance Tokenize Plus where
+  tokenize Plus{..} = within' (TInfixL Add 6) $ lhs *> yield TSym <* rhs
+
 data Minus a = Minus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
@@ -137,6 +148,9 @@ instance Evaluatable Minus where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
 
+instance Tokenize Minus where
+  tokenize Minus{..} = within' (TInfixL Subtract 6) $ lhs *> yield TSym <* rhs
+
 data Times a = Times { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
@@ -147,6 +161,9 @@ instance Show1 Times where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Times where
   eval t = rvalBox =<< (traverse subtermValue t >>= go) where
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
+
+instance Tokenize Times where
+  tokenize Times{..} = within' (TInfixL Multiply 7) $ lhs *> yield TSym <* rhs
 
 data DividedBy a = DividedBy { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

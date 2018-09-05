@@ -30,3 +30,5 @@ bin/
 .licenses/log/
 
 codex.tags
+
+vendor/proto3-suite

@@ -1,12 +1,13 @@
-{-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
-import Prelude hiding (readFile)
+import Prelude hiding (id, (.), readFile)
 
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
+import           Control.Category
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address.Monovariant as Monovariant
@@ -137,7 +138,6 @@ parseFile parser = runTask . (parse parser <=< readBlob . file)
 
 blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
-
 
 mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
 mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)

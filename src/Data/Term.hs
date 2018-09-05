@@ -1,14 +1,17 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, FunctionalDependencies #-}
 module Data.Term
 ( Term(..)
 , termIn
 , termAnnotation
 , termOut
+, injectTerm
+, projectTerm
 , TermF(..)
 , termSize
 , hoistTerm
 , hoistTermF
 , stripTerm
+, Annotated (..)
 ) where
 
 import Prologue
@@ -16,6 +19,7 @@ import Data.Aeson
 import Data.JSON.Fields
 import Data.Record
 import Text.Show
+import qualified Data.Sum as Sum
 import Proto3.Suite.Class
 import Proto3.Suite.DotProto
 import qualified Proto3.Wire.Encode as Encode
@@ -30,9 +34,22 @@ termAnnotation = termFAnnotation . unTerm
 termOut :: Term syntax ann -> syntax (Term syntax ann)
 termOut = termFOut . unTerm
 
+projectTerm :: forall f syntax ann . (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
+projectTerm = Sum.project . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable)
+
+-- | A convenience typeclass to get the annotation out of a 'Term' or 'TermF'.
+-- Useful in term-rewriting algebras.
+class Annotated t ann | t -> ann where
+  annotation :: t -> ann
+
+instance Annotated (TermF syntax ann recur) ann where
+  annotation = termFAnnotation
+
+instance Annotated (Term syntax ann) ann where
+  annotation = termAnnotation
 
 
 -- | Return the node count of a term.
@@ -43,6 +60,9 @@ termSize = cata size where
 -- | Build a Term from its annotation and syntax.
 termIn :: ann -> syntax (Term syntax ann) -> Term syntax ann
 termIn = (Term .) . In
+
+injectTerm :: (f :< syntax) => ann -> f (Term (Sum syntax) ann) -> Term (Sum syntax) ann
+injectTerm a = termIn a . Sum.inject
 
 
 hoistTerm :: Functor f => (forall a. f a -> g a) -> Term f a -> Term g a
