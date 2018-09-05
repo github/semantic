@@ -22,6 +22,7 @@ import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
 import           Data.Record
 import           Data.Span
+import           Data.Graph (JSONVertex(..))
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -82,6 +83,9 @@ vertexToType Function{}      = "Function"
 
 instance Lower Vertex where
   lowerBound = Package ""
+
+instance JSONVertex Vertex where
+  jsonVertexId = vertexIdentifier
 
 class VertexDeclaration syntax where
   toVertex :: (Declarations1 syntax, Foldable syntax, HasField fields Span)

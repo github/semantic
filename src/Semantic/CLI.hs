@@ -72,6 +72,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
     parseArgumentsParser = do
       renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
+              <|> flag'                                          (Parse.runParse JSONAdjTermRenderer)     (long "json-adj"    <> help "Output JSON adjacency list")
               <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
