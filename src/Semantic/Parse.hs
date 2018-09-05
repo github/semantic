@@ -7,35 +7,34 @@ module Semantic.Parse
   , runJSONParse
   ) where
 
-import Analysis.ConstructorName (ConstructorName)
-import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.PackageDef (HasPackageDef)
-import Control.Monad.Effect.Exception
-import Data.AST
-import Data.Blob
-import Data.JSON.Fields
-import Data.Quieterm
-import Data.Record
-import Data.Term
-import Parsing.Parser
-import Prologue hiding (MonadError(..))
-import Rendering.Graph
-import Rendering.Renderer
-import Semantic.IO (noLanguageForBlob)
-import Semantic.Task
-import Serializing.Format
-import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TypeScript.Assignment as TypeScript
+import           Analysis.ConstructorName (ConstructorName)
+import           Analysis.Declaration (HasDeclaration, declarationAlgebra)
+import           Analysis.PackageDef (HasPackageDef)
+import           Control.Monad.Effect.Exception
+import           Data.AST
+import           Data.Blob
+import           Data.JSON.Fields
+import           Data.Quieterm
+import           Data.Record
+import           Data.Term
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Python.Assignment as Python
-
-import Rendering.JSON (SomeJSON(..))
+import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TypeScript.Assignment as TypeScript
+import           Parsing.Parser
+import           Prologue hiding (MonadError (..))
+import           Rendering.Graph
+import           Rendering.JSON (SomeJSON (..))
 import qualified Rendering.JSON as JSON
+import           Rendering.Renderer
+import           Semantic.IO (noLanguageForBlob)
+import           Semantic.Task
+import           Serializing.Format
 
 runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
-runParse JSONTermRenderer             = withParsedBlobs renderJSONError  (render . renderJSONTerm) >=> serialize JSON
-runParse JSONAdjTermRenderer          = withParsedBlobs (\_ _ -> mempty) (render . renderAdjGraph) >=> serialize JSON
-  where renderAdjGraph :: (Recursive t, ToTreeGraph (TaggedVertex ()) (Base t)) => Blob -> t -> JSON.JSON "graphs" SomeJSON
+runParse JSONTermRenderer             = withParsedBlobs renderJSONError (render . renderJSONTerm) >=> serialize JSON
+runParse JSONAdjTermRenderer          = withParsedBlobs renderJSONError (render . renderAdjGraph) >=> serialize JSON
+  where renderAdjGraph :: (Recursive t, ToTreeGraph (TaggedVertex ()) (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON
         renderAdjGraph blob term = renderJSONAdjGraph blob (renderTreeGraph term)
 runParse SExpressionTermRenderer      = withParsedBlobs (\_ _ -> mempty) (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (\_ _ -> mempty) (const (serialize Show . quieterm))

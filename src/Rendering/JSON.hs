@@ -56,7 +56,7 @@ instance ToJSON a => ToJSON (JSONTerm a) where
   toJSON JSONTerm{..} = object ("tree" .= jsonTerm : toJSONFields jsonTermBlob)
   toEncoding JSONTerm{..} = pairs (fold ("tree" .= jsonTerm : toJSONFields jsonTermBlob))
 
-renderJSONAdjGraph :: ToJSON a => Blob -> a -> JSON "graphs" SomeJSON
+renderJSONAdjGraph :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
 renderJSONAdjGraph blob content = JSON [ SomeJSON (JSONAdjTerm blob content) ]
 
 data JSONAdjTerm a = JSONAdjTerm { jsonAdjTermBlob :: Blob, jsonAdjTerm :: a }
