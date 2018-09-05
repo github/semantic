@@ -7,6 +7,7 @@ module Data.Graph
 , Lower(..)
 , simplify
 , topologicalSort
+, JSONVertex(..)
 ) where
 
 import qualified Algebra.Graph as G
@@ -106,12 +107,15 @@ instance Ord vertex => Ord (Graph vertex) where
   compare (Graph (G.Connect a1 a2)) (Graph (G.Connect b1 b2)) = (compare `on` Graph) a1 b1 <> (compare `on` Graph) a2 b2
 
 
-instance (Ord vertex, ToJSON vertex) => ToJSON (Graph vertex) where
+class JSONVertex vertex where
+  jsonVertexId :: vertex -> Text
+
+instance (Ord vertex, ToJSON vertex, JSONVertex vertex) => ToJSON (Graph vertex) where
   toJSON     (Graph graph) = object ["vertices" .= G.vertexList graph,   "edges" .= (JSONEdge <$> G.edgeList graph)]
   toEncoding (Graph graph) = pairs  ("vertices" .= G.vertexList graph <> "edges" .= (JSONEdge <$> G.edgeList graph))
 
 newtype JSONEdge vertex = JSONEdge (vertex, vertex)
 
-instance ToJSON vertex => ToJSON (JSONEdge vertex) where
-  toJSON     (JSONEdge (a, b)) = object ["source" .= a,   "target" .= b]
-  toEncoding (JSONEdge (a, b)) = pairs  ("source" .= a <> "target" .= b)
+instance (ToJSON vertex, JSONVertex vertex) => ToJSON (JSONEdge vertex) where
+  toJSON     (JSONEdge (a, b)) = object ["source" .= jsonVertexId a,   "target" .= jsonVertexId b]
+  toEncoding (JSONEdge (a, b)) = pairs  ("source" .= jsonVertexId a <> "target" .= jsonVertexId b)

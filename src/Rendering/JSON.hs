@@ -3,6 +3,7 @@ module Rendering.JSON
 ( JSON(..)
 , renderJSONDiff
 , renderJSONTerm
+, renderJSONAdjGraph
 , renderJSONAST
 , renderSymbolTerms
 , renderJSONError
@@ -55,6 +56,15 @@ instance ToJSON a => ToJSON (JSONTerm a) where
   toJSON JSONTerm{..} = object ("tree" .= jsonTerm : toJSONFields jsonTermBlob)
   toEncoding JSONTerm{..} = pairs (fold ("tree" .= jsonTerm : toJSONFields jsonTermBlob))
 
+renderJSONAdjGraph :: ToJSON a => Blob -> a -> JSON "graphs" SomeJSON
+renderJSONAdjGraph blob content = JSON [ SomeJSON (JSONAdjTerm blob content) ]
+
+data JSONAdjTerm a = JSONAdjTerm { jsonAdjTermBlob :: Blob, jsonAdjTerm :: a }
+  deriving (Eq, Show)
+
+instance ToJSON a => ToJSON (JSONAdjTerm a) where
+  toJSON JSONAdjTerm{..} = object ("graph" .= jsonAdjTerm : toJSONFields jsonAdjTermBlob)
+  toEncoding JSONAdjTerm{..} = pairs (fold ("graph" .= jsonAdjTerm : toJSONFields jsonAdjTermBlob))
 
 renderJSONAST :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
 renderJSONAST blob content = JSON [ SomeJSON (JSONAST blob content) ]
