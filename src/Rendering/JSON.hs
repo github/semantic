@@ -2,8 +2,9 @@
 module Rendering.JSON
 ( JSON(..)
 , renderJSONDiff
+, renderJSONAdjDiff
 , renderJSONTerm
-, renderJSONAdjGraph
+, renderJSONAdjTerm
 , renderJSONAST
 , renderSymbolTerms
 , renderJSONError
@@ -38,6 +39,17 @@ instance ToJSON a => ToJSON (JSONDiff a) where
   toJSON JSONDiff{..} = object [ "diff" .= jsonDiff, "stat" .= jsonDiffStat ]
   toEncoding JSONDiff{..} = pairs ("diff" .= jsonDiff <> "stat" .= jsonDiffStat)
 
+-- | Render a diff to a value representing its JSON.
+renderJSONAdjDiff :: ToJSON a => BlobPair -> a -> JSON "diffs" SomeJSON
+renderJSONAdjDiff blobs diff = JSON [ SomeJSON (JSONAdjDiff (JSONStat blobs) diff) ]
+
+data JSONAdjDiff a = JSONAdjDiff { jsonAdjDiffStat :: JSONStat, jsonAdjDiff :: a }
+  deriving (Eq, Show)
+
+instance ToJSON a => ToJSON (JSONAdjDiff a) where
+  toJSON JSONAdjDiff{..} = object [ "graph" .= jsonAdjDiff, "stat" .= jsonAdjDiffStat ]
+  toEncoding JSONAdjDiff{..} = pairs ("graph" .= jsonAdjDiff <> "stat" .= jsonAdjDiffStat)
+
 newtype JSONStat = JSONStat { jsonStatBlobs :: BlobPair }
   deriving (Eq, Show)
 
@@ -56,8 +68,8 @@ instance ToJSON a => ToJSON (JSONTerm a) where
   toJSON JSONTerm{..} = object ("tree" .= jsonTerm : toJSONFields jsonTermBlob)
   toEncoding JSONTerm{..} = pairs (fold ("tree" .= jsonTerm : toJSONFields jsonTermBlob))
 
-renderJSONAdjGraph :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
-renderJSONAdjGraph blob content = JSON [ SomeJSON (JSONAdjTerm blob content) ]
+renderJSONAdjTerm :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
+renderJSONAdjTerm blob content = JSON [ SomeJSON (JSONAdjTerm blob content) ]
 
 data JSONAdjTerm a = JSONAdjTerm { jsonAdjTermBlob :: Blob, jsonAdjTerm :: a }
   deriving (Eq, Show)

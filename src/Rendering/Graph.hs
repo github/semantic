@@ -4,8 +4,8 @@ module Rendering.Graph
 , termStyle
 , diffStyle
 , ToTreeGraph(..)
-, TaggedVertex(..)
-, DiffTag(..)
+, TermVertex(..)
+, DiffVertex(..)
 ) where
 
 import Data.Aeson
@@ -32,84 +32,176 @@ renderTreeGraph = simplify . runGraph . cata toTreeGraph
 runGraph :: Eff '[Reader (Graph vertex), Fresh] (Graph vertex) -> Graph vertex
 runGraph = run . runFresh 0 . runReader mempty
 
-
-termAlgebra ::
-  ( ConstructorName syntax
-  , HasField fields Range
-  , HasField fields Span
-  , Foldable syntax
-  , Member Fresh effs
-  , Member (Reader (Graph (TaggedVertex tag))) effs
-  )
-  => tag
-  -> TermF syntax (Record fields) (Eff effs (Graph (TaggedVertex tag)))
-  -> Eff effs (Graph (TaggedVertex tag))
-termAlgebra t (In ann syntax) = do
-  i <- fresh
-  parent <- ask
-  let root = vertex (TaggedVertex i t (constructorName syntax) (getField ann) (getField ann))
-  subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
-  pure (parent `connect` root `overlay` subGraph)
-
-style :: (IsString string, Monoid string) => String -> (tag -> [Attribute string]) -> Style (TaggedVertex tag) string
-style name tagAttributes = (defaultStyle (fromString . show . vertexId))
+-- | GraphViz styling for terms
+termStyle :: (IsString string, Monoid string) => String -> Style TermVertex string
+termStyle name = (defaultStyle (fromString . show . vertexId))
   { graphName = fromString (quote name)
   , vertexAttributes = vertexAttributes }
   where quote a = "\"" <> a <> "\""
-        vertexAttributes TaggedVertex{..} = "label" := fromString vertexTermName : tagAttributes vertexTag
+        vertexAttributes TermVertex{..} = ["label" := fromString vertexTermName]
 
-termStyle :: (IsString string, Monoid string) => String -> Style (TaggedVertex ()) string
-termStyle name = style name (const [])
+-- | Graphviz styling for diffs
+diffStyle :: (IsString string, Monoid string) => String -> Style DiffVertex string
+diffStyle name = (defaultStyle (fromString . show . diffVertexId))
+  { graphName = fromString (quote name)
+  , vertexAttributes = vertexAttributes }
+  where quote a = "\"" <> a <> "\""
+        vertexAttributes (DiffVertex _ (Deleted DeletedTerm{..}))   = [ "label" := fromString deletedTermName,  "color" := "red" ]
+        vertexAttributes (DiffVertex _ (Inserted InsertedTerm{..})) = [ "label" := fromString insertedTermName, "color" := "green" ]
+        vertexAttributes (DiffVertex _ (Replaced ReplacedTerm{..})) = [ "label" := "Replacement",               "color" := "orange", "style" := "dashed" ]
+        vertexAttributes (DiffVertex _ (Merged MergedTerm{..}))     = [ "label" := fromString mergedTermName ]
 
-diffStyle :: (IsString string, Monoid string) => String -> Style (TaggedVertex DiffTag) string
-diffStyle name = style name diffTagAttributes
-  where diffTagAttributes Deleted  = ["color" := "red"]
-        diffTagAttributes Inserted = ["color" := "green"]
-        diffTagAttributes Replaced = ["color" := "orange", "style" := "dashed"]
-        diffTagAttributes _        = []
-
-data TaggedVertex tag
-  = TaggedVertex
+data TermVertex
+  = TermVertex
   { vertexId :: Int
-  , vertexTag :: tag
   , vertexTermName :: String
   , vertexRange :: Range
   , vertexSpan :: Span
   } deriving (Eq, Ord, Show)
 
-instance ToJSON (TaggedVertex ()) where
-  toJSON TaggedVertex{..}
-    = object $ [ "id"    .= T.pack (show vertexId)
-               , "term"  .= vertexTermName ]
+data TermAnnotation
+  = TermAnnotation
+  { range :: Range
+  , span :: Span
+  } deriving (Eq, Ord, Show)
+
+instance ToJSON TermAnnotation where
+  toJSON TermAnnotation{..} = object $ toJSONFields range <> toJSONFields span
+
+instance ToJSONFields TermAnnotation where
+  toJSONFields TermAnnotation{..} = toJSONFields range <> toJSONFields span
+
+data MergedTerm
+  = MergedTerm
+  { mergedTermName :: String
+  , mergedTermBefore :: TermAnnotation
+  , mergedTermAfter :: TermAnnotation
+  } deriving (Eq, Ord, Show)
+
+instance ToJSON MergedTerm where
+  toJSON MergedTerm{..} = object [ "term" .= mergedTermName, "before" .= mergedTermBefore, "after" .= mergedTermAfter ]
+
+data DeletedTerm
+  = DeletedTerm
+  { deletedTermName :: String
+  , deletedTermBefore :: TermAnnotation
+  } deriving (Eq, Ord, Show)
+
+instance ToJSON DeletedTerm where
+  toJSON DeletedTerm{..} = object [ "term" .= deletedTermName, "before" .= deletedTermBefore ]
+
+data InsertedTerm
+  = InsertedTerm
+  { insertedTermName :: String
+  , insertedTermAfter :: TermAnnotation
+  } deriving (Eq, Ord, Show)
+
+instance ToJSON InsertedTerm where
+  toJSON InsertedTerm{..} = object [ "term" .= insertedTermName, "after" .= insertedTermAfter ]
+
+data ReplacedTerm
+  = ReplacedTerm
+  { replacedTermBefore :: DeletedTerm
+  , replacedTermAfter :: InsertedTerm
+  } deriving (Eq, Ord, Show)
+
+instance ToJSON ReplacedTerm where
+  toJSON (ReplacedTerm DeletedTerm{..} InsertedTerm{..})
+    = object [ "before" .= deleted, "after" .= inserted ]
+    where deleted  = object $ [ "term" .= deletedTermName  ] <> toJSONFields deletedTermBefore
+          inserted = object $ [ "term" .= insertedTermName ] <> toJSONFields insertedTermAfter
+
+data DiffVertexTerm
+  = Deleted DeletedTerm
+  | Inserted InsertedTerm
+  | Replaced ReplacedTerm
+  | Merged MergedTerm
+    deriving (Eq, Ord, Show)
+
+data DiffVertex
+  = DiffVertex
+  { diffVertexId :: Int
+  , diffVertexTerm :: DiffVertexTerm
+  } deriving (Eq, Ord, Show)
+
+instance ToJSON TermVertex where
+  toJSON TermVertex{..}
+    = object $ [ "id"   .= T.pack (show vertexId)
+               , "term" .= vertexTermName ]
                <> toJSONFields vertexRange
                <> toJSONFields vertexSpan
-  toEncoding TaggedVertex{..}
-    = pairs ( fold ( "id"    .= T.pack (show vertexId)
-                   : "name"  .= vertexTermName
-                   : toJSONFields vertexRange ) )
+  toEncoding TermVertex{..}
+    = pairs ( fold ( "id"   .= T.pack (show vertexId)
+                   : "name" .= vertexTermName
+                   : toJSONFields vertexRange
+                   <> toJSONFields vertexSpan ))
 
-instance JSONVertex (TaggedVertex ()) where
+
+instance JSONVertex TermVertex where
   jsonVertexId = T.pack . show . vertexId
 
-data DiffTag = Deleted | Inserted | Replaced | Merged
-  deriving (Eq, Ord, Show)
+instance ToJSON DiffVertex where
+  toJSON (DiffVertex i (Deleted t))  = object [ "id" .= T.pack (show i), "deleted"  .= t ]
+  toJSON (DiffVertex i (Inserted t)) = object [ "id" .= T.pack (show i), "inserted" .= t ]
+  toJSON (DiffVertex i (Replaced t)) = object [ "id" .= T.pack (show i), "replaced" .= t ]
+  toJSON (DiffVertex i (Merged t))   = object [ "id" .= T.pack (show i), "merged"   .= t ]
+  -- TODO
+  -- toEncoding = undefined
+
+
+instance JSONVertex DiffVertex where
+  jsonVertexId = T.pack . show . diffVertexId
 
 
 class ToTreeGraph vertex t | t -> vertex where
   toTreeGraph :: (Member Fresh effs, Member (Reader (Graph vertex)) effs) => t (Eff effs (Graph vertex)) -> Eff effs (Graph vertex)
 
-instance (ConstructorName syntax, Foldable syntax, HasField fields Range, HasField fields Span) => ToTreeGraph (TaggedVertex ()) (TermF syntax (Record fields)) where
-  toTreeGraph = termAlgebra ()
+instance (ConstructorName syntax, Foldable syntax, HasField fields Range, HasField fields Span) =>
+  ToTreeGraph TermVertex (TermF syntax (Record fields)) where
+  toTreeGraph = termAlgebra where
+    termAlgebra ::
+      ( ConstructorName syntax
+      , HasField fields Range
+      , HasField fields Span
+      , Foldable syntax
+      , Member Fresh effs
+      , Member (Reader (Graph TermVertex)) effs
+      )
+      => TermF syntax (Record fields) (Eff effs (Graph TermVertex))
+      -> Eff effs (Graph TermVertex)
+    termAlgebra (In ann syntax) = do
+      i <- fresh
+      parent <- ask
+      let root = vertex (TermVertex i (constructorName syntax) (getField ann) (getField ann))
+      subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
+      pure (parent `connect` root `overlay` subGraph)
 
-instance (ConstructorName syntax, Foldable syntax) => ToTreeGraph (TaggedVertex DiffTag) (DiffF syntax ann1 ann2) where
-  toTreeGraph = undefined
-  -- toTreeGraph d = case d of
-  --   Merge t               -> termAlgebra Merged t
-  --   Patch (Delete  t1)    ->          termAlgebra Deleted t1
-  --   Patch (Insert     t2) ->                                     termAlgebra Inserted t2
-  --   Patch (Replace t1 t2) -> do
-  --     i <- fresh
-  --     parent <- ask
-  --     let replace = vertex (TaggedVertex i Replaced "Replacement")
-  --     graph <- local (const replace) (overlay <$> termAlgebra Deleted t1 <*> termAlgebra Inserted t2)
-  --     pure (parent `connect` replace `overlay` graph)
+instance (ConstructorName syntax, Foldable syntax, HasField fields1 Range, HasField fields1 Span, HasField fields2 Range, HasField fields2 Span) =>
+  ToTreeGraph DiffVertex (DiffF syntax (Record fields1) (Record fields2)) where
+  toTreeGraph d = case d of
+    Merge t@(In (a1, a2) syntax)     -> diffAlgebra t  (Merged   (MergedTerm (constructorName syntax) (ann a1) (ann a2)))
+    Patch (Delete t1@(In a1 syntax)) -> diffAlgebra t1 (Deleted  (DeletedTerm (constructorName syntax) (ann a1)))
+    Patch (Insert t2@(In a2 syntax)) -> diffAlgebra t2 (Inserted (InsertedTerm (constructorName syntax) (ann a2)))
+    Patch (Replace t1@(In a1 syntax1) t2@(In a2 syntax2)) -> do
+      i <- fresh
+      parent <- ask
+      let a = DeletedTerm (constructorName syntax1) (ann a1)
+      let b = InsertedTerm (constructorName syntax2) (ann a2)
+      let replace = vertex (DiffVertex i (Replaced (ReplacedTerm a b)))
+      graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted a) <*> diffAlgebra t2 (Inserted b))
+      pure (parent `connect` replace `overlay` graph)
+    where
+      ann a = TermAnnotation (getField a) (getField a)
+      diffAlgebra ::
+        ( Foldable f
+        , Member Fresh effs
+        , Member (Reader (Graph DiffVertex)) effs
+        ) => f (Eff effs (Graph DiffVertex)) -> DiffVertexTerm -> Eff effs (Graph DiffVertex)
+      diffAlgebra syntax a = do
+        i <- fresh
+        parent <- ask
+        let root = vertex (DiffVertex i a)
+        subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
+        pure (parent `connect` root `overlay` subGraph)
+
+      -- flatTerm (n, r, s) = FlatTerm n r s

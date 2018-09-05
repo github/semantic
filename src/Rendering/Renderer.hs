@@ -3,8 +3,9 @@ module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
 , renderJSONDiff
+, renderJSONAdjDiff
 , renderJSONTerm
-, renderJSONAdjGraph
+, renderJSONAdjTerm
 , renderJSONAST
 , renderToCDiff
 , renderRPCToCDiff
@@ -33,10 +34,12 @@ data DiffRenderer output where
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
+  -- | Render to JSON as an adjacency list.
+  JSONAdjDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
-  DOTDiffRenderer :: DiffRenderer (Graph (TaggedVertex DiffTag))
+  DOTDiffRenderer :: DiffRenderer (Graph DiffVertex)
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
   ShowDiffRenderer :: DiffRenderer Builder
 
@@ -54,7 +57,7 @@ data TermRenderer output where
   -- | Render to a list of symbols.
   SymbolsTermRenderer :: SymbolFields -> TermRenderer (JSON "files" SomeJSON)
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
-  DOTTermRenderer :: TermRenderer (Graph (TaggedVertex ()))
+  DOTTermRenderer :: TermRenderer (Graph TermVertex)
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
   ShowTermRenderer :: TermRenderer Builder
 

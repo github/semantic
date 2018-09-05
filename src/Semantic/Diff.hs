@@ -25,6 +25,8 @@ import Semantic.IO (noLanguageForBlob)
 import Semantic.Telemetry as Stat
 import Semantic.Task as Task
 import Serializing.Format
+import Rendering.JSON (SomeJSON (..))
+import qualified Rendering.JSON as JSON
 import qualified Language.TypeScript.Assignment as TypeScript
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.JSON.Assignment as JSON
@@ -33,6 +35,9 @@ import qualified Language.Python.Assignment as Python
 runDiff :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
 runDiff JSONDiffRenderer        = withParsedBlobPairs (const pure) (render . renderJSONDiff) >=> serialize JSON
+runDiff JSONAdjDiffRenderer     = withParsedBlobPairs (const pure) (render . renderAdjGraph) >=> serialize JSON
+  where renderAdjGraph :: (Recursive t, ToTreeGraph DiffVertex (Base t)) => BlobPair -> t -> JSON.JSON "diffs" SomeJSON
+        renderAdjGraph blob diff = renderJSONAdjDiff blob (renderTreeGraph diff)
 runDiff SExpressionDiffRenderer = withParsedBlobPairs (const pure) (const (serialize (SExpression ByConstructorName)))
 runDiff ShowDiffRenderer        = withParsedBlobPairs (const pure) (const (serialize Show))
 runDiff DOTDiffRenderer         = withParsedBlobPairs (const pure) (const (render renderTreeGraph)) >=> serialize (DOT (diffStyle "diffs"))
