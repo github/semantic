@@ -19,12 +19,22 @@ import Data.JSON.Fields
 import GHC.Stack
 import Prologue
 
--- | Source position information
+-- | Source position information (1 indexed)
 data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
   }
   deriving (Show, Read, Eq, Ord, Generic, Hashable)
+
+-- | A Span of position information
+data Span = Span
+  { spanStart :: Pos
+  , spanEnd   :: Pos
+  }
+  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named)
+
+
+-- Instances
 
 instance Named Pos where nameOf _ = "Position"
 instance Message Pos where
@@ -49,13 +59,6 @@ instance Lower Pos where
 
 instance HasDefault Pos where
   def = lowerBound @Pos
-
-
-data Span = Span
-  { spanStart :: Pos
-  , spanEnd   :: Pos
-  }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named)
 
 
 instance Message Span where
