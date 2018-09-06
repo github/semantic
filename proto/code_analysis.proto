@@ -119,7 +119,7 @@ message CallGraphRequest {
 }
 
 message CallGraphResponse {
-  AdjacencyList graph = 1;
+  ControlFlowGraph graph = 1;
   DebugInfo error_info = 2;
 }
 
@@ -128,7 +128,7 @@ message ImportGraphRequest {
 }
 
 message ImportGraphResponse {
-  AdjacencyList graph = 1;
+  ControlFlowGraph graph = 1;
   DebugInfo error_info = 2;
 }
 

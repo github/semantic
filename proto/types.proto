@@ -21,15 +21,6 @@ enum Language {
   PHP = 11;
 }
 
-enum VertexType {
-  PACKAGE = 0;
-  MODULE = 1;
-  UNKNOWN_MODULE = 2;
-  VARIABLE = 3;
-  METHOD = 4;
-  FUNCTION = 5;
-}
-
 message BlobPair {
   Blob before = 1;
   Blob after = 2;
@@ -41,24 +32,14 @@ message Blob {
   Language blobLanguage = 3;
 }
 
-message Edge {
-  uint64 edgeFrom = 1;
-  uint64 edgeTo = 2;
-}
-
 message ErrorSite {
   string errorMessage = 1;
   SrcLoc errorLocation = 2;
 }
 
-message AdjacencyList {
-  repeated Vertex graphVertices = 1;
-  repeated Edge graphEdges = 2;
-}
-
-message Pos {
-  int64 posLine = 1;
-  int64 posColumn = 2;
+message Position {
+  int64 line = 1;
+  int64 column = 2;
 }
 
 message Project {
@@ -69,8 +50,8 @@ message Project {
 }
 
 message Span {
-  Pos spanStart = 1;
-  Pos spanEnd = 2;
+  Position start = 1;
+  Position end = 2;
 }
 
 message SrcLoc {
@@ -83,8 +64,53 @@ message SrcLoc {
   int64 srcLocEndCol = 7;
 }
 
-message Vertex {
-  VertexType vertexType = 1;
-  string vertexContents = 2;
-  uint64 vertexTag = 3;
+message ControlFlowGraph {
+  repeated ControlFlowVertex vertices = 1;
+  repeated ControlFlowEdge edges = 2;
+}
+
+message ControlFlowEdge {
+  string from = 1;
+  string to = 2;
+}
+
+message ControlFlowVertex {
+  oneof vertex {
+    Package package = 1;
+    Module module = 2;
+    UnknownModule unknownModule = 3;
+    Variable variable = 4;
+    Method method = 5;
+    Function function = 6;
+  }
+  message Package {
+    string id = 1;
+    string name = 2;
+  }
+  message Module {
+    string id = 1;
+    string name = 2;
+  }
+  message UnknownModule {
+    string id = 1;
+    string name = 2;
+  }
+  message Variable {
+    string id = 1;
+    string name = 2;
+    string moduleName = 3;
+    Span span = 4;
+  }
+  message Method {
+    string id = 1;
+    string name = 2;
+    string moduleName = 3;
+    Span span = 4;
+  }
+  message Function {
+    string id = 1;
+    string name = 2;
+    string moduleName = 3;
+    Span span = 4;
+  }
 }
