@@ -28,16 +28,12 @@ data Pos = Pos
 
 instance Named Pos where nameOf _ = "Position"
 instance Message Pos where
-  encodeMessage num Pos{..} = Encode.embedded num (encodePrimitive 1 posLine <> encodePrimitive 2 posColumn)
-  -- TODO: FIXME
-  decodeMessage = undefined -- fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
+  encodeMessage _ Pos{..} = encodeMessageField 1 posLine <> encodeMessageField 2 posColumn
+  decodeMessage _ = Pos <$> Decode.at decodeMessageField 1 <*> Decode.at decodeMessageField 2
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim Int64) (Single "line") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim Int64) (Single "column") [] Nothing
     ]
-
-instance HasDefault Pos where
-  def = Pos 1 1
 
 instance A.ToJSON Pos where
   toJSON Pos{..} =
@@ -51,6 +47,10 @@ instance A.FromJSON Pos where
 instance Lower Pos where
   lowerBound = Pos 1 1
 
+instance HasDefault Pos where
+  def = lowerBound @Pos
+
+
 data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
@@ -59,8 +59,9 @@ data Span = Span
 
 
 instance Message Span where
-  encodeMessage num Span{..} = Encode.embedded num (encodeMessage 1 spanStart <> encodeMessage 2 spanEnd)
-  decodeMessage = undefined
+  encodeMessage _ Span{..} = Encode.embedded 1 (encodeMessage 1 spanStart) <> Encode.embedded 2 (encodeMessage 1 spanEnd)
+  decodeMessage _ = Span <$> embeddedAt (decodeMessage 1) 1 <*> embeddedAt (decodeMessage 1) 2
+    where embeddedAt parser = Decode.at (Decode.embedded'' parser)
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single (nameOf (Proxy @Pos))) (Single "start") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim . Named $ Single (nameOf (Proxy @Pos))) (Single "end") [] Nothing
@@ -91,4 +92,7 @@ instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
 
 instance Lower Span where
-  lowerBound = Span lowerBound lowerBound
+  lowerBound = emptySpan
+
+instance HasDefault Span where
+  def = emptySpan
