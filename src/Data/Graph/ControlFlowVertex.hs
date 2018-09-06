@@ -34,10 +34,8 @@ import           Prologue hiding (packageName)
 -- import Data.Word
 import Proto3.Suite
 import qualified Proto3.Suite as PB
-import qualified Proto3.Suite.Types as PB
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import qualified Algebra.Graph as Graph
 import GHC.Exts (fromList)
 
 -- | A vertex of representing some node in a control flow graph.
@@ -49,26 +47,6 @@ data ControlFlowVertex
   | Method        { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
   | Function      { vertexName :: Text, vertexModuleName :: Text, vertexSpan :: Span }
   deriving (Eq, Ord, Show, Generic, Hashable, Named)
-
--- | A tag used on each vertex of a 'Graph' to convert to an 'ControlFlowAdjacencyList'.
--- type Tag = Word64
-
--- -- | A serializable edge type for control flow graphs. Only tag information is
--- -- carried about vertices; consumers are expected to look up nodes in the vertex
--- -- list when necessary.
--- data ControlFlowEdge = ControlFlowEdge
---   { controlFlowEdgeFrom :: Tag
---   , controlFlowEdgeTo :: Tag
---   } deriving (Eq, Ord, Show, Generic, Hashable, PB.Named, Message)
-
--- -- | An adjacency list-representation of a control flow graph. This
--- -- representation is less efficient and fluent than an ordinary 'Graph', but is
--- -- more amenable to serialization.
--- data ControlFlowAdjacencyList = ControlFlowAdjacencyList
---   { controlFlowVertices :: [ControlFlowVertex]
---   , controlFlowEdges :: [ControlFlowEdge]
---   } deriving (Eq, Ord, Show, Generic, Hashable, Named, Message)
-
 
 packageVertex :: PackageInfo -> ControlFlowVertex
 packageVertex (PackageInfo name _) = Package (formatName name)
@@ -123,18 +101,18 @@ instance Message (G.Graph ControlFlowVertex) where
     ]
 
 instance Lower ControlFlowVertex where lowerBound = Package ""
-instance VertexTag ControlFlowVertex where uniqueTag = vertexIdentifier
+instance VertexTag ControlFlowVertex where uniqueTag = hash . vertexIdentifier
 
 instance ToJSON ControlFlowVertex where
   toJSON v = object [ "name" .= vertexIdentifier v, "type" .= vertexToType v ]
 
 instance Message ControlFlowVertex where
-  encodeMessage _ v@Package{..}       = Encode.embedded 1 (encodePrimitive 1 (vertexIdentifier v) <> encodePrimitive 2 vertexName)
-  encodeMessage _ v@Module{..}        = Encode.embedded 2 (encodePrimitive 1 (vertexIdentifier v) <> encodePrimitive 2 vertexName)
-  encodeMessage _ v@UnknownModule{..} = Encode.embedded 3 (encodePrimitive 1 (vertexIdentifier v) <> encodePrimitive 2 vertexName)
-  encodeMessage _ v@Variable{..}      = Encode.embedded 4 (encodePrimitive 1 (vertexIdentifier v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 vertexModuleName <> encodeMessage 4 vertexSpan)
-  encodeMessage _ v@Method{..}        = Encode.embedded 5 (encodePrimitive 1 (vertexIdentifier v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 vertexModuleName <> encodeMessage 4 vertexSpan)
-  encodeMessage _ v@Function{..}      = Encode.embedded 6 (encodePrimitive 1 (vertexIdentifier v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 vertexModuleName <> encodeMessage 4 vertexSpan)
+  encodeMessage _ v@Package{..}       = Encode.embedded 1 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v))
+  encodeMessage _ v@Module{..}        = Encode.embedded 2 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v))
+  encodeMessage _ v@UnknownModule{..} = Encode.embedded 3 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v))
+  encodeMessage _ v@Variable{..}      = Encode.embedded 4 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
+  encodeMessage _ v@Method{..}        = Encode.embedded 5 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
+  encodeMessage _ v@Function{..}      = Encode.embedded 6 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
   decodeMessage = undefined
   dotProto _ =
     [ DotProtoMessageOneOf (Single "vertex")
@@ -153,12 +131,13 @@ instance Message ControlFlowVertex where
     <> gen "Method" [ genModuleName, genSpan ]
     <> gen "Function" [ genModuleName, genSpan ]
     where
-      genModuleName = DotProtoMessageField $ DotProtoField 3 (Prim PB.String) (Single "moduleName") [] Nothing
-      genSpan = DotProtoMessageField $ DotProtoField 4 (Prim . Named $ Single (nameOf (Proxy @Span))) (Single "span") [] Nothing
+      genModuleName = DotProtoMessageField $ DotProtoField 4 (Prim PB.String) (Single "moduleName") [] Nothing
+      genSpan = DotProtoMessageField $ DotProtoField 5 (Prim . Named $ Single (nameOf (Proxy @Span))) (Single "span") [] Nothing
       gen name extras =
         [ DotProtoMessageDefinition . DotProtoMessage (Single name) $
-            (DotProtoMessageField $ DotProtoField 1 (Prim PB.String) (Single "id") [] Nothing)
+            (DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "id") [] Nothing)
             : (DotProtoMessageField $ DotProtoField 2 (Prim PB.String) (Single "name") [] Nothing)
+            : (DotProtoMessageField $ DotProtoField 3 (Prim PB.String) (Single "description") [] Nothing)
             : extras
         ]
 
@@ -169,11 +148,12 @@ instance Message (G.Edge ControlFlowVertex) where
   encodeMessage _ (G.Edge (from, to)) = encodePrimitive 1 (uniqueTag from) <> encodePrimitive 2 (uniqueTag to)
   decodeMessage = undefined
   dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim PB.String) (Single "from") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim PB.String) (Single "to")   [] Nothing
+    [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "from") [] Nothing
+    , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "to")   [] Nothing
     ]
 
 
+-- TODO: This is potentially valuable just to get name's out of declarable things.
 -- Typeclasses to create 'ControlFlowVertex's from 'Term's. Also extracts
 -- 'Name's for terms with symbolic names like Identifiers and Declarations.
 

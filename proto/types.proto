@@ -70,8 +70,8 @@ message ControlFlowGraph {
 }
 
 message ControlFlowEdge {
-  string from = 1;
-  string to = 2;
+  int64 from = 1;
+  int64 to = 2;
 }
 
 message ControlFlowVertex {
@@ -84,33 +84,39 @@ message ControlFlowVertex {
     Function function = 6;
   }
   message Package {
-    string id = 1;
+    int64 id = 1;
     string name = 2;
+    string description = 3;
   }
   message Module {
-    string id = 1;
+    int64 id = 1;
     string name = 2;
+    string description = 3;
   }
   message UnknownModule {
-    string id = 1;
+    int64 id = 1;
     string name = 2;
+    string description = 3;
   }
   message Variable {
-    string id = 1;
+    int64 id = 1;
     string name = 2;
-    string moduleName = 3;
-    Span span = 4;
+    string description = 3;
+    string moduleName = 4;
+    Span span = 5;
   }
   message Method {
-    string id = 1;
+    int64 id = 1;
     string name = 2;
-    string moduleName = 3;
-    Span span = 4;
+    string description = 3;
+    string moduleName = 4;
+    Span span = 5;
   }
   message Function {
-    string id = 1;
+    int64 id = 1;
     string name = 2;
-    string moduleName = 3;
-    Span span = 4;
+    string description = 3;
+    string moduleName = 4;
+    Span span = 5;
   }
 }

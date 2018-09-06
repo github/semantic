@@ -118,7 +118,7 @@ instance Ord vertex => Ord (Graph vertex) where
 
 
 class VertexTag vertex where
-  uniqueTag :: vertex -> Text
+  uniqueTag :: vertex -> Int
 
 instance (Ord vertex, ToJSON vertex, VertexTag vertex) => ToJSON (Graph vertex) where
   toJSON     (Graph graph) = object ["vertices" .= G.vertexList graph,   "edges" .= (Edge <$> G.edgeList graph)]

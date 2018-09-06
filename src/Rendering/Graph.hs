@@ -138,7 +138,7 @@ instance ToJSON TermVertex where
 
 
 instance VertexTag TermVertex where
-  uniqueTag = T.pack . show . vertexId
+  uniqueTag = vertexId
 
 instance ToJSON DiffVertex where
   toJSON (DiffVertex i (Deleted t))  = object [ "id" .= T.pack (show i), "deleted"  .= t ]
@@ -150,7 +150,7 @@ instance ToJSON DiffVertex where
 
 
 instance VertexTag DiffVertex where
-  uniqueTag = T.pack . show . diffVertexId
+  uniqueTag = diffVertexId
 
 
 class ToTreeGraph vertex t | t -> vertex where
