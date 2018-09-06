@@ -82,8 +82,7 @@ library
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
-                     , Data.Graph.Adjacency
-                     , Data.Graph.Vertex
+                     , Data.Graph.ControlFlowVertex
                      , Data.History
                      , Data.JSON.Fields
                      , Data.Language

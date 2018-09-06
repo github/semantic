@@ -33,7 +33,7 @@ import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
 import           Data.Abstract.Evaluatable (HasPostlude, HasPrelude)
 import           Data.AST
-import           Data.Graph.Vertex (VertexDeclaration')
+import           Data.Graph.ControlFlowVertex (VertexDeclaration')
 import           Data.Kind
 import           Data.Language
 import           Data.Record
