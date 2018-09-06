@@ -24,12 +24,17 @@ data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named, Message)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
-instance MessageField Pos where
-  encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
-  decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
-  protoType pr = messageField (Prim $ Named (Single (nameOf pr))) Nothing
+instance Named Pos where nameOf _ = "Position"
+instance Message Pos where
+  encodeMessage num Pos{..} = Encode.embedded num (encodePrimitive 1 posLine <> encodePrimitive 2 posColumn)
+  -- TODO: FIXME
+  decodeMessage = undefined -- fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
+  dotProto _ =
+    [ DotProtoMessageField $ DotProtoField 1 (Prim Int64) (Single "line") [] Nothing
+    , DotProtoMessageField $ DotProtoField 2 (Prim Int64) (Single "column") [] Nothing
+    ]
 
 instance HasDefault Pos where
   def = Pos 1 1
@@ -50,7 +55,16 @@ data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named, Message)
+  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named)
+
+
+instance Message Span where
+  encodeMessage num Span{..} = Encode.embedded num (encodeMessage 1 spanStart <> encodeMessage 2 spanEnd)
+  decodeMessage = undefined
+  dotProto _ =
+    [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single (nameOf (Proxy @Pos))) (Single "start") [] Nothing
+    , DotProtoMessageField $ DotProtoField 2 (Prim . Named $ Single (nameOf (Proxy @Pos))) (Single "end") [] Nothing
+    ]
 
 spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc = Span . (Pos . srcLocStartLine <*> srcLocStartCol) <*> (Pos . srcLocEndLine <*> srcLocEndCol)
