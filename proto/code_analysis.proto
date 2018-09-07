@@ -2,13 +2,15 @@ syntax = "proto3";
 
 package github.semantic;
 
-import "ruby_term.proto";
-import "ruby_diff.proto";
+import "go_term.proto";
+import "java_term.proto";
 import "json_term.proto";
-import "typescript_term.proto";
-import "typescript_diff.proto";
-import "python_term.proto";
 import "python_diff.proto";
+import "python_term.proto";
+import "ruby_diff.proto";
+import "ruby_term.proto";
+import "typescript_diff.proto";
+import "typescript_term.proto";
 import "types.proto";
 import "error_details.proto";
 
@@ -47,32 +49,42 @@ service CodeAnalysis {
   rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
 }
 
+// Term Requests and Responses
+//
 message ParseTreeRequest {
   repeated Blob blobs = 1;
 }
 
 message ParseTreeGraphResponse {
-  ParseTreeGraph graph = 1;
+  ParseTreeGraph response = 1;
   DebugInfo error_info = 2;
 }
 
 message ParseTreeGraph {
-  repeated TermGraph graph = 1;
+  repeated TermGraph graphs = 1;
   repeated DebugInfo error_info = 2;
 }
 
+
 message ParseTreeResponse {
+  DebugInfo error_info = 1;
   oneof response_type {
-    RubyResponse ruby = 1;
-    JSONResponse json = 2;
-    TypeScriptResponse typescript = 3;
-    PythonResponse python = 4;
+    GoResponse go = 2;
+    JavaResponse java = 3;
+    JSONResponse json = 4;
+    PythonResponse python = 5;
+    RubyResponse ruby = 6;
+    TypeScriptResponse typescript = 7;
   }
-  DebugInfo error_info = 5;
 }
 
-message RubyResponse {
-  repeated rubyterm.RubyTerm terms = 1;
+message GoResponse {
+  repeated goterm.GoTerm terms = 1;
+  repeated DebugInfo errors = 2;
+}
+
+message JavaResponse {
+  repeated javaterm.JavaTerm terms = 1;
   repeated DebugInfo errors = 2;
 }
 
@@ -81,16 +93,23 @@ message JSONResponse {
   repeated DebugInfo errors = 2;
 }
 
-message TypeScriptResponse {
-  repeated typescriptterm.TypeScriptTerm terms = 1;
-  repeated DebugInfo errors = 2;
-}
-
 message PythonResponse {
   repeated pythonterm.PythonTerm terms = 1;
   repeated DebugInfo errors = 2;
 }
 
+message RubyResponse {
+  repeated rubyterm.RubyTerm terms = 1;
+  repeated DebugInfo errors = 2;
+}
+
+message TypeScriptResponse {
+  repeated typescriptterm.TypeScriptTerm terms = 1;
+  repeated DebugInfo errors = 2;
+}
+
+// Diff Request & Responses
+//
 message SummarizeDiffRequest  {
   repeated BlobPair blobPairs = 1;
 }

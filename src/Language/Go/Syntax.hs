@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, LambdaCase #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Go.Syntax where
 
@@ -19,18 +19,23 @@ import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import           System.FilePath.Posix
 
-data Relative = Unknown | Relative | NonRelative
-  deriving (Bounded, Enum, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField)
+data IsRelative = Unknown | Relative | NonRelative
+  deriving (Bounded, Enum, Finite, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField)
 
-instance Primitive Relative where
-  encodePrimitive = Encode.enum
-  decodePrimitive = either (const def) id <$> Decode.enum
-  primType _ = Named (Single (nameOf (Proxy @Relative)))
+instance Primitive IsRelative where
+  -- encodePrimitive = Encode.enum
+  -- decodePrimitive = either (const def) id <$> Decode.enum
+  -- primType _ = Named (Single (nameOf (Proxy @IsRelative)))
+  primType _ = primType (Proxy @(Enumerated IsRelative))
+  encodePrimitive f = encodePrimitive f . Enumerated . Right
+  decodePrimitive   = decodePrimitive >>= \case
+    (Enumerated (Right r)) -> pure r
+    other                  -> Prelude.fail ("IsRelative decodeMessageField: unexpected value" <> show other)
 
-instance HasDefault Relative where
+instance HasDefault IsRelative where
   def = Unknown
 
-data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
+data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
   deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message)
 
 instance MessageField ImportPath where
