@@ -68,8 +68,8 @@ getSlot address heap declaration = do
   slotMap <- frameSlots address heap
   Map.lookup declaration slotMap
 
-setSlot :: (Ord address, Ord declaration) => Heap scope address declaration value -> address -> declaration -> value -> Heap scope address declaration value
-setSlot heap address declaration value =
+setSlot :: (Ord address, Ord declaration) => address -> declaration -> value -> Heap scope address declaration value -> Heap scope address declaration value
+setSlot address declaration value heap =
     case frameLookup address heap of
       Just frame -> let slotMap = slots frame in
         Heap $ Monoidal.insert address (frame { slots = (Map.insert declaration value slotMap) }) (unHeap heap)
@@ -83,6 +83,20 @@ lookup heap address (EPath label scope path) declaration = do
     nextAddress <- Map.lookup scope scopeMap
     lookup heap nextAddress path declaration
 
+newFrame :: (Ord address, Ord declaration) => scope -> address -> Map EdgeLabel (Map scope address) -> Heap scope address declaration value -> Heap scope address declaration value
+newFrame scope address links = insertFrame address (Frame scope links mempty)
+
+initFrame :: (Ord address, Ord declaration, Ord scope) => scope -> address -> Map EdgeLabel (Map scope address) -> Map declaration value -> Heap scope address declaration value -> Heap scope address declaration value
+initFrame scope address links slots = fillFrame address slots . newFrame scope address links
+
+insertFrame :: Ord address => address -> Frame scope address declaration value -> Heap scope address declaration value -> Heap scope address declaration value
+insertFrame address frame = Heap . Monoidal.insert address frame . unHeap
+
+fillFrame :: Ord address => address -> Map declaration value -> Heap scope address declaration value -> Heap scope address declaration value
+fillFrame address slots heap =
+  case frameLookup address heap of
+    Just frame -> insertFrame address (frame { slots = slots }) heap
+    Nothing -> heap
 
 -- -- | Look up the list of values stored for a given address, if any.
 -- scopeLookupAll :: Ord address => address -> Heap address value -> Maybe [value]
