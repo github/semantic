@@ -21,6 +21,8 @@ option go_package = "github.com/semantic/analysis/;analysis";
 service CodeAnalysis {
   // Parsing
   //
+  // Parse source code blobs and return abstract syntax trees as adjacency list graph.
+  rpc ParseTreeGraph (ParseTreeRequest) returns (ParseTreeGraphResponse);
   // Parse source code blobs and return abstract syntax trees.
   rpc ParseTree (ParseTreeRequest) returns (ParseTreeResponse);
 
@@ -47,6 +49,11 @@ service CodeAnalysis {
 
 message ParseTreeRequest {
   repeated Blob blobs = 1;
+}
+
+message ParseTreeGraphResponse {
+  repeated TermGraph graph = 1;
+  DebugInfo error_info = 2;
 }
 
 message ParseTreeResponse {
