@@ -98,6 +98,13 @@ fillFrame address slots heap =
     Just frame -> insertFrame address (frame { slots = slots }) heap
     Nothing -> heap
 
+deleteFrame :: Ord address => address -> Heap scope address declaration value -> Heap scope address declaration value
+deleteFrame address = Heap . Monoidal.delete address . unHeap
+
+-- | The number of frames in the `Heap`.
+heapSize :: Heap scope address declaration value -> Int
+heapSize = Monoidal.size . unHeap
+
 -- -- | Look up the list of values stored for a given address, if any.
 -- scopeLookupAll :: Ord address => address -> Heap address value -> Maybe [value]
 -- scopeLookupAll address = fmap toList . scopeLookup address
