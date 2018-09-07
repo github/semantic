@@ -13,6 +13,7 @@ import           Analysis.PackageDef (HasPackageDef)
 import           Control.Monad.Effect.Exception
 import           Data.AST
 import           Data.Blob
+import           Data.Graph.TermVertex
 import           Data.JSON.Fields
 import           Data.Quieterm
 import           Data.Record

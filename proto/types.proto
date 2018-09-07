@@ -54,6 +54,11 @@ message Span {
   Position end = 2;
 }
 
+message Range {
+  int64 start = 1;
+  int64 end = 2;
+}
+
 message SrcLoc {
   string srcLocPackage = 1;
   string srcLocModule = 2;
@@ -119,4 +124,24 @@ message ControlFlowVertex {
     string moduleName = 4;
     Span span = 5;
   }
+}
+
+message TermGraph {
+  repeated TermVertex vertices = 1;
+  repeated TermEdge edges = 2;
+}
+
+message TermEdge {
+  int64 from = 1;
+  int64 to = 2;
+}
+
+message TermVertex {
+  int64 id = 1;
+  string name = 2;
+}
+
+message TermAnnotation {
+  Range range = 1;
+  Span span = 2;
 }

@@ -4,20 +4,17 @@ module Rendering.Graph
 , termStyle
 , diffStyle
 , ToTreeGraph(..)
-, TermVertex(..)
-, DiffVertex(..)
 ) where
 
-import Data.Aeson
-import Data.JSON.Fields
 import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
 import Control.Monad.Effect
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Reader
-import qualified Data.Text as T
 import Data.Diff
 import Data.Graph
+import Data.Graph.TermVertex
+import Data.Graph.DiffVertex
 import Data.Range
 import Data.Span
 import Data.Record
@@ -50,108 +47,6 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
         vertexAttributes (DiffVertex _ (Inserted InsertedTerm{..})) = [ "label" := fromString insertedTermName, "color" := "green" ]
         vertexAttributes (DiffVertex _ (Replaced ReplacedTerm{..})) = [ "label" := "Replacement",               "color" := "orange", "style" := "dashed" ]
         vertexAttributes (DiffVertex _ (Merged MergedTerm{..}))     = [ "label" := fromString mergedTermName ]
-
-data TermVertex
-  = TermVertex
-  { vertexId :: Int
-  , vertexTermName :: String
-  , vertexRange :: Range
-  , vertexSpan :: Span
-  } deriving (Eq, Ord, Show)
-
-data TermAnnotation
-  = TermAnnotation
-  { range :: Range
-  , span :: Span
-  } deriving (Eq, Ord, Show)
-
-instance ToJSON TermAnnotation where
-  toJSON TermAnnotation{..} = object $ toJSONFields range <> toJSONFields span
-
-instance ToJSONFields TermAnnotation where
-  toJSONFields TermAnnotation{..} = toJSONFields range <> toJSONFields span
-
-data MergedTerm
-  = MergedTerm
-  { mergedTermName :: String
-  , mergedTermBefore :: TermAnnotation
-  , mergedTermAfter :: TermAnnotation
-  } deriving (Eq, Ord, Show)
-
-instance ToJSON MergedTerm where
-  toJSON MergedTerm{..} = object [ "term" .= mergedTermName, "before" .= mergedTermBefore, "after" .= mergedTermAfter ]
-
-data DeletedTerm
-  = DeletedTerm
-  { deletedTermName :: String
-  , deletedTermBefore :: TermAnnotation
-  } deriving (Eq, Ord, Show)
-
-instance ToJSON DeletedTerm where
-  toJSON DeletedTerm{..} = object [ "term" .= deletedTermName, "before" .= deletedTermBefore ]
-
-data InsertedTerm
-  = InsertedTerm
-  { insertedTermName :: String
-  , insertedTermAfter :: TermAnnotation
-  } deriving (Eq, Ord, Show)
-
-instance ToJSON InsertedTerm where
-  toJSON InsertedTerm{..} = object [ "term" .= insertedTermName, "after" .= insertedTermAfter ]
-
-data ReplacedTerm
-  = ReplacedTerm
-  { replacedTermBefore :: DeletedTerm
-  , replacedTermAfter :: InsertedTerm
-  } deriving (Eq, Ord, Show)
-
-instance ToJSON ReplacedTerm where
-  toJSON (ReplacedTerm DeletedTerm{..} InsertedTerm{..})
-    = object [ "before" .= deleted, "after" .= inserted ]
-    where deleted  = object $ [ "term" .= deletedTermName  ] <> toJSONFields deletedTermBefore
-          inserted = object $ [ "term" .= insertedTermName ] <> toJSONFields insertedTermAfter
-
-data DiffVertexTerm
-  = Deleted DeletedTerm
-  | Inserted InsertedTerm
-  | Replaced ReplacedTerm
-  | Merged MergedTerm
-    deriving (Eq, Ord, Show)
-
-data DiffVertex
-  = DiffVertex
-  { diffVertexId :: Int
-  , diffVertexTerm :: DiffVertexTerm
-  } deriving (Eq, Ord, Show)
-
-instance ToJSON TermVertex where
-  toJSON TermVertex{..}
-    = object $ [ "id"   .= T.pack (show vertexId)
-               , "term" .= vertexTermName ]
-               <> toJSONFields vertexRange
-               <> toJSONFields vertexSpan
-  toEncoding TermVertex{..}
-    = pairs ( fold ( "id"   .= T.pack (show vertexId)
-                   : "name" .= vertexTermName
-                   : toJSONFields vertexRange
-                   <> toJSONFields vertexSpan ))
-
-
-instance VertexTag TermVertex where
-  uniqueTag = vertexId
-
-instance ToJSON DiffVertex where
-  toJSON (DiffVertex i (Deleted t))  = object [ "id" .= T.pack (show i), "deleted"  .= t ]
-  toJSON (DiffVertex i (Inserted t)) = object [ "id" .= T.pack (show i), "inserted" .= t ]
-  toJSON (DiffVertex i (Replaced t)) = object [ "id" .= T.pack (show i), "replaced" .= t ]
-  toJSON (DiffVertex i (Merged t))   = object [ "id" .= T.pack (show i), "merged"   .= t ]
-  -- TODO
-  -- toEncoding = undefined
-
-
-instance VertexTag DiffVertex where
-  uniqueTag = diffVertexId
-
 
 class ToTreeGraph vertex t | t -> vertex where
   toTreeGraph :: (Member Fresh effs, Member (Reader (Graph vertex)) effs) => t (Eff effs (Graph vertex)) -> Eff effs (Graph vertex)

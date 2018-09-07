@@ -23,6 +23,7 @@ module Rendering.Renderer
 
 import Data.ByteString.Builder
 import Data.Graph
+import Data.Graph.DiffVertex
 import Rendering.Graph as R
 import Rendering.JSON as R
 import Rendering.Symbol as R
