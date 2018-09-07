@@ -111,8 +111,9 @@ instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeParameter
 
 data Annotation a = Annotation { annotationName :: !a, annotationField :: [a]}
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Message1, Traversable)
 
+instance Named1 Annotation where nameOf1 _ = "JavaAnnotation"
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
@@ -180,7 +181,7 @@ instance Show1 Wildcard where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for TypeWithModifiers
 instance Evaluatable Wildcard
 
-data WildcardBounds a = WildcardBoundExtends { wildcardBoundType :: a} | WildcardBoundSuper { wildcardBoundType :: a}
+data WildcardBounds a = WildcardBoundExtends { wildcardBoundExtendsType :: a} | WildcardBoundSuper { wildcardBoundSuperType :: a}
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
 
 instance Eq1 WildcardBounds where liftEq = genericLiftEq

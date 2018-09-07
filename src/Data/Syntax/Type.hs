@@ -42,8 +42,9 @@ instance Tokenize Annotation where
 
 
 data Function a = Function { functionParameters :: ![a], functionReturn :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Message1)
 
+instance Named1 Function where nameOf1 _ = "TypeFunction"
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
@@ -86,8 +87,9 @@ instance Evaluatable Parenthesized
 
 
 newtype Pointer a = Pointer { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Message1)
 
+instance Named1 Pointer where nameOf1 _ = "TypePointer"
 instance Eq1 Pointer where liftEq = genericLiftEq
 instance Ord1 Pointer where liftCompare = genericLiftCompare
 instance Show1 Pointer where liftShowsPrec = genericLiftShowsPrec
@@ -119,8 +121,9 @@ instance Evaluatable Readonly
 
 
 newtype Slice a = Slice { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Message1)
 
+instance Named1 Slice where nameOf1 _ = "TypeSlice"
 instance Eq1 Slice where liftEq = genericLiftEq
 instance Ord1 Slice where liftCompare = genericLiftCompare
 instance Show1 Slice where liftShowsPrec = genericLiftShowsPrec
@@ -162,7 +165,9 @@ instance Show1 Int where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Int
 
 data Float a = Float
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Message1)
+
+instance Named1 Float where nameOf1 _ = "TypeFloat"
 
 instance Eq1 Float where liftEq = genericLiftEq
 instance Ord1 Float where liftCompare = genericLiftCompare
