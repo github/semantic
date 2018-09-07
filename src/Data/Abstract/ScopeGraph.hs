@@ -81,8 +81,7 @@ lookup heap address (EPath label scope path) declaration = do
     frame <- frameLookup address heap
     scopeMap <- Map.lookup label (links frame)
     nextAddress <- Map.lookup scope scopeMap
-    lookup heap address path declaration
-
+    lookup heap nextAddress path declaration
 
 
 -- -- | Look up the list of values stored for a given address, if any.
