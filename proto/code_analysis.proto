@@ -52,8 +52,13 @@ message ParseTreeRequest {
 }
 
 message ParseTreeGraphResponse {
-  repeated TermGraph graph = 1;
+  ParseTreeGraph graph = 1;
   DebugInfo error_info = 2;
+}
+
+message ParseTreeGraph {
+  repeated TermGraph graph = 1;
+  repeated DebugInfo error_info = 2;
 }
 
 message ParseTreeResponse {
