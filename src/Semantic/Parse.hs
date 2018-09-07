@@ -12,9 +12,6 @@ import           Data.JSON.Fields
 import           Data.Quieterm
 import           Data.Record
 import           Data.Term
-import qualified Language.JSON.Assignment as JSON
-import qualified Language.Python.Assignment as Python
-import qualified Language.TypeScript.Assignment as TypeScript
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Graph
