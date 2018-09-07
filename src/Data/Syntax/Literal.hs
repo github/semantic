@@ -2,14 +2,15 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
+import Prelude hiding (Float, null)
+import Prologue hiding (Set, hash, null)
+
 import           Data.Abstract.Evaluatable as Eval
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Numeric.Exts
-import           Prelude hiding (Float, null)
-import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize as Tok
 import           Text.Read (readMaybe)
@@ -265,7 +266,7 @@ instance Evaluatable Set
 -- Pointers
 
 -- | A declared pointer (e.g. var pointer *int in Go)
-newtype Pointer a = Pointer a
+newtype Pointer a = Pointer { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Pointer where liftEq = genericLiftEq
@@ -277,7 +278,7 @@ instance Evaluatable Pointer
 
 
 -- | A reference to a pointer's address (e.g. &pointer in Go)
-newtype Reference a = Reference a
+newtype Reference a = Reference { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Reference where liftEq = genericLiftEq
