@@ -23,6 +23,7 @@ import Data.String (IsString(..))
 import Data.Term
 import Prologue
 
+-- TODO: rename as this isn't a render
 renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -> Graph vertex
 renderTreeGraph = simplify . runGraph . cata toTreeGraph
 

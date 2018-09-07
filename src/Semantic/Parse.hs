@@ -3,6 +3,7 @@ module Semantic.Parse
   ( runParse
   , runPythonParse
   , runRubyParse
+  , runRubyParse'
   , runTypeScriptParse
   , runJSONParse
   ) where
@@ -49,6 +50,11 @@ runRubyParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member
   => [Blob] -> Eff effs [Either SomeException (Term (Sum Ruby.Syntax) ())]
 runRubyParse = flip distributeFor $ \blob ->
     (Right . (() <$) <$> parse rubyParser blob) `catchError` (pure . Left)
+
+runRubyParse' :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
+  => [Blob] -> Eff effs [Either SomeException (Term (Sum Ruby.Syntax) (Record Location))]
+runRubyParse' = flip distributeFor $ \blob ->
+    (Right <$> parse rubyParser blob) `catchError` (pure . Left)
 
 runTypeScriptParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
   => [Blob] -> Eff effs [Either SomeException (Term (Sum TypeScript.Syntax) ())]
