@@ -20,23 +20,21 @@ import           Data.Abstract.Module (ModuleInfo (..))
 import           Data.Abstract.Name
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
+import           Data.Graph (VertexTag (..))
+import qualified Data.Graph as G
 import           Data.Record
 import           Data.Span
-import           Data.Graph (VertexTag(..))
-import qualified Data.Graph as G
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
+import           GHC.Exts (fromList)
 import           Prologue hiding (packageName)
-
--- import Data.Word
-import Proto3.Suite
+import           Proto3.Suite
 import qualified Proto3.Suite as PB
-import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import GHC.Exts (fromList)
+import qualified Proto3.Wire.Encode as Encode
 
 -- | A vertex of representing some node in a control flow graph.
 data ControlFlowVertex

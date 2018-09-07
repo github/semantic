@@ -16,6 +16,7 @@ import Data.Diff
 import Data.JSON.Fields
 import Data.Record
 import Data.Term
+import Data.Graph.DiffVertex
 import Diffing.Algorithm (Diffable)
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
