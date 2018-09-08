@@ -23,9 +23,6 @@ data IsRelative = Unknown | Relative | NonRelative
   deriving (Bounded, Enum, Finite, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField)
 
 instance Primitive IsRelative where
-  -- encodePrimitive = Encode.enum
-  -- decodePrimitive = either (const def) id <$> Decode.enum
-  -- primType _ = Named (Single (nameOf (Proxy @IsRelative)))
   primType _ = primType (Proxy @(Enumerated IsRelative))
   encodePrimitive f = encodePrimitive f . Enumerated . Right
   decodePrimitive   = decodePrimitive >>= \case
