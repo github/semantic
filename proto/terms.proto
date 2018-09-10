@@ -4,11 +4,14 @@ syntax = "proto3";
 package github.semantic;
 
 import "go_term.proto";
+import "haskell_term.proto";
 import "java_term.proto";
 import "json_term.proto";
+import "markdown_term.proto";
 import "python_term.proto";
 import "ruby_term.proto";
 import "typescript_term.proto";
+import "php_term.proto";
 import "types.proto";
 
 option java_package = "com.github.semantic.terms";
@@ -20,10 +23,13 @@ message ParseTree {
   string error = 3;
   oneof response_type {
     goterm.GoTerm go_tree = 4;
-    javaterm.JavaTerm java_tree = 5;
-    jsonterm.JSONTerm json_tree = 6;
-    pythonterm.PythonTerm python_tree = 7;
-    rubyterm.RubyTerm ruby_tree = 8;
-    typescriptterm.TypeScriptTerm typescript_tree = 9;
+    haskellterm.HaskellTerm haskell_tree = 5;
+    javaterm.JavaTerm java_tree = 6;
+    jsonterm.JSONTerm json_tree = 7;
+    markdownterm.MarkdownTerm markdown_tree = 8;
+    pythonterm.PythonTerm python_tree = 9;
+    rubyterm.RubyTerm ruby_tree = 10;
+    typescriptterm.TypeScriptTerm typescript_tree = 11;
+    phpterm.PHPTerm php_tree = 12;
   }
 }

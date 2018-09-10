@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Haskell.Assignment
 ( assignment
 , Syntax
@@ -6,15 +7,16 @@ module Language.Haskell.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error, count)
-import Data.ByteString.Char8 (count)
-import Data.Record
-import Data.Sum
-import Data.Syntax (emptyTerm, handleError, parseError, makeTerm, makeTerm1, makeTerm', makeTerm'', contextualize, postContextualize)
-import Language.Haskell.Grammar as Grammar
+import Prologue
+
+import           Assigning.Assignment hiding (Assignment, Error, count)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Name as Name
+import           Data.ByteString.Char8 (count)
 import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Record
+import           Data.Syntax
+    (contextualize, emptyTerm, handleError, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -22,8 +24,10 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import qualified Data.Diff as Diff
+import           Language.Haskell.Grammar as Grammar
 import qualified Language.Haskell.Syntax as Syntax
-import Prologue
+import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax = '[
     Comment.Comment
@@ -52,7 +56,7 @@ type Syntax = '[
   , Syntax.ConstructorPattern
   , Syntax.ConstructorSymbol
   , Syntax.Context
-  , Syntax.Context'
+  , Syntax.ContextAlt
   , Syntax.CPPDirective
   , Syntax.DefaultDeclaration
   , Syntax.DefaultSignature
@@ -66,7 +70,7 @@ type Syntax = '[
   , Syntax.Field
   , Syntax.FieldBind
   , Syntax.FieldPattern
-  , Syntax.Fixity'
+  , Syntax.FixityAlt
   , Syntax.FunctionalDependency
   , Syntax.FunctionConstructor
   , Syntax.FunctionGuardPattern
@@ -141,8 +145,8 @@ type Syntax = '[
   , Syntax.StrictPattern
   , Syntax.StrictType
   , Syntax.StrictTypeVariable
-  , Syntax.Tuple
   , Syntax.TupleConstructor
+  , Syntax.TupleExpression
   , Syntax.TuplePattern
   , Syntax.Type
   , Syntax.TypeApp
@@ -170,6 +174,11 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+-- For Protobuf serialization
+instance Named1 (Sum Syntax) where nameOf1 _ = "HaskellSyntax"
+instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "HaskellTerm"
+instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "HaskellDiff"
 
 assignment :: Assignment Term
 assignment = handleError $ module' <|> parseError
@@ -250,7 +259,7 @@ constructorSymbol :: Assignment Term
 constructorSymbol = makeTerm <$> symbol ConstructorSymbol <*> (Syntax.ConstructorSymbol . Name.name <$> source)
 
 context' :: Assignment Term
-context' = makeTerm <$> symbol Context <*> children (Syntax.Context' <$> expressions)
+context' = makeTerm <$> symbol Context <*> children (Syntax.ContextAlt <$> expressions)
 
 contextPattern :: Assignment Term
 contextPattern = symbol ContextPattern *> children expressions
@@ -453,7 +462,7 @@ fieldPattern :: Assignment Term
 fieldPattern = makeTerm <$> symbol FieldPattern <*> children (Syntax.FieldPattern <$> expression <*> expressions)
 
 fixityDeclaration :: Assignment Term
-fixityDeclaration = makeTerm <$> symbol FixityDeclaration <*> children (Syntax.Fixity' <$> (integer <|> emptyTerm) <*> manyTerm expression)
+fixityDeclaration = makeTerm <$> symbol FixityDeclaration <*> children (Syntax.FixityAlt <$> (integer <|> emptyTerm) <*> manyTerm expression)
 
 float :: Assignment Term
 float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
@@ -781,7 +790,7 @@ string :: Assignment Term
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 tuple :: Assignment Term
-tuple = makeTerm <$> symbol TupleExpression <*> children (Syntax.Tuple <$> manyTerm expression)
+tuple = makeTerm <$> symbol TupleExpression <*> children (Syntax.TupleExpression <$> manyTerm expression)
 
 tuplePattern :: Assignment Term
 tuplePattern = makeTerm <$> symbol TuplePattern <*> children (Syntax.TuplePattern <$> manyTerm expression)
