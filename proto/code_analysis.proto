@@ -2,19 +2,13 @@ syntax = "proto3";
 
 package github.semantic;
 
-import "go_term.proto";
-import "java_term.proto";
-import "json_term.proto";
 import "python_diff.proto";
-import "python_term.proto";
 import "ruby_diff.proto";
-import "ruby_term.proto";
 import "typescript_diff.proto";
-import "typescript_term.proto";
-import "error_details.proto";
 
 import "types.proto";
-import "apitypes.proto";
+import "terms.proto";
+import "error_details.proto";
 
 option java_package = "com.github.semantic.analysis";
 option go_package = "github.com/semantic/analysis/;analysis";
@@ -67,52 +61,14 @@ message ParseTreeGraph {
   repeated DebugInfo error_info = 2;
 }
 
+// A ParseTreeResponse contains a list of syntax trees, one for each blob passed
+// in the request.
 message ParseTreeResponse {
+  // The list of trees.
   repeated ParseTree trees = 1;
-  DebugInfo error_info = 2; // Top level failure for things like timeouts
+  // Entire response failed (e.g. a timeout)
+  DebugInfo error_info = 2;
 }
-
-// message ParseTree {
-//   Language language = 1;
-//   string path = 2;
-//
-//    // Parse failure for an individual path or language not supported
-//   DebugInfo error_info = 3;
-//
-//   oneof response_type {
-//     // GoResponse go = 4;
-//     // JavaResponse java = 5;
-//     javaterm.JavaTerm term = 5;
-//     // JSONResponse json = 6;
-//     // PythonResponse python = 7;
-//     // RubyResponse ruby = 8;
-//     // TypeScriptResponse typescript = 9;
-//   }
-// }
-
-// message GoResponse {
-//   goterm.GoTerm term = 1;
-// }
-//
-// message JavaResponse {
-//   javaterm.JavaTerm term = 1;
-// }
-//
-// message JSONResponse {
-//   jsonterm.JSONTerm term = 1;
-// }
-//
-// message PythonResponse {
-//   pythonterm.PythonTerm term = 1;
-// }
-//
-// message RubyResponse {
-//   rubyterm.RubyTerm term = 1;
-// }
-//
-// message TypeScriptResponse {
-//   typescriptterm.TypeScriptTerm term = 1;
-// }
 
 // Diff Request & Responses
 //
