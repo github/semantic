@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, FunctionalDependencies #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, FunctionalDependencies #-}
 module Data.Term
 ( Term(..)
 , termIn

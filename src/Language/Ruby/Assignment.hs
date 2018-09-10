@@ -15,7 +15,6 @@ import           Data.Abstract.Name (name)
 import           Data.List (elem)
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Record
-import           Data.Sum
 import           Data.Syntax
     ( contextualize
     , emptyTerm
