@@ -33,24 +33,16 @@
       {+(Plus
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Times
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(LShift
+    {+(Assignment
+      {+(Identifier)+}
+      {+(LShift
         {+(Identifier)+}
-        {+(Integer)+}) })
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Plus
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(RShift
+        {+(Integer)+})+})+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(RShift
         {+(Identifier)+}
-        {+(Integer)+}) })
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(DividedBy
@@ -84,6 +76,16 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Times
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Plus
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(LShift
