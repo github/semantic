@@ -1,11 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, GADTs #-}
 module Data.Abstract.ScopeGraph
-  ( ScopeGraph
+  ( ScopeGraph(..)
   , Path
-  ,  Reference
-  ,  Declaration
-  ,  EdgeLabel
-  ,  Heap
+  , Reference
+  , Declaration
+  , EdgeLabel
+  , Heap
   , frameLookup
   , scopeLookup
   , frameSlots
@@ -13,41 +13,51 @@ module Data.Abstract.ScopeGraph
   , getSlot
   , setSlot
   , lookup
+  , scopeOfRef
   ) where
 
+import Data.Abstract.Name
 import Data.Abstract.Live
-import qualified Data.Map.Monoidal as Monoidal
 import qualified Data.Map.Strict as Map
 import Data.Semigroup.Reducer
 import Prologue
 import Prelude hiding (lookup)
 
-data Scope scopeAddress name term ddata = Scope {
+data Scope scopeAddress term ddata = Scope {
     edges :: Map EdgeLabel [scopeAddress]
-  , references :: Map (Reference name term) (Path scopeAddress name term)
-  , declarations :: Map (Declaration name term) ddata
-}
+  , references :: Map (Reference term) (Path scopeAddress term)
+  , declarations :: Map (Declaration term) ddata
+  } deriving (Eq, Show, Ord)
 
-newtype ScopeGraph scopeAddress name term ddata = ScopeGraph { unScopeGraph :: Map scopeAddress (Scope scopeAddress name term ddata) }
 
-data Path scopeAddress name term where
-  DPath :: Declaration name term -> Path scopeAddress name term
-  EPath :: EdgeLabel -> scopeAddress -> (Path scopeAddress name term) -> Path scopeAddress name term
+newtype ScopeGraph scopeAddress term ddata = ScopeGraph { unScopeGraph :: Map scopeAddress (Scope scopeAddress term ddata) }
 
-pathDeclaration :: Path scope name term -> Declaration name term
+deriving instance (Eq address, Eq term, Eq ddata) => Eq (ScopeGraph address term ddata)
+deriving instance (Show address, Show term, Show ddata) => Show (ScopeGraph address term ddata)
+deriving instance (Ord address, Ord term, Ord ddata) => Ord (ScopeGraph address term ddata)
+
+data Path scopeAddress term where
+  DPath :: Declaration term -> Path scopeAddress term
+  EPath :: EdgeLabel -> scopeAddress -> (Path scopeAddress term) -> Path scopeAddress term
+
+deriving instance (Eq scope, Eq term) => Eq (Path scope term)
+deriving instance (Show scope, Show term) => Show (Path scope term)
+deriving instance (Ord scope, Ord term) => Ord (Path scope term)
+
+pathDeclaration :: Path scope term -> Declaration term
 pathDeclaration (DPath d) = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
 
-pathsOfScope :: Ord scope => scope -> ScopeGraph scope name term ddata -> Maybe (Map (Reference name term) (Path scope name term))
+pathsOfScope :: Ord scope => scope -> ScopeGraph scope term ddata -> Maybe (Map (Reference term) (Path scope term))
 pathsOfScope scope = fmap references . Map.lookup scope . unScopeGraph
 
-ddataOfScope :: Ord scope => scope -> ScopeGraph scope name term ddata -> Maybe (Map (Declaration name term) ddata)
+ddataOfScope :: Ord scope => scope -> ScopeGraph scope term ddata -> Maybe (Map (Declaration term) ddata)
 ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 
-linksOfScope :: Ord scope => scope -> ScopeGraph scope name term ddata -> Maybe (Map EdgeLabel [scope])
+linksOfScope :: Ord scope => scope -> ScopeGraph scope term ddata -> Maybe (Map EdgeLabel [scope])
 linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
 
-scopeOfRef :: (Ord name, Ord term, Ord scope) => (Reference name term) -> ScopeGraph scope name term ddata -> Maybe scope
+scopeOfRef :: (Ord term, Ord scope) => Reference term -> ScopeGraph scope term ddata -> Maybe scope
 scopeOfRef ref graph = go $ Map.keys (unScopeGraph graph)
   where
     go (s : scopes') = case pathsOfScope s graph of
@@ -57,13 +67,13 @@ scopeOfRef ref graph = go $ Map.keys (unScopeGraph graph)
       Nothing -> go scopes'
     go [] = Nothing
 
-pathOfRef :: (Ord name, Ord term, Ord scope) => (Reference name term) -> ScopeGraph scope name term ddata -> Maybe (Path scope name term)
+pathOfRef :: (Ord term, Ord scope) => Reference term -> ScopeGraph scope term ddata -> Maybe (Path scope term)
 pathOfRef ref graph = do
   scope <- scopeOfRef ref graph
   pathsMap <- pathsOfScope scope graph
   Map.lookup ref pathsMap
 
-scopeOfDeclaration :: (Ord name, Ord term, Ord scope) => Declaration name term -> ScopeGraph scope name term ddata -> Maybe scope
+scopeOfDeclaration :: (Ord term, Ord scope) => Declaration term -> ScopeGraph scope term ddata -> Maybe scope
 scopeOfDeclaration declaration graph = go $ Map.keys (unScopeGraph graph)
   where
     go (s : scopes') = case ddataOfScope s graph of
@@ -73,10 +83,10 @@ scopeOfDeclaration declaration graph = go $ Map.keys (unScopeGraph graph)
       Nothing -> go scopes'
     go [] = Nothing
 
-data Reference name term = Reference name term
+data Reference term = Reference Name term
   deriving (Eq, Ord, Show)
 
-data Declaration name term = Declaration name term
+data Declaration term = Declaration Name term
   deriving (Eq, Ord, Show)
 
 data EdgeLabel = P | I
@@ -88,11 +98,11 @@ data Frame scopeAddress frameAddress declaration value = Frame {
   , slots :: Map declaration value
   }
 
-newtype Heap scopeAddress frameAddress declaration value = Heap { unHeap :: Monoidal.Map frameAddress (Frame scopeAddress frameAddress declaration value) }
+newtype Heap scopeAddress frameAddress declaration value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress declaration value) }
 
 -- | Look up the frame for an 'address' in a 'Heap', if any.
 frameLookup :: Ord address => address -> Heap scope address declaration value -> Maybe (Frame scope address declaration value)
-frameLookup address = Monoidal.lookup address . unHeap
+frameLookup address = Map.lookup address . unHeap
 
 -- | Look up the scope address for a given frame address.
 scopeLookup :: Ord address => address -> Heap scope address declaration value -> Maybe scope
@@ -113,10 +123,10 @@ setSlot :: (Ord address, Ord declaration) => address -> declaration -> value -> 
 setSlot address declaration value heap =
     case frameLookup address heap of
       Just frame -> let slotMap = slots frame in
-        Heap $ Monoidal.insert address (frame { slots = (Map.insert declaration value slotMap) }) (unHeap heap)
+        Heap $ Map.insert address (frame { slots = (Map.insert declaration value slotMap) }) (unHeap heap)
       Nothing -> heap
 
-lookup :: (Ord address, Ord scope) => Heap scope address declaration value -> address -> (Path scope name term) -> declaration -> Maybe scope
+lookup :: (Ord address, Ord scope) => Heap scope address declaration value -> address -> (Path scope term) -> declaration -> Maybe scope
 lookup heap address (DPath d) declaration = scopeLookup address heap
 lookup heap address (EPath label scope path) declaration = do
     frame <- frameLookup address heap
@@ -131,7 +141,7 @@ initFrame :: (Ord address, Ord declaration) => scope -> address -> Map EdgeLabel
 initFrame scope address links slots = fillFrame address slots . newFrame scope address links
 
 insertFrame :: Ord address => address -> Frame scope address declaration value -> Heap scope address declaration value -> Heap scope address declaration value
-insertFrame address frame = Heap . Monoidal.insert address frame . unHeap
+insertFrame address frame = Heap . Map.insert address frame . unHeap
 
 fillFrame :: Ord address => address -> Map declaration value -> Heap scope address declaration value -> Heap scope address declaration value
 fillFrame address slots heap =
@@ -140,11 +150,11 @@ fillFrame address slots heap =
     Nothing -> heap
 
 deleteFrame :: Ord address => address -> Heap scope address declaration value -> Heap scope address declaration value
-deleteFrame address = Heap . Monoidal.delete address . unHeap
+deleteFrame address = Heap . Map.delete address . unHeap
 
 -- | The number of frames in the `Heap`.
 heapSize :: Heap scope address declaration value -> Int
-heapSize = Monoidal.size . unHeap
+heapSize = Map.size . unHeap
 
 -- -- | Look up the list of values stored for a given address, if any.
 -- scopeLookupAll :: Ord address => address -> Heap address value -> Maybe [value]
@@ -156,18 +166,18 @@ heapSize = Monoidal.size . unHeap
 
 -- -- | Manually insert a cell into the scope at a given address.
 -- scopeInit :: Ord address => address -> Set value -> Scope address value -> Scope address value
--- scopeInit address cell (Scope h) = Scope (Monoidal.insert address cell h)
+-- scopeInit address cell (Scope h) = Scope (Map.insert address cell h)
 
 -- -- | The number of addresses extant in a 'Scope'.
 -- scopeSize :: Scope address value -> Int
--- scopeSize = Monoidal.size . unScope
+-- scopeSize = Map.size . unScope
 
 -- -- | Restrict a 'Scope' to only those addresses in the given 'Live' set (in essence garbage collecting the rest).
 -- scopeRestrict :: Ord address => Scope address value -> Live address -> Scope address value
--- scopeRestrict (Scope m) roots = Scope (Monoidal.filterWithKey (\ address _ -> address `liveMember` roots) m)
+-- scopeRestrict (Scope m) roots = Scope (Map.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
 -- scopeDelete :: Ord address => address -> Scope address value -> Scope address value
--- scopeDelete addr = Scope . Monoidal.delete addr . unScope
+-- scopeDelete addr = Scope . Map.delete addr . unScope
 
 -- instance (Ord address, Ord value) => Reducer (address, value) (Scope address value) where
 --   unit = Scope . unit
@@ -175,4 +185,4 @@ heapSize = Monoidal.size . unHeap
 --   snoc (Scope scope) (addr, a) = Scope (snoc scope (addr, a))
 
 -- instance (Show address, Show value) => Show (Scope address value) where
---   showsPrec d = showsUnaryWith showsPrec "Scope" d . map (second toList) . Monoidal.pairs . unScope
+--   showsPrec d = showsUnaryWith showsPrec "Scope" d . map (second toList) . Map.pairs . unScope
