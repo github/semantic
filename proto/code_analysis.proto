@@ -11,8 +11,10 @@ import "ruby_diff.proto";
 import "ruby_term.proto";
 import "typescript_diff.proto";
 import "typescript_term.proto";
-import "types.proto";
 import "error_details.proto";
+
+import "types.proto";
+import "apitypes.proto";
 
 option java_package = "com.github.semantic.analysis";
 option go_package = "github.com/semantic/analysis/;analysis";
@@ -65,48 +67,52 @@ message ParseTreeGraph {
   repeated DebugInfo error_info = 2;
 }
 
-
 message ParseTreeResponse {
-  DebugInfo error_info = 1;
-  oneof response_type {
-    GoResponse go = 2;
-    JavaResponse java = 3;
-    JSONResponse json = 4;
-    PythonResponse python = 5;
-    RubyResponse ruby = 6;
-    TypeScriptResponse typescript = 7;
-  }
+  repeated ParseTree trees = 1;
+  DebugInfo error_info = 2; // Top level failure for things like timeouts
 }
 
-message GoResponse {
-  repeated goterm.GoTerm terms = 1;
-  repeated DebugInfo errors = 2;
-}
+// message ParseTree {
+//   Language language = 1;
+//   string path = 2;
+//
+//    // Parse failure for an individual path or language not supported
+//   DebugInfo error_info = 3;
+//
+//   oneof response_type {
+//     // GoResponse go = 4;
+//     // JavaResponse java = 5;
+//     javaterm.JavaTerm term = 5;
+//     // JSONResponse json = 6;
+//     // PythonResponse python = 7;
+//     // RubyResponse ruby = 8;
+//     // TypeScriptResponse typescript = 9;
+//   }
+// }
 
-message JavaResponse {
-  repeated javaterm.JavaTerm terms = 1;
-  repeated DebugInfo errors = 2;
-}
-
-message JSONResponse {
-  repeated jsonterm.JSONTerm terms = 1;
-  repeated DebugInfo errors = 2;
-}
-
-message PythonResponse {
-  repeated pythonterm.PythonTerm terms = 1;
-  repeated DebugInfo errors = 2;
-}
-
-message RubyResponse {
-  repeated rubyterm.RubyTerm terms = 1;
-  repeated DebugInfo errors = 2;
-}
-
-message TypeScriptResponse {
-  repeated typescriptterm.TypeScriptTerm terms = 1;
-  repeated DebugInfo errors = 2;
-}
+// message GoResponse {
+//   goterm.GoTerm term = 1;
+// }
+//
+// message JavaResponse {
+//   javaterm.JavaTerm term = 1;
+// }
+//
+// message JSONResponse {
+//   jsonterm.JSONTerm term = 1;
+// }
+//
+// message PythonResponse {
+//   pythonterm.PythonTerm term = 1;
+// }
+//
+// message RubyResponse {
+//   rubyterm.RubyTerm term = 1;
+// }
+//
+// message TypeScriptResponse {
+//   typescriptterm.TypeScriptTerm term = 1;
+// }
 
 // Diff Request & Responses
 //

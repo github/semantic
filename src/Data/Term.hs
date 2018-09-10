@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, FunctionalDependencies #-}
+{-# LANGUAGE DeriveAnyClass, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, FunctionalDependencies #-}
 module Data.Term
 ( Term(..)
 , termIn
@@ -103,9 +103,27 @@ instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
 instance (Named1 f, Message1 f) => Message (Term f ()) where
-  encodeMessage num (Term (In _ f)) = Encode.embedded num (liftEncodeMessage encodeMessage 1 f)
+  encodeMessage num (Term (In _ f)) =  Encode.embedded num (liftEncodeMessage encodeMessage 1 f)
   decodeMessage num = termIn () . fromMaybe undefined <$> Decode.at (Decode.embedded (liftDecodeMessage decodeMessage 1)) num
   dotProto (_ :: Proxy (Term f ())) = [ DotProtoMessageField (DotProtoField 1 (Prim . Named $ Single (nameOf1 (Proxy @f))) (Single "syntax") [] Nothing) ]
+
+-- -- TODO: Implement these
+-- instance (Named1 f, Message1 f, Foldable f, Message a) => MessageField (Term f a) where
+--   encodeMessageField num = foldMap (Encode.embedded num . encodeMessage 1)
+--   -- encodeMessageField num (Term (In _ f)) = Encode.embedded num (liftEncodeMessage encodeMessageField 1 f)
+--   -- encodeMessageField num (Term (In _ f)) = liftEncodeMessage encodeMessageField num f
+--   decodeMessageField = undefined
+--   protoType = undefined
+--
+-- instance (Eq1 f) => HasDefault (Term f ()) where
+--   def = undefined
+--
+-- deriving instance Message ()
+--
+-- instance Primitive (Term f ()) where
+--   primType = undefined
+--   encodePrimitive = undefined
+--   decodePrimitive = undefined
 
 instance Ord1 f => Ord1 (Term f) where
   liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unTerm t1) (unTerm t2)

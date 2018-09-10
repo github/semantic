@@ -89,6 +89,7 @@ library
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
+                     , Data.ParseTree
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
