@@ -46,6 +46,7 @@ library
                      , Control.Abstract.Primitive
                      , Control.Abstract.PythonPackage
                      , Control.Abstract.Roots
+                     , Control.Abstract.ScopeGraph
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
                      -- Datatypes for abstract interpretation
