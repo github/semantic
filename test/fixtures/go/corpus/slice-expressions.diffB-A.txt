@@ -4,36 +4,50 @@
   (Function
     (Identifier)
     (Statements
-      (Slice
-        (Identifier)
-      { (Integer)
-      ->(Integer) }
-        (Empty)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Empty)
-      { (Integer)
-      ->(Integer) }
-        (Empty))
-      (Slice
-        (Identifier)
-      { (Integer)
-      ->(Empty) }
-      { (Integer)
-      ->(Empty) }
-        (Empty))
-      (Slice
-        (Identifier)
-      { (Integer)
-      ->(Integer) }
-      { (Integer)
-      ->(Integer) }
-      { (Integer)
-      ->(Integer) })
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Empty)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Empty)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Integer)+})+}
       (Slice
       { (Identifier)
       ->(Identifier) }
         (Integer)
-        (Integer)
-        (Empty)))))
+      { (Empty)
+      ->(Integer) }
+        (Empty))
+    {-(Slice
+      {-(Identifier)-}
+      {-(Empty)-}
+      {-(Integer)-}
+      {-(Empty)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Empty)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Integer)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Empty)-})-})))
