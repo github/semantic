@@ -15,7 +15,6 @@ import qualified Data.Abstract.Name as Name
 import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Record
-import           Data.Sum
 import           Data.Syntax
     ( contextualize
     , emptyTerm
