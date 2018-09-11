@@ -21,15 +21,6 @@ enum Language {
   PHP = 11;
 }
 
-enum VertexType {
-  PACKAGE = 0;
-  MODULE = 1;
-  UNKNOWN_MODULE = 2;
-  VARIABLE = 3;
-  METHOD = 4;
-  FUNCTION = 5;
-}
-
 message BlobPair {
   Blob before = 1;
   Blob after = 2;
@@ -41,24 +32,14 @@ message Blob {
   Language blobLanguage = 3;
 }
 
-message Edge {
-  uint64 edgeFrom = 1;
-  uint64 edgeTo = 2;
-}
-
 message ErrorSite {
   string errorMessage = 1;
   SrcLoc errorLocation = 2;
 }
 
-message AdjacencyList {
-  repeated Vertex graphVertices = 1;
-  repeated Edge graphEdges = 2;
-}
-
-message Pos {
-  int64 posLine = 1;
-  int64 posColumn = 2;
+message Position {
+  int64 line = 1;
+  int64 column = 2;
 }
 
 message Project {
@@ -69,8 +50,13 @@ message Project {
 }
 
 message Span {
-  Pos spanStart = 1;
-  Pos spanEnd = 2;
+  Position start = 1;
+  Position end = 2;
+}
+
+message Range {
+  int64 start = 1;
+  int64 end = 2;
 }
 
 message SrcLoc {
@@ -83,8 +69,80 @@ message SrcLoc {
   int64 srcLocEndCol = 7;
 }
 
-message Vertex {
-  VertexType vertexType = 1;
-  string vertexContents = 2;
-  uint64 vertexTag = 3;
+message ControlFlowGraph {
+  repeated ControlFlowVertex vertices = 1;
+  repeated ControlFlowEdge edges = 2;
+}
+
+message ControlFlowEdge {
+  int64 source = 1;
+  int64 target = 2;
+}
+
+message ControlFlowVertex {
+  oneof vertex {
+    Package package = 1;
+    Module module = 2;
+    UnknownModule unknownModule = 3;
+    Variable variable = 4;
+    Method method = 5;
+    Function function = 6;
+  }
+  message Package {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+  }
+  message Module {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+  }
+  message UnknownModule {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+  }
+  message Variable {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string moduleName = 4;
+    Span span = 5;
+  }
+  message Method {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string moduleName = 4;
+    Span span = 5;
+  }
+  message Function {
+    int64 id = 1;
+    string name = 2;
+    string description = 3;
+    string moduleName = 4;
+    Span span = 5;
+  }
+}
+
+message TermGraph {
+  repeated TermVertex vertices = 1;
+  repeated TermEdge edges = 2;
+}
+
+message TermEdge {
+  int64 source = 1;
+  int64 target = 2;
+}
+
+message TermVertex {
+  int64 id = 1;
+  string name = 2;
+  TermAnnotation annotation = 3;
+}
+
+message TermAnnotation {
+  Range range = 1;
+  Span span = 2;
 }

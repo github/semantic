@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Go.Assignment
 ( assignment
 , Syntax
@@ -6,14 +7,14 @@ module Language.Go.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.Name (Name, name)
-import Data.Record
-import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
-import Language.Go.Grammar as Grammar
-import Language.Go.Syntax as Go.Syntax
-import Language.Go.Type as Go.Type
+import Prologue
+
+import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
+import           Data.Abstract.Name (Name, name)
+import           Data.Record
+import           Data.Syntax
+    (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -21,9 +22,12 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
-import Data.Sum
 import qualified Data.Term as Term
-import Prologue
+import qualified Data.Diff as Diff
+import           Language.Go.Grammar as Grammar
+import           Language.Go.Syntax as Go.Syntax hiding (runeLiteral, labelName)
+import           Language.Go.Type as Go.Type
+import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax =
   '[ Comment.Comment
@@ -65,12 +69,6 @@ type Syntax =
    , Expression.Not
    , Expression.Or
    , Expression.XOr
-   , Expression.Call
-   , Expression.Comparison
-   , Expression.Subscript
-   , Statement.PostDecrement
-   , Statement.PostIncrement
-   , Expression.MemberAccess
    , Go.Syntax.Composite
    , Go.Syntax.DefaultPattern
    , Go.Syntax.Defer
@@ -136,6 +134,10 @@ type Syntax =
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
 
+-- For Protobuf serialization
+instance Named1 (Sum Syntax) where nameOf1 _ = "GoSyntax"
+instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "GoTerm"
+instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "GoDiff"
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
 assignment :: Assignment Term

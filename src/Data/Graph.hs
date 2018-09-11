@@ -7,17 +7,22 @@ module Data.Graph
 , Lower(..)
 , simplify
 , topologicalSort
+, VertexTag(..)
+, Edge(..)
+, vertexList
+, edgeList
 ) where
+
+import Prologue
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.AdjacencyMap as A
-import Algebra.Graph.Class (connect, overlay, vertex)
+import           Algebra.Graph.Class (connect, overlay, vertex)
 import qualified Algebra.Graph.Class as Class
-import Control.Monad.Effect
-import Control.Monad.Effect.State
-import Data.Aeson
+import           Control.Monad.Effect
+import           Control.Monad.Effect.State
+import           Data.Aeson
 import qualified Data.Set as Set
-import Prologue
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
@@ -78,10 +83,16 @@ extendVisited f (Visited a b) = Visited (f a) b
 extendOrder :: ([v] -> [v]) -> Visited v -> Visited v
 extendOrder f (Visited a b) = Visited a (f b)
 
-
 toAdjacencyMap :: Ord v => G.Graph v -> A.AdjacencyMap v
 toAdjacencyMap = Class.toGraph
 
+vertexList :: Ord v => Graph v -> [v]
+vertexList = G.vertexList . unGraph
+
+edgeList :: Ord v => Graph v -> [Edge v]
+edgeList = fmap Edge . G.edgeList . unGraph
+
+-- Instances
 
 instance Lower (Graph vertex) where
   lowerBound = Class.empty
@@ -106,12 +117,15 @@ instance Ord vertex => Ord (Graph vertex) where
   compare (Graph (G.Connect a1 a2)) (Graph (G.Connect b1 b2)) = (compare `on` Graph) a1 b1 <> (compare `on` Graph) a2 b2
 
 
-instance (Ord vertex, ToJSON vertex) => ToJSON (Graph vertex) where
-  toJSON     (Graph graph) = object ["vertices" .= G.vertexList graph,   "edges" .= (JSONEdge <$> G.edgeList graph)]
-  toEncoding (Graph graph) = pairs  ("vertices" .= G.vertexList graph <> "edges" .= (JSONEdge <$> G.edgeList graph))
+class VertexTag vertex where
+  uniqueTag :: vertex -> Int
 
-newtype JSONEdge vertex = JSONEdge (vertex, vertex)
+instance (Ord vertex, ToJSON vertex, VertexTag vertex) => ToJSON (Graph vertex) where
+  toJSON     (Graph graph) = object ["vertices" .= G.vertexList graph,   "edges" .= (Edge <$> G.edgeList graph)]
+  toEncoding (Graph graph) = pairs  ("vertices" .= G.vertexList graph <> "edges" .= (Edge <$> G.edgeList graph))
 
-instance ToJSON vertex => ToJSON (JSONEdge vertex) where
-  toJSON     (JSONEdge (a, b)) = object ["source" .= a,   "target" .= b]
-  toEncoding (JSONEdge (a, b)) = pairs  ("source" .= a <> "target" .= b)
+newtype Edge vertex = Edge (vertex, vertex)
+
+instance (ToJSON vertex, VertexTag vertex) => ToJSON (Edge vertex) where
+  toJSON     (Edge (a, b)) = object ["source" .= uniqueTag a,   "target" .= uniqueTag b]
+  toEncoding (Edge (a, b)) = pairs  ("source" .= uniqueTag a <> "target" .= uniqueTag b)

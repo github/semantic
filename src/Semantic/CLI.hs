@@ -60,6 +60,7 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
     diffArgumentsParser = do
       renderer <- flag  (Diff.runDiff SExpressionDiffRenderer) (Diff.runDiff SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                        (Diff.runDiff JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
+              <|> flag'                                        (Diff.runDiff JSONGraphDiffRenderer)     (long "json-graph"    <> help "Output JSON diff trees")
               <|> flag'                                        (Diff.runDiff ToCDiffRenderer)         (long "toc"         <> help "Output JSON table of contents diff summary")
               <|> flag'                                        (Diff.runDiff DOTDiffRenderer)         (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                        (Diff.runDiff ShowDiffRenderer)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
@@ -72,6 +73,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
     parseArgumentsParser = do
       renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
+              <|> flag'                                          (Parse.runParse JSONGraphTermRenderer)     (long "json-graph"    <> help "Output JSON adjacency list")
               <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."

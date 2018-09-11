@@ -43,7 +43,10 @@ spec = parallel $ do
       \sp -> shouldRoundtrip @BlobPair sp
   describe "spans" $
     prop "roundtrips" $
-      \sp -> shouldRoundtrip @Span sp
+      \x -> shouldRoundtrip @Span x 
+  describe "pos" $
+    prop "roundtrips" $
+      \x -> shouldRoundtrip @Pos x
 
   describe "nulls" $
     prop "roundtrips" $

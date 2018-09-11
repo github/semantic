@@ -2,14 +2,8 @@ syntax = "proto3";
 
 package github.semantic;
 
-import "ruby_term.proto";
-import "ruby_diff.proto";
-import "json_term.proto";
-import "typescript_term.proto";
-import "typescript_diff.proto";
-import "python_term.proto";
-import "python_diff.proto";
 import "types.proto";
+import "terms.proto";
 import "error_details.proto";
 
 option java_package = "com.github.semantic.analysis";
@@ -21,6 +15,8 @@ option go_package = "github.com/semantic/analysis/;analysis";
 service CodeAnalysis {
   // Parsing
   //
+  // Parse source code blobs and return abstract syntax trees as adjacency list graph.
+  rpc ParseTreeGraph (ParseTreeRequest) returns (ParseTreeGraphResponse);
   // Parse source code blobs and return abstract syntax trees.
   rpc ParseTree (ParseTreeRequest) returns (ParseTreeResponse);
 
@@ -45,40 +41,48 @@ service CodeAnalysis {
   rpc CheckHealth (HealthCheckRequest) returns (HealthCheckResponse);
 }
 
+// Term Requests and Responses
+//
 message ParseTreeRequest {
   repeated Blob blobs = 1;
 }
 
+
+// A ParseTreeResponse contains a list of syntax trees, one for each blob passed
+// in the request.
 message ParseTreeResponse {
-  oneof response_type {
-    RubyResponse ruby = 1;
-    JSONResponse json = 2;
-    TypeScriptResponse typescript = 3;
-    PythonResponse python = 4;
-  }
-  DebugInfo error_info = 5;
+  // The list of trees.
+  repeated ParseTree trees = 1;
+  // Entire response failed (e.g. a timeout)
+  DebugInfo error_info = 2;
 }
 
-message RubyResponse {
-  repeated rubyterm.RubyTerm terms = 1;
-  repeated DebugInfo errors = 2;
+// A ParseTreeResponse contains a list of syntax trees represented as adjacency
+// graphs, one for each blob passed in the request.
+message ParseTreeGraphResponse {
+  // The list of graphs.
+  repeated ParseTreeGraph graphs = 1;
+  // Entire response failed (e.g. a timeout)
+  DebugInfo error_info = 2;
 }
 
-message JSONResponse {
-  repeated jsonterm.JSONTerm terms = 1;
-  repeated DebugInfo errors = 2;
+message ParseTreeGraph {
+  TermGraph graph = 1;
+  string error = 2;
 }
 
-message TypeScriptResponse {
-  repeated typescriptterm.TypeScriptTerm terms = 1;
-  repeated DebugInfo errors = 2;
+// Diff Request & Responses
+//
+message DiffTreeRequest  {
+  repeated BlobPair blobPairs = 1;
 }
 
-message PythonResponse {
-  repeated pythonterm.PythonTerm terms = 1;
-  repeated DebugInfo errors = 2;
+message DiffTreeResponse {
+  repeated DiffTree diffs = 1;
+  DebugInfo error_info = 2;
 }
 
+// Diff summaries
 message SummarizeDiffRequest  {
   repeated BlobPair blobPairs = 1;
 }
@@ -87,49 +91,6 @@ message SummarizeDiffResponse {
   repeated DiffSummary changes = 1;
   repeated ParseError errors = 2;
   DebugInfo error_info = 3;
-}
-
-message DiffTreeRequest  {
-  repeated BlobPair blobPairs = 1;
-}
-
-message DiffTreeResponse {
-  oneof response_type {
-    RubyDiffResponse ruby = 1;
-    PythonDiffResponse python = 2;
-    TypeScriptDiffResponse typescript = 3;
-  }
-  DebugInfo error_info = 4;
-}
-
-message RubyDiffResponse {
-  repeated rubydiff.RubyDiff diffs = 1;
-}
-
-message PythonDiffResponse {
-  repeated pythondiff.PythonDiff diffs = 1;
-}
-
-message TypeScriptDiffResponse {
-  repeated typescriptdiff.TypeScriptDiff diffs = 1;
-}
-
-message CallGraphRequest {
-  Project project = 1;
-}
-
-message CallGraphResponse {
-  AdjacencyList graph = 1;
-  DebugInfo error_info = 2;
-}
-
-message ImportGraphRequest {
-  Project project = 1;
-}
-
-message ImportGraphResponse {
-  AdjacencyList graph = 1;
-  DebugInfo error_info = 2;
 }
 
 message DiffSummary {
@@ -145,6 +106,27 @@ message ParseError {
   string language = 3;
 }
 
+// Call Graphs
+message CallGraphRequest {
+  Project project = 1;
+}
+
+message CallGraphResponse {
+  ControlFlowGraph graph = 1;
+  DebugInfo error_info = 2;
+}
+
+// Import Graphs
+message ImportGraphRequest {
+  Project project = 1;
+}
+
+message ImportGraphResponse {
+  ControlFlowGraph graph = 1;
+  DebugInfo error_info = 2;
+}
+
+// Health Check
 message HealthCheckRequest {
   string service = 1;
 }
