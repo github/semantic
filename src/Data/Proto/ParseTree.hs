@@ -67,7 +67,7 @@ instance Message ParseTree where
          Just (TypeScriptResponse x) -> Encode.embedded 11 (encodeMessage 1 x)
          Just (PHPResponse x)        -> Encode.embedded 12 (encodeMessage 1 x)
          _ -> mempty
-  decodeMessage = undefined
+  decodeMessage = error "decodeMessage not implemented for ParseTree"
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "Language") (Single "language") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim PB.String) (Single "path") [] Nothing

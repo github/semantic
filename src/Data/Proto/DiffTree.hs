@@ -71,7 +71,7 @@ instance Message DiffTree where
          Just (TypeScriptDiffResponse x) -> Encode.embedded 13 (encodeMessage 1 x)
          Just (PHPDiffResponse x)        -> Encode.embedded 14 (encodeMessage 1 x)
          _ -> mempty
-  decodeMessage = undefined
+  decodeMessage = error "decodeMessage not implemented for DiffTree"
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "Language") (Single "language_before") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim . Named $ Single "Language") (Single "language_after") [] Nothing
