@@ -14,7 +14,6 @@ import Data.Aeson
 import Data.JSON.Fields
 import Proto3.Suite
 import Proto3.Wire.Decode as Decode
-import Proto3.Wire.Encode as Encode
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
