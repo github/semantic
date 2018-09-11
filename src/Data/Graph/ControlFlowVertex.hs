@@ -91,7 +91,7 @@ instance Named (G.Graph ControlFlowVertex) where nameOf _ = "ControlFlowGraph"
 instance Message (G.Graph ControlFlowVertex) where
   encodeMessage _ graph =  encodeMessageField 1 (NestedVec (fromList (G.vertexList graph)))
                         <> encodeMessageField 2 (NestedVec (fromList (G.edgeList graph)))
-  decodeMessage = undefined
+  decodeMessage = error "decodeMessage not implemented for (G.Graph ControlFlowVertex)"
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Repeated . Named $ Single "ControlFlowVertex") (Single "vertices") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Repeated . Named $ Single "ControlFlowEdge")  (Single "edges") [] Nothing
@@ -110,7 +110,7 @@ instance Message ControlFlowVertex where
   encodeMessage _ v@Variable{..}      = Encode.embedded 4 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
   encodeMessage _ v@Method{..}        = Encode.embedded 5 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
   encodeMessage _ v@Function{..}      = Encode.embedded 6 (encodePrimitive 1 (uniqueTag v) <> encodePrimitive 2 vertexName <> encodePrimitive 3 (vertexIdentifier v) <> encodePrimitive 4 vertexModuleName <> Encode.embedded 5 (encodeMessage 1 vertexSpan))
-  decodeMessage = undefined
+  decodeMessage = error "decodeMessage not implemented for ControlFlowVertex"
   dotProto _ =
     [ DotProtoMessageOneOf (Single "vertex")
       [ DotProtoField 1 (Prim . Named $ Single "Package") (Single "package") [] Nothing
@@ -143,7 +143,7 @@ instance Named (G.Edge ControlFlowVertex) where nameOf _ = "ControlFlowEdge"
 
 instance Message (G.Edge ControlFlowVertex) where
   encodeMessage _ (G.Edge (from, to)) = encodePrimitive 1 (uniqueTag from) <> encodePrimitive 2 (uniqueTag to)
-  decodeMessage = undefined
+  decodeMessage = error "decodeMessage not implemented for (G.Edge ControlFlowVertex)"
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "from") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "to")   [] Nothing

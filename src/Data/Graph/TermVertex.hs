@@ -39,7 +39,7 @@ instance Named (Graph TermVertex) where nameOf _ = "TermGraph"
 instance Message (Graph TermVertex) where
   encodeMessage _ graph =  encodeMessageField 1 (NestedVec (fromList (vertexList graph)))
                         <> encodeMessageField 2 (NestedVec (fromList (edgeList graph)))
-  decodeMessage = undefined
+  decodeMessage = error "decodeMessage not implemented for (Graph TermVertex)"
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Repeated . Named $ Single "TermVertex") (Single "vertices") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Repeated . Named $ Single "TermEdge")  (Single "edges") [] Nothing
@@ -48,7 +48,7 @@ instance Message (Graph TermVertex) where
 instance Named (Edge TermVertex) where nameOf _ = "TermEdge"
 instance Message (Edge TermVertex) where
   encodeMessage _ (Edge (from, to)) = encodePrimitive 1 (uniqueTag from) <> encodePrimitive 2 (uniqueTag to)
-  decodeMessage = undefined
+  decodeMessage = error "decodeMessage not implemented for (Edge TermVertex)"
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "from") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "to")   [] Nothing
