@@ -75,8 +75,8 @@ message ControlFlowGraph {
 }
 
 message ControlFlowEdge {
-  int64 from = 1;
-  int64 to = 2;
+  int64 source = 1;
+  int64 target = 2;
 }
 
 message ControlFlowVertex {
@@ -132,8 +132,8 @@ message TermGraph {
 }
 
 message TermEdge {
-  int64 from = 1;
-  int64 to = 2;
+  int64 source = 1;
+  int64 target = 2;
 }
 
 message TermVertex {

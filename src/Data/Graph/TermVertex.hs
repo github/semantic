@@ -50,8 +50,8 @@ instance Message (Edge TermVertex) where
   encodeMessage _ (Edge (from, to)) = encodePrimitive 1 (uniqueTag from) <> encodePrimitive 2 (uniqueTag to)
   decodeMessage = error "decodeMessage not implemented for (Edge TermVertex)"
   dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "from") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "to")   [] Nothing
+    [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "source") [] Nothing
+    , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "target")   [] Nothing
     ]
 
 instance Message TermVertex where
