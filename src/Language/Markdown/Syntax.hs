@@ -8,7 +8,6 @@ import           Diffing.Algorithm
 import           Prologue hiding (Text)
 import           Proto3.Suite
 import qualified Proto3.Suite as PB
-import qualified Proto3.Wire.Encode as Encode
 
 newtype Document a = Document { values :: [a] }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, ToJSONFields1, Named1, Message1)
@@ -118,7 +117,7 @@ data Link a = Link { linkURL :: T.Text, linkTitle :: Maybe T.Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, ToJSONFields1, Named1)
 
 instance Message1 Link where
-  liftEncodeMessage _ num Link{..} = encodeMessageField 1 linkURL <> maybe mempty (encodeMessageField 2) linkTitle
+  liftEncodeMessage _ _ Link{..} = encodeMessageField 1 linkURL <> maybe mempty (encodeMessageField 2) linkTitle
   liftDecodeMessage = undefined
   liftDotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim PB.String) (Single "linkUrl") [] Nothing
@@ -133,7 +132,7 @@ data Image a = Image { imageURL :: T.Text, imageTitle :: Maybe T.Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, ToJSONFields1, Named1)
 
 instance Message1 Image where
-  liftEncodeMessage _ num Image{..} = encodeMessageField 1 imageURL <> maybe mempty (encodeMessageField 2) imageTitle
+  liftEncodeMessage _ _ Image{..} = encodeMessageField 1 imageURL <> maybe mempty (encodeMessageField 2) imageTitle
   liftDecodeMessage = undefined
   liftDotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim PB.String) (Single "imageURL") [] Nothing
@@ -148,7 +147,7 @@ data Code a = Code { codeLanguage :: Maybe T.Text, codeContent :: T.Text }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, ToJSONFields1, Named1)
 
 instance Message1 Code where
-  liftEncodeMessage _ num Code{..} = maybe mempty (encodeMessageField 1) codeLanguage <> encodeMessageField 2 codeContent
+  liftEncodeMessage _ _ Code{..} = maybe mempty (encodeMessageField 1) codeLanguage <> encodeMessageField 2 codeContent
   liftDecodeMessage = undefined
   liftDotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim PB.String) (Single "codeLanguage") [] Nothing
