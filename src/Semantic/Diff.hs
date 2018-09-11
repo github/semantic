@@ -28,7 +28,7 @@ import qualified Rendering.JSON as JSON
 runDiff :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
 runDiff JSONDiffRenderer        = withParsedBlobPairs (const pure) (render . renderJSONDiff) >=> serialize JSON
-runDiff JSONAdjDiffRenderer     = withParsedBlobPairs (const pure) (render . renderAdjGraph) >=> serialize JSON
+runDiff JSONGraphDiffRenderer     = withParsedBlobPairs (const pure) (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph DiffVertex (Base t)) => BlobPair -> t -> JSON.JSON "diffs" SomeJSON
         renderAdjGraph blob diff = renderJSONAdjDiff blob (renderTreeGraph diff)
 runDiff SExpressionDiffRenderer = withParsedBlobPairs (const pure) (const (serialize (SExpression ByConstructorName)))
