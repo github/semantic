@@ -4,7 +4,6 @@ module Data.Proto.DiffTree (DiffTree(..), ResponseType(..)) where
 import Prologue
 
 import           Data.Language
-import           Data.Term
 import           Data.Diff
 import qualified Language.Go.Assignment as Go
 import qualified Language.Haskell.Assignment as Haskell
