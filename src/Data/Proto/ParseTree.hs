@@ -35,12 +35,28 @@ data ParseTree
   , responseType :: Maybe ResponseType
   } deriving (Eq, Show, Generic, Named)
 
+data ResponseType
+  = ParseError String
+  | GoResponse GoTerm
+  | HaskellResponse HaskellTerm
+  | JavaResponse JavaTerm
+  | JSONResponse JSONTerm
+  | MarkdownResponse MarkdownTerm
+  | PythonResponse PythonTerm
+  | RubyResponse RubyTerm
+  | TypeScriptResponse TypeScriptTerm
+  | PHPResponse PHPTerm
+  deriving (Eq, Show)
+
+
+-- Instances
+
 instance Message ParseTree where
   encodeMessage _ ParseTree{..}
     =  encodeMessageField 1 language
     <> encodeMessageField 2 path
     <> case responseType of
-         Just (ParseError x)              -> Encode.embedded 3 (encodeMessageField 1 x)
+         Just (ParseError x)         -> Encode.embedded 3 (encodeMessageField 1 x)
          Just (GoResponse x)         -> Encode.embedded 4 (encodeMessage 1 x)
          Just (HaskellResponse x)    -> Encode.embedded 5 (encodeMessage 1 x)
          Just (JavaResponse x)       -> Encode.embedded 6 (encodeMessage 1 x)
@@ -68,16 +84,3 @@ instance Message ParseTree where
       , DotProtoField 12 (Prim . Named $ Dots (Path ["phpterm", "PHPTerm"])) (Single "php_tree") [] Nothing
       ]
     ]
-
-data ResponseType
-  = ParseError String
-  | GoResponse GoTerm
-  | HaskellResponse HaskellTerm
-  | JavaResponse JavaTerm
-  | JSONResponse JSONTerm
-  | MarkdownResponse MarkdownTerm
-  | PythonResponse PythonTerm
-  | RubyResponse RubyTerm
-  | TypeScriptResponse TypeScriptTerm
-  | PHPResponse PHPTerm
-  deriving (Eq, Show)
