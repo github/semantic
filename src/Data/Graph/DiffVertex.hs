@@ -11,12 +11,9 @@ module Data.Graph.DiffVertex
 , TermAnnotation(..)
 ) where
 
-import Prologue
 import Data.Graph
 import Data.Graph.TermVertex
 import Data.Aeson
-import Data.Range
-import Data.Span
 import Data.JSON.Fields
 import qualified Data.Text as T
 
