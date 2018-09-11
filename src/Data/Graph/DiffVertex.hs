@@ -89,7 +89,5 @@ instance ToJSON DiffVertex where
   toJSON (DiffVertex i (Inserted t)) = object [ "id" .= T.pack (show i), "inserted" .= t ]
   toJSON (DiffVertex i (Replaced t)) = object [ "id" .= T.pack (show i), "replaced" .= t ]
   toJSON (DiffVertex i (Merged t))   = object [ "id" .= T.pack (show i), "merged"   .= t ]
-  -- TODO
-  -- toEncoding = undefined
 
 instance VertexTag DiffVertex where uniqueTag = diffVertexId
