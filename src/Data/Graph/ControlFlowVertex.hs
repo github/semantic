@@ -33,7 +33,6 @@ import           GHC.Exts (fromList)
 import           Prologue hiding (packageName)
 import           Proto3.Suite
 import qualified Proto3.Suite as PB
-import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
 
 -- | A vertex of representing some node in a control flow graph.

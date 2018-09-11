@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Markdown.Assignment
 ( assignment
 , Syntax
@@ -12,7 +13,6 @@ import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
 import           Data.Record
-import           Data.Sum
 import           Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import qualified Data.Term as Term
