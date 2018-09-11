@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, GADTs #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving #-}
 module Data.Abstract.ScopeGraph
   ( ScopeGraph(..)
   , Path
@@ -14,79 +14,97 @@ module Data.Abstract.ScopeGraph
   , setSlot
   , lookup
   , scopeOfRef
+  , declare
+  , emptyGraph
   ) where
 
-import Data.Abstract.Name
-import Data.Abstract.Live
+import           Data.Abstract.Live
+import           Data.Abstract.Name
 import qualified Data.Map.Strict as Map
-import Data.Semigroup.Reducer
-import Prologue
-import Prelude hiding (lookup)
+import           Data.Semigroup.Reducer
+import           Prelude hiding (lookup)
+import           Prologue
 
-data Scope scopeAddress term ddata = Scope {
-    edges :: Map EdgeLabel [scopeAddress]
-  , references :: Map (Reference term) (Path scopeAddress term)
-  , declarations :: Map (Declaration term) ddata
+data Scope scopeAddress ddata = Scope {
+    edges        :: Map EdgeLabel [scopeAddress]
+  , references   :: Map Reference (Path scopeAddress)
+  , declarations :: Map Declaration ddata
   } deriving (Eq, Show, Ord)
 
 
-newtype ScopeGraph scopeAddress term ddata = ScopeGraph { unScopeGraph :: Map scopeAddress (Scope scopeAddress term ddata) }
+data ScopeGraph scope ddata = ScopeGraph { unScopeGraph :: (Map scope (Scope scope ddata), scope) }
 
-deriving instance (Eq address, Eq term, Eq ddata) => Eq (ScopeGraph address term ddata)
-deriving instance (Show address, Show term, Show ddata) => Show (ScopeGraph address term ddata)
-deriving instance (Ord address, Ord term, Ord ddata) => Ord (ScopeGraph address term ddata)
+emptyGraph :: scope -> ScopeGraph scope ddata
+emptyGraph scope = ScopeGraph (Map.singleton scope (Scope mempty mempty mempty), scope)
 
-data Path scopeAddress term where
-  DPath :: Declaration term -> Path scopeAddress term
-  EPath :: EdgeLabel -> scopeAddress -> (Path scopeAddress term) -> Path scopeAddress term
+deriving instance (Eq address, Eq ddata) => Eq (ScopeGraph address ddata)
+deriving instance (Show address, Show ddata) => Show (ScopeGraph address ddata)
+deriving instance (Ord address, Ord ddata) => Ord (ScopeGraph address ddata)
 
-deriving instance (Eq scope, Eq term) => Eq (Path scope term)
-deriving instance (Show scope, Show term) => Show (Path scope term)
-deriving instance (Ord scope, Ord term) => Ord (Path scope term)
+data Path scopeAddress where
+  DPath :: Declaration -> Path scopeAddress
+  EPath :: EdgeLabel -> scopeAddress -> Path scopeAddress  -> Path scopeAddress
 
-pathDeclaration :: Path scope term -> Declaration term
-pathDeclaration (DPath d) = d
+deriving instance Eq scope => Eq (Path scope)
+deriving instance Show scope => Show (Path scope)
+deriving instance Ord scope => Ord (Path scope)
+
+pathDeclaration :: Path scope -> Declaration
+pathDeclaration (DPath d)     = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
 
-pathsOfScope :: Ord scope => scope -> ScopeGraph scope term ddata -> Maybe (Map (Reference term) (Path scope term))
-pathsOfScope scope = fmap references . Map.lookup scope . unScopeGraph
+pathsOfScope :: Ord scope => scope -> ScopeGraph scope ddata -> Maybe (Map Reference (Path scope))
+pathsOfScope scope = fmap references . Map.lookup scope . fst . unScopeGraph
 
-ddataOfScope :: Ord scope => scope -> ScopeGraph scope term ddata -> Maybe (Map (Declaration term) ddata)
-ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
+ddataOfScope :: Ord scope => scope -> ScopeGraph scope ddata -> Maybe (Map Declaration  ddata)
+ddataOfScope scope = fmap declarations . Map.lookup scope . fst . unScopeGraph
 
-linksOfScope :: Ord scope => scope -> ScopeGraph scope term ddata -> Maybe (Map EdgeLabel [scope])
-linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
+linksOfScope :: Ord scope => scope -> ScopeGraph scope ddata -> Maybe (Map EdgeLabel [scope])
+linksOfScope scope = fmap edges . Map.lookup scope . fst . unScopeGraph
 
-scopeOfRef :: (Ord term, Ord scope) => Reference term -> ScopeGraph scope term ddata -> Maybe scope
-scopeOfRef ref graph = go $ Map.keys (unScopeGraph graph)
+lookupScope :: Ord scope => scope -> ScopeGraph scope ddata -> Maybe (Scope scope ddata)
+lookupScope scope = Map.lookup scope . fst . unScopeGraph
+
+currentScope :: ScopeGraph scope ddata -> scope
+currentScope = snd . unScopeGraph
+
+declare :: Ord scope => Declaration -> ddata -> ScopeGraph scope ddata -> ScopeGraph scope ddata
+declare declaration ddata graph = let scopeKey = currentScope graph
+  in case lookupScope scopeKey graph of
+    Just scope -> let newScope = scope { declarations = Map.insert declaration ddata (declarations scope) }
+      in graph { unScopeGraph = (Map.insert scopeKey newScope (fst $ unScopeGraph graph), scopeKey) }
+    Nothing -> graph
+
+scopeOfRef :: Ord scope => Reference -> ScopeGraph scope ddata -> Maybe scope
+scopeOfRef ref graph = go . Map.keys . fst $ unScopeGraph graph
   where
     go (s : scopes') = case pathsOfScope s graph of
       Just pathMap -> case Map.lookup ref pathMap of
-        Just _ -> Just s
+        Just _  -> Just s
         Nothing -> go scopes'
       Nothing -> go scopes'
     go [] = Nothing
 
-pathOfRef :: (Ord term, Ord scope) => Reference term -> ScopeGraph scope term ddata -> Maybe (Path scope term)
+pathOfRef :: (Ord scope) => Reference -> ScopeGraph scope ddata -> Maybe (Path scope)
 pathOfRef ref graph = do
   scope <- scopeOfRef ref graph
   pathsMap <- pathsOfScope scope graph
   Map.lookup ref pathsMap
 
-scopeOfDeclaration :: (Ord term, Ord scope) => Declaration term -> ScopeGraph scope term ddata -> Maybe scope
-scopeOfDeclaration declaration graph = go $ Map.keys (unScopeGraph graph)
+scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope ddata -> Maybe scope
+scopeOfDeclaration declaration graph = go . Map.keys . fst $ (unScopeGraph graph)
   where
     go (s : scopes') = case ddataOfScope s graph of
       Just ddataMap -> case Map.lookup declaration ddataMap of
-        Just _ -> Just s
+        Just _  -> Just s
         Nothing -> go scopes'
       Nothing -> go scopes'
     go [] = Nothing
 
-data Reference term = Reference Name term
+newtype Reference = Reference Name
   deriving (Eq, Ord, Show)
 
-data Declaration term = Declaration Name term
+newtype Declaration = Declaration Name
   deriving (Eq, Ord, Show)
 
 data EdgeLabel = P | I
@@ -94,8 +112,8 @@ data EdgeLabel = P | I
 
 data Frame scopeAddress frameAddress declaration value = Frame {
     scopeAddress :: scopeAddress
-  , links :: Map EdgeLabel (Map scopeAddress frameAddress)
-  , slots :: Map declaration value
+  , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
+  , slots        :: Map declaration value
   }
 
 newtype Heap scopeAddress frameAddress declaration value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress declaration value) }
@@ -126,7 +144,7 @@ setSlot address declaration value heap =
         Heap $ Map.insert address (frame { slots = (Map.insert declaration value slotMap) }) (unHeap heap)
       Nothing -> heap
 
-lookup :: (Ord address, Ord scope) => Heap scope address declaration value -> address -> (Path scope term) -> declaration -> Maybe scope
+lookup :: (Ord address, Ord scope) => Heap scope address declaration value -> address -> Path scope -> declaration -> Maybe scope
 lookup heap address (DPath d) declaration = scopeLookup address heap
 lookup heap address (EPath label scope path) declaration = do
     frame <- frameLookup address heap
@@ -147,7 +165,7 @@ fillFrame :: Ord address => address -> Map declaration value -> Heap scope addre
 fillFrame address slots heap =
   case frameLookup address heap of
     Just frame -> insertFrame address (frame { slots = slots }) heap
-    Nothing -> heap
+    Nothing    -> heap
 
 deleteFrame :: Ord address => address -> Heap scope address declaration value -> Heap scope address declaration value
 deleteFrame address = Heap . Map.delete address . unHeap
