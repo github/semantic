@@ -139,6 +139,7 @@ message TermEdge {
 message TermVertex {
   int64 id = 1;
   string name = 2;
+  TermAnnotation annotation = 3;
 }
 
 message TermAnnotation {

@@ -68,7 +68,7 @@ instance (ConstructorName syntax, Foldable syntax, HasField fields Range, HasFie
     termAlgebra (In ann syntax) = do
       i <- fresh
       parent <- ask
-      let root = vertex (TermVertex i (constructorName syntax) (getField ann) (getField ann))
+      let root = vertex (TermVertex i (constructorName syntax) (TermAnnotation (getField ann) (getField ann)))
       subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
       pure (parent `connect` root `overlay` subGraph)
 

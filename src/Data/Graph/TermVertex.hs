@@ -23,8 +23,7 @@ data TermVertex
   = TermVertex
   { vertexId :: Int
   , vertexTermName :: String
-  , vertexRange :: Range
-  , vertexSpan :: Span
+  , vertexAnnotation :: TermAnnotation
   } deriving (Eq, Ord, Show, Generic, Named)
 
 data TermAnnotation
@@ -56,12 +55,20 @@ instance Message (Edge TermVertex) where
     ]
 
 instance Message TermVertex where
-  encodeMessage _ TermVertex{..} = encodeMessageField 1 vertexId <> encodeMessageField 2 vertexTermName -- Encode.embedded 1 (encodeMessage 0 vertexId) <> Encode.embedded 2 (encodeMessage 0 vertexTermName)
-  decodeMessage _ = TermVertex <$> Decode.at decodeMessageField 1 <*> Decode.at decodeMessageField 2 <*> pure lowerBound <*> pure lowerBound -- TODO <*> embeddedAt (decodeMessage 0) 1 <*> embeddedAt (decodeMessage 0) 2
+  encodeMessage _ TermVertex{..}
+    =  encodeMessageField 1 vertexId
+    <> encodeMessageField 2 vertexTermName
+    <> Encode.embedded 3 (encodeMessage 0 vertexAnnotation)
+  decodeMessage _
+    =   TermVertex
+    <$> Decode.at decodeMessageField 1
+    <*> Decode.at decodeMessageField 2
+    <*> embeddedAt (decodeMessage 0) 3
     where embeddedAt parser = Decode.at (Decode.embedded'' parser)
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "id") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim PB.String) (Single "name") [] Nothing
+    , DotProtoMessageField $ DotProtoField 3 (Prim . Named $ Single "TermAnnotation") (Single "annotation") [] Nothing
     ]
 
 instance VertexTag TermVertex where uniqueTag = vertexId
@@ -69,14 +76,12 @@ instance VertexTag TermVertex where uniqueTag = vertexId
 instance ToJSON TermVertex where
   toJSON TermVertex{..} = object $
     [ "id"   .= vertexId
-    , "term" .= vertexTermName ]
-    <> toJSONFields vertexRange
-    <> toJSONFields vertexSpan
+    , "term" .= vertexTermName
+    ] <> toJSONFields vertexAnnotation
   toEncoding TermVertex{..} = pairs . fold $
       "id"   .= vertexId
-    : "name" .= vertexTermName
-    : toJSONFields vertexRange
-    <> toJSONFields vertexSpan
+    : "term" .= vertexTermName
+    : toJSONFields vertexAnnotation
 
 instance Message TermAnnotation where
   encodeMessage _ TermAnnotation{..} = Encode.embedded 1 (encodeMessage 0 range) <> Encode.embedded 2 (encodeMessage 0 span)
