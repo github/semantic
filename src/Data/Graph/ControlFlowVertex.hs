@@ -145,8 +145,8 @@ instance Message (G.Edge ControlFlowVertex) where
   encodeMessage _ (G.Edge (from, to)) = encodePrimitive 1 (uniqueTag from) <> encodePrimitive 2 (uniqueTag to)
   decodeMessage = error "decodeMessage not implemented for (G.Edge ControlFlowVertex)"
   dotProto _ =
-    [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "from") [] Nothing
-    , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "to")   [] Nothing
+    [ DotProtoMessageField $ DotProtoField 1 (Prim PB.Int64) (Single "source") [] Nothing
+    , DotProtoMessageField $ DotProtoField 2 (Prim PB.Int64) (Single "target")   [] Nothing
     ]
 
 
