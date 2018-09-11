@@ -24,10 +24,6 @@ import Semantic.Task as Task
 import Serializing.Format
 import Rendering.JSON (SomeJSON (..))
 import qualified Rendering.JSON as JSON
-import qualified Language.TypeScript.Assignment as TypeScript
-import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.JSON.Assignment as JSON
-import qualified Language.Python.Assignment as Python
 
 runDiff :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON

@@ -99,5 +99,3 @@ instance (ConstructorName syntax, Foldable syntax, HasField fields1 Range, HasFi
         let root = vertex (DiffVertex i a)
         subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
         pure (parent `connect` root `overlay` subGraph)
-
-      -- flatTerm (n, r, s) = FlatTerm n r s
