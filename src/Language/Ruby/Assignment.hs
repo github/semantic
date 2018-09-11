@@ -37,7 +37,7 @@ import qualified Data.Term as Term
 import qualified Data.Diff as Diff
 import           Language.Ruby.Grammar as Grammar
 import qualified Language.Ruby.Syntax as Ruby.Syntax
-import           Prologue hiding (for)
+import           Prologue hiding (for, unless)
 import           Proto3.Suite (Named (..), Named1 (..))
 
 -- | The type of Ruby syntax.
