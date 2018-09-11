@@ -51,14 +51,18 @@ message ParseTreeRequest {
   repeated Blob blobs = 1;
 }
 
+// A ParseTreeResponse contains a list of syntax trees represented as adjacency
+// graphs, one for each blob passed in the request.
 message ParseTreeGraphResponse {
-  ParseTreeGraph response = 1;
+  // The list of graphs.
+  repeated ParseTreeGraph graphs = 1;
+  // Entire response failed (e.g. a timeout)
   DebugInfo error_info = 2;
 }
 
 message ParseTreeGraph {
-  repeated TermGraph graphs = 1;
-  repeated DebugInfo error_info = 2;
+  TermGraph graph = 1;
+  string error = 2;
 }
 
 // A ParseTreeResponse contains a list of syntax trees, one for each blob passed

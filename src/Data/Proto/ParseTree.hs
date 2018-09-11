@@ -32,7 +32,6 @@ data ParseTree
   = ParseTree
   { language :: Language
   , path :: FilePath
-  , error :: String -- TODO: make parse of oneof error
   , responseType :: Maybe ResponseType
   } deriving (Eq, Show, Generic, Named)
 
@@ -40,8 +39,8 @@ instance Message ParseTree where
   encodeMessage _ ParseTree{..}
     =  encodeMessageField 1 language
     <> encodeMessageField 2 path
-    <> encodeMessageField 3 error
     <> case responseType of
+         Just (ParseError x)              -> Encode.embedded 3 (encodeMessageField 1 x)
          Just (GoResponse x)         -> Encode.embedded 4 (encodeMessage 1 x)
          Just (HaskellResponse x)    -> Encode.embedded 5 (encodeMessage 1 x)
          Just (JavaResponse x)       -> Encode.embedded 6 (encodeMessage 1 x)
@@ -56,9 +55,9 @@ instance Message ParseTree where
   dotProto _ =
     [ DotProtoMessageField $ DotProtoField 1 (Prim . Named $ Single "Language") (Single "language") [] Nothing
     , DotProtoMessageField $ DotProtoField 2 (Prim PB.String) (Single "path") [] Nothing
-    , DotProtoMessageField $ DotProtoField 3 (Prim PB.String) (Single "error") [] Nothing
     , DotProtoMessageOneOf (Single "response_type")
-      [ DotProtoField 4 (Prim . Named $ Dots (Path ["goterm", "GoTerm"])) (Single "go_tree") [] Nothing
+      [ DotProtoField 3 (Prim PB.String) (Single "error") [] Nothing
+      , DotProtoField 4 (Prim . Named $ Dots (Path ["goterm", "GoTerm"])) (Single "go_tree") [] Nothing
       , DotProtoField 5 (Prim . Named $ Dots (Path ["haskellterm", "HaskellTerm"])) (Single "haskell_tree") [] Nothing
       , DotProtoField 6 (Prim . Named $ Dots (Path ["javaterm", "JavaTerm"])) (Single "java_tree") [] Nothing
       , DotProtoField 7 (Prim . Named $ Dots (Path ["jsonterm", "JSONTerm"])) (Single "json_tree") [] Nothing
@@ -71,7 +70,8 @@ instance Message ParseTree where
     ]
 
 data ResponseType
-  = GoResponse GoTerm
+  = ParseError String
+  | GoResponse GoTerm
   | HaskellResponse HaskellTerm
   | JavaResponse JavaTerm
   | JSONResponse JSONTerm

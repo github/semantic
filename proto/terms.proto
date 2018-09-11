@@ -20,8 +20,8 @@ option go_package = "github.com/semantic/terms;types";
 message ParseTree {
   Language language = 1;
   string path = 2;
-  string error = 3;
   oneof response_type {
+    string error = 3;
     goterm.GoTerm go_tree = 4;
     haskellterm.HaskellTerm haskell_tree = 5;
     javaterm.JavaTerm java_tree = 6;
