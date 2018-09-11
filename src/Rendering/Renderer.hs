@@ -36,7 +36,7 @@ data DiffRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to JSON as an adjacency list.
-  JSONAdjDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
+  JSONGraphDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
@@ -52,7 +52,7 @@ data TermRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
   JSONTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to JSON as an adjacency list represenation.
-  JSONAdjTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
+  JSONGraphTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of symbols.
