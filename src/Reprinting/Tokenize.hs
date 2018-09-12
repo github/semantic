@@ -73,27 +73,25 @@ instance Applicative Tokenizer where
 
 instance Monad Tokenizer where (>>=) = Bind
 
-
 data Strategy
   = Reprinting
   | PrettyPrinting
     deriving (Eq, Show)
 
 data State = State
-  { _source   :: Source   -- We need to be able to slice
-  , _history  :: History  -- What's the history of the term we're examining
-  , _strategy :: Strategy -- What are we doing right now?
-  , _cursor   :: Int      -- Where do we begin slices?
-  , _enabled  :: Bool     -- Should we ignore ddata tokens
+  { source   :: Source   -- We need to be able to slice
+  , history  :: History  -- What's the history of the term we're examining
+  , strategy :: Strategy -- What are we doing right now?
+  , cursor   :: Int      -- Where do we begin slices?
+  , enabled  :: Bool     -- Should we ignore data tokens?
   } deriving (Show, Eq)
-
 
 -- Builtins
 
 -- | Yield an 'Element' token in a 'Tokenizer' context.
 yield :: Element -> Tokenizer ()
 yield e = do
-  on <- _enabled <$> Get
+  on <- enabled <$> Get
   when on . Tell . TElement $ e
 
 -- | Yield a 'Control' token.
@@ -107,9 +105,9 @@ chunk = Tell . Chunk
 -- | Ensures that the final chunk is emitted
 finish :: Tokenizer ()
 finish = do
-  crs <- asks _cursor
+  crs <- asks cursor
   log ("Finishing, cursor is " <> show crs)
-  src <- asks _source
+  src <- asks source
   chunk (dropSource crs src)
 
 -- State handling
@@ -121,28 +119,28 @@ modify :: (State -> State) -> Tokenizer ()
 modify f = Get >>= \x -> Put . f $! x
 
 enable, disable :: Tokenizer ()
-enable  = modify (\x -> x { _enabled = True })
-disable = modify (\x -> x { _enabled = False})
+enable  = modify (\x -> x { enabled = True })
+disable = modify (\x -> x { enabled = False})
 
 move :: Int -> Tokenizer ()
-move c = modify (\x -> x { _cursor = c })
+move c = modify (\x -> x { cursor = c })
 
 withHistory :: (Annotated t (Record fields), HasField fields History)
             => t
             -> Tokenizer a
             -> Tokenizer a
 withHistory t act = do
-  old <- asks _history
-  modify (\x -> x { _history = getField (annotation t)})
-  act <* modify (\x -> x { _history = old })
+  old <- asks history
+  modify (\x -> x { history = getField (annotation t)})
+  act <* modify (\x -> x { history = old })
 
 withStrategy :: Strategy -> Tokenizer a -> Tokenizer a
 withStrategy s act = do
   old <- Get
-  Put (old { _strategy = s })
+  Put (old { strategy = s })
   res <- act
   new <- Get
-  Put (new { _strategy = _strategy old })
+  Put (new { strategy = strategy old })
   pure res
 
 -- The reprinting algorithm.
