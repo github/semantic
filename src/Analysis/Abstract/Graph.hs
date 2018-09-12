@@ -1,7 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
-, Vertex(..)
+, ControlFlowVertex(..)
 , moduleVertex
 , unknownModuleVertex
 , style
@@ -28,14 +28,14 @@ import           Data.Abstract.Module (Module (moduleInfo), ModuleInfo (..))
 import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
-import           Data.Graph.Vertex
+import           Data.Graph.ControlFlowVertex
 import           Data.Record
 import           Data.Term
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue hiding (project)
 
-style :: Style Vertex Builder
+style :: Style ControlFlowVertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
@@ -65,11 +65,11 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
 graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (Reader Span) effects
                  , Member (Env (Hole context (Located address))) effects
-                 , Member (State (Graph Vertex)) effects
-                 , Member (State (Map (Hole context (Located address)) Vertex)) effects
+                 , Member (State (Graph ControlFlowVertex)) effects
+                 , Member (State (Map (Hole context (Located address)) ControlFlowVertex)) effects
                  , Member (Resumable (BaseError (EnvironmentError (Hole context (Located address))))) effects
                  , AbstractValue (Hole context (Located address)) value effects
-                 , Member (Reader Vertex) effects
+                 , Member (Reader ControlFlowVertex) effects
                  , HasField fields Span
                  , VertexDeclaration syntax
                  , Declarations1 syntax
@@ -108,8 +108,8 @@ graphingTerms recur term@(In a syntax) = do
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) effects
-                    , Member (State (Graph Vertex)) effects
-                    , Member (Reader Vertex) effects
+                    , Member (State (Graph ControlFlowVertex)) effects
+                    , Member (Reader ControlFlowVertex) effects
                     )
                  => SubtermAlgebra Module term (TermEvaluator term address value effects a)
                  -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
@@ -120,8 +120,8 @@ graphingPackages recur m =
 graphingModules :: forall term address value effects a
                 .  ( Member (Modules address) effects
                    , Member (Reader ModuleInfo) effects
-                   , Member (State (Graph Vertex)) effects
-                   , Member (Reader Vertex) effects
+                   , Member (State (Graph ControlFlowVertex)) effects
+                   , Member (Reader ControlFlowVertex) effects
                    , PureEffects effects
                    )
                 => SubtermAlgebra Module term (TermEvaluator term address value effects a)
@@ -160,10 +160,10 @@ graphingModuleInfo recur m = do
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Effectful m
                     , Member (Reader PackageInfo) effects
-                    , Member (State (Graph Vertex)) effects
+                    , Member (State (Graph ControlFlowVertex)) effects
                     , Monad (m effects)
                     )
-                 => Vertex
+                 => ControlFlowVertex
                  -> m effects ()
 packageInclusion v = do
   p <- currentPackage
@@ -172,20 +172,20 @@ packageInclusion v = do
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: ( Effectful m
                    , Member (Reader ModuleInfo) effects
-                   , Member (State (Graph Vertex)) effects
+                   , Member (State (Graph ControlFlowVertex)) effects
                    , Monad (m effects)
                    )
-                => Vertex
+                => ControlFlowVertex
                 -> m effects ()
 moduleInclusion v = do
   m <- currentModule
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the context it originated within.
-variableDefinition :: ( Member (State (Graph Vertex)) effects
-                      , Member (Reader Vertex) effects
+variableDefinition :: ( Member (State (Graph ControlFlowVertex)) effects
+                      , Member (Reader ControlFlowVertex) effects
                       )
-                   => Vertex
+                   => ControlFlowVertex
                    -> TermEvaluator term (Hole context (Located address)) value effects ()
 variableDefinition var = do
   context <- ask
@@ -195,6 +195,6 @@ appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m e
 appendGraph = modify' . (<>)
 
 
-graphing :: (Effectful m, Effects effects, Functor (m (State (Graph Vertex) : effects)))
-         => m (State (Map (Hole context (Located address)) Vertex) ': State (Graph Vertex) ': effects) result -> m effects (Graph Vertex, result)
+graphing :: (Effectful m, Effects effects, Functor (m (State (Graph ControlFlowVertex) : effects)))
+         => m (State (Map (Hole context (Located address)) ControlFlowVertex) ': State (Graph ControlFlowVertex) ': effects) result -> m effects (Graph ControlFlowVertex, result)
 graphing = runState mempty . fmap snd . runState lowerBound

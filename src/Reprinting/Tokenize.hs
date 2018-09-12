@@ -61,7 +61,7 @@ compile :: State -> Tokenizer a -> Machine.Plan k Token (State, a)
 compile p = \case
   Pure a   -> pure (p, a)
   Bind a f -> compile p a >>= (\(new, v) -> compile new (f v))
-  Tell t   -> Machine.yield t *> pure (p, ())
+  Tell t   -> Machine.yield t $> (p, ())
   Get      -> pure (p, p)
   Put p'   -> pure (p', ())
 

@@ -11,7 +11,7 @@ import Data.List (uncons)
 
 import           Data.Abstract.Module
 import           "semantic" Data.Graph (Graph (..), topologicalSort)
-import           Data.Graph.Vertex
+import           Data.Graph.ControlFlowVertex
 import           Data.Span
 import qualified Data.Language as Language
 import           Semantic.Config (defaultOptions)

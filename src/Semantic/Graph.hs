@@ -7,7 +7,7 @@ module Semantic.Graph
 , runImportGraphToModuleInfos
 , GraphType(..)
 , Graph
-, Vertex
+, ControlFlowVertex
 , ConcreteEff(..)
 , style
 , parsePackage
@@ -47,7 +47,7 @@ import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.Coerce
 import           Data.Graph
-import           Data.Graph.Vertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
+import           Data.Graph.ControlFlowVertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
@@ -70,7 +70,7 @@ runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) eff
          => GraphType
          -> Bool
          -> Project
-         -> Eff effs (Graph Vertex)
+         -> Eff effs (Graph ControlFlowVertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser (lang' :: Proxy lang) <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
@@ -103,7 +103,7 @@ runCallGraph :: ( HasField fields Span
              -> Bool
              -> [Module term]
              -> Package term
-             -> Eff effs (Graph Vertex)
+             -> Eff effs (Graph ControlFlowVertex)
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
@@ -122,7 +122,7 @@ runCallGraph lang includePackages modules package = do
         . resumingAddressError
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
-        . runReader (lowerBound @Vertex)
+        . runReader (lowerBound @ControlFlowVertex)
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
@@ -142,7 +142,7 @@ runImportGraphToModuleInfos :: ( Declarations term
                                )
                             => Proxy lang
                             -> Package term
-                            -> Eff effs (Graph Vertex)
+                            -> Eff effs (Graph ControlFlowVertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
