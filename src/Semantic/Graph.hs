@@ -347,7 +347,7 @@ resumingLoadError :: ( Applicative (m address value effects)
                   => m address value (Resumable (BaseError (LoadError address)) ': effects) a
                   -> m address value effects a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
-  ModuleNotFoundError _ -> pure (lowerBound, hole))
+  ModuleNotFoundError _ -> pure (undefined, (lowerBound, hole)))
 
 resumingEvalError :: ( Applicative (m effects)
                      , Effectful m

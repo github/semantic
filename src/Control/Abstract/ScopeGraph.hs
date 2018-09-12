@@ -2,6 +2,7 @@
 module Control.Abstract.ScopeGraph (runScopeEnv, ScopeEnv) where
 
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Data.Abstract.Name
 import Data.Span
 import Data.Abstract.ScopeGraph as ScopeGraph
@@ -20,29 +21,31 @@ instance Effect (ScopeEnv address) where
   handleState c dist (Request (Reference ref decl) k) = Request (Reference ref decl) (dist . (<$ c) . k)
   handleState c dist (Request (Create edges) k) = Request (Create edges) (dist . (<$ c) . k)
 
-runScopeEnv :: (Ord scope, Effects effects, Member Fresh effects)
-            => scope
-            -> Evaluator address value (ScopeEnv scope ': effects) a
-            -> Evaluator address value effects (ScopeGraph scope, a)
-runScopeEnv scope = runState (ScopeGraph.emptyGraph scope) . reinterpret handleScopeEnv
+runScopeEnv :: (Ord address, Effects effects, Member Fresh effects, Member (Allocator address) effects)
+            => Evaluator address value (ScopeEnv address ': effects) a
+            -> Evaluator address value effects (ScopeGraph address, a)
+runScopeEnv evaluator = do
+    name <- gensym
+    address <- alloc name
+    runState (ScopeGraph.emptyGraph address) (reinterpret handleScopeEnv evaluator)
 
-handleScopeEnv :: forall scope address value effects a. (Ord scope, Member Fresh effects)
-          => ScopeEnv scope (Eff (ScopeEnv scope ': effects)) a
-          -> Evaluator address value (State (ScopeGraph scope) ': effects) a
+handleScopeEnv :: forall address value effects a. (Ord address, Member Fresh effects)
+          => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
+          -> Evaluator address value (State (ScopeGraph address) ': effects) a
 handleScopeEnv = \case
     Lookup ref -> do
-        graph <- get @(ScopeGraph scope)
+        graph <- get @(ScopeGraph address)
         pure (ScopeGraph.scopeOfRef ref graph)
     Declare decl ddata -> do
         graph <- get
-        put @(ScopeGraph scope) (ScopeGraph.declare decl ddata graph)
+        put @(ScopeGraph address) (ScopeGraph.declare decl ddata graph)
         pure ()
     Reference ref decl -> do
         graph <- get
-        put @(ScopeGraph scope) (ScopeGraph.reference ref decl graph)
+        put @(ScopeGraph address) (ScopeGraph.reference ref decl graph)
         pure ()
     Create edges -> do
-        graph <- get @(ScopeGraph scope)
+        graph <- get @(ScopeGraph address)
         scope <- gensym
         put  (ScopeGraph.create scope edges graph)
         pure ()
