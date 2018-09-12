@@ -5,6 +5,8 @@ module Data.Reprinting.Token
   , Element (..)
   , Control (..)
   , Context (..)
+  , imperativeDepth
+  , precedenceOf
   , Operator (..)
   ) where
 
@@ -70,6 +72,18 @@ data Context
   | TInfixL Operator Int
   | Imperative
     deriving (Show, Eq)
+
+precedenceOf :: [Context] -> Int
+precedenceOf cs = case filter isInfix cs of
+  (TInfixL _ n:_) -> n
+  _ -> 0
+  where isInfix (TInfixL _ _) = True
+        isInfix _             = False
+
+
+-- | Depth of imperative scope.
+imperativeDepth :: [Context] -> Int
+imperativeDepth = length . filter (== Imperative)
 
 -- | A sum type representing every concievable infix operator a
 -- language can define. These are handled by instances of 'Concrete'

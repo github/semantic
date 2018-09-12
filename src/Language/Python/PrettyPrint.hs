@@ -23,7 +23,7 @@ step (Defer el cs)  = case (el, cs) of
   (TOpen,  TFunction:_)         -> emit "def" *> space
   (TOpen,  TParams:TFunction:_) -> emit "("
   (TClose, TParams:TFunction:_) -> emit "):"
-  (TClose, TFunction:xs)        -> endContext (depth xs)
+  (TClose, TFunction:xs)        -> endContext (imperativeDepth xs)
 
   -- Return statements
   (TOpen,  TReturn:_) -> emit "return" *> space
@@ -35,7 +35,7 @@ step (Defer el cs)  = case (el, cs) of
   -- If statements
   (TOpen,  TIf:_)  -> emit "if" *> space
   (TThen,  TIf:_)  -> emit ":"
-  (TElse,  TIf:xs) -> endContext (depth xs) *> emit "else:"
+  (TElse,  TIf:xs) -> endContext (imperativeDepth xs) *> emit "else:"
   (TClose, TIf:_)  -> pure ()
 
   -- Booleans
@@ -43,11 +43,11 @@ step (Defer el cs)  = case (el, cs) of
   (Truth False, _) -> emit "False"
 
   -- Infix binary operators
-  (TOpen,  TInfixL _ p:xs)       -> emitIf (p < prec xs) "("
+  (TOpen,  TInfixL _ p:xs)       -> emitIf (p < precedenceOf xs) "("
   (TSym,   TInfixL Add _:_)      -> space *> emit "+" *> space
   (TSym,   TInfixL Multiply _:_) -> space *> emit "*" *> space
   (TSym,   TInfixL Subtract _:_) -> space *> emit "-" *> space
-  (TClose, TInfixL _ p:xs)       -> emitIf (p < prec xs) ")"
+  (TClose, TInfixL _ p:xs)       -> emitIf (p < precedenceOf xs) ")"
 
   -- General params handling
   (TOpen,  TParams:_) -> emit "("
@@ -57,29 +57,11 @@ step (Defer el cs)  = case (el, cs) of
   -- Imperative context and whitespace handling
   (TOpen,  [Imperative])  -> pure ()            -- Don't indent at the top-level imperative context...
   (TClose, [Imperative])  -> layout HardWrap -- but end the program with a newline.
-  (TOpen,  Imperative:xs) -> layout HardWrap *> indent (depth xs)
-  (TSep,   Imperative:xs) -> layout HardWrap *> indent (depth xs)
+  (TOpen,  Imperative:xs) -> layout HardWrap *> indent 4 (imperativeDepth xs)
+  (TSep,   Imperative:xs) -> layout HardWrap *> indent 4 (imperativeDepth xs)
   (TClose, Imperative:_)  -> pure ()
 
   _ -> lift (throwError (NoTranslation el cs))
 
   where
-    emitIf predicate txt = when predicate (emit txt)
-    endContext times = layout HardWrap *> indent (pred times)
-
-prec :: [Context] -> Int
-prec cs = case filter isInfix cs of
-  (TInfixL _ n:_) -> n
-  _ -> 0
-  where isInfix (TInfixL _ _) = True
-        isInfix _             = False
-
--- | Depth of imperative scope.
-depth :: [Context] -> Int
-depth = length . filter (== Imperative)
-
--- | Indent n times.
-indent :: Int -> Plan k Splice ()
-indent times
-  | times > 0 = replicateM_ times (layout (Indent 4 Spaces))
-  | otherwise = pure ()
+    endContext times = layout HardWrap *> indent 4 (pred times)
