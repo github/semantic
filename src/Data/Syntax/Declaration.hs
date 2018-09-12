@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, TupleSections #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
@@ -10,6 +10,7 @@ import qualified Data.Set as Set
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
+import qualified Data.Map.Strict as Map
 import           Reprinting.Tokenize
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -126,7 +127,18 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
   eval (VariableDeclaration [])   = rvalBox unit
-  eval (VariableDeclaration decs) = rvalBox =<< tuple =<< traverse subtermAddress decs
+  eval (VariableDeclaration decs) = do
+    addresses <- for decs $ \declaration -> do
+      name <- maybeM (throwEvalError NoNameError) (declaredName (subterm declaration))
+      (span, valueRef) <- do
+        ref <- subtermRef declaration -- (Assignment  [Empty] Identifier Val)
+        subtermSpan <- get @Span
+        pure (subtermSpan, ref)
+
+      declare (Declaration name) span
+
+      address valueRef
+    rvalBox =<< tuple addresses
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
@@ -159,7 +171,13 @@ instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
 instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
-instance Evaluatable PublicFieldDefinition
+instance Evaluatable PublicFieldDefinition where
+  eval PublicFieldDefinition{..} = do
+    span <- ask @Span
+    propertyName <- maybeM (throwEvalError NoNameError) (declaredName (subterm publicFieldPropertyName))
+    declare (Declaration propertyName) span
+    rvalBox unit
+
 
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
@@ -192,7 +210,8 @@ instance Evaluatable Class where
     -- Add the class to the current scope.
     declare (Declaration name) span
     -- Start a new scope.
-    newScope mempty
+    currentScope' <- currentScope
+    newScope (Map.singleton P [ currentScope' ])
 
     supers <- traverse subtermAddress classSuperclasses
     (_, addr) <- letrec name $ do

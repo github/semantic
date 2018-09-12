@@ -64,6 +64,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
+          , Member (State Span) effects
           , Member (Resumable (BaseError (AddressError address value))) effects
           , Member (Resumable (BaseError (EnvironmentError address))) effects
           , Member (Resumable (BaseError (UnspecializedError value))) effects
@@ -107,6 +108,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
+            , Member (State Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
             , Member (Resumable (BaseError (EnvironmentError address))) effects
             , Member (Resumable (BaseError EvalError)) effects

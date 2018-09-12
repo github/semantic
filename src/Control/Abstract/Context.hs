@@ -8,11 +8,13 @@ module Control.Abstract.Context
 , Span
 , currentSpan
 , withCurrentSpan
+, modifyChildSpan
 , withCurrentCallStack
 ) where
 
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
+import Control.Monad.Effect.State
 import Data.Abstract.Module
 import Data.Abstract.Package
 import Data.Span
@@ -43,6 +45,8 @@ currentSpan = ask
 withCurrentSpan :: (Effectful m, Member (Reader Span) effects) => Span -> m effects a -> m effects a
 withCurrentSpan = local . const
 
+modifyChildSpan :: (Effectful m, Member (State Span) effects) => Span -> m effects a -> m effects a
+modifyChildSpan span m = raiseEff (lowerEff m >>= (\a -> modify' (const span) >> pure a))
 
 -- | Run an action with locally-replaced 'ModuleInfo' & 'Span' derived from the passed 'SrcLoc'.
 withCurrentSrcLoc :: (Effectful m, Member (Reader ModuleInfo) effects, Member (Reader Span) effects) => SrcLoc -> m effects a -> m effects a

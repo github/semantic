@@ -10,6 +10,7 @@ import           Proto3.Suite
 
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
+import           Control.Abstract.ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
@@ -271,6 +272,7 @@ newtype PredefinedType a = PredefinedType { predefinedType :: T.Text }
 instance Eq1 PredefinedType where liftEq = genericLiftEq
 instance Ord1 PredefinedType where liftCompare = genericLiftCompare
 instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
+-- TODO: Implement Eval instance for PredefinedType
 instance Evaluatable PredefinedType
 
 newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
