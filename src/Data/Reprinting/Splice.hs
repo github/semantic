@@ -7,7 +7,9 @@ module Data.Reprinting.Splice
   , defer
   , Splice(..)
   , emit
+  , emitIf
   , layout
+  , indent
   , layouts
   , space
   , Whitespace(..)
@@ -53,9 +55,19 @@ data Splice
 emit :: Text -> Plan k Splice ()
 emit = yield . Emit
 
+-- | Emit the provided 'Text' if the given predicate is true.
+emitIf :: Bool -> Text -> Plan k Splice ()
+emitIf p = when p . emit
+
 -- | Construct a layout 'Splice'.
 layout :: Whitespace -> Plan k Splice ()
 layout = yield . Layout
+
+-- | @indent w n@ emits @w@ 'Spaces' @n@ times.
+indent :: Int -> Int -> Plan k Splice ()
+indent width times
+  | times > 0 = replicateM_ times (layout (Indent width Spaces))
+  | otherwise = pure ()
 
 -- | Construct multiple layouts.
 layouts :: [Whitespace] -> Plan k Splice ()
