@@ -2,7 +2,6 @@
 
 module Language.Python.PrettyPrint ( printingPython ) where
 
-import Control.Monad
 import Control.Monad.Effect
 import Control.Monad.Effect.Exception (Exc, throwError)
 import Control.Monad.Trans (lift)
