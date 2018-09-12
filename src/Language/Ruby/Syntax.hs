@@ -98,8 +98,8 @@ doRequire :: ( Member (Boolean value) effects
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> (,) . fst <$> load path <*> boolean True
-    Just (env, _) -> (env,) <$> boolean False
+    Nothing       -> (,) . fst . snd <$> load path <*> boolean True
+    Just (_, (env, _)) -> (env,) <$> boolean False
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
@@ -132,7 +132,7 @@ doLoad :: ( Member (Boolean value) effects
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- fst <$> load path'
+  importedEnv <- fst . snd <$> load path'
   unless shouldWrap $ bindAll importedEnv
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
