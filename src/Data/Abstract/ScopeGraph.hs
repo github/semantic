@@ -17,6 +17,7 @@ module Data.Abstract.ScopeGraph
   , declare
   , emptyGraph
   , reference
+  , create
   ) where
 
 import           Data.Abstract.Live
@@ -94,12 +95,17 @@ reference ref declaration graph = let
           traverseEdges edge = do
             linkMap <- linksOfScope address graph
             scopes <- Map.lookup edge linkMap
-            getFirst (flip foldMap scopes . First $ \nextAddress  ->
-              go currentScope nextAddress (path . EPath edge nextAddress))
+            -- Return the first path to the declaration through the scopes.
+            getFirst (foldMap (First . ap (go currentScope) ((path .) . EPath edge)) scopes)
           in traverseEdges P <|> traverseEdges I
   in case lookupScope currentAddress graph of
       Just currentScope -> fromMaybe graph (go currentScope currentAddress id)
       Nothing -> graph
+
+create :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address ddata -> ScopeGraph address ddata
+create address edges graph = graph { unScopeGraph = (Map.insert address newScope (scopeGraph graph), address) }
+  where
+    newScope = Scope edges mempty mempty
 
 scopeOfRef :: Ord scope => Reference -> ScopeGraph scope ddata -> Maybe scope
 scopeOfRef ref graph = go . Map.keys . fst $ unScopeGraph graph
