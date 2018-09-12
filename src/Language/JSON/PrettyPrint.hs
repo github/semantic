@@ -9,9 +9,9 @@ module Language.JSON.PrettyPrint
 import Prologue hiding (throwError)
 
 import Control.Arrow
-import Control.Monad.Trans (lift)
 import Control.Monad.Effect
 import Control.Monad.Effect.Exception (Exc, throwError)
+import Control.Monad.Trans (lift)
 import Data.Machine
 
 import Data.Reprinting.Errors

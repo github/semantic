@@ -1,4 +1,4 @@
-{-# LANGUAGE ApplicativeDo, GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, UndecidableInstances #-}
 
 module Reprinting.Tokenize
   ( module Data.Reprinting.Token
@@ -26,16 +26,16 @@ module Reprinting.Tokenize
   ) where
 
 import Prelude hiding (fail, log)
-import Prologue hiding (hash, Element)
+import Prologue hiding (Element, hash)
 
-import Data.History
-import Data.List (intersperse)
-import Data.Range
-import Data.Record
-import Data.Reprinting.Token
+import           Data.History
+import           Data.List (intersperse)
 import qualified Data.Machine as Machine
-import Data.Source
-import Data.Term
+import           Data.Range
+import           Data.Record
+import           Data.Reprinting.Token
+import           Data.Source
+import           Data.Term
 
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
