@@ -37,19 +37,6 @@ import qualified Data.Machine as Machine
 import Data.Source
 import Data.Term
 
-data Strategy
-  = Reprinting
-  | PrettyPrinting
-    deriving (Eq, Show)
-
-data State = State
-  { _source   :: Source
-  , _history  :: History
-  , _strategy :: Strategy
-  , _cursor   :: Int
-  , _enabled  :: Bool
-  } deriving (Show, Eq)
-
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
 -- consumer. Its primary interface is through the 'Tokenize'
@@ -64,6 +51,14 @@ data Tokenizer a where
   Get :: Tokenizer State
   Put :: State -> Tokenizer ()
 
+compile :: State -> Tokenizer a -> Machine.PlanT k Token m (State, a)
+compile p = \case
+  Pure a   -> pure (p, a)
+  Bind a f -> compile p a >>= (\(new, v) -> compile new (f v))
+  Tell t   -> Machine.yield t *> pure (p, ())
+  Get      -> pure (p, p)
+  Put p'   -> pure (p', ())
+
 instance Functor Tokenizer where
   fmap = liftA
 
@@ -73,6 +68,26 @@ instance Applicative Tokenizer where
 
 instance Monad Tokenizer where
   (>>=) = Bind
+
+-- Internal state. This is hidden within Tokenizer rather
+-- than being exposed to the outside by reifying this in
+-- an Eff State. If we encounter performance problems,
+-- we can trade off the slightly more pleasant interface
+-- that a deep embedding gets us.
+
+data Strategy
+  = Reprinting
+  | PrettyPrinting
+    deriving (Eq, Show)
+
+data State = State
+  { _source   :: Source
+  , _history  :: History
+  , _strategy :: Strategy
+  , _cursor   :: Int
+  , _enabled  :: Bool
+  } deriving (Show, Eq)
+
 
 -- Builtins
 
@@ -90,9 +105,6 @@ control = Tell . TControl
 chunk :: Source -> Tokenizer ()
 chunk = Tell . Chunk
 
--- FIXME: the commented out implementation is correct, but we emit too
--- much information, so the emitted Chunk becomes a duplicate. We have
--- to be smarter downstream in a way that I don't quite yet understand.
 finish :: Tokenizer ()
 finish = do
   crs <- asks _cursor
@@ -219,14 +231,6 @@ tokenizing src term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
         state = State src (getField (termAnnotation term)) Reprinting 0 False
         go    = disable *> foldSubterms descend term <* finish
-
-compile :: State -> Tokenizer a -> Machine.PlanT k Token m (State, a)
-compile p = \case
-  Pure a   -> pure (p, a)
-  Bind a f -> compile p a >>= (\(new, v) -> compile new (f v))
-  Tell t   -> Machine.yield t *> pure (p, ())
-  Get      -> pure (p, p)
-  Put p'   -> pure (p', ())
 
 -- | Sums of reprintable terms are reprintable.
 instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Tokenize fs) => Tokenize (Sum fs) where
