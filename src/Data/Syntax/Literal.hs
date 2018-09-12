@@ -51,7 +51,7 @@ instance Evaluatable Data.Syntax.Literal.Integer where
     rvalBox =<< (integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x))
 
 instance Tokenize Data.Syntax.Literal.Integer where
-  tokenize = yield . Fragment . integerContent
+  tokenize = yield . Run . integerContent
 
 -- | A literal float of unspecified width.
 
@@ -67,7 +67,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 instance Tokenize Data.Syntax.Literal.Float where
-  tokenize = yield . Fragment . floatContent
+  tokenize = yield . Run . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -141,7 +141,7 @@ instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
 instance Tokenize TextElement where
-  tokenize = yield . Fragment . textElementContent
+  tokenize = yield . Run . textElementContent
 
 -- | A sequence of textual contents within a string literal.
 newtype EscapeSequence a = EscapeSequence { value :: Text }

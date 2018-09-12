@@ -32,7 +32,7 @@ isControl _ = False
 -- and are interpreted into language-specific representations at a
 -- later point in the reprinting pipeline.
 data Element
-  = Fragment Text -- ^ A literal chunk of text.
+  = Run Text      -- ^ A literal chunk of text.
   | Truth Bool    -- ^ A boolean value.
   | Nullity       -- ^ @null@ or @nil@ or some other zero value.
   | TSep          -- ^ Some sort of delimiter, interpreted in some 'Context'.
