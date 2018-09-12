@@ -1,5 +1,7 @@
 module Data.Reprinting.Token
   ( Token (..)
+  , isChunk
+  , isControl
   , Element (..)
   , Control (..)
   , Context (..)
@@ -16,6 +18,14 @@ data Token
   | TElement Element -- ^ Content token to be rendered.
   | TControl Control -- ^ AST's context.
     deriving (Show, Eq)
+
+isChunk :: Token -> Bool
+isChunk (Chunk _) = True
+isChunk _ = False
+
+isControl :: Token -> Bool
+isControl (TControl _) = True
+isControl _ = False
 
 -- | 'Element' tokens describe atomic pieces of source code to be
 -- output to a rendered document. These tokens are language-agnostic

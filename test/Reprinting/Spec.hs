@@ -34,7 +34,9 @@ spec = describe "reprinting" $ do
       it "should pass over a pristine tree" $ do
         let tagged = mark Unmodified tree
         let toks = Machine.run $ tokenizing src tagged
-        toks `shouldSatisfy` elem (Chunk src)
+        toks `shouldSatisfy` not . null
+        head toks `shouldSatisfy` isControl
+        last toks `shouldSatisfy` isChunk
 
       it "should emit control tokens but only 1 chunk for a wholly-modified tree" $ do
         let toks = Machine.run $ tokenizing src (mark Refactored tree)
