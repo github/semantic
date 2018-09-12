@@ -2,9 +2,9 @@
 
 module Language.Ruby.PrettyPrint ( printingRuby ) where
 
-import Control.Monad.Trans (lift)
 import Control.Monad.Effect
 import Control.Monad.Effect.Exception (Exc, throwError)
+import Control.Monad.Trans (lift)
 import Data.Machine
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
@@ -18,19 +18,19 @@ step :: (Member (Exc TranslationError) effs) => Fragment -> PlanT k Splice (Eff 
 step (Verbatim txt) = emit txt
 step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of
-  (TOpen,  TMethod:_)  -> emit "def" *> space
-  (TClose, TMethod:xs) -> endContext (imperativeDepth xs) *> emit "end"
+  (TOpen,  TMethod:_)            -> emit "def" *> space
+  (TClose, TMethod:xs)           -> endContext (imperativeDepth xs) *> emit "end"
 
   -- TODO: do..end vs {..} should be configurable.
-  (TOpen,  TFunction:_)         -> space *> emit "do" *> space
-  (TOpen,  TParams:TFunction:_) -> emit "|"
-  (TClose, TParams:TFunction:_) -> emit "|"
-  (TClose, TFunction:xs)        -> endContext (imperativeDepth xs) *> emit "end"
+  (TOpen,  TFunction:_)          -> space *> emit "do" *> space
+  (TOpen,  TParams:TFunction:_)  -> emit "|"
+  (TClose, TParams:TFunction:_)  -> emit "|"
+  (TClose, TFunction:xs)         -> endContext (imperativeDepth xs) *> emit "end"
 
   -- TODO: Parens for calls are a style choice, make configurable.
-  (TOpen,  TParams:_) -> emit "("
-  (TSep,   TParams:_) -> emit "," *> space
-  (TClose, TParams:_) -> emit ")"
+  (TOpen,  TParams:_)            -> emit "("
+  (TSep,   TParams:_)            -> emit "," *> space
+  (TClose, TParams:_)            -> emit ")"
 
   (TOpen,  TInfixL _ p:xs)       -> emitIf (p < precedenceOf xs) "("
   (TSym,   TInfixL Add _:_)      -> space *> emit "+" *> space
@@ -38,15 +38,15 @@ step (Defer el cs)  = case (el, cs) of
   (TSym,   TInfixL Subtract _:_) -> space *> emit "-" *> space
   (TClose, TInfixL _ p:xs)       -> emitIf (p < precedenceOf xs) ")"
 
-  (TOpen,  [Imperative])  -> pure ()
-  (TOpen,  Imperative:xs) -> layout HardWrap *> indent 2 (imperativeDepth xs)
-  (TSep,   Imperative:xs) -> layout HardWrap *> indent 2 (imperativeDepth xs)
-  (TClose, [Imperative])  -> layout HardWrap
-  (TClose, Imperative:xs) -> indent 2 (pred (imperativeDepth xs))
+  (TOpen,  [Imperative])         -> pure ()
+  (TOpen,  Imperative:xs)        -> layout HardWrap *> indent 2 (imperativeDepth xs)
+  (TSep,   Imperative:xs)        -> layout HardWrap *> indent 2 (imperativeDepth xs)
+  (TClose, [Imperative])         -> layout HardWrap
+  (TClose, Imperative:xs)        -> indent 2 (pred (imperativeDepth xs))
 
-  (TSep, TCall:_) -> emit "."
+  (TSep, TCall:_)                -> emit "."
 
-  _ -> lift (throwError (NoTranslation el cs))
+  _                              -> lift (throwError (NoTranslation el cs))
 
   where
     endContext times = layout HardWrap *> indent 2 (pred times)
