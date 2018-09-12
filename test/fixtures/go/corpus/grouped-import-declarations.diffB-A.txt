@@ -6,10 +6,10 @@
     {+(Identifier)+})+}
   {+(Import
     {+(TextElement)+})+}
-  { (QualifiedImport
-    {-(Identifier)-})
-  ->(QualifiedImport
-    {+(Identifier)+}) }
+  {+(QualifiedImport
+    {+(Identifier)+})+}
+  {-(QualifiedImport
+    {-(Identifier)-})-}
   {-(Import
     {-(TextElement)-})-}
   {-(QualifiedImport

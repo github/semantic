@@ -1,63 +1,36 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Semantic.Parse
-  ( runParse
-  , runPythonParse
-  , runRubyParse
-  , runTypeScriptParse
-  , runJSONParse
-  ) where
+module Semantic.Parse ( runParse ) where
 
-import Analysis.ConstructorName (ConstructorName)
-import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.PackageDef (HasPackageDef)
-import Control.Monad.Effect.Exception
-import Data.AST
-import Data.Blob
-import Data.JSON.Fields
-import Data.Quieterm
-import Data.Record
-import Data.Term
-import Parsing.Parser
-import Prologue hiding (MonadError(..))
-import Rendering.Graph
-import Rendering.Renderer
-import Semantic.IO (noLanguageForBlob)
-import Semantic.Task
-import Serializing.Format
-import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TypeScript.Assignment as TypeScript
-import qualified Language.JSON.Assignment as JSON
-import qualified Language.Python.Assignment as Python
+import           Analysis.ConstructorName (ConstructorName)
+import           Analysis.Declaration (HasDeclaration, declarationAlgebra)
+import           Analysis.PackageDef (HasPackageDef)
+import           Control.Monad.Effect.Exception
+import           Data.AST
+import           Data.Blob
+import           Data.Graph.TermVertex
+import           Data.JSON.Fields
+import           Data.Quieterm
+import           Data.Record
+import           Data.Term
+import           Parsing.Parser
+import           Prologue hiding (MonadError (..))
+import           Rendering.Graph
+import           Rendering.JSON (SomeJSON (..))
+import qualified Rendering.JSON as JSON
+import           Rendering.Renderer
+import           Semantic.IO (noLanguageForBlob)
+import           Semantic.Task
+import           Serializing.Format
 
 runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs renderJSONError (render . renderJSONTerm) >=> serialize JSON
+runParse JSONGraphTermRenderer          = withParsedBlobs renderJSONError (render . renderAdjGraph) >=> serialize JSON
+  where renderAdjGraph :: (Recursive t, ToTreeGraph TermVertex (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON
+        renderAdjGraph blob term = renderJSONAdjTerm blob (renderTreeGraph term)
 runParse SExpressionTermRenderer      = withParsedBlobs (\_ _ -> mempty) (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (\_ _ -> mempty) (const (serialize Show . quieterm))
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\_ _ -> mempty) (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (\_ _ -> mempty) (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
-
--- NB: Our gRPC interface requires concrete 'Term's for each language to know
--- how to encode messages, so we have dedicated functions for parsing each
--- supported language.
-runRubyParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
-  => [Blob] -> Eff effs [Either SomeException (Term (Sum Ruby.Syntax) ())]
-runRubyParse = flip distributeFor $ \blob ->
-    (Right . (() <$) <$> parse rubyParser blob) `catchError` (pure . Left)
-
-runTypeScriptParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
-  => [Blob] -> Eff effs [Either SomeException (Term (Sum TypeScript.Syntax) ())]
-runTypeScriptParse = flip distributeFor $ \blob -> do
-    (Right . (() <$) <$> parse typescriptParser blob) `catchError` (pure . Left)
-
-runPythonParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
-  => [Blob] -> Eff effs [Either SomeException (Term (Sum Python.Syntax) ())]
-runPythonParse = flip distributeFor $ \blob -> do
-    (Right . (() <$) <$> parse pythonParser blob) `catchError` (pure . Left)
-
-runJSONParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
-  => [Blob] -> Eff effs [Either SomeException (Term (Sum JSON.Syntax) ())]
-runJSONParse = flip distributeFor $ \blob -> do
-    (Right . (() <$) <$> parse jsonParser blob) `catchError` (pure . Left)
 
 withParsedBlobs ::
   ( Member Distribute effs

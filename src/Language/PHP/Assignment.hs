@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.PHP.Assignment
 ( assignment
 , Syntax
@@ -6,10 +7,15 @@ module Language.PHP.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import Data.Record
-import Data.Sum
-import Data.Syntax
+import Prologue
+
+import           Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
+import qualified Data.Abstract.Name as Name
+import qualified Data.Diff as Diff
+import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Record
+import           Data.Syntax
     ( contextualize
     , emptyTerm
     , handleError
@@ -20,10 +26,6 @@ import Data.Syntax
     , parseError
     , postContextualize
     )
-import Language.PHP.Grammar as Grammar
-import qualified Assigning.Assignment as Assignment
-import qualified Data.Abstract.Name as Name
-import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -32,8 +34,9 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import           Language.PHP.Grammar as Grammar
 import qualified Language.PHP.Syntax as Syntax
-import Prologue
+import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax = '[
     Comment.Comment
@@ -88,7 +91,6 @@ type Syntax = '[
   , Statement.For
   , Statement.ForEach
   , Statement.Goto
-  , Statement.If
   , Statement.If
   , Statement.Match
   , Statement.Pattern
@@ -162,6 +164,11 @@ type Syntax = '[
 
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar
+
+-- For Protobuf serialization
+instance Named1 (Sum Syntax) where nameOf1 _ = "PHPSyntax"
+instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "PHPTerm"
+instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "PHPDiff"
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment Term

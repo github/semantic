@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-} -- FIXME
 module Language.Markdown.Assignment
 ( assignment
 , Syntax
@@ -6,18 +7,20 @@ module Language.Markdown.Assignment
 , Language.Markdown.Assignment.Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
-import Data.Record
-import Data.Syntax (makeTerm)
-import qualified Data.Term as Term
-import Parsing.CMark as Grammar (Grammar(..))
+import Prologue
+
+import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
-import Data.Sum
+import           Data.Record
+import           Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
+import qualified Data.Term as Term
+import qualified Data.Diff as Diff
 import qualified Data.Text as Text
 import qualified Language.Markdown.Syntax as Markup
-import Prologue
+import           Parsing.CMark as Grammar (Grammar (..))
+import           Proto3.Suite (Named (..), Named1 (..))
 
 type Syntax =
   '[ Markup.Document
@@ -49,6 +52,10 @@ type Syntax =
 type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = Assignment.Assignment (Term.TermF [] CMarkGFM.NodeType) Grammar
 
+-- For Protobuf serialization
+instance Named1 (Sum Syntax) where nameOf1 _ = "MarkdownSyntax"
+instance Named (Term.Term (Sum Syntax) ()) where nameOf _ = "MarkdownTerm"
+instance Named (Diff.Diff (Sum Syntax) () ()) where nameOf _ = "MarkdownDiff"
 
 assignment :: Assignment Term
 assignment = Syntax.handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)

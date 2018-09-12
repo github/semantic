@@ -1,56 +1,57 @@
+{-# LANGUAGE Rank2Types #-}
+
 module Language.Ruby.PrettyPrint ( printingRuby ) where
 
-import Control.Arrow
+import Control.Monad
+import Control.Monad.Trans (lift)
 import Control.Monad.Effect
 import Control.Monad.Effect.Exception (Exc, throwError)
 import Data.Machine
-import Data.Sequence (Seq)
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token as Token
-import Data.Semigroup (stimes)
 
 -- | Print Ruby syntax.
 printingRuby :: (Member (Exc TranslationError) effs) => ProcessT (Eff effs) Fragment Splice
-printingRuby = autoT (Kleisli step) ~> flattened
+printingRuby = repeatedly (await >>= step)
 
-step :: (Member (Exc TranslationError) effs) => Fragment -> Eff effs (Seq Splice)
-step (Verbatim txt) = pure $ emit txt
-step (New _ _ txt)  = pure $ emit txt
+step :: (Member (Exc TranslationError) effs) => Fragment -> PlanT k Splice (Eff effs) ()
+step (Verbatim txt) = emit txt
+step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of
-  (TOpen,  TMethod:_)  -> pure $ emit "def" <> space
-  (TClose, TMethod:xs) -> pure $ endContext (depth xs) <> emit "end"
+  (TOpen,  TMethod:_)  -> emit "def" *> space
+  (TClose, TMethod:xs) -> endContext (depth xs) *> emit "end"
 
   -- TODO: do..end vs {..} should be configurable.
-  (TOpen,  TFunction:_)         -> pure $ space <> emit "do" <> space
-  (TOpen,  TParams:TFunction:_) -> pure $ emit "|"
-  (TClose, TParams:TFunction:_) -> pure $ emit "|"
-  (TClose, TFunction:xs)        -> pure $ endContext (depth xs) <> emit "end"
+  (TOpen,  TFunction:_)         -> space *> emit "do" *> space
+  (TOpen,  TParams:TFunction:_) -> emit "|"
+  (TClose, TParams:TFunction:_) -> emit "|"
+  (TClose, TFunction:xs)        -> endContext (depth xs) *> emit "end"
 
   -- TODO: Parens for calls are a style choice, make configurable.
-  (TOpen,  TParams:_) -> pure $ emit "("
-  (TSep,   TParams:_) -> pure $ emit "," <> space
-  (TClose, TParams:_) -> pure $ emit ")"
+  (TOpen,  TParams:_) -> emit "("
+  (TSep,   TParams:_) -> emit "," *> space
+  (TClose, TParams:_) -> emit ")"
 
   (TOpen,  TInfixL _ p:xs)       -> emitIf (p < prec xs) "("
-  (TSym,   TInfixL Add _:_)      -> pure $ space <> emit "+" <> space
-  (TSym,   TInfixL Multiply _:_) -> pure $ space <> emit "*" <> space
-  (TSym,   TInfixL Subtract _:_) -> pure $ space <> emit "-" <> space
+  (TSym,   TInfixL Add _:_)      -> space *> emit "+" *> space
+  (TSym,   TInfixL Multiply _:_) -> space *> emit "*" *> space
+  (TSym,   TInfixL Subtract _:_) -> space *> emit "-" *> space
   (TClose, TInfixL _ p:xs)       -> emitIf (p < prec xs) ")"
 
-  (TOpen,  [Imperative])  -> pure mempty
-  (TOpen,  Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
-  (TSep,   Imperative:xs) -> pure $ layout HardWrap <> indent (depth xs)
-  (TClose, [Imperative])  -> pure $ layout HardWrap
-  (TClose, Imperative:xs) -> pure $ indent (pred (depth xs))
+  (TOpen,  [Imperative])  -> pure ()
+  (TOpen,  Imperative:xs) -> layout HardWrap *> indent (depth xs)
+  (TSep,   Imperative:xs) -> layout HardWrap *> indent (depth xs)
+  (TClose, [Imperative])  -> layout HardWrap
+  (TClose, Imperative:xs) -> indent (pred (depth xs))
 
-  (TSep, TCall:_) -> pure $ emit "."
+  (TSep, TCall:_) -> emit "."
 
-  _ -> throwError (NoTranslation el cs)
+  _ -> lift (throwError (NoTranslation el cs))
 
   where
-    emitIf predicate txt = pure $ if predicate then emit txt else mempty
-    endContext times = layout HardWrap <> indent (pred times)
+    emitIf predicate txt = when predicate (emit txt)
+    endContext times = layout HardWrap *> indent (pred times)
 
 prec :: [Context] -> Int
 prec cs = case filter isInfix cs of
@@ -64,7 +65,7 @@ depth :: [Context] -> Int
 depth = length . filter (== Imperative)
 
 -- | Indent n times.
-indent :: Integral b => b -> Seq Splice
+indent :: Int -> Plan k Splice ()
 indent times
-  | times > 0 = stimes times (layout (Indent 2 Spaces))
-  | otherwise = mempty
+  | times > 0 = replicateM_ times (layout (Indent 2 Spaces))
+  | otherwise = pure ()
