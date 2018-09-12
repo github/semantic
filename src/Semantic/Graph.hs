@@ -122,6 +122,7 @@ runCallGraph lang includePackages modules package = do
         . resumingAddressError
         . runReader (packageInfo package)
         . runReader (lowerBound @Span)
+        . runState (lowerBound @Span)
         . runReader (lowerBound @Vertex)
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
@@ -192,6 +193,7 @@ runImportGraph lang (package :: Package term) f =
         . runModules (ModuleTable.modulePaths (packageModules package))
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
         . runReader (packageInfo package)
+        . runState lowerBound
         . runReader lowerBound
       runAddressEffects
         = Hole.runAllocator Precise.handleAllocator
@@ -200,6 +202,7 @@ runImportGraph lang (package :: Package term) f =
 
 type ConcreteEffects address rest
   =  Reader Span
+  ': State Span
   ': Reader PackageInfo
   ': Modules address
   ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
@@ -273,6 +276,7 @@ parsePythonPackage parser project = do
         . runModules lowerBound
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
         . runReader (PackageInfo (name "setup") lowerBound)
+        . runState lowerBound
         . runReader lowerBound
       runAddressEffects
         = Hole.runAllocator Precise.handleAllocator
@@ -322,10 +326,13 @@ parseModule proj parser file = do
 
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
+                 , Member (State Span) effects -- last evaluated child's span
                  )
               => SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
               -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
-withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
+withTermSpans recur term = let
+  updatedSpanAlg = withCurrentSpan (getField (termFAnnotation term)) (recur term)
+  in modifyChildSpan (getField (termFAnnotation term)) updatedSpanAlg
 
 resumingResolutionError :: ( Applicative (m effects)
                            , Effectful m

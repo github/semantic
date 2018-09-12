@@ -2,9 +2,9 @@
 module Data.Abstract.ScopeGraph
   ( ScopeGraph(..)
   , Path
-  , Reference
+  , Reference(..)
   , Declaration(..)
-  , EdgeLabel
+  , EdgeLabel(..)
   , Heap
   , frameLookup
   , scopeLookup
@@ -18,6 +18,7 @@ module Data.Abstract.ScopeGraph
   , emptyGraph
   , reference
   , create
+  , currentScope
   ) where
 
 import           Data.Abstract.Live
