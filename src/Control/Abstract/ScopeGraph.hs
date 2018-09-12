@@ -35,5 +35,5 @@ handleScopeEnv = \case
         pure ()
     Reference ref decl -> do
         graph <- get
-        put @(ScopeGraph scope ddata) (ScopeGraph.reference reference decl graph)
+        put @(ScopeGraph scope ddata) (ScopeGraph.reference ref decl graph)
         pure ()
