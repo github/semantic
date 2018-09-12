@@ -12,7 +12,7 @@ data ScopeEnv address (m :: * -> *) a where
     Lookup :: Reference -> ScopeEnv address m (Maybe address)
     Declare :: Declaration -> Span -> ScopeEnv address m ()
     Reference :: Reference -> Declaration -> ScopeEnv address m ()
-    Create :: Map EdgeLabel [Name] -> ScopeEnv Name m ()
+    Create :: Map EdgeLabel [address] -> ScopeEnv address m ()
 
 instance PureEffect (ScopeEnv address)
 instance Effect (ScopeEnv address) where
@@ -29,7 +29,7 @@ runScopeEnv evaluator = do
     address <- alloc name
     runState (ScopeGraph.emptyGraph address) (reinterpret handleScopeEnv evaluator)
 
-handleScopeEnv :: forall address value effects a. (Ord address, Member Fresh effects)
+handleScopeEnv :: forall address value effects a. (Ord address, Member Fresh effects, Member (Allocator address) effects)
           => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
           -> Evaluator address value (State (ScopeGraph address) ': effects) a
 handleScopeEnv = \case
@@ -37,5 +37,6 @@ handleScopeEnv = \case
     Declare decl ddata -> modify @(ScopeGraph address) (ScopeGraph.declare decl ddata)
     Reference ref decl -> modify @(ScopeGraph address) (ScopeGraph.reference ref decl)
     Create edges -> do
-        scope <- gensym
-        modify @(ScopeGraph address) (ScopeGraph.create scope edges)
+        name <- gensym
+        address <- alloc name
+        modify @(ScopeGraph address) (ScopeGraph.create address edges)
