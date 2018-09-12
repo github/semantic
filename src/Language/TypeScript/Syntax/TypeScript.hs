@@ -274,7 +274,10 @@ instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PredefinedType
 
 newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Declarations1 TypeIdentifier where
+  liftDeclaredName _ (TypeIdentifier identifier) = Just (name identifier)
 
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
 instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
