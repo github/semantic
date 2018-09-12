@@ -3,7 +3,7 @@ module Data.Abstract.ScopeGraph
   ( ScopeGraph(..)
   , Path
   , Reference
-  , Declaration
+  , Declaration(..)
   , EdgeLabel
   , Heap
   , frameLookup

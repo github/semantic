@@ -4,6 +4,7 @@ module Data.Syntax.Declaration where
 
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
+import           Control.Abstract.ScopeGraph
 import           Data.JSON.Fields
 import qualified Data.Set as Set
 import           Diffing.Algorithm
@@ -187,6 +188,12 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Class where
   eval Class{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
+    span <- ask @Span
+    -- Add the class to the current scope.
+    declare (Declaration name) span
+    -- Start a new scope.
+    newScope mempty
+
     supers <- traverse subtermAddress classSuperclasses
     (_, addr) <- letrec name $ do
       void $ subtermValue classBody

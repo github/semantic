@@ -1,11 +1,11 @@
 {-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
-module Control.Abstract.ScopeGraph (runScopeEnv, ScopeEnv, lookup, declare, reference, create) where
+module Control.Abstract.ScopeGraph (runScopeEnv, ScopeEnv, lookup, declare, reference, newScope, Declaration(..)) where
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Name
 import Data.Span
-import Data.Abstract.ScopeGraph (Declaration, Reference, EdgeLabel, ScopeGraph)
+import Data.Abstract.ScopeGraph (Declaration(..), Reference, EdgeLabel, ScopeGraph)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Prologue
 import Prelude hiding (lookup)
@@ -25,8 +25,8 @@ declare = (send .) . Declare @address
 reference :: forall address value effects. Member (ScopeEnv address) effects => Reference -> Declaration -> Evaluator address value effects ()
 reference = (send .) . Reference @address
 
-create :: forall address value effects. Member (ScopeEnv address) effects => Map EdgeLabel [address] -> Evaluator address value effects ()
-create = send . Create @address
+newScope :: forall address value effects. Member (ScopeEnv address) effects => Map EdgeLabel [address] -> Evaluator address value effects ()
+newScope = send . Create @address
 
 instance PureEffect (ScopeEnv address)
 instance Effect (ScopeEnv address) where
