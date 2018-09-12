@@ -94,8 +94,8 @@ reference ref declaration graph = let
           traverseEdges edge = do
             linkMap <- linksOfScope address graph
             scopes <- Map.lookup edge linkMap
-            getFirst (flip foldMap scopes $ (First . (\nextAddress  ->
-              go currentScope nextAddress (path . (EPath edge nextAddress)))))
+            getFirst (flip foldMap scopes . First $ \nextAddress  ->
+              go currentScope nextAddress (path . EPath edge nextAddress))
           in traverseEdges P <|> traverseEdges I
   in case lookupScope currentAddress graph of
       Just currentScope -> fromMaybe graph (go currentScope currentAddress id)
@@ -118,7 +118,7 @@ pathOfRef ref graph = do
   Map.lookup ref pathsMap
 
 scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope ddata -> Maybe scope
-scopeOfDeclaration declaration graph = go . Map.keys . fst $ (unScopeGraph graph)
+scopeOfDeclaration declaration graph = go . Map.keys . fst $ unScopeGraph graph
   where
     go (s : scopes') = case ddataOfScope s graph of
       Just ddataMap -> case Map.lookup declaration ddataMap of
@@ -167,7 +167,7 @@ setSlot :: (Ord address, Ord declaration) => address -> declaration -> value -> 
 setSlot address declaration value heap =
     case frameLookup address heap of
       Just frame -> let slotMap = slots frame in
-        Heap $ Map.insert address (frame { slots = (Map.insert declaration value slotMap) }) (unHeap heap)
+        Heap $ Map.insert address (frame { slots = Map.insert declaration value slotMap }) (unHeap heap)
       Nothing -> heap
 
 lookup :: (Ord address, Ord scope) => Heap scope address declaration value -> address -> Path scope -> declaration -> Maybe scope
