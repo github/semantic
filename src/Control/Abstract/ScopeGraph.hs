@@ -33,19 +33,9 @@ handleScopeEnv :: forall address value effects a. (Ord address, Member Fresh eff
           => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
           -> Evaluator address value (State (ScopeGraph address) ': effects) a
 handleScopeEnv = \case
-    Lookup ref -> do
-        graph <- get @(ScopeGraph address)
-        pure (ScopeGraph.scopeOfRef ref graph)
-    Declare decl ddata -> do
-        graph <- get
-        put @(ScopeGraph address) (ScopeGraph.declare decl ddata graph)
-        pure ()
-    Reference ref decl -> do
-        graph <- get
-        put @(ScopeGraph address) (ScopeGraph.reference ref decl graph)
-        pure ()
+    Lookup ref -> ScopeGraph.scopeOfRef ref <$> get
+    Declare decl ddata -> modify @(ScopeGraph address) (ScopeGraph.declare decl ddata)
+    Reference ref decl -> modify @(ScopeGraph address) (ScopeGraph.reference ref decl)
     Create edges -> do
-        graph <- get @(ScopeGraph address)
         scope <- gensym
-        put  (ScopeGraph.create scope edges graph)
-        pure ()
+        modify @(ScopeGraph address) (ScopeGraph.create scope edges)
