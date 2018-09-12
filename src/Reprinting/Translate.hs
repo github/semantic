@@ -24,8 +24,8 @@ contextualizing :: ProcessT Translator Token Fragment
 contextualizing = repeatedly $ await >>= \case
   Chunk source -> yield . Verbatim . Source.toText $ source
   TElement t -> case t of
-    Fragment f -> lift get >>= \c -> yield (New t c f)
-    _          -> lift get >>= yield . Defer t
+    Run f -> lift get >>= \c -> yield (New t c f)
+    _     -> lift get >>= yield . Defer t
   TControl ctl -> case ctl of
     Enter c -> enterContext c
     Exit c  -> exitContext c

@@ -21,7 +21,7 @@ instance Evaluatable Comment where
   eval _ = rvalBox unit
 
 instance Tokenize Comment where
-  tokenize = yield . Fragment . commentContent
+  tokenize = yield . Run . commentContent
 
 -- TODO: nested comment types
 -- TODO: documentation comment types
