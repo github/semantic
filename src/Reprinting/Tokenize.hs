@@ -43,6 +43,8 @@ import Data.Term
 -- typeclass, and is compiled to a 'Data.Machine.Source' by
 -- 'tokenizing'.
 data Tokenizer a where
+  -- If we hit slowdowns here, let's pull in a Freer monad,
+  -- which might have better >>= performance.
   Pure :: a -> Tokenizer a
   Bind :: Tokenizer a -> (a -> Tokenizer b) -> Tokenizer b
 
@@ -51,7 +53,11 @@ data Tokenizer a where
   Get :: Tokenizer State
   Put :: State -> Tokenizer ()
 
-compile :: State -> Tokenizer a -> Machine.PlanT k Token m (State, a)
+-- Tokenizers are compiled into a Plan capable of being converted
+-- to a Source. Note that the state parameter is internal to the
+-- tokenizer being run: the invoker of 'tokenizing' doesn't need
+-- to keep track of it at all.
+compile :: State -> Tokenizer a -> Machine.Plan k Token (State, a)
 compile p = \case
   Pure a   -> pure (p, a)
   Bind a f -> compile p a >>= (\(new, v) -> compile new (f v))
@@ -59,21 +65,14 @@ compile p = \case
   Get      -> pure (p, p)
   Put p'   -> pure (p', ())
 
-instance Functor Tokenizer where
-  fmap = liftA
+instance Functor Tokenizer where fmap = liftA
 
 instance Applicative Tokenizer where
   pure  = Pure
   (<*>) = ap
 
-instance Monad Tokenizer where
-  (>>=) = Bind
+instance Monad Tokenizer where (>>=) = Bind
 
--- Internal state. This is hidden within Tokenizer rather
--- than being exposed to the outside by reifying this in
--- an Eff State. If we encounter performance problems,
--- we can trade off the slightly more pleasant interface
--- that a deep embedding gets us.
 
 data Strategy
   = Reprinting
@@ -81,11 +80,11 @@ data Strategy
     deriving (Eq, Show)
 
 data State = State
-  { _source   :: Source
-  , _history  :: History
-  , _strategy :: Strategy
-  , _cursor   :: Int
-  , _enabled  :: Bool
+  { _source   :: Source   -- We need to be able to slice
+  , _history  :: History  -- What's the history of the term we're examining
+  , _strategy :: Strategy -- What are we doing right now?
+  , _cursor   :: Int      -- Where do we begin slices?
+  , _enabled  :: Bool     -- Should we ignore ddata tokens
   } deriving (Show, Eq)
 
 
@@ -105,6 +104,7 @@ control = Tell . TControl
 chunk :: Source -> Tokenizer ()
 chunk = Tell . Chunk
 
+-- | Ensures that the final chunk is emitted
 finish :: Tokenizer ()
 finish = do
   crs <- asks _cursor
