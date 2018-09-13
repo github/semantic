@@ -352,6 +352,7 @@ test-suite test
                      , hspec-expectations-pretty-diff
                      , HUnit
                      , leancheck
+                     , machines
                      , mtl
                      , network
                      , proto3-suite

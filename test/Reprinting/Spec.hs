@@ -18,6 +18,7 @@ import Data.Blob
 import Language.JSON.PrettyPrint
 import Language.Ruby.PrettyPrint
 import Language.Python.PrettyPrint
+import qualified Data.Machine as Machine
 
 spec :: Spec
 spec = describe "reprinting" $ do
@@ -32,11 +33,13 @@ spec = describe "reprinting" $ do
 
       it "should pass over a pristine tree" $ do
         let tagged = mark Unmodified tree
-        let toks = tokenizing src tagged
-        toks `shouldBe` [Chunk src]
+        let toks = Machine.run $ tokenizing src tagged
+        toks `shouldSatisfy` not . null
+        head toks `shouldSatisfy` isControl
+        last toks `shouldSatisfy` isChunk
 
       it "should emit control tokens but only 1 chunk for a wholly-modified tree" $ do
-        let toks = tokenizing src (mark Refactored tree)
+        let toks = Machine.run $ tokenizing src (mark Refactored tree)
         for_ @[] [TList, THash] $ \t -> do
           toks `shouldSatisfy` elem (TControl (Enter t))
           toks `shouldSatisfy` elem (TControl (Exit t))
