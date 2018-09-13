@@ -64,6 +64,7 @@ import           Data.Blob
 import           Data.Bool
 import           Data.ByteString.Builder
 import           Data.Diff
+import           Data.Duration
 import qualified Data.Error as Error
 import           Data.Language (Language)
 import           Data.Record
@@ -75,7 +76,7 @@ import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter
 import           Parsing.CMark
 import           Parsing.Parser
-import           Parsing.TreeSitter hiding (Timeout)
+import           Parsing.TreeSitter
 import           Prologue hiding (MonadError (..), project)
 import           Semantic.Config
 import           Semantic.Distribute
@@ -249,7 +250,8 @@ runParser blob@Blob{..} parser = case parser of
             writeLog Error "failed parsing" (("task", "parse") : blobFields)
             throwError (toException err)
 
-          res <- timeout 10000 . time "parse.assign" languageTag $
+          -- TODO: Could give assignment a dedicated config for it's timeout.
+          res <- timeout (fromSeconds 3) . time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
                 writeStat (increment "parse.assign_errors" languageTag)
@@ -267,4 +269,7 @@ runParser blob@Blob{..} parser = case parser of
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
           case res of
             Just r -> pure r
-            Nothing -> throwError (SomeException (AssignmentTimedOut blobPath blobLanguage))
+            Nothing -> do
+              writeStat (increment "assign.assign_timeouts" languageTag)
+              writeLog Error "assignment timeout" (("task", "assign") : blobFields)
+              throwError (SomeException (AssignmentTimedOut blobPath blobLanguage))
