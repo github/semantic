@@ -40,6 +40,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete
     (Value, ValueError (..), runBoolean, runFunction, runValueErrorWith)
@@ -354,7 +355,7 @@ resumingLoadError :: ( Applicative (m address value effects)
                   => m address value (Resumable (BaseError (LoadError address)) ': effects) a
                   -> m address value effects a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
-  ModuleNotFoundError _ -> pure (undefined, (lowerBound, hole)))
+  ModuleNotFoundError _ -> pure (ScopeGraph.emptyGraph, (lowerBound, hole)))
 
 resumingEvalError :: ( Applicative (m effects)
                      , Effectful m
