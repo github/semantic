@@ -209,17 +209,19 @@ instance Evaluatable Class where
     span <- ask @Span
     -- Add the class to the current scope.
     declare (Declaration name) span
-    -- Start a new scope.
+    -- Run the action within the class's scope.
     currentScope' <- currentScope
-    newScope (Map.singleton P [ currentScope' ])
+    let edges = maybe mempty (Map.singleton P . pure) currentScope'
+    newScope edges $ do
+      supers <- traverse subtermAddress classSuperclasses
+      (_, addr) <- letrec name $ do
+        void $ subtermValue classBody
+        classBinds <- Env.head <$> getEnv
+        klass name supers classBinds
+      bind name addr
+      pure (Rval addr)
 
-    supers <- traverse subtermAddress classSuperclasses
-    (_, addr) <- letrec name $ do
-      void $ subtermValue classBody
-      classBinds <- Env.head <$> getEnv
-      klass name supers classBinds
-    bind name addr
-    pure (Rval addr)
+
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
