@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, UndecidableInstances #-}
 
 module Reprinting.Tokenize
   ( module Data.Reprinting.Token
@@ -25,35 +25,153 @@ module Reprinting.Tokenize
   , tokenizing
   ) where
 
-import Prelude hiding (fail, log)
-import Prologue hiding (hash, Element)
+import Prelude hiding (fail, log, filter)
+import Prologue hiding (Element, hash)
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Writer
-import Data.History
-import Data.List (intersperse)
-import Data.Range
-import Data.Record
-import Data.Reprinting.Token
-import Data.Sequence (singleton)
-import Data.Source
-import Data.Term
+import           Data.History
+import           Data.List (intersperse)
+import qualified Data.Machine as Machine
+import           Data.Range
+import           Data.Record
+import           Data.Reprinting.Token
+import           Data.Source
+import           Data.Term
 
 -- | The 'Tokenizer' monad represents a context in which 'Control'
 -- tokens and 'Element' tokens can be sent to some downstream
 -- consumer. Its primary interface is through the 'Tokenize'
--- typeclass.
-type Tokenizer = Eff '[Reader RPContext, State RPState, Writer (Seq Token)]
+-- typeclass, and is compiled to a 'Data.Machine.Source' by
+-- 'tokenizing'.
+data Tokenizer a where
+  Pure :: a -> Tokenizer a
+  Bind :: Tokenizer a -> (a -> Tokenizer b) -> Tokenizer b
+
+  Tell :: Token -> Tokenizer ()
+
+  Get :: Tokenizer State
+  Put :: State -> Tokenizer ()
+
+-- Tokenizers are compiled into a Plan capable of being converted
+-- to a Source. Note that the state parameter is internal to the
+-- tokenizer being run: the invoker of 'tokenizing' doesn't need
+-- to keep track of it at all.
+compile :: State -> Tokenizer a -> Machine.Plan k Token (State, a)
+compile p = \case
+  Pure a   -> pure (p, a)
+  Bind a f -> compile p a >>= (\(new, v) -> compile new (f v))
+  Tell t   -> Machine.yield t $> (p, ())
+  Get      -> pure (p, p)
+  Put p'   -> pure (p', ())
+
+instance Functor Tokenizer where fmap = liftA
+
+instance Applicative Tokenizer where
+  pure  = Pure
+  (<*>) = ap
+
+instance Monad Tokenizer where (>>=) = Bind
+
+data Strategy
+  = Reprinting
+  | PrettyPrinting
+    deriving (Eq, Show)
+
+data Filter
+  = AllowAll
+  | ForbidData
+    deriving (Eq, Show)
+
+data State = State
+  { source   :: Source   -- We need to be able to slice
+  , history  :: History  -- What's the history of the term we're examining
+  , strategy :: Strategy -- What are we doing right now?
+  , cursor   :: Int      -- Where do we begin slices?
+  , filter   :: Filter   -- Should we ignore data tokens?
+  } deriving (Show, Eq)
+
+-- Builtins
 
 -- | Yield an 'Element' token in a 'Tokenizer' context.
 yield :: Element -> Tokenizer ()
-yield = tell . singleton . TElement
+yield e = do
+  on <- filter <$> Get
+  when (on == AllowAll) . Tell . TElement $ e
 
--- | Yield a 'Control' token in a 'Tokenizer' context.
+-- | Yield a 'Control' token.
 control :: Control -> Tokenizer ()
-control = tell . singleton . TControl
+control = Tell . TControl
+
+-- | Yield a 'Chunk' of some 'Source'.
+chunk :: Source -> Tokenizer ()
+chunk = Tell . Chunk
+
+-- | Ensures that the final chunk is emitted
+finish :: Tokenizer ()
+finish = do
+  crs <- asks cursor
+  log ("Finishing, cursor is " <> show crs)
+  src <- asks source
+  chunk (dropSource crs src)
+
+-- State handling
+
+asks :: (State -> a) -> Tokenizer a
+asks f = f <$> Get
+
+modify :: (State -> State) -> Tokenizer ()
+modify f = Get >>= \x -> Put . f $! x
+
+allowAll, forbidData :: Tokenizer ()
+allowAll   = modify (\x -> x { filter = AllowAll })
+forbidData = modify (\x -> x { filter = ForbidData })
+
+move :: Int -> Tokenizer ()
+move c = modify (\x -> x { cursor = c })
+
+withHistory :: (Annotated t (Record fields), HasField fields History)
+            => t
+            -> Tokenizer a
+            -> Tokenizer a
+withHistory t act = do
+  old <- asks history
+  modify (\x -> x { history = getField (annotation t)})
+  act <* modify (\x -> x { history = old })
+
+withStrategy :: Strategy -> Tokenizer a -> Tokenizer a
+withStrategy s act = do
+  old <- Get
+  Put (old { strategy = s })
+  res <- act
+  new <- Get
+  Put (new { strategy = strategy old })
+  pure res
+
+-- The reprinting algorithm.
+
+-- | A subterm algebra inspired by the /Scrap Your Reprinter/ algorithm.
+descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
+descend t = do
+  (State src hist strat crs _) <- asks id
+  let into s = withHistory (subterm s) (subtermRef s)
+  case (hist, strat) of
+    (Unmodified _, _) -> do
+      tokenize (fmap into t)
+      forbidData
+    (Refactored _, PrettyPrinting) -> do
+      allowAll
+      tokenize (fmap into t)
+    (Refactored r, Reprinting) -> do
+      allowAll
+      let delimiter = Range crs (start r)
+      unless (delimiter == Range 0 0) $ do
+        log ("slicing: " <> show delimiter)
+        chunk (slice delimiter src)
+      move (start r)
+      tokenize (fmap (withStrategy PrettyPrinting . into) t)
+      move (end r)
+
+
+-- Combinators
 
 -- | Emit a log message to the token stream. Useful for debugging.
 log :: String -> Tokenizer ()
@@ -106,6 +224,15 @@ class (Show1 constr, Traversable constr) => Tokenize constr where
   -- | Should emit control and data tokens.
   tokenize :: FAlgebra constr (Tokenizer ())
 
+tokenizing :: (Show (Record fields), Tokenize a, HasField fields History)
+           => Source
+           -> Term a (Record fields)
+           -> Machine.Source Token
+tokenizing src term = pipe
+  where pipe  = Machine.construct . fmap snd $ compile state go
+        state = State src (getField (termAnnotation term)) Reprinting 0 ForbidData
+        go    = forbidData *> foldSubterms descend term <* finish
+
 -- | Sums of reprintable terms are reprintable.
 instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Tokenize fs) => Tokenize (Sum fs) where
   tokenize = apply @Tokenize tokenize
@@ -116,76 +243,3 @@ instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize
 
 instance Tokenize [] where
   tokenize = imperative
-
--- | The top-level function. Pass in a 'Source' and a 'Term' and
--- you'll get out a 'Seq' of 'Token's for later processing.
-tokenizing :: (Show (Record fields), Tokenize a, HasField fields History) => Source -> Term a (Record fields) -> Seq Token
-tokenizing s t = let h = getField (termAnnotation t) in
-  run
-  . fmap fst
-  . runWriter
-  . fmap snd
-  . runState (RPState 0)
-  . runReader (RPContext s h Reprinting)
-  $ foldSubterms descend t *> finish
-
--- Private interfaces
-
-newtype RPState = RPState
-  { _cursor   :: Int -- from SYR, used to slice and dice a 'Source' (mutates)
-  } deriving (Show, Eq)
-
-setCursor :: Int -> RPState -> RPState
-setCursor c s = s { _cursor = c }
-
-data RPContext = RPContext
-  { _source  :: Source
-  , _history :: History
-  , _strategy :: Strategy
-  } deriving (Show, Eq)
-
-data Strategy
-  = Reprinting
-  | PrettyPrinting
-    deriving (Eq, Show)
-
-setStrategy :: Strategy -> RPContext -> RPContext
-setStrategy s c = c { _strategy = s }
-
-setHistory :: History -> RPContext -> RPContext
-setHistory h c = c { _history = h }
-
-chunk :: Source -> Tokenizer ()
-chunk = tell . singleton . Chunk
-
-finish :: Tokenizer ()
-finish = do
-  crs <- gets _cursor
-  src <- asks _source
-  chunk (dropSource crs src)
-
-withHistory :: (Annotated t (Record fields), HasField fields History) => t -> Tokenizer a -> Tokenizer a
-withHistory x = local (setHistory (getField (annotation x)))
-
-withStrategy :: Strategy -> Tokenizer a -> Tokenizer a
-withStrategy x = local (setStrategy x)
-
--- | A subterm algebra inspired by the /Scrap Your Reprinter/ algorithm.
-descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
-descend t = do
-  -- log (showsPrec1 0 (() <$ t) "")
-  hist <- asks _history
-  strat <- asks _strategy
-  let into s = withHistory (subterm s) (subtermRef s)
-  case (hist, strat) of
-    (Unmodified _, _) -> traverse_ into t
-    (Refactored _, PrettyPrinting) -> tokenize (fmap into t)
-    (Refactored r, Reprinting) -> do
-      crs <- gets _cursor
-      src <- asks _source
-      let delimiter = Range crs (start r)
-      log ("slicing: " <> show delimiter)
-      chunk (slice delimiter src)
-      modify' (setCursor (start r))
-      tokenize (fmap (withStrategy PrettyPrinting . into) t)
-      modify' (setCursor (end r))

@@ -6,7 +6,7 @@ module Rendering.Symbol
 , parseSymbolFields
 ) where
 
-import Prologue
+import Prologue hiding (when)
 import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
