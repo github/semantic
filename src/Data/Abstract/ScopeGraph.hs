@@ -95,7 +95,7 @@ reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
               scopes <- Map.lookup edge linkMap
               -- Return the first path to the declaration through the scopes.
               getFirst (foldMap (First . ap (go currentAddress currentScope) ((path .) . EPath edge)) scopes)
-            in traverseEdges P <|> traverseEdges I
+            in traverseEdges I <|> traverseEdges P
 
 create :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
 create address edges g@ScopeGraph{..} = g { graph = Map.insert address newScope graph, currentScope = Just address }
