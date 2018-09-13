@@ -18,7 +18,6 @@ module Data.Abstract.ScopeGraph
   , emptyGraph
   , reference
   , create
-  , currentScope
   ) where
 
 import           Data.Abstract.Live
@@ -36,10 +35,10 @@ data Scope scopeAddress = Scope {
   } deriving (Eq, Show, Ord)
 
 
-data ScopeGraph scope = ScopeGraph { unScopeGraph :: (Map scope (Scope scope), scope) }
+data ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope), currentScope :: Maybe scope }
 
-emptyGraph :: scope -> ScopeGraph scope
-emptyGraph scope = ScopeGraph (Map.singleton scope (Scope mempty mempty mempty), scope)
+emptyGraph :: Ord scope => ScopeGraph scope
+emptyGraph = ScopeGraph mempty Nothing
 
 deriving instance Eq address => Eq (ScopeGraph address)
 deriving instance Show address => Show (ScopeGraph address)
@@ -58,65 +57,58 @@ pathDeclaration (DPath d)     = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
 
 pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference (Path scope))
-pathsOfScope scope = fmap references . Map.lookup scope . fst . unScopeGraph
+pathsOfScope scope = fmap references . Map.lookup scope . graph
 
 ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Declaration Span)
-ddataOfScope scope = fmap declarations . Map.lookup scope . fst . unScopeGraph
+ddataOfScope scope = fmap declarations . Map.lookup scope . graph
 
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
-linksOfScope scope = fmap edges . Map.lookup scope . fst . unScopeGraph
+linksOfScope scope = fmap edges . Map.lookup scope . graph
 
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
-lookupScope scope = Map.lookup scope . fst . unScopeGraph
-
-currentScope :: ScopeGraph scope -> scope
-currentScope = snd . unScopeGraph
-
-scopeGraph :: ScopeGraph scope -> Map scope (Scope scope)
-scopeGraph = fst . unScopeGraph
+lookupScope scope = Map.lookup scope . graph
 
 declare :: Ord scope => Declaration -> Span -> ScopeGraph scope -> ScopeGraph scope
-declare declaration ddata graph = let scopeKey = currentScope graph
-  in case lookupScope scopeKey graph of
-    Just scope -> let newScope = scope { declarations = Map.insert declaration ddata (declarations scope) }
-      in graph { unScopeGraph = (Map.insert scopeKey newScope (fst $ unScopeGraph graph), scopeKey) }
-    Nothing -> graph
+declare declaration ddata g@ScopeGraph{..} = fromMaybe g $ do
+  scopeKey <- currentScope
+  scope <- lookupScope scopeKey g
+  let newScope = scope { declarations = Map.insert declaration ddata (declarations scope) }
+  pure $ g { graph = (Map.insert scopeKey newScope graph) }
 
 reference :: Ord scope => Reference -> Declaration -> ScopeGraph scope -> ScopeGraph scope
-reference ref declaration graph = let
-  currentAddress = currentScope graph
-  declDataOfScope address = do
-    dataMap <- ddataOfScope address graph
-    Map.lookup declaration dataMap
-  go currentScope address path =
-    case declDataOfScope address of
-        Just ddata ->
-          let newScope = currentScope { references = Map.insert ref (path (DPath declaration)) (references currentScope) }
-          in Just (graph { unScopeGraph = (Map.insert currentAddress newScope (scopeGraph graph), currentAddress) })
-        Nothing -> let
-          traverseEdges edge = do
-            linkMap <- linksOfScope address graph
-            scopes <- Map.lookup edge linkMap
-            -- Return the first path to the declaration through the scopes.
-            getFirst (foldMap (First . ap (go currentScope) ((path .) . EPath edge)) scopes)
-          in traverseEdges P <|> traverseEdges I
-  in case lookupScope currentAddress graph of
-      Just currentScope -> fromMaybe graph (go currentScope currentAddress id)
-      Nothing           -> graph
+reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
+  currentAddress <- currentScope
+  currentScope' <- lookupScope currentAddress g
+  go currentAddress currentScope' currentAddress id
+  where
+    declDataOfScope address = do
+      dataMap <- ddataOfScope address g
+      Map.lookup declaration dataMap
+    go currentAddress currentScope address path =
+      case declDataOfScope address of
+          Just ddata ->
+            let newScope = currentScope { references = Map.insert ref (path (DPath declaration)) (references currentScope) }
+            in Just (g { graph = Map.insert currentAddress newScope graph })
+          Nothing -> let
+            traverseEdges edge = do
+              linkMap <- linksOfScope address g
+              scopes <- Map.lookup edge linkMap
+              -- Return the first path to the declaration through the scopes.
+              getFirst (foldMap (First . ap (go currentAddress currentScope) ((path .) . EPath edge)) scopes)
+            in traverseEdges P <|> traverseEdges I
 
 create :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
-create address edges graph = graph { unScopeGraph = (Map.insert address newScope (scopeGraph graph), address) }
+create address edges g@ScopeGraph{..} = g { graph = Map.insert address newScope graph, currentScope = Just address }
   where
     newScope = Scope edges mempty mempty
 
 scopeOfRef :: Ord scope => Reference -> ScopeGraph scope -> Maybe scope
-scopeOfRef ref graph = go . Map.keys . fst $ unScopeGraph graph
+scopeOfRef ref g@ScopeGraph{..} = go (Map.keys graph)
   where
-    go (s : scopes') = case pathsOfScope s graph of
-      Just pathMap -> case Map.lookup ref pathMap of
-        Just _  -> Just s
-        Nothing -> go scopes'
-      Nothing -> go scopes'
+    go (s : scopes') = fromMaybe (go scopes') $ do
+      pathMap <- pathsOfScope s g
+      _ <- Map.lookup ref pathMap
+      pure (Just s)
     go [] = Nothing
 
 pathOfRef :: (Ord scope) => Reference -> ScopeGraph scope -> Maybe (Path scope)
@@ -126,13 +118,12 @@ pathOfRef ref graph = do
   Map.lookup ref pathsMap
 
 scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
-scopeOfDeclaration declaration graph = go . Map.keys . fst $ unScopeGraph graph
+scopeOfDeclaration declaration g@ScopeGraph{..} = go (Map.keys graph)
   where
-    go (s : scopes') = case ddataOfScope s graph of
-      Just ddataMap -> case Map.lookup declaration ddataMap of
-        Just _  -> Just s
-        Nothing -> go scopes'
-      Nothing -> go scopes'
+    go (s : scopes') = fromMaybe (go scopes') $ do
+      ddataMap <- ddataOfScope s g
+      _ <- Map.lookup declaration ddataMap
+      pure (Just s)
     go [] = Nothing
 
 newtype Reference = Reference Name
