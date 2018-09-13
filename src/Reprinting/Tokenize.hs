@@ -25,7 +25,7 @@ module Reprinting.Tokenize
   , tokenizing
   ) where
 
-import Prelude hiding (fail, log)
+import Prelude hiding (fail, log, filter)
 import Prologue hiding (Element, hash)
 
 import           Data.History
@@ -43,8 +43,6 @@ import           Data.Term
 -- typeclass, and is compiled to a 'Data.Machine.Source' by
 -- 'tokenizing'.
 data Tokenizer a where
-  -- If we hit slowdowns here, let's pull in a Freer monad,
-  -- which might have better >>= performance.
   Pure :: a -> Tokenizer a
   Bind :: Tokenizer a -> (a -> Tokenizer b) -> Tokenizer b
 
@@ -78,12 +76,17 @@ data Strategy
   | PrettyPrinting
     deriving (Eq, Show)
 
+data Filter
+  = AllowAll
+  | ForbidData
+    deriving (Eq, Show)
+
 data State = State
   { source   :: Source   -- We need to be able to slice
   , history  :: History  -- What's the history of the term we're examining
   , strategy :: Strategy -- What are we doing right now?
   , cursor   :: Int      -- Where do we begin slices?
-  , enabled  :: Bool     -- Should we ignore data tokens?
+  , filter   :: Filter   -- Should we ignore data tokens?
   } deriving (Show, Eq)
 
 -- Builtins
@@ -91,8 +94,8 @@ data State = State
 -- | Yield an 'Element' token in a 'Tokenizer' context.
 yield :: Element -> Tokenizer ()
 yield e = do
-  on <- enabled <$> Get
-  when on . Tell . TElement $ e
+  on <- filter <$> Get
+  when (on == AllowAll) . Tell . TElement $ e
 
 -- | Yield a 'Control' token.
 control :: Control -> Tokenizer ()
@@ -118,9 +121,9 @@ asks f = f <$> Get
 modify :: (State -> State) -> Tokenizer ()
 modify f = Get >>= \x -> Put . f $! x
 
-enable, disable :: Tokenizer ()
-enable  = modify (\x -> x { enabled = True })
-disable = modify (\x -> x { enabled = False})
+allowAll, forbidData :: Tokenizer ()
+allowAll   = modify (\x -> x { filter = AllowAll })
+forbidData = modify (\x -> x { filter = ForbidData })
 
 move :: Int -> Tokenizer ()
 move c = modify (\x -> x { cursor = c })
@@ -153,12 +156,12 @@ descend t = do
   case (hist, strat) of
     (Unmodified _, _) -> do
       tokenize (fmap into t)
-      disable
+      forbidData
     (Refactored _, PrettyPrinting) -> do
-      enable
+      allowAll
       tokenize (fmap into t)
     (Refactored r, Reprinting) -> do
-      enable
+      allowAll
       let delimiter = Range crs (start r)
       unless (delimiter == Range 0 0) $ do
         log ("slicing: " <> show delimiter)
@@ -227,8 +230,8 @@ tokenizing :: (Show (Record fields), Tokenize a, HasField fields History)
            -> Machine.Source Token
 tokenizing src term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
-        state = State src (getField (termAnnotation term)) Reprinting 0 False
-        go    = disable *> foldSubterms descend term <* finish
+        state = State src (getField (termAnnotation term)) Reprinting 0 ForbidData
+        go    = forbidData *> foldSubterms descend term <* finish
 
 -- | Sums of reprintable terms are reprintable.
 instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Tokenize fs) => Tokenize (Sum fs) where
