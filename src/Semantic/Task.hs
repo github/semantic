@@ -75,10 +75,11 @@ import           Diffing.Algorithm (Diffable)
 import           Diffing.Interpreter
 import           Parsing.CMark
 import           Parsing.Parser
-import           Parsing.TreeSitter
+import           Parsing.TreeSitter hiding (Timeout)
 import           Prologue hiding (MonadError (..), project)
 import           Semantic.Config
 import           Semantic.Distribute
+import           Semantic.Timeout
 import qualified Semantic.IO as IO
 import           Semantic.Resolution
 import           Semantic.Telemetry
@@ -93,6 +94,7 @@ type TaskEff = Eff '[ Task
                     , Trace
                     , Telemetry
                     , Exc SomeException
+                    , Timeout
                     , Distribute
                     , Lift IO
                     ]
@@ -146,6 +148,7 @@ runTaskWithConfig options logger statter task = do
         run
           = runM
           . runDistribute
+          . runTimeout (runM . runDistribute)
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
@@ -180,7 +183,7 @@ instance Effect Task where
   handleState c dist (Request (Serialize format input) k) = Request (Serialize format input) (dist . (<$ c) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, PureEffects effs) => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Timeout effs, Member Trace effs, PureEffects effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
@@ -196,13 +199,13 @@ runTaskF = interpret $ \ task -> case task of
 logError :: Member Telemetry effs => Config -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Config{..} level blob err = writeLog level (Error.formatError configLogPrintSource configIsTerminal blob err)
 
-data ParserCancelled = ParserTimedOut FilePath Language
+data ParserCancelled = ParserTimedOut FilePath Language | AssignmentTimedOut FilePath Language
   deriving (Show, Typeable)
 
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Trace effs, PureEffects effs) => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Timeout effs, Member Trace effs, PureEffects effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -230,6 +233,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Member (Lift IO) effs
                          , Member (Reader Config) effs
                          , Member Telemetry effs
+                         , Member Timeout effs
                          , Member Trace effs
                          , PureEffects effs
                          )
@@ -244,7 +248,8 @@ runParser blob@Blob{..} parser = case parser of
             writeStat (increment "parse.parse_failures" languageTag)
             writeLog Error "failed parsing" (("task", "parse") : blobFields)
             throwError (toException err)
-          time "parse.assign" languageTag $
+
+          res <- timeout 10000 . time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
                 writeStat (increment "parse.assign_errors" languageTag)
@@ -260,3 +265,6 @@ runParser blob@Blob{..} parser = case parser of
                     logError config Warning blob err (("task", "assign") : blobFields)
                     when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
+          case res of
+            Just r -> pure r
+            Nothing -> throwError (SomeException (AssignmentTimedOut blobPath blobLanguage))
