@@ -3,6 +3,8 @@
 module Data.Syntax.Statement where
 
 import Data.Abstract.Evaluatable
+import Control.Abstract.ScopeGraph
+import qualified Data.Map.Strict as Map
 import Data.Aeson (ToJSON1 (..))
 import Data.JSON.Fields
 import Data.Semigroup.App
@@ -27,7 +29,10 @@ instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
 instance ToJSON1 Statements
 
 instance Evaluatable Statements where
-  eval (Statements xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
+  eval (Statements xs) = do
+    currentScope' <- currentScope
+    let edges = maybe mempty (Map.singleton P . pure) currentScope'
+    newScope edges $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
