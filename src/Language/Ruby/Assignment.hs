@@ -7,7 +7,7 @@ module Language.Ruby.Assignment
 , Term
 ) where
 
-import Prologue hiding (for)
+import Prologue hiding (for, unless)
 
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
