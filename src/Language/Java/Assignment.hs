@@ -254,7 +254,7 @@ modifier = make <$> symbol Modifier <*> children(Left <$> annotation <|> Right .
     make _ (Left annotation) = annotation
 
 arrayInitializer :: Assignment Term
-arrayInitializer = makeTerm <$> symbol ArrayInitializer <*> (Literal.Array <$> many expression)
+arrayInitializer = makeTerm <$> symbol ArrayInitializer <*> children (Literal.Array <$> many expression)
 
 comment :: Assignment Term
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
