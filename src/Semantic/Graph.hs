@@ -351,6 +351,7 @@ resumingLoadError :: ( Applicative (m address value effects)
                      , Effectful (m address value)
                      , Effects effects
                      , Member Trace effects
+                     , Ord address
                      )
                   => m address value (Resumable (BaseError (LoadError address)) ': effects) a
                   -> m address value effects a
