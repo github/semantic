@@ -129,7 +129,7 @@ evaluate :: ( AbstractValue address value valueEffects
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
-  (scopeGraph, (preludeBinds, _)) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
+  (_, (preludeBinds, _)) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
   foldr (run preludeBinds) ask modules
