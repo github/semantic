@@ -312,6 +312,7 @@ test-suite test
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
+                     , Control.Rewriting.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec

@@ -7,6 +7,7 @@ import qualified Analysis.Ruby.Spec
 import qualified Analysis.TypeScript.Spec
 import qualified Assigning.Assignment.Spec
 import qualified Control.Abstract.Evaluator.Spec
+import qualified Control.Rewriting.Spec
 import qualified Data.Diff.Spec
 import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
@@ -45,6 +46,7 @@ main = do
       describe "Analysis.TypeScript" (Analysis.TypeScript.Spec.spec args)
       describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
       describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
+      describe "Control.Rewriting.Spec" Control.Rewriting.Spec.spec
       describe "Data.Diff" Data.Diff.Spec.spec
       describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
       describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
