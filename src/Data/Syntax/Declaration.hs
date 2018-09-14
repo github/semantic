@@ -215,7 +215,7 @@ instance Evaluatable Class where
       scope <- associatedScope (Declaration name)
       (scope,) <$> subtermAddress superclass
 
-    let imports = ((I,) <$> (fmap pure . catMaybes $ fst <$> supers))
+    let imports = (I,) <$> (fmap pure . catMaybes $ fst <$> supers)
         current = maybe mempty (fmap (P, ) . pure . pure) currentScope'
         edges = Map.fromList (imports <> current)
     childScope <- newScope edges
