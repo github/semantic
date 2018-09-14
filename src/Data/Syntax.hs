@@ -167,7 +167,7 @@ instance Evaluatable Identifier where
   eval (Identifier name) = pure (LvalLocal name)
 
 instance Tokenize Identifier where
-  tokenize = yield . Fragment . formatName . Data.Syntax.name
+  tokenize = yield . Run . formatName . Data.Syntax.name
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
