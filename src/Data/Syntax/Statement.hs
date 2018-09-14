@@ -32,7 +32,8 @@ instance Evaluatable Statements where
   eval (Statements xs) = do
     currentScope' <- currentScope
     let edges = maybe mempty (Map.singleton P . pure) currentScope'
-    newScope edges $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
+    scope <- newScope edges
+    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
@@ -141,8 +142,17 @@ instance Evaluatable Assignment where
     rhs <- subtermAddress assignmentValue
 
     case lhs of
-      LvalLocal nam -> do
-        bind nam rhs
+      LvalLocal name -> do
+        case (declaredName (subterm assignmentValue)) of
+          Just rhsName -> do
+            assocScope <- associatedScope (Declaration rhsName)
+            let edges = maybe mempty (Map.singleton I . pure) assocScope
+            objectScope <- newScope edges
+            putDeclarationScope (Declaration name) objectScope
+          Nothing ->
+            -- The rhs wasn't assigned to a reference/declaration.
+            pure ()
+        bind name rhs
       LvalMember _ _ ->
         -- we don't yet support mutable object properties:
         pure ()

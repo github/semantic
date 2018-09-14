@@ -135,7 +135,7 @@ instance Evaluatable VariableDeclaration where
         subtermSpan <- get @Span
         pure (subtermSpan, ref)
 
-      declare (Declaration name) span
+      declare (Declaration name) span Nothing -- TODO is it true that variable declarations never have an associated scope?
 
       address valueRef
     rvalBox =<< tuple addresses
@@ -175,7 +175,7 @@ instance Evaluatable PublicFieldDefinition where
   eval PublicFieldDefinition{..} = do
     span <- ask @Span
     propertyName <- maybeM (throwEvalError NoNameError) (declaredName (subterm publicFieldPropertyName))
-    declare (Declaration propertyName) span
+    declare (Declaration propertyName) span Nothing
     rvalBox unit
 
 
@@ -207,12 +207,12 @@ instance Evaluatable Class where
   eval Class{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
     span <- ask @Span
-    -- Add the class to the current scope.
-    declare (Declaration name) span
     -- Run the action within the class's scope.
     currentScope' <- currentScope
     let edges = maybe mempty (Map.singleton P . pure) currentScope'
-    newScope edges $ do
+    childScope <- newScope edges
+    declare (Declaration name) span (Just childScope)
+    withScope childScope $ do
       supers <- traverse subtermAddress classSuperclasses
       (_, addr) <- letrec name $ do
         void $ subtermValue classBody

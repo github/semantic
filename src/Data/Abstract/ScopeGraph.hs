@@ -17,7 +17,9 @@ module Data.Abstract.ScopeGraph
   , declare
   , emptyGraph
   , reference
-  , create
+  , newScope
+  , associatedScope
+  , insertDeclarationScope
   ) where
 
 import           Data.Abstract.Live
@@ -31,7 +33,7 @@ import           Prologue
 data Scope scopeAddress = Scope {
     edges        :: Map EdgeLabel [scopeAddress] -- Maybe Map EdgeLabel [Path scope]?
   , references   :: Map Reference (Path scopeAddress)
-  , declarations :: Map Declaration Span
+  , declarations :: Map Declaration (Span, Maybe scopeAddress)
   } deriving (Eq, Show, Ord)
 
 
@@ -59,7 +61,7 @@ pathDeclaration (EPath _ _ p) = pathDeclaration p
 pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference (Path scope))
 pathsOfScope scope = fmap references . Map.lookup scope . graph
 
-ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Declaration Span)
+ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Declaration (Span, Maybe scope))
 ddataOfScope scope = fmap declarations . Map.lookup scope . graph
 
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
@@ -68,11 +70,11 @@ linksOfScope scope = fmap edges . Map.lookup scope . graph
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
 lookupScope scope = Map.lookup scope . graph
 
-declare :: Ord scope => Declaration -> Span -> ScopeGraph scope -> ScopeGraph scope
-declare declaration ddata g@ScopeGraph{..} = fromMaybe g $ do
+declare :: Ord scope => Declaration -> Span -> Maybe scope -> ScopeGraph scope -> ScopeGraph scope
+declare declaration ddata assocScope g@ScopeGraph{..} = fromMaybe g $ do
   scopeKey <- currentScope
   scope <- lookupScope scopeKey g
-  let newScope = scope { declarations = Map.insert declaration ddata (declarations scope) }
+  let newScope = scope { declarations = Map.insert declaration (ddata, assocScope) (declarations scope) }
   pure $ g { graph = (Map.insert scopeKey newScope graph) }
 
 reference :: Ord scope => Reference -> Declaration -> ScopeGraph scope -> ScopeGraph scope
@@ -97,8 +99,15 @@ reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
               getFirst (foldMap (First . ap (go currentAddress currentScope) ((path .) . EPath edge)) scopes)
             in traverseEdges I <|> traverseEdges P
 
-create :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
-create address edges g@ScopeGraph{..} = g { graph = Map.insert address newScope graph, currentScope = Just address }
+insertDeclarationScope :: Ord address => Declaration -> address -> ScopeGraph address -> ScopeGraph address
+insertDeclarationScope decl address g@ScopeGraph{..} = fromMaybe g $ do
+  declScope <- scopeOfDeclaration decl g
+  scope <- lookupScope declScope g
+  (span, _) <- Map.lookup decl (declarations scope)
+  pure $ g { graph = Map.insert declScope (scope { declarations = Map.insert decl (span, Just address) (declarations scope) }) graph }
+
+newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
+newScope address edges g@ScopeGraph{..} = g { graph = Map.insert address newScope graph }
   where
     newScope = Scope edges mempty mempty
 
@@ -117,6 +126,7 @@ pathOfRef ref graph = do
   pathsMap <- pathsOfScope scope graph
   Map.lookup ref pathsMap
 
+-- Returns the scope the declaration was declared in.
 scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 scopeOfDeclaration declaration g@ScopeGraph{..} = go (Map.keys graph)
   where
@@ -124,6 +134,15 @@ scopeOfDeclaration declaration g@ScopeGraph{..} = go (Map.keys graph)
       ddataMap <- ddataOfScope s g
       _ <- Map.lookup declaration ddataMap
       pure (Just s)
+    go [] = Nothing
+
+associatedScope :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
+associatedScope declaration g@ScopeGraph{..} = go (Map.keys graph)
+  where
+    go (s : scopes') = fromMaybe (go scopes') $ do
+      ddataMap <- ddataOfScope s g
+      (_, assocScope) <- Map.lookup declaration ddataMap
+      pure assocScope
     go [] = Nothing
 
 newtype Reference = Reference Name
