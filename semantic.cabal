@@ -48,6 +48,8 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
+                     -- Rewriting
+                     , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Located
@@ -239,6 +241,7 @@ library
                      , parsers
                      , prettyprinter
                      , pretty-show
+                     , profunctors
                      , recursion-schemes
                      , reducers
                      , scientific
