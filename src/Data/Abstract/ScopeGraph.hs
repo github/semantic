@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GADTs #-}
 module Data.Abstract.ScopeGraph
   ( ScopeGraph(..)
   , Path
@@ -75,7 +75,7 @@ declare declaration ddata assocScope g@ScopeGraph{..} = fromMaybe g $ do
   scopeKey <- currentScope
   scope <- lookupScope scopeKey g
   let newScope = scope { declarations = Map.insert declaration (ddata, assocScope) (declarations scope) }
-  pure $ g { graph = (Map.insert scopeKey newScope graph) }
+  pure $ g { graph = Map.insert scopeKey newScope graph }
 
 reference :: Ord scope => Reference -> Declaration -> ScopeGraph scope -> ScopeGraph scope
 reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do

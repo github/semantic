@@ -143,7 +143,7 @@ instance Evaluatable Assignment where
 
     case lhs of
       LvalLocal name -> do
-        case (declaredName (subterm assignmentValue)) of
+        case declaredName (subterm assignmentValue) of
           Just rhsName -> do
             assocScope <- associatedScope (Declaration rhsName)
             let edges = maybe mempty (Map.singleton I . pure) assocScope

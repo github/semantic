@@ -366,7 +366,7 @@ instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ExtendsClause where
   eval ExtendsClause{..} = do
     -- Evaluate subterms
-    _ <- traverse subtermRef extendsClauses
+    traverse_ subtermRef extendsClauses
     rvalBox unit
 
 newtype ArrayType a = ArrayType { arrayType :: a }
