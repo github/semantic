@@ -264,7 +264,6 @@ library
                      , tree-sitter-ruby
                      , tree-sitter-typescript
                      , tree-sitter-java
-                     , type-combinators
   default-language:    Haskell2010
   default-extensions:  DataKinds
                      , DeriveFoldable
