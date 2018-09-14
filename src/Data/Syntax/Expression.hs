@@ -530,7 +530,10 @@ instance Ord1 New where liftCompare = genericLiftCompare
 instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for New
-instance Evaluatable New
+instance Evaluatable New where
+  eval (New a) =
+    -- TODO: Traverse subterms and instantiate frames from the corresponding scope
+    rvalBox unit
 
 -- | A cast expression to a specified type.
 data Cast a =  Cast { castSubject :: !a, castType :: !a }
