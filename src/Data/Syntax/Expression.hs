@@ -2,6 +2,8 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Expression where
 
+import qualified Data.Map.Strict as Map
+import Control.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Bits
@@ -432,7 +434,17 @@ instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
   eval (MemberAccess obj propName) = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm obj))
+    reference (Reference name) (Declaration name)
+    childScope <- associatedScope (Declaration name)
+
     ptr <- subtermAddress obj
+    case childScope of
+      Just childScope -> withScope childScope $ reference (Reference propName) (Declaration propName)
+      Nothing ->
+        -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
+        pure ()
+
     pure $! LvalMember ptr propName
 
 -- | Subscript (e.g a[1])
@@ -523,7 +535,11 @@ instance Evaluatable Await where
 
 -- | An object constructor call in Javascript, Java, etc.
 newtype New a = New { newSubject :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Declarations1 New where
+  liftDeclaredName _ (New []) = Nothing
+  liftDeclaredName declaredName (New (subject : _)) = declaredName subject
 
 instance Eq1 New where liftEq = genericLiftEq
 instance Ord1 New where liftCompare = genericLiftCompare
@@ -531,7 +547,9 @@ instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for New
 instance Evaluatable New where
-  eval (New a) =
+  eval (New [subject]) = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm subject))
+    reference (Reference name) (Declaration name)
     -- TODO: Traverse subterms and instantiate frames from the corresponding scope
     rvalBox unit
 
