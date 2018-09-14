@@ -6,6 +6,7 @@ module Data.Abstract.ScopeGraph
   , Reference(..)
   , Declaration(..)
   , EdgeLabel(..)
+  , Frame
   , Heap
   , frameLookup
   , scopeLookup
@@ -15,12 +16,19 @@ module Data.Abstract.ScopeGraph
   , setSlot
   , lookup
   , scopeOfRef
+  , pathOfRef
   , declare
   , emptyGraph
   , reference
   , newScope
   , associatedScope
   , insertDeclarationScope
+  , newFrame
+  , initFrame
+  , insertFrame
+  , fillFrame
+  , deleteFrame
+  , heapSize
   ) where
 
 import           Data.Abstract.Name
@@ -168,68 +176,68 @@ newtype Declaration = Declaration Name
 data EdgeLabel = P | I
   deriving (Eq, Ord, Show)
 
-data Frame scopeAddress frameAddress declaration value = Frame {
+data Frame scopeAddress frameAddress value = Frame {
     scopeAddress :: scopeAddress
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
-  , slots        :: Map declaration value
+  , slots        :: Map Declaration value
   }
 
-newtype Heap scopeAddress frameAddress declaration value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress declaration value) }
+newtype Heap scopeAddress frameAddress value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress value) }
 
 -- | Look up the frame for an 'address' in a 'Heap', if any.
-frameLookup :: Ord address => address -> Heap scope address declaration value -> Maybe (Frame scope address declaration value)
+frameLookup :: Ord address => address -> Heap scope address value -> Maybe (Frame scope address value)
 frameLookup address = Map.lookup address . unHeap
 
 -- | Look up the scope address for a given frame address.
-scopeLookup :: Ord address => address -> Heap scope address declaration value -> Maybe scope
+scopeLookup :: Ord address => address -> Heap scope address value -> Maybe scope
 scopeLookup address = fmap scopeAddress . frameLookup address
 
-frameSlots :: Ord address => address -> Heap scope address declaration value -> Maybe (Map declaration value)
+frameSlots :: Ord address => address -> Heap scope address value -> Maybe (Map Declaration value)
 frameSlots address = fmap slots . frameLookup address
 
-frameLinks :: Ord address => address -> Heap scope address declaration value -> Maybe (Map EdgeLabel (Map scope address))
+frameLinks :: Ord address => address -> Heap scope address value -> Maybe (Map EdgeLabel (Map scope address))
 frameLinks address = fmap links . frameLookup address
 
-getSlot :: (Ord address, Ord declaration) => address -> Heap scope address declaration value -> declaration -> Maybe value
+getSlot :: Ord address => address -> Heap scope address value -> Declaration -> Maybe value
 getSlot address heap declaration = do
   slotMap <- frameSlots address heap
   Map.lookup declaration slotMap
 
-setSlot :: (Ord address, Ord declaration) => address -> declaration -> value -> Heap scope address declaration value -> Heap scope address declaration value
+setSlot :: Ord address => address -> Declaration -> value -> Heap scope address value -> Heap scope address value
 setSlot address declaration value heap =
     case frameLookup address heap of
       Just frame -> let slotMap = slots frame in
         Heap $ Map.insert address (frame { slots = Map.insert declaration value slotMap }) (unHeap heap)
       Nothing -> heap
 
-lookup :: (Ord address, Ord scope) => Heap scope address declaration value -> address -> Path scope -> declaration -> Maybe scope
-lookup heap address (DPath d) declaration = scopeLookup address heap
+lookup :: (Ord address, Ord scope) => Heap scope address value -> address -> Path scope -> Declaration -> Maybe scope
+lookup heap address (DPath d) declaration = guard (d == declaration) >> scopeLookup address heap
 lookup heap address (EPath label scope path) declaration = do
     frame <- frameLookup address heap
     scopeMap <- Map.lookup label (links frame)
     nextAddress <- Map.lookup scope scopeMap
     lookup heap nextAddress path declaration
 
-newFrame :: (Ord address, Ord declaration) => scope -> address -> Map EdgeLabel (Map scope address) -> Heap scope address declaration value -> Heap scope address declaration value
+newFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Heap scope address value -> Heap scope address value
 newFrame scope address links = insertFrame address (Frame scope links mempty)
 
-initFrame :: (Ord address, Ord declaration) => scope -> address -> Map EdgeLabel (Map scope address) -> Map declaration value -> Heap scope address declaration value -> Heap scope address declaration value
+initFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Map Declaration value -> Heap scope address value -> Heap scope address value
 initFrame scope address links slots = fillFrame address slots . newFrame scope address links
 
-insertFrame :: Ord address => address -> Frame scope address declaration value -> Heap scope address declaration value -> Heap scope address declaration value
+insertFrame :: Ord address => address -> Frame scope address value -> Heap scope address value -> Heap scope address value
 insertFrame address frame = Heap . Map.insert address frame . unHeap
 
-fillFrame :: Ord address => address -> Map declaration value -> Heap scope address declaration value -> Heap scope address declaration value
+fillFrame :: Ord address => address -> Map Declaration value -> Heap scope address value -> Heap scope address value
 fillFrame address slots heap =
   case frameLookup address heap of
     Just frame -> insertFrame address (frame { slots = slots }) heap
     Nothing    -> heap
 
-deleteFrame :: Ord address => address -> Heap scope address declaration value -> Heap scope address declaration value
+deleteFrame :: Ord address => address -> Heap scope address value -> Heap scope address value
 deleteFrame address = Heap . Map.delete address . unHeap
 
 -- | The number of frames in the `Heap`.
-heapSize :: Heap scope address declaration value -> Int
+heapSize :: Heap scope address value -> Int
 heapSize = Map.size . unHeap
 
 -- -- | Look up the list of values stored for a given address, if any.
