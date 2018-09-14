@@ -15,7 +15,7 @@ spec config = parallel $ do
     it "evaluates include and require" $ do
       (_, (heap, res)) <- evaluate ["main.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main.php" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> do
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           heapLookupAll addr heap `shouldBe` Just [unit]
           Env.names env `shouldBe` [ "bar", "foo" ]
         other -> expectationFailure (show other)
@@ -23,7 +23,7 @@ spec config = parallel $ do
     it "evaluates include_once and require_once" $ do
       (_, (heap, res)) <- evaluate ["main_once.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main_once.php" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> do
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           heapLookupAll addr heap `shouldBe` Just [unit]
           Env.names env `shouldBe` [ "bar", "foo" ]
         other -> expectationFailure (show other)
@@ -31,7 +31,7 @@ spec config = parallel $ do
     it "evaluates namespaces" $ do
       (_, (heap, res)) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> do
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldBe` [ "Foo", "NS1" ]
 
           (derefQName heap ("NS1" :| [])               env >>= deNamespace heap) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])
