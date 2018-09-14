@@ -209,15 +209,23 @@ instance Evaluatable Class where
     span <- ask @Span
     -- Run the action within the class's scope.
     currentScope' <- currentScope
-    let edges = maybe mempty (Map.singleton P . pure) currentScope'
+
+    supers <- for classSuperclasses $ \superclass -> do
+      name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
+      scope <- associatedScope (Declaration name)
+      (scope,) <$> subtermAddress superclass
+
+    let imports = ((I,) <$> (fmap pure . catMaybes $ fst <$> supers))
+        current = maybe mempty (fmap (P, ) . pure . pure) currentScope'
+        edges = Map.fromList (imports <> current)
     childScope <- newScope edges
     declare (Declaration name) span (Just childScope)
+
     withScope childScope $ do
-      supers <- traverse subtermAddress classSuperclasses
       (_, addr) <- letrec name $ do
         void $ subtermValue classBody
         classBinds <- Env.head <$> getEnv
-        klass name supers classBinds
+        klass name (snd <$> supers) classBinds
       bind name addr
       pure (Rval addr)
 

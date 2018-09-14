@@ -284,7 +284,12 @@ instance Declarations1 TypeIdentifier where
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
 instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
 instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable TypeIdentifier
+-- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
+instance Evaluatable TypeIdentifier where
+  eval TypeIdentifier{..} = do
+    -- Add a reference to the type identifier in the current scope.
+    reference (Reference (name contents)) (Declaration (name contents))
+    rvalBox unit
 
 data NestedIdentifier a = NestedIdentifier { left :: !a, right :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -348,12 +353,21 @@ instance Declarations a => Declarations (EnumDeclaration a) where
   declaredName EnumDeclaration{..} = declaredName enumDeclarationIdentifier
 
 newtype ExtendsClause a = ExtendsClause { extendsClauses :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Declarations1 ExtendsClause where
+  liftDeclaredName _ (ExtendsClause []) = Nothing
+  liftDeclaredName declaredName (ExtendsClause (x : _)) = declaredName x
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
 instance Ord1 ExtendsClause where liftCompare = genericLiftCompare
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable ExtendsClause
+-- TODO: ExtendsClause shouldn't evaluate to an address in the heap?
+instance Evaluatable ExtendsClause where
+  eval ExtendsClause{..} = do
+    -- Evaluate subterms
+    _ <- traverse subtermRef extendsClauses
+    rvalBox unit
 
 newtype ArrayType a = ArrayType { arrayType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
