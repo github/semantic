@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Expression where
 
-import qualified Data.Map.Strict as Map
 import Control.Abstract.ScopeGraph as ScopeGraph
 import Data.Abstract.Evaluatable hiding (Member)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
@@ -550,9 +549,12 @@ instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for New
 instance Evaluatable New where
-  eval (New [subject]) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm subject))
-    reference (Reference name) (Declaration name)
+  eval New{..} = do
+    case newSubject of
+      [] -> pure ()
+      (subject : _) -> do
+        name <- maybeM (throwEvalError NoNameError) (declaredName (subterm subject))
+        reference (Reference name) (Declaration name)
     -- TODO: Traverse subterms and instantiate frames from the corresponding scope
     rvalBox unit
 
