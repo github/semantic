@@ -33,43 +33,54 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
 
   runIO setupExampleRepos
 
-  for_ languages $ \ (lang, ext) -> do
-    let tsDir = languagesDir </> lang </> ("vendor/tree-sitter-" <> lang)
-    parallel . describe lang $ parseExamples args lang ext tsDir
+  for_ languages $ \ lang@LanguageExample{..} -> do
+    let tsDir = languagesDir </> languageName </> ("vendor/tree-sitter-" <> languageName)
+    parallel . describe languageName $ parseExamples args lang tsDir
 
   where
-    parseExamples args lang ext tsDir = do
-      knownFailures <- runIO $ BC.lines <$> (knownFailuresFile tsDir >>= B.readFile)
-      let knownFailures' = (tsDir </>) . BC.unpack <$> knownFailures
-      files <- runIO $ globDir1 (compile ("**/*" <> ext)) (tsDir </> "examples")
+    parseExamples args LanguageExample{..} tsDir = do
+      knownFailures <- runIO $ knownFailuresForPath tsDir languageKnownFailuresTxt
+      files <- runIO $ globDir1 (compile ("**/*" <> languageExtension)) (tsDir </> languageExampleDir)
       for_ files $ \file -> it file $ do
         res <- parseFilePath args file
-        if file `elem` knownFailures'
+        if file `elem` knownFailures
           then pendingWith $ "Known parse failures " <> show (const "Assignment: OK" <$> res)
           else res `shouldSatisfy` isRight
 
     setupExampleRepos = readProcess "script/setup-example-repos" mempty mempty >>= print
     opts = defaultOptions { optionsFailOnWarning = True, optionsLogLevel = Nothing }
 
-    knownFailuresFile tsDir = do
-      let f = tsDir </> "script/known_failures.txt"
-      exists <- doesFileExist f
-      if exists
-        then pure f
-        else pure $ tsDir </> "script/known-failures.txt"
+    knownFailuresForPath :: FilePath -> Maybe FilePath -> IO [FilePath]
+    knownFailuresForPath _     Nothing     = pure []
+    knownFailuresForPath tsDir (Just path) = do
+      known <- BC.lines <$> B.readFile (tsDir </> path)
+      pure $ (tsDir </>) . BC.unpack <$> known
 
-languages :: [(FilePath, FilePath)]
+data LanguageExample
+  = LanguageExample
+  { languageName :: FilePath
+  , languageExtension :: FilePath
+  , languageExampleDir :: FilePath
+  , languageKnownFailuresTxt :: Maybe FilePath
+  } deriving (Eq, Show)
+
+le :: FilePath -> FilePath -> FilePath -> Maybe FilePath -> LanguageExample
+le = LanguageExample
+
+languages :: [LanguageExample]
 languages =
-  [ ("go", ".go")
-  , ("python", ".py")
-  , ("ruby", ".rb")
-  , ("typescript", ".ts")
+  [ le "python" ".py" "examples" (Just "script/known_failures.txt")
+  , le "go" ".go" "examples" (Just "script/known-failures.txt")
+  , le "ruby" ".rb" "examples" (Just "script/known_failures.txt")
+  , le "typescript" ".ts" "examples" (Just "script/known_failures.txt")
+  -- , le "java" ".java" "examples/guava" (Just "script/known_failures_guava.txt")
+  -- , le "java" ".java" "examples/elasticsearch" (Just "script/known_failures_elasticsearch.txt")
+  -- , le "java" ".java" "examples/RxJava" (Just "script/known_failures_RxJava.txt")
+  -- , le "haskell" ".hs" "examples/effects" (Just "script/known-failures-effects.txt")
+  -- , le "haskell" ".hs" "examples/postgrest" (Just "script/known-failures-postgrest.txt")
+  -- , le "haskell" ".hs" "examples/ivory" (Just "script/known-failures-ivory.txt")
 
-  -- TODO: Known failures are a bit more complicated or not in conventional format
-  -- , ("java", ".java")
-  -- , ("haskell", ".hs")
-
-  -- , ("javascript", ".js") -- TODO: Actually tests javascript
+  -- , ("javascript", ".js") -- TODO: Actually test javascript
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
   ]
 
