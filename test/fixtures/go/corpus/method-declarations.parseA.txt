@@ -27,7 +27,7 @@
         (Identifier)))
     (Identifier)
     (Return
-      (TypeConversion
+      (Call
         (MemberAccess
           (Identifier))
         (Plus
@@ -40,7 +40,8 @@
             (MemberAccess
               (Identifier))
             (MemberAccess
-              (Identifier)))))))
+              (Identifier))))
+        (Empty))))
   (Method
     (Statements
       (Assignment

@@ -70,21 +70,23 @@
         {-(Identifier)-})
       ->(MemberAccess
         {+(Identifier)+}) })
-    {+(TypeConversion
+    {+(Call
       {+(MemberAccess
         {+(Identifier)+})+}
-      {+(Identifier)+})+}
-    {+(TypeConversion
-      {+(Parenthesized
-        {+(MemberAccess
-          {+(Identifier)+})+})+}
-      {+(Identifier)+})+}
-    {-(TypeConversion
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(Call
+      {+(MemberAccess
+        {+(Identifier)+})+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {-(Call
       {-(MemberAccess
         {-(Identifier)-})-}
-      {-(Identifier)-})-}
-    {-(TypeConversion
-      {-(Parenthesized
-        {-(MemberAccess
-          {-(Identifier)-})-})-}
-      {-(Identifier)-})-})))
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(Call
+      {-(MemberAccess
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(Empty)-})-})))
