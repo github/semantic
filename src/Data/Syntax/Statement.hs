@@ -146,9 +146,11 @@ instance Evaluatable Assignment where
         case declaredName (subterm assignmentValue) of
           Just rhsName -> do
             assocScope <- associatedScope (Declaration rhsName)
-            let edges = maybe mempty (Map.singleton I . pure) assocScope
-            objectScope <- newScope edges
-            putDeclarationScope (Declaration name) objectScope
+            case assocScope of
+              Just assocScope' -> do
+                objectScope <- newScope (Map.singleton I [ assocScope' ])
+                putDeclarationScope (Declaration name) objectScope
+              Nothing -> pure ()
           Nothing ->
             -- The rhs wasn't assigned to a reference/declaration.
             pure ()
