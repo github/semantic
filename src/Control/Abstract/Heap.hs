@@ -25,6 +25,7 @@ import Control.Abstract.Roots
 import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import Data.Abstract.Heap
+import Data.Abstract.ScopeGraph (Declaration)
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
@@ -32,21 +33,21 @@ import Data.Span (Span)
 import Prologue
 
 -- | Retrieve the heap.
-getHeap :: Member (State (Heap address value)) effects => Evaluator address value effects (Heap address value)
+getHeap :: Member (State (Heap address address value)) effects => Evaluator address value effects (Heap address address value)
 getHeap = get
 
 -- | Set the heap.
-putHeap :: Member (State (Heap address value)) effects => Heap address value -> Evaluator address value effects ()
+putHeap :: Member (State (Heap address address value)) effects => Heap address address value -> Evaluator address value effects ()
 putHeap = put
 
 -- | Update the heap.
-modifyHeap :: Member (State (Heap address value)) effects => (Heap address value -> Heap address value) -> Evaluator address value effects ()
+modifyHeap :: Member (State (Heap address address value)) effects => (Heap address address value -> Heap address address value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
 box :: ( Member (Allocator address) effects
        , Member (Deref value) effects
        , Member Fresh effects
-       , Member (State (Heap address value)) effects
+       , Member (State (Heap address address value)) effects
        , Ord address
        )
     => value
@@ -60,15 +61,15 @@ box val = do
 alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
 alloc = send . Alloc
 
-dealloc :: (Member (State (Heap address value)) effects, Ord address) => address -> Evaluator address value effects ()
-dealloc addr = modifyHeap (heapDelete addr)
+dealloc :: (Member (State (Heap address address value)) effects, Ord address) => address -> Declaration -> value -> Evaluator address value effects ()
+dealloc address decl val = modifyHeap (setSlot address decl val)
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: ( Member (Deref value) effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (AddressError address value))) effects
-         , Member (State (Heap address value)) effects
+         , Member (State (Heap address address value)) effects
          , Ord address
          )
       => address
@@ -78,7 +79,7 @@ deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAd
 
 -- | Write a value to the given address in the 'Allocator'.
 assign :: ( Member (Deref value) effects
-          , Member (State (Heap address value)) effects
+          , Member (State (Heap address address value)) effects
           , Ord address
           )
        => address
@@ -93,7 +94,7 @@ assign addr value = do
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: ( Member (State (Heap address value)) effects
+gc :: ( Member (State (Heap address address value)) effects
       , Ord address
       , ValueRoots address value
       )
@@ -106,7 +107,7 @@ reachable :: ( Ord address
              , ValueRoots address value
              )
           => Live address       -- ^ The set of root addresses.
-          -> Heap address value -- ^ The heap to trace addresses through.
+          -> Heap address address value -- ^ The heap to trace addresses through.
           -> Live address       -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
