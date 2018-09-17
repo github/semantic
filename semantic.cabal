@@ -401,6 +401,7 @@ test-suite parse-examples
                      , hspec-expectations-pretty-diff
                      , process
                      , semantic
+  default-extensions:  RecordWildCards
 
 test-suite doctests
   type:                exitcode-stdio-1.0
