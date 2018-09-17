@@ -4,59 +4,38 @@
   (Function
     (Identifier)
     (Statements
-    {+(Type
-      {+(Identifier)+}
-      {+(BidirectionalChannel
-        {+(ReceiveChannel
-          {+(Identifier)+})+})+})+}
-    {+(Type
-      {+(Identifier)+}
-      {+(SendChannel
-        {+(SendChannel
-          {+(Constructor
-            {+(Empty)+}
-            {+(Statements)+})+})+})+})+}
-    {+(Type
-      {+(Identifier)+}
-      {+(SendChannel
-        {+(ReceiveChannel
-          {+(Identifier)+})+})+})+}
-    {+(Type
-      {+(Identifier)+}
-      {+(ReceiveChannel
-        {+(ReceiveChannel
-          {+(Identifier)+})+})+})+}
-    {+(Type
-      {+(Identifier)+}
-      {+(BidirectionalChannel
-        {+(Parenthesized
-          {+(ReceiveChannel
-            {+(Identifier)+})+})+})+})+}
-    {-(Type
-      {-(Identifier)-}
-      {-(BidirectionalChannel
-        {-(ReceiveChannel
-          {-(Identifier)-})-})-})-}
-    {-(Type
-      {-(Identifier)-}
-      {-(SendChannel
-        {-(SendChannel
-          {-(Constructor
-            {-(Empty)-}
-            {-(Statements)-})-})-})-})-}
-    {-(Type
-      {-(Identifier)-}
-      {-(SendChannel
-        {-(ReceiveChannel
-          {-(Identifier)-})-})-})-}
-    {-(Type
-      {-(Identifier)-}
-      {-(ReceiveChannel
-        {-(ReceiveChannel
-          {-(Identifier)-})-})-})-}
-    {-(Type
-      {-(Identifier)-}
-      {-(BidirectionalChannel
-        {-(Parenthesized
-          {-(ReceiveChannel
-            {-(Identifier)-})-})-})-})-})))
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (BidirectionalChannel
+          (ReceiveChannel
+          { (Identifier)
+          ->(Identifier) })))
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (SendChannel
+          (SendChannel
+            (Constructor
+              (Empty)
+              (Statements)))))
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (SendChannel
+          (ReceiveChannel
+          { (Identifier)
+          ->(Identifier) })))
+      (Type
+        (Identifier)
+        (ReceiveChannel
+          (ReceiveChannel
+          { (Identifier)
+          ->(Identifier) })))
+      (Type
+        (Identifier)
+        (BidirectionalChannel
+          (Parenthesized
+            (ReceiveChannel
+            { (Identifier)
+            ->(Identifier) })))))))
