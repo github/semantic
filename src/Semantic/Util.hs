@@ -39,7 +39,6 @@ import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
 import           Text.Show.Pretty (ppShow, pPrint)
 
-import           Control.Rewriting
 import           Control.Rewriting as Rewriting
 import qualified Data.ByteString as B
 import           Data.History
@@ -172,7 +171,7 @@ onTrees' = do
   guard (null els)
   k <- modified $ Literal.TextElement "\"hi\""
   v <- modified $ Literal.TextElement "\"bye\""
-  pair <- modified $ (Literal.KeyValue k v)
+  pair <- modified $ Literal.KeyValue k v
   pure (Literal.Hash (pair : els))
 
 testJson = do
