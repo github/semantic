@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeOperators #-}
 module Parsing.TreeSitter
-( Timeout (..)
+( Duration(..)
 , parseToAST
 ) where
 
@@ -16,21 +16,20 @@ import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
 import           Foreign.Marshal.Array (allocaArray)
-import           System.Timeout
 
 import Data.AST (AST, Node (Node))
 import Data.Blob
+import Data.Duration
 import Data.Range
 import Data.Source
 import Data.Span
 import Data.Term
+import Semantic.Timeout
 
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
-
-newtype Timeout = Milliseconds Int
 
 data Result grammar
   = Failed
@@ -58,10 +57,8 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Trace effects, PureEffects effects) => Timeout -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
-parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
-  let parserTimeout = s * 1000
-
+parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Timeout effects, Member Trace effects, PureEffects effects) => Duration -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
+parseToAST parseTimeout language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
   liftIO $ do
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
@@ -71,7 +68,7 @@ parseToAST (Milliseconds s) language Blob{..} = bracket TS.ts_parser_new TS.ts_p
   parsing <- liftIO . async $ runParser parser blobSource
 
   -- Kick the parser off asynchronously and wait according to the provided timeout.
-  res <- liftIO . timeout parserTimeout $ wait parsing
+  res <- timeout parseTimeout $ liftIO (wait parsing)
 
   case res of
     Just Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
