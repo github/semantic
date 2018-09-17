@@ -1,6 +1,6 @@
 name:                semantic
 version:             0.4.0
-synopsis:            Initial project template from stack
+synopsis:            Framework and service for analyzing and diffing untrusted code.
 description:         Please see README.md
 homepage:            http://github.com/github/semantic#readme
 author:              Rob Rix, Josh Vera
