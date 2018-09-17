@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: mwc-random
-version: 0.13.6.0
+version: 0.13.3.2
 summary: Fast, high quality pseudo random number generation
 homepage: https://github.com/bos/mwc-random
 license: bsd-2-clause
