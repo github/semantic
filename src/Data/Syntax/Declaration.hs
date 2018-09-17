@@ -131,7 +131,7 @@ instance Evaluatable VariableDeclaration where
     addresses <- for decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName (subterm declaration))
       (span, valueRef) <- do
-        ref <- subtermRef declaration -- (Assignment  [Empty] Identifier Val)
+        ref <- subtermRef declaration
         subtermSpan <- get @Span
         pure (subtermSpan, ref)
 
