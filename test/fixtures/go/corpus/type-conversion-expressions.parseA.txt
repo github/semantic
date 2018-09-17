@@ -54,13 +54,12 @@
               (Identifier))))
         (MemberAccess
           (Identifier)))
-      (Call
+      (TypeConversion
         (MemberAccess
           (Identifier))
-        (Identifier)
-        (Empty))
-      (Call
-        (MemberAccess
-          (Identifier))
-        (Identifier)
-        (Empty)))))
+        (Identifier))
+      (TypeConversion
+        (Parenthesized
+          (MemberAccess
+            (Identifier)))
+        (Identifier)))))

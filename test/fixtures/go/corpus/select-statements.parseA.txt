@@ -27,11 +27,10 @@
             (Receive
               (Empty)
               (ReceiveOperator
-                (Call
+                (TypeConversion
                   (MemberAccess
                     (Identifier))
-                  (Integer)
-                  (Empty))))
+                  (Integer))))
             (Statements
               (Call
                 (Identifier)

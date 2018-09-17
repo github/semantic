@@ -27,7 +27,7 @@
         (Identifier)))
     (Identifier)
     (Return
-      (Call
+      (TypeConversion
         (MemberAccess
           (Identifier))
         (Plus
@@ -52,8 +52,7 @@
                 (Integer))
               (Empty)))
           (MemberAccess
-            (Identifier)))
-        (Empty))))
+            (Identifier))))))
   (Method
     (Statements
       (Assignment

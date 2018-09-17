@@ -31,7 +31,7 @@
   { (Identifier)
   ->(Identifier) }
     (Return
-      (Call
+      (TypeConversion
         (MemberAccess
           (Identifier))
         (Plus
@@ -66,8 +66,7 @@
           {-(MemberAccess
             {-(Identifier)-})-})
         ->(MemberAccess
-          {+(Identifier)+}) })
-        (Empty))))
+          {+(Identifier)+}) }))))
   (Method
     (Statements
       (Assignment
