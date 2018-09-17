@@ -78,6 +78,7 @@ library
                      , Data.AST
                      , Data.Blob
                      , Data.Diff
+                     , Data.Duration
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
@@ -191,6 +192,7 @@ library
                      , Semantic.Telemetry.Haystack
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
+                     , Semantic.Timeout
                      , Semantic.Util
                      , Semantic.Util.Rewriting
                      , Semantic.Version
