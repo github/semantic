@@ -24,7 +24,7 @@ import           Serializing.Format
 
 runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs renderJSONError (render . renderJSONTerm) >=> serialize JSON
-runParse JSONGraphTermRenderer          = withParsedBlobs renderJSONError (render . renderAdjGraph) >=> serialize JSON
+runParse JSONGraphTermRenderer        = withParsedBlobs renderJSONError (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph TermVertex (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON
         renderAdjGraph blob term = renderJSONAdjTerm blob (renderTreeGraph term)
 runParse SExpressionTermRenderer      = withParsedBlobs (\_ _ -> mempty) (const (serialize (SExpression ByConstructorName)))
