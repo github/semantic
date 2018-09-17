@@ -81,16 +81,20 @@ library
                      , Data.AST
                      , Data.Blob
                      , Data.Diff
+                     , Data.Duration
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
-                     , Data.Graph.Adjacency
-                     , Data.Graph.Vertex
+                     , Data.Graph.ControlFlowVertex
+                     , Data.Graph.TermVertex
+                     , Data.Graph.DiffVertex
                      , Data.History
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
+                     , Data.Proto.DiffTree
+                     , Data.Proto.ParseTree
                      , Data.Patch
                      , Data.Project
                      , Data.Quieterm
@@ -191,6 +195,7 @@ library
                      , Semantic.Telemetry.Haystack
                      , Semantic.Telemetry.Log
                      , Semantic.Telemetry.Stat
+                     , Semantic.Timeout
                      , Semantic.Util
                      , Semantic.Util.Rewriting
                      , Semantic.Version
@@ -352,6 +357,7 @@ test-suite test
                      , hspec-expectations-pretty-diff
                      , HUnit
                      , leancheck
+                     , machines
                      , mtl
                      , network
                      , proto3-suite

@@ -163,7 +163,7 @@ instance Evaluatable Assignment where
     pure (Rval rhs)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
-newtype PostIncrement a = PostIncrement a
+newtype PostIncrement a = PostIncrement { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 PostIncrement where liftEq = genericLiftEq
@@ -175,7 +175,7 @@ instance Evaluatable PostIncrement
 
 
 -- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
-newtype PostDecrement a = PostDecrement a
+newtype PostDecrement a = PostDecrement { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 PostDecrement where liftEq = genericLiftEq
@@ -186,8 +186,8 @@ instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable PostDecrement
 
 -- | Pre increment operator (e.g. ++1 in C or Java).
-newtype PreIncrement a = PreIncrement a
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+newtype PreIncrement a = PreIncrement { value :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 PreIncrement where liftEq = genericLiftEq
 instance Ord1 PreIncrement where liftCompare = genericLiftCompare
@@ -198,8 +198,8 @@ instance Evaluatable PreIncrement
 
 
 -- | Pre decrement operator (e.g. --1 in C or Java).
-newtype PreDecrement a = PreDecrement a
-  deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1)
+newtype PreDecrement a = PreDecrement { value :: a }
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 PreDecrement where liftEq = genericLiftEq
 instance Ord1 PreDecrement where liftCompare = genericLiftCompare

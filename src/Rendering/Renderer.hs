@@ -3,7 +3,9 @@ module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
 , renderJSONDiff
+, renderJSONAdjDiff
 , renderJSONTerm
+, renderJSONAdjTerm
 , renderJSONAST
 , renderToCDiff
 , renderRPCToCDiff
@@ -21,6 +23,7 @@ module Rendering.Renderer
 
 import Data.ByteString.Builder
 import Data.Graph
+import Data.Graph.DiffVertex
 import Rendering.Graph as R
 import Rendering.JSON as R
 import Rendering.Symbol as R
@@ -32,10 +35,12 @@ data DiffRenderer output where
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
+  -- | Render to JSON as an adjacency list.
+  JSONGraphDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
-  DOTDiffRenderer :: DiffRenderer (Graph (TaggedVertex DiffTag))
+  DOTDiffRenderer :: DiffRenderer (Graph DiffVertex)
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
   ShowDiffRenderer :: DiffRenderer Builder
 
@@ -46,12 +51,14 @@ deriving instance Show (DiffRenderer output)
 data TermRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
   JSONTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
+  -- | Render to JSON as an adjacency list represenation.
+  JSONGraphTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of symbols.
   SymbolsTermRenderer :: SymbolFields -> TermRenderer (JSON "files" SomeJSON)
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
-  DOTTermRenderer :: TermRenderer (Graph (TaggedVertex ()))
+  DOTTermRenderer :: TermRenderer (Graph TermVertex)
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
   ShowTermRenderer :: TermRenderer Builder
 

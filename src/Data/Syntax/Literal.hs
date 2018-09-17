@@ -2,14 +2,15 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Literal where
 
+import Prelude hiding (Float, null)
+import Prologue hiding (Set, hash, null)
+
 import           Data.Abstract.Evaluatable as Eval
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Numeric.Exts
-import           Prelude hiding (Float, null)
-import           Prologue hiding (Set, hash, null)
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize as Tok
 import           Text.Read (readMaybe)
@@ -51,7 +52,7 @@ instance Evaluatable Data.Syntax.Literal.Integer where
     rvalBox =<< (integer <$> either (const (throwEvalError (IntegerFormatError x))) pure (parseInteger x))
 
 instance Tokenize Data.Syntax.Literal.Integer where
-  tokenize = yield . Fragment . integerContent
+  tokenize = yield . Run . integerContent
 
 -- | A literal float of unspecified width.
 
@@ -67,7 +68,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
     rvalBox =<< (float <$> either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 instance Tokenize Data.Syntax.Literal.Float where
-  tokenize = yield . Fragment . floatContent
+  tokenize = yield . Run . floatContent
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
@@ -141,7 +142,7 @@ instance Evaluatable TextElement where
   eval (TextElement x) = rvalBox (string x)
 
 instance Tokenize TextElement where
-  tokenize = yield . Fragment . textElementContent
+  tokenize = yield . Run . textElementContent
 
 -- | A sequence of textual contents within a string literal.
 newtype EscapeSequence a = EscapeSequence { value :: Text }
@@ -265,7 +266,7 @@ instance Evaluatable Set
 -- Pointers
 
 -- | A declared pointer (e.g. var pointer *int in Go)
-newtype Pointer a = Pointer a
+newtype Pointer a = Pointer { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Pointer where liftEq = genericLiftEq
@@ -277,7 +278,7 @@ instance Evaluatable Pointer
 
 
 -- | A reference to a pointer's address (e.g. &pointer in Go)
-newtype Reference a = Reference a
+newtype Reference a = Reference { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Eq1 Reference where liftEq = genericLiftEq
