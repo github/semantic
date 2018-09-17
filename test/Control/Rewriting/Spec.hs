@@ -26,8 +26,8 @@ onTrees :: ( Literal.TextElement :< syn
 onTrees = do
   Literal.Hash els <- Rewriting.target
   guard (null els)
-  k <- modified $ Literal.TextElement "'hi'"
-  v <- modified $ Literal.TextElement "'bye'"
+  k <- modified $ Literal.TextElement "\"hi\""
+  v <- modified $ Literal.TextElement "\"bye\""
   pair <- modified $ (Literal.KeyValue k v)
   pure (Literal.Hash (pair : els))
 
