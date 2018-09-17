@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Semantic.Parse ( runParse ) where
+module Semantic.Parse ( runParse, runParse' ) where
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.Declaration (HasDeclaration, declarationAlgebra)
@@ -31,6 +31,10 @@ runParse SExpressionTermRenderer      = withParsedBlobs (\_ _ -> mempty) (const 
 runParse ShowTermRenderer             = withParsedBlobs (\_ _ -> mempty) (const (serialize Show . quieterm))
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\_ _ -> mempty) (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (\_ _ -> mempty) (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
+
+
+runParse' :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs Builder
+runParse' blob = parseSomeBlob blob >>= withSomeTerm (serialize Show . quieterm)
 
 withParsedBlobs ::
   ( Member Distribute effs
