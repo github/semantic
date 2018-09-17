@@ -14,10 +14,10 @@ module Semantic.Config
   , withTelemetry
   ) where
 
+import           Data.Duration
 import           Network.BSD
 import           Network.HTTP.Client.TLS
 import           Network.URI
-import           Parsing.TreeSitter (Timeout (..))
 import           Prologue
 import           Semantic.Env
 import           Semantic.Telemetry
@@ -38,7 +38,7 @@ data Config
   , configStatsHost              :: Stat.Host    -- ^ Host of statsd/datadog (default: "127.0.0.1")
   , configStatsPort              :: Stat.Port    -- ^ Port of statsd/datadog (default: "28125")
 
-  , configTreeSitterParseTimeout :: Timeout      -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 10000).
+  , configTreeSitterParseTimeout :: Duration     -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 10000).
   , configMaxTelemetyQueueSize   :: Int          -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
   , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
@@ -78,7 +78,7 @@ defaultConfig options@Options{..} = do
     , configStatsHost = statsHost
     , configStatsPort = statsPort
 
-    , configTreeSitterParseTimeout = Milliseconds parseTimeout
+    , configTreeSitterParseTimeout = fromMilliseconds parseTimeout
     , configMaxTelemetyQueueSize = size
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal
