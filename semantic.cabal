@@ -63,7 +63,6 @@ library
                      , Data.Abstract.Exports
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
-                     , Data.Abstract.Frame
                      , Data.Abstract.Live
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
