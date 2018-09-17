@@ -34,7 +34,7 @@ onTrees = do
 isHi :: ( Literal.TextElement :< fs
         , ann ~ Record (History : fields)
         ) => Matcher (Term (Sum fs) ann) Text
-isHi = match Literal.textElementContent (Matching.target <* ensure (== "'hi'"))
+isHi = match Literal.textElementContent (Matching.target <* ensure (== "\"hi\""))
 
 spec :: Spec
 spec = describe "rewriting" $ do
