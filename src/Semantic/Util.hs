@@ -2,17 +2,17 @@
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
-import Prelude hiding (id, readFile, (.))
+import Prelude hiding (id, (.), readFile)
 
-import           Analysis.Abstract.Caching.FlowSensitive
+import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Control.Abstract hiding (null)
+import           Control.Abstract
 import           Control.Category
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
-import           Data.Abstract.Evaluatable hiding (null)
+import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package
@@ -37,19 +37,7 @@ import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
-import           Text.Show.Pretty (ppShow, pPrint)
-
-import           Control.Rewriting as Rewriting
-import qualified Data.ByteString as B
-import           Data.History
-import           Data.Record
-import qualified Data.Source as Source
-import qualified Data.Syntax.Literal as Literal
-import           Data.Term
-import qualified Data.Text as T
-import qualified Data.Text.IO as T
-import           Language.JSON.PrettyPrint
-import           Reprinting.Pipeline
+import           Text.Show.Pretty (ppShow)
 
 justEvaluating
   = runM
@@ -163,42 +151,3 @@ reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeE
 
 prettyShow :: Show a => a -> IO ()
 prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow
-
-onTrees' :: ( Literal.TextElement :< syn
-            , Literal.KeyValue :< syn
-            , Apply Functor syn
-            , term ~ Term (Sum syn) (Record (History : fields))
-            ) => Rewrite (env, term) m (Literal.Hash term)
-onTrees' = do
-  Literal.Hash els <- Rewriting.target
-  guard (null els)
-  k <- modified $ Literal.TextElement "\"hi\""
-  v <- modified $ Literal.TextElement "\"bye\""
-  pair <- modified $ Literal.KeyValue k v
-  pure (Literal.Hash (pair : els))
-
-testJson = do
-  let path = "test/fixtures/json/rewriting/add_keys.json"
-
-  bytes <- Source.fromUTF8 <$> B.readFile path
-  json <- parseFile jsonParser path
-
-  refactored <-
-    case applyPure (somewhere' onTrees' markRefactored) () (mark Unmodified json) of
-      Left  l -> Prelude.fail (show l)
-      -- there are three dictionaries in add_keys.json, and they should all
-      -- have a 'hi' key.
-      Right r -> pure r
-
-  let res = runReprinter bytes defaultJSONPipeline refactored
-  T.putStrLn "*****tokenizing*****"
-  pPrint $ runTokenizing bytes refactored
-  T.putStrLn "*****contextualizing*****"
-  pPrint $ runContextualizing bytes refactored
-  T.putStrLn "*****translating*****"
-  pPrint $ runTranslating bytes defaultJSONPipeline refactored
-  T.putStrLn "*****source*****"
-  T.putStrLn $ either (T.pack . show) Source.toText res
-
-  T.putStrLn "*****returning tree*****"
-  pure refactored
