@@ -100,8 +100,10 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
     lambda' (var : vars) (body var)
   {-# INLINE lambda' #-}
 
-instance Member (Function address value) effects => Lambda address value effects (Evaluator address value effects address) where
-  lambda' vars = function Nothing vars lowerBound
+instance (Member Fresh effects, Member (Function address value) effects) => Lambda address value effects (Evaluator address value effects address) where
+  lambda' vars action = do
+    name <- Name.gensym
+    function name vars lowerBound action
   {-# INLINE lambda' #-}
 
 builtInPrint :: ( AbstractValue address value effects
