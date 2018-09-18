@@ -40,7 +40,6 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete
     (Value, ValueError (..), runBoolean, runFunction, runValueErrorWith)
