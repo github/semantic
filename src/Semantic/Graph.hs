@@ -26,7 +26,7 @@ module Semantic.Graph
 
 import Prelude hiding (readFile)
 
-import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
@@ -111,8 +111,8 @@ runCallGraph lang includePackages modules package = do
       runGraphAnalysis
         = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
         . graphing @_ @_ @(Maybe Name) @Monovariant
-        . caching
         . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) Abstract))
+        . caching
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
