@@ -25,6 +25,7 @@ module Control.Abstract.Value
 , subtermAddress
 ) where
 
+import Control.Abstract.ScopeGraph (Declaration)
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
@@ -196,7 +197,7 @@ class AbstractIntro value => AbstractValue address value effects where
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
-  namespace :: Name                 -- ^ The namespace's identifier
+  namespace :: Declaration                 -- ^ The namespace's declaration
             -> Maybe address        -- The ancestor of the namespace
             -> Bindings address     -- ^ The environment to mappend
             -> Evaluator address value effects value
@@ -244,17 +245,17 @@ doWhile body cond = loop $ \ continue -> body *> do
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Deref value) effects
                  , Member (Env address) effects
-                 , Member (State (Heap address value)) effects
+                 , Member (State (Heap address address value)) effects
                  , Ord address
                  )
-              => Name
+              => Declaration
               -> address
               -> Maybe address
               -> Evaluator address value effects ()
               -> Evaluator address value effects value
-makeNamespace name addr super body = do
+makeNamespace declaration addr super body = do
   namespaceBinds <- Env.head <$> locally (body >> getEnv)
-  v <- namespace name super namespaceBinds
+  v <- namespace declaration super namespaceBinds
   v <$ assign addr v
 
 
@@ -279,7 +280,7 @@ value :: ( AbstractValue address value effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (AddressError address value))) effects
          , Member (Resumable (BaseError (EnvironmentError address))) effects
-         , Member (State (Heap address value)) effects
+         , Member (State (Heap address address value)) effects
          , Ord address
          )
       => ValueRef address
@@ -294,7 +295,7 @@ subtermValue :: ( AbstractValue address value effects
                 , Member (Reader Span) effects
                 , Member (Resumable (BaseError (AddressError address value))) effects
                 , Member (Resumable (BaseError (EnvironmentError address))) effects
-                , Member (State (Heap address value)) effects
+                , Member (State (Heap address address value)) effects
                 , Ord address
                 )
              => Subterm term (Evaluator address value effects (ValueRef address))
@@ -329,7 +330,7 @@ subtermAddress = address <=< subtermRef
 rvalBox :: ( Member (Allocator address) effects
            , Member (Deref value) effects
            , Member Fresh effects
-           , Member (State (Heap address value)) effects
+           , Member (State (Heap address address value)) effects
            , Ord address
            )
         => value
