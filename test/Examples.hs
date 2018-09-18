@@ -70,9 +70,9 @@ le = LanguageExample
 languages :: [LanguageExample]
 languages =
   [ le "python" ".py" "examples" (Just "script/known_failures.txt")
-  , le "go" ".go" "examples" (Just "script/known-failures.txt")
-  , le "ruby" ".rb" "examples" (Just "script/known_failures.txt")
-  , le "typescript" ".ts" "examples" (Just "script/known_failures.txt")
+  -- , le "go" ".go" "examples" (Just "script/known-failures.txt")
+  -- , le "ruby" ".rb" "examples" (Just "script/known_failures.txt")
+  -- , le "typescript" ".ts" "examples" (Just "script/known_failures.txt")
   -- , le "java" ".java" "examples/guava" (Just "script/known_failures_guava.txt")
   -- , le "java" ".java" "examples/elasticsearch" (Just "script/known_failures_elasticsearch.txt")
   -- , le "java" ".java" "examples/RxJava" (Just "script/known_failures_RxJava.txt")
