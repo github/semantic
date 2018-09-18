@@ -22,7 +22,7 @@ onTrees :: ( Literal.TextElement :< syn
            , Literal.KeyValue :< syn
            , Apply Functor syn
            , term ~ Term (Sum syn) (Record (History : fields))
-           ) => Rewrite (env, term) m (Literal.Hash term)
+           ) => Rewrite (env, term) (Literal.Hash term)
 onTrees = do
   Literal.Hash els <- Rewriting.target
   guard (null els)
@@ -45,7 +45,7 @@ spec = describe "rewriting" $ do
 
   refactored <- runIO $ do
     json <- parseFile jsonParser path
-    let result = applyPure (somewhere' onTrees markRefactored) () (History.mark Unmodified json)
+    let result = rewrite (somewhere' onTrees markRefactored) () (History.mark Unmodified json)
     either (fail . show) pure result
 
   it "should add keys to JSON values" $ do
