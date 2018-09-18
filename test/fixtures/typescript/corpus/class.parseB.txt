@@ -1,7 +1,7 @@
 (Statements
   (Class
     (TypeParameter
-      (Identifier)
+      (TypeIdentifier)
       (Empty)
       (Empty))
     (TypeIdentifier)
