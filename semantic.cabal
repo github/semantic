@@ -19,7 +19,8 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.Caching
+                       Analysis.Abstract.Caching.FlowInsensitive
+                     , Analysis.Abstract.Caching.FlowSensitive
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Graph
@@ -35,7 +36,6 @@ library
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
-                     , Control.Abstract.Configuration
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
@@ -55,8 +55,6 @@ library
                      , Data.Abstract.Address.Monovariant
                      , Data.Abstract.Address.Precise
                      , Data.Abstract.BaseError
-                     , Data.Abstract.Cache
-                     , Data.Abstract.Configuration
                      , Data.Abstract.Declarations
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
