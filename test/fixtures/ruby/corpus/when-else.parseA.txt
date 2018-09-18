@@ -7,14 +7,14 @@
         (Statements
           (Send
             (Identifier)))
+        (Statements))
+      (Pattern
         (Statements
-          (Pattern
-            (Statements
-              (Send
-                (Identifier))
-              (Send
-                (Identifier)))
-            (Statements
-              (Send
-                (Identifier))
-              (Statements))))))))
+          (Send
+            (Identifier))
+          (Send
+            (Identifier)))
+        (Statements
+          (Send
+            (Identifier))))
+      (Statements))))
