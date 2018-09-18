@@ -1,3 +1,5 @@
+{-# LANGUAGE RankNTypes #-}
+
 module Data.Reprinting.Fragment
   ( Fragment(..)
   , copy

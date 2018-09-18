@@ -21,7 +21,6 @@ import Prologue hiding (Element)
 import Data.Machine
 
 import Data.Reprinting.Fragment
-import Data.Reprinting.Token
 
 -- | The final representation of concrete syntax in the reprinting pipeline.
 data Splice

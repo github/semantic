@@ -60,12 +60,12 @@ beautifyingJSON :: (Member (Exc TranslationError) effs)
 beautifyingJSON _ = repeatedly (await >>= step) where
   step (Defer el cs)   = lift (throwError (NoTranslation el cs))
   step (Verbatim txt)  = emit txt
-  step (New el cs txt) = case (el, listToMaybe cs) of
-    (TOpen,  Just THash) -> emit txt *> layouts [HardWrap, Indent 2 Spaces]
-    (TClose, Just THash) -> layout HardWrap *> emit txt
-    (TSep, Just TList)   -> emit txt *> space
-    (TSep, Just TPair)   -> emit txt *> space
-    (TSep, Just THash)   -> emit txt *> layouts [HardWrap, Indent 2 Spaces]
+  step (New el cs txt) = case (el, cs) of
+    (TOpen,  THash:_) -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
+    (TClose, THash:rest) -> layout HardWrap *> indent 2 (hashDepth rest) *> emit txt
+    (TSep,   TList:_)    -> emit txt *> space
+    (TSep,   TPair:_)    -> emit txt *> space
+    (TSep,   THash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
     _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.
@@ -75,3 +75,6 @@ minimizingJSON = repeatedly (await >>= step) where
   step (Defer el cs)  = lift (throwError (NoTranslation el cs))
   step (Verbatim txt) = emit txt
   step (New _ _ txt)  = emit txt
+
+hashDepth :: [Context] -> Int
+hashDepth = length . filter (== THash)
