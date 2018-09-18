@@ -10,6 +10,7 @@ import           Proto3.Suite
 
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
+import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
@@ -25,7 +26,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedBinds <- fst <$> require modulePath
+    importedBinds <- fst . snd <$> require modulePath
     bindAll (renamed importedBinds)
     rvalBox unit
     where
@@ -92,7 +93,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedBinds <- fst <$> require modulePath
+    importedBinds <- fst . snd <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \Alias{..} -> do
       let address = Env.lookup aliasValue importedBinds
@@ -271,15 +272,24 @@ newtype PredefinedType a = PredefinedType { predefinedType :: T.Text }
 instance Eq1 PredefinedType where liftEq = genericLiftEq
 instance Ord1 PredefinedType where liftCompare = genericLiftCompare
 instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
+-- TODO: Implement Eval instance for PredefinedType
 instance Evaluatable PredefinedType
 
 newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Declarations1 TypeIdentifier where
+  liftDeclaredName _ (TypeIdentifier identifier) = Just (name identifier)
 
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
 instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
 instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable TypeIdentifier
+-- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
+instance Evaluatable TypeIdentifier where
+  eval TypeIdentifier{..} = do
+    -- Add a reference to the type identifier in the current scope.
+    reference (Reference (name contents)) (Declaration (name contents))
+    rvalBox unit
 
 data NestedIdentifier a = NestedIdentifier { left :: !a, right :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -343,12 +353,21 @@ instance Declarations a => Declarations (EnumDeclaration a) where
   declaredName EnumDeclaration{..} = declaredName enumDeclarationIdentifier
 
 newtype ExtendsClause a = ExtendsClause { extendsClauses :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Declarations1 ExtendsClause where
+  liftDeclaredName _ (ExtendsClause []) = Nothing
+  liftDeclaredName declaredName (ExtendsClause (x : _)) = declaredName x
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
 instance Ord1 ExtendsClause where liftCompare = genericLiftCompare
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable ExtendsClause
+-- TODO: ExtendsClause shouldn't evaluate to an address in the heap?
+instance Evaluatable ExtendsClause where
+  eval ExtendsClause{..} = do
+    -- Evaluate subterms
+    traverse_ subtermRef extendsClauses
+    rvalBox unit
 
 newtype ArrayType a = ArrayType { arrayType :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
