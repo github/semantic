@@ -4,7 +4,7 @@ module Semantic.Util where
 
 import Prelude hiding (id, (.), readFile)
 
-import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Caching.FlowSensitive
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Category

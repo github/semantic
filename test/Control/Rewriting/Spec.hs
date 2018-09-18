@@ -17,8 +17,7 @@ import qualified Data.Syntax.Literal as Literal
 import           Language.JSON.PrettyPrint
 import           Reprinting.Pipeline
 
--- import           Reprinting.Pipeline
-
+-- Adds a "hi": "bye" key-value pair to any empty Hash.
 onTrees :: ( Literal.TextElement :< syn
            , Literal.KeyValue :< syn
            , Apply Functor syn
@@ -32,6 +31,7 @@ onTrees = do
   pair <- modified $ (Literal.KeyValue k v)
   pure (Literal.Hash (pair : els))
 
+-- Matches only "hi" string literals.
 isHi :: ( Literal.TextElement :< fs
         , ann ~ Record (History : fields)
         ) => Matcher (Term (Sum fs) ann) Text
@@ -39,19 +39,19 @@ isHi = match Literal.textElementContent (Matching.target <* ensure (== "\"hi\"")
 
 spec :: Spec
 spec = describe "rewriting" $ do
-  it "should add keys to JSON values" $ do
-    let path = "test/fixtures/json/rewriting/add_keys.json"
+  let path = "test/fixtures/json/rewriting/add_keys.json"
 
-    bytes <- Source.fromUTF8 <$> B.readFile path
+  bytes <- runIO $ Source.fromUTF8 <$> B.readFile path
+
+  refactored <- runIO $ do
     json <- parseFile jsonParser path
+    let result = applyPure (somewhere' onTrees markRefactored) () (History.mark Unmodified json)
+    either (fail . show) pure result
 
-    refactored <-
-      case applyPure (somewhere' onTrees markRefactored) () (History.mark Unmodified json) of
-        Left  l -> fail (show l)
-        Right r -> pure r
-
+  it "should add keys to JSON values" $ do
     length (runMatcher @[] isHi refactored) `shouldBe` 1
 
+  it "should round-trip correctly" $ do
     let res = runReprinter bytes defaultJSONPipeline refactored
     expected <- Source.fromUTF8 <$> B.readFile "test/fixtures/json/rewriting/add_keys_expected.json"
     res `shouldBe` Right expected
