@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 
 -- | This module provides 'Rule', a monadic DSL that abstracts the
 -- details of rewriting a given datum into another type in some
@@ -20,10 +20,10 @@
 -- details of exception handling.
 module Control.Rewriting
   ( -- * Rule types
-    Rule
+    RuleM
+  , RewriteM
+  , Rule
   , Rewrite
-  , PureRule
-  , PureRewrite
   , TransformFailed (..)
   -- * Reexports from Control.Arrow
   , (>>>)
@@ -57,8 +57,8 @@ module Control.Rewriting
   , modified
   , markRefactored
   -- * Running rules
-  , applyEff
-  , applyPure
+  , rewrite
+  , rewriteM
   , runE
   ) where
 
@@ -79,8 +79,8 @@ import Control.Abstract.Matching (Matcher, stepMatcher)
 import Data.History as History
 import Data.Term
 
--- | The fundamental type of rewriting rules. You can think of a @Rule
--- env m from to@ as @env -> from -> m (Maybe to)@; in other words, a
+-- | The fundamental type of rewriting rules. You can think of a
+-- @RuleM env m from to@ as @env -> from -> m (Maybe to)@; in other words, a
 -- Kleisli arrow with an immutable environment, supporting failure as
 -- well as arbitrary effects in a monadic context. However, Rule
 -- encompasses both 'cata' and 'para', so you can use them to fold
@@ -89,92 +89,90 @@ import Data.Term
 --
 -- | Unlike KURE, a 'Rule' is a functor, applicative, monad, &c. with
 -- no regard to its inner monad parameter.
-data Rule env (m :: * -> *) from to where
-  Then  :: Rule env m from a -> (a -> Rule env m from b) -> Rule env m from b
-  Dimap :: (a -> b) -> (c -> d) -> Rule env m b c -> Rule env m a d
-  Stop  :: String -> Rule env m from to
-  Alt   :: Rule env m from to -> Rule env m from to -> Rule env m from to
-  Pass  :: Rule env m a a
-  Comp  :: Rule env m b c -> Rule env m a b -> Rule env m a c
-  Split :: Rule env m from to -> Rule env m from' to' -> Rule env m (from, from') (to, to')
-  Fanin :: Rule env m from to -> Rule env m from' to -> Rule env m (Either from from') to
+data RuleM env (m :: * -> *) from to where
+  Then  :: RuleM env m from a -> (a -> RuleM env m from b) -> RuleM env m from b
+  Dimap :: (a -> b) -> (c -> d) -> RuleM env m b c -> RuleM env m a d
+  Stop  :: String -> RuleM env m from to
+  Alt   :: RuleM env m from to -> RuleM env m from to -> RuleM env m from to
+  Pass  :: RuleM env m a a
+  Comp  :: RuleM env m b c -> RuleM env m a b -> RuleM env m a c
+  Split :: RuleM env m from to -> RuleM env m from' to' -> RuleM env m (from, from') (to, to')
+  Fanin :: RuleM env m from to -> RuleM env m from' to -> RuleM env m (Either from from') to
 
-  Context :: Rule env m from env
-  Local   :: (env' -> env) -> Rule env m from to -> Rule env' m from to
-  Promote :: m to -> Rule env m from to
+  Context :: RuleM env m from env
+  Local   :: (env' -> env) -> RuleM env m from to -> RuleM env' m from to
+  Promote :: m to -> RuleM env m from to
 
   Recur :: (Traversable f, Traversable g)
-        => Rule (env, Term f ann) m (f (Term g ann)) (g (Term g ann))
-        -> Rule env m (Term f ann) (Term g ann)
+        => RuleM (env, Term f ann) m (f (Term g ann)) (g (Term g ann))
+        -> RuleM env m (Term f ann) (Term g ann)
 
   Somewhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
                , f :< fs, g :< fs
                )
-            => Rule (env, Term (Sum fs) ann) m (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
+            => RuleM (env, Term (Sum fs) ann) m (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
             -> (Term (Sum fs) ann -> g (Term (Sum fs) ann) -> Term (Sum fs) ann)
-            -> Rewrite env m (Term (Sum fs) ann)
+            -> RewriteM env m (Term (Sum fs) ann)
 
 
 -- | @a >>> b@ succeeds only if both @a@ and @b@ succeed. @id@ is the
 -- identity rule that always succeeds; if you want to use it without
 -- hiding Prelude's @id@, use 'target'.
-instance Category (Rule env m) where
+instance Category (RuleM env m) where
   id  = Pass
   (.) = Comp
 
-instance Functor (Rule env m from) where
+instance Functor (RuleM env m from) where
   fmap = rmap
 
-instance Applicative (Rule env m from) where
+instance Applicative (RuleM env m from) where
   pure  = arr . const
   (<*>) = ap
 
-instance Monad (Rule env m from) where
+instance Monad (RuleM env m from) where
   (>>=) = Then
 
 -- | This doesn't have a tremendous error message; you should
 -- prefer 'fail'.
-instance MonadPlus (Rule env m from) where
+instance MonadPlus (RuleM env m from) where
   mzero = Stop "MonadPlus.mzero"
 
 -- | The message passed to 'fail' will be shown to the user
 -- in a 'TransformFailed' exception.
-instance MonadFail (Rule env m from) where
+instance MonadFail (RuleM env m from) where
   fail = Stop
 
 -- | @a <|> b@ succeeds if a or b succeeds.
-instance Alternative (Rule env m from) where
+instance Alternative (RuleM env m from) where
   (<|>) = Alt
   empty = Stop "Alternative.empty"
 
 -- | You can map over the input type of a Rule contravariantly and the
 -- output type covariantly, just like a function.
-instance Profunctor (Rule env m) where
+instance Profunctor (RuleM env m) where
   dimap = Dimap
 
 -- | You can use arrow operations and syntax, if you're feeling saucy.
 -- This also provides the useful '&&&' operator, which runs
 -- two rules and returns a tuple of the results.
-instance Arrow (Rule env m) where
+instance Arrow (RuleM env m) where
   arr f = Dimap id f id
   (***) = Split
 
 -- | This instance lets you use @if@ and @case@ in arrow syntax over
 -- rules, and provides '|||', which lifts its arguments into
 -- a single rule that takes 'Either' values and dispatches appropriately.
-instance ArrowChoice (Rule env m) where
+instance ArrowChoice (RuleM env m) where
   f +++ g = (Left <$> f) ||| (Right <$> g)
   (|||)   = Fanin
 
--- | A 'Rewrite' is a 'Rule' which does not change the type of its
--- input. TODO: can we get more expressive than a type synonym?
--- newtypes? phantom types?
-type Rewrite env m item = Rule env m item item
+-- | A 'RewriteM' is a 'RuleM' that does not change the type of its input.
+type RewriteM env m item = RuleM env m item item
 
--- | 'PureRule's and 'PureRewrite's don't depend on any monadic effects,
--- save for catch/throw internally to handle failure.
-type PureRule env from to = Rule env Identity from to
-type PureRewrite env item = PureRule env item item
+-- | 'PureRule's and 'PureRewrite's don't offer access to
+-- their monad parameter.
+type Rule env from to = forall m . RuleM env m from to
+type Rewrite env item = Rule env item item
 
 -- | Used to indicate failure and retrying.
 -- TODO: look into using Data.Error.
@@ -187,16 +185,16 @@ newtype TransformFailed = TransformFailed Text deriving (Show, Eq)
 
 -- | Extract the input parameter being considered by this rule.
 -- An alias for 'id'.
-target :: Rule env m from from
+target :: Rule env from from
 target = id
 
 -- | Extract the environment parameter within a rule.
-context :: Rule env m from env
+context :: Rule env from env
 context = Context
 
 -- | Map a function over the environment parameter. Note that this is contravariant
 -- rather than covariant, in contrast to 'Reader'.
-localContext :: (newenv -> oldenv) -> Rule oldenv m from to -> Rule newenv m from to
+localContext :: (newenv -> oldenv) -> Rule oldenv from to -> Rule newenv from to
 localContext = Local
 
 --
@@ -204,22 +202,24 @@ localContext = Local
 --
 
 -- | Builds a 'Rule' out of a function. Alias for 'arr'.
-purely :: (from -> to) -> Rule env m from to
+purely :: (from -> to) -> Rule env from to
 purely = arr
 
--- | Promote a monadic value to a Rule in that monad.
-promote :: m to -> Rule env m from to
+-- | Promote a monadic value to a Rule in that monad. Analogous to
+-- 'Control.Monad.Trans.lift', but 'RuleM' cannot be both an instance
+-- of Category and of MonadTrans due to parameter order.
+promote :: m to -> RuleM env m from to
 promote = Promote
 
 -- | Promote a 'Matcher' to a 'Rule'.
-fromMatcher :: Matcher from to -> Rule env m from to
+fromMatcher :: Matcher from to -> Rule env from to
 fromMatcher m = target >>= \t -> maybeM (fail "fromMatcher") (stepMatcher t m)
 
 -- | Promote a Rule from a recursive functor to one over terms, operating
 -- leaf-to-root in the style of 'Data.Functor.Foldable.para'.
 leafToRoot :: (Traversable f, Traversable g)
-           => Rule (env, Term f ann) m (f (Term g ann)) (g (Term g ann))
-           -> Rule env m (Term f ann) (Term g ann)
+           => RuleM (env, Term f ann) m (f (Term g ann)) (g (Term g ann))
+           -> RuleM env m (Term f ann) (Term g ann)
 leafToRoot = Recur
 
 --
@@ -231,11 +231,11 @@ leafToRoot = Recur
 -- @
 --  try x = x <|> id
 -- @
-try :: Rewrite env m term -> Rewrite env m term
+try :: Rewrite env term -> Rewrite env term
 try = (<|> id)
 
--- | Apply a Rule to one datum. Similar to '&'.
-apply :: Rule env m x to -> x -> Rule env m from to
+-- | Feed one datum into a Rule. Similar to '&'.
+apply :: Rule env x to -> x -> Rule env from to
 apply rule x = pure x >>> rule
 
 -- | The identity rule, but one that emits a trace of the provided
@@ -243,7 +243,7 @@ apply rule x = pure x >>> rule
 -- @
 --  tracing "rule fired" >>> someRule >>> tracing "rule completed"
 -- @
-tracing :: Member Trace effs => String -> Rewrite env (Eff effs) item
+tracing :: Member Trace effs => String -> RewriteM env (Eff effs) item
 tracing s = id >>= (\t -> promote (t <$ trace s))
 
 --
@@ -252,11 +252,11 @@ tracing s = id >>= (\t -> promote (t <$ trace s))
 
 -- | Project from a 'Sum' to a component of that sum, failing
 -- if the projection fails.
-projecting :: (f :< fs) => Rule env m (Sum fs recur) (f recur)
+projecting :: (f :< fs) => Rule env (Sum fs recur) (f recur)
 projecting = target >>= Sum.projectGuard
 
 -- | Inject a component into a 'Sum'. This always succeeds.
-injecting :: (f :< fs) => Rule env m (f recur) (Sum fs recur)
+injecting :: (f :< fs) => Rule env (f recur) (Sum fs recur)
 injecting = arr Sum.inject
 
 -- | Promote a Rule over the components of 'Sum' values to
@@ -267,8 +267,8 @@ injecting = arr Sum.inject
 -- @
 --
 insideSum :: (f :< fs, g :< gs)
-           => Rule env m (f recur) (g recur)
-           -> Rule env m (Sum fs recur) (Sum gs recur)
+           => RuleM env m (f recur) (g recur)
+           -> RuleM env m (Sum fs recur) (Sum gs recur)
 insideSum x = projecting >>> x >>> injecting
 
 --
@@ -280,8 +280,8 @@ insideSum x = projecting >>> x >>> injecting
 everywhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs, f :< fs
               , Apply Functor gs, Apply Foldable gs, Apply Traversable gs, g :< gs
               )
-           => Rule (env, Term (Sum fs) ann) m (f (Term (Sum gs) ann)) (g (Term (Sum gs) ann))
-           -> Rule env m (Term (Sum fs) ann) (Term (Sum gs) ann)
+           => RuleM (env, Term (Sum fs) ann) m (f (Term (Sum gs) ann)) (g (Term (Sum gs) ann))
+           -> RuleM env m (Term (Sum fs) ann) (Term (Sum gs) ann)
 everywhere = leafToRoot . insideSum
 
 -- | Given a 'Rule' over an @f@ and @g@ both in @fs@, promote that
@@ -290,8 +290,8 @@ everywhere = leafToRoot . insideSum
 somewhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
              , f :< fs, g :< fs
              )
-          => Rule (env, Term (Sum fs) ann) m (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
-          -> Rewrite env m (Term (Sum fs) ann)
+          => Rule (env, Term (Sum fs) ann) (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
+          -> Rewrite env (Term (Sum fs) ann)
 somewhere = flip Somewhere (\x -> termIn (annotation x) . Sum.inject)
 
 -- | As 'somewhere', but @somewhere' rule fn@ takes an extra @fn@
@@ -302,9 +302,9 @@ somewhere = flip Somewhere (\x -> termIn (annotation x) . Sum.inject)
 somewhere' :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
               , f :< fs, g :< fs
               )
-           => Rule (env, Term (Sum fs) ann) m (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
+           => Rule (env, Term (Sum fs) ann) (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
            -> (Term (Sum fs) ann -> g (Term (Sum fs) ann) -> Term (Sum fs) ann)
-           -> Rewrite env m (Term (Sum fs) ann)
+           -> Rewrite env (Term (Sum fs) ann)
 somewhere' = Somewhere
 
 --
@@ -316,7 +316,7 @@ somewhere' = Somewhere
 generate :: ( term ~ Term (Sum syn) ann
             , f :< syn
             )
-         => f term -> Rule term m a term
+         => f term -> Rule term a term
 generate x = termIn <$> (termAnnotation <$> context) <*> pure (Sum.inject x)
 
 -- | As 'generate', but operating in a tuple context of the sort you might see
@@ -324,13 +324,14 @@ generate x = termIn <$> (termAnnotation <$> context) <*> pure (Sum.inject x)
 generate' :: ( term ~ Term (Sum syn) ann
             , f :< syn
             )
-         => f term -> Rule (env, term) m a term
+         => f term -> Rule (env, term) a term
 generate' x = termIn <$> (termAnnotation . snd <$> context) <*> pure (Sum.inject x)
 
 -- | If we are operating in a History context, tag the provided sum
 -- with a 'Refactored' annotation derived from the current context.
 modified :: (Apply Functor syn, f :< syn, term ~ Term (Sum syn) (Record (History : fields)))
-         => f term -> Rule (env, term) m a term
+         => f term
+         -> Rule (env, term) a term
 modified x = History.remark Refactored <$> generate' x
 
 -- | Mark the provided functor with a 'Refactored' version of the original
@@ -346,20 +347,20 @@ markRefactored old t = remark Refactored (termIn (annotation old) (inject t))
 -- Interpreters
 --
 
--- | Apply a transform in an effectful context.
-applyEff :: Monad m
-         => Rule env m from to
+-- | Apply a transform in an monadic context.
+rewriteM :: Monad m
+         => RuleM env m from to
          -> env
          -> from
          -> m (Either TransformFailed to)
-applyEff r env from = runE env from r
+rewriteM r env from = runE env from r
 
 -- | Apply a 'PureRule'.
-applyPure :: PureRule env from to
-          -> env
-          -> from
-          -> Either TransformFailed to
-applyPure r env from = runIdentity $ runE env from r
+rewrite :: RuleM env Identity from to
+        -> env
+        -> from
+        -> Either TransformFailed to
+rewrite r env from = runIdentity $ runE env from r
 
 cataM :: (Recursive t, Traversable (Base t), Monad m) => (Base t a -> m a) -> (t -> m a)
 cataM phi = c where c = phi <=< (traverse c . project)
@@ -373,11 +374,11 @@ paraM f = liftM snd . cataM run
 eitherA :: Applicative f => (b -> f (Either a c)) -> Either a b -> f (Either a c)
 eitherA = either (pure . Left)
 
--- | As 'applyEff', but with some parameters reversed.
+-- | As 'rewriteM', but with some parameters reversed.
 runE :: forall m env from to . Monad m
      => env
      -> from
-     -> Rule env m from to
+     -> RuleM env m from to
      -> m (Either TransformFailed to)
 runE env from = \case
   Then a f     -> runE env from a >>= eitherA (runE env from) . fmap f
@@ -387,13 +388,13 @@ runE env from = \case
   Promote p    -> fmap Right p
 
   Alt a b   -> runE env from a  >>= either (const (runE env from b)) (pure . Right)
-  Fanin a b -> runE env from id >>= eitherA (applyEff a env ||| applyEff b env)
+  Fanin a b -> runE env from id >>= eitherA (rewriteM a env ||| rewriteM b env)
   Split a b -> runE env from id >>= eitherA (fmap bisequence . runKleisli prod)
-    where prod = Kleisli (applyEff a env) *** Kleisli (applyEff b env)
+    where prod = Kleisli (rewriteM a env) *** Kleisli (rewriteM b env)
 
   Local f m   -> runE (f env) from m
   Context     -> pure . pure $ env
-  Comp a b    -> runE env from b >>= eitherA (applyEff a env)
+  Comp a b    -> runE env from b >>= eitherA (rewriteM a env)
 
   Recur r -> paraM go from where
     go (In ann recur) = eitherA hi (traverse snd recur)
