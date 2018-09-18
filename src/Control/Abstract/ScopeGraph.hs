@@ -73,7 +73,7 @@ instance Effect (ScopeEnv address) where
 runScopeEnv :: (Ord address, Effects effects, Member Fresh effects, Member (Allocator address) effects)
             => Evaluator address value (ScopeEnv address ': effects) a
             -> Evaluator address value effects (ScopeGraph address, a)
-runScopeEnv evaluator = runState ScopeGraph.emptyGraph (reinterpret handleScopeEnv evaluator)
+runScopeEnv evaluator = runState lowerBound (reinterpret handleScopeEnv evaluator)
 
 handleScopeEnv :: forall address value effects a. (Ord address, Member Fresh effects, Member (Allocator address) effects, Effects effects)
           => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
