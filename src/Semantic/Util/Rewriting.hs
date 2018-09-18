@@ -2,13 +2,17 @@
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util.Rewriting where
 
-import Prelude hiding (id, (.), readFile)
+import Prelude hiding (id, readFile, (.))
+import Prologue
+
+import           Control.Category
+import qualified Data.ByteString.Char8 as BC
+import           Text.Show.Pretty (pPrint)
 
 import           Control.Abstract
 import           Control.Abstract.Matching
-import           Control.Category
+import           Control.Rewriting hiding (fromMatcher, target)
 import           Data.Blob
-import qualified Data.ByteString.Char8 as BC
 import           Data.History
 import qualified Data.Language as Language
 import           Data.Machine
@@ -20,11 +24,10 @@ import qualified Data.Sum as Sum
 import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.JSON.PrettyPrint
-import           Language.Ruby.PrettyPrint
 import           Language.Python.PrettyPrint
+import           Language.Ruby.PrettyPrint
 import           Matching.Core
 import           Parsing.Parser
-import           Prologue hiding (weaken)
 import           Reprinting.Pipeline
 import           Semantic.IO as IO
 import           Semantic.Task
@@ -81,18 +84,21 @@ testJSONFile = do
   tree <- parseFile jsonParser path
   pure (src, tree)
 
-renameKey :: (Literal.TextElement :< fs, Literal.KeyValue :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
-renameKey p = case projectTerm p of
-  Just (Literal.KeyValue k v)
-    | Just (Literal.TextElement x) <- Sum.project (termOut k)
-    , x == "\"foo\""
-    -> let newKey = termIn (termAnnotation k) (inject (Literal.TextElement "\"fooA\""))
-       in remark Refactored (termIn (termAnnotation p) (inject (Literal.KeyValue newKey v)))
-  _ -> Term (fmap renameKey (unTerm p))
+renameKey :: ( Literal.TextElement :< fs
+             , Apply Functor fs
+             , term ~ Term (Sum fs) (Record (History : fields))
+             )
+          => Rewrite (env, term) m (Literal.KeyValue term)
+renameKey = do
+  Literal.KeyValue k v <- id
+  guard (projectTerm k == (Just (Literal.TextElement "\"foo\"")))
+  new <- modified (Literal.TextElement "\"fooA\"")
+  pure (Literal.KeyValue new v)
 
 testRenameKey = do
   (src, tree) <- testJSONFile
-  let tagged = renameKey (mark Unmodified tree)
+  let (Right tagged) = applyPure (somewhere renameKey) () (mark Unmodified tree)
+  pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
@@ -180,7 +186,7 @@ changeKV = auto $ either id injKV
     injKV :: (term, Literal.KeyValue term) -> term
     injKV (term, Literal.KeyValue k v) = case projectTerm v of
       Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue k (newArray elems))))
-      _ -> term
+      _                          -> term
       where newArray xs = termIn ann (inject (Literal.Array (xs <> [float])))
             float = termIn ann (inject (Literal.Float "4"))
             ann = termAnnotation term
