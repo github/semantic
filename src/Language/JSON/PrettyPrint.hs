@@ -61,7 +61,7 @@ beautifyingJSON _ = repeatedly (await >>= step) where
   step (Defer el cs)   = lift (throwError (NoTranslation el cs))
   step (Verbatim txt)  = emit txt
   step (New el cs txt) = case (el, cs) of
-    (TOpen,  THash:_) -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
+    (TOpen,  THash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
     (TClose, THash:rest) -> layout HardWrap *> indent 2 (hashDepth rest) *> emit txt
     (TSep,   TList:_)    -> emit txt *> space
     (TSep,   TPair:_)    -> emit txt *> space
