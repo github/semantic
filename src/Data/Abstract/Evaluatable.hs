@@ -70,7 +70,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError (UnspecializedError value))) effects
           , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable (BaseError ResolutionError)) effects
-          , Member (State (Heap address value)) effects
+          , Member (State (Heap address address value)) effects
           , Member Trace effects
           , Ord address
           )
@@ -114,7 +114,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
-            , Member (State (Heap address value)) effects
+            , Member (State (Heap address address value)) effects
             , Member Trace effects
             , Ord address
             , Recursive term
@@ -172,7 +172,7 @@ class HasPrelude (language :: Language) where
                    , Member (Reader Span) effects
                    , Member (Resumable (BaseError (AddressError address value))) effects
                    , Member (Resumable (BaseError (EnvironmentError address))) effects
-                   , Member (State (Heap address value)) effects
+                   , Member (State (Heap address address value)) effects
                    , Member Trace effects
                    , Ord address
                    )

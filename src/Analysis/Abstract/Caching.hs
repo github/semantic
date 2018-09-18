@@ -35,7 +35,7 @@ lookupCache :: (Cacheable term address value, Member (State (Cache term address 
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term address value, Member (State (Cache term address value)) effects, Member (State (Heap address value)) effects)
+cachingConfiguration :: (Cacheable term address value, Member (State (Cache term address value)) effects, Member (State (Heap address address value)) effects)
                      => Configuration term address value
                      -> Set (Cached address value)
                      -> TermEvaluator term address value effects (ValueRef address)
@@ -65,7 +65,7 @@ cachingTerms :: ( Cacheable term address value
                 , Member (Reader (Live address)) effects
                 , Member (State (Cache term address value)) effects
                 , Member (Env address) effects
-                , Member (State (Heap address value)) effects
+                , Member (State (Heap address address value)) effects
                 )
              => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
              -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
@@ -89,7 +89,7 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (Resumable (BaseError (EnvironmentError address))) effects
                      , Member (State (Cache term address value)) effects
                      , Member (Env address) effects
-                     , Member (State (Heap address value)) effects
+                     , Member (State (Heap address address value)) effects
                      , Effects effects
                      )
                   => SubtermAlgebra Module term (TermEvaluator term address value effects address)
@@ -126,7 +126,7 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address value)) effects) => t (Cached address value) -> TermEvaluator term address value effects (ValueRef address)
+scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address address value)) effects) => t (Cached address value) -> TermEvaluator term address value effects (ValueRef address)
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 

@@ -168,7 +168,7 @@ evalRequire :: ( AbstractValue address value effects
                , Member (Deref value) effects
                , Member (Env address) effects
                , Member (Modules address) effects
-               , Member (State (Heap address value)) effects
+               , Member (State (Heap address address value)) effects
                , Ord address
                )
             => M.ModulePath

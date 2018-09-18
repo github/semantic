@@ -238,7 +238,7 @@ runFunction :: ( Member (Allocator address) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError TypeError)) effects
                , Member (Resumable (BaseError (AddressError address Type))) effects
-               , Member (State (Heap address Type)) effects
+               , Member (State (Heap address address Type)) effects
                , Member (State TypeMap) effects
                , Ord address
                , PureEffects effects
@@ -302,7 +302,7 @@ instance ( Member (Allocator address) effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (AddressError address Type))) effects
          , Member (Resumable (BaseError TypeError)) effects
-         , Member (State (Heap address Type)) effects
+         , Member (State (Heap address address Type)) effects
          , Member (State TypeMap) effects
          , Ord address
          )
