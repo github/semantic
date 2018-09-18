@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, TypeOperators #-}
-module Analysis.Abstract.Caching
+module Analysis.Abstract.Caching.FlowSensitive
 ( cachingTerms
 , convergingModules
 , caching
