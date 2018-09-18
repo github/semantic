@@ -19,9 +19,9 @@ module Control.Abstract.Value
 , makeNamespace
 , evaluateInScopedEnv
 , address
-, value
+-- , value
 , rvalBox
-, subtermValue
+-- , subtermValue
 , subtermAddress
 ) where
 
@@ -242,6 +242,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue (pure unit)
 
+-- TODO rethink whether this function is necessary.
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Deref value) effects
                  , Member (Env address) effects
@@ -256,7 +257,7 @@ makeNamespace :: ( AbstractValue address value effects
 makeNamespace declaration addr super body = do
   namespaceBinds <- Env.head <$> locally (body >> getEnv)
   v <- namespace declaration super namespaceBinds
-  v <$ assign addr v
+  v <$ assign addr declaration v
 
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
@@ -272,35 +273,35 @@ evaluateInScopedEnv receiver term = do
   withEvalContext (EvalContext (Just receiver) env) term
 
 
--- | Evaluates a 'Value' returning the referenced value
-value :: ( AbstractValue address value effects
-         , Member (Deref value) effects
-         , Member (Env address) effects
-         , Member (Reader ModuleInfo) effects
-         , Member (Reader Span) effects
-         , Member (Resumable (BaseError (AddressError address value))) effects
-         , Member (Resumable (BaseError (EnvironmentError address))) effects
-         , Member (State (Heap address address value)) effects
-         , Ord address
-         )
-      => ValueRef address
-      -> Evaluator address value effects value
-value = deref <=< address
+-- -- | Evaluates a 'Value' returning the referenced value
+-- value :: ( AbstractValue address value effects
+--          , Member (Deref value) effects
+--          , Member (Env address) effects
+--          , Member (Reader ModuleInfo) effects
+--          , Member (Reader Span) effects
+--          , Member (Resumable (BaseError (AddressError address value))) effects
+--          , Member (Resumable (BaseError (EnvironmentError address))) effects
+--          , Member (State (Heap address address value)) effects
+--          , Ord address
+--          )
+--       => ValueRef address
+--       -> Evaluator address value effects value
+-- value = deref <=< address
 
--- | Evaluates a 'Subterm' to its rval
-subtermValue :: ( AbstractValue address value effects
-                , Member (Deref value) effects
-                , Member (Env address) effects
-                , Member (Reader ModuleInfo) effects
-                , Member (Reader Span) effects
-                , Member (Resumable (BaseError (AddressError address value))) effects
-                , Member (Resumable (BaseError (EnvironmentError address))) effects
-                , Member (State (Heap address address value)) effects
-                , Ord address
-                )
-             => Subterm term (Evaluator address value effects (ValueRef address))
-             -> Evaluator address value effects value
-subtermValue = value <=< subtermRef
+-- -- | Evaluates a 'Subterm' to its rval
+-- subtermValue :: ( AbstractValue address value effects
+--                 , Member (Deref value) effects
+--                 , Member (Env address) effects
+--                 , Member (Reader ModuleInfo) effects
+--                 , Member (Reader Span) effects
+--                 , Member (Resumable (BaseError (AddressError address value))) effects
+--                 , Member (Resumable (BaseError (EnvironmentError address))) effects
+--                 , Member (State (Heap address address value)) effects
+--                 , Ord address
+--                 )
+--              => Subterm term (Evaluator address value effects (ValueRef address))
+--              -> Evaluator address value effects value
+-- subtermValue = value <=< subtermRef
 
 -- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue address value effects

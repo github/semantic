@@ -27,7 +27,7 @@ define :: ( HasCallStack
           , Member (Env address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
-          , Member (State (Heap address value)) effects
+          , Member (State (Heap address address value)) effects
           , Ord address
           )
        => Name
@@ -45,7 +45,7 @@ defineClass :: ( AbstractValue address value effects
                , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
-               , Member (State (Heap address value)) effects
+               , Member (State (Heap address address value)) effects
                , Ord address
                )
             => Name
@@ -63,7 +63,7 @@ defineNamespace :: ( AbstractValue address value effects
                    , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
-                   , Member (State (Heap address value)) effects
+                   , Member (State (Heap address address value)) effects
                    , Ord address
                    )
                 => Name
@@ -112,7 +112,7 @@ builtInPrint :: ( AbstractValue address value effects
                 , Member (Reader Span) effects
                 , Member (Resumable (BaseError (AddressError address value))) effects
                 , Member (Resumable (BaseError (EnvironmentError address))) effects
-                , Member (State (Heap address value)) effects
+                , Member (State (Heap address address value)) effects
                 , Member Trace effects
                 , Ord address
                 )
@@ -130,7 +130,7 @@ builtInExport :: ( AbstractValue address value effects
                  , Member (Reader Span) effects
                  , Member (Resumable (BaseError (AddressError address value))) effects
                  , Member (Resumable (BaseError (EnvironmentError address))) effects
-                 , Member (State (Heap address value)) effects
+                 , Member (State (Heap address address value)) effects
                  , Ord address
                  )
               => Evaluator address value effects value
