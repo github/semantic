@@ -53,7 +53,6 @@ library
                      , Data.Abstract.Address.Monovariant
                      , Data.Abstract.Address.Precise
                      , Data.Abstract.BaseError
-                     , Data.Abstract.Cache
                      , Data.Abstract.Declarations
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable

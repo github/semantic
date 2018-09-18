@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Analysis.Abstract.Caching
 ( cachingTerms
 , convergingModules
@@ -6,11 +6,11 @@ module Analysis.Abstract.Caching
 ) where
 
 import Control.Abstract
-import Data.Abstract.Cache
 import Data.Abstract.BaseError
 import Data.Abstract.Environment
 import Data.Abstract.Module
 import Data.Abstract.Ref
+import Data.Map.Monoidal as Monoidal
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
@@ -140,3 +140,41 @@ caching
   = runState lowerBound
   . runReader lowerBound
   . runNonDet
+
+
+-- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
+newtype Cache term address value = Cache { unCache :: Monoidal.Map (Configuration term address value) (Set (Cached address value)) }
+  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term address value, Cached address value), Semigroup)
+
+-- | A single point in a program’s execution.
+data Configuration term address value = Configuration
+  { configurationTerm    :: term                -- ^ The “instruction,” i.e. the current term to evaluate.
+  , configurationRoots   :: Live address        -- ^ The set of rooted addresses.
+  , configurationContext :: EvalContext address -- ^ The evaluation context in 'configurationTerm'.
+  , configurationHeap    :: Heap address value  -- ^ The heap of values.
+  }
+  deriving (Eq, Ord, Show)
+
+data Cached address value = Cached
+  { cachedValue :: ValueRef address
+  , cachedHeap  :: Heap address value
+  }
+  deriving (Eq, Ord, Show)
+
+
+type Cacheable term address value = (Ord address, Ord term, Ord value)
+
+-- | Look up the resulting value & 'Heap' for a given 'Configuration'.
+cacheLookup :: Cacheable term address value => Configuration term address value -> Cache term address value -> Maybe (Set (Cached address value))
+cacheLookup key = Monoidal.lookup key . unCache
+
+-- | Set the resulting value & 'Heap' for a given 'Configuration', overwriting any previous entry.
+cacheSet :: Cacheable term address value => Configuration term address value -> Set (Cached address value) -> Cache term address value -> Cache term address value
+cacheSet key value = Cache . Monoidal.insert key value . unCache
+
+-- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
+cacheInsert :: Cacheable term address value => Configuration term address value -> Cached address value -> Cache term address value -> Cache term address value
+cacheInsert = curry cons
+
+instance (Show term, Show address, Show value) => Show (Cache term address value) where
+  showsPrec d = showsUnaryWith showsPrec "Cache" d . map (second toList) . Monoidal.pairs . unCache
