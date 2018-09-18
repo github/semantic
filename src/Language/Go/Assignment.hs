@@ -535,7 +535,7 @@ varDeclaration :: Assignment Term
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
 variadicArgument :: Assignment Term
-variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic [] <$> expression)
+variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic [] <$> expressions)
 
 variadicParameterDeclaration :: Assignment Term
 variadicParameterDeclaration =  makeTerm <$> symbol VariadicParameterDeclaration <*> children (flip Go.Syntax.Variadic <$> (expression <|> emptyTerm) <* token AnonDotDotDot <*> many expression)
