@@ -101,10 +101,10 @@ testRenameKey = do
   pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
-increaseNumbers p = case Sum.project (termOut p) of
-  Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
-  Nothing                -> Term (fmap increaseNumbers (unTerm p))
+increaseNumbers :: (term ~ Term (Sum fs) (Record (History : fields))) => Rewrite (env, term) m (Literal.Float term)
+increaseNumbers = do
+  (Literal.Float c) <- id
+  pure (Literal.Float (c <> "0"))
 
 addKVPair :: forall effs syntax ann fields term .
   ( Apply Functor syntax
