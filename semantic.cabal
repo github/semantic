@@ -54,7 +54,6 @@ library
                      , Data.Abstract.Address.Precise
                      , Data.Abstract.BaseError
                      , Data.Abstract.Cache
-                     , Data.Abstract.Configuration
                      , Data.Abstract.Declarations
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
