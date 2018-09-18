@@ -50,10 +50,10 @@ putCache :: Member (State (Cache term address)) effects
 putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-isolateCache :: Member (State (Cache term address)) effects
+isolateCache :: (Member (State (Cache term address)) effects, Member (State (Heap address value)) effects)
              => TermEvaluator term address value effects a
-             -> TermEvaluator term address value effects (Cache term address)
-isolateCache action = putCache lowerBound *> action *> get
+             -> TermEvaluator term address value effects (Cache term address, Heap address value)
+isolateCache action = putCache lowerBound *> action *> ((,) <$> get <*> get)
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
@@ -79,6 +79,7 @@ cachingTerms recur term = do
 
 convergingModules :: ( AbstractValue address value effects
                      , Effects effects
+                     , Eq value
                      , Member (Env address) effects
                      , Member Fresh effects
                      , Member NonDet effects
@@ -88,6 +89,7 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (Reader Span) effects
                      , Member (Resumable (BaseError (EnvironmentError address))) effects
                      , Member (State (Cache term address)) effects
+                     , Member (State (Heap address value)) effects
                      , Ord address
                      , Ord term
                      )
@@ -95,8 +97,9 @@ convergingModules :: ( AbstractValue address value effects
                   -> SubtermAlgebra Module term (TermEvaluator term address value effects address)
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
+  heap <- TermEvaluator getHeap
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
-  cache <- converge lowerBound (\ prevCache -> isolateCache $ do
+  (cache, _) <- converge (lowerBound, heap) (\ (prevCache, _) -> isolateCache $ do
     TermEvaluator (putEvalContext (configurationContext c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
