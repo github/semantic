@@ -1,10 +1,10 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields #-}
 module Data.Abstract.ScopeGraph
   ( ScopeGraph(..)
   , Path(..)
   , pathDeclaration
-  , Reference(..)
-  , Declaration(..)
+  , Reference(..) -- TODO don't export these constructors
+  , Declaration(..) -- TODO don't export these constructors
   , EdgeLabel(..)
   , scopeOfRef
   , pathOfRef
@@ -151,10 +151,10 @@ associatedScope declaration g@ScopeGraph{..} = go (Map.keys graph)
       pure assocScope
     go [] = Nothing
 
-newtype Reference = Reference Name
+newtype Reference = Reference { name :: Name }
   deriving (Eq, Ord, Show)
 
-newtype Declaration = Declaration Name
+newtype Declaration = Declaration { name :: Name }
   deriving (Eq, Ord, Show)
 
 -- | The type of edge from a scope to its parent scopes.
