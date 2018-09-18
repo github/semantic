@@ -189,7 +189,7 @@ class AbstractIntro value => AbstractValue address value effects where
   index :: value -> value -> Evaluator address value effects address
 
   -- | Build a class value from a name and environment.
-  klass :: Name             -- ^ The new class's identifier
+  klass :: Declaration      -- ^ The new class's identifier
         -> [address]        -- ^ A list of superclasses
         -> Bindings address -- ^ The environment to capture
         -> Evaluator address value effects value
@@ -197,7 +197,7 @@ class AbstractIntro value => AbstractValue address value effects where
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
-  namespace :: Declaration                 -- ^ The namespace's declaration
+  namespace :: Declaration          -- ^ The namespace's declaration
             -> Maybe address        -- The ancestor of the namespace
             -> Bindings address     -- ^ The environment to mappend
             -> Evaluator address value effects value
