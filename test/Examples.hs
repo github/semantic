@@ -47,7 +47,7 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
           then pendingWith $ "Known parse failures " <> show (const "Assignment: OK" <$> res)
           else res `shouldSatisfy` isRight
 
-    setupExampleRepos = readProcess "script/setup-example-repos" mempty mempty >>= print
+    setupExampleRepos = readProcess "script/clone-example-repos" mempty mempty >>= print
     opts = defaultOptions { optionsFailOnWarning = True, optionsLogLevel = Nothing }
 
     knownFailuresForPath :: FilePath -> Maybe FilePath -> IO [FilePath]
