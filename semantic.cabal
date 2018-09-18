@@ -101,6 +101,7 @@ library
                      , Data.Record
                      , Data.Reprinting.Errors
                      , Data.Reprinting.Token
+                     , Data.Reprinting.Fragment
                      , Data.Reprinting.Splice
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
