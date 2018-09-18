@@ -5,7 +5,6 @@ module Analysis.Abstract.Caching
 , caching
 ) where
 
-import Control.Abstract.Configuration
 import Control.Abstract
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
@@ -129,6 +128,12 @@ converge seed f = loop seed
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Foldable t, Member NonDet effects, Member (State (Heap address value)) effects) => t (Cached address value) -> TermEvaluator term address value effects (ValueRef address)
 scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
+
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address value)) effects)
+                 => term
+                 -> TermEvaluator term address value effects (Configuration term address value)
+getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
 
 
 caching :: Effects effects => TermEvaluator term address value (NonDet ': Reader (Cache term address value) ': State (Cache term address value) ': effects) a -> TermEvaluator term address value effects (Cache term address value, [a])
