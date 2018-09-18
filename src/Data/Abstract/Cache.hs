@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Cache
   ( Cache
+  , Configuration (..)
   , Cached (..)
   , Cacheable
   , cacheLookup
@@ -9,8 +10,9 @@ module Data.Abstract.Cache
   , cacheKeys
   ) where
 
-import Data.Abstract.Configuration
+import Data.Abstract.Environment
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Ref
 import Data.Map.Monoidal as Monoidal
 import Prologue
@@ -18,6 +20,15 @@ import Prologue
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache term address value = Cache { unCache :: Monoidal.Map (Configuration term address value) (Set (Cached address value)) }
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term address value, Cached address value), Semigroup)
+
+-- | A single point in a program’s execution.
+data Configuration term address value = Configuration
+  { configurationTerm    :: term                -- ^ The “instruction,” i.e. the current term to evaluate.
+  , configurationRoots   :: Live address        -- ^ The set of rooted addresses.
+  , configurationContext :: EvalContext address -- ^ The evaluation context in 'configurationTerm'.
+  , configurationHeap    :: Heap address value  -- ^ The heap of values.
+  }
+  deriving (Eq, Ord, Show)
 
 data Cached address value = Cached
   { cachedValue :: ValueRef address

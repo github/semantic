@@ -7,7 +7,6 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
-import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import Data.Abstract.Environment
 import Data.Abstract.Module
