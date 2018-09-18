@@ -14,7 +14,6 @@ import Prologue
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 tracingTerms :: ( Corecursive term
-                , Member (Reader (Live address)) effects
                 , Member (Env address) effects
                 , Member (State (Heap address value)) effects
                 , Member (Writer (trace (Configuration term address value))) effects
@@ -33,15 +32,14 @@ tracing = runWriter
 
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address value)) effects)
+getConfiguration :: (Member (Env address) effects, Member (State (Heap address value)) effects)
                  => term
                  -> TermEvaluator term address value effects (Configuration term address value)
-getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
+getConfiguration term = Configuration term <$> TermEvaluator getEvalContext <*> TermEvaluator getHeap
 
 -- | A single point in a program’s execution.
 data Configuration term address value = Configuration
   { configurationTerm    :: term                -- ^ The “instruction,” i.e. the current term to evaluate.
-  , configurationRoots   :: Live address        -- ^ The set of rooted addresses.
   , configurationContext :: EvalContext address -- ^ The evaluation context in 'configurationTerm'.
   , configurationHeap    :: Heap address value  -- ^ The heap of values.
   }
