@@ -71,7 +71,7 @@ include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (importedEnv, v) <- f path
+  (_, (importedEnv, v)) <- f path
   bindAll importedEnv
   pure (Rval v)
 
