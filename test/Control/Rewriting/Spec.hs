@@ -4,17 +4,18 @@ module Control.Rewriting.Spec (spec) where
 
 import SpecHelpers
 
-import           Control.Abstract.Matching as Matching
-import           Control.Rewriting as Rewriting
 import qualified Data.ByteString as B
 import           Data.Either
+import           Data.Text (Text)
+
+import           Control.Abstract.Matching as Matching
+import           Control.Rewriting as Rewriting
+import           Data.History as History
 import qualified Data.Source as Source
 import           Data.Sum
 import qualified Data.Syntax.Literal as Literal
 import           Language.JSON.PrettyPrint
-import Data.History as History
-
-import Data.Text (Text)
+import           Reprinting.Pipeline
 
 -- import           Reprinting.Pipeline
 
@@ -51,6 +52,6 @@ spec = describe "rewriting" $ do
 
     length (runMatcher @[] isHi refactored) `shouldBe` 1
 
-    -- let res = runReprinter bytes defaultJSONPipeline refactored
-    -- expected <- Source.fromUTF8 <$> B.readFile "test/fixtures/json/rewriting/add_keys_expected.json"
-    -- res `shouldBe` Right expected
+    let res = runReprinter bytes defaultJSONPipeline refactored
+    expected <- Source.fromUTF8 <$> B.readFile "test/fixtures/json/rewriting/add_keys_expected.json"
+    res `shouldBe` Right expected
