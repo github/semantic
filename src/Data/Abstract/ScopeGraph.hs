@@ -18,7 +18,6 @@ module Data.Abstract.ScopeGraph
   , scopeOfRef
   , pathOfRef
   , declare
-  , emptyGraph
   , reference
   , newScope
   , associatedScope
@@ -46,8 +45,8 @@ data Scope scopeAddress = Scope {
 
 data ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope), currentScope :: Maybe scope }
 
-emptyGraph :: Ord scope => ScopeGraph scope
-emptyGraph = ScopeGraph mempty Nothing
+instance Ord scope => Lower (ScopeGraph scope) where
+  lowerBound = ScopeGraph mempty Nothing
 
 deriving instance Eq address => Eq (ScopeGraph address)
 deriving instance Show address => Show (ScopeGraph address)
