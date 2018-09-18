@@ -93,7 +93,7 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      importedEnv <- fst <$> require path
+      importedEnv <- fst . snd <$> require path
       bindAll importedEnv
     rvalBox unit
 
@@ -115,7 +115,7 @@ instance Evaluatable QualifiedImport where
     void . letrec' alias $ \addr -> do
       makeNamespace alias addr Nothing . for_ paths $ \p -> do
         traceResolve (unPath importPath) p
-        importedEnv <- fst <$> require p
+        importedEnv <- fst . snd <$> require p
         bindAll importedEnv
     rvalBox unit
 

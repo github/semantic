@@ -104,6 +104,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
     . raiseHandler (runModules (ModuleTable.modulePaths (packageModules (snd <$> package))))
     . runReader (packageInfo package)
+    . runState (lowerBound @Span)
     . runReader (lowerBound @Span)
     $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runFunction coerce coerce) modules
 
