@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
-, Configuration(..)
 , Live
 , getHeap
 , putHeap
@@ -22,7 +21,6 @@ module Control.Abstract.Heap
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
-import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import Data.Abstract.Heap
 import Data.Abstract.Live
