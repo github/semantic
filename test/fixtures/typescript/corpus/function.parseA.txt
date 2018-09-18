@@ -2,7 +2,7 @@
   (Function
     (TypeParameters
       (TypeParameter
-        (Identifier)
+        (TypeIdentifier)
         (Empty)
         (Empty)))
     (Annotation
