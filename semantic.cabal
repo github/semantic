@@ -19,7 +19,8 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.Caching.FlowSensitive
+                       Analysis.Abstract.Caching.FlowInsensitive
+                     , Analysis.Abstract.Caching.FlowSensitive
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Graph
