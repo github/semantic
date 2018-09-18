@@ -9,5 +9,6 @@
     (Not
       (Send
         (Identifier)))
-    (Statements)
+    (Statements
+      (Statements))
     (Empty)))

@@ -9,6 +9,16 @@
             (Identifier)))
         (Statements
           (Send
-            (Identifier))
+            (Identifier))))
+      (Pattern
+        (Statements
           (Send
-            (Identifier)))))))
+            (Identifier)))
+        (Statements))
+      (Pattern
+        (Statements
+          (Send
+            (Identifier)))
+        (Statements))
+      (Send
+        (Identifier)))))
