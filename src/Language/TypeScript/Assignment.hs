@@ -620,7 +620,7 @@ constructorTy :: Assignment Term
 constructorTy = makeTerm <$> symbol ConstructorType <*> children (TypeScript.Syntax.Constructor <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> term ty)
 
 statementBlock :: Assignment Term
-statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
+statementBlock = makeTerm <$> symbol StatementBlock <*> children (Statement.Statements <$> manyTerm statement)
 
 classBodyStatements :: Assignment Term
 classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as <> [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
