@@ -118,12 +118,12 @@ type TestEvaluatingErrors = '[ BaseError (ValueError Precise (ConcreteEff Precis
                              , BaseError (UnspecializedError Val)
                              , BaseError (LoadError Precise)
                              ]
-testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
+testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (Span, a)
                -> IO
                  ( [String]
                  , ( Heap Precise Val
                    , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
-                            (ModuleTable (NonEmpty (Module (ModuleResult Precise))))
+                            a
                    )
                  )
 testEvaluating
@@ -139,6 +139,7 @@ testEvaluating
   . runResolutionError
   . runAddressError
   . runValueError @_ @Precise @(ConcreteEff Precise _)
+  . fmap snd
 
 type Val = Value Precise (ConcreteEff Precise '[Trace, Lift IO])
 
@@ -153,11 +154,12 @@ namespaceScope :: Heap Precise (Value Precise term)
                -> Value Precise term
                -> Maybe (Environment Precise)
 namespaceScope heap ns@(Namespace _ _ _)
-  = either (const Nothing) snd
+  = either (const Nothing) (snd . snd)
   . run
   . runFresh 0
   . runAddressError
   . runState heap
+  . runState (lowerBound @Span)
   . runReader (lowerBound @Span)
   . runReader (ModuleInfo "SpecHelper.hs")
   . runDeref

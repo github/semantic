@@ -14,7 +14,7 @@ spec config = parallel $ do
     it "imports and wildcard imports" $ do
       (_, (heap, res)) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main.go" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> do
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
           (derefQName heap ("foo" :| []) env >>= deNamespace heap) `shouldBe` Just ("foo",  ["New"])
         other -> expectationFailure (show other)
@@ -22,7 +22,7 @@ spec config = parallel $ do
     it "imports with aliases (and side effects only)" $ do
       (_, (heap, res)) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main1.go" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> do
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldBe` [ "f", "main" ]
           (derefQName heap ("f" :| []) env >>= deNamespace heap) `shouldBe` Just ("f",  ["New"])
         other -> expectationFailure (show other)
