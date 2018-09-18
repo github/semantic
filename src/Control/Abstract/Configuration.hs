@@ -6,6 +6,7 @@ import Control.Abstract.Environment
 import Control.Abstract.Heap
 import Control.Abstract.Roots
 import Control.Abstract.TermEvaluator
+import Data.Abstract.Configuration
 
 -- | Get the current 'Configuration' with a passed-in term.
 getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects, Member (State (Heap address value)) effects)
