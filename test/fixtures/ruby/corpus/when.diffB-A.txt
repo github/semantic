@@ -9,16 +9,16 @@
             (Identifier)))
         (Statements
         {-(Send
+          {-(Identifier)-})-}))
+    {-(Pattern
+      {-(Statements
+        {-(Send
           {-(Identifier)-})-}
-        {-(Pattern
-          {-(Statements
-            {-(Send
-              {-(Identifier)-})-}
-            {-(Send
-              {-(Identifier)-})-})-}
-          {-(Statements
-            {-(Send
-              {-(Identifier)-})-})-})-}))))
+        {-(Send
+          {-(Identifier)-})-})-}
+      {-(Statements)-})-}
+    {-(Send
+      {-(Identifier)-})-}))
 {+(Match
   {+(Empty)+}
   {+(Statements

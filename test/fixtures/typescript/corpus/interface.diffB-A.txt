@@ -2,7 +2,7 @@
   (InterfaceDeclaration
   {+(TypeParameters
     {+(TypeParameter
-      {+(Identifier)+}
+      {+(TypeIdentifier)+}
       {+(Empty)+}
       {+(Empty)+})+})+}
   {-(Empty)-}

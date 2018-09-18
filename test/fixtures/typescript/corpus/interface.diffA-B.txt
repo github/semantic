@@ -3,7 +3,7 @@
   {+(Empty)+}
   {-(TypeParameters
     {-(TypeParameter
-      {-(Identifier)-}
+      {-(TypeIdentifier)-}
       {-(Empty)-}
       {-(Empty)-})-})-}
   { (TypeIdentifier)

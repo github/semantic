@@ -3,6 +3,8 @@
 module Data.Syntax.Statement where
 
 import Data.Abstract.Evaluatable
+import Control.Abstract.ScopeGraph
+import qualified Data.Map.Strict as Map
 import Data.Aeson (ToJSON1 (..))
 import Data.JSON.Fields
 import Data.Semigroup.App
@@ -27,7 +29,11 @@ instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
 instance ToJSON1 Statements
 
 instance Evaluatable Statements where
-  eval (Statements xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
+  eval (Statements xs) = do
+    currentScope' <- currentScope
+    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+    scope <- newScope edges
+    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
@@ -121,7 +127,10 @@ instance Evaluatable Let where
 
 -- | Assignment to a variable or other lvalue.
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+
+instance Declarations1 Assignment where
+  liftDeclaredName declaredName Assignment{..} = declaredName assignmentTarget
 
 instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
@@ -133,8 +142,19 @@ instance Evaluatable Assignment where
     rhs <- subtermAddress assignmentValue
 
     case lhs of
-      LvalLocal nam -> do
-        bind nam rhs
+      LvalLocal name -> do
+        case declaredName (subterm assignmentValue) of
+          Just rhsName -> do
+            assocScope <- associatedScope (Declaration rhsName)
+            case assocScope of
+              Just assocScope' -> do
+                objectScope <- newScope (Map.singleton Import [ assocScope' ])
+                putDeclarationScope (Declaration name) objectScope
+              Nothing -> pure ()
+          Nothing ->
+            -- The rhs wasn't assigned to a reference/declaration.
+            pure ()
+        bind name rhs
       LvalMember _ _ ->
         -- we don't yet support mutable object properties:
         pure ()
