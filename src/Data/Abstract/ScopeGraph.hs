@@ -113,7 +113,7 @@ reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
               scopes <- Map.lookup edge linkMap
               -- Return the first path to the declaration through the scopes.
               getFirst (foldMap (First . ap (go currentAddress currentScope) ((path .) . EPath edge)) scopes)
-            in traverseEdges I <|> traverseEdges P
+            in traverseEdges Import <|> traverseEdges Lexical
 
 -- | Insert associate the given address to a declaration in the scope graph.
 insertDeclarationScope :: Ord address => Declaration -> address -> ScopeGraph address -> ScopeGraph address
@@ -172,7 +172,9 @@ newtype Reference = Reference Name
 newtype Declaration = Declaration Name
   deriving (Eq, Ord, Show)
 
-data EdgeLabel = P | I
+-- | The type of edge from a scope to its parent scopes.
+-- Either a lexical edge or an import edge in the case of non-lexical edges.
+data EdgeLabel = Lexical | Import
   deriving (Eq, Ord, Show)
 
 data Frame scopeAddress frameAddress value = Frame {
