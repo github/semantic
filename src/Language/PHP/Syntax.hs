@@ -60,7 +60,7 @@ include :: ( AbstractValue address value effects
            , Member (Resumable (BaseError (AddressError address value))) effects
            , Member (Resumable (BaseError ResolutionError)) effects
            , Member (Resumable (BaseError (EnvironmentError address))) effects
-           , Member (State (Heap address value)) effects
+           , Member (State (Heap address address value)) effects
            , Member Trace effects
            , Ord address
            )

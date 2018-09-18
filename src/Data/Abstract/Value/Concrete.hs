@@ -74,7 +74,7 @@ runFunction :: ( Member (Allocator address) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                , Member (Resumable (BaseError (ValueError address body))) effects
-               , Member (State (Heap address (Value address body))) effects
+               , Member (State (Heap address address (Value address body))) effects
                , Ord address
                , PureEffects effects
                )
@@ -137,7 +137,7 @@ materializeEnvironment :: ( Member (Deref (Value address body)) effects
                           , Member (Reader ModuleInfo) effects
                           , Member (Reader Span) effects
                           , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
-                          , Member (State (Heap address (Value address body))) effects
+                          , Member (State (Heap address address (Value address body))) effects
                           , Ord address
                           )
                        => Value address body
@@ -174,7 +174,7 @@ instance ( Coercible body (Eff effects)
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (ValueError address body))) effects
          , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
-         , Member (State (Heap address (Value address body))) effects
+         , Member (State (Heap address address (Value address body))) effects
          , Member Trace effects
          , Ord address
          , Show address
