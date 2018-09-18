@@ -7,6 +7,7 @@ module Control.Abstract.ScopeGraph
   , reference
   , newScope
   , Declaration(..)
+  , name
   , Reference(..)
   , EdgeLabel(..)
   , currentScope
@@ -17,7 +18,7 @@ module Control.Abstract.ScopeGraph
 
 import           Control.Abstract.Evaluator hiding (Local)
 import           Control.Abstract.Heap
-import           Data.Abstract.Name
+import           Data.Abstract.Name hiding (name)
 import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
