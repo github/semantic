@@ -28,6 +28,7 @@ import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catc
 import Control.Abstract.Heap as X hiding (runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Boolean(..), Function(..))
+import Control.Abstract.ScopeGraph
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.BaseError as X
@@ -53,6 +54,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Allocator address) effects
           , Member (Boolean value) effects
           , Member (Deref value) effects
+          , Member (ScopeEnv address) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
@@ -62,6 +64,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
+          , Member (State Span) effects
           , Member (Resumable (BaseError (AddressError address value))) effects
           , Member (Resumable (BaseError (EnvironmentError address))) effects
           , Member (Resumable (BaseError (UnspecializedError value))) effects
@@ -82,6 +85,7 @@ type ModuleEffects address value rest
   =  Exc (LoopControl address)
   ': Exc (Return address)
   ': Env address
+  ': ScopeEnv address
   ': Deref value
   ': Allocator address
   ': Reader ModuleInfo
@@ -104,6 +108,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
+            , Member (State Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
             , Member (Resumable (BaseError (EnvironmentError address))) effects
             , Member (Resumable (BaseError EvalError)) effects
@@ -124,7 +129,7 @@ evaluate :: ( AbstractValue address value valueEffects
          -> [Module term]
          -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
-  (preludeBinds, _) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
+  (_, (preludeBinds, _)) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
   foldr (run preludeBinds) ask modules
@@ -143,6 +148,7 @@ evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
         runInModule preludeBinds info
           = runReader info
           . runAllocDeref
+          . runScopeEnv
           . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
           . runReturn
           . runLoopControl
