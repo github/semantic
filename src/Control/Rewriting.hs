@@ -86,9 +86,6 @@ import Data.Term
 -- encompasses both 'cata' and 'para', so you can use them to fold
 -- over 'Recursive' data types. Rules are covariant in their result
 -- type and contravariant in their environment and input parameters.
---
--- | Unlike KURE, a 'Rule' is a functor, applicative, monad, &c. with
--- no regard to its inner monad parameter.
 data RuleM env (m :: * -> *) from to where
   Then  :: RuleM env m from a -> (a -> RuleM env m from b) -> RuleM env m from b
   Dimap :: (a -> b) -> (c -> d) -> RuleM env m b c -> RuleM env m a d
@@ -109,10 +106,11 @@ data RuleM env (m :: * -> *) from to where
 
   Somewhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
                , f :< fs, g :< fs
+               , term ~ Term (Sum fs) ann
                )
-            => RuleM (env, Term (Sum fs) ann) m (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
-            -> (Term (Sum fs) ann -> g (Term (Sum fs) ann) -> Term (Sum fs) ann)
-            -> RewriteM env m (Term (Sum fs) ann)
+            => RuleM (env, term) m (f term) (g term)
+            -> (term -> g term -> term)
+            -> RuleM env m term term
 
 
 -- | @a >>> b@ succeeds only if both @a@ and @b@ succeed. @id@ is the
