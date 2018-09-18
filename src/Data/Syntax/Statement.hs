@@ -31,7 +31,7 @@ instance ToJSON1 Statements
 instance Evaluatable Statements where
   eval (Statements xs) = do
     currentScope' <- currentScope
-    let edges = maybe mempty (Map.singleton P . pure) currentScope'
+    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
     scope <- newScope edges
     withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
@@ -148,7 +148,7 @@ instance Evaluatable Assignment where
             assocScope <- associatedScope (Declaration rhsName)
             case assocScope of
               Just assocScope' -> do
-                objectScope <- newScope (Map.singleton I [ assocScope' ])
+                objectScope <- newScope (Map.singleton Import [ assocScope' ])
                 putDeclarationScope (Declaration name) objectScope
               Nothing -> pure ()
           Nothing ->
