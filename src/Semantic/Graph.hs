@@ -26,7 +26,7 @@ module Semantic.Graph
 
 import Prelude hiding (readFile)
 
-import           Analysis.Abstract.Caching.FlowSensitive
+import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
