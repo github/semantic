@@ -4,4 +4,4 @@
     (Statements
       (Identifier)
       (Identifier))
-    (Empty)))
+    (Statements)))
