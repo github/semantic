@@ -294,8 +294,11 @@ somewhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
           -> Rewrite env m (Term (Sum fs) ann)
 somewhere = flip Somewhere (\x -> termIn (annotation x) . Sum.inject)
 
--- | As 'somewhere', but @somewhere' rule fn@ takes an extra @fn@ parameter used to
--- inject a member back into the resulting 'Term' type if the provided @rule@ succeeds.
+-- | As 'somewhere', but @somewhere' rule fn@ takes an extra @fn@
+-- parameter used to inject a member back into the resulting 'Term'
+-- type if the provided @rule@ succeeds. This will very often be
+-- 'markRefactored', which toggles the annotation from 'Unmodified' to
+-- 'Refactored'.
 somewhere' :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
               , f :< fs, g :< fs
               )
