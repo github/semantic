@@ -22,7 +22,7 @@ import Prelude hiding (lookup)
 data Frame scopeAddress frameAddress value = Frame {
     scopeAddress :: scopeAddress
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
-  , slots        :: Map Declaration value
+  , slots        :: Map Declaration (Set value)
   }
   deriving (Eq, Ord, Show)
 
@@ -37,18 +37,16 @@ frameLookup address = Map.lookup address . unHeap
 scopeLookup :: Ord address => address -> Heap scope address value -> Maybe scope
 scopeLookup address = fmap scopeAddress . frameLookup address
 
-frameSlots :: Ord address => address -> Heap scope address value -> Maybe (Map Declaration value)
+frameSlots :: Ord address => address -> Heap scope address value -> Maybe (Map Declaration (Set value))
 frameSlots address = fmap slots . frameLookup address
 
 frameLinks :: Ord address => address -> Heap scope address value -> Maybe (Map EdgeLabel (Map scope address))
 frameLinks address = fmap links . frameLookup address
 
-getSlot :: Ord address => address -> Heap scope address value -> Declaration -> Maybe value
-getSlot address heap declaration = do
-  slotMap <- frameSlots address heap
-  Map.lookup declaration slotMap
+getSlot :: Ord address => address -> Declaration -> Heap address address value -> Maybe (Set value)
+getSlot address declaration = (Map.lookup declaration =<<) . frameSlots address
 
-setSlot :: Ord address => address -> Declaration -> value -> Heap scope address value -> Heap scope address value
+setSlot :: Ord address => address -> Declaration -> Set value -> Heap scope address value -> Heap scope address value
 setSlot address declaration value heap =
     case frameLookup address heap of
       Just frame -> let slotMap = slots frame in
@@ -66,13 +64,13 @@ lookup heap address (EPath label scope path) declaration = do
 newFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Heap scope address value -> Heap scope address value
 newFrame scope address links = insertFrame address (Frame scope links mempty)
 
-initFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Map Declaration value -> Heap scope address value -> Heap scope address value
+initFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Map Declaration (Set value) -> Heap scope address value -> Heap scope address value
 initFrame scope address links slots = fillFrame address slots . newFrame scope address links
 
 insertFrame :: Ord address => address -> Frame scope address value -> Heap scope address value -> Heap scope address value
 insertFrame address frame = Heap . Map.insert address frame . unHeap
 
-fillFrame :: Ord address => address -> Map Declaration value -> Heap scope address value -> Heap scope address value
+fillFrame :: Ord address => address -> Map Declaration (Set value) -> Heap scope address value -> Heap scope address value
 fillFrame address slots heap =
   case frameLookup address heap of
     Just frame -> insertFrame address (frame { slots = slots }) heap
