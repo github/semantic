@@ -267,10 +267,10 @@ floatLiteral :: Assignment Term
 floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
 identifier :: Assignment Term
-identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
+identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') <*> (Syntax.Identifier . name <$> source)
 
 identifier' :: Assignment Name
-identifier' =  (symbol Identifier <|> symbol Identifier') *> (name <$> source)
+identifier' =  (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
 
 imaginaryLiteral :: Assignment Term
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
