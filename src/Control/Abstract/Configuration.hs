@@ -12,4 +12,3 @@ getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address
                  => term
                  -> TermEvaluator term address value effects (Configuration term address value)
 getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext <*> TermEvaluator getHeap
-
