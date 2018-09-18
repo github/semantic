@@ -26,12 +26,13 @@ module Control.Abstract.Environment
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
+import Control.Abstract.ScopeGraph (Declaration(..))
 import Data.Abstract.BaseError
 import Data.Abstract.Environment (Bindings, Environment, EvalContext(..), EnvironmentError(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Exports
 import Data.Abstract.Module
-import Data.Abstract.Name
+import Data.Abstract.Name hiding (name)
 import Data.Span
 import Prologue
 
@@ -97,16 +98,16 @@ lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 letrec :: ( Member (Allocator address) effects
           , Member (Deref value) effects
           , Member (Env address) effects
-          , Member (State (Heap address value)) effects
+          , Member (State (Heap address address value)) effects
           , Ord address
           )
-       => Name
+       => Declaration
        -> Evaluator address value effects value
        -> Evaluator address value effects (value, address)
-letrec name body = do
-  addr <- lookupOrAlloc name
-  v <- locally (bind name addr *> body)
-  assign addr v
+letrec declaration body = do
+  addr <- lookupOrAlloc (name declaration)
+  v <- locally (bind (name declaration) addr *> body)
+  assign addr declaration v
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
