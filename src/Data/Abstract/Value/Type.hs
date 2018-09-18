@@ -10,6 +10,7 @@ module Data.Abstract.Value.Type
   , runBoolean
   ) where
 
+import Control.Abstract.ScopeGraph (Declaration(..))
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
@@ -246,13 +247,15 @@ runFunction :: ( Member (Allocator address) effects
             => Evaluator address Type (Abstract.Function address Type ': effects) a
             -> Evaluator address Type effects a
 runFunction = interpret $ \case
-  Abstract.Function _ params _ body -> do
+  Abstract.Function name params _ body -> do
     (env, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
-      assign addr tvar
+      -- TODO: Declare name in the scope graph?
+      assign addr (Declaration name) tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
-    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
+    -- TODO: Probably declare name and create a new scope in the scope graph
+    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= flip deref (Declaration name))
   Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
