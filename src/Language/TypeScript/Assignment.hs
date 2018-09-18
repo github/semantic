@@ -382,7 +382,7 @@ false :: Assignment Term
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ rawSource)
 
 identifier :: Assignment Term
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') <*> (Syntax.Identifier . name <$> source)
 
 class' :: Assignment Term
 class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term typeIdentifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
@@ -515,7 +515,7 @@ typeAnnotation' :: Assignment Term
 typeAnnotation' = makeTerm <$> symbol TypeAnnotation <*> children (TypeScript.Syntax.Annotation <$> term ty)
 
 typeParameter' :: Assignment Term
-typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (TypeScript.Syntax.TypeParameter <$> term identifier <*> term (constraint <|> emptyTerm) <*> term (defaultType <|> emptyTerm))
+typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (TypeScript.Syntax.TypeParameter <$> term typeIdentifier <*> term (constraint <|> emptyTerm) <*> term (defaultType <|> emptyTerm))
 
 defaultType :: Assignment Term
 defaultType = makeTerm <$> symbol Grammar.DefaultType <*> children (TypeScript.Syntax.DefaultType <$> term ty)
@@ -593,7 +593,7 @@ typeQuery :: Assignment Term
 typeQuery = makeTerm <$> symbol Grammar.TypeQuery <*> children (TypeScript.Syntax.TypeQuery <$> term (identifier <|> nestedIdentifier))
 
 indexTypeQuery :: Assignment Term
-indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TypeScript.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedIdentifier))
+indexTypeQuery = makeTerm <$> symbol Grammar.IndexTypeQuery <*> children (TypeScript.Syntax.IndexTypeQuery <$> term (typeIdentifier <|> nestedTypeIdentifier))
 
 thisType :: Assignment Term
 thisType = makeTerm <$> symbol Grammar.ThisType <*> (TypeScript.Syntax.ThisType <$> source)
@@ -725,7 +725,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
-    rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
+    rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
 
@@ -784,7 +784,7 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
                  <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)
     makeNameAliasPair from (Just alias) = TypeScript.Syntax.Alias from alias
     makeNameAliasPair from Nothing = TypeScript.Syntax.Alias from from
-    rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
+    rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
     fromClause = symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source)
 
@@ -860,7 +860,7 @@ variableDeclarator =
   where
     makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
 
-    requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier') *> do
+    requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier' <|> symbol Identifier'') *> do
       s <- source
       guard (s == "require")
       symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Resolution.importPath <$> source))

@@ -152,7 +152,7 @@ spec = parallel $ do
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
       output <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) (runDiff ToCDiffRenderer [blobs])
-      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,3]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
