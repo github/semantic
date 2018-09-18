@@ -7,7 +7,6 @@ module Control.Abstract.Heap
 , putHeap
 , box
 , alloc
-, dealloc
 , deref
 , assign
 -- * Garbage collection
@@ -24,12 +23,14 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Roots
 import Data.Abstract.Configuration
 import Data.Abstract.BaseError
-import Data.Abstract.Heap
-import Data.Abstract.ScopeGraph (Declaration)
+import qualified Data.Abstract.Heap as Heap
+import Data.Abstract.Heap (Heap)
+import Data.Abstract.ScopeGraph (Declaration(..))
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Span (Span)
+import qualified Data.Set as Set
 import Prologue
 
 -- | Retrieve the heap.
@@ -55,14 +56,11 @@ box :: ( Member (Allocator address) effects
 box val = do
   name <- gensym
   addr <- alloc name
-  assign addr val
+  assign addr (Declaration name) val -- TODO This is probably wrong
   pure addr
 
 alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
 alloc = send . Alloc
-
-dealloc :: (Member (State (Heap address address value)) effects, Ord address) => address -> Declaration -> value -> Evaluator address value effects ()
-dealloc address decl val = modifyHeap (setSlot address decl val)
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: ( Member (Deref value) effects
@@ -73,8 +71,10 @@ deref :: ( Member (Deref value) effects
          , Ord address
          )
       => address
+      -> Declaration
       -> Evaluator address value effects value
-deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress addr))
+-- TODO: THIS IS WRONG we need to call Heap.lookup
+deref addr declaration = gets (Heap.getSlot addr declaration) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress addr))
 
 
 -- | Write a value to the given address in the 'Allocator'.
@@ -83,12 +83,13 @@ assign :: ( Member (Deref value) effects
           , Ord address
           )
        => address
+       -> Declaration
        -> value
        -> Evaluator address value effects ()
-assign addr value = do
+assign addr declaration value = do
   heap <- getHeap
-  cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)))
-  putHeap (heapInit addr cell heap)
+  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlot addr declaration heap)))
+  putHeap (Heap.setSlot addr declaration cell heap)
 
 
 -- Garbage collection
@@ -100,7 +101,10 @@ gc :: ( Member (State (Heap address address value)) effects
       )
    => Live address                       -- ^ The set of addresses to consider rooted.
    -> Evaluator address value effects ()
-gc roots = modifyHeap (heapRestrict <*> reachable roots)
+gc roots =
+  -- TODO: Implement frame garbage collection
+  undefined
+  -- modifyHeap (heapRestrict <*> reachable roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: ( Ord address
@@ -112,9 +116,9 @@ reachable :: ( Ord address
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
-          Just (a, as) -> go (liveInsert a seen) $ case heapLookupAll a heap of
-            Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
-            _           -> seen
+          Just (a, as) -> undefined -- go (liveInsert a seen) $ case heapLookupAll a heap of
+            -- Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
+            -- _           -> seen
 
 
 -- Effects
