@@ -175,4 +175,4 @@ evalRequire :: ( AbstractValue address value effects
             -> Name
             -> Evaluator address value effects value
 evalRequire modulePath alias = letrec' alias $ \addr ->
-  unit <$ makeNamespace alias addr Nothing (bindAll . fst =<< require modulePath)
+  unit <$ makeNamespace alias addr Nothing (bindAll . fst . snd =<< require modulePath)

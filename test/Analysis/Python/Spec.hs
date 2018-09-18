@@ -16,7 +16,7 @@ spec config = parallel $ do
     it "imports" $ do
       (_, (heap, res)) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main.py" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> do
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldContain` [ "a", "b" ]
 
           (derefQName heap ("a" :| [])    env >>= deNamespace heap) `shouldBe` Just ("a", ["foo"])
@@ -27,19 +27,19 @@ spec config = parallel $ do
     it "imports with aliases" $ do
       (_, (_, res)) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main1.py" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> Env.names env `shouldContain` [ "b", "e" ]
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> Env.names env `shouldContain` [ "b", "e" ]
         other -> expectationFailure (show other)
 
     it "imports using 'from' syntax" $ do
       (_, (_, res)) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main2.py" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> Env.names env `shouldContain` [ "bar", "foo" ]
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> Env.names env `shouldContain` [ "bar", "foo" ]
         other -> expectationFailure (show other)
 
     it "imports with relative syntax" $ do
       (_, (heap, res)) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
       case ModuleTable.lookup "main3.py" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> do
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldContain` [ "utils" ]
           (derefQName heap ("utils" :| []) env >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
         other -> expectationFailure (show other)
@@ -47,13 +47,13 @@ spec config = parallel $ do
     it "subclasses" $ do
       (_, (heap, res)) <- evaluate ["subclass.py"]
       case ModuleTable.lookup "subclass.py" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"bar\""]
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"bar\""]
         other -> expectationFailure (show other)
 
     it "handles multiple inheritance left-to-right" $ do
       (_, (heap, res)) <- evaluate ["multiple_inheritance.py"]
       case ModuleTable.lookup "multiple_inheritance.py" <$> res of
-        Right (Just (Module _ (env, addr) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"foo!\""]
+        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"foo!\""]
         other -> expectationFailure (show other)
 
   where
