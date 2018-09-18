@@ -13,11 +13,13 @@ import Data.Abstract.Environment
 import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
+import Control.Abstract.ScopeGraph (Declaration(..))
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
-import Data.Abstract.Name
+import qualified Data.Abstract.Name as Name
+import Data.Abstract.Name (Name)
 import Data.Text (unpack)
 import Prologue
 
@@ -30,13 +32,14 @@ define :: ( HasCallStack
           , Member (State (Heap address address value)) effects
           , Ord address
           )
-       => Name
+       => Declaration
        -> Evaluator address value effects value
        -> Evaluator address value effects ()
-define name def = withCurrentCallStack callStack $ do
-  addr <- alloc name
-  def >>= assign addr
-  bind name addr
+define declaration def = withCurrentCallStack callStack $ do
+  addr <- alloc (name declaration)
+  def >>= assign addr declaration
+  -- TODO: This probably needs to declare something in the scope graph.
+  bind (name declaration) addr -- TODO: Insert something in the heap
 
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
@@ -48,13 +51,13 @@ defineClass :: ( AbstractValue address value effects
                , Member (State (Heap address address value)) effects
                , Ord address
                )
-            => Name
+            => Declaration
             -> [address]
             -> Evaluator address value effects a
             -> Evaluator address value effects ()
-defineClass name superclasses body = define name $ do
+defineClass declaration superclasses body = define declaration $ do
   binds <- Env.head <$> locally (body >> getEnv)
-  klass name superclasses binds
+  klass declaration superclasses binds
 
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
@@ -66,12 +69,12 @@ defineNamespace :: ( AbstractValue address value effects
                    , Member (State (Heap address address value)) effects
                    , Ord address
                    )
-                => Name
+                => Declaration
                 -> Evaluator address value effects a
                 -> Evaluator address value effects ()
-defineNamespace name scope = define name $ do
+defineNamespace declaration scope = define declaration $ do
   binds <- Env.head <$> locally (scope >> getEnv)
-  namespace name Nothing binds
+  namespace declaration Nothing binds
 
 -- | Construct a function from a Haskell function taking 'Name's as arguments.
 --
@@ -93,7 +96,7 @@ class Lambda address value effects ty | ty -> address, ty -> value, ty -> effect
 
 instance (Member Fresh effects, Lambda address value effects ret) => Lambda address value effects (Name -> ret) where
   lambda' vars body = do
-    var <- gensym
+    var <- Name.gensym
     lambda' (var : vars) (body var)
   {-# INLINE lambda' #-}
 
@@ -117,7 +120,8 @@ builtInPrint :: ( AbstractValue address value effects
                 , Ord address
                 )
              => Evaluator address value effects value
-builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit)
+-- TODO: This Declaration usage might be wrong. How do we know name exists.
+builtInPrint = lambda (\ v -> variable v >>= flip deref (Declaration v)  >>= asString >>= trace . unpack >> box unit)
 
 builtInExport :: ( AbstractValue address value effects
                  , HasCallStack
@@ -135,9 +139,9 @@ builtInExport :: ( AbstractValue address value effects
                  )
               => Evaluator address value effects value
 builtInExport = lambda (\ v -> do
-  var <- variable v >>= deref
+  var <- variable v >>= flip deref (Declaration v)
   (k, value) <- asPair var
   sym <- asString k
   addr <- box value
-  export (name sym) (name sym) (Just addr)
+  export (Name.name sym) (Name.name sym) (Just addr)
   box unit)
