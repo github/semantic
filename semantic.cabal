@@ -395,6 +395,7 @@ test-suite parse-examples
   build-depends:       base
                      , bytestring
                      , directory
+                     , effects
                      , fastsum
                      , filepath
                      , Glob
@@ -404,6 +405,7 @@ test-suite parse-examples
                      , process
                      , semantic
   default-extensions:  RecordWildCards
+                     , FlexibleContexts
 
 test-suite doctests
   type:                exitcode-stdio-1.0
