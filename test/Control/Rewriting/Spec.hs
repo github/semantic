@@ -45,7 +45,7 @@ spec = describe "rewriting" $ do
 
   refactored <- runIO $ do
     json <- parseFile jsonParser path
-    let result = rewrite (somewhere' onTrees markRefactored) () (History.mark Unmodified json)
+    let result = rewrite (somewhere onTrees markRefactored) () (History.mark Unmodified json)
     either (fail . show) pure result
 
   it "should add keys to JSON values" $ do

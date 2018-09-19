@@ -100,9 +100,11 @@ data RuleM env (m :: * -> *) from to where
   Local   :: (env' -> env) -> RuleM env m from to -> RuleM env' m from to
   Promote :: m to -> RuleM env m from to
 
-  Recur :: (Traversable f, Traversable g)
-        => RuleM (env, Term f ann) m (f (Term g ann)) (g (Term g ann))
-        -> RuleM env m (Term f ann) (Term g ann)
+  Recur :: ( Traversable f, Traversable g
+           , old ~ Term f ann, new ~ Term g ann
+           )
+        => RuleM (env, old) m (f new) (g new)
+        -> RuleM env m old new
 
   Somewhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
                , f :< fs, g :< fs
@@ -167,7 +169,7 @@ instance ArrowChoice (RuleM env m) where
 -- | A 'RewriteM' is a 'RuleM' that does not change the type of its input.
 type RewriteM env m item = RuleM env m item item
 
--- | 'PureRule's and 'PureRewrite's don't offer access to
+-- | 'Rule's and 'Rewrite's don't offer access to
 -- their monad parameter.
 type Rule env from to = forall m . RuleM env m from to
 type Rewrite env item = Rule env item item
@@ -282,28 +284,34 @@ everywhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs, f :< 
            -> RuleM env m (Term (Sum fs) ann) (Term (Sum gs) ann)
 everywhere = leafToRoot . insideSum
 
--- | Given a 'Rule' over an @f@ and @g@ both in @fs@, promote that
--- rule to a 'Rewrite' over @fs@, applying said rule everywhere
--- possible. The resulting 'Rewrite' always succeeds.
+-- | @somewhere rule fn@, when applied to a 'Term' over 'Sum' values,
+-- will recurse through the provided term in the style of a paramophism.
+-- If the provided rule succeeds, the @fn@ function, which wraps the
+-- result of the provided @rule@ back into a 'Term', is applied.
+-- If at some stage the @rule@ does not succeed, no modifications
+-- are made to that level (though they may affect the children
+-- or parents of that level).
+--
+-- The finalizer function @fn@ is very often 'markRefactored', which ensures
+-- that any term possessing a 'History' is marked as 'Refactored'.
 somewhere :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
-             , f :< fs, g :< fs
-             )
-          => Rule (env, Term (Sum fs) ann) (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
-          -> Rewrite env (Term (Sum fs) ann)
-somewhere = flip Somewhere (\x -> termIn (annotation x) . Sum.inject)
-
--- | As 'somewhere', but @somewhere' rule fn@ takes an extra @fn@
--- parameter used to inject a member back into the resulting 'Term'
--- type if the provided @rule@ succeeds. This will very often be
--- 'markRefactored', which toggles the annotation from 'Unmodified' to
--- 'Refactored'.
-somewhere' :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
               , f :< fs, g :< fs
               )
            => Rule (env, Term (Sum fs) ann) (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
            -> (Term (Sum fs) ann -> g (Term (Sum fs) ann) -> Term (Sum fs) ann)
            -> Rewrite env (Term (Sum fs) ann)
-somewhere' = Somewhere
+somewhere = Somewhere
+
+
+-- | As 'somewhere', but the wrapper is implicit, extracting the needed annotation
+-- history at each level from the original level.
+somewhere' :: ( Apply Functor fs, Apply Foldable fs, Apply Traversable fs
+             , f :< fs, g :< fs
+             )
+          => Rule (env, Term (Sum fs) ann) (f (Term (Sum fs) ann)) (g (Term (Sum fs) ann))
+          -> Rewrite env (Term (Sum fs) ann)
+somewhere' = flip Somewhere (\x -> termIn (annotation x) . Sum.inject)
+
 
 --
 -- Helpers for termIn over a context and sum.
