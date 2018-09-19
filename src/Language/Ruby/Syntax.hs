@@ -2,21 +2,22 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Ruby.Syntax where
 
-import           Control.Abstract.Value (Boolean)
 import           Control.Monad (unless)
+import qualified Data.Text as T
+import           Prologue
+import           System.FilePath.Posix
+
+import           Control.Abstract.Value (Boolean)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path
+import qualified Data.Reprinting.Scope as Scope
 import           Data.JSON.Fields
 import qualified Data.Language as Language
-import qualified Data.Text as T
 import           Diffing.Algorithm
-import           Prologue
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize
-import           System.FilePath.Posix
-
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
@@ -68,10 +69,10 @@ instance Evaluatable Send where
     Rval <$> call func recv args -- TODO pass through sendBlock
 
 instance Tokenize Send where
-  tokenize Send{..} = within TCall $ do
-    maybe (pure ()) (\r -> r *> yield TSep) sendReceiver
+  tokenize Send{..} = within Scope.Call $ do
+    maybe (pure ()) (\r -> r *> yield Sep) sendReceiver
     fromMaybe (pure ()) sendSelector
-    within' TParams $ sequenceA_ (sep sendArgs)
+    within' Scope.Params $ sequenceA_ (sep sendArgs)
     fromMaybe (pure ()) sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
@@ -98,7 +99,7 @@ doRequire :: ( Member (Boolean value) effects
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> (,) . fst . snd <$> load path <*> boolean True
+    Nothing            -> (,) . fst . snd <$> load path <*> boolean True
     Just (_, (env, _)) -> (env,) <$> boolean False
 
 

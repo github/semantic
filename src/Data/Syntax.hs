@@ -18,7 +18,7 @@ import GHC.TypeLits
 import Diffing.Algorithm hiding (Empty)
 import Prelude
 import Prologue
-import Reprinting.Tokenize hiding (Context, Element)
+import Reprinting.Tokenize hiding (Element)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
