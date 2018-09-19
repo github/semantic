@@ -30,8 +30,9 @@ import qualified Data.Set as Set
 import Data.Span
 import Prologue
 import System.FilePath.Posix (takeDirectory)
+import Data.Abstract.ScopeGraph
 
-type ModuleResult address = (Bindings address, address)
+type ModuleResult address = (ScopeGraph address, (Bindings address, address))
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: Member (Modules address) effects => ModulePath -> Evaluator address value effects (Maybe (ModuleResult address))
@@ -94,7 +95,7 @@ askModuleTable = ask
 newtype Merging address = Merging { runMerging :: ModuleResult address }
 
 instance Semigroup (Merging address) where
-  Merging (binds1, _) <> Merging (binds2, addr) = Merging (binds1 <> binds2, addr)
+  Merging (_, (binds1, _)) <> Merging (graph2, (binds2, addr)) = Merging (graph2, (binds1 <> binds2, addr))
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.

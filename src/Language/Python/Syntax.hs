@@ -145,7 +145,7 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedBinds <- fst <$> require path
+    importedBinds <- fst . snd <$> require path
     bindAll (select importedBinds)
     rvalBox unit
     where
@@ -165,7 +165,7 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        )
                     => Name -> ModulePath -> Evaluator address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
-  unit <$ makeNamespace name addr Nothing (bindAll . fst =<< require path)
+  unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -218,7 +218,7 @@ instance Evaluatable QualifiedAliasedImport where
     alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
-      unit <$ makeNamespace alias addr Nothing (void (bindAll . fst =<< require path)))
+      unit <$ makeNamespace alias addr Nothing (void (bindAll . fst . snd =<< require path)))
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
