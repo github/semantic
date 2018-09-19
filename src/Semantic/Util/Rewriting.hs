@@ -88,7 +88,7 @@ renameKey :: ( Literal.TextElement :< fs
              , Apply Functor fs
              , term ~ Term (Sum fs) (Record (History : fields))
              )
-          => Rewrite (env, term) m (Literal.KeyValue term)
+          => Rewrite (env, term) (Literal.KeyValue term)
 renameKey = do
   Literal.KeyValue k v <- id
   guard (projectTerm k == (Just (Literal.TextElement "\"foo\"")))
@@ -97,11 +97,11 @@ renameKey = do
 
 testRenameKey = do
   (src, tree) <- testJSONFile
-  let (Right tagged) = applyPure (somewhere renameKey) () (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere' renameKey) () (mark Unmodified tree)
   pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-increaseNumbers :: (term ~ Term (Sum fs) (Record (History : fields))) => Rewrite (env, term) m (Literal.Float term)
+increaseNumbers :: (term ~ Term (Sum fs) (Record (History : fields))) => Rewrite (env, term) (Literal.Float term)
 increaseNumbers = do
   (Literal.Float c) <- id
   pure (Literal.Float (c <> "0"))
