@@ -2,18 +2,21 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Statement where
 
-import Data.Abstract.Evaluatable
-import Control.Abstract.ScopeGraph
+import Prologue
+
 import qualified Data.Map.Strict as Map
 import Data.Aeson (ToJSON1 (..))
-import Data.JSON.Fields
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
-import Diffing.Algorithm
-import Prelude
-import Prologue
 import Proto3.Suite.Class
+
+import Data.Abstract.Evaluatable
+import Control.Abstract.ScopeGraph
+import Data.JSON.Fields
+import Diffing.Algorithm
 import Reprinting.Tokenize
+import qualified Data.Reprinting.Token as Token
+import qualified Data.Reprinting.Scope as Scope
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
@@ -52,11 +55,11 @@ instance Evaluatable If where
     Rval <$> ifthenelse bool (subtermAddress if') (subtermAddress else')
 
 instance Tokenize If where
-  tokenize If{..} = within' TIf $ do
+  tokenize If{..} = within' Scope.If $ do
     ifCondition
-    yield TThen
+    yield Token.Then
     ifThenBody
-    yield TElse
+    yield Token.Else
     ifElseBody
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
@@ -224,7 +227,7 @@ instance Evaluatable Return where
   eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
 
 instance Tokenize Return where
-  tokenize (Return x) = within' TReturn x
+  tokenize (Return x) = within' Scope.Return x
 
 newtype Yield a = Yield { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
