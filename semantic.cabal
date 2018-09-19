@@ -49,6 +49,8 @@ library
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
+                     -- Rewriting
+                     , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Located
@@ -99,6 +101,7 @@ library
                      , Data.Record
                      , Data.Reprinting.Errors
                      , Data.Reprinting.Token
+                     , Data.Reprinting.Fragment
                      , Data.Reprinting.Splice
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
@@ -241,6 +244,7 @@ library
                      , parsers
                      , prettyprinter
                      , pretty-show
+                     , profunctors
                      , recursion-schemes
                      , reducers
                      , scientific
@@ -311,6 +315,7 @@ test-suite test
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
+                     , Control.Rewriting.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
