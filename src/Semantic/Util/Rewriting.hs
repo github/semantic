@@ -1,5 +1,5 @@
 {-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
+{-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists -Wno-incomplete-uni-patterns #-}
 module Semantic.Util.Rewriting where
 
 import Prelude hiding (id, readFile, (.))
@@ -9,24 +9,19 @@ import           Control.Category
 import qualified Data.ByteString.Char8 as BC
 import           Text.Show.Pretty (pPrint)
 
-import           Control.Abstract
 import           Control.Abstract.Matching
 import           Control.Rewriting hiding (fromMatcher, target)
 import           Data.Blob
 import           Data.History
 import qualified Data.Language as Language
-import           Data.Machine
-import           Data.Machine.Runner
 import           Data.Project hiding (readFile)
 import           Data.Record
 import qualified Data.Source as Source
-import qualified Data.Sum as Sum
 import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.JSON.PrettyPrint
 import           Language.Python.PrettyPrint
 import           Language.Ruby.PrettyPrint
-import           Matching.Core
 import           Parsing.Parser
 import           Reprinting.Pipeline
 import           Semantic.IO as IO
@@ -133,14 +128,6 @@ testOverwriteFloats = do
   pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-findKV ::
-  ( Literal.KeyValue :< syntax
-  , Literal.TextElement :< syntax
-  , term ~ Term (Sum syntax) ann
-  ) =>
-  Text -> ProcessT (Eff effs) term (Either term (term, Literal.KeyValue term))
-findKV name = fromMatcher (kvMatcher name)
-
 kvMatcher :: forall fs ann term .
   ( Literal.KeyValue :< fs
   , Literal.TextElement :< fs
@@ -153,42 +140,23 @@ kvMatcher name = matchM projectTerm target <* matchKey where
         match Literal.textElementContent $
           ensure (== name)
 
-changeKV :: forall effs syntax ann fields term .
-  ( Apply Functor syntax
-  , Literal.KeyValue :< syntax
-  , Literal.Array :< syntax
-  , Literal.Float :< syntax
-  , ann ~ Record (History ': fields)
-  , term ~ Term (Sum syntax) ann
-  ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.KeyValue term)) term
-changeKV = auto $ either id injKV
-  where
-    injKV :: (term, Literal.KeyValue term) -> term
-    injKV (term, Literal.KeyValue k v) = case projectTerm v of
-      Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue k (newArray elems))))
-      _                          -> term
-      where newArray xs = termIn ann (inject (Literal.Array (xs <> [float])))
-            float = termIn ann (inject (Literal.Float "4"))
-            ann = termAnnotation term
+changeKV :: ( Apply Functor syntax
+            , Literal.Array :< syntax
+            , Literal.Float :< syntax
+            , term ~ Term (Sum syntax) (Record (History : fields))
+            )
+         => Rewrite (env, term) (Literal.KeyValue term)
+changeKV = do
+  (Literal.KeyValue k v) <- id
+  (Literal.Array vals) <- guardTerm v
+  let float = remark Refactored (injectTerm (annotation v) (Literal.Float "4"))
+  let newArr = remark Refactored (injectTerm (annotation v) (Literal.Array (float:vals)))
+  pure (Literal.KeyValue k newArr)
 
 testChangeKV = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (findKV "\"bar\"" ~> changeKV)) (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere' changeKV) () (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
-
--- Temporary, until new KURE system lands.
-fromMatcher :: Matcher from to -> ProcessT (Eff effs) from (Either from (from, to))
-fromMatcher m = auto go where go x = maybe (Left x) (\y -> Right (x, y)) (stepMatcher x m)
-
--- Turn a 'ProccessT' into an FAlgebra.
-toAlgebra :: (Traversable (Base t), Corecursive t)
-          => ProcessT (Eff effs) t t
-          -> FAlgebra (Base t) (Eff effs t)
-toAlgebra m t = do
-  inner <- sequenceA t
-  res <- runT1 (source (Just (embed inner)) ~> m)
-  pure (fromMaybe (embed inner) res)
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)

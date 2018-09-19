@@ -6,6 +6,7 @@ module Data.Term
 , termOut
 , injectTerm
 , projectTerm
+, guardTerm
 , TermF(..)
 , termSize
 , hoistTerm
@@ -36,6 +37,11 @@ termOut = termFOut . unTerm
 
 projectTerm :: forall f syntax ann . (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
 projectTerm = Sum.project . termOut
+
+guardTerm :: forall m f syntax ann . (f :< syntax, Alternative m)
+          => Term (Sum syntax) ann
+          -> m (f (Term (Sum syntax) ann))
+guardTerm = Sum.projectGuard . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable)
