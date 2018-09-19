@@ -1,6 +1,5 @@
 module Reprinting.Typeset
-  ( typeset
-  , typesetting
+  ( typesetting
   , typesettingWithVisualWhitespace
   ) where
 
@@ -9,9 +8,6 @@ import Prologue
 import Data.Machine
 import Data.Reprinting.Splice hiding (space)
 import Data.Text.Prettyprint.Doc
-
-typeset :: Seq Splice -> Doc a
-typeset = foldMap step
 
 typesetting :: Monad m => ProcessT m Splice (Doc a)
 typesetting = auto step
