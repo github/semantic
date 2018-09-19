@@ -1,7 +1,9 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, UndecidableInstances #-}
 
 module Reprinting.Tokenize
-  ( module Data.Reprinting.Token
+  ( module Token
+  , module Scope
+  , module Operator
   , History (..)
   , mark
   , remark
@@ -33,7 +35,10 @@ import           Data.List (intersperse)
 import qualified Data.Machine as Machine
 import           Data.Range
 import           Data.Record
-import           Data.Reprinting.Token
+import           Data.Reprinting.Scope (Scope)
+import qualified Data.Reprinting.Scope as Scope
+import           Data.Reprinting.Token as Token
+import           Data.Reprinting.Operator as Operator
 import           Data.Source
 import           Data.Term
 
@@ -95,11 +100,11 @@ data State = State
 yield :: Element -> Tokenizer ()
 yield e = do
   on <- filter <$> Get
-  when (on == AllowAll) . Tell . TElement $ e
+  when (on == AllowAll) . Tell . Element $ e
 
 -- | Yield a 'Control' token.
 control :: Control -> Tokenizer ()
-control = Tell . TControl
+control = Tell . Control
 
 -- | Yield a 'Chunk' of some 'Source'.
 chunk :: Source -> Tokenizer ()
@@ -179,39 +184,40 @@ log = control . Log
 
 -- | Emit an Enter for the given context, then run the provided
 -- action, then emit a corresponding Exit.
-within :: Context -> Tokenizer () -> Tokenizer ()
+within :: Scope -> Tokenizer () -> Tokenizer ()
 within c r = control (Enter c) *> r <* control (Exit c)
 
--- | Like 'within', but adds 'TOpen' and 'TClose' elements around the action.
-within' :: Context -> Tokenizer () -> Tokenizer ()
-within' c x = within c $ yield TOpen *> x <* yield TClose
+-- | Like 'within', but adds 'Open' and 'Close' elements around the action.
+within' :: Scope -> Tokenizer () -> Tokenizer ()
+within' c x = within c $ yield Token.Open *> x <* yield Token.Close
 
--- | Emit a sequence of tokens interspersed with 'TSep'.
+-- | Emit a sequence of tokens interspersed with 'Sep'.
 sep :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
-sep = intersperse (yield TSep) . toList
+sep = intersperse (yield Token.Sep) . toList
 
--- | Emit a sequence of tokens each with trailing 'TSep'.
+-- | Emit a sequence of tokens each with trailing 'Sep'.
 sepTrailing :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
-sepTrailing = foldr (\x acc -> x : yield TSep : acc) mempty
+sepTrailing = foldr (\x acc -> x : yield Token.Sep : acc) mempty
 
--- | Emit a sequence of tokens within a 'TList' Context with appropriate 'TOpen',
+-- | Emit a sequence of tokens within a 'List' Scope with appropriate 'Open',
 -- 'TClose' tokens surrounding.
 list :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-list = within' TList . sequenceA_ . sep
+list = within' Scope.List . sequenceA_ . sep
 
--- | Emit a sequence of tokens within a 'THash' Context with appropriate
--- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
+-- | Emit a sequence of tokens within a 'Hash' Scope with appropriate
+-- 'Open', 'TClose' tokens surrounding and interspersing 'Sep'.
 hash :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-hash = within' THash . sequenceA_ . sep
+hash = within' Scope.Hash . sequenceA_ . sep
 
--- | Emit key value tokens with a 'TSep' within an TPair Context
+-- | Emit key value tokens with a 'Sep' within a scoped 'Pair'.
 pair :: Tokenizer () -> Tokenizer () -> Tokenizer ()
-pair k v = within TPair $ k *> yield TSep <* v
+pair k v = within Scope.Pair $ k *> yield Token.Sep <* v
 
--- | Emit a sequence of tokens within an Imperative Context with appropriate
--- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
+-- | Emit a sequence of tokens within an 'Imperative' scope with
+-- appropriate 'Open', 'Close' tokens surrounding and interspersing
+-- 'Sep'.
 imperative :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-imperative = within' Imperative . sequenceA_ . sep
+imperative = within' Scope.Imperative . sequenceA_ . sep
 
 -- | Shortcut for @const (pure ())@, useful for when no action
 -- should be taken.

@@ -1,16 +1,17 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
+import           Control.Abstract.ScopeGraph
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
-import           Control.Abstract.ScopeGraph
 import           Data.JSON.Fields
+import qualified Data.Map.Strict as Map
+import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Set as Set
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
-import qualified Data.Map.Strict as Map
 import           Reprinting.Tokenize
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -35,9 +36,9 @@ instance Evaluatable Function where
     where paramNames = foldMap (maybeToList . declaredName . subterm)
 
 instance Tokenize Function where
-  tokenize Function{..} = within' TFunction $ do
+  tokenize Function{..} = within' Scope.Function $ do
     functionName
-    within' TParams $ sequenceA_ (sep functionParameters)
+    within' Scope.Params $ sequenceA_ (sep functionParameters)
     functionBody
 
 instance Declarations1 Function where
@@ -67,10 +68,10 @@ instance Evaluatable Method where
     pure (Rval addr)
     where paramNames = foldMap (maybeToList . declaredName . subterm)
 
-instance Tokenize Method where
-  tokenize Method{..} = within' TMethod $ do
+instance Tokenize Data.Syntax.Declaration.Method where
+  tokenize Method{..} = within' Scope.Method $ do
     methodName
-    within' TParams $ sequenceA_ (sep methodParameters)
+    within' Scope.Params $ sequenceA_ (sep methodParameters)
     methodBody
 
 instance Declarations1 Method where
