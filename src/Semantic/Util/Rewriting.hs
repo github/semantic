@@ -106,32 +106,22 @@ increaseNumbers = do
   (Literal.Float c) <- id
   pure (Literal.Float (c <> "0"))
 
-addKVPair :: forall effs syntax ann fields term .
-  ( Apply Functor syntax
-  , Literal.Hash :< syntax
-  , Literal.Array :< syntax
-  , Literal.TextElement :< syntax
-  , Literal.KeyValue :< syntax
-  , ann ~ Record (History ': fields)
-  , term ~ Term (Sum syntax) ann
-  ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.Hash term)) term
-addKVPair = repeatedly $ do
-  t <- await
-  Data.Machine.yield (either id injKVPair t)
-  where
-    injKVPair :: (term, Literal.Hash term) -> term
-    injKVPair (origTerm, Literal.Hash xs) =
-      remark Refactored (injectTerm ann (Literal.Hash (xs <> [newItem])))
-      where
-        newItem = termIn ann (inject (Literal.KeyValue k v))
-        k = termIn ann (inject (Literal.TextElement "\"added\""))
-        v = termIn ann (inject (Literal.Array []))
-        ann = termAnnotation origTerm
+addKVPair :: ( Literal.TextElement :< syn
+             , Literal.KeyValue :< syn
+             , Literal.Array :< syn
+             , Apply Functor syn
+             , term ~ Term (Sum syn) (Record (History : fields))
+             ) => Rewrite (env, term) (Literal.Hash term)
+addKVPair = do
+  Literal.Hash els <- id
+  k <- modified $ Literal.TextElement "\"added\""
+  v <- modified $ Literal.Array []
+  pair <- modified $ (Literal.KeyValue k v)
+  pure (Literal.Hash (pair : els))
 
 testAddKVPair = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (fromMatcher matchHash ~> addKVPair)) (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere addKVPair markRefactored) () (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 overwriteFloats :: forall effs syntax ann fields term .
