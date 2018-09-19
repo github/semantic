@@ -6,12 +6,13 @@
     {+(Identifier)+}
       (Identifier)
     {-(Identifier)-})
-  { (If
-    {-(Identifier)-}
+    (Statements
+    {-(If
+      {-(Identifier)-}
+      {-(Statements
+        {-(Identifier)-}
+        {-(Identifier)-})-}
+      {-(Statements)-})-}
     {-(Statements
       {-(Identifier)-}
-      {-(Identifier)-})-}
-    {-(Statements
-      {-(Identifier)-}
-      {-(Identifier)-})-})
-  ->(Empty) }))
+      {-(Identifier)-})-})))
