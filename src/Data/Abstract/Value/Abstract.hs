@@ -3,6 +3,7 @@ module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runFunction
 , runBoolean
+, runWhile
 ) where
 
 import Control.Abstract as Abstract
@@ -49,6 +50,23 @@ runBoolean = interpret $ \case
   Boolean _       -> pure Abstract
   AsBool  _       -> pure True <|> pure False
   Disjunction a b -> runBoolean (Evaluator (a <|> b))
+
+runWhile ::
+  ( Member (Allocator address) effects
+  , Member (Deref Abstract) effects
+  , Member (Env address) effects
+  , Member (Exc (Return address)) effects
+  , Member Fresh effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (BaseError (AddressError address Abstract))) effects
+  , Member (State (Heap address Abstract)) effects
+  , Ord address
+  , PureEffects effects
+  )
+  => Evaluator address Abstract (While Abstract ': effects) a
+  -> Evaluator address Abstract effects a
+runWhile = undefined
 
 
 instance Ord address => ValueRoots address Abstract where

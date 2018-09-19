@@ -27,7 +27,7 @@ import Control.Abstract.Environment as X hiding (runEnvironmentError, runEnviron
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Heap as X hiding (runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
-import Control.Abstract.Value as X hiding (Boolean(..), Function(..))
+import Control.Abstract.Value as X hiding (Boolean(..), Function(..), While(..))
 import Control.Abstract.ScopeGraph
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
@@ -53,6 +53,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address) effects
           , Member (Boolean value) effects
+          , Member (While value) effects
           , Member (Deref value) effects
           , Member (ScopeEnv address) effects
           , Member (Env address) effects
@@ -93,6 +94,7 @@ type ModuleEffects address value rest
 
 type ValueEffects address value rest
   =  Function address value
+  ': While value
   ': Boolean value
   ': rest
 

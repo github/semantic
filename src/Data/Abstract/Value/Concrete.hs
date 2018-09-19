@@ -1,18 +1,20 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances, LambdaCase #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
   , ClosureBody (..)
   , runFunction
   , runBoolean
+  , runWhile
   , materializeEnvironment
   , runValueError
   , runValueErrorWith
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..))
+import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Data.Abstract.BaseError
+import Data.Abstract.Evaluatable (UnspecializedError)
 import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Name
@@ -24,7 +26,7 @@ import Data.Scientific (Scientific, coefficient, normalize)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Data.Word
-import Prologue
+import Prologue hiding (catchError)
 
 data Value address body
   = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (ClosureBody address body) (Environment address)
@@ -114,6 +116,39 @@ runBoolean = interpret $ \case
     a' <- runBoolean (Evaluator a)
     a'' <- runBoolean (asBool a')
     if a'' then pure a' else runBoolean (Evaluator b)
+
+
+runWhile :: forall effects address body a .
+  ( PureEffects effects
+  , Member (Deref (Value address body)) effects
+  , Member (Abstract.Boolean (Value address body)) effects
+  , Member (Exc (LoopControl address)) effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
+  , Member (Resumable (BaseError (ValueError address body))) effects
+  , Member (Resumable (BaseError (UnspecializedError (Value address body)))) effects
+  , Member (State (Heap address (Value address body))) effects
+  , Ord address
+  , Show address
+  )
+  => Evaluator address (Value address body) (Abstract.While (Value address body) ': effects) a
+  -> Evaluator address (Value address body) effects a
+runWhile = interpret $ \case
+  Abstract.While cond body -> loop $ \continue -> do
+    cond' <- runWhile (raiseEff cond)
+    -- let body' = interpose @(Resumable (BaseError (UnspecializedError (Value address body)))) (\(Resumable _) -> pure hole) $
+    --       runWhile (raiseEff body) *> continue
+    let body' = (runWhile (raiseEff body) *> continue) `catchError` (\_ -> pure unit)
+    -- let body' = runWhile (raiseEff body) *> continue
+    ifthenelse cond' body' (pure unit)
+  where
+    loop x = catchLoopControl (fix x) (\ control -> case control of
+      Break value -> deref value
+      -- FIXME: Figure out how to deal with this. Ruby treats this as the result
+      -- of the current block iteration, while PHP specifies a breakout level
+      -- and TypeScript appears to take a label.
+      Continue _  -> loop x)
 
 
 instance AbstractHole (Value address body) where
