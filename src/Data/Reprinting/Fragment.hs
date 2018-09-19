@@ -10,16 +10,17 @@ module Data.Reprinting.Fragment
 import Data.Machine
 import Data.Text (Text)
 
+import Data.Reprinting.Scope
 import Data.Reprinting.Token
 
 -- | An intermediate representation of concrete syntax in the reprinting pipeline.
 data Fragment
   = Verbatim Text
   -- ^ Verbatim copy of original 'Text' (un-refactored).
-  | New Element [Context] Text
-  -- ^ New 'Text' to be inserted, along with original 'Element' and `Context`
+  | New Element [Scope] Text
+  -- ^ New 'Text' to be inserted, along with original 'Element' and `Scope`
   -- allowing later steps to re-write.
-  | Defer Element [Context]
+  | Defer Element [Scope]
   -- ^ To be handled further down the pipeline.
   deriving (Eq, Show)
 
@@ -28,9 +29,9 @@ copy :: Text -> Plan k Fragment ()
 copy = yield . Verbatim
 
 -- | Insert some new 'Text'.
-insert :: Element -> [Context] -> Text -> Plan k Fragment ()
+insert :: Element -> [Scope] -> Text -> Plan k Fragment ()
 insert el c = yield . New el c
 
 -- | Defer processing an element to a later stage.
-defer :: Element -> [Context] -> Plan k Fragment ()
+defer :: Element -> [Scope] -> Plan k Fragment ()
 defer el = yield . Defer el

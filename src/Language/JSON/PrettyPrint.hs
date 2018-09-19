@@ -16,6 +16,7 @@ import Data.Machine
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token
+import Data.Reprinting.Scope
 
 -- | Default printing pipeline for JSON.
 defaultJSONPipeline :: (Member (Exc TranslationError) effs)
@@ -34,14 +35,14 @@ printingJSON = repeatedly (await >>= step) where
       (Truth False, _)     -> ins "false"
       (Nullity, _)         -> ins "null"
 
-      (TOpen,  Just TList) -> ins "["
-      (TClose, Just TList) -> ins "]"
-      (TOpen,  Just THash) -> ins "{"
-      (TClose, Just THash) -> ins "}"
+      (Open,  Just List) -> ins "["
+      (Close, Just List) -> ins "]"
+      (Open,  Just Hash) -> ins "{"
+      (Close, Just Hash) -> ins "}"
 
-      (TSep, Just TList)   -> ins ","
-      (TSep, Just TPair)   -> ins ":"
-      (TSep, Just THash)   -> ins ","
+      (Sep, Just List)   -> ins ","
+      (Sep, Just Pair)   -> ins ":"
+      (Sep, Just Hash)   -> ins ","
 
       _                    -> yield s
   step x = yield x
@@ -61,11 +62,11 @@ beautifyingJSON _ = repeatedly (await >>= step) where
   step (Defer el cs)   = lift (throwError (NoTranslation el cs))
   step (Verbatim txt)  = emit txt
   step (New el cs txt) = case (el, cs) of
-    (TOpen,  THash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
-    (TClose, THash:rest) -> layout HardWrap *> indent 2 (hashDepth rest) *> emit txt
-    (TSep,   TList:_)    -> emit txt *> space
-    (TSep,   TPair:_)    -> emit txt *> space
-    (TSep,   THash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
+    (Open,  Hash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
+    (Close, Hash:rest) -> layout HardWrap *> indent 2 (hashDepth rest) *> emit txt
+    (Sep,   List:_)    -> emit txt *> space
+    (Sep,   Pair:_)    -> emit txt *> space
+    (Sep,   Hash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
     _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.
@@ -76,5 +77,5 @@ minimizingJSON = repeatedly (await >>= step) where
   step (Verbatim txt) = emit txt
   step (New _ _ txt)  = emit txt
 
-hashDepth :: [Context] -> Int
-hashDepth = length . filter (== THash)
+hashDepth :: [Scope] -> Int
+hashDepth = length . filter (== Hash)

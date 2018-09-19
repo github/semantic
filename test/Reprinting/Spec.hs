@@ -2,23 +2,26 @@
 
 module Reprinting.Spec where
 
-import SpecHelpers hiding (project, inject)
+import SpecHelpers hiding (inject, project)
 
-import Data.Functor.Foldable (embed, cata)
-import qualified Data.Language as Language
-import qualified Data.Syntax.Literal as Literal
-import Data.Algebra
-import Reprinting.Tokenize
-import Reprinting.Pipeline
-import Data.Sum
-import Data.Foldable
-import Semantic.IO
-import Semantic.Util.Rewriting hiding (parseFile)
-import Data.Blob
-import Language.JSON.PrettyPrint
-import Language.Ruby.PrettyPrint
-import Language.Python.PrettyPrint
+import           Data.Foldable
+import           Data.Functor.Foldable (cata, embed)
 import qualified Data.Machine as Machine
+
+import           Data.Algebra
+import           Data.Blob
+import qualified Data.Language as Language
+import           Data.Reprinting.Token
+import           Data.Reprinting.Scope
+import           Data.Sum
+import qualified Data.Syntax.Literal as Literal
+import           Language.JSON.PrettyPrint
+import           Language.Python.PrettyPrint
+import           Language.Ruby.PrettyPrint
+import           Reprinting.Pipeline
+import           Reprinting.Tokenize
+import           Semantic.IO
+import           Semantic.Util.Rewriting hiding (parseFile)
 
 spec :: Spec
 spec = describe "reprinting" $ do
@@ -40,9 +43,9 @@ spec = describe "reprinting" $ do
 
       it "should emit control tokens but only 1 chunk for a wholly-modified tree" $ do
         let toks = Machine.run $ tokenizing src (mark Refactored tree)
-        for_ @[] [TList, THash] $ \t -> do
-          toks `shouldSatisfy` elem (TControl (Enter t))
-          toks `shouldSatisfy` elem (TControl (Exit t))
+        for_ @[] [List, Hash] $ \t -> do
+          toks `shouldSatisfy` elem (Control (Enter t))
+          toks `shouldSatisfy` elem (Control (Exit t))
 
     describe "pipeline" $ do
 
