@@ -100,9 +100,11 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Reprinting.Errors
-                     , Data.Reprinting.Token
                      , Data.Reprinting.Fragment
+                     , Data.Reprinting.Operator
+                     , Data.Reprinting.Scope
                      , Data.Reprinting.Splice
+                     , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Source

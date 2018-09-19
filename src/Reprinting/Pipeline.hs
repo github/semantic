@@ -108,14 +108,16 @@ import qualified Control.Monad.Effect.Exception as Exc
 import           Control.Monad.Effect.State
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
+import           Data.Text.Prettyprint.Doc
+import           Data.Text.Prettyprint.Doc.Render.Text
+
 import           Data.Record
 import           Data.Reprinting.Errors
+import           Data.Reprinting.Scope
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 import           Data.Term
-import           Data.Text.Prettyprint.Doc
-import           Data.Text.Prettyprint.Doc.Render.Text
 import           Reprinting.Tokenize
 import           Reprinting.Translate
 import           Reprinting.Typeset
@@ -137,7 +139,7 @@ runReprinter src translating tree
   . Effect.run
   . Exc.runError
   . fmap snd
-  . runState (mempty :: [Context])
+  . runState (mempty :: [Scope])
   . foldT $ source (tokenizing src tree)
       ~> contextualizing
       ~> translating
@@ -169,7 +171,7 @@ runContextualizing src tree
   = Effect.run
   . Exc.runError
   . fmap snd
-  . runState (mempty :: [Context])
+  . runState (mempty :: [Scope])
   . runT $ source (tokenizing src tree)
       ~> contextualizing
 
@@ -186,7 +188,7 @@ runTranslating src translating tree
   = Effect.run
   . Exc.runError
   . fmap snd
-  . runState (mempty :: [Context])
+  . runState (mempty :: [Scope])
   . runT $ source (tokenizing src tree)
       ~> contextualizing
       ~> translating

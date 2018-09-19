@@ -1,18 +1,21 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Expression where
 
-import Control.Abstract.ScopeGraph as ScopeGraph
-import Data.Abstract.Evaluatable hiding (Member)
-import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
-import Data.Bits
-import Data.Fixed
-import Data.JSON.Fields
-import Diffing.Algorithm hiding (Delete)
-import Prologue hiding (index, Member, This, null)
 import Prelude hiding (null)
+import Prologue hiding (Member, This, index, null)
+
+import Data.Fixed
 import Proto3.Suite.Class
-import Reprinting.Tokenize
+
+import           Control.Abstract.ScopeGraph as ScopeGraph
+import           Data.Abstract.Evaluatable hiding (Member)
+import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
+import           Data.JSON.Fields
+import qualified Data.Reprinting.Scope as Scope
+import           Diffing.Algorithm hiding (Delete)
+import           Reprinting.Tokenize
+import qualified Data.Reprinting.Token as Token
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -30,10 +33,10 @@ instance Evaluatable Call where
     Rval <$> call op recv args
 
 instance Tokenize Call where
-  tokenize Call{..} = within TCall $ do
+  tokenize Call{..} = within Scope.Call $ do
     -- TODO: callContext
     callFunction
-    within' TParams $ sequenceA_ (sep callParams)
+    within' Scope.Params $ sequenceA_ (sep callParams)
     callBlock
 
 data LessThan a = LessThan { lhs :: a, rhs :: a }
@@ -136,7 +139,7 @@ instance Evaluatable Plus where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
 
 instance Tokenize Plus where
-  tokenize Plus{..} = within' (TInfixL Add 6) $ lhs *> yield TSym <* rhs
+  tokenize Plus{..} = within' (Scope.InfixL Add 6) $ lhs *> yield Token.Sym <* rhs
 
 data Minus a = Minus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -150,7 +153,7 @@ instance Evaluatable Minus where
     go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
 
 instance Tokenize Minus where
-  tokenize Minus{..} = within' (TInfixL Subtract 6) $ lhs *> yield TSym <* rhs
+  tokenize Minus{..} = within' (Scope.InfixL Subtract 6) $ lhs *> yield Token.Sym <* rhs
 
 data Times a = Times { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -164,7 +167,7 @@ instance Evaluatable Times where
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
 
 instance Tokenize Times where
-  tokenize Times{..} = within' (TInfixL Multiply 7) $ lhs *> yield TSym <* rhs
+  tokenize Times{..} = within' (Scope.InfixL Multiply 7) $ lhs *> yield Token.Sym <* rhs
 
 data DividedBy a = DividedBy { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -540,7 +543,7 @@ newtype New a = New { newSubject :: [a] }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Declarations1 New where
-  liftDeclaredName _ (New []) = Nothing
+  liftDeclaredName _ (New [])                       = Nothing
   liftDeclaredName declaredName (New (subject : _)) = declaredName subject
 
 instance Eq1 New where liftEq = genericLiftEq
