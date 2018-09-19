@@ -124,22 +124,13 @@ testAddKVPair = do
   let (Right tagged) = rewrite (somewhere addKVPair markRefactored) () (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-overwriteFloats :: forall effs syntax ann fields term .
-  ( Apply Functor syntax
-  , Literal.Float :< syntax
-  , ann ~ Record (History ': fields)
-  , term ~ Term (Sum syntax) ann
-  ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.Float term)) term
-overwriteFloats = repeatedly $ do
-  t <- await
-  Data.Machine.yield (either id injFloat t)
-  where injFloat :: (term, Literal.Float term) -> term
-        injFloat (term, _) = remark Refactored (termIn (termAnnotation term) (inject (Literal.Float "0")))
+overwriteFloats :: Rewrite (env, term) (Literal.Float term)
+overwriteFloats = pure (Literal.Float "0")
 
 testOverwriteFloats = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (fromMatcher matchFloat ~> overwriteFloats)) (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere overwriteFloats markRefactored) () (mark Unmodified tree)
+  pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 findKV ::
