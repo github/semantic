@@ -8,10 +8,11 @@ module Data.Abstract.Value.Type
   , unify
   , runFunction
   , runBoolean
+  , runWhile
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), raiseHandler)
+import Control.Abstract hiding (Boolean(..), Function(..), While(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
@@ -276,6 +277,25 @@ runBoolean = interpret $ \case
   Abstract.AsBool  t         -> unify t Bool *> (pure True <|> pure False)
   Abstract.Disjunction t1 t2 -> (runBoolean (Evaluator t1) >>= unify Bool) <|> (runBoolean (Evaluator t2) >>= unify Bool)
 
+
+runWhile ::
+  ( Member (Allocator address) effects
+  , Member (Deref Type) effects
+  , Member (Env address) effects
+  , Member (Exc (Return address)) effects
+  , Member Fresh effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (BaseError TypeError)) effects
+  , Member (Resumable (BaseError (AddressError address Type))) effects
+  , Member (State (Heap address Type)) effects
+  , Member (State TypeMap) effects
+  , Ord address
+  , PureEffects effects
+  )
+  => Evaluator address Type (Abstract.While Type ': effects) a
+  -> Evaluator address Type effects a
+runWhile = undefined
 
 instance AbstractHole Type where
   hole = Hole
