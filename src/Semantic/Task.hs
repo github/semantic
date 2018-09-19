@@ -41,13 +41,15 @@ module Semantic.Task
 , runTaskWithConfig
 , runTraceInTelemetry
 , runTaskF
+-- * Exceptions
+, ParserCancelled(..)
 -- * Re-exports
 , Distribute
 , Eff
 , Exc
 , Lift
 , throwError
-, SomeException
+, SomeException(..)
 , Telemetry
 ) where
 
