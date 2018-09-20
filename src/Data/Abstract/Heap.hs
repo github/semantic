@@ -22,6 +22,9 @@ import Data.Semigroup.Reducer
 import Prologue
 import Prelude hiding (lookup)
 
+
+data Address address = Address { address :: address, position :: Position }
+
 data Frame scopeAddress frameAddress value = Frame {
     scopeAddress :: scopeAddress
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
@@ -46,11 +49,11 @@ frameSlots address = fmap slots . frameLookup address
 frameLinks :: Ord address => address -> Heap scope address value -> Maybe (Map EdgeLabel (Map scope address))
 frameLinks address = fmap links . frameLookup address
 
-getSlot :: Ord address => address -> Declaration -> Heap address address value -> Maybe (Set value)
-getSlot address declaration = (Map.lookup declaration =<<) . frameSlots address
+getSlot :: Ord address => Address address -> Heap address address value -> Maybe (Set value)
+getSlot Address{..} = (IntMap.lookup (unPosition position) =<<) . frameSlots address
 
-setSlot :: Ord address => address -> Declaration -> Set value -> Heap scope address value -> Heap scope address value
-setSlot address declaration value heap =
+setSlot :: Ord address => Address address -> Set value -> Heap scope address value -> Heap scope address value
+setSlot Address{..} value heap =
     case frameLookup address heap of
       Just frame -> let slotMap = slots frame in
         Heap $ Map.insert address (frame { slots = IntMap.insert (unPosition position) value slotMap }) (unHeap heap)
