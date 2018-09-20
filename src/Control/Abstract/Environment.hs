@@ -13,7 +13,7 @@ module Control.Abstract.Environment
 , locally
 , close
 , self
-, letrec
+-- , letrec
 , letrec'
 , variable
 -- * Effects
@@ -95,20 +95,20 @@ lookupOrAlloc :: ( Member (Allocator address) effects
               -> Evaluator address value effects address
 lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
-letrec :: ( Member (Allocator address) effects
-          , Member (Deref value) effects
-          , Member (Env address) effects
-          , Member (State (Heap address address value)) effects
-          , Ord address
-          )
-       => Declaration
-       -> Evaluator address value effects value
-       -> Evaluator address value effects (value, address)
-letrec declaration body = do
-  addr <- lookupOrAlloc (name declaration)
-  v <- locally (bind (name declaration) addr *> body)
-  assign addr declaration v
-  pure (v, addr)
+-- letrec :: ( Member (Allocator address) effects
+--           , Member (Deref value) effects
+--           , Member (Env address) effects
+--           , Member (State (Heap address address value)) effects
+--           , Ord address
+--           )
+--        => Declaration
+--        -> Evaluator address value effects value
+--        -> Evaluator address value effects (value, address)
+-- letrec declaration body = do
+--   addr <- lookupOrAlloc (name declaration)
+--   v <- locally (bind (name declaration) addr *> body)
+--   assign addr declaration v
+--   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
 letrec' :: ( Member (Allocator address) effects
