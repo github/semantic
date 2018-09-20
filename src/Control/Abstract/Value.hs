@@ -28,7 +28,8 @@ module Control.Abstract.Value
 import Control.Abstract.ScopeGraph (Declaration)
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Control.Abstract.Heap
+import Control.Abstract.Heap hiding (address)
+import qualified Control.Abstract.Heap as Heap
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
 import Data.Abstract.Module
@@ -250,14 +251,14 @@ makeNamespace :: ( AbstractValue address value effects
                  , Ord address
                  )
               => Declaration
-              -> address
-              -> Maybe address
+              -> Address address
+              -> Maybe (Address address)
               -> Evaluator address value effects ()
               -> Evaluator address value effects value
 makeNamespace declaration addr super body = do
   namespaceBinds <- Env.head <$> locally (body >> getEnv)
-  v <- namespace declaration super namespaceBinds
-  v <$ assign addr declaration v
+  v <- namespace declaration (Heap.address <$> super) namespaceBinds
+  v <$ assign addr v
 
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
