@@ -58,7 +58,6 @@ isolateCache action = putCache lowerBound *> action *> get
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
 cachingTerms :: ( Cacheable term address value
-                , Corecursive term
                 , Member NonDet effects
                 , Member (Reader (Cache term address value)) effects
                 , Member (Reader (Live address)) effects
@@ -66,16 +65,15 @@ cachingTerms :: ( Cacheable term address value
                 , Member (Env address) effects
                 , Member (State (Heap address value)) effects
                 )
-             => SubtermAlgebra (Base term) term (Evaluator term address value effects (ValueRef address))
-             -> SubtermAlgebra (Base term) term (Evaluator term address value effects (ValueRef address))
-cachingTerms recur term = do
-  c <- getConfiguration (embedSubterm term)
+             => Open (Open (term -> Evaluator term address value effects (ValueRef address)))
+cachingTerms recur0 recur term = do
+  c <- getConfiguration term
   cached <- lookupCache c
   case cached of
     Just pairs -> scatter pairs
     Nothing -> do
       pairs <- consultOracle c
-      cachingConfiguration c pairs (recur term)
+      cachingConfiguration c pairs (recur0 recur term)
 
 convergingModules :: ( AbstractValue address value effects
                      , Cacheable term address value

@@ -33,7 +33,7 @@ import           Data.Record
 import           Data.Term
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
-import           Prologue hiding (project)
+import           Prologue
 
 style :: Style ControlFlowVertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
@@ -76,14 +76,12 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Ord address
                  , Ord context
                  , Foldable syntax
-                 , Functor syntax
                  , term ~ Term syntax (Record fields)
                  )
-              => SubtermAlgebra (Base term) term (Evaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
-              -> SubtermAlgebra (Base term) term (Evaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
-graphingTerms recur term@(In a syntax) = do
+              => Open (Open (term -> Evaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address)))))
+graphingTerms recur0 recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
-  case toVertex a definedInModule (subterm <$> syntax) of
+  case toVertex a definedInModule syntax of
     Just (v@Function{}, _) -> recurWithContext v
     Just (v@Method{}, _) -> recurWithContext v
     Just (v@Variable{..}, name) -> do
@@ -94,14 +92,14 @@ graphingTerms recur term@(In a syntax) = do
           defined <- gets (Map.lookup a)
           maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
         _ -> pure ()
-      recur term
-    _ -> recur term
+      recur0 recur term
+    _ -> recur0 recur term
   where
     recurWithContext v = do
       variableDefinition v
       moduleInclusion v
       local (const v) $ do
-        valRef <- recur term
+        valRef <- recur0 recur term
         addr <- Control.Abstract.address valRef
         modify' (Map.insert addr v)
         pure valRef

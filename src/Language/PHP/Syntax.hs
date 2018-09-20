@@ -3,7 +3,7 @@
 module Language.PHP.Syntax where
 
 import           Data.Abstract.BaseError
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable as Abstract
 import           Data.Abstract.Module
 import           Data.Abstract.Path
 import           Data.JSON.Fields
@@ -64,11 +64,12 @@ include :: ( AbstractValue address value effects
            , Member Trace effects
            , Ord address
            )
-        => Subterm term (Evaluator term address value effects (ValueRef address))
+        => (term -> Evaluator term address value effects (ValueRef address))
+        -> term
         -> (ModulePath -> Evaluator term address value effects (ModuleResult address))
         -> Evaluator term address value effects (ValueRef address)
-include pathTerm f = do
-  name <- subtermValue pathTerm >>= asString
+include eval pathTerm f = do
+  name <- eval pathTerm >>= Abstract.value >>= asString
   path <- resolvePHPName name
   traceResolve name path
   (_, (importedEnv, v)) <- f path
@@ -83,7 +84,7 @@ instance Ord1 Require where liftCompare    = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval (Require path) = include path load
+  eval eval (Require path) = include eval path load
 
 
 newtype RequireOnce a = RequireOnce { value :: a }
@@ -94,7 +95,7 @@ instance Ord1 RequireOnce where liftCompare = genericLiftCompare
 instance Show1 RequireOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable RequireOnce where
-  eval (RequireOnce path) = include path require
+  eval eval (RequireOnce path) = include eval path require
 
 
 newtype Include a = Include { value :: a }
@@ -105,7 +106,7 @@ instance Ord1 Include where liftCompare    = genericLiftCompare
 instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Include where
-  eval (Include path) = include path load
+  eval eval (Include path) = include eval path load
 
 
 newtype IncludeOnce a = IncludeOnce { value :: a }
@@ -116,7 +117,7 @@ instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
 instance Show1 IncludeOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable IncludeOnce where
-  eval (IncludeOnce path) = include path require
+  eval eval (IncludeOnce path) = include eval path require
 
 
 newtype ArrayElement a = ArrayElement { value :: a }
@@ -210,9 +211,9 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (QualifiedName name iden) = do
-    namePtr <- subtermAddress name
-    Rval <$> evaluateInScopedEnv namePtr (subtermAddress iden)
+  eval eval (QualifiedName name iden) = do
+    namePtr <- eval name >>= address
+    Rval <$> evaluateInScopedEnv namePtr (eval iden >>= address)
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -223,7 +224,7 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
+  eval eval (NamespaceName xs) = Rval <$> foldl1 f (fmap (eval >=> address) xs)
     where f ns id = ns >>= flip evaluateInScopedEnv id
 
 newtype ConstDeclaration a = ConstDeclaration { values :: [a] }
@@ -379,7 +380,7 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = Rval <$> go (declaredName . subterm <$> namespaceName)
+  eval eval Namespace{..} = Rval <$> go (declaredName <$> namespaceName)
     where
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (n:x:xs) = do
@@ -390,9 +391,9 @@ instance Evaluatable Namespace where
       go [n] = do
         name <- maybeM (throwEvalError NoNameError) n
         letrec' name $ \addr ->
-          box =<< makeNamespace name addr Nothing (void $ subtermAddress namespaceBody)
+          box =<< makeNamespace name addr Nothing (void $ eval namespaceBody)
       -- The absence of names implies global scope, cf http://php.net/manual/en/language.namespaces.definitionmultiple.php
-      go [] = subtermAddress namespaceBody
+      go [] = eval namespaceBody >>= address
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

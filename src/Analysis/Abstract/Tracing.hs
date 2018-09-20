@@ -8,21 +8,18 @@ import Control.Abstract hiding (trace)
 import Control.Monad.Effect.Writer
 import Data.Abstract.Environment
 import Data.Semigroup.Reducer as Reducer
-import Prologue
 
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-tracingTerms :: ( Corecursive term
-                , Member (Env address) effects
+tracingTerms :: ( Member (Env address) effects
                 , Member (State (Heap address value)) effects
                 , Member (Writer (trace (Configuration term address value))) effects
                 , Reducer (Configuration term address value) (trace (Configuration term address value))
                 )
              => trace (Configuration term address value)
-             -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
-             -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
-tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
+             -> Open (Open (term -> Evaluator term address value effects a))
+tracingTerms proxy recur0 recur term = getConfiguration term >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur0 recur term
 
 trace :: Member (Writer (trace (Configuration term address value))) effects => trace (Configuration term address value) -> Evaluator term address value effects ()
 trace = tell

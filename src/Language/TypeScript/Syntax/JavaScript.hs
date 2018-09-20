@@ -19,9 +19,9 @@ instance Ord1 JavaScriptRequire where liftCompare = genericLiftCompare
 instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable JavaScriptRequire where
-  eval (JavaScriptRequire aliasTerm importPath) = do
+  eval _ (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     rvalBox =<< evalRequire modulePath alias
 
 data Debugger a = Debugger
