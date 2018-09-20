@@ -6,6 +6,7 @@ module Data.Abstract.Evaluatable
 , ValueEffects
 , evaluate
 , traceResolve
+, Open
 -- * Preludes
 , HasPrelude(..)
 -- * Postludes
@@ -96,6 +97,8 @@ type ValueEffects address value rest
   ': Boolean value
   ': rest
 
+type Open a = a -> a
+
 evaluate :: ( AbstractValue address value valueEffects
             , Declarations term
             , Effects effects
@@ -122,8 +125,8 @@ evaluate :: ( AbstractValue address value valueEffects
             , valueEffects ~ ValueEffects address value moduleEffects
             )
          => proxy lang
-         -> (SubtermAlgebra Module      term (Evaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (Evaluator term address value moduleEffects address))
-         -> (SubtermAlgebra (Base term) term (Evaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (Evaluator term address value valueEffects (ValueRef address)))
+         -> Open (SubtermAlgebra Module      term (Evaluator term address value moduleEffects address))
+         -> Open (SubtermAlgebra (Base term) term (Evaluator term address value valueEffects (ValueRef address)))
          -> (forall x . Evaluator term address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator term address value (Reader ModuleInfo ': effects) x)
          -> (forall x . Evaluator term address value valueEffects x -> Evaluator term address value moduleEffects x)
          -> [Module term]
