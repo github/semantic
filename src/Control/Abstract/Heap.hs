@@ -5,7 +5,6 @@ module Control.Abstract.Heap
 , Live
 , getHeap
 , putHeap
-, box
 , alloc
 , deref
 , assign
@@ -45,19 +44,19 @@ putHeap = put
 modifyHeap :: Member (State (Heap address address value)) effects => (Heap address address value -> Heap address address value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
-box :: ( Member (Allocator address) effects
-       , Member (Deref value) effects
-       , Member Fresh effects
-       , Member (State (Heap address address value)) effects
-       , Ord address
-       )
-    => value
-    -> Evaluator address value effects address
-box val = do
-  name <- gensym
-  addr <- alloc name
-  assign addr (Declaration name) val -- TODO This is probably wrong
-  pure addr
+-- box :: ( Member (Allocator address) effects
+--        , Member (Deref value) effects
+--        , Member Fresh effects
+--        , Member (State (Heap address address value)) effects
+--        , Ord address
+--        )
+--     => value
+--     -> Evaluator address value effects address
+-- box val = do
+--   name <- gensym
+--   addr <- alloc name
+--   assign addr (Declaration name) val -- TODO This is probably wrong
+--   pure addr
 
 alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
 alloc = send . Alloc
