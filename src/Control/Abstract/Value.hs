@@ -257,11 +257,6 @@ class AbstractIntro value => AbstractValue address value effects where
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
   scopedEnvironment :: address -> Evaluator address value effects (Maybe (Environment address))
 
-  -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
-  --
-  --   The function argument takes an action which recurs through the loop.
-  loop :: (Evaluator address value effects value -> Evaluator address value effects value) -> Evaluator address value effects value
-
 
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Deref value) effects

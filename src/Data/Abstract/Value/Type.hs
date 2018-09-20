@@ -281,6 +281,8 @@ runBoolean = interpret $ \case
 runWhile ::
   ( Member (Allocator address) effects
   , Member (Deref Type) effects
+  , Member (Abstract.Boolean Type) effects
+  , Member NonDet effects
   , Member (Env address) effects
   , Member (Exc (Return address)) effects
   , Member Fresh effects
@@ -295,7 +297,11 @@ runWhile ::
   )
   => Evaluator address Type (Abstract.While Type ': effects) a
   -> Evaluator address Type effects a
-runWhile = undefined
+runWhile = interpret $ \case
+  Abstract.While cond body -> do
+    cond' <- runWhile (raiseEff cond)
+    body' <- runWhile (raiseEff body) *> empty
+    ifthenelse cond' body' (pure unit)
 
 instance AbstractHole Type where
   hole = Hole
@@ -317,7 +323,6 @@ instance AbstractIntro Type where
 instance ( Member (Allocator address) effects
          , Member (Deref Type) effects
          , Member Fresh effects
-         , Member NonDet effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (AddressError address Type))) effects
@@ -373,7 +378,5 @@ instance ( Member (Allocator address) effects
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
-
-  loop f = f empty
 
   castToInteger t = unify t (Int :+ Float :+ Rational) $> Int

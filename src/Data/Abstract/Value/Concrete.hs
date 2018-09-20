@@ -137,11 +137,16 @@ runWhile :: forall effects address body a .
 runWhile = interpret $ \case
   Abstract.While cond body -> loop $ \continue -> do
     cond' <- runWhile (raiseEff cond)
-    let body' = interpose @(Resumable (BaseError (UnspecializedError (Value address body)))) (\(Resumable (BaseError _ _ (UnspecializedError _))) -> throwAbort) $
+
+    -- `interpose` is used to handle 'UnspecializedError's and abort out of the
+    -- loop, otherwise under concrete semantics we run the risk of the
+    -- conditional always being true and getting stuck in an infinite loop.
+    let body' = interpose @(Resumable (BaseError (UnspecializedError (Value address body))))
+          (\(Resumable (BaseError _ _ (UnspecializedError _))) -> throwAbort) $
           runWhile (raiseEff body) *> continue
+
     ifthenelse cond' body' (pure unit)
   where
-
     loop x = catchLoopControl (fix x) (\ control -> case control of
       Break value -> deref value
       Abort -> pure unit
@@ -279,11 +284,7 @@ instance ( Coercible body (Eff effects)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: ( AbstractValue address (Value address body) effects
-                      , Member (Reader ModuleInfo) effects
-                      , Member (Reader Span) effects
-                      , Member (Resumable (BaseError (ValueError address body))) effects
-                      )
+        specialize :: ( AbstractValue address (Value address body) effects)
                    => Either ArithException Number.SomeNumber
                    -> Evaluator address (Value address body) effects (Value address body)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
@@ -304,7 +305,7 @@ instance ( Coercible body (Eff effects)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue address (Value address body) effects, Member (Abstract.Boolean (Value address body)) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
+        go :: (AbstractValue address (Value address body) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> pure $ integer (orderingToInt (compare l r))
@@ -333,11 +334,6 @@ instance ( Coercible body (Eff effects)
         pair = (left, right)
         ourShift :: Word64 -> Int -> Integer
         ourShift a b = toInteger (shiftR a b)
-
-  loop x = catchLoopControl (fix x) (\ control -> case control of
-    Break value -> deref value
-    -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
-    Continue _  -> loop x)
 
   castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
   castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
