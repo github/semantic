@@ -39,6 +39,7 @@ deriving instance Member NonDet effects => Alternative (Evaluator term address v
 deriving instance Member (Lift IO) effects => MonadIO (Evaluator term address value effects)
 
 
+-- | An open-recursive function.
 type Open a = a -> a
 
 
