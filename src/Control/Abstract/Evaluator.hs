@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
+  , Open
   -- * Effects
   , Return(..)
   , earlyReturn
@@ -36,6 +37,10 @@ newtype Evaluator term address value effects a = Evaluator { runEvaluator :: Eff
 
 deriving instance Member NonDet effects => Alternative (Evaluator term address value effects)
 deriving instance Member (Lift IO) effects => MonadIO (Evaluator term address value effects)
+
+
+type Open a = a -> a
+
 
 -- Effects
 
