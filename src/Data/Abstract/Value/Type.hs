@@ -11,7 +11,7 @@ module Data.Abstract.Value.Type
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), raiseHandler)
+import Control.Abstract hiding (Boolean(..), Function(..))
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
@@ -97,7 +97,7 @@ throwTypeError :: ( Member (Resumable (BaseError TypeError)) effects
                   , Member (Reader Span) effects
                   )
                => TypeError resume
-               -> Evaluator address value effects resume
+               -> Evaluator term address value effects resume
 throwTypeError = throwBaseError
 
 runTypeMap :: ( Effectful m
@@ -190,7 +190,7 @@ substitute :: ( Member (Reader ModuleInfo) effects
               )
            => TName
            -> Type
-           -> Evaluator address value effects Type
+           -> Evaluator term address value effects Type
 substitute id ty = do
   infiniteType <- occur id ty
   ty <- if infiniteType
@@ -207,7 +207,7 @@ unify :: ( Member (Reader ModuleInfo) effects
          )
       => Type
       -> Type
-      -> Evaluator address value effects Type
+      -> Evaluator term address value effects Type
 unify a b = do
   a' <- prune a
   b' <- prune b
@@ -243,8 +243,8 @@ runFunction :: ( Member (Allocator address) effects
                , Ord address
                , PureEffects effects
                )
-            => Evaluator address Type (Abstract.Function address Type ': effects) a
-            -> Evaluator address Type effects a
+            => Evaluator term address Type (Abstract.Function address Type ': effects) a
+            -> Evaluator term address Type effects a
 runFunction = interpret $ \case
   Abstract.Function _ params _ body -> do
     (env, tvars) <- foldr (\ name rest -> do
@@ -269,8 +269,8 @@ runBoolean :: ( Member NonDet effects
               , Member (State TypeMap) effects
               , PureEffects effects
               )
-           => Evaluator address Type (Abstract.Boolean Type ': effects) a
-           -> Evaluator address Type effects a
+           => Evaluator term address Type (Abstract.Boolean Type ': effects) a
+           -> Evaluator term address Type effects a
 runBoolean = interpret $ \case
   Abstract.Boolean _         -> pure Bool
   Abstract.AsBool  t         -> unify t Bool *> (pure True <|> pure False)

@@ -31,8 +31,8 @@ define :: ( HasCallStack
           , Ord address
           )
        => Name
-       -> Evaluator address value effects value
-       -> Evaluator address value effects ()
+       -> Evaluator term address value effects value
+       -> Evaluator term address value effects ()
 define name def = withCurrentCallStack callStack $ do
   addr <- alloc name
   def >>= assign addr
@@ -50,8 +50,8 @@ defineClass :: ( AbstractValue address value effects
                )
             => Name
             -> [address]
-            -> Evaluator address value effects a
-            -> Evaluator address value effects ()
+            -> Evaluator term address value effects a
+            -> Evaluator term address value effects ()
 defineClass name superclasses body = define name $ do
   binds <- Env.head <$> locally (body >> getEnv)
   klass name superclasses binds
@@ -67,8 +67,8 @@ defineNamespace :: ( AbstractValue address value effects
                    , Ord address
                    )
                 => Name
-                -> Evaluator address value effects a
-                -> Evaluator address value effects ()
+                -> Evaluator term address value effects a
+                -> Evaluator term address value effects ()
 defineNamespace name scope = define name $ do
   binds <- Env.head <$> locally (scope >> getEnv)
   namespace name Nothing binds
@@ -77,27 +77,27 @@ defineNamespace name scope = define name $ do
 --
 -- The constructed function will have the same arity as the Haskell function. Nullary functions are constructed by providing an evaluator producing an address. Note that the constructed function must not contain free variables as they will not be captured by the closure, and/or will be garbage collected.
 lambda :: ( HasCallStack
-          , Lambda address value effects fn
+          , Lambda term address value effects fn
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           )
        => fn
-       -> Evaluator address value effects value
+       -> Evaluator term address value effects value
 lambda body = withCurrentCallStack callStack (lambda' [] body)
 
 -- | A class of types forming the body of 'lambda's. Note that there should in general only be two cases: a recursive case of functions taking 'Name's as parameters, and a base case of an 'Evaluator'.
-class Lambda address value effects ty | ty -> address, ty -> value, ty -> effects where
+class Lambda term address value effects ty | ty -> term, ty -> address, ty -> value, ty -> effects where
   lambda' :: [Name]
           -> ty
-          -> Evaluator address value effects value
+          -> Evaluator term address value effects value
 
-instance (Member Fresh effects, Lambda address value effects ret) => Lambda address value effects (Name -> ret) where
+instance (Member Fresh effects, Lambda term address value effects ret) => Lambda term address value effects (Name -> ret) where
   lambda' vars body = do
     var <- gensym
     lambda' (var : vars) (body var)
   {-# INLINE lambda' #-}
 
-instance Member (Function address value) effects => Lambda address value effects (Evaluator address value effects address) where
+instance Member (Function address value) effects => Lambda term address value effects (Evaluator term address value effects address) where
   lambda' vars = function Nothing vars lowerBound
   {-# INLINE lambda' #-}
 
@@ -116,7 +116,7 @@ builtInPrint :: ( AbstractValue address value effects
                 , Member Trace effects
                 , Ord address
                 )
-             => Evaluator address value effects value
+             => Evaluator term address value effects value
 builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit)
 
 builtInExport :: ( AbstractValue address value effects
@@ -133,7 +133,7 @@ builtInExport :: ( AbstractValue address value effects
                  , Member (State (Heap address value)) effects
                  , Ord address
                  )
-              => Evaluator address value effects value
+              => Evaluator term address value effects value
 builtInExport = lambda (\ v -> do
   var <- variable v >>= deref
   (k, value) <- asPair var

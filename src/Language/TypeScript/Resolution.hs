@@ -74,7 +74,7 @@ resolveWithNodejsStrategy :: ( Member (Modules address) effects
                              )
                           => ImportPath
                           -> [String]
-                          -> Evaluator address value effects M.ModulePath
+                          -> Evaluator term address value effects M.ModulePath
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path _)    exts        = resolveRelativePath path exts
 
@@ -94,7 +94,7 @@ resolveRelativePath :: ( Member (Modules address) effects
                        )
                     => FilePath
                     -> [String]
-                    -> Evaluator address value effects M.ModulePath
+                    -> Evaluator term address value effects M.ModulePath
 resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
@@ -123,7 +123,7 @@ resolveNonRelativePath :: ( Member (Modules address) effects
                           )
                        => FilePath
                        -> [String]
-                       -> Evaluator address value effects M.ModulePath
+                       -> Evaluator term address value effects M.ModulePath
 resolveNonRelativePath name exts = do
   M.ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -146,7 +146,7 @@ resolveModule :: ( Member (Modules address) effects
                  )
               => FilePath -- ^ Module path used as directory to search in
               -> [String] -- ^ File extensions to look for
-              -> Evaluator address value effects (Either [FilePath] M.ModulePath)
+              -> Evaluator term address value effects (Either [FilePath] M.ModulePath)
 resolveModule path' exts = do
   let path = makeRelative "." path'
   PackageInfo{..} <- currentPackage
@@ -173,6 +173,6 @@ evalRequire :: ( AbstractValue address value effects
                )
             => M.ModulePath
             -> Name
-            -> Evaluator address value effects value
+            -> Evaluator term address value effects value
 evalRequire modulePath alias = letrec' alias $ \addr ->
   unit <$ makeNamespace alias addr Nothing (bindAll . fst . snd =<< require modulePath)

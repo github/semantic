@@ -26,8 +26,8 @@ runFunction :: ( Member (Allocator address) effects
                , Ord address
                , PureEffects effects
                )
-            => Evaluator address Abstract (Function address Abstract ': effects) a
-            -> Evaluator address Abstract effects a
+            => Evaluator term address Abstract (Function address Abstract ': effects) a
+            -> Evaluator term address Abstract effects a
 runFunction = interpret $ \case
   Function _ params _ body -> do
     env <- foldr (\ name rest -> do
@@ -43,8 +43,8 @@ runFunction = interpret $ \case
 runBoolean :: ( Member NonDet effects
               , PureEffects effects
               )
-           => Evaluator address Abstract (Boolean Abstract ': effects) a
-           -> Evaluator address Abstract effects a
+           => Evaluator term address Abstract (Boolean Abstract ': effects) a
+           -> Evaluator term address Abstract effects a
 runBoolean = interpret $ \case
   Boolean _       -> pure Abstract
   AsBool  _       -> pure True <|> pure False

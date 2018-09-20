@@ -47,7 +47,6 @@ library
                      , Control.Abstract.PythonPackage
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
-                     , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
                      -- Rewriting
                      , Control.Rewriting

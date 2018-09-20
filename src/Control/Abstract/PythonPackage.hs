@@ -18,7 +18,7 @@ import           Prologue
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
-runPythonPackaging :: forall effects address body a. (
+runPythonPackaging :: forall effects term address body a. (
                       Eff.PureEffects effects
                       , Ord address
                       , Show address
@@ -39,8 +39,8 @@ runPythonPackaging :: forall effects address body a. (
                       , Member (Eff.Reader PackageInfo) effects
                       , Member (Eff.Reader Span) effects
                       , Member (Function address (Value address body)) effects)
-                   => Evaluator address (Value address body) effects a
-                   -> Evaluator address (Value address body) effects a
+                   => Evaluator term address (Value address body) effects a
+                   -> Evaluator term address (Value address body) effects a
 runPythonPackaging = Eff.interpose @(Function address (Value address body)) $ \case
   Call callName super params -> do
     case callName of

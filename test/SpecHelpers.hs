@@ -10,7 +10,6 @@ module SpecHelpers
 , deNamespace
 , derefQName
 , verbatim
-, TermEvaluator(..)
 , Verbatim(..)
 , toList
 , Config
@@ -118,7 +117,7 @@ type TestEvaluatingErrors = '[ BaseError (ValueError Precise (ConcreteEff Precis
                              , BaseError (UnspecializedError Val)
                              , BaseError (LoadError Precise)
                              ]
-testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (Span, a)
+testEvaluating :: Evaluator term Precise Val TestEvaluatingEffects (Span, a)
                -> IO
                  ( [String]
                  , ( Heap Precise Val
@@ -138,7 +137,7 @@ testEvaluating
   . runEvalError
   . runResolutionError
   . runAddressError
-  . runValueError @_ @Precise @(ConcreteEff Precise _)
+  . runValueError @_ @_ @Precise @(ConcreteEff Precise _)
   . fmap snd
 
 type Val = Value Precise (ConcreteEff Precise '[Trace, Lift IO])

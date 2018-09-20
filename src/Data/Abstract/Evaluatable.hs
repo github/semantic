@@ -74,7 +74,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member Trace effects
           , Ord address
           )
-       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
+       => SubtermAlgebra constr term (Evaluator term address value effects (ValueRef address))
   eval expr = do
     traverse_ subtermValue expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
@@ -122,14 +122,14 @@ evaluate :: ( AbstractValue address value valueEffects
             , valueEffects ~ ValueEffects address value moduleEffects
             )
          => proxy lang
-         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
-         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
-         -> (forall x . Evaluator address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator address value (Reader ModuleInfo ': effects) x)
-         -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
+         -> (SubtermAlgebra Module      term (Evaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (Evaluator term address value moduleEffects address))
+         -> (SubtermAlgebra (Base term) term (Evaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (Evaluator term address value valueEffects (ValueRef address)))
+         -> (forall x . Evaluator term address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator term address value (Reader ModuleInfo ': effects) x)
+         -> (forall x . Evaluator term address value valueEffects x -> Evaluator term address value moduleEffects x)
          -> [Module term]
-         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
+         -> Evaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
-  (_, (preludeBinds, _)) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
+  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
   foldr (run preludeBinds) ask modules
@@ -142,8 +142,8 @@ evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
         evalModuleBody term = Subterm term (coerce runValue (do
-          result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
-          result <$ TermEvaluator (postlude lang)))
+          result <- foldSubterms (analyzeTerm eval) term >>= address
+          result <$ postlude lang))
 
         runInModule preludeBinds info
           = runReader info
@@ -154,7 +154,7 @@ evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
           . runLoopControl
 
 
-traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
+traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator term address value effects ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
@@ -177,7 +177,7 @@ class HasPrelude (language :: Language) where
                    , Ord address
                    )
                 => proxy language
-                -> Evaluator address value effects ()
+                -> Evaluator term address value effects ()
   definePrelude _ = pure ()
 
 instance HasPrelude 'Go
@@ -221,7 +221,7 @@ class HasPostlude (language :: Language) where
               , Member Trace effects
               )
            => proxy language
-           -> Evaluator address value effects ()
+           -> Evaluator term address value effects ()
   postlude _ = pure ()
 
 instance HasPostlude 'Go
@@ -263,10 +263,10 @@ instance Eq1 EvalError where
 instance Show1 EvalError where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: (Effectful m, Effects effects) => m (Resumable (BaseError EvalError) ': effects) a -> m effects (Either (SomeExc (BaseError EvalError)) a)
+runEvalError :: Effects effects => Evaluator term address value (Resumable (BaseError EvalError) ': effects) a -> Evaluator term address value effects (Either (SomeExc (BaseError EvalError)) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError EvalError) resume -> m effects resume) -> m (Resumable (BaseError EvalError) ': effects) a -> m effects a
+runEvalErrorWith :: Effects effects => (forall resume . (BaseError EvalError) resume -> Evaluator term address value effects resume) -> Evaluator term address value (Resumable (BaseError EvalError) ': effects) a -> Evaluator term address value effects a
 runEvalErrorWith = runResumableWith
 
 throwEvalError :: ( Member (Reader ModuleInfo) effects
@@ -274,7 +274,7 @@ throwEvalError :: ( Member (Reader ModuleInfo) effects
                   , Member (Resumable (BaseError EvalError)) effects
                   )
                => EvalError resume
-               -> Evaluator address value effects resume
+               -> Evaluator term address value effects resume
 throwEvalError = throwBaseError
 
 
@@ -290,15 +290,15 @@ instance Eq1 (UnspecializedError a) where
 instance Show1 (UnspecializedError a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: (Effectful (m value), Effects effects)
-                 => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
-                 -> m value effects (Either (SomeExc (BaseError (UnspecializedError value))) a)
+runUnspecialized :: Effects effects
+                 => Evaluator term address value (Resumable (BaseError (UnspecializedError value)) ': effects) a
+                 -> Evaluator term address value effects (Either (SomeExc (BaseError (UnspecializedError value))) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: (Effectful (m value), Effects effects)
-                     => (forall resume . BaseError (UnspecializedError value) resume -> m value effects resume)
-                     -> m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
-                     -> m value effects a
+runUnspecializedWith :: Effects effects
+                     => (forall resume . BaseError (UnspecializedError value) resume -> Evaluator term address value effects resume)
+                     -> Evaluator term address value (Resumable (BaseError (UnspecializedError value)) ': effects) a
+                     -> Evaluator term address value effects a
 runUnspecializedWith = runResumableWith
 
 throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) effects
@@ -306,7 +306,7 @@ throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError va
                            , Member (Reader Span) effects
                            )
                         => UnspecializedError value resume
-                        -> Evaluator address value effects resume
+                        -> Evaluator term address value effects resume
 throwUnspecializedError = throwBaseError
 
 
