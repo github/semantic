@@ -18,6 +18,8 @@ module Control.Abstract.ScopeGraph
 
 import           Control.Abstract.Evaluator hiding (Local)
 import           Control.Abstract.Heap
+import           Data.Abstract.Module
+import           Data.Abstract.BaseError
 import           Data.Abstract.Name hiding (name)
 import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
@@ -27,7 +29,7 @@ import           Prologue
 
 data ScopeEnv address (m :: * -> *) a where
     Lookup :: Reference -> ScopeEnv address m (Maybe address)
-    Declare :: Declaration -> Span -> Maybe address -> ScopeEnv address m ()
+    Declare :: Declaration -> Span -> Maybe address -> ScopeEnv address m Position
     PutDeclarationScope :: Declaration -> address -> ScopeEnv address m ()
     Reference :: Reference -> Declaration -> ScopeEnv address m ()
     NewScope :: Map EdgeLabel [address] -> ScopeEnv address m address
@@ -38,7 +40,7 @@ data ScopeEnv address (m :: * -> *) a where
 lookup :: forall address value effects. Member (ScopeEnv address) effects => Reference -> Evaluator address value effects (Maybe address)
 lookup = send . Lookup @address
 
-declare :: forall address value effects. Member (ScopeEnv address) effects => Declaration -> Span -> Maybe address -> Evaluator address value effects ()
+declare :: forall address value effects. Member (ScopeEnv address) effects => Declaration -> Span -> Maybe address -> Evaluator address value effects Position
 declare = ((send .) .) . Declare @address
 
 putDeclarationScope :: forall address value effects. Member (ScopeEnv address) effects => Declaration -> address -> Evaluator address value effects ()
@@ -71,17 +73,27 @@ instance Effect (ScopeEnv address) where
   handleState c dist (Request (Local scope action) k) = Request (Local scope (dist (action <$ c))) (dist . fmap k)
 
 
-runScopeEnv :: (Ord address, Effects effects, Member Fresh effects, Member (Allocator address) effects)
+runScopeEnv :: (Ord address, Effects effects, Member Fresh effects, Member (Allocator address) effects, Member (Resumable (BaseError ScopeError)) effects, Member (Reader ModuleInfo) effects, Member (Reader Span) effects)
             => Evaluator address value (ScopeEnv address ': effects) a
             -> Evaluator address value effects (ScopeGraph address, a)
 runScopeEnv evaluator = runState lowerBound (reinterpret handleScopeEnv evaluator)
 
-handleScopeEnv :: forall address value effects a. (Ord address, Member Fresh effects, Member (Allocator address) effects, Effects effects)
-          => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
-          -> Evaluator address value (State (ScopeGraph address) ': effects) a
+handleScopeEnv :: forall address value effects a. (Ord address
+                , Member Fresh effects
+                , Member (Allocator address) effects
+                , Member (Resumable (BaseError ScopeError)) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Effects effects)
+               => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
+               -> Evaluator address value (State (ScopeGraph address) ': effects) a
 handleScopeEnv = \case
     Lookup ref -> ScopeGraph.scopeOfRef ref <$> get
-    Declare decl span scope -> modify @(ScopeGraph address) (ScopeGraph.declare decl span scope)
+    Declare decl span scope -> do
+        graph <- get
+        let (graph', position) = ScopeGraph.declare decl span scope graph
+        put graph'
+        maybeM (throwScopeError (ScopeError decl span)) position
     PutDeclarationScope decl scope -> modify @(ScopeGraph address) (ScopeGraph.insertDeclarationScope decl scope)
     Reference ref decl -> modify @(ScopeGraph address) (ScopeGraph.reference ref decl)
     NewScope edges -> do
@@ -97,3 +109,19 @@ handleScopeEnv = \case
         value <- reinterpret handleScopeEnv (raiseEff action)
         modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = prevScope })
         pure value
+
+throwScopeError :: ( Member (Resumable (BaseError ScopeError)) effects
+                         , Member (Reader ModuleInfo) effects
+                         , Member (Reader Span) effects
+                         )
+                      => ScopeError resume
+                      -> Evaluator address value effects resume
+throwScopeError = throwBaseError
+
+data ScopeError return where
+  ScopeError :: Declaration -> Span -> ScopeError Position
+
+deriving instance Eq (ScopeError return)
+deriving instance Show (ScopeError return)
+instance Show1 ScopeError where liftShowsPrec _ _ = showsPrec
+instance Eq1 ScopeError where liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
