@@ -20,7 +20,7 @@ module Control.Abstract.Value
 , evaluateInScopedEnv
 , address
 -- , value
-, rvalBox
+-- , rvalBox
 -- , subtermValue
 , subtermAddress
 ) where
@@ -327,13 +327,13 @@ subtermAddress :: ( AbstractValue address value effects
                -> Evaluator address value effects address
 subtermAddress = address <=< subtermRef
 
--- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: ( Member (Allocator address) effects
-           , Member (Deref value) effects
-           , Member Fresh effects
-           , Member (State (Heap address address value)) effects
-           , Ord address
-           )
-        => value
-        -> Evaluator address value effects (ValueRef address)
-rvalBox val = Rval <$> box val
+-- -- | Convenience function for boxing a raw value and wrapping it in an Rval
+-- rvalBox :: ( Member (Allocator address) effects
+--            , Member (Deref value) effects
+--            , Member Fresh effects
+--            , Member (State (Heap address address value)) effects
+--            , Ord address
+--            )
+--         => value
+--         -> Evaluator address value effects (ValueRef address)
+-- rvalBox val = Rval <$> box val
