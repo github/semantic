@@ -1,6 +1,8 @@
 {-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
+, Address(..)
+, Position(..)
 , Configuration(..)
 , Live
 , getHeap
@@ -23,7 +25,7 @@ import Control.Abstract.Roots
 import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
-import Data.Abstract.Heap (Heap)
+import Data.Abstract.Heap (Heap, Address(..), Position(..))
 import Data.Abstract.ScopeGraph (Declaration(..))
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
@@ -69,11 +71,10 @@ deref :: ( Member (Deref value) effects
          , Member (State (Heap address address value)) effects
          , Ord address
          )
-      => address
-      -> Declaration
+      => Address address
       -> Evaluator address value effects value
 -- TODO: THIS IS WRONG we need to call Heap.lookup
-deref addr declaration = gets (Heap.getSlot addr declaration) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress addr))
+deref addr@Address{..} = gets (Heap.getSlot addr) >>= maybeM (throwAddressError (UnallocatedAddress address)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress address))
 
 
 -- | Write a value to the given address in the 'Allocator'.
@@ -81,14 +82,13 @@ assign :: ( Member (Deref value) effects
           , Member (State (Heap address address value)) effects
           , Ord address
           )
-       => address
-       -> Declaration
+       => Address address
        -> value
        -> Evaluator address value effects ()
-assign addr declaration value = do
+assign addr value = do
   heap <- getHeap
-  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlot addr declaration heap)))
-  putHeap (Heap.setSlot addr declaration cell heap)
+  cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlot addr heap)))
+  putHeap (Heap.setSlot addr cell heap)
 
 
 -- Garbage collection
