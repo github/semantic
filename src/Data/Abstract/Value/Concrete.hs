@@ -78,10 +78,10 @@ runFunction :: ( Member (Allocator address) effects
                , Ord address
                , PureEffects effects
                )
-            => (body address -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) address)
-            -> (Evaluator address value (Abstract.Function address (Value address body) ': effects) address -> body address)
-            -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
-            -> Evaluator address (Value address body) effects a
+            => (body address -> Evaluator term address (Value address body) (Abstract.Function address (Value address body) ': effects) address)
+            -> (Evaluator term address value (Abstract.Function address (Value address body) ': effects) address -> body address)
+            -> Evaluator term address (Value address body) (Abstract.Function address (Value address body) ': effects) a
+            -> Evaluator term address (Value address body) effects a
 runFunction toEvaluator fromEvaluator = interpret $ \case
   Abstract.Function name params fvs body -> do
     packageInfo <- currentPackage
@@ -104,8 +104,8 @@ runBoolean :: ( Member (Reader ModuleInfo) effects
               , Member (Resumable (BaseError (ValueError address body))) effects
               , PureEffects effects
               )
-           => Evaluator address (Value address body) (Abstract.Boolean (Value address body) ': effects) a
-           -> Evaluator address (Value address body) effects a
+           => Evaluator term address (Value address body) (Abstract.Boolean (Value address body) ': effects) a
+           -> Evaluator term address (Value address body) effects a
 runBoolean = interpret $ \case
   Abstract.Boolean b          -> pure $! Boolean b
   Abstract.AsBool (Boolean b) -> pure b
@@ -141,7 +141,7 @@ materializeEnvironment :: ( Member (Deref (Value address body)) effects
                           , Ord address
                           )
                        => Value address body
-                       -> Evaluator address (Value address body) effects (Maybe (Environment address))
+                       -> Evaluator term address (Value address body) effects (Maybe (Environment address))
 materializeEnvironment val = do
   ancestors <- rec val
   pure (Env.Environment <$> nonEmpty ancestors)
@@ -250,7 +250,7 @@ instance ( Coercible body (Eff effects)
                       , Member (Resumable (BaseError (ValueError address body))) effects
                       )
                    => Either ArithException Number.SomeNumber
-                   -> Evaluator address (Value address body) effects (Value address body)
+                   -> Evaluator term address (Value address body) effects (Value address body)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
@@ -269,7 +269,7 @@ instance ( Coercible body (Eff effects)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue address (Value address body) effects, Member (Abstract.Boolean (Value address body)) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
+        go :: (AbstractValue address (Value address body) effects, Member (Abstract.Boolean (Value address body)) effects, Ord a) => a -> a -> Evaluator term address (Value address body) effects (Value address body)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> pure $ integer (orderingToInt (compare l r))
@@ -346,15 +346,15 @@ deriving instance Show address => Show (ValueError address body resume)
 instance Show address => Show1 (ValueError address body) where
   liftShowsPrec _ _ = showsPrec
 
-runValueError :: (Effectful (m address (Value address body)), Effects effects)
-              => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
-              -> m address (Value address body) effects (Either (SomeExc (BaseError (ValueError address body))) a)
+runValueError :: Effects effects
+              => Evaluator term address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
+              -> Evaluator term address (Value address body) effects (Either (SomeExc (BaseError (ValueError address body))) a)
 runValueError = runResumable
 
-runValueErrorWith :: (Effectful (m address (Value address body)), Effects effects)
-                  => (forall resume . BaseError (ValueError address body) resume -> m address (Value address body) effects resume)
-                  -> m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
-                  -> m address (Value address body) effects a
+runValueErrorWith :: Effects effects
+                  => (forall resume . BaseError (ValueError address body) resume -> Evaluator term address (Value address body) effects resume)
+                  -> Evaluator term address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
+                  -> Evaluator term address (Value address body) effects a
 runValueErrorWith = runResumableWith
 
 throwValueError :: ( Member (Resumable (BaseError (ValueError address body))) effects
@@ -362,5 +362,5 @@ throwValueError :: ( Member (Resumable (BaseError (ValueError address body))) ef
                    , Member (Reader Span) effects
                    )
                 => ValueError address body resume
-                -> Evaluator address (Value address body) effects resume
+                -> Evaluator term address (Value address body) effects resume
 throwValueError = throwBaseError

@@ -89,7 +89,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . fmap snd
     . runState ([] @Breakpoint)
     . runReader Step
-    . runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise _))
+    . id @(Evaluator _ Precise (Value Precise (ConcreteEff Precise _)) _ _)
     . runPrintingTrace
     . runState lowerBound
     . runFresh 0
@@ -102,7 +102,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . runAddressError
     . runValueError
     . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-    . raiseHandler (runModules (ModuleTable.modulePaths (packageModules (snd <$> package))))
+    . runModules (ModuleTable.modulePaths (packageModules (snd <$> package)))
     . runReader (packageInfo package)
     . runState (lowerBound @Span)
     . runReader (lowerBound @Span)
@@ -129,8 +129,8 @@ step :: ( Member (Env address) effects
         , Show address
         )
      => [(ModulePath, Blob)]
-     -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
-     -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
+     -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
+     -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
 step blobs recur term = do
   break <- shouldBreak
   if break then do
@@ -152,7 +152,7 @@ step blobs recur term = do
           output "  :show bindings              show the current bindings"
           output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
         showBindings = do
-          bindings <- Env.head <$> TermEvaluator getEnv
+          bindings <- Env.head <$> getEnv
           output $ unlines (uncurry showBinding <$> Env.pairs bindings)
         showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"]     = local (const Step) run
@@ -190,7 +190,7 @@ data Step
 
 -- TODO: StepLocal/StepModule
 
-shouldBreak :: (Member (State [Breakpoint]) effects, Member (Reader Span) effects, Member (Reader Step) effects) => TermEvaluator term address value effects Bool
+shouldBreak :: (Member (State [Breakpoint]) effects, Member (Reader Span) effects, Member (Reader Step) effects) => Evaluator term address value effects Bool
 shouldBreak = do
   step <- ask
   case step of

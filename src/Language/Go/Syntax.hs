@@ -60,7 +60,7 @@ resolveGoImport :: ( Member (Modules address) effects
                    , Member Trace effects
                    )
                 => ImportPath
-                -> Evaluator address value effects [ModulePath]
+                -> Evaluator term address value effects [ModulePath]
 resolveGoImport (ImportPath path Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule

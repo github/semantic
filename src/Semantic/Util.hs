@@ -2,12 +2,12 @@
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
-import Prelude hiding (id, (.), readFile)
+import Prelude hiding (readFile)
 
 import           Analysis.Abstract.Caching.FlowSensitive
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
-import           Control.Category
+-- import           Control.Category
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address.Monovariant as Monovariant
@@ -58,7 +58,6 @@ checking
   . runPrintingTrace
   . runState (lowerBound @(Heap Monovariant Type))
   . runFresh 0
-  . runTermEvaluator @_ @Monovariant @Type
   . caching
   . providingLiveSet
   . fmap reassociate
@@ -87,7 +86,7 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
-evaluatePythonProject = evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
+evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
@@ -102,9 +101,9 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise _))
+  pure (id @(Evaluator _ Precise (Value Precise (ConcreteEff Precise _)) _ _)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (runModules (ModuleTable.modulePaths (packageModules package))
        (runReader (packageInfo package)
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
@@ -115,9 +114,9 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
   package <- fmap quieterm <$> parsePythonPackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise '[Trace]))
+  pure (id @(Evaluator _ Precise (Value Precise (ConcreteEff Precise _)) _ _)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (runModules (ModuleTable.modulePaths (packageModules package))
        (runReader (packageInfo package)
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
@@ -132,7 +131,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (runModules (ModuleTable.modulePaths (packageModules package))
        (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (Type.runBoolean . Type.runFunction) modules))))))
 
 

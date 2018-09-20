@@ -13,13 +13,13 @@ collectingTerms :: ( Member (Reader (Live address)) effects
                    , Ord address
                    , ValueRoots address value
                    )
-                => SubtermAlgebra (Base term) term (TermEvaluator term address value effects value)
-                -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects value)
+                => SubtermAlgebra (Base term) term (Evaluator term address value effects value)
+                -> SubtermAlgebra (Base term) term (Evaluator term address value effects value)
 collectingTerms recur term = do
-  roots <- TermEvaluator askRoots
+  roots <- askRoots
   v <- recur term
-  v <$ TermEvaluator (gc (roots <> valueRoots v))
+  v <$ gc (roots <> valueRoots v)
 
 
-providingLiveSet :: (Effectful (m address value), PureEffects effects) => m address value (Reader (Live address) ': effects) a -> m address value effects a
+providingLiveSet :: PureEffects effects => Evaluator term address value (Reader (Live address) ': effects) a -> Evaluator term address value effects a
 providingLiveSet = runReader lowerBound

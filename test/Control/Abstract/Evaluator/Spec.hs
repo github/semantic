@@ -43,7 +43,7 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . Precise.runDeref @_ @Val
+  . Precise.runDeref @_ @_ @Val
   . Precise.runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound

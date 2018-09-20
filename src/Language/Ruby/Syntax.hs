@@ -28,7 +28,7 @@ resolveRubyName :: ( Member (Modules address) effects
                    , Member (Resumable (BaseError ResolutionError)) effects
                    )
                 => Text
-                -> Evaluator address value effects M.ModulePath
+                -> Evaluator term address value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
@@ -42,7 +42,7 @@ resolveRubyPath :: ( Member (Modules address) effects
                    , Member (Resumable (BaseError ResolutionError)) effects
                    )
                 => Text
-                -> Evaluator address value effects M.ModulePath
+                -> Evaluator term address value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
@@ -95,7 +95,7 @@ doRequire :: ( Member (Boolean value) effects
              , Member (Modules address) effects
              )
           => M.ModulePath
-          -> Evaluator address value effects (Bindings address, value)
+          -> Evaluator term address value effects (Bindings address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
@@ -129,7 +129,7 @@ doLoad :: ( Member (Boolean value) effects
           )
        => Text
        -> Bool
-       -> Evaluator address value effects value
+       -> Evaluator term address value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'

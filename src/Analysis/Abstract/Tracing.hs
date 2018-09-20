@@ -20,22 +20,22 @@ tracingTerms :: ( Corecursive term
                 , Reducer (Configuration term address value) (trace (Configuration term address value))
                 )
              => trace (Configuration term address value)
-             -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
-             -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects a)
+             -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
+             -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
 tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-trace :: Member (Writer (trace (Configuration term address value))) effects => trace (Configuration term address value) -> TermEvaluator term address value effects ()
+trace :: Member (Writer (trace (Configuration term address value))) effects => trace (Configuration term address value) -> Evaluator term address value effects ()
 trace = tell
 
-tracing :: (Monoid (trace (Configuration term address value)), Effects effects) => TermEvaluator term address value (Writer (trace (Configuration term address value)) ': effects) a -> TermEvaluator term address value effects (trace (Configuration term address value), a)
+tracing :: (Monoid (trace (Configuration term address value)), Effects effects) => Evaluator term address value (Writer (trace (Configuration term address value)) ': effects) a -> Evaluator term address value effects (trace (Configuration term address value), a)
 tracing = runWriter
 
 
 -- | Get the current 'Configuration' with a passed-in term.
 getConfiguration :: (Member (Env address) effects, Member (State (Heap address value)) effects)
                  => term
-                 -> TermEvaluator term address value effects (Configuration term address value)
-getConfiguration term = Configuration term <$> TermEvaluator getEvalContext <*> TermEvaluator getHeap
+                 -> Evaluator term address value effects (Configuration term address value)
+getConfiguration term = Configuration term <$> getEvalContext <*> getHeap
 
 -- | A single point in a program’s execution.
 data Configuration term address value = Configuration

@@ -44,7 +44,7 @@ resolvePHPName :: ( Member (Modules address) effects
                   , Member (Resumable (BaseError ResolutionError)) effects
                   )
                => T.Text
-               -> Evaluator address value effects ModulePath
+               -> Evaluator term address value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybeM (throwResolutionError $ NotFoundError name [name] Language.PHP) modulePath
@@ -64,9 +64,9 @@ include :: ( AbstractValue address value effects
            , Member Trace effects
            , Ord address
            )
-        => Subterm term (Evaluator address value effects (ValueRef address))
-        -> (ModulePath -> Evaluator address value effects (ModuleResult address))
-        -> Evaluator address value effects (ValueRef address)
+        => Subterm term (Evaluator term address value effects (ValueRef address))
+        -> (ModulePath -> Evaluator term address value effects (ModuleResult address))
+        -> Evaluator term address value effects (ValueRef address)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name

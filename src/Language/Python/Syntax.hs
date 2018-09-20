@@ -72,7 +72,7 @@ resolvePythonModules :: ( Member (Modules address) effects
                         , Member Trace effects
                         )
                      => QualifiedName
-                     -> Evaluator address value effects (NonEmpty ModulePath)
+                     -> Evaluator term address value effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -163,7 +163,7 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (State (Heap address value)) effects
                        , Ord address
                        )
-                    => Name -> ModulePath -> Evaluator address value effects value
+                    => Name -> ModulePath -> Evaluator term address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
   unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
