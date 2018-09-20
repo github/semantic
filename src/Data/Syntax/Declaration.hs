@@ -128,7 +128,7 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable VariableDeclaration where
   eval (VariableDeclaration [])   = rvalBox unit
   eval (VariableDeclaration decs) = do
-    addresses <- for decs $ \declaration -> do
+    for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName (subterm declaration))
       (span, valueRef) <- do
         ref <- subtermRef declaration
@@ -136,9 +136,7 @@ instance Evaluatable VariableDeclaration where
         pure (subtermSpan, ref)
 
       declare (Declaration name) span Nothing -- TODO is it true that variable declarations never have an associated scope?
-
-      address valueRef
-    rvalBox =<< tuple addresses
+    rvalBox unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
   declaredName (VariableDeclaration vars) = case vars of
