@@ -10,7 +10,7 @@ module Data.Abstract.Value.Type
   , runBoolean
   ) where
 
-import Control.Abstract.ScopeGraph (Declaration(..))
+import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
@@ -248,14 +248,22 @@ runFunction :: ( Member (Allocator address) effects
             -> Evaluator address Type effects a
 runFunction = interpret $ \case
   Abstract.Function name params _ body -> do
-    (env, tvars) <- foldr (\ name rest -> do
-      addr <- alloc name
-      tvar <- Var <$> fresh
-      -- TODO: Declare name in the scope graph?
-      assign addr (Declaration name) tvar
-      bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
+    functionSpan <- ask @Span
+    declare (Declaration name) functionSpan Nothing
+    currentScope' <- currentScope
+    let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+    functionScope <- newScope lexicalEdges
+    withScope functionScope $ do
+      (env, tvars) <- foldr (\ name rest -> do
+        addr <- alloc name
+        tvar <- Var <$> fresh
+        -- TODO: Declare name in the scope graph?
+        -- declare name
+        -- assign tvar values to names in the frame of the function
+        -- assign functionFrameAddress (Declaration name) tvar
+        bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     -- TODO: Probably declare name and create a new scope in the scope graph
-    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= flip deref (Declaration name))
+      (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= flip deref (Declaration name))
   Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
@@ -264,6 +272,13 @@ runFunction = interpret $ \case
     case unified of
       _ :-> ret -> box ret
       actual    -> throwTypeError (UnificationError needed actual) >>= box
+
+var a, b, d, c;
+a = 1
+b = 1
+d = 1
+c = 1
+foo(a, b, c)
 
 runBoolean :: ( Member NonDet effects
               , Member (Reader ModuleInfo) effects
