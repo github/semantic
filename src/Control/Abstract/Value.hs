@@ -112,8 +112,8 @@ while (Evaluator cond) (Evaluator body) = send (While cond body)
 
 -- | Do-while loop, built on top of while.
 doWhile :: Member (While value) effects
-  => Evaluator address value effects value
-  -> Evaluator address value effects value
+  => Evaluator address value effects value -- ^ Body
+  -> Evaluator address value effects value -- ^ Condition
   -> Evaluator address value effects value
 doWhile body cond = body *> while cond body
 
