@@ -1,8 +1,10 @@
-{-# LANGUAGE GADTs, DuplicateRecordFields #-}
+{-# LANGUAGE GADTs, DuplicateRecordFields, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( ScopeGraph(..)
   , Path(..)
+  , Position(..)
   , pathDeclaration
+  , pathPosition
   , Reference(..) -- TODO don't export these constructors
   , Declaration(..) -- TODO don't export these constructors
   , EdgeLabel(..)
@@ -20,13 +22,17 @@ import qualified Data.Map.Strict as Map
 import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
+import qualified Data.Sequence as Seq
 
-data Scope scopeAddress = Scope {
-    edges        :: Map EdgeLabel [scopeAddress] -- Maybe Map EdgeLabel [Path scope]?
-  , references   :: Map Reference (Path scopeAddress)
-  , declarations :: Map Declaration (Span, Maybe scopeAddress)
+-- Offsets and frame addresses in the heap should be addresses?
+data Scope address = Scope {
+    edges        :: Map EdgeLabel [address] -- Maybe Map EdgeLabel [Path scope]?
+  , references   :: Map Reference (Path address)
+  , declarations :: Seq (Declaration, (Span, Maybe address))
   } deriving (Eq, Show, Ord)
 
+newtype Position = Position { unPosition :: Int }
+  deriving (Eq, Show, Ord)
 
 data ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope), currentScope :: Maybe scope }
 
@@ -39,7 +45,7 @@ deriving instance Ord address => Ord (ScopeGraph address)
 
 data Path scope where
   -- | Construct a direct path to a declaration.
-  DPath :: Declaration -> Path scope
+  DPath :: Declaration -> Position -> Path scope
   -- | Construct an edge from a scope to another declaration path.
   EPath :: EdgeLabel -> scope -> Path scope -> Path scope
 
@@ -49,15 +55,19 @@ deriving instance Ord scope => Ord (Path scope)
 
 -- Returns the declaration of a path.
 pathDeclaration :: Path scope -> Declaration
-pathDeclaration (DPath d)     = d
+pathDeclaration (DPath d _)     = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
+
+pathPosition :: Path scope -> Position
+pathPosition (DPath _ p)   = p
+pathPosition (EPath _ _ p) = pathPosition p
 
 -- Returns the reference paths of a scope in a scope graph.
 pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference (Path scope))
 pathsOfScope scope = fmap references . Map.lookup scope . graph
 
 -- Returns the declaration data of a scope in a scope graph.
-ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Declaration (Span, Maybe scope))
+ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Seq (Declaration, (Span, Maybe scope)))
 ddataOfScope scope = fmap declarations . Map.lookup scope . graph
 
 -- Returns the edges of a scope in a scope graph.
@@ -69,12 +79,12 @@ lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
 lookupScope scope = Map.lookup scope . graph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
-declare :: Ord scope => Declaration -> Span -> Maybe scope -> ScopeGraph scope -> ScopeGraph scope
-declare declaration ddata assocScope g@ScopeGraph{..} = fromMaybe g $ do
+declare :: Ord scope => Declaration -> Span -> Maybe scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
+declare declaration ddata assocScope g@ScopeGraph{..} = fromMaybe (g, Nothing) $ do
   scopeKey <- currentScope
   scope <- lookupScope scopeKey g
-  let newScope = scope { declarations = Map.insert declaration (ddata, assocScope) (declarations scope) }
-  pure $ g { graph = Map.insert scopeKey newScope graph }
+  let newScope = scope { declarations = (declarations scope) Seq.|> (declaration, (ddata, assocScope)) }
+  pure $ (g { graph = Map.insert scopeKey newScope graph }, Just . Position $ length (declarations newScope))
 
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
@@ -86,11 +96,11 @@ reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
   where
     declDataOfScope address = do
       dataMap <- ddataOfScope address g
-      Map.lookup declaration dataMap
+      lookupDeclaration declaration dataMap
     go currentAddress currentScope address path =
       case declDataOfScope address of
-          Just _ ->
-            let newScope = currentScope { references = Map.insert ref (path (DPath declaration)) (references currentScope) }
+          Just (_, index) ->
+            let newScope = currentScope { references = Map.insert ref (path (DPath declaration index)) (references currentScope) }
             in Just (g { graph = Map.insert currentAddress newScope graph })
           Nothing -> let
             traverseEdges edge = do
@@ -105,8 +115,8 @@ insertDeclarationScope :: Ord address => Declaration -> address -> ScopeGraph ad
 insertDeclarationScope decl address g@ScopeGraph{..} = fromMaybe g $ do
   declScope <- scopeOfDeclaration decl g
   scope <- lookupScope declScope g
-  (span, _) <- Map.lookup decl (declarations scope)
-  pure $ g { graph = Map.insert declScope (scope { declarations = Map.insert decl (span, Just address) (declarations scope) }) graph }
+  (span, position) <- (fst . snd . fst &&& unPosition . snd) <$> lookupDeclaration decl (declarations scope)
+  pure $ g { graph = Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, Just address))) position (declarations scope) }) graph }
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
@@ -147,8 +157,7 @@ associatedScope declaration g@ScopeGraph{..} = go (Map.keys graph)
   where
     go (s : scopes') = fromMaybe (go scopes') $ do
       ddataMap <- ddataOfScope s g
-      (_, assocScope) <- Map.lookup declaration ddataMap
-      pure assocScope
+      snd . snd . fst <$> lookupDeclaration declaration ddataMap
     go [] = Nothing
 
 newtype Reference = Reference { name :: Name }
