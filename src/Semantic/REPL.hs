@@ -129,15 +129,14 @@ step :: ( Member (Env address) effects
         , Show address
         )
      => [(ModulePath, Blob)]
-     -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
-     -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
-step blobs recur term = do
+     -> Open (Open (term -> Evaluator term address value effects a))
+step blobs recur0 recur term = do
   break <- shouldBreak
   if break then do
     list
-    runCommands (recur term)
+    runCommands (recur0 recur term)
   else
-    recur term
+    recur0 recur term
   where list = do
           path <- asks modulePath
           span <- ask

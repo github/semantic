@@ -24,7 +24,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
-  eval (Import symbols importPath) = do
+  eval _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedBinds <- fst . snd <$> require modulePath
     bindAll (renamed importedBinds)
@@ -42,9 +42,9 @@ instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedAliasedImport where
-  eval (QualifiedAliasedImport aliasTerm importPath) = do
+  eval _ (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     rvalBox =<< evalRequire modulePath alias
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
@@ -55,7 +55,7 @@ instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
-  eval (SideEffectImport importPath) = do
+  eval _ (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ require modulePath
     rvalBox unit
@@ -70,7 +70,7 @@ instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
 instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
-  eval (QualifiedExport exportSymbols) = do
+  eval _ (QualifiedExport exportSymbols) = do
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \Alias{..} ->
       export aliasValue aliasName Nothing
@@ -91,7 +91,7 @@ instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
 instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExportFrom where
-  eval (QualifiedExportFrom importPath exportSymbols) = do
+  eval _ (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedBinds <- fst . snd <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
@@ -108,10 +108,10 @@ instance Ord1 DefaultExport where liftCompare = genericLiftCompare
 instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultExport where
-  eval (DefaultExport term) = do
+  eval eval (DefaultExport term) = do
     case declaredName term of
       Just name -> do
-        addr <- subtermAddress term
+        addr <- eval term >>= address
         export name name Nothing
         bind name addr
       Nothing -> throwEvalError DefaultExportError
@@ -286,7 +286,7 @@ instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
 instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 -- TODO: TypeIdentifier shouldn't evaluate to an address in the heap?
 instance Evaluatable TypeIdentifier where
-  eval TypeIdentifier{..} = do
+  eval _ TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
     reference (Reference (name contents)) (Declaration (name contents))
     rvalBox unit
@@ -339,7 +339,7 @@ instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AmbientDeclaration where
-  eval (AmbientDeclaration body) = subtermRef body
+  eval eval (AmbientDeclaration body) = eval body
 
 data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, enumDeclarationBody :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -364,9 +364,9 @@ instance Ord1 ExtendsClause where liftCompare = genericLiftCompare
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
 -- TODO: ExtendsClause shouldn't evaluate to an address in the heap?
 instance Evaluatable ExtendsClause where
-  eval ExtendsClause{..} = do
+  eval eval ExtendsClause{..} = do
     -- Evaluate subterms
-    traverse_ subtermRef extendsClauses
+    traverse_ eval extendsClauses
     rvalBox unit
 
 newtype ArrayType a = ArrayType { arrayType :: a }
@@ -506,10 +506,10 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval (Module iden xs) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
+  eval eval (Module iden xs) = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr Nothing (void (eval xs)))
+      makeNamespace name addr Nothing (traverse_ eval xs))
 
 
 data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
@@ -520,10 +520,10 @@ instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
-  eval (InternalModule iden xs) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
+  eval eval (InternalModule iden xs) = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr Nothing (void (eval xs)))
+      makeNamespace name addr Nothing (traverse_ eval xs))
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier
@@ -555,11 +555,11 @@ instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 instance Evaluatable AbstractClass where
-  eval AbstractClass{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm abstractClassIdentifier))
-    supers <- traverse subtermAddress classHeritage
+  eval eval AbstractClass{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
+    supers <- traverse (eval >=> address) classHeritage
     (v, addr) <- letrec name $ do
-      void $ subtermValue classBody
+      void $ eval classBody
       classBinds <- Env.head <$> getEnv
       klass name supers classBinds
     rvalBox =<< (v <$ bind name addr)

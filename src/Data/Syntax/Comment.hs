@@ -18,7 +18,7 @@ instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Comment where
-  eval _ = rvalBox unit
+  eval _ _ = rvalBox unit
 
 instance Tokenize Comment where
   tokenize = yield . Run . commentContent

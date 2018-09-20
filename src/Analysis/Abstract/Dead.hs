@@ -31,13 +31,11 @@ subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead ter
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-revivingTerms :: ( Corecursive term
-                 , Member (State (Dead term)) effects
+revivingTerms :: ( Member (State (Dead term)) effects
                  , Ord term
                  )
-              => SubtermAlgebra (Base term) term (Evaluator term address value effects a)
-              -> SubtermAlgebra (Base term) term (Evaluator term address value effects a)
-revivingTerms recur term = revive (embedSubterm term) *> recur term
+              => Open (Open (term -> Evaluator term address value effects a))
+revivingTerms recur0 recur term = revive term *> recur0 recur term
 
 killingModules :: ( Foldable (Base term)
                   , Member (State (Dead term)) effects

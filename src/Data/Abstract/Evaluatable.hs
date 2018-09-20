@@ -39,10 +39,11 @@ import Data.Abstract.Name as X
 import Data.Abstract.Ref as X
 import Data.Coerce
 import Data.Language
+import Data.Function
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
-import Data.Sum
+import Data.Sum hiding (project)
 import Data.Term
 import Prologue
 
@@ -74,9 +75,10 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member Trace effects
           , Ord address
           )
-       => SubtermAlgebra constr term (Evaluator term address value effects (ValueRef address))
-  eval expr = do
-    traverse_ subtermValue expr
+       => (term -> Evaluator term address value effects (ValueRef address))
+       -> (constr term -> Evaluator term address value effects (ValueRef address))
+  eval eval expr = do
+    traverse_ eval expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
@@ -123,7 +125,7 @@ evaluate :: ( AbstractValue address value valueEffects
             )
          => proxy lang
          -> Open (Module term -> Evaluator term address value moduleEffects address)
-         -> Open (SubtermAlgebra (Base term) term (Evaluator term address value valueEffects (ValueRef address)))
+         -> Open (Open (term -> Evaluator term address value valueEffects (ValueRef address)))
          -> (forall x . Evaluator term address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator term address value (Reader ModuleInfo ': effects) x)
          -> (forall x . Evaluator term address value valueEffects x -> Evaluator term address value moduleEffects x)
          -> [Module term]
@@ -142,7 +144,7 @@ evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
         evalModuleBody term = coerce runValue (do
-          result <- foldSubterms (analyzeTerm eval) term >>= address
+          result <- fix (analyzeTerm ((. project) . eval)) term >>= address
           result <$ postlude lang)
 
         runInModule preludeBinds info
@@ -314,11 +316,11 @@ throwUnspecializedError = throwBaseError
 
 -- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
 instance (Apply Evaluatable fs, Apply Show1 fs, Apply Foldable fs) => Evaluatable (Sum fs) where
-  eval = apply @Evaluatable eval
+  eval eval' = apply @Evaluatable (eval eval')
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
-  eval = eval . termFOut
+  eval eval' = eval eval' . termFOut
 
 
 -- NOTE: Use 'Data.Syntax.Statements' instead of '[]' if you need imperative eval semantics.
@@ -330,4 +332,4 @@ instance (Evaluatable s, Show a) => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
+  eval eval = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) . nonEmpty

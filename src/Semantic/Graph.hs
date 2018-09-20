@@ -324,12 +324,14 @@ parseModule proj parser file = do
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
                  , Member (State Span) effects -- last evaluated child's span
+                 , Recursive term
+                 , Base term ~ TermF syntax (Record fields)
                  )
-              => SubtermAlgebra (TermF syntax (Record fields)) term (Evaluator term address value effects a)
-              -> SubtermAlgebra (TermF syntax (Record fields)) term (Evaluator term address value effects a)
-withTermSpans recur term = let
-  updatedSpanAlg = withCurrentSpan (getField (termFAnnotation term)) (recur term)
-  in modifyChildSpan (getField (termFAnnotation term)) updatedSpanAlg
+              => Open (Open (term -> Evaluator term address value effects a))
+withTermSpans recur0 recur term = let
+  span = getField (termFAnnotation (project term))
+  updatedSpanAlg = withCurrentSpan span (recur0 recur term)
+  in modifyChildSpan span updatedSpanAlg
 
 resumingResolutionError :: ( Member Trace effects
                            , Effects effects
