@@ -122,7 +122,7 @@ evaluate :: ( AbstractValue address value valueEffects
             , valueEffects ~ ValueEffects address value moduleEffects
             )
          => proxy lang
-         -> Open (SubtermAlgebra Module      term (Evaluator term address value moduleEffects address))
+         -> Open (Module term -> Evaluator term address value moduleEffects address)
          -> Open (SubtermAlgebra (Base term) term (Evaluator term address value valueEffects (ValueRef address)))
          -> (forall x . Evaluator term address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator term address value (Reader ModuleInfo ': effects) x)
          -> (forall x . Evaluator term address value valueEffects x -> Evaluator term address value moduleEffects x)
@@ -136,14 +136,14 @@ evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
   where run preludeBinds m rest = do
           evaluated <- coerce
             (runInModule preludeBinds (moduleInfo m))
-            (analyzeModule (subtermRef . moduleBody)
-            (evalModuleBody <$> m))
+            (analyzeModule (evalModuleBody . moduleBody)
+            m)
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModuleBody term = Subterm term (coerce runValue (do
+        evalModuleBody term = coerce runValue (do
           result <- foldSubterms (analyzeTerm eval) term >>= address
-          result <$ postlude lang))
+          result <$ postlude lang)
 
         runInModule preludeBinds info
           = runReader info

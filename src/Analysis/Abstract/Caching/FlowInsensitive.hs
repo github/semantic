@@ -93,10 +93,9 @@ convergingModules :: ( AbstractValue address value effects
                      , Ord address
                      , Ord term
                      )
-                  => SubtermAlgebra Module term (Evaluator term address value effects address)
-                  -> SubtermAlgebra Module term (Evaluator term address value effects address)
+                  => Open (Module term -> Evaluator term address value effects address)
 convergingModules recur m = do
-  c <- getConfiguration (subterm (moduleBody m))
+  c <- getConfiguration (moduleBody m)
   heap <- getHeap
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   (cache, _) <- converge (lowerBound, heap) (\ (prevCache, _) -> isolateCache $ do

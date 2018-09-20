@@ -111,8 +111,7 @@ graphingPackages :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph ControlFlowVertex)) effects
                     , Member (Reader ControlFlowVertex) effects
                     )
-                 => SubtermAlgebra Module term (Evaluator term address value effects a)
-                 -> SubtermAlgebra Module term (Evaluator term address value effects a)
+                 => Open (Module term -> Evaluator term address value effects a)
 graphingPackages recur m =
   let v = moduleVertex (moduleInfo m) in packageInclusion v *> local (const v) (recur m)
 
@@ -124,8 +123,7 @@ graphingModules :: forall term address value effects a
                    , Member (Reader ControlFlowVertex) effects
                    , PureEffects effects
                    )
-                => SubtermAlgebra Module term (Evaluator term address value effects a)
-                -> SubtermAlgebra Module term (Evaluator term address value effects a)
+                => Open (Module term -> Evaluator term address value effects a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
@@ -147,8 +145,7 @@ graphingModuleInfo :: forall term address value effects a
                       , Member (State (Graph ModuleInfo)) effects
                       , PureEffects effects
                       )
-                   => SubtermAlgebra Module term (Evaluator term address value effects a)
-                   -> SubtermAlgebra Module term (Evaluator term address value effects a)
+                   => Open (Module term -> Evaluator term address value effects a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
   eavesdrop @(Modules address) (\ eff -> case eff of

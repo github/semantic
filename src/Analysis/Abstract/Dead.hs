@@ -44,9 +44,8 @@ killingModules :: ( Foldable (Base term)
                   , Ord term
                   , Recursive term
                   )
-               => SubtermAlgebra Module term (Evaluator term address value effects a)
-               -> SubtermAlgebra Module term (Evaluator term address value effects a)
-killingModules recur m = killAll (subterms (subterm (moduleBody m))) *> recur m
+               => Open (Module term -> Evaluator term address value effects a)
+killingModules recur m = killAll (subterms (moduleBody m)) *> recur m
 
 providingDeadSet :: Effects effects => Evaluator term address value (State (Dead term) ': effects) a -> Evaluator term address value effects (Dead term, a)
 providingDeadSet = runState lowerBound
