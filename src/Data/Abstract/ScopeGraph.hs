@@ -110,6 +110,11 @@ reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
               getFirst (foldMap (First . ap (go currentAddress currentScope) ((path .) . EPath edge)) scopes)
             in traverseEdges Import <|> traverseEdges Lexical
 
+lookupDeclaration :: Declaration -> Seq (Declaration, (Span, Maybe address)) -> Maybe ((Declaration, (Span, Maybe address)), Position)
+lookupDeclaration declaration seq = do
+      index <- Seq.findIndexR ((declaration ==) . fst) seq
+      (, Position index) <$> Seq.lookup index seq
+
 -- | Insert associate the given address to a declaration in the scope graph.
 insertDeclarationScope :: Ord address => Declaration -> address -> ScopeGraph address -> ScopeGraph address
 insertDeclarationScope decl address g@ScopeGraph{..} = fromMaybe g $ do
@@ -147,7 +152,7 @@ scopeOfDeclaration declaration g@ScopeGraph{..} = go (Map.keys graph)
   where
     go (s : scopes') = fromMaybe (go scopes') $ do
       ddataMap <- ddataOfScope s g
-      _ <- Map.lookup declaration ddataMap
+      _ <- lookupDeclaration declaration ddataMap
       pure (Just s)
     go [] = Nothing
 
