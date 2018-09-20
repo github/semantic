@@ -6,7 +6,6 @@ module Data.Abstract.Evaluatable
 , ValueEffects
 , evaluate
 , traceResolve
-, Open
 -- * Preludes
 , HasPrelude(..)
 -- * Postludes
@@ -96,8 +95,6 @@ type ValueEffects address value rest
   =  Function address value
   ': Boolean value
   ': rest
-
-type Open a = a -> a
 
 evaluate :: ( AbstractValue address value valueEffects
             , Declarations term
