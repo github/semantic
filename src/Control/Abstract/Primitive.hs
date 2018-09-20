@@ -4,7 +4,6 @@ module Control.Abstract.Primitive
   , defineClass
   , defineNamespace
   , builtInPrint
-  , builtInExport
   , lambda
   , Lambda(..)
   ) where
@@ -118,26 +117,3 @@ builtInPrint :: ( AbstractValue address value effects
                 )
              => Evaluator term address value effects value
 builtInPrint = lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> box unit)
-
-builtInExport :: ( AbstractValue address value effects
-                 , HasCallStack
-                 , Member (Allocator address) effects
-                 , Member (Deref value) effects
-                 , Member (Env address) effects
-                 , Member Fresh effects
-                 , Member (Function address value) effects
-                 , Member (Reader ModuleInfo) effects
-                 , Member (Reader Span) effects
-                 , Member (Resumable (BaseError (AddressError address value))) effects
-                 , Member (Resumable (BaseError (EnvironmentError address))) effects
-                 , Member (State (Heap address value)) effects
-                 , Ord address
-                 )
-              => Evaluator term address value effects value
-builtInExport = lambda (\ v -> do
-  var <- variable v >>= deref
-  (k, value) <- asPair var
-  sym <- asString k
-  addr <- box value
-  export (name sym) (name sym) (Just addr)
-  box unit)
