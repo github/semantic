@@ -108,7 +108,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
        (runReader (packageInfo package)
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
-       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runFunction coerce coerce) modules)))))))
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runWhile . Concrete.runFunction coerce coerce) modules)))))))
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
@@ -121,7 +121,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
        (runReader (packageInfo package)
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
-       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runFunction coerce coerce) modules)))))))
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runWhile . Concrete.runFunction coerce coerce) modules)))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
@@ -133,7 +133,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (Type.runBoolean . Type.runFunction) modules))))))
+       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (Type.runBoolean . Type.runWhile . Type.runFunction) modules))))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
