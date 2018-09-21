@@ -71,8 +71,7 @@ runWhile ::
 runWhile = interpret $ \case
   Abstract.While cond body -> do
     cond' <- runWhile (raiseEff cond)
-    body' <- runWhile (raiseEff body) *> empty
-    ifthenelse cond' body' (pure unit)
+    ifthenelse cond' (runWhile (raiseEff body) *> empty) (pure unit)
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
