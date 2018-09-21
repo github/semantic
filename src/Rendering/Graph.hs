@@ -15,9 +15,7 @@ import Data.Diff
 import Data.Graph
 import Data.Graph.TermVertex
 import Data.Graph.DiffVertex
-import Data.Range
-import Data.Span
-import Data.Record
+import Data.Location
 import Data.Patch
 import Data.String (IsString(..))
 import Data.Term
@@ -52,28 +50,26 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
 class ToTreeGraph vertex t | t -> vertex where
   toTreeGraph :: (Member Fresh effs, Member (Reader (Graph vertex)) effs) => t (Eff effs (Graph vertex)) -> Eff effs (Graph vertex)
 
-instance (ConstructorName syntax, Foldable syntax, HasField fields Range, HasField fields Span) =>
-  ToTreeGraph TermVertex (TermF syntax (Record fields)) where
+instance (ConstructorName syntax, Foldable syntax) =>
+  ToTreeGraph TermVertex (TermF syntax Location) where
   toTreeGraph = termAlgebra where
     termAlgebra ::
       ( ConstructorName syntax
-      , HasField fields Range
-      , HasField fields Span
       , Foldable syntax
       , Member Fresh effs
       , Member (Reader (Graph TermVertex)) effs
       )
-      => TermF syntax (Record fields) (Eff effs (Graph TermVertex))
+      => TermF syntax Location (Eff effs (Graph TermVertex))
       -> Eff effs (Graph TermVertex)
     termAlgebra (In ann syntax) = do
       i <- fresh
       parent <- ask
-      let root = vertex (TermVertex i (constructorName syntax) (TermAnnotation (getField ann) (getField ann)))
+      let root = vertex (TermVertex i (constructorName syntax) (TermAnnotation (locationByteRange ann) (locationSpan ann)))
       subGraph <- foldl' (\acc x -> overlay <$> acc <*> local (const root) x) (pure mempty) syntax
       pure (parent `connect` root `overlay` subGraph)
 
-instance (ConstructorName syntax, Foldable syntax, HasField fields1 Range, HasField fields1 Span, HasField fields2 Range, HasField fields2 Span) =>
-  ToTreeGraph DiffVertex (DiffF syntax (Record fields1) (Record fields2)) where
+instance (ConstructorName syntax, Foldable syntax) =>
+  ToTreeGraph DiffVertex (DiffF syntax Location Location) where
   toTreeGraph d = case d of
     Merge t@(In (a1, a2) syntax)     -> diffAlgebra t  (Merged   (MergedTerm (constructorName syntax) (ann a1) (ann a2)))
     Patch (Delete t1@(In a1 syntax)) -> diffAlgebra t1 (Deleted  (DeletedTerm (constructorName syntax) (ann a1)))
@@ -87,7 +83,7 @@ instance (ConstructorName syntax, Foldable syntax, HasField fields1 Range, HasFi
       graph <- local (const replace) (overlay <$> diffAlgebra t1 (Deleted a) <*> diffAlgebra t2 (Inserted b))
       pure (parent `connect` replace `overlay` graph)
     where
-      ann a = TermAnnotation (getField a) (getField a)
+      ann a = TermAnnotation (locationByteRange a) (locationSpan a)
       diffAlgebra ::
         ( Foldable f
         , Member Fresh effs

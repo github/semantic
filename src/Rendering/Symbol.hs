@@ -11,8 +11,7 @@ import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
 import Data.Language (ensureLanguage)
-import Data.Record
-import Data.Span
+import Data.Location
 import Data.List.Split (splitWhen)
 import Data.Term
 import qualified Data.Text as T
@@ -20,14 +19,14 @@ import Rendering.TOC
 
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
-renderToSymbols :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => SymbolFields -> Blob -> Term f (Record fields) -> [Value]
+renderToSymbols :: (Foldable f, Functor f) => SymbolFields -> Blob -> Term f Annotation -> [Value]
 renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
   where
-    termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => SymbolFields -> FilePath -> Term f (Record fields) -> File
+    termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f Annotation -> File
     termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
-symbolSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => SymbolFields -> FilePath -> T.Text -> Record fields -> Maybe Symbol
+symbolSummary :: SymbolFields -> FilePath -> T.Text -> Annotation -> Maybe Symbol
 symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
   Just ErrorDeclaration{} -> Nothing
   Just declaration -> Just Symbol
@@ -36,7 +35,7 @@ symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
     , symbolLang = join (when symbolFieldsLang (T.pack . show <$> ensureLanguage (declarationLanguage declaration)))
     , symbolKind = when symbolFieldsKind (toCategoryName declaration)
     , symbolLine = when symbolFieldsLine (declarationText declaration)
-    , symbolSpan = when symbolFieldsSpan (getField record)
+    , symbolSpan = when symbolFieldsSpan (locationSpan (snd record))
     }
   _ -> Nothing
 

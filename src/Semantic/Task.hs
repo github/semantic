@@ -69,7 +69,7 @@ import           Data.Diff
 import           Data.Duration
 import qualified Data.Error as Error
 import           Data.Language (Language)
-import           Data.Record
+import           Data.Location
 import           Data.Source (Source)
 import           Data.Sum
 import qualified Data.Syntax as Syntax
@@ -114,11 +114,11 @@ analyze :: Member Task effs => (Analysis.TermEvaluator term address value effect
 analyze interpret analysis = send (Analyze interpret analysis)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
+decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Eff effs (Term f (field, Location))
 decorate algebra = send . Decorate algebra
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
-diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
+diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task effs) => These (Term syntax Location) (Term syntax Location) -> Eff effs (Diff syntax Location Location)
 diff terms = send (Semantic.Task.Diff terms)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
@@ -171,8 +171,8 @@ runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 data Task (m :: * -> *) output where
   Parse     :: Parser term -> Blob -> Task m term
   Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task m result
-  Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task m (Term f (Record (field ': fields)))
-  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task m (Diff syntax (Record fields1) (Record fields2))
+  Decorate  :: Functor f => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Task m (Term f (field, Location))
+  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax Location) (Term syntax Location) -> Task m (Diff syntax Location Location)
   Render    :: Renderer input output -> input -> Task m output
   Serialize :: Format input -> input -> Task m Builder
 
@@ -225,9 +225,9 @@ runParser blob@Blob{..} parser = case parser of
       in length term `seq` pure term
   SomeParser parser -> SomeTerm <$> runParser blob parser
   where languageTag = pure . (,) ("language" :: String) . show $ blobLanguage
-        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
-        errors = cata $ \ (In a syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError (getField a) err]
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) Assignment.Location -> [Error.Error String]
+        errors = cata $ \ (In Assignment.Location{..} syntax) -> case syntax of
+          _ | Just err@Syntax.Error{} <- project syntax -> [Syntax.unError locationSpan err]
           _ -> fold syntax
         runAssignment :: ( Apply Foldable syntaxes
                          , Apply Functor syntaxes
@@ -240,10 +240,10 @@ runParser blob@Blob{..} parser = case parser of
                          , Member Trace effs
                          , PureEffects effs
                          )
-                      => (Source -> assignment (Term (Sum syntaxes) (Record Assignment.Location)) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) (Record Assignment.Location)))
+                      => (Source -> assignment (Term (Sum syntaxes) Assignment.Location) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Location))
                       -> Parser ast
-                      -> assignment (Term (Sum syntaxes) (Record Assignment.Location))
-                      -> Eff effs (Term (Sum syntaxes) (Record Assignment.Location))
+                      -> assignment (Term (Sum syntaxes) Assignment.Location)
+                      -> Eff effs (Term (Sum syntaxes) Assignment.Location)
         runAssignment assign parser assignment = do
           config <- ask
           let blobFields = ("path", if configLogPrintSource config then blobPath else "<filtered>") : languageTag

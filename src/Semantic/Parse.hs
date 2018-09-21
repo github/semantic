@@ -1,16 +1,15 @@
 {-# LANGUAGE GADTs, RankNTypes #-}
-module Semantic.Parse ( runParse, runParse' ) where
+module Semantic.Parse ( runParse, runParse', parseSomeBlob ) where
 
 import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import           Analysis.PackageDef (HasPackageDef)
 import           Control.Monad.Effect.Exception
-import           Data.AST
 import           Data.Blob
 import           Data.Graph.TermVertex
 import           Data.JSON.Fields
 import           Data.Quieterm
-import           Data.Record
+import           Data.Location
 import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
@@ -51,7 +50,7 @@ withParsedBlobs ::
         , HasPackageDef syntax
         , Show1 syntax
         , ToJSONFields1 syntax
-        ) => Blob -> Term syntax (Record Location) -> Eff effs output
+        ) => Blob -> Term syntax Location -> Eff effs output
       )
   -> [Blob]
   -> Eff effs output
@@ -59,5 +58,5 @@ withParsedBlobs onError render = distributeFoldMap $ \blob ->
   (parseSomeBlob blob >>= withSomeTerm (render blob)) `catchError` \(SomeException e) ->
     pure (onError blob (show e))
 
-parseSomeBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1] (Record Location))
+parseSomeBlob :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1] Location)
 parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (`parse` blob) (someParser blobLanguage)

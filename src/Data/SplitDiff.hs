@@ -4,8 +4,7 @@ module Data.SplitDiff
   ) where
 
 import Control.Monad.Free
-import Data.Range
-import Data.Record
+import Data.Location
 import Data.Term
 
 -- | A patch to only one side of a diff.
@@ -16,8 +15,8 @@ data SplitPatch a
   deriving (Foldable, Eq, Functor, Show, Traversable)
 
 -- | Get the range of a SplitDiff.
-getRange :: HasField fields Range => SplitDiff f (Record fields) -> Range
-getRange diff = getField $ case diff of
+getRange :: SplitDiff f Location -> Range
+getRange diff = locationByteRange $ case diff of
   Free annotated -> termFAnnotation annotated
   Pure patch -> termAnnotation (splitTerm patch)
 
