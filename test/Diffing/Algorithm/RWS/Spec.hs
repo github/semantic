@@ -41,3 +41,7 @@ spec = parallel $ do
   where decorate = defaultFeatureVectorDecorator
 
         diffThese = these deleting inserting replacing
+
+-- | Strips the head annotation off a term annotated with non-empty records.
+stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
+stripTerm = fmap rtail
