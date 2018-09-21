@@ -243,16 +243,17 @@ runFunction :: ( Member (Allocator address) effects
                , Ord address
                , PureEffects effects
                )
-            => Evaluator term address Type (Abstract.Function address Type ': effects) a
+            => (term -> Evaluator term address Type (Abstract.Function term address Type ': effects) address)
+            -> Evaluator term address Type (Abstract.Function term address Type ': effects) a
             -> Evaluator term address Type effects a
-runFunction = interpret $ \case
-  Abstract.Function _ params _ body -> do
+runFunction eval = interpret $ \case
+  Abstract.Function _ params body -> do
     (env, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
-    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
+    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction eval (eval body))) >>= deref)
   Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
@@ -306,7 +307,7 @@ instance ( Member (Allocator address) effects
          , Member (State TypeMap) effects
          , Ord address
          )
-      => AbstractValue address Type effects where
+      => AbstractValue term address Type effects where
   array fields = do
     var <- fresh
     fieldTypes <- traverse deref fields

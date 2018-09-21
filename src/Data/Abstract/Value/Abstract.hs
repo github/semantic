@@ -26,15 +26,16 @@ runFunction :: ( Member (Allocator address) effects
                , Ord address
                , PureEffects effects
                )
-            => Evaluator term address Abstract (Function address Abstract ': effects) a
+            => (term -> Evaluator term address Abstract (Abstract.Function term address Abstract ': effects) address)
+            -> Evaluator term address Abstract (Function term address Abstract ': effects) a
             -> Evaluator term address Abstract effects a
-runFunction = interpret $ \case
-  Function _ params _ body -> do
+runFunction eval = interpret $ \case
+  Function _ params body -> do
     env <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract
       Env.insert name addr <$> rest) (pure lowerBound) params
-    addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
+    addr <- locally (bindAll env *> catchReturn (runFunction eval (eval body)))
     deref addr
   Call _ _ params -> do
     traverse_ deref params
@@ -76,7 +77,7 @@ instance ( Member (Allocator address) effects
          , Member (State (Heap address Abstract)) effects
          , Ord address
          )
-      => AbstractValue address Abstract effects where
+      => AbstractValue term address Abstract effects where
   array _ = pure Abstract
 
   tuple _ = pure Abstract

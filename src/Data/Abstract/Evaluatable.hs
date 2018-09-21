@@ -49,7 +49,7 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
-  eval :: ( AbstractValue address value effects
+  eval :: ( AbstractValue term address value effects
           , Declarations term
           , FreeVariables term
           , Member (Allocator address) effects
@@ -60,7 +60,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
           , Member Fresh effects
-          , Member (Function address value) effects
+          , Member (Function term address value) effects
           , Member (Modules address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
@@ -93,12 +93,12 @@ type ModuleEffects address value rest
   ': Reader ModuleInfo
   ': rest
 
-type ValueEffects address value rest
-  =  Function address value
+type ValueEffects term address value rest
+  =  Function term address value
   ': Boolean value
   ': rest
 
-evaluate :: ( AbstractValue address value valueEffects
+evaluate :: ( AbstractValue term address value valueEffects
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
@@ -121,17 +121,17 @@ evaluate :: ( AbstractValue address value valueEffects
             , Ord address
             , Recursive term
             , moduleEffects ~ ModuleEffects address value effects
-            , valueEffects ~ ValueEffects address value moduleEffects
+            , valueEffects ~ ValueEffects term address value moduleEffects
             )
          => proxy lang
          -> Open (Module term -> Evaluator term address value moduleEffects address)
          -> Open (Open (term -> Evaluator term address value valueEffects (ValueRef address)))
          -> (forall x . Evaluator term address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator term address value (Reader ModuleInfo ': effects) x)
-         -> (forall x . Evaluator term address value valueEffects x -> Evaluator term address value moduleEffects x)
+         -> (forall x . (term -> Evaluator term address value valueEffects address) -> Evaluator term address value valueEffects x -> Evaluator term address value moduleEffects x)
          -> [Module term]
          -> Evaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
-  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runValue $ do
+  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runValue evalTerm $ do
     definePrelude lang
     box unit
   foldr (run preludeBinds) ask modules
@@ -143,9 +143,11 @@ evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModuleBody term = coerce runValue (do
-          result <- fix (analyzeTerm ((. project) . eval)) term >>= address
+        evalModuleBody term = runValue evalTerm (do
+          result <- evalTerm term
           result <$ postlude lang)
+
+        evalTerm = fix (analyzeTerm ((. project) . eval)) >=> address
 
         runInModule preludeBinds info
           = runReader info
@@ -163,13 +165,13 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 -- Preludes
 
 class HasPrelude (language :: Language) where
-  definePrelude :: ( AbstractValue address value effects
+  definePrelude :: ( AbstractValue term address value effects
                    , HasCallStack
                    , Member (Allocator address) effects
                    , Member (Deref value) effects
                    , Member (Env address) effects
                    , Member Fresh effects
-                   , Member (Function address value) effects
+                   , Member (Function term address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
                    , Member (Resumable (BaseError (AddressError address value))) effects
@@ -188,30 +190,30 @@ instance HasPrelude 'Java
 instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
-  definePrelude _ =
-    define (name "print") builtInPrint
+  -- definePrelude _ =
+  --   define (name "print") (builtIn Print)
 
 instance HasPrelude 'Ruby where
-  definePrelude _ = do
-    define (name "puts") builtInPrint
-
-    defineClass (name "Object") [] $ do
-      define (name "inspect") (lambda (box (string "<object>")))
+  -- definePrelude _ = do
+  --   define (name "puts") (builtIn Print)
+  --
+  --   defineClass (name "Object") [] $ do
+  --     define (name "inspect") (builtIn (Constant (string "<object>")))
 
 instance HasPrelude 'TypeScript where
-  definePrelude _ =
-    defineNamespace (name "console") $ do
-      define (name "log") builtInPrint
+  -- definePrelude _ =
+  --   defineNamespace (name "console") $ do
+  --     define (name "log") (builtIn Print)
 
 instance HasPrelude 'JavaScript where
-  definePrelude _ = do
-    defineNamespace (name "console") $ do
-      define (name "log") builtInPrint
+  -- definePrelude _ = do
+  --   defineNamespace (name "console") $ do
+  --     define (name "log") (builtIn Print)
 
 -- Postludes
 
 class HasPostlude (language :: Language) where
-  postlude :: ( AbstractValue address value effects
+  postlude :: ( AbstractValue term address value effects
               , HasCallStack
               , Member (Allocator address) effects
               , Member (Deref value) effects

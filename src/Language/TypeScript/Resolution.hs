@@ -163,7 +163,7 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: ( AbstractValue address value effects
+evalRequire :: ( AbstractValue term address value effects
                , Member (Allocator address) effects
                , Member (Deref value) effects
                , Member (Env address) effects

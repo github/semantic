@@ -68,7 +68,7 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (State (Graph ControlFlowVertex)) effects
                  , Member (State (Map (Hole context (Located address)) ControlFlowVertex)) effects
                  , Member (Resumable (BaseError (EnvironmentError (Hole context (Located address))))) effects
-                 , AbstractValue (Hole context (Located address)) value effects
+                 , AbstractValue term (Hole context (Located address)) value effects
                  , Member (Reader ControlFlowVertex) effects
                  , HasField fields Span
                  , VertexDeclaration syntax

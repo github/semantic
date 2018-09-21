@@ -30,7 +30,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval eval Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
-    (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) (freeVariables functionBody) (eval functionBody >>= address))
+    (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) functionBody)
     bind name addr
     pure (Rval addr)
     where paramNames = foldMap (maybeToList . declaredName)
@@ -63,7 +63,7 @@ instance Diffable Method where
 instance Evaluatable Method where
   eval eval Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
-    (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) (freeVariables methodBody) (eval methodBody >>= address))
+    (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) methodBody)
     bind name addr
     pure (Rval addr)
     where paramNames = foldMap (maybeToList . declaredName)
