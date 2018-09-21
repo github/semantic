@@ -190,25 +190,25 @@ instance HasPrelude 'Java
 instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
-  -- definePrelude _ =
-  --   define (name "print") (builtIn Print)
+  definePrelude _ =
+    define (name "print") (builtIn Print)
 
 instance HasPrelude 'Ruby where
-  -- definePrelude _ = do
-  --   define (name "puts") (builtIn Print)
-  --
-  --   defineClass (name "Object") [] $ do
-  --     define (name "inspect") (builtIn (Constant (string "<object>")))
+  definePrelude _ = do
+    define (name "puts") (builtIn Print)
+
+    defineClass (name "Object") [] $ do
+      define (name "inspect") (builtIn Show)
 
 instance HasPrelude 'TypeScript where
-  -- definePrelude _ =
-  --   defineNamespace (name "console") $ do
-  --     define (name "log") (builtIn Print)
+  definePrelude _ =
+    defineNamespace (name "console") $ do
+      define (name "log") (builtIn Print)
 
 instance HasPrelude 'JavaScript where
-  -- definePrelude _ = do
-  --   defineNamespace (name "console") $ do
-  --     define (name "log") (builtIn Print)
+  definePrelude _ = do
+    defineNamespace (name "console") $ do
+      define (name "log") (builtIn Print)
 
 -- Postludes
 

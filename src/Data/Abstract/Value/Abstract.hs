@@ -37,6 +37,7 @@ runFunction eval = interpret $ \case
       Env.insert name addr <$> rest) (pure lowerBound) params
     addr <- locally (bindAll env *> catchReturn (runFunction eval (eval body)))
     deref addr
+  BuiltIn _ -> pure Abstract
   Call _ _ params -> do
     traverse_ deref params
     box Abstract

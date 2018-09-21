@@ -254,6 +254,8 @@ runFunction eval = interpret $ \case
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction eval (eval body))) >>= deref)
+  Abstract.BuiltIn Print -> pure (String :-> Unit)
+  Abstract.BuiltIn Show  -> pure (Object :-> String)
   Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params

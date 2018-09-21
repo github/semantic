@@ -22,11 +22,12 @@ import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific, coefficient, normalize)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
+import Data.Text (pack)
 import Data.Word
 import Prologue
 
 data Value address term
-  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] term (Environment address)
+  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) (Environment address)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -64,8 +65,11 @@ runFunction :: ( FreeVariables term
                , Member (Resumable (BaseError (AddressError address (Value address term)))) effects
                , Member (Resumable (BaseError (ValueError address term))) effects
                , Member (State (Heap address (Value address term))) effects
+               , Member Trace effects
                , Ord address
                , PureEffects effects
+               , Show address
+               , Show term
                )
             => (term -> Evaluator term address (Value address term) (Abstract.Function term address (Value address term) ': effects) address)
             -> Evaluator term address (Value address term) (Abstract.Function term address (Value address term) ': effects) a
@@ -74,10 +78,16 @@ runFunction eval = interpret $ \case
   Abstract.Function name params body -> do
     packageInfo <- currentPackage
     moduleInfo <- currentModule
-    Closure packageInfo moduleInfo name params body <$> close (foldr Set.delete (freeVariables body) params)
+    Closure packageInfo moduleInfo name params (Right body) <$> close (foldr Set.delete (freeVariables body) params)
+  Abstract.BuiltIn builtIn -> do
+    packageInfo <- currentPackage
+    moduleInfo <- currentModule
+    pure (Closure packageInfo moduleInfo Nothing [] (Left builtIn) lowerBound)
   Abstract.Call op self params -> do
     case op of
-      Closure packageInfo moduleInfo _ names body env -> do
+      Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> box Unit
+      Closure _ _ _ _ (Left Show) _ -> deref self >>= box . String . pack . show
+      Closure packageInfo moduleInfo _ names (Right body) env -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
