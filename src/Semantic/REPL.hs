@@ -14,7 +14,6 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
-import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
@@ -89,9 +88,9 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . fmap snd
     . runState ([] @Breakpoint)
     . runReader Step
-    . id @(Evaluator _ Precise (Value Precise (ConcreteEff Precise _)) _ _)
+    . id @(Evaluator _ Precise (Value Precise _) _ _)
     . runPrintingTrace
-    . runState lowerBound
+    . runHeap
     . runFresh 0
     . fmap reassociate
     . runLoadError
@@ -106,7 +105,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . runReader (packageInfo package)
     . runState (lowerBound @Span)
     . runReader (lowerBound @Span)
-    $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runFunction coerce coerce) modules
+    $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Precise.runAllocator . Precise.runDeref) (fmap Concrete.runBoolean . Concrete.runFunction) modules
 
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without

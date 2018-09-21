@@ -75,7 +75,7 @@ cachingTerms recur0 recur term = do
       values <- consultOracle c
       cachingConfiguration c values (recur0 recur term)
 
-convergingModules :: ( AbstractValue address value effects
+convergingModules :: ( AbstractValue term address value effects
                      , Effects effects
                      , Eq value
                      , Member (Env address) effects

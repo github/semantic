@@ -97,31 +97,33 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO])))
-                              , Resumable (BaseError (AddressError Precise Val))
-                              , Resumable (BaseError ResolutionError)
-                              , Resumable (BaseError EvalError)
-                              , Resumable (BaseError (EnvironmentError Precise))
-                              , Resumable (BaseError (UnspecializedError Val))
-                              , Resumable (BaseError (LoadError Precise))
-                              , Fresh
-                              , State (Heap Precise Val)
-                              , Trace
-                              , Lift IO
-                              ]
-type TestEvaluatingErrors = '[ BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO]))
-                             , BaseError (AddressError Precise Val)
-                             , BaseError ResolutionError
-                             , BaseError EvalError
-                             , BaseError (EnvironmentError Precise)
-                             , BaseError (UnspecializedError Val)
-                             , BaseError (LoadError Precise)
-                             ]
-testEvaluating :: Evaluator term Precise Val TestEvaluatingEffects (Span, a)
+type TestEvaluatingEffects term
+  = '[ Resumable (BaseError (ValueError Precise term))
+     , Resumable (BaseError (AddressError Precise (Val term)))
+     , Resumable (BaseError ResolutionError)
+     , Resumable (BaseError EvalError)
+     , Resumable (BaseError (EnvironmentError Precise))
+     , Resumable (BaseError (UnspecializedError (Val term)))
+     , Resumable (BaseError (LoadError Precise))
+     , Fresh
+     , State (Heap Precise (Val term))
+     , Trace
+     , Lift IO
+     ]
+type TestEvaluatingErrors term
+  = '[ BaseError (ValueError Precise term)
+     , BaseError (AddressError Precise (Val term))
+     , BaseError ResolutionError
+     , BaseError EvalError
+     , BaseError (EnvironmentError Precise)
+     , BaseError (UnspecializedError (Val term))
+     , BaseError (LoadError Precise)
+     ]
+testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingEffects term) (Span, a)
                -> IO
                  ( [String]
-                 , ( Heap Precise Val
-                   , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
+                 , ( Heap Precise (Val term)
+                   , Either (SomeExc (Data.Sum.Sum (TestEvaluatingErrors term)))
                             a
                    )
                  )
@@ -137,10 +139,10 @@ testEvaluating
   . runEvalError
   . runResolutionError
   . runAddressError
-  . runValueError @_ @_ @Precise @(ConcreteEff Precise _)
+  . runValueError @_ @_ @Precise
   . fmap snd
 
-type Val = Value Precise (ConcreteEff Precise '[Trace, Lift IO])
+type Val = Value Precise
 
 
 deNamespace :: Heap Precise (Value Precise term)

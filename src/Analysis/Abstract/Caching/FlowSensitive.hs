@@ -75,7 +75,7 @@ cachingTerms recur0 recur term = do
       pairs <- consultOracle c
       cachingConfiguration c pairs (recur0 recur term)
 
-convergingModules :: ( AbstractValue address value effects
+convergingModules :: ( AbstractValue term address value effects
                      , Cacheable term address value
                      , Member Fresh effects
                      , Member NonDet effects

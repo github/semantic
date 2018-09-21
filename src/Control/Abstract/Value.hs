@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types #-}
+{-# LANGUAGE GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -28,8 +28,8 @@ module Control.Abstract.Value
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
+import Data.Abstract.Environment as Env
 import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
@@ -62,19 +62,23 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: Member (Function address value) effects => Maybe Name -> [Name] -> Set Name -> Evaluator term address value effects address -> Evaluator term address value effects value
-function name params fvs (Evaluator body) = send (Function name params fvs body)
+function :: Member (Function term address value) effects => Maybe Name -> [Name] -> term -> Evaluator term address value effects value
+function name params body = sendFunction (Function name params body)
 
-call :: Member (Function address value) effects => value -> address -> [address] -> Evaluator term address value effects address
-call fn self args = send (Call fn self args)
+call :: Member (Function term address value) effects => value -> address -> [address] -> Evaluator term address value effects address
+call fn self args = sendFunction (Call fn self args)
 
-data Function address value m result where
-  Function :: Maybe Name -> [Name] -> Set Name -> m address -> Function address value m value
-  Call     :: value -> address -> [address]   -> Function address value m address
+sendFunction :: Member (Function term address value) effects => Function term address value (Eff effects) a -> Evaluator term address value effects a
+sendFunction = send
 
-instance PureEffect (Function address value) where
-  handle handler (Request (Function name params fvs body) k) = Request (Function name params fvs (handler body)) (handler . k)
-  handle handler (Request (Call fn self addrs)            k) = Request (Call fn self addrs)                      (handler . k)
+data Function term address value (m :: * -> *) result where
+  Function :: Maybe Name -> [Name] -> term -> Function term address value m value
+  Call     :: value -> address -> [address] -> Function term address value m address
+
+instance PureEffect (Function term address value)
+instance Effect (Function term address value) where
+  handleState state handler (Request (Function name params body) k) = Request (Function name params body) (handler . (<$ state) . k)
+  handleState state handler (Request (Call fn self addrs)        k) = Request (Call fn self addrs)        (handler . (<$ state) . k)
 
 -- | Construct a boolean value in the abstract domain.
 boolean :: Member (Boolean value) effects => Bool -> Evaluator term address value effects value
@@ -139,7 +143,7 @@ class Show value => AbstractIntro value where
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class AbstractIntro value => AbstractValue address value effects where
+class AbstractIntro value => AbstractValue term address value effects where
   -- | Cast numbers to integers
   castToInteger :: value -> Evaluator term address value effects value
 
@@ -211,7 +215,7 @@ class AbstractIntro value => AbstractValue address value effects where
 
 
 -- | C-style for loops.
-forLoop :: ( AbstractValue address value effects
+forLoop :: ( AbstractValue term address value effects
            , Member (Boolean value) effects
            , Member (Env address) effects
            )
@@ -224,7 +228,7 @@ forLoop initial cond step body =
   locally (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
-while :: (AbstractValue address value effects, Member (Boolean value) effects)
+while :: (AbstractValue term address value effects, Member (Boolean value) effects)
       => Evaluator term address value effects value
       -> Evaluator term address value effects value
       -> Evaluator term address value effects value
@@ -233,7 +237,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) (pure unit)
 
 -- | Do-while loop, built on top of while.
-doWhile :: (AbstractValue address value effects, Member (Boolean value) effects)
+doWhile :: (AbstractValue term address value effects, Member (Boolean value) effects)
         => Evaluator term address value effects value
         -> Evaluator term address value effects value
         -> Evaluator term address value effects value
@@ -241,7 +245,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue (pure unit)
 
-makeNamespace :: ( AbstractValue address value effects
+makeNamespace :: ( AbstractValue term address value effects
                  , Member (Deref value) effects
                  , Member (Env address) effects
                  , Member (State (Heap address value)) effects
@@ -259,7 +263,7 @@ makeNamespace name addr super body = do
 
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
-evaluateInScopedEnv :: ( AbstractValue address value effects
+evaluateInScopedEnv :: ( AbstractValue term address value effects
                        , Member (Env address) effects
                        )
                     => address
@@ -272,7 +276,7 @@ evaluateInScopedEnv receiver term = do
 
 
 -- | Evaluates a 'Value' returning the referenced value
-value :: ( AbstractValue address value effects
+value :: ( AbstractValue term address value effects
          , Member (Deref value) effects
          , Member (Env address) effects
          , Member (Reader ModuleInfo) effects
@@ -287,7 +291,7 @@ value :: ( AbstractValue address value effects
 value = deref <=< address
 
 -- | Evaluates a 'Subterm' to its rval
-subtermValue :: ( AbstractValue address value effects
+subtermValue :: ( AbstractValue term address value effects
                 , Member (Deref value) effects
                 , Member (Env address) effects
                 , Member (Reader ModuleInfo) effects
@@ -302,7 +306,7 @@ subtermValue :: ( AbstractValue address value effects
 subtermValue = value <=< subtermRef
 
 -- | Returns the address of a value referenced by a 'ValueRef'
-address :: ( AbstractValue address value effects
+address :: ( AbstractValue term address value effects
            , Member (Env address) effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
@@ -315,7 +319,7 @@ address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
 address (Rval addr)           = pure addr
 
 -- | Evaluates a 'Subterm' to the address of its rval
-subtermAddress :: ( AbstractValue address value effects
+subtermAddress :: ( AbstractValue term address value effects
                   , Member (Env address) effects
                   , Member (Reader ModuleInfo) effects
                   , Member (Reader Span) effects
