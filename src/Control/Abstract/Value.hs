@@ -6,6 +6,8 @@ module Control.Abstract.Value
 -- * Value effects
 -- $valueEffects
 , function
+, BuiltIn(..)
+, builtIn
 , call
 , Function(..)
 , boolean
@@ -65,6 +67,14 @@ data Comparator
 function :: Member (Function term address value) effects => Maybe Name -> [Name] -> term -> Evaluator term address value effects value
 function name params body = sendFunction (Function name params body)
 
+data BuiltIn
+  = Print
+  | Show
+  deriving (Eq, Ord, Show)
+
+builtIn :: Member (Function term address value) effects => BuiltIn -> Evaluator term address value effects value
+builtIn = sendFunction . BuiltIn
+
 call :: Member (Function term address value) effects => value -> address -> [address] -> Evaluator term address value effects address
 call fn self args = sendFunction (Call fn self args)
 
@@ -73,11 +83,13 @@ sendFunction = send
 
 data Function term address value (m :: * -> *) result where
   Function :: Maybe Name -> [Name] -> term -> Function term address value m value
+  BuiltIn  :: BuiltIn -> Function term address value m value
   Call     :: value -> address -> [address] -> Function term address value m address
 
 instance PureEffect (Function term address value)
 instance Effect (Function term address value) where
   handleState state handler (Request (Function name params body) k) = Request (Function name params body) (handler . (<$ state) . k)
+  handleState state handler (Request (BuiltIn builtIn)           k) = Request (BuiltIn builtIn)           (handler . (<$ state) . k)
   handleState state handler (Request (Call fn self addrs)        k) = Request (Call fn self addrs)        (handler . (<$ state) . k)
 
 -- | Construct a boolean value in the abstract domain.

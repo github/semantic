@@ -62,3 +62,4 @@ runPythonPackaging = Eff.interpose @(Function term address (Value address term))
       _ -> pure ()
     call callName super params
   Function name params body ->  function name params body
+  BuiltIn b -> builtIn b
