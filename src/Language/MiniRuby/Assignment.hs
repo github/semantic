@@ -12,7 +12,6 @@ import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
 import           Data.List (elem)
-import           Data.Record
 import           Data.Sum
 import           Data.Syntax
     ( contextualize
@@ -55,7 +54,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 assignment :: Assignment Term
@@ -210,7 +209,7 @@ withNewScope inner = withExtendedScope $ do
   putLocals []
   inner
 
-identWithLocals :: Assignment (Record Location, Text, [Text])
+identWithLocals :: Assignment (Location, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getLocals first

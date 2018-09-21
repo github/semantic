@@ -10,7 +10,7 @@ import Data.AST
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields
-import Data.Record
+import Data.Location
 import Data.Term
 import Data.Graph.DiffVertex
 import Diffing.Algorithm (Diffable)

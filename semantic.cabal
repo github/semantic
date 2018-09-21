@@ -91,6 +91,7 @@ library
                      , Data.History
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Location
                      , Data.Map.Monoidal
                      , Data.Proto.DiffTree
                      , Data.Proto.ParseTree

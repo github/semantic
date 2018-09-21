@@ -71,7 +71,6 @@ import           Control.Monad.Effect
 import           Control.Monad.Effect.Trace
 import           Data.Functor.Identity
 import           Data.Profunctor
-import           Data.Record
 import qualified Data.Sum as Sum hiding (apply)
 import           Data.Text (pack)
 
@@ -335,7 +334,7 @@ generate' x = termIn <$> (termAnnotation . snd <$> context) <*> pure (Sum.inject
 
 -- | If we are operating in a History context, tag the provided sum
 -- with a 'Refactored' annotation derived from the current context.
-modified :: (Apply Functor syn, f :< syn, term ~ Term (Sum syn) (Record (History : fields)))
+modified :: (Apply Functor syn, f :< syn, term ~ Term (Sum syn) History)
          => f term
          -> Rule (env, term) a term
 modified x = History.remark Refactored <$> generate' x
@@ -343,9 +342,9 @@ modified x = History.remark Refactored <$> generate' x
 -- | Mark the provided functor with a 'Refactored' version of the original
 -- 'Term'. This is useful for passing in to 'somewhere''.
 markRefactored :: (Apply Functor fs, g :< fs)
-               => Term (Sum fs) (Record (History ': fields))
-               -> g (Term (Sum fs) (Record (History ': fields)))
-               -> Term (Sum fs) (Record (History ': fields))
+               => Term (Sum fs) History
+               -> g (Term (Sum fs) History)
+               -> Term (Sum fs) History
 markRefactored old t = remark Refactored (termIn (annotation old) (inject t))
 
 

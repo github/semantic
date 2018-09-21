@@ -29,8 +29,8 @@ import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex
-import           Data.Record
 import           Data.Term
+import           Data.Location
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
 import           Prologue hiding (project)
@@ -70,14 +70,13 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (Resumable (BaseError (EnvironmentError (Hole context (Located address))))) effects
                  , AbstractValue (Hole context (Located address)) value effects
                  , Member (Reader ControlFlowVertex) effects
-                 , HasField fields Span
                  , VertexDeclaration syntax
                  , Declarations1 syntax
                  , Ord address
                  , Ord context
                  , Foldable syntax
                  , Functor syntax
-                 , term ~ Term syntax (Record fields)
+                 , term ~ Term syntax Location
                  )
               => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
               -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))

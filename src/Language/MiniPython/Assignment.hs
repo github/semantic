@@ -12,7 +12,6 @@ module Language.MiniPython.Assignment
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
-import           Data.Record
 import           Data.Sum
 import           Data.Syntax
     ( contextualize
@@ -59,7 +58,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.

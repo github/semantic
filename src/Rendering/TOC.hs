@@ -6,6 +6,7 @@ module Rendering.TOC
 , diffTOC
 , Summaries(..)
 , TOCSummary(..)
+, Annotation
 , isValidSummary
 , getDeclaration
 , declaration
@@ -28,8 +29,7 @@ import Data.List (sortOn)
 import qualified Data.List as List
 import qualified Data.Map as Map
 import Data.Patch
-import Data.Record
-import Data.Span
+import Data.Location
 import Data.Term
 import qualified Data.Text as T
 
@@ -65,12 +65,14 @@ isValidSummary :: TOCSummary -> Bool
 isValidSummary ErrorSummary{} = False
 isValidSummary _ = True
 
+type Annotation = (Maybe Declaration, Location)
 
-getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
-getDeclaration = getField
+
+getDeclaration :: Annotation -> Maybe Declaration
+getDeclaration = fst
 
 -- | Produce the annotations of nodes representing declarations.
-declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
+declaration :: TermF f Annotation a -> Maybe Annotation
 declaration (In annotation _) = annotation <$ getDeclaration annotation
 
 
@@ -114,12 +116,12 @@ newtype DedupeKey = DedupeKey (Maybe T.Text, Maybe T.Text) deriving (Eq, Ord)
 -- 2. Two similar entries (defined by a case insensitive comparision of their
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
-dedupe :: forall fields. HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
+dedupe :: [Entry Annotation] -> [Entry Annotation]
 dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in (fmap . fmap) snd tuples
   where
-    go :: (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
-       -> Entry (Record fields)
-       -> (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
+    go :: (Int, Map.Map DedupeKey (Int, Entry Annotation))
+       -> Entry Annotation
+       -> (Int, Map.Map DedupeKey (Int, Entry Annotation))
     go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m
                     = if exactMatch similar x
                       then (succ index, m)
@@ -132,7 +134,7 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     exactMatch = (==) `on` (getDeclaration . entryPayload)
 
 -- | Construct a 'TOCSummary' from an 'Entry'.
-entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe TOCSummary
+entrySummary :: Entry Annotation -> Maybe TOCSummary
 entrySummary entry = case entry of
   Changed  a -> recordSummary "modified" a
   Deleted  a -> recordSummary "removed" a
@@ -140,41 +142,41 @@ entrySummary entry = case entry of
   Replaced a -> recordSummary "modified" a
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
-recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => T.Text -> Record fields -> Maybe TOCSummary
+recordSummary :: T.Text -> Annotation -> Maybe TOCSummary
 recordSummary changeText record = case getDeclaration record of
-  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (getField record) language
-  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (getField record) changeText
+  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (locationSpan (snd record)) language
+  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (locationSpan (snd record)) changeText
   Nothing -> Nothing
   where
     formatIdentifier (MethodDeclaration identifier _ Language.Go        (Just receiver)) = "(" <> receiver <> ") " <> identifier
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> Summaries
+renderToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f Annotation Annotation -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
-renderRPCToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> ([TOCSummary], [TOCSummary])
+renderRPCToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f Annotation Annotation -> ([TOCSummary], [TOCSummary])
 renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
+diffTOC :: (Foldable f, Functor f) => Diff f Annotation Annotation -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration
   where
-    extraDeclarations :: HasField fields (Maybe Declaration) => Entry (Record fields) -> Bool
+    extraDeclarations :: Entry Annotation -> Bool
     extraDeclarations entry = case getDeclaration (entryPayload entry) of
       Just ImportDeclaration{..} -> False
       Just CallReference{..} -> False
       _ -> True
 
-renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
+renderToCTerm :: (Foldable f, Functor f) => Blob -> Term f Annotation -> Summaries
 renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where
     toMap [] = mempty
     toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-    termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [TOCSummary]
+    termToC :: (Foldable f, Functor f) => Term f Annotation -> [TOCSummary]
     termToC = mapMaybe (recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name

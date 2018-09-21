@@ -8,9 +8,8 @@ where
 
 import Assigning.Assignment.Deterministic hiding (Assignment)
 import qualified Assigning.Assignment.Deterministic as Deterministic
-import Data.AST
-import Data.Record
 import Data.Sum
+import Data.Location
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
@@ -31,7 +30,7 @@ type Syntax =
   , Syntax.Error
   ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Deterministic.Assignment Grammar
 
 instance Named1 (Sum Syntax) where
