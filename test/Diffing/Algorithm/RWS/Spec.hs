@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, TypeOperators #-}
 module Diffing.Algorithm.RWS.Spec where
 
 import Analysis.Decorator
