@@ -18,11 +18,11 @@ module Control.Abstract.Value
 , forLoop
 , makeNamespace
 , evaluateInScopedEnv
-, address
+-- , address
 -- , value
 -- , rvalBox
 -- , subtermValue
-, subtermAddress
+-- , subtermAddress
 ) where
 
 import Control.Abstract.ScopeGraph (Declaration)
@@ -305,28 +305,28 @@ evaluateInScopedEnv receiver term = do
 -- subtermValue = value <=< subtermRef
 
 -- | Returns the address of a value referenced by a 'ValueRef'
-address :: ( AbstractValue address value effects
-           , Member (Env address) effects
-           , Member (Reader ModuleInfo) effects
-           , Member (Reader Span) effects
-           , Member (Resumable (BaseError (EnvironmentError address))) effects
-           )
-        => ValueRef address
-        -> Evaluator address value effects address
-address (LvalLocal var)       = variable var
-address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
-address (Rval addr)           = pure addr
+-- address :: ( AbstractValue address value effects
+--            , Member (Env address) effects
+--            , Member (Reader ModuleInfo) effects
+--            , Member (Reader Span) effects
+--            , Member (Resumable (BaseError (EnvironmentError address))) effects
+--            )
+--         => ValueRef address
+--         -> Evaluator address value effects address
+-- address (LvalLocal var)       = variable var
+-- address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
+-- address (Rval addr)           = pure addr
 
 -- | Evaluates a 'Subterm' to the address of its rval
-subtermAddress :: ( AbstractValue address value effects
-                  , Member (Env address) effects
-                  , Member (Reader ModuleInfo) effects
-                  , Member (Reader Span) effects
-                  , Member (Resumable (BaseError (EnvironmentError address))) effects
-                  )
-               => Subterm term (Evaluator address value effects (ValueRef address))
-               -> Evaluator address value effects address
-subtermAddress = address <=< subtermRef
+-- subtermAddress :: ( AbstractValue address value effects
+--                   , Member (Env address) effects
+--                   , Member (Reader ModuleInfo) effects
+--                   , Member (Reader Span) effects
+--                   , Member (Resumable (BaseError (EnvironmentError address))) effects
+--                   )
+--                => Subterm term (Evaluator address value effects (ValueRef address))
+--                -> Evaluator address value effects address
+-- subtermAddress = address <=< subtermRef
 
 -- -- | Convenience function for boxing a raw value and wrapping it in an Rval
 -- rvalBox :: ( Member (Allocator address) effects
