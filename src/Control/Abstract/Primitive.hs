@@ -13,7 +13,7 @@ import Data.Abstract.Environment
 import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Control.Abstract.ScopeGraph (Declaration(..))
+import Control.Abstract.ScopeGraph (Declaration(..), declare, ScopeEnv, currentScope, newScope, EdgeLabel(..), withScope)
 import Control.Abstract.Heap
 import Control.Abstract.Value
 import qualified Data.Abstract.Environment as Env
@@ -22,28 +22,32 @@ import qualified Data.Abstract.Name as Name
 import Data.Abstract.Name (Name)
 import Data.Text (unpack)
 import Prologue
+import qualified Data.Map.Strict as Map
 
 define :: ( HasCallStack
-          , Member (Allocator address) effects
+          , Member (Allocator (Address address)) effects
           , Member (Deref value) effects
           , Member (Env address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           , Member (State (Heap address address value)) effects
+          , Member (ScopeEnv address) effects
           , Ord address
           )
        => Declaration
        -> Evaluator address value effects value
        -> Evaluator address value effects ()
 define declaration def = withCurrentCallStack callStack $ do
-  addr <- alloc (name declaration)
-  def >>= assign addr declaration
+  span <- ask @Span -- TODO: This Span is most definitely wrong
+  addr <- declare declaration span Nothing
+  def >>= assign addr
   -- TODO: This probably needs to declare something in the scope graph.
-  bind (name declaration) addr -- TODO: Insert something in the heap
+  bind (name declaration) (Control.Abstract.Heap.address addr) -- TODO: Insert something in the heap
 
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
-               , Member (Allocator address) effects
+               , Member (Allocator (Address address)) effects
+               , Member (ScopeEnv address) effects
                , Member (Deref value) effects
                , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
@@ -61,7 +65,8 @@ defineClass declaration superclasses body = define declaration $ do
 
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
-                   , Member (Allocator address) effects
+                   , Member (Allocator (Address address)) effects
+                   , Member (ScopeEnv address) effects
                    , Member (Deref value) effects
                    , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
@@ -123,7 +128,8 @@ builtInPrint :: ( AbstractValue address value effects
                 )
              => Evaluator address value effects value
 -- TODO: This Declaration usage might be wrong. How do we know name exists.
-builtInPrint = lambda (\ v -> variable v >>= flip deref (Declaration v)  >>= asString >>= trace . unpack >> box unit)
+builtInPrint =
+  lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> currentFrame) -- box unit)
 
 builtInExport :: ( AbstractValue address value effects
                  , HasCallStack
