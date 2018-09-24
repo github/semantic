@@ -14,7 +14,7 @@ module Control.Abstract.Environment
 , close
 , self
 -- , letrec
-, letrec'
+-- , letrec'
 , variable
 -- * Effects
 , Env(..)
@@ -87,13 +87,13 @@ close = send . Close
 self :: Member (Env address) effects => Evaluator address value effects (Maybe address)
 self = ctxSelf <$> getEvalContext
 
--- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( Member (Allocator address) effects
-                 , Member (Env address) effects
-                 )
-              => Name
-              -> Evaluator address value effects address
-lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
+-- -- | Look up or allocate an address for a 'Name'.
+-- lookupOrAlloc :: ( Member (Allocator address) effects
+--                  , Member (Env address) effects
+--                  )
+--               => Name
+--               -> Evaluator address value effects address
+-- lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 -- letrec :: ( Member (Allocator address) effects
 --           , Member (Deref value) effects
@@ -111,26 +111,25 @@ lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 --   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( Member (Allocator address) effects
-           , Member (Env address) effects
-           )
-        => Name
-        -> (address -> Evaluator address value effects a)
-        -> Evaluator address value effects a
-letrec' name body = do
-  addr <- lookupOrAlloc name
-  v <- locally (body addr)
-  v <$ bind name addr
+-- letrec' :: ( Member (Allocator address) effects
+--            , Member (Env address) effects
+--            )
+--         => Name
+--         -> (address -> Evaluator address value effects a)
+--         -> Evaluator address value effects a
+-- letrec' name body = do
+--   addr <- lookupOrAlloc name
+--   v <- locally (body addr)
+--   v <$ bind name addr
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Env address) effects
-            , Member (Reader ModuleInfo) effects
+variable :: ( Member (Reader ModuleInfo) effects
             , Member (Reader Span) effects
             , Member (Resumable (BaseError (EnvironmentError address))) effects
             )
          => Name
-         -> Evaluator address value effects address
-variable name = lookupEnv name >>= maybeM (freeVariableError name)
+         -> Evaluator address value effects (Address address)
+variable name = undefined -- lookupEnv name >>= maybeM (freeVariableError name)
 
 -- Effects
 
