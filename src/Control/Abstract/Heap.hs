@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Control.Abstract.Heap
 ( Heap
 , Address(..)
@@ -46,6 +46,13 @@ putHeap = put
 modifyHeap :: Member (State (Heap address address value)) effects => (Heap address address value -> Heap address address value) -> Evaluator address value effects ()
 modifyHeap = modify'
 
+currentFrame :: forall address value effects. ( Member (State (Heap address address value)) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Member (Resumable (BaseError (HeapError address))) effects
+                )
+             => Evaluator address value effects address
+currentFrame = maybeM (throwHeapError EmptyHeapError) =<< (Heap.currentFrame <$> get @(Heap address address value))
 -- box :: ( Member (Allocator address) effects
 --        , Member (Deref value) effects
 --        , Member Fresh effects
@@ -123,7 +130,7 @@ reachable roots heap = go mempty roots
 -- Effects
 
 data Allocator address (m :: * -> *) return where
-  Alloc   :: Name    -> Allocator address m address
+  Alloc :: Name -> Allocator address m address
 
 data Deref value (m :: * -> *) return where
   DerefCell  :: Set value          -> Deref value m (Maybe value)
