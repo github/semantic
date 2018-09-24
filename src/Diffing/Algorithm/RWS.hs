@@ -31,11 +31,11 @@ import Prologue
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
 
 rws :: (Foldable syntax, Functor syntax, Diffable syntax)
-    => ComparabilityRelation syntax (FeatureVector, Location) (FeatureVector, Location)
-    -> (Term syntax (FeatureVector, Location) -> Term syntax (FeatureVector, Location) -> Bool)
-    -> [Term syntax (FeatureVector, Location)]
-    -> [Term syntax (FeatureVector, Location)]
-    -> EditScript (Term syntax (FeatureVector, Location)) (Term syntax (FeatureVector, Location))
+    => ComparabilityRelation syntax (FeatureVector, DiffAnnotation a) (FeatureVector, DiffAnnotation a)
+    -> (Term syntax (FeatureVector, DiffAnnotation a) -> Term syntax (FeatureVector, DiffAnnotation a) -> Bool)
+    -> [Term syntax (FeatureVector, DiffAnnotation a)]
+    -> [Term syntax (FeatureVector, DiffAnnotation a)]
+    -> EditScript (Term syntax (FeatureVector, DiffAnnotation a)) (Term syntax (FeatureVector, DiffAnnotation a))
 rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
@@ -97,7 +97,7 @@ defaultP = 0
 defaultQ = 3
 
 
-toKdMap :: [(Int, Term syntax (FeatureVector, Location))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (FeatureVector, Location))
+toKdMap :: [(Int, Term syntax (FeatureVector, DiffAnnotation a))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (FeatureVector, DiffAnnotation a))
 toKdMap = KdMap.build unFV . fmap (fst . termAnnotation . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
@@ -106,12 +106,12 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
 defaultFeatureVectorDecorator :: (Hashable1 syntax, Traversable syntax)
-                              => Term syntax Location
-                              -> Term syntax (FeatureVector, Location)
+                              => Term syntax (DiffAnnotation a)
+                              -> Term syntax (FeatureVector, DiffAnnotation a)
 defaultFeatureVectorDecorator = featureVectorDecorator . pqGramDecorator defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Foldable syntax, Functor syntax, Hashable label) => Term syntax (Gram label, Location) -> Term syntax (FeatureVector, Location)
+featureVectorDecorator :: (Foldable syntax, Functor syntax, Hashable label) => Term syntax (Gram label, DiffAnnotation a) -> Term syntax (FeatureVector, DiffAnnotation a)
 featureVectorDecorator = cata (\ (In (label, ann) functor) ->
   termIn (foldl' addSubtermVector (unitVector (hash label)) functor, ann) functor)
   where addSubtermVector v term = addVectors v (fst (termAnnotation term))
@@ -120,8 +120,8 @@ featureVectorDecorator = cata (\ (In (label, ann) functor) ->
 pqGramDecorator :: Traversable syntax
                 => Int                                         -- ^ 'p'; the desired stem length for the grams.
                 -> Int                                         -- ^ 'q'; the desired base length for the grams.
-                -> Term syntax Location                        -- ^ The term to decorate.
-                -> Term syntax (Gram (Label syntax), Location) -- ^ The decorated term.
+                -> Term syntax (DiffAnnotation a)-- ^ The term to decorate.
+                -> Term syntax (Gram (Label syntax), DiffAnnotation a) -- ^ The decorated term.
 pqGramDecorator p q = cata algebra
   where
     algebra term = let label = Label (termFOut term) in
@@ -130,13 +130,13 @@ pqGramDecorator p q = cata algebra
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
     assignLabels :: label
-                 -> Term syntax (Gram label, Location)
-                 -> State [Maybe label] (Term syntax (Gram label, Location))
+                 -> Term syntax (Gram label, DiffAnnotation a)
+                 -> State [Maybe label] (Term syntax (Gram label, DiffAnnotation a))
     assignLabels label (Term.Term (In (gram, rest) functor)) = do
       labels <- get
       put (drop 1 labels)
       pure $! termIn (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels }, rest) functor
-    siblingLabels :: Traversable syntax => syntax (Term syntax (Gram label, Location)) -> [Maybe label]
+    siblingLabels :: Traversable syntax => syntax (Term syntax (Gram label, DiffAnnotation a)) -> [Maybe label]
     siblingLabels = foldMap (base . fst . termAnnotation)
     padToSize n list = take n (list <> repeat empty)
 
