@@ -105,10 +105,17 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
     lambda' (var : vars) (body var)
   {-# INLINE lambda' #-}
 
-instance (Member Fresh effects, Member (Function address value) effects) => Lambda address value effects (Evaluator address value effects address) where
+instance (Member Fresh effects, Member (Function address value) effects, Member (ScopeEnv address) effects) => Lambda address value effects (Evaluator address value effects address) where
   lambda' vars action = do
     name <- Name.gensym
-    function name vars lowerBound action
+    span <- ask @Span -- TODO: This span is probably wrong
+    currentScope' <- currentScope
+    address <- declare (Declaration name) span Nothing
+    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+    functionScope <- newScope edges
+    withScope functionScope $
+      newFrame functionScope
+      function name vars lowerBound action
   {-# INLINE lambda' #-}
 
 builtInPrint :: ( AbstractValue address value effects
