@@ -2,11 +2,14 @@ module Data.Location
   ( Location(..)
   , Span(..)
   , Range(..)
+  , DiffAnnotation
   ) where
 
 import Data.JSON.Fields
 import Data.Range
 import Data.Span
+
+type DiffAnnotation a = (a, Location)
 
 -- | A location specified as possibly-empty intervals of bytes and line/column positions.
 -- type Location = '[Range, Span]
