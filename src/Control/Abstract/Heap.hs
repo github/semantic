@@ -140,6 +140,31 @@ instance Effect (Deref value) where
   handleState c dist (Request (DerefCell cell) k) = Request (DerefCell cell) (dist . (<$ c) . k)
   handleState c dist (Request (AssignCell value cell) k) = Request (AssignCell  value cell) (dist . (<$ c) . k)
 
+data HeapError address resume where
+  EmptyHeapError :: HeapError address address
+
+deriving instance Eq address => Eq (HeapError address resume)
+deriving instance Show address => Show (HeapError address resume)
+instance Show address => Show1 (HeapError address) where
+  liftShowsPrec _ _ = showsPrec
+instance Eq address => Eq1 (HeapError address) where
+  liftEq _ EmptyHeapError EmptyHeapError = True
+
+throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   )
+                => HeapError address resume
+                -> Evaluator address value effects resume
+throwHeapError = throwBaseError
+
+runHeapError :: ( Effectful (m address value)
+                   , Effects effects
+                   )
+                => m address value (Resumable (BaseError (HeapError address)) ': effects) a
+                -> m address value effects (Either (SomeExc (BaseError (HeapError address))) a)
+runHeapError = runResumable
+
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Set value)
   UninitializedAddress :: address -> AddressError address value value
