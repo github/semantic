@@ -9,6 +9,7 @@ module Data.Abstract.Heap
   , setSlot
   , initFrame
   , heapSize
+  , currentFrame
   , Address(..)
   , Position(..)
   ) where
@@ -32,12 +33,12 @@ data Frame scopeAddress frameAddress value = Frame {
   }
   deriving (Eq, Ord, Show)
 
-newtype Heap scopeAddress frameAddress value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress value) }
+data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
     deriving (Eq, Ord, Show)
 
 -- | Look up the frame for an 'address' in a 'Heap', if any.
 frameLookup :: Ord address => address -> Heap scope address value -> Maybe (Frame scope address value)
-frameLookup address = Map.lookup address . unHeap
+frameLookup address = Map.lookup address . heap
 
 -- | Look up the scope address for a given frame address.
 scopeLookup :: Ord address => address -> Heap scope address value -> Maybe scope
@@ -53,11 +54,11 @@ getSlot :: Ord address => Address address -> Heap address address value -> Maybe
 getSlot Address{..} = (IntMap.lookup (unPosition position) =<<) . frameSlots address
 
 setSlot :: Ord address => Address address -> Set value -> Heap scope address value -> Heap scope address value
-setSlot Address{..} value heap =
-    case frameLookup address heap of
+setSlot Address{..} value h@Heap{} =
+    case frameLookup address h of
       Just frame -> let slotMap = slots frame in
-        Heap $ Map.insert address (frame { slots = IntMap.insert (unPosition position) value slotMap }) (unHeap heap)
-      Nothing -> heap
+        h { heap = Map.insert address (frame { slots = IntMap.insert (unPosition position) value slotMap }) (heap h) }
+      Nothing -> h
 
 lookup :: (Ord address, Ord scope) => Heap scope address value -> address -> Path scope -> Declaration -> Maybe scope
 lookup heap address (DPath d _) declaration = guard (d == declaration) >> scopeLookup address heap
@@ -74,7 +75,7 @@ initFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope addre
 initFrame scope address links slots = fillFrame address slots . newFrame scope address links
 
 insertFrame :: Ord address => address -> Frame scope address value -> Heap scope address value -> Heap scope address value
-insertFrame address frame = Heap . Map.insert address frame . unHeap
+insertFrame address frame h@Heap{..} = h { heap = (Map.insert address frame heap) }
 
 fillFrame :: Ord address => address -> IntMap (Set value) -> Heap scope address value -> Heap scope address value
 fillFrame address slots heap =
@@ -83,11 +84,11 @@ fillFrame address slots heap =
     Nothing    -> heap
 
 deleteFrame :: Ord address => address -> Heap scope address value -> Heap scope address value
-deleteFrame address = Heap . Map.delete address . unHeap
+deleteFrame address h@Heap{..} = h { heap = Map.delete address heap }
 
 -- | The number of frames in the `Heap`.
 heapSize :: Heap scope address value -> Int
-heapSize = Map.size . unHeap
+heapSize = Map.size . heap
 
 -- -- | A map of addresses onto cells holding their values.
 -- newtype Heap address value = Heap { unHeap :: Monoidal.Map address (Set value) }
