@@ -154,7 +154,7 @@ builtInExport :: ( AbstractValue address value effects
                  )
               => Evaluator address value effects value
 builtInExport = lambda (\ v -> do
-  var <- variable v >>= flip deref (Declaration v)
+  var <- variable v >>= deref
   (k, value) <- asPair var
   sym <- asString k
   addr <- box value
