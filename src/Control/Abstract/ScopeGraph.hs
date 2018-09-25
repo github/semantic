@@ -14,6 +14,9 @@ module Control.Abstract.ScopeGraph
   , withScope
   , associatedScope
   , putDeclarationScope
+  , Allocator(..)
+  , alloc
+  , Address(..)
   ) where
 
 import           Control.Abstract.Evaluator hiding (Local)
@@ -90,3 +93,14 @@ deriving instance Eq (ScopeError address return)
 deriving instance Show (ScopeError address return)
 instance Show address => Show1 (ScopeError address) where liftShowsPrec _ _ = showsPrec
 instance Eq address => Eq1 (ScopeError address) where liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
+
+alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
+alloc = send . Alloc
+
+data Allocator address (m :: * -> *) return where
+  Alloc :: Name -> Allocator address m address
+
+instance PureEffect (Allocator address)
+
+instance Effect (Allocator address) where
+  handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
