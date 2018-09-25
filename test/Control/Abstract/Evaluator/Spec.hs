@@ -57,7 +57,7 @@ evaluate
 reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
 reassociate = mergeExcs . mergeExcs . mergeExcs . Right
 
-type Val = Value Precise SpecEff
+type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
   { runSpecEff :: Eff '[ Function SpecEff Precise Val
                        , Boolean Val
@@ -68,7 +68,7 @@ newtype SpecEff = SpecEff
                        , Deref Val
                        , Resumable (BaseError (AddressError Precise Val))
                        , Resumable (BaseError (EnvironmentError Precise))
-                       , Resumable (BaseError (ValueError Precise SpecEff))
+                       , Resumable (BaseError (ValueError SpecEff Precise))
                        , Reader Span
                        , Reader ModuleInfo
                        , Reader PackageInfo

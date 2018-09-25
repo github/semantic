@@ -198,7 +198,7 @@ runImportGraph lang (package :: Package term) f =
       runAddressEffects
         = Hole.runAllocator Precise.handleAllocator
         . Hole.runDeref Precise.handleDeref
-  in extractGraph <$> runEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) _) (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (fmap Concrete.runBoolean . Concrete.runFunction) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+  in extractGraph <$> runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise)) (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (fmap Concrete.runBoolean . Concrete.runFunction) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 
 runHeap :: Effects effects => Evaluator term address value (State (Heap address value) ': effects) a -> Evaluator term address value effects (Heap address value, a)
@@ -241,9 +241,9 @@ parsePythonPackage :: forall syntax fields effs term.
                    -> Project           -- ^ Project to parse into a package.
                    -> Eff effs (Package term)
 parsePythonPackage parser project = do
-  let runAnalysis = runEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) term)
+  let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
         . runState PythonPackage.Unknown
-        . runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value (Hole (Maybe Name) Precise) term)))
+        . runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise))))
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -373,8 +373,8 @@ resumingValueError :: ( Effects effects
                       , Show address
                       , Show term
                       )
-                   => Evaluator term address (Value address term) (Resumable (BaseError (ValueError address term)) ': effects) a
-                   -> Evaluator term address (Value address term) effects a
+                   => Evaluator term address (Value term address) (Resumable (BaseError (ValueError term address)) ': effects) a
+                   -> Evaluator term address (Value term address) effects a
 resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
   CallError val     -> pure val
   StringError val   -> pure (pack (prettyShow val))

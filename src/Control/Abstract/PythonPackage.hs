@@ -22,24 +22,24 @@ runPythonPackaging :: forall effects term address a. (
                       , Show address
                       , Show term
                       , Member Trace effects
-                      , Member (Boolean (Value address term)) effects
-                      , Member (State (Heap address (Value address term))) effects
-                      , Member (Resumable (BaseError (AddressError address (Value address term)))) effects
-                      , Member (Resumable (BaseError (ValueError address term))) effects
+                      , Member (Boolean (Value term address)) effects
+                      , Member (State (Heap address (Value term address))) effects
+                      , Member (Resumable (BaseError (AddressError address (Value term address)))) effects
+                      , Member (Resumable (BaseError (ValueError term address))) effects
                       , Member Fresh effects
                       , Member (State Strategy) effects
                       , Member (Allocator address) effects
-                      , Member (Deref (Value address term)) effects
+                      , Member (Deref (Value term address)) effects
                       , Member (Env address) effects
                       , Member (Eff.Exc (LoopControl address)) effects
                       , Member (Eff.Exc (Return address)) effects
                       , Member (Eff.Reader ModuleInfo) effects
                       , Member (Eff.Reader PackageInfo) effects
                       , Member (Eff.Reader Span) effects
-                      , Member (Function term address (Value address term)) effects)
-                   => Evaluator term address (Value address term) effects a
-                   -> Evaluator term address (Value address term) effects a
-runPythonPackaging = Eff.interpose @(Function term address (Value address term)) $ \case
+                      , Member (Function term address (Value term address)) effects)
+                   => Evaluator term address (Value term address) effects a
+                   -> Evaluator term address (Value term address) effects a
+runPythonPackaging = Eff.interpose @(Function term address (Value term address)) $ \case
   Call callName super params -> do
     case callName of
       Closure _ _ name' paramNames _ _ -> do

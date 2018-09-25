@@ -88,7 +88,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . fmap snd
     . runState ([] @Breakpoint)
     . runReader Step
-    . id @(Evaluator _ Precise (Value Precise _) _ _)
+    . id @(Evaluator _ Precise (Value _ Precise) _ _)
     . runPrintingTrace
     . runHeap
     . runFresh 0

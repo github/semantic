@@ -100,7 +100,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (id @(Evaluator _ Precise (Value Precise _) _ _)
+  pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (runModules (ModuleTable.modulePaths (packageModules package))
        (runReader (packageInfo package)
@@ -113,7 +113,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
   package <- fmap quieterm <$> parsePythonPackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (id @(Evaluator _ Precise (Value Precise _) _ _)
+  pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
        (runModules (ModuleTable.modulePaths (packageModules package))
        (runReader (packageInfo package)
