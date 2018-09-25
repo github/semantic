@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables #-}
 module Semantic.Diff
   ( runDiff
+  , unitAlgebra
   , diffBlobTOCPairs
   ) where
 
