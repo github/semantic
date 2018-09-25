@@ -114,7 +114,7 @@ analyze :: Member Task effs => (Analysis.TermEvaluator term address value effect
 analyze interpret analysis = send (Analyze interpret analysis)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Eff effs (Term f (field, Location))
+decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Eff effs (Term f field)
 decorate algebra = send . Decorate algebra
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
@@ -171,7 +171,7 @@ runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 data Task (m :: * -> *) output where
   Parse     :: Parser term -> Blob -> Task m term
   Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task m result
-  Decorate  :: Functor f => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Task m (Term f (field, Location))
+  Decorate  :: Functor f => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Task m (Term f field)
   Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (DiffAnnotation a)) (Term syntax (DiffAnnotation a)) -> Task m (Diff syntax (DiffAnnotation a) (DiffAnnotation a))
   Render    :: Renderer input output -> input -> Task m output
   Serialize :: Format input -> input -> Task m Builder

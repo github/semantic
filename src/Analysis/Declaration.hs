@@ -45,12 +45,12 @@ data Declaration
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
 declarationAlgebra :: (Foldable syntax, HasDeclaration syntax)
-                   => Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) (Maybe Declaration)
-declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
+                   => Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) (Maybe Declaration, Location)
+declarationAlgebra blob (In ann syntax) = (toDeclaration blob ann syntax, ann)
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass
 class HasDeclaration syntax where
-  toDeclaration :: (Foldable syntax) => Blob -> Location -> syntax (Term syntax Location, Maybe Declaration) -> Maybe Declaration
+  toDeclaration :: (Foldable syntax) => Blob -> Location -> syntax (Term syntax Location, (Maybe Declaration, Location)) -> Maybe Declaration
 
 instance (HasDeclaration' syntax syntax) => HasDeclaration syntax where
   toDeclaration = toDeclaration'
@@ -60,7 +60,7 @@ instance (HasDeclaration' syntax syntax) => HasDeclaration syntax where
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class HasDeclaration' whole syntax where
   -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
-  toDeclaration' :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, Maybe Declaration) -> Maybe Declaration
+  toDeclaration' :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, (Maybe Declaration, Location)) -> Maybe Declaration
 
 -- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
 --
@@ -74,7 +74,7 @@ instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy stra
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
 class CustomHasDeclaration whole syntax where
   -- | Produce a customized 'Declaration' for a given syntax node.
-  customToDeclaration :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, Maybe Declaration) -> Maybe Declaration
+  customToDeclaration :: (Foldable whole) => Blob -> Location -> syntax (Term whole Location, (Maybe Declaration, Location)) -> Maybe Declaration
 
 
 -- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
@@ -149,7 +149,7 @@ data Strategy = Default | Custom
 --
 --   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
 class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
-  toDeclarationWithStrategy :: (Foldable whole) => proxy strategy -> Blob -> Location -> syntax (Term whole Location, Maybe Declaration) -> Maybe Declaration
+  toDeclarationWithStrategy :: (Foldable whole) => proxy strategy -> Blob -> Location -> syntax (Term whole Location, (Maybe Declaration, Location)) -> Maybe Declaration
 
 
 -- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.
