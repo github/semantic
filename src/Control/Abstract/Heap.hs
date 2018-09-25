@@ -12,6 +12,7 @@ module Control.Abstract.Heap
 , assign
 , newFrame
 , currentFrame
+, withScopeAndFrame
 -- * Garbage collection
 , gc
 -- * Effects
@@ -28,13 +29,21 @@ import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Heap (Heap, Address(..), Position(..))
-import Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph)
+import Control.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph, withScope)
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Span (Span)
 import qualified Data.Set as Set
 import Prologue
+
+withScopeAndFrame :: (Member (State (Heap address address value)) effects, Member (State (ScopeGraph address)) effects) => address -> m address effects a -> Evaluator address value effects a
+withScopeAndFrame address action = do
+  scope <- scopeLookup address
+  withScope scope (withFrame address action)
+
+scopeLookup :: (Member (State (Heap address address value)) effects, Member (State (ScopeGraph address)) effects) => address -> Evaluator address value effects address
+scopeLookup address = maybeM (throwHeapError (LookupError address)) (scopeLookup address)
 
 -- | Retrieve the heap.
 getHeap :: Member (State (Heap address address value)) effects => Evaluator address value effects (Heap address address value)
@@ -169,6 +178,7 @@ instance Effect (Deref value) where
 
 data HeapError address resume where
   EmptyHeapError :: HeapError address address
+  LookupError :: HeapError address address
 
 deriving instance Eq address => Eq (HeapError address resume)
 deriving instance Show address => Show (HeapError address resume)
