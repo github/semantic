@@ -7,7 +7,6 @@ import Prelude hiding (readFile)
 import           Analysis.Abstract.Caching.FlowSensitive
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
--- import           Control.Category
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address.Monovariant as Monovariant
