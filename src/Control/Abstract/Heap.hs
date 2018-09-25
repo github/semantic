@@ -11,6 +11,7 @@ module Control.Abstract.Heap
 , deref
 , assign
 , newFrame
+, currentFrame
 -- * Garbage collection
 , gc
 -- * Effects
