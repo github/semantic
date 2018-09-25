@@ -28,8 +28,8 @@ import Control.Abstract.Roots
 import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
-import Data.Abstract.Heap (Heap, Address(..), Position(..))
-import Control.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph, withScope)
+import Data.Abstract.Heap (Heap, Position(..))
+import Control.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph, withScope, Allocator, Address(..), alloc)
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
@@ -37,13 +37,13 @@ import Data.Span (Span)
 import qualified Data.Set as Set
 import Prologue
 
-withScopeAndFrame :: (Member (State (Heap address address value)) effects, Member (State (ScopeGraph address)) effects) => address -> m address effects a -> Evaluator address value effects a
-withScopeAndFrame address action = do
-  scope <- scopeLookup address
-  withScope scope (withFrame address action)
+withScopeAndFrame :: forall address value effects m a. (Ord address, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Effectful (m address value), Member (Resumable (BaseError (HeapError address))) effects, Member (State (Heap address address value)) effects, Member (State (ScopeGraph address)) effects) => address -> m address value effects a -> m address value effects a
+withScopeAndFrame address action = raiseEff $ do
+  scope <- lowerEff (scopeLookup @address @value address)
+  lowerEff $ withScope scope (withFrame address action)
 
-scopeLookup :: (Member (State (Heap address address value)) effects, Member (State (ScopeGraph address)) effects) => address -> Evaluator address value effects address
-scopeLookup address = maybeM (throwHeapError (LookupError address)) (scopeLookup address)
+scopeLookup :: forall address value effects. (Ord address, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError (HeapError address))) effects, Member (State (Heap address address value)) effects, Member (State (ScopeGraph address)) effects) => address -> Evaluator address value effects address
+scopeLookup address = maybeM (throwHeapError (LookupError address)) =<< Heap.scopeLookup address <$> get @(Heap address address value)
 
 -- | Retrieve the heap.
 getHeap :: Member (State (Heap address address value)) effects => Evaluator address value effects (Heap address address value)
@@ -76,11 +76,20 @@ newFrame :: forall address value effects. ( Member (State (Heap address address 
           )
          => address
          -> Map EdgeLabel (Map address address)
-         -> Evaluator address value effects ()
+         -> Evaluator address value effects address
 newFrame scope links = do
   name <- gensym
   address <- alloc name
   modify @(Heap address address value) (Heap.newFrame scope address links)
+  pure address
+
+withFrame :: forall address effects m value a. (Member (Resumable (BaseError (HeapError address))) effects, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Effectful (m address value), Member (State (Heap address address value)) effects) => address -> m address value effects a -> m address value effects a
+withFrame address action = raiseEff $ do
+    prevFrame <- (lowerEff (currentFrame @address @value))
+    modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
+    value <- (lowerEff action)
+    modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just prevFrame })
+    pure value
 
 -- box :: ( Member (Allocator address) effects
 --        , Member (Deref value) effects
