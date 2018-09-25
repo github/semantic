@@ -30,6 +30,7 @@ import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
 import Data.Record
+import Data.Location
 import Data.Semigroup (Semigroup(..))
 import Data.Source
 import Data.Blob
@@ -534,9 +535,11 @@ instance Listable Language.Language where
     \/ cons0 Language.Ruby
     \/ cons0 Language.TypeScript
 
+instance Listable Location where
+  tiers = cons2 Location
+
 instance Listable Range where
   tiers = cons2 Range
-
 
 instance Listable Pos where
   tiers = cons2 Pos

@@ -5,12 +5,13 @@ import Analysis.Decorator
 import Data.Bifunctor
 import Data.Diff
 import Data.Functor.Listable (ListableSyntax)
-import Data.Record
+import Data.Location
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.These
 import Diffing.Algorithm
+import Diffing.Interpreter (stripDiff)
 import Diffing.Algorithm.RWS
 import Diffing.Interpreter.Spec (afterTerm, beforeTerm)
 import Test.Hspec.LeanCheck
@@ -21,27 +22,34 @@ spec = parallel $ do
   let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
-      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively p) . length . stem . rhead)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (DiffAnnotation ())) `shouldSatisfy` all ((== positively p) . length . stem . fst)
 
     prop "produces grams with bases of the specified width" $
-      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively q) . length . base . rhead)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (DiffAnnotation ())) `shouldSatisfy` all ((== positively q) . length . base . fst)
 
   describe "rws" $ do
     prop "produces correct diffs" $
-      \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax (Record '[])])
-                        tbs = decorate <$> (bs :: [Term ListableSyntax (Record '[])])
-                        wrap = termIn Nil . inject
-                        diff = merge (Nil, Nil) (inject (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
+      \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax (DiffAnnotation ())])
+                        tbs = decorate <$> (bs :: [Term ListableSyntax (DiffAnnotation ())])
+                        wrap = termIn emptyAnnotation . inject
+                        diff = merge (emptyAnnotation, emptyAnnotation) (inject (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
+        -- (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap tas), Just (wrap tbs))
 
     it "produces unbiased insertions within branches" $
-      let (a, b) = (decorate (termIn Nil (inject [ termIn Nil (inject (Syntax.Identifier "a")) ])), decorate (termIn Nil (inject [ termIn Nil (inject (Syntax.Identifier "b")) ]))) in
+      let (a, b) = (decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "a")) ])), decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "b")) ]))) in
       fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
+      -- rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ] `shouldBe` [ That a, These b b ]
 
   where decorate = defaultFeatureVectorDecorator
 
         diffThese = these deleting inserting replacing
 
 -- | Strips the head annotation off a term annotated with non-empty records.
-stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
-stripTerm = fmap rtail
+-- stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
+-- stripTerm = fmap rtail
+stripTerm :: Functor f => Term f (FeatureVector, DiffAnnotation ()) -> Term f (DiffAnnotation ())
+stripTerm = fmap snd
+
+emptyAnnotation :: DiffAnnotation ()
+emptyAnnotation = ((), Location emptyRange emptySpan)
