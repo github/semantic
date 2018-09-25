@@ -10,6 +10,7 @@ module Control.Abstract.Heap
 , alloc
 , deref
 , assign
+, newFrame
 -- * Garbage collection
 , gc
 -- * Effects
@@ -26,7 +27,7 @@ import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Heap (Heap, Address(..), Position(..))
-import Data.Abstract.ScopeGraph (Declaration(..))
+import Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph, linksOfScope)
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
@@ -53,6 +54,24 @@ currentFrame :: forall address value effects. ( Member (State (Heap address addr
                 )
              => Evaluator address value effects address
 currentFrame = maybeM (throwHeapError EmptyHeapError) =<< (Heap.currentFrame <$> get @(Heap address address value))
+
+newFrame :: forall address value effects. ( Member (State (Heap address address value)) effects
+          , Member (Reader ModuleInfo) effects
+          , Member (Reader Span) effects
+          , Member (Resumable (BaseError (HeapError address))) effects
+          , Ord address
+          , Member (Allocator address) effects
+          , Member (State (ScopeGraph address)) effects
+          , Member Fresh effects
+          )
+         => address
+         -> Map EdgeLabel (Map address address)
+         -> Evaluator address value effects ()
+newFrame scope links = do
+  name <- gensym
+  address <- alloc name
+  modify @(Heap address address value) (Heap.newFrame scope address links)
+
 -- box :: ( Member (Allocator address) effects
 --        , Member (Deref value) effects
 --        , Member Fresh effects
