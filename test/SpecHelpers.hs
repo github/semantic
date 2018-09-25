@@ -97,7 +97,7 @@ readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
 type TestEvaluatingEffects term
-  = '[ Resumable (BaseError (ValueError Precise term))
+  = '[ Resumable (BaseError (ValueError term Precise))
      , Resumable (BaseError (AddressError Precise (Val term)))
      , Resumable (BaseError ResolutionError)
      , Resumable (BaseError EvalError)
@@ -110,7 +110,7 @@ type TestEvaluatingEffects term
      , Lift IO
      ]
 type TestEvaluatingErrors term
-  = '[ BaseError (ValueError Precise term)
+  = '[ BaseError (ValueError term Precise)
      , BaseError (AddressError Precise (Val term))
      , BaseError ResolutionError
      , BaseError EvalError
@@ -141,17 +141,17 @@ testEvaluating
   . runValueError @_ @_ @Precise
   . fmap snd
 
-type Val = Value Precise
+type Val term = Value term Precise
 
 
-deNamespace :: Heap Precise (Value Precise term)
-            -> Value Precise term
+deNamespace :: Heap Precise (Value term Precise)
+            -> Value term Precise
             -> Maybe (Name, [Name])
 deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
 deNamespace _ _                          = Nothing
 
-namespaceScope :: Heap Precise (Value Precise term)
-               -> Value Precise term
+namespaceScope :: Heap Precise (Value term Precise)
+               -> Value term Precise
                -> Maybe (Environment Precise)
 namespaceScope heap ns@(Namespace _ _ _)
   = either (const Nothing) (snd . snd)
@@ -167,7 +167,7 @@ namespaceScope heap ns@(Namespace _ _ _)
 
 namespaceScope _ _ = Nothing
 
-derefQName :: Heap Precise (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
+derefQName :: Heap Precise (Value term Precise) -> NonEmpty Name -> Bindings Precise -> Maybe (Value term Precise)
 derefQName heap names binds = go names (Env.newEnv binds)
   where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= fmap fst . Set.minView >>= case ns of
           []        -> Just
