@@ -35,7 +35,7 @@ runDiff ShowDiffRenderer        = withParsedBlobPairs (decorate . passAlgebra) (
 runDiff DOTDiffRenderer         = withParsedBlobPairs (decorate . passAlgebra) (\_ -> render renderTreeGraph . bimap snd snd) >=> serialize (DOT (diffStyle "diffs"))
 
 passAlgebra :: Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) ()
-passAlgebra _ (In ann syntax) = ()
+passAlgebra _ _ = ()
 
 data SomeTermPair typeclasses ann where
   SomeTermPair :: ApplyAll typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
