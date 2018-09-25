@@ -149,3 +149,5 @@ reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeE
 
 prettyShow :: Show a => a -> IO ()
 prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow
+
+{-# ANN module ("HLint: ignore Reduce duplication" :: String) #-}
