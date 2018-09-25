@@ -15,9 +15,10 @@ spec = parallel $ do
       output <- fmap runBuilder . runTask $ runParse JSONTermRenderer [ methodsBlob { blobLanguage = Unknown } ]
       output `shouldBe` "{\"trees\":[{\"error\":{\"path\":\"methods.rb\",\"language\":\"Unknown\",\"message\":\"NoLanguageForBlob \\\"methods.rb\\\"\"}}]}\n"
 
-    it "drops results for sexpression output" $ do
-      output <- fmap runBuilder . runTask $ runParse SExpressionTermRenderer [ methodsBlob { blobLanguage = Unknown } ]
-      output `shouldBe` ""
+    it "throws if given an unknown language for sexpression output" $ do
+      runTask (runParse SExpressionTermRenderer [methodsBlob { blobLanguage = Unknown }]) `shouldThrow` (\ code -> case code of
+        ExitFailure 1 -> True
+        _ -> False)
 
     it "renders with the specified renderer" $ do
       output <- fmap runBuilder . runTask $ runParse SExpressionTermRenderer [methodsBlob]
