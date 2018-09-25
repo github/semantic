@@ -27,7 +27,7 @@ import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Heap (Heap, Address(..), Position(..))
-import Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph, linksOfScope)
+import Data.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph)
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
