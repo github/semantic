@@ -11,12 +11,11 @@ module Data.Abstract.Heap
   , newFrame
   , heapSize
   , currentFrame
-  , Address(..)
   , Position(..)
   ) where
 
 import Data.Abstract.Live
-import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..))
+import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Address(..))
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
@@ -24,8 +23,6 @@ import Data.Semigroup.Reducer
 import Prologue
 import Prelude hiding (lookup)
 
-
-data Address address = Address { address :: address, position :: Position }
 
 data Frame scopeAddress frameAddress value = Frame {
     scopeAddress :: scopeAddress
