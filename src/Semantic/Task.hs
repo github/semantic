@@ -118,7 +118,7 @@ decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f Location) (Term f
 decorate algebra = send . Decorate algebra
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
-diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (DiffAnnotation a)) (Term syntax (DiffAnnotation a)) -> Eff effs (Diff syntax (DiffAnnotation a) (DiffAnnotation a))
+diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task effs) => These (Term syntax ann) (Term syntax ann) -> Eff effs (Diff syntax ann ann)
 diff terms = send (Semantic.Task.Diff terms)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
@@ -172,7 +172,7 @@ data Task (m :: * -> *) output where
   Parse     :: Parser term -> Blob -> Task m term
   Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task m result
   Decorate  :: Functor f => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Task m (Term f field)
-  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (DiffAnnotation a)) (Term syntax (DiffAnnotation a)) -> Task m (Diff syntax (DiffAnnotation a) (DiffAnnotation a))
+  Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax ann) (Term syntax ann) -> Task m (Diff syntax ann ann)
   Render    :: Renderer input output -> input -> Task m output
   Serialize :: Format input -> input -> Task m Builder
 

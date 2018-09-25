@@ -7,7 +7,6 @@ module Diffing.Interpreter
 
 import Control.Monad.Free.Freer
 import Data.Diff
-import Data.Location
 import Data.Term
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
@@ -15,30 +14,30 @@ import Prologue
 
 -- | Diff two à la carte terms recursively.
 diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax)
-          => Term syntax (DiffAnnotation a)
-          -> Term syntax (DiffAnnotation a)
-          -> Diff syntax (DiffAnnotation a) (DiffAnnotation a)
+          => Term syntax ann
+          -> Term syntax ann
+          -> Diff syntax ann ann
 diffTerms t1 t2 = stripDiff (fromMaybe (replacing t1' t2') (runAlgorithm (diff t1' t2')))
   where (t1', t2') = ( defaultFeatureVectorDecorator t1
                      , defaultFeatureVectorDecorator t2)
 
 -- | Strips the head annotation off a diff annotated with non-empty records.
 stripDiff :: Functor syntax
-          => Diff syntax (FeatureVector, DiffAnnotation a) (FeatureVector, DiffAnnotation a)
-          -> Diff syntax (DiffAnnotation a) (DiffAnnotation a)
+          => Diff syntax (FeatureVector, ann) (FeatureVector, ann)
+          -> Diff syntax ann ann
 stripDiff = bimap snd snd
 
 -- | Diff a 'These' of terms.
-diffTermPair :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax (DiffAnnotation a)) (Term syntax (DiffAnnotation a)) -> Diff syntax (DiffAnnotation a) (DiffAnnotation a)
+diffTermPair :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax ann) (Term syntax ann) -> Diff syntax ann ann
 diffTermPair = these deleting inserting diffTerms
 
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
 runAlgorithm :: (Diffable syntax, Eq1 syntax, Traversable syntax, Alternative m, Monad m)
              => Algorithm
-                  (Term syntax (FeatureVector, DiffAnnotation a))
-                  (Term syntax (FeatureVector, DiffAnnotation a))
-                  (Diff syntax (FeatureVector, DiffAnnotation a) (FeatureVector, DiffAnnotation a))
+                  (Term syntax (FeatureVector, ann))
+                  (Term syntax (FeatureVector, ann))
+                  (Diff syntax (FeatureVector, ann) (FeatureVector, ann))
                   result
              -> m result
 runAlgorithm = iterFreerA (\ yield step -> case step of
