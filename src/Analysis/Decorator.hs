@@ -10,5 +10,5 @@ import Prologue
 decoratorWithAlgebra :: Functor syntax
                      => RAlgebra (TermF syntax a) (Term syntax a) b -- ^ An R-algebra on terms.
                      -> Term syntax a                               -- ^ A term to decorate with values produced by the R-algebra.
-                     -> Term syntax (b, a)                          -- ^ A term decorated with values produced by the R-algebra.
-decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (fst . termAnnotation)) c), a) (fmap snd f)
+                     -> Term syntax b                               -- ^ A term decorated with values produced by the R-algebra.
+decoratorWithAlgebra alg = para $ \ c@(In _ f) -> termIn (alg (fmap (second termAnnotation) c)) (fmap snd f)

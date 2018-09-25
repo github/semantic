@@ -26,16 +26,16 @@ import qualified Rendering.JSON as JSON
 
 runDiff :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
-runDiff JSONDiffRenderer        = withParsedBlobPairs (decorate . passAlgebra) (\blob -> render (renderJSONDiff blob) . bimap snd snd) >=> serialize JSON
-runDiff JSONGraphDiffRenderer   = withParsedBlobPairs (decorate . passAlgebra) (\blob -> render (renderAdjGraph blob) . bimap snd snd) >=> serialize JSON
+runDiff JSONDiffRenderer        = withParsedBlobPairs (decorate . unitAlgebra) (\blob -> render (renderJSONDiff blob) . bimap snd snd) >=> serialize JSON
+runDiff JSONGraphDiffRenderer   = withParsedBlobPairs (decorate . unitAlgebra) (\blob -> render (renderAdjGraph blob) . bimap snd snd) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph DiffVertex (Base t)) => BlobPair -> t -> JSON.JSON "diffs" SomeJSON
         renderAdjGraph blob diff = renderJSONAdjDiff blob (renderTreeGraph diff)
-runDiff SExpressionDiffRenderer = withParsedBlobPairs (decorate . passAlgebra) (const (serialize (SExpression ByConstructorName)))
-runDiff ShowDiffRenderer        = withParsedBlobPairs (decorate . passAlgebra) (const (serialize Show))
-runDiff DOTDiffRenderer         = withParsedBlobPairs (decorate . passAlgebra) (\_ -> render renderTreeGraph . bimap snd snd) >=> serialize (DOT (diffStyle "diffs"))
+runDiff SExpressionDiffRenderer = withParsedBlobPairs (decorate . unitAlgebra) (const (serialize (SExpression ByConstructorName)))
+runDiff ShowDiffRenderer        = withParsedBlobPairs (decorate . unitAlgebra) (const (serialize Show))
+runDiff DOTDiffRenderer         = withParsedBlobPairs (decorate . unitAlgebra) (\_ -> render renderTreeGraph . bimap snd snd) >=> serialize (DOT (diffStyle "diffs"))
 
-passAlgebra :: Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) ()
-passAlgebra _ _ = ()
+unitAlgebra :: Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) (DiffAnnotation ())
+unitAlgebra _ (In ann _) = ((), ann)
 
 data SomeTermPair typeclasses ann where
   SomeTermPair :: ApplyAll typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
