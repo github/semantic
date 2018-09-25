@@ -18,6 +18,7 @@ module Control.Abstract.Value
 , while
 , doWhile
 , forLoop
+, While(..)
 , makeNamespace
 , evaluateInScopedEnv
 , address
@@ -38,7 +39,7 @@ import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Span
-import Prologue hiding (TypeError)
+import Prologue hiding (TypeError, catchError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -117,6 +118,36 @@ instance PureEffect (Boolean value) where
   handle handler (Request (Boolean b)        k) = Request (Boolean b) (handler . k)
   handle handler (Request (AsBool v)         k) = Request (AsBool v)  (handler . k)
   handle handler (Request (Disjunction a b)  k) = Request (Disjunction (handler a) (handler b))  (handler . k)
+
+-- | The fundamental looping primitive, built on top of 'ifthenelse'.
+while :: Member (While value) effects
+  => Evaluator term address value effects value -- ^ Condition
+  -> Evaluator term address value effects value -- ^ Body
+  -> Evaluator term address value effects value
+while (Evaluator cond) (Evaluator body) = send (While cond body)
+
+-- | Do-while loop, built on top of while.
+doWhile :: Member (While value) effects
+  => Evaluator term address value effects value -- ^ Body
+  -> Evaluator term address value effects value -- ^ Condition
+  -> Evaluator term address value effects value
+doWhile body cond = body *> while cond body
+
+-- | C-style for loops.
+forLoop :: (Member (While value) effects, Member (Env address) effects)
+  => Evaluator term address value effects value -- ^ Initial statement
+  -> Evaluator term address value effects value -- ^ Condition
+  -> Evaluator term address value effects value -- ^ Increment/stepper
+  -> Evaluator term address value effects value -- ^ Body
+  -> Evaluator term address value effects value
+forLoop initial cond step body =
+  locally (initial *> while cond (body *> step))
+
+data While value m result where
+  While :: m value -> m value -> While value m value
+
+instance PureEffect (While value) where
+  handle handler (Request (While cond body) k) = Request (While (handler cond) (handler body)) (handler . k)
 
 
 class Show value => AbstractIntro value where
@@ -220,42 +251,6 @@ class AbstractIntro value => AbstractValue term address value effects where
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
   scopedEnvironment :: address -> Evaluator term address value effects (Maybe (Environment address))
 
-  -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
-  --
-  --   The function argument takes an action which recurs through the loop.
-  loop :: (Evaluator term address value effects value -> Evaluator term address value effects value) -> Evaluator term address value effects value
-
-
--- | C-style for loops.
-forLoop :: ( AbstractValue term address value effects
-           , Member (Boolean value) effects
-           , Member (Env address) effects
-           )
-        => Evaluator term address value effects value -- ^ Initial statement
-        -> Evaluator term address value effects value -- ^ Condition
-        -> Evaluator term address value effects value -- ^ Increment/stepper
-        -> Evaluator term address value effects value -- ^ Body
-        -> Evaluator term address value effects value
-forLoop initial cond step body =
-  locally (initial *> while cond (body *> step))
-
--- | The fundamental looping primitive, built on top of 'ifthenelse'.
-while :: (AbstractValue term address value effects, Member (Boolean value) effects)
-      => Evaluator term address value effects value
-      -> Evaluator term address value effects value
-      -> Evaluator term address value effects value
-while cond body = loop $ \ continue -> do
-  this <- cond
-  ifthenelse this (body *> continue) (pure unit)
-
--- | Do-while loop, built on top of while.
-doWhile :: (AbstractValue term address value effects, Member (Boolean value) effects)
-        => Evaluator term address value effects value
-        -> Evaluator term address value effects value
-        -> Evaluator term address value effects value
-doWhile body cond = loop $ \ continue -> body *> do
-  this <- cond
-  ifthenelse this continue (pure unit)
 
 makeNamespace :: ( AbstractValue term address value effects
                  , Member (Deref value) effects

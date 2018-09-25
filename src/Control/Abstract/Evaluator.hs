@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators, ScopedTypeVariables #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   , Open
@@ -10,6 +10,7 @@ module Control.Abstract.Evaluator
   , LoopControl(..)
   , throwBreak
   , throwContinue
+  , throwAbort
   , catchLoopControl
   , runLoopControl
   , module X
@@ -65,6 +66,7 @@ runReturn = Eff.raiseHandler (fmap (either unReturn id) . runError)
 data LoopControl address
   = Break    { unLoopControl :: address }
   | Continue { unLoopControl :: address }
+  | Abort
   deriving (Eq, Ord, Show)
 
 throwBreak :: Member (Exc (LoopControl address)) effects
@@ -76,6 +78,10 @@ throwContinue :: Member (Exc (LoopControl address)) effects
               => address
               -> Evaluator term address value effects address
 throwContinue = throwError . Continue
+
+throwAbort :: forall term address effects value a . Member (Exc (LoopControl address)) effects
+           => Evaluator term address value effects a
+throwAbort = throwError (Abort @address)
 
 catchLoopControl :: Member (Exc (LoopControl address)) effects => Evaluator term address value effects a -> (LoopControl address -> Evaluator term address value effects a) -> Evaluator term address value effects a
 catchLoopControl = catchError
