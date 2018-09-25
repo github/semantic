@@ -117,9 +117,12 @@ instance (Member Fresh effects, Member (Function address value) effects, Member 
     address <- declare (Declaration name) span Nothing
     let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
     functionScope <- newScope edges
-
-    functionFrame <- newFrame functionScope edges
-    withFrame functionFrame $
+    currentFrame' <- currentFrame
+    let frameEdges = case currentScope' of
+          Just scope -> Map.singleton Lexical (Map.singleton scope currentFrame')
+          Nothing -> mempty
+    functionFrame <- newFrame functionScope frameEdges
+    withScopeAndFrame functionFrame $
       function name vars lowerBound action
   {-# INLINE lambda' #-}
 
