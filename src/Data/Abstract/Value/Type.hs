@@ -251,8 +251,11 @@ runFunction = interpret $ \case
     functionSpan <- ask @Span
     declare (Declaration name) functionSpan Nothing
     currentScope' <- currentScope
-    let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
     functionScope <- newScope lexicalEdges
+    currentFrame' <- currentFrame
+    let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+    functionFrame <- newFrame functionScope frameEdges
     withScope functionScope $ do
       (env, tvars) <- foldr (\ name rest -> do
         addr <- alloc name
