@@ -28,7 +28,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval eval Function{..} = do
+  eval _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
     (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) functionBody)
     bind name addr
@@ -61,7 +61,7 @@ instance Diffable Method where
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
 instance Evaluatable Method where
-  eval eval Method{..} = do
+  eval _ Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
     (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) methodBody)
     bind name addr
