@@ -273,13 +273,6 @@ runFunction = interpret $ \case
       _ :-> ret -> box ret
       actual    -> throwTypeError (UnificationError needed actual) >>= box
 
-var a, b, d, c;
-a = 1
-b = 1
-d = 1
-c = 1
-foo(a, b, c)
-
 runBoolean :: ( Member NonDet effects
               , Member (Reader ModuleInfo) effects
               , Member (Reader Span) effects
