@@ -6,7 +6,7 @@ module Rendering.TOC
 , diffTOC
 , Summaries(..)
 , TOCSummary(..)
-, Annotation
+, TOCAnnotation
 , isValidSummary
 , getDeclaration
 , declaration
@@ -65,14 +65,14 @@ isValidSummary :: TOCSummary -> Bool
 isValidSummary ErrorSummary{} = False
 isValidSummary _ = True
 
-type Annotation = (Maybe Declaration, Location)
+type TOCAnnotation = (Maybe Declaration, Location)
 
 
-getDeclaration :: Annotation -> Maybe Declaration
+getDeclaration :: TOCAnnotation -> Maybe Declaration
 getDeclaration = fst
 
 -- | Produce the annotations of nodes representing declarations.
-declaration :: TermF f Annotation a -> Maybe Annotation
+declaration :: TermF f TOCAnnotation a -> Maybe TOCAnnotation
 declaration (In annotation _) = annotation <$ getDeclaration annotation
 
 
@@ -116,12 +116,12 @@ newtype DedupeKey = DedupeKey (Maybe T.Text, Maybe T.Text) deriving (Eq, Ord)
 -- 2. Two similar entries (defined by a case insensitive comparision of their
 --    identifiers) are in the list.
 --    Action: Combine them into a single Replaced entry.
-dedupe :: [Entry Annotation] -> [Entry Annotation]
+dedupe :: [Entry TOCAnnotation] -> [Entry TOCAnnotation]
 dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in (fmap . fmap) snd tuples
   where
-    go :: (Int, Map.Map DedupeKey (Int, Entry Annotation))
-       -> Entry Annotation
-       -> (Int, Map.Map DedupeKey (Int, Entry Annotation))
+    go :: (Int, Map.Map DedupeKey (Int, Entry TOCAnnotation))
+       -> Entry TOCAnnotation
+       -> (Int, Map.Map DedupeKey (Int, Entry TOCAnnotation))
     go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m
                     = if exactMatch similar x
                       then (succ index, m)
@@ -134,7 +134,7 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     exactMatch = (==) `on` (getDeclaration . entryPayload)
 
 -- | Construct a 'TOCSummary' from an 'Entry'.
-entrySummary :: Entry Annotation -> Maybe TOCSummary
+entrySummary :: Entry TOCAnnotation -> Maybe TOCSummary
 entrySummary entry = case entry of
   Changed  a -> recordSummary "modified" a
   Deleted  a -> recordSummary "removed" a
@@ -142,7 +142,7 @@ entrySummary entry = case entry of
   Replaced a -> recordSummary "modified" a
 
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
-recordSummary :: T.Text -> Annotation -> Maybe TOCSummary
+recordSummary :: T.Text -> TOCAnnotation -> Maybe TOCSummary
 recordSummary changeText record = case getDeclaration record of
   Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (locationSpan (snd record)) language
   Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (locationSpan (snd record)) changeText
@@ -152,31 +152,31 @@ recordSummary changeText record = case getDeclaration record of
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
-renderToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f Annotation Annotation -> Summaries
+renderToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f TOCAnnotation TOCAnnotation -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
-renderRPCToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f Annotation Annotation -> ([TOCSummary], [TOCSummary])
+renderRPCToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f TOCAnnotation TOCAnnotation -> ([TOCSummary], [TOCSummary])
 renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
-diffTOC :: (Foldable f, Functor f) => Diff f Annotation Annotation -> [TOCSummary]
+diffTOC :: (Foldable f, Functor f) => Diff f TOCAnnotation TOCAnnotation -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration
   where
-    extraDeclarations :: Entry Annotation -> Bool
+    extraDeclarations :: Entry TOCAnnotation -> Bool
     extraDeclarations entry = case getDeclaration (entryPayload entry) of
       Just ImportDeclaration{..} -> False
       Just CallReference{..} -> False
       _ -> True
 
-renderToCTerm :: (Foldable f, Functor f) => Blob -> Term f Annotation -> Summaries
+renderToCTerm :: (Foldable f, Functor f) => Blob -> Term f TOCAnnotation -> Summaries
 renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where
     toMap [] = mempty
     toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-    termToC :: (Foldable f, Functor f) => Term f Annotation -> [TOCSummary]
+    termToC :: (Foldable f, Functor f) => Term f TOCAnnotation -> [TOCSummary]
     termToC = mapMaybe (recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
