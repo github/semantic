@@ -8,6 +8,7 @@ module Data.Abstract.Heap
   , getSlot
   , setSlot
   , initFrame
+  , newFrame
   , heapSize
   , currentFrame
   , Address(..)
