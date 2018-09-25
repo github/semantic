@@ -19,14 +19,14 @@ import Rendering.TOC
 
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
-renderToSymbols :: (Foldable f, Functor f) => SymbolFields -> Blob -> Term f Annotation -> [Value]
+renderToSymbols :: (Foldable f, Functor f) => SymbolFields -> Blob -> Term f TOCAnnotation -> [Value]
 renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
   where
-    termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f Annotation -> File
+    termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f TOCAnnotation -> File
     termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
-symbolSummary :: SymbolFields -> FilePath -> T.Text -> Annotation -> Maybe Symbol
+symbolSummary :: SymbolFields -> FilePath -> T.Text -> TOCAnnotation -> Maybe Symbol
 symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
   Just ErrorDeclaration{} -> Nothing
   Just declaration -> Just Symbol

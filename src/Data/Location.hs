@@ -2,14 +2,11 @@ module Data.Location
   ( Location(..)
   , Span(..)
   , Range(..)
-  , DiffAnnotation
   ) where
 
 import Data.JSON.Fields
 import Data.Range
 import Data.Span
-
-type DiffAnnotation a = (a, Location)
 
 data Location
   = Location

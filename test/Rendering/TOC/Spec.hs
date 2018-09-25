@@ -35,7 +35,7 @@ spec = parallel $ do
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff ListableSyntax () ()) `shouldBe` []
 
     prop "produces no entries for identity diffs" $
-      \ term -> tableOfContentsBy (Just . termFAnnotation) (diffTerms term (term :: Term ListableSyntax (DiffAnnotation ()))) `shouldBe` []
+      \ term -> tableOfContentsBy (Just . termFAnnotation) (diffTerms term (term :: Term ListableSyntax TOCAnnotation)) `shouldBe` []
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting replacing p)
