@@ -17,11 +17,10 @@ module Control.Abstract.ScopeGraph
   ) where
 
 import           Control.Abstract.Evaluator hiding (Local)
-import           Control.Abstract.Heap
 import           Data.Abstract.Module
 import           Data.Abstract.BaseError
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph)
+import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Address(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)

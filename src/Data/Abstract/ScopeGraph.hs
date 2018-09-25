@@ -1,20 +1,21 @@
 {-# LANGUAGE GADTs, DuplicateRecordFields, TupleSections #-}
 module Data.Abstract.ScopeGraph
-  ( ScopeGraph(..)
-  , Path(..)
-  , Position(..)
-  , pathDeclaration
-  , pathPosition
-  , Reference(..) -- TODO don't export these constructors
-  , Declaration(..) -- TODO don't export these constructors
-  , EdgeLabel(..)
-  , scopeOfRef
-  , pathOfRef
-  , declare
-  , reference
-  , newScope
+  ( Address(..)
   , associatedScope
+  , Declaration(..) -- TODO don't export these constructors
+  , declare
+  , EdgeLabel(..)
   , insertDeclarationScope
+  , newScope
+  , Path(..)
+  , pathDeclaration
+  , pathOfRef
+  , pathPosition
+  , Position(..)
+  , reference
+  , Reference(..) -- TODO don't export these constructors
+  , ScopeGraph(..)
+  , scopeOfRef
   ) where
 
 import           Data.Abstract.Name
@@ -23,6 +24,8 @@ import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
 import qualified Data.Sequence as Seq
+
+data Address address = Address { address :: address, position :: Position }
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address = Scope {
