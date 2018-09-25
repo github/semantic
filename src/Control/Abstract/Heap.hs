@@ -29,7 +29,7 @@ import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.Heap (Heap, Position(..))
-import Control.Abstract.ScopeGraph (Declaration(..), EdgeLabel(..), ScopeGraph, withScope, Allocator, Address(..), alloc)
+import Control.Abstract.ScopeGraph
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
@@ -37,7 +37,19 @@ import Data.Span (Span)
 import qualified Data.Set as Set
 import Prologue
 
-withScopeAndFrame :: forall address value effects m a. (Ord address, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Effectful (m address value), Member (Resumable (BaseError (HeapError address))) effects, Member (State (Heap address address value)) effects, Member (State (ScopeGraph address)) effects) => address -> m address value effects a -> m address value effects a
+withScopeAndFrame :: forall address value effects m a. (
+                      Effectful (m address value)
+                    , Member (Reader ModuleInfo) effects
+                    , Member (Reader Span) effects
+                    , Member (Resumable (BaseError (HeapError address))) effects
+                    , Member (Resumable (BaseError (ScopeError address))) effects
+                    , Member (State (Heap address address value)) effects
+                    , Member (State (ScopeGraph address)) effects
+                    , Ord address
+                    )
+                  => address
+                  -> m address value effects a
+                  -> m address value effects a
 withScopeAndFrame address action = raiseEff $ do
   scope <- lowerEff (scopeLookup @address @value address)
   lowerEff $ withScope scope (withFrame address action)
