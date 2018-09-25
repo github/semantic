@@ -97,7 +97,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "puts.rb" <$> res of
         Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           heapLookupAll addr heap `shouldBe` Just [Unit]
-          traces `shouldContain` [ "\"hello\"" ]
+          traces `shouldContain` ["String \"\\\"hello\\\"\""]
         other -> expectationFailure (show other)
 
   where
