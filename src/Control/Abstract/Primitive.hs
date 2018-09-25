@@ -14,7 +14,7 @@ import           Control.Abstract.Environment
 import           Control.Abstract.Evaluator
 import           Control.Abstract.Heap
 import           Control.Abstract.ScopeGraph
-    (Declaration (..), EdgeLabel (..), ScopeError, ScopeGraph, currentScope, declare, newScope, withScope)
+    (Declaration (..), EdgeLabel (..), ScopeError, ScopeGraph, currentScope, declare, newScope, withScope, Allocator)
 import           Control.Abstract.Value
 import           Data.Abstract.BaseError
 import           Data.Abstract.Environment
@@ -109,7 +109,7 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
     lambda' (var : vars) (body var)
   {-# INLINE lambda' #-}
 
-instance (Member Fresh effects, Member (Function address value) effects, Member (State (ScopeGraph address)) effects) => Lambda address value effects (Evaluator address value effects address) where
+instance (Member (Reader ModuleInfo) effects, Member (Resumable (BaseError (ScopeError address))) effects, Member (Reader Span) effects, Ord address, Member (Allocator address) effects, Member (State (Heap address address value)) effects, Member (Resumable (BaseError (HeapError address))) effects, Member Fresh effects, Member (Function address value) effects, Member (State (ScopeGraph address)) effects) => Lambda address value effects (Evaluator address value effects address) where
   lambda' vars action = do
     name <- Name.gensym
     span <- ask @Span -- TODO: This span is probably wrong
@@ -122,7 +122,7 @@ instance (Member Fresh effects, Member (Function address value) effects, Member 
           Just scope -> Map.singleton Lexical (Map.singleton scope currentFrame')
           Nothing -> mempty
     functionFrame <- newFrame functionScope frameEdges
-    withScopeAndFrame functionFrame $
+    withScopeAndFrame functionFrame $ do
       function name vars lowerBound action
   {-# INLINE lambda' #-}
 
@@ -138,6 +138,9 @@ builtInPrint :: ( AbstractValue address value effects
                 , Member (Resumable (BaseError (AddressError address value))) effects
                 , Member (Resumable (BaseError (EnvironmentError address))) effects
                 , Member (State (Heap address address value)) effects
+                , Member (State (ScopeGraph address)) effects
+                , Member (Resumable (BaseError (HeapError address))) effects
+                , Member (Resumable (BaseError (ScopeError address))) effects
                 , Member Trace effects
                 , Ord address
                 )
@@ -165,6 +168,7 @@ builtInExport = lambda (\ v -> do
   var <- variable v >>= deref
   (k, value) <- asPair var
   sym <- asString k
-  addr <- box value
+  addr <- undefined -- box value
   export (Name.name sym) (Name.name sym) (Just addr)
-  box unit)
+  undefined)
+  -- box unit)
