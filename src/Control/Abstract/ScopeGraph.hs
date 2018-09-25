@@ -64,18 +64,31 @@ newScope edges = do
   address <- alloc name
   address <$ modify (ScopeGraph.newScope address edges)
 
-currentScope :: Member (State (ScopeGraph address)) effects => Evaluator address value effects (Maybe address)
-currentScope = ScopeGraph.currentScope <$> get
+currentScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Member (State (ScopeGraph address)) effects
+                )
+             => Evaluator address value effects address
+currentScope = maybeM (throwScopeError CurrentScopeError) . ScopeGraph.currentScope =<< get
 
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) effects) => Declaration -> Evaluator address value effects (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
-withScope :: forall m address value effects a. (Effectful (m address value), Member (State (ScopeGraph address)) effects) => address -> m address value effects a -> m address value effects a
+withScope :: forall m address value effects a. (Effectful (m address value)
+            , Member (Resumable (BaseError (ScopeError address))) effects
+            , Member (Reader ModuleInfo) effects
+            , Member (Reader Span) effects
+            , Member (State (ScopeGraph address)) effects
+            )
+          => address
+          -> m address value effects a
+          -> m address value effects a
 withScope scope action = raiseEff $ do
     prevScope <- (lowerEff (currentScope @address))
     modify (\g -> g { ScopeGraph.currentScope = Just scope })
     value <- (lowerEff action)
-    modify (\g -> g { ScopeGraph.currentScope = prevScope })
+    modify (\g -> g { ScopeGraph.currentScope = Just prevScope })
     pure value
 
 throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) effects
@@ -88,11 +101,15 @@ throwScopeError = throwBaseError
 
 data ScopeError address return where
   ScopeError :: Declaration -> Span -> ScopeError address (Address address)
+  CurrentScopeError :: ScopeError address address
 
 deriving instance Eq (ScopeError address return)
 deriving instance Show (ScopeError address return)
 instance Show address => Show1 (ScopeError address) where liftShowsPrec _ _ = showsPrec
-instance Eq address => Eq1 (ScopeError address) where liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
+instance Eq address => Eq1 (ScopeError address) where
+  liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
+  liftEq _ CurrentScopeError CurrentScopeError = True
+  liftEq _ _ _ = False
 
 alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
 alloc = send . Alloc
