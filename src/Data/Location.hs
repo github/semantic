@@ -11,9 +11,6 @@ import Data.Span
 
 type DiffAnnotation a = (a, Location)
 
--- | A location specified as possibly-empty intervals of bytes and line/column positions.
--- type Location = '[Range, Span]
-
 data Location
   = Location
   { locationByteRange :: {-# UNPACK #-} Range
