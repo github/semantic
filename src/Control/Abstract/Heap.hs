@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Control.Abstract.Heap
 ( Heap
+, HeapError
 , Address(..)
 , Position(..)
 , Configuration(..)
@@ -16,7 +17,6 @@ module Control.Abstract.Heap
 -- * Garbage collection
 , gc
 -- * Effects
-, Allocator(..)
 , Deref(..)
 , AddressError(..)
 , runAddressError
@@ -96,9 +96,6 @@ newFrame scope links = do
 --   assign addr (Declaration name) val -- TODO This is probably wrong
 --   pure addr
 
-alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
-alloc = send . Alloc
-
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: ( Member (Deref value) effects
          , Member (Reader ModuleInfo) effects
@@ -157,18 +154,9 @@ reachable roots heap = go mempty roots
 
 
 -- Effects
-
-data Allocator address (m :: * -> *) return where
-  Alloc :: Name -> Allocator address m address
-
 data Deref value (m :: * -> *) return where
   DerefCell  :: Set value          -> Deref value m (Maybe value)
   AssignCell :: value -> Set value -> Deref value m (Set value)
-
-instance PureEffect (Allocator address)
-
-instance Effect (Allocator address) where
-  handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
 
 instance PureEffect (Deref value)
 
@@ -178,7 +166,7 @@ instance Effect (Deref value) where
 
 data HeapError address resume where
   EmptyHeapError :: HeapError address address
-  LookupError :: HeapError address address
+  LookupError :: address -> HeapError address address
 
 deriving instance Eq address => Eq (HeapError address resume)
 deriving instance Show address => Show (HeapError address resume)
