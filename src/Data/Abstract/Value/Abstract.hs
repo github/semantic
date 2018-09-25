@@ -22,7 +22,7 @@ runFunction :: ( Member (Allocator address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError (AddressError address Abstract))) effects
-               , Member (State (Heap address Abstract)) effects
+               , Member (State (Heap address address Abstract)) effects
                , Ord address
                , PureEffects effects
                )
@@ -73,7 +73,7 @@ instance ( Member (Allocator address) effects
          , Member (Deref Abstract) effects
          , Member Fresh effects
          , Member NonDet effects
-         , Member (State (Heap address Abstract)) effects
+         , Member (State (Heap address address Abstract)) effects
          , Ord address
          )
       => AbstractValue address Abstract effects where
