@@ -1,17 +1,19 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances, LambdaCase #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
   , runFunction
   , runBoolean
+  , runWhile
   , materializeEnvironment
   , runValueError
   , runValueErrorWith
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..))
+import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Data.Abstract.BaseError
+import Data.Abstract.Evaluatable (UnspecializedError(..))
 import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
@@ -24,7 +26,7 @@ import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Data.Text (pack)
 import Data.Word
-import Prologue
+import Prologue hiding (catchError)
 
 data Value term address
   = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) (Environment address)
@@ -111,6 +113,45 @@ runBoolean = interpret $ \case
     a' <- runBoolean (Evaluator a)
     a'' <- runBoolean (asBool a')
     if a'' then pure a' else runBoolean (Evaluator b)
+
+
+runWhile :: forall effects term address a .
+  ( PureEffects effects
+  , Member (Deref (Value term address)) effects
+  , Member (Abstract.Boolean (Value term address)) effects
+  , Member (Exc (LoopControl address)) effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (BaseError (AddressError address (Value term address)))) effects
+  , Member (Resumable (BaseError (ValueError term address))) effects
+  , Member (Resumable (BaseError (UnspecializedError (Value term address)))) effects
+  , Member (State (Heap address (Value term address))) effects
+  , Ord address
+  , Show address
+  , Show term
+  )
+  => Evaluator term address (Value term address) (Abstract.While (Value term address) ': effects) a
+  -> Evaluator term address (Value term address) effects a
+runWhile = interpret $ \case
+  Abstract.While cond body -> loop $ \continue -> do
+    cond' <- runWhile (raiseEff cond)
+
+    -- `interpose` is used to handle 'UnspecializedError's and abort out of the
+    -- loop, otherwise under concrete semantics we run the risk of the
+    -- conditional always being true and getting stuck in an infinite loop.
+    let body' = interpose @(Resumable (BaseError (UnspecializedError (Value term address))))
+          (\(Resumable (BaseError _ _ (UnspecializedError _))) -> throwAbort) $
+          runWhile (raiseEff body) *> continue
+
+    ifthenelse cond' body' (pure unit)
+  where
+    loop x = catchLoopControl (fix x) (\ control -> case control of
+      Break value -> deref value
+      Abort -> pure unit
+      -- FIXME: Figure out how to deal with this. Ruby treats this as the result
+      -- of the current block iteration, while PHP specifies a breakout level
+      -- and TypeScript appears to take a label.
+      Continue _  -> loop x)
 
 
 instance AbstractHole (Value term address) where
@@ -242,9 +283,6 @@ instance ( Member (Allocator address) effects
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
         specialize :: ( AbstractValue term address (Value term address) effects
-                      , Member (Reader ModuleInfo) effects
-                      , Member (Reader Span) effects
-                      , Member (Resumable (BaseError (ValueError term address))) effects
                       )
                    => Either ArithException Number.SomeNumber
                    -> Evaluator term address (Value term address) effects (Value term address)
@@ -266,7 +304,7 @@ instance ( Member (Allocator address) effects
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue term address (Value term address) effects, Member (Abstract.Boolean (Value term address)) effects, Ord a) => a -> a -> Evaluator term address (Value term address) effects (Value term address)
+        go :: (AbstractValue term address (Value term address) effects, Ord a) => a -> a -> Evaluator term address (Value term address) effects (Value term address)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> pure $ integer (orderingToInt (compare l r))
@@ -295,11 +333,6 @@ instance ( Member (Allocator address) effects
         pair = (left, right)
         ourShift :: Word64 -> Int -> Integer
         ourShift a b = toInteger (shiftR a b)
-
-  loop x = catchLoopControl (fix x) (\ control -> case control of
-    Break value -> deref value
-    -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
-    Continue _  -> loop x)
 
   castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
   castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))

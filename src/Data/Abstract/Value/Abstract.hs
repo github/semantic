@@ -3,6 +3,7 @@ module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runFunction
 , runBoolean
+, runWhile
 ) where
 
 import Control.Abstract as Abstract
@@ -52,6 +53,27 @@ runBoolean = interpret $ \case
   AsBool  _       -> pure True <|> pure False
   Disjunction a b -> runBoolean (Evaluator (a <|> b))
 
+runWhile ::
+  ( Member (Allocator address) effects
+  , Member (Deref Abstract) effects
+  , Member (Abstract.Boolean Abstract) effects
+  , Member NonDet effects
+  , Member (Env address) effects
+  , Member (Exc (Return address)) effects
+  , Member Fresh effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (BaseError (AddressError address Abstract))) effects
+  , Member (State (Heap address Abstract)) effects
+  , Ord address
+  , PureEffects effects
+  )
+  => Evaluator term address Abstract (While Abstract ': effects) a
+  -> Evaluator term address Abstract effects a
+runWhile = interpret $ \case
+  Abstract.While cond body -> do
+    cond' <- runWhile (raiseEff cond)
+    ifthenelse cond' (runWhile (raiseEff body) *> empty) (pure unit)
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
@@ -74,7 +96,6 @@ instance AbstractIntro Abstract where
 instance ( Member (Allocator address) effects
          , Member (Deref Abstract) effects
          , Member Fresh effects
-         , Member NonDet effects
          , Member (State (Heap address Abstract)) effects
          , Ord address
          )
@@ -103,7 +124,5 @@ instance ( Member (Allocator address) effects
   unsignedRShift _ _ = pure Abstract
 
   liftComparison _ _ _ = pure Abstract
-
-  loop f = f empty
 
   castToInteger _ = pure Abstract

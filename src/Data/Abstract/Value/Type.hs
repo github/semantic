@@ -8,10 +8,11 @@ module Data.Abstract.Value.Type
   , unify
   , runFunction
   , runBoolean
+  , runWhile
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..))
+import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
@@ -280,6 +281,30 @@ runBoolean = interpret $ \case
   Abstract.Disjunction t1 t2 -> (runBoolean (Evaluator t1) >>= unify Bool) <|> (runBoolean (Evaluator t2) >>= unify Bool)
 
 
+runWhile ::
+  ( Member (Allocator address) effects
+  , Member (Deref Type) effects
+  , Member (Abstract.Boolean Type) effects
+  , Member NonDet effects
+  , Member (Env address) effects
+  , Member (Exc (Return address)) effects
+  , Member Fresh effects
+  , Member (Reader ModuleInfo) effects
+  , Member (Reader Span) effects
+  , Member (Resumable (BaseError TypeError)) effects
+  , Member (Resumable (BaseError (AddressError address Type))) effects
+  , Member (State (Heap address Type)) effects
+  , Member (State TypeMap) effects
+  , Ord address
+  , PureEffects effects
+  )
+  => Evaluator term address Type (Abstract.While Type ': effects) a
+  -> Evaluator term address Type effects a
+runWhile = interpret $ \case
+  Abstract.While cond body -> do
+    cond' <- runWhile (raiseEff cond)
+    ifthenelse cond' (runWhile (raiseEff body) *> empty) (pure unit)
+
 instance AbstractHole Type where
   hole = Hole
 
@@ -300,7 +325,6 @@ instance AbstractIntro Type where
 instance ( Member (Allocator address) effects
          , Member (Deref Type) effects
          , Member Fresh effects
-         , Member NonDet effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader Span) effects
          , Member (Resumable (BaseError (AddressError address Type))) effects
@@ -356,7 +380,5 @@ instance ( Member (Allocator address) effects
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
-
-  loop f = f empty
 
   castToInteger t = unify t (Int :+ Float :+ Rational) $> Int
