@@ -22,34 +22,29 @@ spec = parallel $ do
   let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
-      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (DiffAnnotation ())) `shouldSatisfy` all ((== positively p) . length . stem . fst)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax ()) `shouldSatisfy` all ((== positively p) . length . stem . fst)
 
     prop "produces grams with bases of the specified width" $
-      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax (DiffAnnotation ())) `shouldSatisfy` all ((== positively q) . length . base . fst)
+      \ (term, p, q) -> pqGramDecorator (positively p) (positively q) (term :: Term ListableSyntax ()) `shouldSatisfy` all ((== positively q) . length . base . fst)
 
   describe "rws" $ do
     prop "produces correct diffs" $
-      \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax (DiffAnnotation ())])
-                        tbs = decorate <$> (bs :: [Term ListableSyntax (DiffAnnotation ())])
+      \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax ()])
+                        tbs = decorate <$> (bs :: [Term ListableSyntax ()])
                         wrap = termIn emptyAnnotation . inject
                         diff = merge (emptyAnnotation, emptyAnnotation) (inject (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
-        -- (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap tas), Just (wrap tbs))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "a")) ])), decorate (termIn emptyAnnotation (inject [ termIn emptyAnnotation (inject (Syntax.Identifier "b")) ]))) in
       fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
-      -- rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ] `shouldBe` [ That a, These b b ]
 
   where decorate = defaultFeatureVectorDecorator
 
         diffThese = these deleting inserting replacing
 
--- | Strips the head annotation off a term annotated with non-empty records.
--- stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
--- stripTerm = fmap rtail
-stripTerm :: Functor f => Term f (FeatureVector, DiffAnnotation ()) -> Term f (DiffAnnotation ())
+stripTerm :: Functor f => Term f (FeatureVector, ()) -> Term f ()
 stripTerm = fmap snd
 
-emptyAnnotation :: DiffAnnotation ()
-emptyAnnotation = ((), Location emptyRange emptySpan)
+emptyAnnotation :: ()
+emptyAnnotation = ()

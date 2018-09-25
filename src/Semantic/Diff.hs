@@ -1,7 +1,6 @@
 {-# LANGUAGE ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables #-}
 module Semantic.Diff
   ( runDiff
-  , unitAlgebra
   , diffBlobTOCPairs
   ) where
 
@@ -28,16 +27,13 @@ import qualified Rendering.JSON as JSON
 -- | Using the specified renderer, diff a list of 'BlobPair's to produce a 'Builder' output.
 runDiff :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
-runDiff JSONDiffRenderer        = withParsedBlobPairs (decorate . unitAlgebra) (\blob -> render (renderJSONDiff blob) . bimap snd snd) >=> serialize JSON
-runDiff JSONGraphDiffRenderer   = withParsedBlobPairs (decorate . unitAlgebra) (\blob -> render (renderAdjGraph blob) . bimap snd snd) >=> serialize JSON
+runDiff JSONDiffRenderer        = withParsedBlobPairs (const pure) (render . renderJSONDiff) >=> serialize JSON
+runDiff JSONGraphDiffRenderer   = withParsedBlobPairs (const pure) (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph DiffVertex (Base t)) => BlobPair -> t -> JSON.JSON "diffs" SomeJSON
         renderAdjGraph blob diff = renderJSONAdjDiff blob (renderTreeGraph diff)
-runDiff SExpressionDiffRenderer = withParsedBlobPairs (decorate . unitAlgebra) (const (serialize (SExpression ByConstructorName)))
-runDiff ShowDiffRenderer        = withParsedBlobPairs (decorate . unitAlgebra) (const (serialize Show))
-runDiff DOTDiffRenderer         = withParsedBlobPairs (decorate . unitAlgebra) (\_ -> render renderTreeGraph . bimap snd snd) >=> serialize (DOT (diffStyle "diffs"))
-
-unitAlgebra :: Blob -> RAlgebra (TermF syntax Location) (Term syntax Location) (DiffAnnotation ())
-unitAlgebra _ (In ann _) = ((), ann)
+runDiff SExpressionDiffRenderer = withParsedBlobPairs (const pure) (const (serialize (SExpression ByConstructorName)))
+runDiff ShowDiffRenderer        = withParsedBlobPairs (const pure) (const (serialize Show))
+runDiff DOTDiffRenderer         = withParsedBlobPairs (const pure) (\_ -> render renderTreeGraph) >=> serialize (DOT (diffStyle "diffs"))
 
 data SomeTermPair typeclasses ann where
   SomeTermPair :: ApplyAll typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
@@ -52,21 +48,21 @@ type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasD
 type Decorate effs a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Eff effs (Term syntax b)
 
 withParsedBlobPairs :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs, Monoid output)
-                    => Decorate effs Location (DiffAnnotation a)
-                    -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax (DiffAnnotation a) (DiffAnnotation a) -> Eff effs output)
+                    => Decorate effs Location ann
+                    -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> Eff effs output)
                     -> [BlobPair]
                     -> Eff effs output
 withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> withParsedBlobPair decorate blobs >>= withSomeTermPair (diffTerms blobs >=> render blobs))
-  where diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax (DiffAnnotation a)) -> Eff effs (Diff syntax (DiffAnnotation a) (DiffAnnotation a))
+  where diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax ann) -> Eff effs (Diff syntax ann ann)
         diffTerms blobs terms = time "diff" languageTag $ do
           diff <- diff (runJoin terms)
           diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
           where languageTag = languageTagForBlobPair blobs
 
 withParsedBlobPair :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
-                   => Decorate effs Location (DiffAnnotation a)
+                   => Decorate effs Location ann
                    -> BlobPair
-                   -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] (DiffAnnotation a))
+                   -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] ann)
 withParsedBlobPair decorate blobs
   | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] (languageForBlobPair blobs)
     = SomeTermPair <$> distributeFor blobs (\ blob -> parse parser blob >>= decorate blob)
