@@ -1,4 +1,3 @@
-{-# LANGUAGE FunctionalDependencies, UndecidableInstances #-}
 module Control.Abstract.Primitive
   ( define
   , defineClass
