@@ -9,20 +9,21 @@ module Control.Abstract.Primitive
   , Lambda(..)
   ) where
 
-import Data.Abstract.Environment
-import Control.Abstract.Context
-import Control.Abstract.Environment
-import Control.Abstract.Evaluator
-import Control.Abstract.ScopeGraph (Declaration(..), declare, ScopeEnv, currentScope, newScope, EdgeLabel(..), withScope)
-import Control.Abstract.Heap
-import Control.Abstract.Value
+import           Control.Abstract.Context
+import           Control.Abstract.Environment
+import           Control.Abstract.Evaluator
+import           Control.Abstract.Heap
+import           Control.Abstract.ScopeGraph
+    (Declaration (..), EdgeLabel (..), ScopeError, ScopeGraph, currentScope, declare, newScope, withScope)
+import           Control.Abstract.Value
+import           Data.Abstract.BaseError
+import           Data.Abstract.Environment
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.BaseError
+import           Data.Abstract.Name (Name)
 import qualified Data.Abstract.Name as Name
-import Data.Abstract.Name (Name)
-import Data.Text (unpack)
-import Prologue
 import qualified Data.Map.Strict as Map
+import           Data.Text (unpack)
+import           Prologue
 
 define :: ( HasCallStack
           , Member (Allocator (Address address)) effects
@@ -31,7 +32,8 @@ define :: ( HasCallStack
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           , Member (State (Heap address address value)) effects
-          , Member (ScopeEnv address) effects
+          , Member (State (ScopeGraph address)) effects
+          , Member (Resumable (BaseError (ScopeError address))) effects
           , Ord address
           )
        => Declaration
@@ -47,12 +49,13 @@ define declaration def = withCurrentCallStack callStack $ do
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
                , Member (Allocator (Address address)) effects
-               , Member (ScopeEnv address) effects
                , Member (Deref value) effects
                , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
+               , Member (Resumable (BaseError (ScopeError address))) effects
                , Member (State (Heap address address value)) effects
+               , Member (State (ScopeGraph address)) effects
                , Ord address
                )
             => Declaration
@@ -66,12 +69,13 @@ defineClass declaration superclasses body = define declaration $ do
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator (Address address)) effects
-                   , Member (ScopeEnv address) effects
                    , Member (Deref value) effects
                    , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
+                   , Member (Resumable (BaseError (ScopeError address))) effects
                    , Member (State (Heap address address value)) effects
+                   , Member (State (ScopeGraph address)) effects
                    , Ord address
                    )
                 => Declaration
@@ -105,7 +109,7 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
     lambda' (var : vars) (body var)
   {-# INLINE lambda' #-}
 
-instance (Member Fresh effects, Member (Function address value) effects, Member (ScopeEnv address) effects) => Lambda address value effects (Evaluator address value effects address) where
+instance (Member Fresh effects, Member (Function address value) effects, Member (State (ScopeGraph address)) effects) => Lambda address value effects (Evaluator address value effects address) where
   lambda' vars action = do
     name <- Name.gensym
     span <- ask @Span -- TODO: This span is probably wrong
@@ -113,8 +117,9 @@ instance (Member Fresh effects, Member (Function address value) effects, Member 
     address <- declare (Declaration name) span Nothing
     let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
     functionScope <- newScope edges
-    withScope functionScope $
-      newFrame functionScope
+
+    functionFrame <- newFrame functionScope edges
+    withFrame functionFrame $
       function name vars lowerBound action
   {-# INLINE lambda' #-}
 
