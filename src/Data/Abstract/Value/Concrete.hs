@@ -10,6 +10,7 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
+import Control.Abstract.ScopeGraph (Allocator)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..))
 import Data.Abstract.BaseError
