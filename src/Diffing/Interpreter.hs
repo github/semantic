@@ -2,6 +2,7 @@
 module Diffing.Interpreter
 ( diffTerms
 , diffTermPair
+, stripDiff
 ) where
 
 import Control.Monad.Free.Freer
