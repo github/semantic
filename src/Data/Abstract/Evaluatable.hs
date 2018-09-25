@@ -54,7 +54,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Allocator address) effects
           , Member (Boolean value) effects
           , Member (Deref value) effects
-          , Member (ScopeEnv address) effects
+          , Member (State (ScopeGraph address)) effects
           , Member (Env address) effects
           , Member (Exc (LoopControl address)) effects
           , Member (Exc (Return address)) effects
@@ -85,7 +85,7 @@ type ModuleEffects address value rest
   =  Exc (LoopControl address)
   ': Exc (Return address)
   ': Env address
-  ': ScopeEnv address
+  ': State (ScopeGraph address)
   ': Deref value
   ': Allocator address
   ': Reader ModuleInfo
