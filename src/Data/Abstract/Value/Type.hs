@@ -263,7 +263,7 @@ runFunction = interpret $ \case
         -- assign functionFrameAddress (Declaration name) tvar
         bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     -- TODO: Probably declare name and create a new scope in the scope graph
-      (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= flip deref (Declaration name))
+      (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
   Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
