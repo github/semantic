@@ -6,6 +6,7 @@ import Control.Abstract.Context as X
 import Control.Abstract.Environment as X hiding (Lookup)
 import Control.Abstract.Evaluator as X
 import Control.Abstract.Heap as X
+import Control.Abstract.ScopeGraph as X
 import Control.Abstract.Hole as X
 import Control.Abstract.Modules as X
 import Control.Abstract.Primitive as X
