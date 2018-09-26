@@ -123,7 +123,7 @@ instance (Member (Reader ModuleInfo) effects, Member (Resumable (BaseError (Scop
       function name vars lowerBound action
   {-# INLINE lambda' #-}
 
-builtInPrint :: ( AbstractValue address value effects
+builtInPrint :: forall address value effects. ( AbstractValue address value effects
                 , HasCallStack
                 , Member (Allocator address) effects
                 , Member (Deref value) effects
@@ -144,4 +144,4 @@ builtInPrint :: ( AbstractValue address value effects
              => Evaluator address value effects value
 -- TODO: This Declaration usage might be wrong. How do we know name exists.
 builtInPrint =
-  lambda (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> currentFrame) -- box unit)
+  lambda @address @value @effects @(Name -> Evaluator address value effects value) (\ v -> variable v >>= deref >>= asString >>= trace . unpack >> pure unit) -- box unit)
