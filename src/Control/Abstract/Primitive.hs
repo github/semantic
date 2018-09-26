@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies, UndecidableInstances, ScopedTypeVariables #-}
 module Control.Abstract.Primitive
   ( define
   , defineClass
