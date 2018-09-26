@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances, LambdaCase #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances, LambdaCase, ScopedTypeVariables #-}
 module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
@@ -233,13 +233,16 @@ instance Ord address => ValueRoots address Type where
 runFunction :: ( Member (Allocator address) effects
                , Member (Deref Type) effects
                , Member (Env address) effects
-               , Member (Exc (Return address)) effects
+               , Member (Exc (Return Type)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError TypeError)) effects
                , Member (Resumable (BaseError (AddressError address Type))) effects
                , Member (State (Heap address address Type)) effects
+               , Member (State (ScopeGraph address)) effects
+               , Member (Resumable (BaseError (ScopeError address))) effects
+               , Member (Resumable (BaseError (HeapError address))) effects
                , Member (State TypeMap) effects
                , Ord address
                , PureEffects effects
@@ -266,15 +269,15 @@ runFunction = interpret $ \case
         -- assign functionFrameAddress (Declaration name) tvar
         bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     -- TODO: Probably declare name and create a new scope in the scope graph
-      (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
-  Abstract.Call op _ params -> do
+      (zeroOrMoreProduct tvars :->) <$> locally (catchReturn (bindAll env *> runFunction (Evaluator body)))
+
+  Abstract.Call op _ paramTypes -> do
     tvar <- fresh
-    paramTypes <- traverse deref params
     let needed = zeroOrMoreProduct paramTypes :-> Var tvar
     unified <- op `unify` needed
     case unified of
-      _ :-> ret -> box ret
-      actual    -> throwTypeError (UnificationError needed actual) >>= box
+      _ :-> ret -> pure ret
+      actual    -> throwTypeError (UnificationError needed actual)
 
 runBoolean :: ( Member NonDet effects
               , Member (Reader ModuleInfo) effects
@@ -321,12 +324,11 @@ instance ( Member (Allocator address) effects
          , Ord address
          )
       => AbstractValue address Type effects where
-  array fields = do
+  array fieldTypes = do
     var <- fresh
-    fieldTypes <- traverse deref fields
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
 
-  tuple fields = zeroOrMoreProduct <$> traverse deref fields
+  tuple fields = pure $ zeroOrMoreProduct fields
 
   klass _ _ _     = pure Object
   namespace _ _ _ = pure Unit
