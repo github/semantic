@@ -4,8 +4,6 @@ module Data.AST
   , nodeSpan
   , nodeByteRange
   , AST
-  -- , Location
-  -- , nodeLocation
   ) where
 
 import Data.Location
@@ -20,8 +18,6 @@ type AST syntax grammar = Term syntax (Node grammar)
 data Node grammar = Node
   { nodeSymbol    :: !grammar
   , nodeLocation  :: {-# UNPACK #-} !Location
-  -- , nodeByteRange :: {-# UNPACK #-} !Range
-  -- , nodeSpan      :: {-# UNPACK #-} !Span
   }
   deriving (Eq, Ord, Show)
 
@@ -37,6 +33,3 @@ nodeSpan = locationSpan . nodeLocation
 
 nodeByteRange :: Node grammar -> Range
 nodeByteRange = locationByteRange . nodeLocation
-
--- nodeLocation :: Node grammar -> Record Location
--- nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
