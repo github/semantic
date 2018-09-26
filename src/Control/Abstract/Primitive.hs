@@ -108,7 +108,18 @@ instance (Member Fresh effects, Lambda address value effects ret) => Lambda addr
     lambda' (var : vars) (body var)
   {-# INLINE lambda' #-}
 
-instance (Member (Reader ModuleInfo) effects, Member (Resumable (BaseError (ScopeError address))) effects, Member (Reader Span) effects, Ord address, Member (Allocator address) effects, Member (State (Heap address address value)) effects, Member (Resumable (BaseError (HeapError address))) effects, Member Fresh effects, Member (Function address value) effects, Member (State (ScopeGraph address)) effects) => Lambda address value effects (Evaluator address value effects address) where
+instance ( Member (Allocator address) effects
+         , Member (Function address value) effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader Span) effects
+         , Member (Resumable (BaseError (HeapError address))) effects
+         , Member (Resumable (BaseError (ScopeError address))) effects
+         , Member (State (Heap address address value)) effects
+         , Member (State (ScopeGraph address)) effects
+         , Member Fresh effects
+         , Ord address
+         )
+        => Lambda address value effects (Evaluator address value effects value) where
   lambda' vars action = do
     name <- Name.gensym
     span <- ask @Span -- TODO: This span is probably wrong
