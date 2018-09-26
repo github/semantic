@@ -114,12 +114,10 @@ instance (Member (Reader ModuleInfo) effects, Member (Resumable (BaseError (Scop
     span <- ask @Span -- TODO: This span is probably wrong
     currentScope' <- currentScope
     address <- declare (Declaration name) span Nothing
-    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+    let edges = Map.singleton Lexical [ currentScope' ]
     functionScope <- newScope edges
     currentFrame' <- currentFrame
-    let frameEdges = case currentScope' of
-          Just scope -> Map.singleton Lexical (Map.singleton scope currentFrame')
-          Nothing -> mempty
+    let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
     functionFrame <- newFrame functionScope frameEdges
     withScopeAndFrame functionFrame $ do
       function name vars lowerBound action
