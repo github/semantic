@@ -11,23 +11,23 @@ import Data.Location
 -- | 'History' values, when attached to a given 'Term', describe the ways in
 -- which that term was modified during a refactoring pass, if any.
 data History
-  = Refactored Location
+  = Refactored Range
   -- ^ A 'Refactored' node was changed by a refactor but still has
   -- (possibly-inaccurate) position information.
-  | Unmodified Location
+  | Unmodified Range
   -- ^ An 'Unmodified' node was not changed, but may have 'Refactored' children.
   deriving (Show, Eq)
 
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
 mark :: Functor f
-  => (Location -> History)
+  => (Range -> History)
   -> f Location
   -> f History
-mark = fmap
+mark f = fmap (\Location{..} -> f locationByteRange)
 
 -- | Change the 'History' annotation on a 'Term'.
 remark :: Functor f
-  => (Location -> History)
+  => (Range -> History)
   -> f History
   -> f History
 remark f = fmap go where

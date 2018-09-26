@@ -34,7 +34,6 @@ import           Data.History
 import           Data.List (intersperse)
 import qualified Data.Machine as Machine
 import           Data.Range
-import           Data.Location
 import           Data.Reprinting.Scope (Scope)
 import qualified Data.Reprinting.Scope as Scope
 import           Data.Reprinting.Token as Token
@@ -165,15 +164,15 @@ descend t = do
     (Refactored _, PrettyPrinting) -> do
       allowAll
       tokenize (fmap into t)
-    (Refactored Location{..}, Reprinting) -> do
+    (Refactored r, Reprinting) -> do
       allowAll
-      let delimiter = Range crs (start locationByteRange)
+      let delimiter = Range crs (start r)
       unless (delimiter == Range 0 0) $ do
         log ("slicing: " <> show delimiter)
         chunk (slice delimiter src)
-      move (start locationByteRange)
+      move (start r)
       tokenize (fmap (withStrategy PrettyPrinting . into) t)
-      move (end locationByteRange)
+      move (end r)
 
 
 -- Combinators
