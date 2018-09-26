@@ -67,12 +67,12 @@ data Comparator
 function :: forall address value effects. Member (Function address value) effects => Name -> [Name] -> Set Name -> Evaluator address value effects value -> Evaluator address value effects value
 function name params fvs (Evaluator body) = send @(Function address value) (Function name params fvs body)
 
-call :: Member (Function address value) effects => value -> address -> [address] -> Evaluator address value effects address
+call :: Member (Function address value) effects => value -> address -> [value] -> Evaluator address value effects value
 call fn self args = send (Call fn self args)
 
 data Function address value m result where
   Function :: Name -> [Name] -> Set Name -> m value -> Function address value m value
-  Call     :: value -> address -> [address]   -> Function address value m address
+  Call     :: value -> address -> [value]   -> Function address value m value
 
 instance PureEffect (Function address value) where
   handle handler (Request (Function name params fvs body) k) = Request (Function name params fvs (handler body)) (handler . k)
@@ -173,10 +173,10 @@ class AbstractIntro value => AbstractValue address value effects where
   unsignedRShift :: value -> value -> Evaluator address value effects value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  tuple :: [address] -> Evaluator address value effects value
+  tuple :: [value] -> Evaluator address value effects value
 
   -- | Construct an array of zero or more values.
-  array :: [address] -> Evaluator address value effects value
+  array :: [value] -> Evaluator address value effects value
 
   asArray :: value -> Evaluator address value effects [address]
 
@@ -187,7 +187,7 @@ class AbstractIntro value => AbstractValue address value effects where
   asString :: value -> Evaluator address value effects Text
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
-  index :: value -> value -> Evaluator address value effects address
+  index :: value -> value -> Evaluator address value effects value
 
   -- | Build a class value from a name and environment.
   klass :: Declaration      -- ^ The new class's identifier
