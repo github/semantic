@@ -23,7 +23,7 @@ mark :: Functor f
   => (Range -> History)
   -> f Location
   -> f History
-mark f = fmap (\Location{..} -> f locationByteRange)
+mark f = fmap (f . locationByteRange)
 
 -- | Change the 'History' annotation on a 'Term'.
 remark :: Functor f
