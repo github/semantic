@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase, ScopedTypeVariables #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
@@ -26,9 +26,10 @@ import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Data.Word
 import Prologue
+import qualified Data.Map.Strict as Map
 
 data Value address body
-  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (ClosureBody address body) (Environment address)
+  = Closure PackageInfo ModuleInfo Name [Name] (ClosureBody (Value address body) body) address
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -47,7 +48,7 @@ data Value address body
   | Hole
   deriving (Eq, Ord, Show)
 
-data ClosureBody address body = ClosureBody { closureBodyId :: Int, closureBody :: body address }
+data ClosureBody value body = ClosureBody { closureBodyId :: Int, closureBody :: body value }
 
 instance Eq   (ClosureBody address body) where
   (==) = (==) `on` closureBodyId
@@ -61,14 +62,14 @@ instance Show (ClosureBody address body) where
 
 instance Ord address => ValueRoots address (Value address body) where
   valueRoots v
-    | Closure _ _ _ _ _ env <- v = Env.addresses env
+    | Closure _ _ _ _ _ env <- v = undefined -- Env.addresses env
     | otherwise                = mempty
 
 
-runFunction :: ( Member (Allocator address) effects
+runFunction :: forall address effects body a. ( Member (Allocator address) effects
                , Member (Deref (Value address body)) effects
                , Member (Env address) effects
-               , Member (Exc (Return address)) effects
+               , Member (Exc (Return (Value address body))) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader PackageInfo) effects
@@ -76,11 +77,12 @@ runFunction :: ( Member (Allocator address) effects
                , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                , Member (Resumable (BaseError (ValueError address body))) effects
                , Member (State (Heap address address (Value address body))) effects
+               , Member (State (ScopeGraph address)) effects
                , Ord address
                , PureEffects effects
                )
-            => (body address -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) address)
-            -> (Evaluator address value (Abstract.Function address (Value address body) ': effects) address -> body address)
+            => (body (Value address body) -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) (Value address body))
+            -> (Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) (Value address body) -> body (Value address body))
             -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
             -> Evaluator address (Value address body) effects a
 runFunction toEvaluator fromEvaluator = interpret $ \case
@@ -88,7 +90,10 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) <$> close (foldr Set.delete fvs params)
+    currentScope' <- (currentScope :: Evaluator address (Value address body) effects address)
+    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+    scope <- (newScope lexicalEdges :: Evaluator address (Value address body) effects address)
+    pure $ (Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) (scope :: address))
   Abstract.Call op self params -> do
     case op of
       Closure packageInfo moduleInfo _ names (ClosureBody _ body) env -> do
