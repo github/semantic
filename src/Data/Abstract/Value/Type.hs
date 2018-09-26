@@ -259,7 +259,7 @@ runFunction = interpret $ \case
     currentFrame' <- currentFrame
     let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
     functionFrame <- newFrame functionScope frameEdges
-    withScope functionScope $ do
+    withScopeAndFrame functionFrame $ do
       (env, tvars) <- foldr (\ name rest -> do
         addr <- alloc name
         tvar <- Var <$> fresh
@@ -348,7 +348,7 @@ instance ( Member (Allocator address) effects
     _ <- unify sub Int
     field <- fresh
     _ <- unify (Array (Var field)) arr
-    box (Var field)
+    pure (Var field)
 
   liftNumeric _ = unify (Int :+ Float :+ Rational)
   liftNumeric2 _ left right = case (left, right) of
