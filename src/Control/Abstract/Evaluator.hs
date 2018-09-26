@@ -40,18 +40,18 @@ deriving instance Member (Lift IO) effects => MonadIO (Evaluator address value e
 -- Effects
 
 -- | An effect for explicitly returning out of a function/method body.
-newtype Return address = Return { unReturn :: address }
+newtype Return value = Return { unReturn :: value }
   deriving (Eq, Ord, Show)
 
-earlyReturn :: Member (Exc (Return address)) effects
-            => address
-            -> Evaluator address value effects address
+earlyReturn :: Member (Exc (Return value)) effects
+            => value
+            -> Evaluator address value effects value
 earlyReturn = throwError . Return
 
-catchReturn :: (Member (Exc (Return address)) effects, Effectful (m address value)) => m address value effects address -> m address value effects address
+catchReturn :: (Member (Exc (Return value)) effects, Effectful (m address value)) => m address value effects value -> m address value effects value
 catchReturn = Eff.raiseHandler (handleError (\ (Return addr) -> pure addr))
 
-runReturn :: (Effectful (m address value), Effects effects) => m address value (Exc (Return address) ': effects) address -> m address value effects address
+runReturn :: (Effectful (m address value), Effects effects) => m address value (Exc (Return value) ': effects) value -> m address value effects value
 runReturn = Eff.raiseHandler (fmap (either unReturn id) . runError)
 
 
