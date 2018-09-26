@@ -201,14 +201,14 @@ isMeaningfulTerm :: Term ListableSyntax a -> Bool
 isMeaningfulTerm a
   | Just (_:_) <- project (termOut a) = False
   | Just []    <- project (termOut a) = False
-  | otherwise                            = True
+  | otherwise                         = True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
 isMethodOrFunction :: Term' -> Bool
 isMethodOrFunction a
   | Just Declaration.Method{}   <- project (termOut a) = True
   | Just Declaration.Function{} <- project (termOut a) = True
-  | any isJust (foldMap (:[]) a)                     = True
+  | any isJust (foldMap (:[]) a)                       = True
   | otherwise                                          = False
 
 blobsForPaths :: Both FilePath -> IO BlobPair
