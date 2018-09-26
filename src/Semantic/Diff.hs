@@ -33,7 +33,7 @@ runDiff JSONGraphDiffRenderer   = withParsedBlobPairs (const pure) (render . ren
         renderAdjGraph blob diff = renderJSONAdjDiff blob (renderTreeGraph diff)
 runDiff SExpressionDiffRenderer = withParsedBlobPairs (const pure) (const (serialize (SExpression ByConstructorName)))
 runDiff ShowDiffRenderer        = withParsedBlobPairs (const pure) (const (serialize Show))
-runDiff DOTDiffRenderer         = withParsedBlobPairs (const pure) (\_ -> render renderTreeGraph) >=> serialize (DOT (diffStyle "diffs"))
+runDiff DOTDiffRenderer         = withParsedBlobPairs (const pure) (const (render renderTreeGraph)) >=> serialize (DOT (diffStyle "diffs"))
 
 data SomeTermPair typeclasses ann where
   SomeTermPair :: ApplyAll typeclasses syntax => Join These (Term syntax ann) -> SomeTermPair typeclasses ann
