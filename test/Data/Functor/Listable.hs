@@ -520,9 +520,9 @@ instance Listable Text where
 
 instance Listable Declaration where
   tiers
-    =  cons4 MethodDeclaration
-    \/ cons3 FunctionDeclaration
-    \/ cons2 (\ a b -> ErrorDeclaration a b Language.Unknown)
+    =  cons5 MethodDeclaration
+    \/ cons4 FunctionDeclaration
+    \/ cons3 (\ a b c -> ErrorDeclaration a b c Language.Unknown)
 
 instance Listable CyclomaticComplexity where
   tiers = cons1 CyclomaticComplexity

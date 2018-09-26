@@ -19,25 +19,24 @@ import Rendering.TOC
 
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
-renderToSymbols :: (Foldable f, Functor f) => SymbolFields -> Blob -> Term f TOCAnnotation -> [Value]
+renderToSymbols :: (Foldable f, Functor f) => SymbolFields -> Blob -> Term f (Maybe Declaration) -> [Value]
 renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
   where
-    termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f TOCAnnotation -> File
+    termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f (Maybe Declaration) -> File
     termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
-symbolSummary :: SymbolFields -> FilePath -> T.Text -> TOCAnnotation -> Maybe Symbol
-symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
-  Just ErrorDeclaration{} -> Nothing
-  Just declaration -> Just Symbol
+symbolSummary :: SymbolFields -> FilePath -> T.Text -> Declaration -> Maybe Symbol
+symbolSummary SymbolFields{..} path _ record = case record of
+  ErrorDeclaration{} -> Nothing
+  declaration -> Just Symbol
     { symbolName = when symbolFieldsName (declarationIdentifier declaration)
     , symbolPath = when symbolFieldsPath (T.pack path)
     , symbolLang = join (when symbolFieldsLang (T.pack . show <$> ensureLanguage (declarationLanguage declaration)))
     , symbolKind = when symbolFieldsKind (toCategoryName declaration)
     , symbolLine = when symbolFieldsLine (declarationText declaration)
-    , symbolSpan = when symbolFieldsSpan (locationSpan (snd record))
+    , symbolSpan = when symbolFieldsSpan (declarationSpan declaration)
     }
-  _ -> Nothing
 
 data File = File
   { filePath :: T.Text
