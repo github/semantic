@@ -75,7 +75,6 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Ord address
                  , Ord context
                  , Foldable syntax
-                 , Functor syntax
                  , term ~ Term syntax Location
                  )
               => Open (Open (term -> Evaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address)))))
