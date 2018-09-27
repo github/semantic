@@ -2,12 +2,11 @@
 {-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
 module Semantic.Util where
 
-import Prelude hiding (id, (.), readFile)
+import Prelude hiding (readFile)
 
 import           Analysis.Abstract.Caching.FlowSensitive
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
-import           Control.Category
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address.Monovariant as Monovariant
@@ -19,7 +18,6 @@ import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
-import           Data.Coerce
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
@@ -42,7 +40,7 @@ import           Text.Show.Pretty (ppShow)
 justEvaluating
   = runM
   . runPrintingTrace
-  . runState lowerBound
+  . runHeap
   . runFresh 0
   . fmap reassociate
   . runLoadError
@@ -58,7 +56,6 @@ checking
   . runPrintingTrace
   . runState (lowerBound @(Heap Monovariant Type))
   . runFresh 0
-  . runTermEvaluator @_ @Monovariant @Type
   . caching
   . providingLiveSet
   . fmap reassociate
@@ -87,7 +84,7 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   x <- runCallGraph proxy False modules package
   pure (x, (() <$) <$> modules)
 
-evaluatePythonProject = evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
+evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 
@@ -102,26 +99,26 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise _))
+  pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (runModules (ModuleTable.modulePaths (packageModules package))
        (runReader (packageInfo package)
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
-       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runWhile . Concrete.runFunction coerce coerce) modules)))))))
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (fmap (Concrete.runBoolean . Concrete.runWhile) . Concrete.runFunction) modules)))))))
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
   package <- fmap quieterm <$> parsePythonPackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
-  pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise '[Trace]))
+  pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
+       (runModules (ModuleTable.modulePaths (packageModules package))
        (runReader (packageInfo package)
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
-       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (Concrete.runBoolean . Concrete.runWhile . Concrete.runFunction coerce coerce) modules)))))))
+       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (fmap (Concrete.runBoolean . Concrete.runWhile) . Concrete.runFunction) modules)))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
@@ -132,8 +129,8 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
        (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
-       (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (Type.runBoolean . Type.runWhile . Type.runFunction) modules))))))
+       (runModules (ModuleTable.modulePaths (packageModules package))
+       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (fmap (Type.runBoolean . Type.runWhile) . Type.runFunction) modules))))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
@@ -151,3 +148,5 @@ reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeE
 
 prettyShow :: Show a => a -> IO ()
 prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow
+
+{-# ANN module ("HLint: ignore Reduce duplication" :: String) #-}

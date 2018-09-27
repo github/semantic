@@ -27,16 +27,18 @@ runFunction :: ( Member (Allocator address) effects
                , Ord address
                , PureEffects effects
                )
-            => Evaluator address Abstract (Function address Abstract ': effects) a
-            -> Evaluator address Abstract effects a
-runFunction = interpret $ \case
-  Function _ params _ body -> do
+            => (term -> Evaluator term address Abstract (Abstract.Function term address Abstract ': effects) address)
+            -> Evaluator term address Abstract (Function term address Abstract ': effects) a
+            -> Evaluator term address Abstract effects a
+runFunction eval = interpret $ \case
+  Function _ params body -> do
     env <- foldr (\ name rest -> do
       addr <- alloc name
       assign addr Abstract
       Env.insert name addr <$> rest) (pure lowerBound) params
-    addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
+    addr <- locally (bindAll env *> catchReturn (runFunction eval (eval body)))
     deref addr
+  BuiltIn _ -> pure Abstract
   Call _ _ params -> do
     traverse_ deref params
     box Abstract
@@ -44,8 +46,8 @@ runFunction = interpret $ \case
 runBoolean :: ( Member NonDet effects
               , PureEffects effects
               )
-           => Evaluator address Abstract (Boolean Abstract ': effects) a
-           -> Evaluator address Abstract effects a
+           => Evaluator term address Abstract (Boolean Abstract ': effects) a
+           -> Evaluator term address Abstract effects a
 runBoolean = interpret $ \case
   Boolean _       -> pure Abstract
   AsBool  _       -> pure True <|> pure False
@@ -66,8 +68,8 @@ runWhile ::
   , Ord address
   , PureEffects effects
   )
-  => Evaluator address Abstract (While Abstract ': effects) a
-  -> Evaluator address Abstract effects a
+  => Evaluator term address Abstract (While Abstract ': effects) a
+  -> Evaluator term address Abstract effects a
 runWhile = interpret $ \case
   Abstract.While cond body -> do
     cond' <- runWhile (raiseEff cond)
@@ -97,7 +99,7 @@ instance ( Member (Allocator address) effects
          , Member (State (Heap address Abstract)) effects
          , Ord address
          )
-      => AbstractValue address Abstract effects where
+      => AbstractValue term address Abstract effects where
   array _ = pure Abstract
 
   tuple _ = pure Abstract

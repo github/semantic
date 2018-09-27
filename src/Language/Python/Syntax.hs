@@ -72,7 +72,7 @@ resolvePythonModules :: ( Member (Modules address) effects
                         , Member Trace effects
                         )
                      => QualifiedName
-                     -> Evaluator address value effects (NonEmpty ModulePath)
+                     -> Evaluator term address value effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -129,7 +129,7 @@ toTuple Alias{..} = (aliasValue, aliasName)
 instance Evaluatable Import where
   -- from . import moduleY
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
+  eval _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
     rvalBox =<< evalQualifiedImport aliasValue path
 
@@ -137,7 +137,7 @@ instance Evaluatable Import where
   -- from a import b as c
   -- from a import *
   -- from .moduleY import b
-  eval (Import name xs) = do
+  eval _ (Import name xs) = do
     modulePaths <- resolvePythonModules name
 
     -- Eval parent modules first
@@ -155,7 +155,7 @@ instance Evaluatable Import where
 
 
 -- Evaluate a qualified import
-evalQualifiedImport :: ( AbstractValue address value effects
+evalQualifiedImport :: ( AbstractValue term address value effects
                        , Member (Allocator address) effects
                        , Member (Deref value) effects
                        , Member (Env address) effects
@@ -163,7 +163,7 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (State (Heap address value)) effects
                        , Ord address
                        )
-                    => Name -> ModulePath -> Evaluator address value effects value
+                    => Name -> ModulePath -> Evaluator term address value effects value
 evalQualifiedImport name path = letrec' name $ \addr -> do
   unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
@@ -188,7 +188,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport qualifiedName) = do
+  eval _ (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
     rvalBox =<< go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
     where
@@ -208,14 +208,14 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c as e
 instance Evaluatable QualifiedAliasedImport where
-  eval (QualifiedAliasedImport name aliasTerm) = do
+  eval _ (QualifiedAliasedImport name aliasTerm) = do
     modulePaths <- resolvePythonModules name
 
     -- Evaluate each parent module
     for_ (NonEmpty.init modulePaths) require
 
     -- Evaluate and import the last module, aliasing and updating the environment
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     rvalBox =<< letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
       unit <$ makeNamespace alias addr Nothing (void (bindAll . fst . snd =<< require path)))

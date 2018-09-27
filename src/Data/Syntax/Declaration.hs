@@ -28,12 +28,12 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval Function{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm functionName))
-    (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) (freeVariables functionBody) (subtermAddress functionBody))
+  eval _ Function{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
+    (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) functionBody)
     bind name addr
     pure (Rval addr)
-    where paramNames = foldMap (maybeToList . declaredName . subterm)
+    where paramNames = foldMap (maybeToList . declaredName)
 
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
@@ -61,12 +61,12 @@ instance Diffable Method where
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
 instance Evaluatable Method where
-  eval Method{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm methodName))
-    (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) (freeVariables methodBody) (subtermAddress methodBody))
+  eval _ Method{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
+    (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) methodBody)
     bind name addr
     pure (Rval addr)
-    where paramNames = foldMap (maybeToList . declaredName . subterm)
+    where paramNames = foldMap (maybeToList . declaredName)
 
 instance Tokenize Data.Syntax.Declaration.Method where
   tokenize Method{..} = within' Scope.Method $ do
@@ -127,12 +127,12 @@ instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
-  eval (VariableDeclaration [])   = rvalBox unit
-  eval (VariableDeclaration decs) = do
+  eval _ (VariableDeclaration [])   = rvalBox unit
+  eval eval (VariableDeclaration decs) = do
     addresses <- for decs $ \declaration -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName (subterm declaration))
+      name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
       (span, valueRef) <- do
-        ref <- subtermRef declaration
+        ref <- eval declaration
         subtermSpan <- get @Span
         pure (subtermSpan, ref)
 
@@ -173,9 +173,9 @@ instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
-  eval PublicFieldDefinition{..} = do
+  eval _ PublicFieldDefinition{..} = do
     span <- ask @Span
-    propertyName <- maybeM (throwEvalError NoNameError) (declaredName (subterm publicFieldPropertyName))
+    propertyName <- maybeM (throwEvalError NoNameError) (declaredName publicFieldPropertyName)
     declare (Declaration propertyName) span Nothing
     rvalBox unit
 
@@ -205,16 +205,16 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval Class{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
+  eval eval Class{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
     span <- ask @Span
     -- Run the action within the class's scope.
     currentScope' <- currentScope
 
     supers <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
+      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
       scope <- associatedScope (Declaration name)
-      (scope,) <$> subtermAddress superclass
+      (scope,) <$> (eval superclass >>= address)
 
     let imports = (Import,) <$> (fmap pure . catMaybes $ fst <$> supers)
         current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
@@ -224,7 +224,7 @@ instance Evaluatable Class where
 
     withScope childScope $ do
       (_, addr) <- letrec name $ do
-        void $ subtermValue classBody
+        void $ eval classBody
         classBinds <- Env.head <$> getEnv
         klass name (snd <$> supers) classBinds
       bind name addr
@@ -302,11 +302,10 @@ instance Eq1 TypeAlias where liftEq = genericLiftEq
 instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for TypeAlias
 instance Evaluatable TypeAlias where
-  eval TypeAlias{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasIdentifier))
-    addr <- subtermAddress typeAliasKind
+  eval eval TypeAlias{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
+    addr <- eval typeAliasKind >>= address
     bind name addr
     pure (Rval addr)
 

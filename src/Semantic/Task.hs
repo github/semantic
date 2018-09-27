@@ -109,8 +109,8 @@ type Renderer i o = i -> o
 parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
--- | A task running some 'Analysis.TermEvaluator' to completion.
-analyze :: Member Task effs => (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Eff effs result
+-- | A task running some 'Analysis.Evaluator' to completion.
+analyze :: Member Task effs => (Analysis.Evaluator term address value effects a -> result) -> Analysis.Evaluator term address value effects a -> Eff effs result
 analyze interpret analysis = send (Analyze interpret analysis)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
@@ -170,7 +170,7 @@ runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 -- | An effect describing high-level tasks to be performed.
 data Task (m :: * -> *) output where
   Parse     :: Parser term -> Blob -> Task m term
-  Analyze   :: (Analysis.TermEvaluator term address value effects a -> result) -> Analysis.TermEvaluator term address value effects a -> Task m result
+  Analyze   :: (Analysis.Evaluator term address value effects a -> result) -> Analysis.Evaluator term address value effects a -> Task m result
   Decorate  :: Functor f => RAlgebra (TermF f Location) (Term f Location) field -> Term f Location -> Task m (Term f field)
   Diff      :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax) => These (Term syntax ann) (Term syntax ann) -> Task m (Diff syntax ann ann)
   Render    :: Renderer input output -> input -> Task m output

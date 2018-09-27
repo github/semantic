@@ -16,29 +16,29 @@ import Prologue
 -- | Look up the set of values for a given configuration in the in-cache.
 consultOracle :: (Member (Reader (Cache term address)) effects, Ord address, Ord term)
               => Configuration term address
-              -> TermEvaluator term address value effects (Set (ValueRef address))
+              -> Evaluator term address value effects (Set (ValueRef address))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
 withOracle :: Member (Reader (Cache term address)) effects
            => Cache term address
-           -> TermEvaluator term address value effects a
-           -> TermEvaluator term address value effects a
+           -> Evaluator term address value effects a
+           -> Evaluator term address value effects a
 withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
 lookupCache :: (Member (State (Cache term address)) effects, Ord address, Ord term)
             => Configuration term address
-            -> TermEvaluator term address value effects (Maybe (Set (ValueRef address)))
+            -> Evaluator term address value effects (Maybe (Set (ValueRef address)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
 cachingConfiguration :: (Member (State (Cache term address)) effects, Ord address, Ord term)
                      => Configuration term address
                      -> Set (ValueRef address)
-                     -> TermEvaluator term address value effects (ValueRef address)
-                     -> TermEvaluator term address value effects (ValueRef address)
+                     -> Evaluator term address value effects (ValueRef address)
+                     -> Evaluator term address value effects (ValueRef address)
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
   result <- action
@@ -46,19 +46,18 @@ cachingConfiguration configuration values action = do
 
 putCache :: Member (State (Cache term address)) effects
          => Cache term address
-         -> TermEvaluator term address value effects ()
+         -> Evaluator term address value effects ()
 putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
 isolateCache :: (Member (State (Cache term address)) effects, Member (State (Heap address value)) effects)
-             => TermEvaluator term address value effects a
-             -> TermEvaluator term address value effects (Cache term address, Heap address value)
+             => Evaluator term address value effects a
+             -> Evaluator term address value effects (Cache term address, Heap address value)
 isolateCache action = putCache lowerBound *> action *> ((,) <$> get <*> get)
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
-cachingTerms :: ( Corecursive term
-                , Member (Env address) effects
+cachingTerms :: ( Member (Env address) effects
                 , Member NonDet effects
                 , Member (Reader (Cache term address)) effects
                 , Member (Reader (Live address)) effects
@@ -66,18 +65,17 @@ cachingTerms :: ( Corecursive term
                 , Ord address
                 , Ord term
                 )
-             => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
-             -> SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address))
-cachingTerms recur term = do
-  c <- getConfiguration (embedSubterm term)
+             => Open (Open (term -> Evaluator term address value effects (ValueRef address)))
+cachingTerms recur0 recur term = do
+  c <- getConfiguration term
   cached <- lookupCache c
   case cached of
     Just values -> scatter values
     Nothing -> do
       values <- consultOracle c
-      cachingConfiguration c values (recur term)
+      cachingConfiguration c values (recur0 recur term)
 
-convergingModules :: ( AbstractValue address value effects
+convergingModules :: ( AbstractValue term address value effects
                      , Effects effects
                      , Eq value
                      , Member (Env address) effects
@@ -93,14 +91,13 @@ convergingModules :: ( AbstractValue address value effects
                      , Ord address
                      , Ord term
                      )
-                  => SubtermAlgebra Module term (TermEvaluator term address value effects address)
-                  -> SubtermAlgebra Module term (TermEvaluator term address value effects address)
+                  => Open (Module term -> Evaluator term address value effects address)
 convergingModules recur m = do
-  c <- getConfiguration (subterm (moduleBody m))
-  heap <- TermEvaluator getHeap
+  c <- getConfiguration (moduleBody m)
+  heap <- getHeap
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   (cache, _) <- converge (lowerBound, heap) (\ (prevCache, _) -> isolateCache $ do
-    TermEvaluator (putEvalContext (configurationContext c))
+    putEvalContext (configurationContext c)
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
@@ -109,7 +106,7 @@ convergingModules recur m = do
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m)))
-  TermEvaluator (address =<< runTermEvaluator (maybe empty scatter (cacheLookup c cache)))
+  address =<< maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
@@ -127,17 +124,17 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet effects) => t (ValueRef address) -> TermEvaluator term address value effects (ValueRef address)
+scatter :: (Foldable t, Member NonDet effects) => t (ValueRef address) -> Evaluator term address value effects (ValueRef address)
 scatter = foldMapA pure
 
 -- | Get the current 'Configuration' with a passed-in term.
 getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects)
                  => term
-                 -> TermEvaluator term address value effects (Configuration term address)
-getConfiguration term = Configuration term <$> TermEvaluator askRoots <*> TermEvaluator getEvalContext
+                 -> Evaluator term address value effects (Configuration term address)
+getConfiguration term = Configuration term <$> askRoots <*> getEvalContext
 
 
-caching :: Effects effects => TermEvaluator term address value (NonDet ': Reader (Cache term address) ': State (Cache term address) ': effects) a -> TermEvaluator term address value effects (Cache term address, [a])
+caching :: Effects effects => Evaluator term address value (NonDet ': Reader (Cache term address) ': State (Cache term address) ': effects) a -> Evaluator term address value effects (Cache term address, [a])
 caching
   = runState lowerBound
   . runReader lowerBound

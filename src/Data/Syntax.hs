@@ -162,7 +162,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = pure (LvalLocal name)
+  eval _ (Identifier name) = pure (LvalLocal name)
 
 instance Tokenize Identifier where
   tokenize = yield . Run . formatName . Data.Syntax.name
@@ -197,7 +197,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = rvalBox unit
+  eval _ _ = rvalBox unit
 
 instance Tokenize Empty where
   tokenize = ignore
@@ -303,7 +303,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval Context{..} = subtermRef contextSubject
+  eval eval Context{..} = eval contextSubject
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

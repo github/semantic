@@ -30,15 +30,15 @@ import Data.Span (Span)
 import Prologue
 
 -- | Retrieve the heap.
-getHeap :: Member (State (Heap address value)) effects => Evaluator address value effects (Heap address value)
+getHeap :: Member (State (Heap address value)) effects => Evaluator term address value effects (Heap address value)
 getHeap = get
 
 -- | Set the heap.
-putHeap :: Member (State (Heap address value)) effects => Heap address value -> Evaluator address value effects ()
+putHeap :: Member (State (Heap address value)) effects => Heap address value -> Evaluator term address value effects ()
 putHeap = put
 
 -- | Update the heap.
-modifyHeap :: Member (State (Heap address value)) effects => (Heap address value -> Heap address value) -> Evaluator address value effects ()
+modifyHeap :: Member (State (Heap address value)) effects => (Heap address value -> Heap address value) -> Evaluator term address value effects ()
 modifyHeap = modify'
 
 box :: ( Member (Allocator address) effects
@@ -48,17 +48,17 @@ box :: ( Member (Allocator address) effects
        , Ord address
        )
     => value
-    -> Evaluator address value effects address
+    -> Evaluator term address value effects address
 box val = do
   name <- gensym
   addr <- alloc name
   assign addr val
   pure addr
 
-alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
+alloc :: Member (Allocator address) effects => Name -> Evaluator term address value effects address
 alloc = send . Alloc
 
-dealloc :: (Member (State (Heap address value)) effects, Ord address) => address -> Evaluator address value effects ()
+dealloc :: (Member (State (Heap address value)) effects, Ord address) => address -> Evaluator term address value effects ()
 dealloc addr = modifyHeap (heapDelete addr)
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
@@ -70,7 +70,7 @@ deref :: ( Member (Deref value) effects
          , Ord address
          )
       => address
-      -> Evaluator address value effects value
+      -> Evaluator term address value effects value
 deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress addr))
 
 
@@ -81,7 +81,7 @@ assign :: ( Member (Deref value) effects
           )
        => address
        -> value
-       -> Evaluator address value effects ()
+       -> Evaluator term address value effects ()
 assign addr value = do
   heap <- getHeap
   cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)))
@@ -96,7 +96,7 @@ gc :: ( Member (State (Heap address value)) effects
       , ValueRoots address value
       )
    => Live address                       -- ^ The set of addresses to consider rooted.
-   -> Evaluator address value effects ()
+   -> Evaluator term address value effects ()
 gc roots = modifyHeap (heapRestrict <*> reachable roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
@@ -152,18 +152,16 @@ throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))
                      , Member (Reader Span) effects
                      )
                   => AddressError address body resume
-                  -> Evaluator address value effects resume
+                  -> Evaluator term address value effects resume
 throwAddressError = throwBaseError
 
-runAddressError :: ( Effectful (m address value)
-                   , Effects effects
-                   )
-                => m address value (Resumable (BaseError (AddressError address value)) ': effects) a
-                -> m address value effects (Either (SomeExc (BaseError (AddressError address value))) a)
+runAddressError :: Effects effects
+                => Evaluator term address value (Resumable (BaseError (AddressError address value)) ': effects) a
+                -> Evaluator term address value effects (Either (SomeExc (BaseError (AddressError address value))) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: (Effectful (m address value), Effects effects)
-                    => (forall resume . (BaseError (AddressError address value)) resume -> m address value effects resume)
-                    -> m address value (Resumable (BaseError (AddressError address value)) ': effects) a
-                    -> m address value effects a
+runAddressErrorWith :: Effects effects
+                    => (forall resume . (BaseError (AddressError address value)) resume -> Evaluator term address value effects resume)
+                    -> Evaluator term address value (Resumable (BaseError (AddressError address value)) ': effects) a
+                    -> Evaluator term address value effects a
 runAddressErrorWith = runResumableWith
