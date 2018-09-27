@@ -12,7 +12,7 @@ module Data.Abstract.Value.Type
   ) where
 
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), While(..), raiseHandler)
+import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Monad.Effect.Internal (raiseHandler)
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
@@ -98,7 +98,7 @@ throwTypeError :: ( Member (Resumable (BaseError TypeError)) effects
                   , Member (Reader Span) effects
                   )
                => TypeError resume
-               -> Evaluator address value effects resume
+               -> Evaluator term address value effects resume
 throwTypeError = throwBaseError
 
 runTypeMap :: ( Effectful m
@@ -191,7 +191,7 @@ substitute :: ( Member (Reader ModuleInfo) effects
               )
            => TName
            -> Type
-           -> Evaluator address value effects Type
+           -> Evaluator term address value effects Type
 substitute id ty = do
   infiniteType <- occur id ty
   ty <- if infiniteType
@@ -208,7 +208,7 @@ unify :: ( Member (Reader ModuleInfo) effects
          )
       => Type
       -> Type
-      -> Evaluator address value effects Type
+      -> Evaluator term address value effects Type
 unify a b = do
   a' <- prune a
   b' <- prune b
@@ -244,16 +244,19 @@ runFunction :: ( Member (Allocator address) effects
                , Ord address
                , PureEffects effects
                )
-            => Evaluator address Type (Abstract.Function address Type ': effects) a
-            -> Evaluator address Type effects a
-runFunction = interpret $ \case
-  Abstract.Function _ params _ body -> do
+            => (term -> Evaluator term address Type (Abstract.Function term address Type ': effects) address)
+            -> Evaluator term address Type (Abstract.Function term address Type ': effects) a
+            -> Evaluator term address Type effects a
+runFunction eval = interpret $ \case
+  Abstract.Function _ params body -> do
     (env, tvars) <- foldr (\ name rest -> do
       addr <- alloc name
       tvar <- Var <$> fresh
       assign addr tvar
       bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
-    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction (Evaluator body))) >>= deref)
+    (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction eval (eval body))) >>= deref)
+  Abstract.BuiltIn Print -> pure (String :-> Unit)
+  Abstract.BuiltIn Show  -> pure (Object :-> String)
   Abstract.Call op _ params -> do
     tvar <- fresh
     paramTypes <- traverse deref params
@@ -270,8 +273,8 @@ runBoolean :: ( Member NonDet effects
               , Member (State TypeMap) effects
               , PureEffects effects
               )
-           => Evaluator address Type (Abstract.Boolean Type ': effects) a
-           -> Evaluator address Type effects a
+           => Evaluator term address Type (Abstract.Boolean Type ': effects) a
+           -> Evaluator term address Type effects a
 runBoolean = interpret $ \case
   Abstract.Boolean _         -> pure Bool
   Abstract.AsBool  t         -> unify t Bool *> (pure True <|> pure False)
@@ -295,8 +298,8 @@ runWhile ::
   , Ord address
   , PureEffects effects
   )
-  => Evaluator address Type (Abstract.While Type ': effects) a
-  -> Evaluator address Type effects a
+  => Evaluator term address Type (Abstract.While Type ': effects) a
+  -> Evaluator term address Type effects a
 runWhile = interpret $ \case
   Abstract.While cond body -> do
     cond' <- runWhile (raiseEff cond)
@@ -330,7 +333,7 @@ instance ( Member (Allocator address) effects
          , Member (State TypeMap) effects
          , Ord address
          )
-      => AbstractValue address Type effects where
+      => AbstractValue term address Type effects where
   array fields = do
     var <- fresh
     fieldTypes <- traverse deref fields
