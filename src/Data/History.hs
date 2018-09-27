@@ -6,8 +6,7 @@ module Data.History
   , remark
   ) where
 
-import Data.Record
-import Data.Range
+import Data.Location
 
 -- | 'History' values, when attached to a given 'Term', describe the ways in
 -- which that term was modified during a refactoring pass, if any.
@@ -22,17 +21,16 @@ data History
 -- | Convert a 'Term' annotated with a 'Range' to one annotated with a 'History'.
 mark :: Functor f
   => (Range -> History)
-  -> f (Record (Range ': fields))
-  -> f (Record (History ': fields))
-mark f = fmap go where go (r :. a) = f r :. a
+  -> f Location
+  -> f History
+mark f = fmap (f . locationByteRange)
 
 -- | Change the 'History' annotation on a 'Term'.
 remark :: Functor f
   => (Range -> History)
-  -> f (Record (History ': fields))
-  -> f (Record (History ': fields))
+  -> f History
+  -> f History
 remark f = fmap go where
-  go (r :. a) = x :. a where
-    x = case r of
-      Refactored r -> f r
-      Unmodified r -> f r
+  go h = case h of
+    Refactored l -> f l
+    Unmodified l -> f l

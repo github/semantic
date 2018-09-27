@@ -15,7 +15,6 @@ import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name
 import           Data.Functor (($>))
 import           Data.List.NonEmpty (some1)
-import           Data.Record
 import           Data.Syntax
     ( contextualize
     , emptyTerm
@@ -153,7 +152,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 -- For Protobuf serialization

@@ -10,7 +10,7 @@ import Data.Functor.Classes
 import Data.Hashable.Lifted
 import Data.Patch
 import Data.Range
-import Data.Record
+import Data.Location
 import Data.Span
 import Data.Sum
 import Data.Term
@@ -35,7 +35,7 @@ spec = parallel $ do
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff ListableSyntax () ()) `shouldBe` []
 
     prop "produces no entries for identity diffs" $
-      \ term -> tableOfContentsBy (Just . termFAnnotation) (diffTerms term (term :: Term ListableSyntax (Record '[Range, Span]))) `shouldBe` []
+      \ term -> tableOfContentsBy (Just . termFAnnotation) (diffTerms term (term :: Term ListableSyntax ())) `shouldBe` []
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting replacing p)
@@ -103,7 +103,7 @@ spec = parallel $ do
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (both "javascript/toc/starts-with-newline.js" "javascript/toc/starts-with-newline.js")
-      diff <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) $ diffWithParser rubyParser sourceBlobs
+      diff <- runTaskWithOptions (defaultOptions { optionsLogLevel = Nothing }) $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe` []
 
     prop "inserts of methods and functions are summarized" . forAll ((not . isMethodOrFunction . Prelude.snd) `filterT` tiers) $
@@ -165,25 +165,25 @@ spec = parallel $ do
       runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
-type Diff' = Diff ListableSyntax (Record '[Maybe Declaration, Range, Span]) (Record '[Maybe Declaration, Range, Span])
-type Term' = Term ListableSyntax (Record '[Maybe Declaration, Range, Span])
+type Diff' = Diff ListableSyntax (Maybe Declaration) (Maybe Declaration)
+type Term' = Term ListableSyntax (Maybe Declaration)
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
-programWithChange body = merge (programInfo, programInfo) (inject [ function' ])
+programWithChange body = merge (Nothing, Nothing) (inject [ function' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty Ruby) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Ruby) :. emptyInfo) (inject (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inject [ inserting body ]))))
-    name' = let info = Nothing :. emptyInfo in merge (info, info) (inject (Syntax.Identifier (name "foo")))
+    function' = merge (Just (FunctionDeclaration "foo" mempty lowerBound Ruby), Just (FunctionDeclaration "foo" mempty lowerBound Ruby)) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject [ inserting body ]))))
+    name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
-programWithChangeOutsideFunction term = merge (programInfo, programInfo) (inject [ function', term' ])
+programWithChangeOutsideFunction term = merge (Nothing, Nothing) (inject [ function', term' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty Unknown) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Unknown) :. emptyInfo) (inject (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inject []))))
-    name' = let info = Nothing :. emptyInfo in  merge (info, info) (inject (Syntax.Identifier (name "foo")))
+    function' = merge (Nothing, Nothing) (inject (Declaration.Function [] name' [] (merge (Nothing, Nothing) (inject []))))
+    name' = merge (Nothing, Nothing) (inject (Syntax.Identifier (name "foo")))
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -196,47 +196,36 @@ programWithReplace :: Text -> Term' -> Diff'
 programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Diff' -> Diff'
-programOf diff = merge (programInfo, programInfo) (inject [ diff ])
+programOf diff = merge (Nothing, Nothing) (inject [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf n body = termIn (Just (FunctionDeclaration n mempty Unknown) :. emptyInfo) (inject (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inject [body]))))
+functionOf n body = termIn (Just (FunctionDeclaration n mempty lowerBound Unknown)) (inject (Declaration.Function [] name' [] (termIn Nothing (inject [body]))))
   where
-    name' = termIn (Nothing :. emptyInfo) (inject (Syntax.Identifier (name n)))
-
-programInfo :: Record '[Maybe Declaration, Range, Span]
-programInfo = Nothing :. emptyInfo
-
-emptyInfo :: Record '[Range, Span]
-emptyInfo = Range 0 0 :. Span (Pos 0 0) (Pos 0 0) :. Nil
+    name' = termIn Nothing (inject (Syntax.Identifier (name n)))
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
 isMeaningfulTerm :: Term ListableSyntax a -> Bool
 isMeaningfulTerm a
   | Just (_:_) <- project (termOut a) = False
   | Just []    <- project (termOut a) = False
-  | otherwise                            = True
+  | otherwise                         = True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
 isMethodOrFunction :: Term' -> Bool
 isMethodOrFunction a
   | Just Declaration.Method{}   <- project (termOut a) = True
   | Just Declaration.Function{} <- project (termOut a) = True
-  | any isJust (foldMap ((:[]) . rhead) a)                = True
-  | otherwise                                             = False
+  | any isJust (foldMap (:[]) a)                       = True
+  | otherwise                                          = False
 
 blobsForPaths :: Both FilePath -> IO BlobPair
 blobsForPaths = readFilePair . fmap ("test/fixtures" </>)
 
 blankDiff :: Diff'
-blankDiff = merge (arrayInfo, arrayInfo) (inject [ inserting (termIn literalInfo (inject (Syntax.Identifier (name "\"a\"")))) ])
-  where
-    arrayInfo = Nothing :. Range 0 3 :. Span (Pos 1 1) (Pos 1 5) :. Nil
-    literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil
+blankDiff = merge (Nothing, Nothing) (inject [ inserting (termIn Nothing (inject (Syntax.Identifier (name "\"a\"")))) ])
 
 -- Diff helpers
-diffWithParser :: ( HasField fields Data.Span.Span
-                  , HasField fields Range
-                  , Eq1 syntax
+diffWithParser :: ( Eq1 syntax
                   , Show1 syntax
                   , Traversable syntax
                   , Diffable syntax
@@ -245,7 +234,7 @@ diffWithParser :: ( HasField fields Data.Span.Span
                   , Member Distribute effs
                   , Member Task effs
                   )
-               => Parser (Term syntax (Record fields))
+               => Parser (Term syntax Location)
                -> BlobPair
-               -> Eff effs (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
+               -> Eff effs (Diff syntax (Maybe Declaration) (Maybe Declaration))
 diffWithParser parser blobs = distributeFor blobs (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) >>= SpecHelpers.diff . runJoin

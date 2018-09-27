@@ -17,7 +17,7 @@ import Proto3.Wire.Decode as Decode
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
-  deriving (Eq, Show, Generic, Named)
+  deriving (Eq, Generic, Named)
 
 emptyRange :: Range
 emptyRange = Range 0 0
@@ -52,6 +52,9 @@ instance Semigroup Range where
 
 instance Ord Range where
   a <= b = start a <= start b
+
+instance Show Range where
+  showsPrec _ Range{..} = showChar '[' . shows start . showString " - " . shows end . showChar ']'
 
 instance ToJSONFields Range where
   toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]

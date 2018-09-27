@@ -12,7 +12,6 @@ import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (Name, name)
 import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Record
 import           Data.Sum
 import           Data.Syntax
     ( contextualize
@@ -120,7 +119,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 instance Named1 (Sum Syntax) where

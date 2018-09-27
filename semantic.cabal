@@ -91,6 +91,7 @@ library
                      , Data.History
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Location
                      , Data.Map.Monoidal
                      , Data.Proto.DiffTree
                      , Data.Proto.ParseTree
@@ -98,7 +99,6 @@ library
                      , Data.Project
                      , Data.Quieterm
                      , Data.Range
-                     , Data.Record
                      , Data.Reprinting.Errors
                      , Data.Reprinting.Fragment
                      , Data.Reprinting.Operator
@@ -109,7 +109,6 @@ library
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
-                     , Data.SplitDiff
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
