@@ -1,14 +1,12 @@
 {-# LANGUAGE DataKinds #-}
 module Data.AST
   ( Node (..)
+  , nodeSpan
+  , nodeByteRange
   , AST
-  , Location
-  , nodeLocation
   ) where
 
-import Data.Range
-import Data.Record
-import Data.Span
+import Data.Location
 import Data.Term
 import Data.Aeson
 import Data.Text (pack)
@@ -19,8 +17,7 @@ type AST syntax grammar = Term syntax (Node grammar)
 
 data Node grammar = Node
   { nodeSymbol    :: !grammar
-  , nodeByteRange :: {-# UNPACK #-} !Range
-  , nodeSpan      :: {-# UNPACK #-} !Span
+  , nodeLocation  :: {-# UNPACK #-} !Location
   }
   deriving (Eq, Ord, Show)
 
@@ -28,11 +25,11 @@ data Node grammar = Node
 instance Show grammar => ToJSONFields (Node grammar) where
   toJSONFields Node{..} =
     [ "symbol" .= pack (show nodeSymbol)
-    , "span"   .= nodeSpan
+    , "span"   .= locationSpan nodeLocation
     ]
 
--- | A location specified as possibly-empty intervals of bytes and line/column positions.
-type Location = '[Range, Span]
+nodeSpan :: Node grammar -> Span
+nodeSpan = locationSpan . nodeLocation
 
-nodeLocation :: Node grammar -> Record Location
-nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
+nodeByteRange :: Node grammar -> Range
+nodeByteRange = locationByteRange . nodeLocation

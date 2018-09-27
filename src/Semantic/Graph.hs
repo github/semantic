@@ -50,7 +50,7 @@ import           Data.Graph.ControlFlowVertex (VertexDeclarationStrategy, Vertex
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
-import           Data.Record
+import           Data.Location
 import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
@@ -82,15 +82,12 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: ( HasField fields Span
-                , Show (Record fields)
-                , Ord (Record fields)
-                , (VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax)
+runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax
                 , Declarations1 syntax
                 , Ord1 syntax
                 , Functor syntax
                 , Evaluatable syntax
-                , term ~ Term syntax (Record fields)
+                , term ~ Term syntax Location
                 , FreeVariables term
                 , Recursive term
                 , HasPrelude lang
@@ -224,18 +221,17 @@ parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule 
 
 
 -- | Parse a list of packages from a python project.
-parsePythonPackage :: forall syntax fields effs term.
+parsePythonPackage :: forall syntax effs term.
                    ( Declarations1 syntax
                    , Evaluatable syntax
                    , FreeVariables1 syntax
                    , Functor syntax
-                   , term ~ Term syntax (Record fields)
+                   , term ~ Term syntax Location
                    , Member (Exc SomeException) effs
                    , Member Distribute effs
                    , Member Resolution effs
                    , Member Trace effs
                    , Member Task effs
-                   , (Show (Record fields))
                    , Effects effs)
                    => Parser term       -- ^ A parser.
                    -> Project           -- ^ Project to parse into a package.
@@ -303,15 +299,14 @@ parseModule proj parser file = do
     Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
     Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
-withTermSpans :: ( HasField fields Span
-                 , Member (Reader Span) effects
+withTermSpans :: ( Member (Reader Span) effects
                  , Member (State Span) effects -- last evaluated child's span
                  , Recursive term
-                 , Base term ~ TermF syntax (Record fields)
+                 , Base term ~ TermF syntax Location
                  )
               => Open (Open (term -> Evaluator term address value effects a))
 withTermSpans recur0 recur term = let
-  span = getField (termFAnnotation (project term))
+  span = locationSpan (termFAnnotation (project term))
   updatedSpanAlg = withCurrentSpan span (recur0 recur term)
   in modifyChildSpan span updatedSpanAlg
 

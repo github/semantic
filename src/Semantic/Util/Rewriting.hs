@@ -14,7 +14,6 @@ import qualified Data.Language as Language
 import           Data.Machine
 import           Data.Machine.Runner
 import           Data.Project hiding (readFile)
-import           Data.Record
 import qualified Data.Source as Source
 import qualified Data.Sum as Sum
 import qualified Data.Syntax.Literal as Literal
@@ -81,7 +80,7 @@ testJSONFile = do
   tree <- parseFile jsonParser path
   pure (src, tree)
 
-renameKey :: (Literal.TextElement :< fs, Literal.KeyValue :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
+renameKey :: (Literal.TextElement :< fs, Literal.KeyValue :< fs, Apply Functor fs) => Term (Sum fs) History -> Term (Sum fs) History
 renameKey p = case projectTerm p of
   Just (Literal.KeyValue k v)
     | Just (Literal.TextElement x) <- Sum.project (termOut k)
@@ -95,19 +94,18 @@ testRenameKey = do
   let tagged = renameKey (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) (Record (History ': fields)) -> Term (Sum fs) (Record (History ': fields))
+increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) History -> Term (Sum fs) History
 increaseNumbers p = case Sum.project (termOut p) of
   Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
   Nothing                -> Term (fmap increaseNumbers (unTerm p))
 
-addKVPair :: forall effs syntax ann fields term .
+addKVPair :: forall effs syntax term .
   ( Apply Functor syntax
   , Literal.Hash :< syntax
   , Literal.Array :< syntax
   , Literal.TextElement :< syntax
   , Literal.KeyValue :< syntax
-  , ann ~ Record (History ': fields)
-  , term ~ Term (Sum syntax) ann
+  , term ~ Term (Sum syntax) History
   ) =>
   ProcessT (Eff effs) (Either term (term, Literal.Hash term)) term
 addKVPair = repeatedly $ do
@@ -128,11 +126,10 @@ testAddKVPair = do
   tagged <- runM $ cata (toAlgebra (fromMatcher matchHash ~> addKVPair)) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-overwriteFloats :: forall effs syntax ann fields term .
+overwriteFloats :: forall effs syntax term .
   ( Apply Functor syntax
   , Literal.Float :< syntax
-  , ann ~ Record (History ': fields)
-  , term ~ Term (Sum syntax) ann
+  , term ~ Term (Sum syntax) History
   ) =>
   ProcessT (Eff effs) (Either term (term, Literal.Float term)) term
 overwriteFloats = repeatedly $ do
@@ -149,15 +146,15 @@ testOverwriteFloats = do
 findKV ::
   ( Literal.KeyValue :< syntax
   , Literal.TextElement :< syntax
-  , term ~ Term (Sum syntax) ann
+  , term ~ Term (Sum syntax) History
   ) =>
   Text -> ProcessT (Eff effs) term (Either term (term, Literal.KeyValue term))
 findKV name = fromMatcher (kvMatcher name)
 
-kvMatcher :: forall fs ann term .
+kvMatcher :: forall fs term .
   ( Literal.KeyValue :< fs
   , Literal.TextElement :< fs
-  , term ~ Term (Sum fs) ann
+  , term ~ Term (Sum fs) History
   ) =>
   Text -> Matcher term (Literal.KeyValue term)
 kvMatcher name = matchM projectTerm target <* matchKey where
@@ -166,13 +163,12 @@ kvMatcher name = matchM projectTerm target <* matchKey where
         match Literal.textElementContent $
           ensure (== name)
 
-changeKV :: forall effs syntax ann fields term .
+changeKV :: forall effs syntax term .
   ( Apply Functor syntax
   , Literal.KeyValue :< syntax
   , Literal.Array :< syntax
   , Literal.Float :< syntax
-  , ann ~ Record (History ': fields)
-  , term ~ Term (Sum syntax) ann
+  , term ~ Term (Sum syntax) History
   ) =>
   ProcessT (Eff effs) (Either term (term, Literal.KeyValue term)) term
 changeKV = auto $ either id injKV
