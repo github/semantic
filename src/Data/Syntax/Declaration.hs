@@ -302,7 +302,6 @@ instance Eq1 TypeAlias where liftEq = genericLiftEq
 instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for TypeAlias
 instance Evaluatable TypeAlias where
   eval eval TypeAlias{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
