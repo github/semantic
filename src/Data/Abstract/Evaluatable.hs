@@ -78,8 +78,8 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           )
        => (term -> Evaluator term address value effects (ValueRef address))
        -> (constr term -> Evaluator term address value effects (ValueRef address))
-  eval eval expr = do
-    traverse_ eval expr
+  eval recur expr = do
+    traverse_ recur expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
