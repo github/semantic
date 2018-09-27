@@ -34,6 +34,9 @@ spec = parallel $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff ListableSyntax () ()) `shouldBe` []
 
+    prop "produces no entries for identity diffs" $
+      \ term -> tableOfContentsBy (Just . termFAnnotation) (diffTerms term (term :: Term ListableSyntax ())) `shouldBe` []
+
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting replacing p)
       `shouldBe`
@@ -43,7 +46,8 @@ spec = parallel $ do
       \ diff -> do
         let diff' = merge (True, True) (inject [bimap (const False) (const False) (diff :: Diff ListableSyntax Bool Bool)])
         let toc = tableOfContentsBy (\ (n `In` _) -> if n then Just n else Nothing) diff'
-        toc `shouldBe` [Changed True]
+        toc `shouldBe` if null (diffPatches diff') then []
+                                                   else [Changed True]
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -127,6 +131,9 @@ spec = parallel $ do
         let diff = programWithChangeOutsideFunction body
         in numTocSummaries diff `shouldBe` 0
 
+    prop "unchanged diffs aren’t summarized" $
+      \term -> diffTOC (diffTerms term (term :: Term')) `shouldBe` []
+
   describe "TOCSummary" $ do
     it "encodes modified summaries to JSON" $ do
       let summary = TOCSummary "Method" "foo" (Span (Pos 1 1) (Pos 4 4)) "modified"
@@ -155,7 +162,7 @@ spec = parallel $ do
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
       output <- runTask (runDiff ToCDiffRenderer [blobs])
-      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[1,1],\"end\":[3,15]},\"category\":\"Heading 1\",\"term\":\"One\",\"changeType\":\"modified\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
 type Diff' = Diff ListableSyntax (Maybe Declaration) (Maybe Declaration)
