@@ -82,18 +82,20 @@ tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f ann b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
                   -> [Entry a]                            -- ^ A list of entries for relevant changed nodes in the diff.
-tableOfContentsBy selector = cata diffAlgebra
-  where diffAlgebra diff = case diff of
-          (Patch patch) -> maybeToList (patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch
-          (Merge (In (_, ann) r)) -> maybeToList (Changed <$> selector (In ann r)) <> fold r
-        patchEntry = patch Deleted Inserted (const Replaced)
+tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
+  Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
+  Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
+    (Just a, Just entries) -> Just (Changed a : entries)
+    (_     , entries)      -> entries)
+   where patchEntry = patch Deleted Inserted (const Replaced)
 
 termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)
                       -> Term f annotation
                       -> [a]
 termTableOfContentsBy selector = cata termAlgebra
-  where termAlgebra r = maybeToList (selector r) <> fold r
+  where termAlgebra r | Just a <- selector r = a : fold r
+                      | otherwise = fold r
 
 newtype DedupeKey = DedupeKey (T.Text, T.Text) deriving (Eq, Ord)
 
