@@ -61,7 +61,7 @@
 module Assigning.Assignment
 -- Types
 ( Assignment
-, Location
+, L.Location(..)
 -- Combinators
 , branchNode
 , leafNode
@@ -101,7 +101,7 @@ import Control.Monad.Free.Freer
 import Data.AST
 import Data.Error
 import Data.Range
-import Data.Record
+import qualified Data.Location as L
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import Data.Span
 import Data.Term
@@ -120,8 +120,8 @@ leafNode sym = symbol sym *> source
 
 -- | Wrap an 'Assignment' producing @syntax@ up into an 'Assignment' producing 'Term's.
 toTerm :: Element syntax syntaxes
-       => Assignment ast grammar (syntax (Term (Sum syntaxes) (Record Location)))
-       -> Assignment ast grammar         (Term (Sum syntaxes) (Record Location))
+       => Assignment ast grammar (syntax (Term (Sum syntaxes) L.Location))
+       -> Assignment ast grammar         (Term (Sum syntaxes) L.Location)
 toTerm syntax = termIn <$> location <*> (inject <$> syntax)
 
 
@@ -132,7 +132,7 @@ type Assignment ast grammar = Freer (Tracing (AssignmentF ast grammar))
 
 data AssignmentF ast grammar a where
   End :: AssignmentF ast grammar ()
-  Location :: AssignmentF ast grammar (Record Location)
+  Location :: AssignmentF ast grammar L.Location
   CurrentNode :: AssignmentF ast grammar (TermF ast (Node grammar) ())
   Source :: AssignmentF ast grammar ByteString
   Children :: Assignment ast grammar a -> AssignmentF ast grammar a
@@ -159,7 +159,7 @@ tracing f = case getCallStack callStack of
 -- | Zero-width production of the current location.
 --
 --   If assigning at the end of input or at the end of a list of children, the location will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
-location :: Assignment ast grammar (Record Location)
+location :: Assignment ast grammar L.Location
 location = tracing Location `Then` return
 
 getLocals :: HasCallStack => Assignment ast grammar [Text]
@@ -174,7 +174,7 @@ currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) 
 currentNode = tracing CurrentNode `Then` return
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
-symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar L.Location
 symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` return
 
 -- | A rule to produce a node’s source as a ByteString.
@@ -213,7 +213,7 @@ choice alternatives
         mergeHandlers hs = Just (\ err -> asum (hs <*> [err]))
 
 -- | Match and advance past a node with the given symbol.
-token :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar (Record Location)
+token :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar L.Location
 token s = symbol s <* advance
 
 
@@ -224,7 +224,7 @@ manyThrough step stop = go
 
 
 nodeError :: CallStack -> [Either String grammar] -> Node grammar -> Error (Either String grammar)
-nodeError cs expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol)) cs
+nodeError cs expected n@Node{..} = Error (nodeSpan n) expected (Just (Right nodeSymbol)) cs
 
 
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
@@ -274,7 +274,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 
                 anywhere node = case runTracing t of
                   End -> requireExhaustive (tracingCallSite t) ((), state) >>= uncurry yield
-                  Location -> yield (Range stateOffset stateOffset :. Span statePos statePos :. Nil) state
+                  Location -> yield (L.Location (Range stateOffset stateOffset) (Span statePos statePos)) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
@@ -305,7 +305,7 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | Term (In Node{..} _) : rest <- stateNodes = State (end nodeByteRange) (spanEnd nodeSpan) stateCallSites rest stateLocals
+  | Term (In node _) : rest <- stateNodes = State (end (nodeByteRange node)) (spanEnd (nodeSpan node)) stateCallSites rest stateLocals
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -386,7 +386,7 @@ instance Show1 f => Show1 (Tracing f) where
 instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
-    Location -> showString "Location" . sp d (Range 0 0 :. Span (Pos 1 1) (Pos 1 1) :. Nil)
+    Location -> showString "Location" . sp d (L.Location (Range 0 0) (Span (Pos 1 1) (Pos 1 1)))
     CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith showChild "Children" d a
