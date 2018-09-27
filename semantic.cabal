@@ -109,7 +109,6 @@ library
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
-                     , Data.SplitDiff
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
