@@ -41,7 +41,6 @@ import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Range as X
-import Data.Record as X
 import Data.Semilattice.Lower as X
 import Data.Source as X
 import Data.Span as X

@@ -21,7 +21,7 @@ import           Reprinting.Pipeline
 onTrees :: ( Literal.TextElement :< syn
            , Literal.KeyValue :< syn
            , Apply Functor syn
-           , term ~ Term (Sum syn) (Record (History : fields))
+           , term ~ Term (Sum syn) History 
            ) => Rewrite (env, term) (Literal.Hash term)
 onTrees = do
   Literal.Hash els <- Rewriting.target
@@ -33,8 +33,7 @@ onTrees = do
 
 -- Matches only "hi" string literals.
 isHi :: ( Literal.TextElement :< fs
-        , ann ~ Record (History : fields)
-        ) => Matcher (Term (Sum fs) ann) Text
+        ) => Matcher (Term (Sum fs) History) Text
 isHi = match Literal.textElementContent (Matching.target <* ensure (== "\"hi\""))
 
 spec :: Spec

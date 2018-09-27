@@ -14,7 +14,6 @@ import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
 import           Data.List (elem)
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Record
 import           Data.Syntax
     ( contextualize
     , emptyTerm
@@ -130,7 +129,7 @@ type Syntax = '[
   , []
   ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 -- For Protobuf serialization
@@ -489,7 +488,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment (Record Location, Text, [Text])
+identWithLocals :: Assignment (Location, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getLocals first
