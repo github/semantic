@@ -56,23 +56,23 @@ runReturn = Eff.raiseHandler (fmap (either unReturn id) . runError)
 
 
 -- | Effects for control flow around loops (breaking and continuing).
-data LoopControl address
-  = Break    { unLoopControl :: address }
-  | Continue { unLoopControl :: address }
+data LoopControl value
+  = Break    { unLoopControl :: value }
+  | Continue { unLoopControl :: value }
   deriving (Eq, Ord, Show)
 
-throwBreak :: Member (Exc (LoopControl address)) effects
-           => address
-           -> Evaluator address value effects address
+throwBreak :: Member (Exc (LoopControl value)) effects
+           => value
+           -> Evaluator address value effects value
 throwBreak = throwError . Break
 
-throwContinue :: Member (Exc (LoopControl address)) effects
-              => address
-              -> Evaluator address value effects address
+throwContinue :: Member (Exc (LoopControl value)) effects
+              => value
+              -> Evaluator address value effects value
 throwContinue = throwError . Continue
 
-catchLoopControl :: (Member (Exc (LoopControl address)) effects, Effectful (m address value)) => m address value effects a -> (LoopControl address -> m address value effects a) -> m address value effects a
+catchLoopControl :: (Member (Exc (LoopControl value)) effects, Effectful (m address value)) => m address value effects a -> (LoopControl value -> m address value effects a) -> m address value effects a
 catchLoopControl = catchError
 
-runLoopControl :: (Effectful (m address value), Effects effects) => m address value (Exc (LoopControl address) ': effects) address -> m address value effects address
+runLoopControl :: (Effectful (m address value), Effects effects) => m address value (Exc (LoopControl value) ': effects) value -> m address value effects value
 runLoopControl = Eff.raiseHandler (fmap (either unLoopControl id) . runError)

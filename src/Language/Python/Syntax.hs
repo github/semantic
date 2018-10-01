@@ -65,7 +65,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: ( Member (Modules address) effects
+resolvePythonModules :: ( Member (Modules address value) effects
                         , Member (Reader ModuleInfo) effects
                         , Member (Reader Span) effects
                         , Member (Resumable (BaseError ResolutionError)) effects
@@ -159,7 +159,7 @@ evalQualifiedImport :: ( AbstractValue address value effects
                        , Member (Allocator address) effects
                        , Member (Deref value) effects
                        , Member (Env address) effects
-                       , Member (Modules address) effects
+                       , Member (Modules address value) effects
                        , Member (State (Heap address address value)) effects
                        , Ord address
                        )

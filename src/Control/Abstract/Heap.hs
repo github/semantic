@@ -14,6 +14,7 @@ module Control.Abstract.Heap
 , newFrame
 , currentFrame
 , withScopeAndFrame
+, withFrame
 -- * Garbage collection
 , gc
 -- * Effects

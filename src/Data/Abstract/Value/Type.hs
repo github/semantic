@@ -251,7 +251,7 @@ runFunction :: ( Member (Allocator address) effects
             -> Evaluator address Type effects a
 runFunction = interpret $ \case
   Abstract.Function name params _ body -> do
-    functionSpan <- ask @Span
+    functionSpan <- ask @Span -- TODO: This might be wrong
     declare (Declaration name) functionSpan Nothing
     currentScope' <- currentScope
     let lexicalEdges = Map.singleton Lexical [ currentScope' ]
@@ -264,9 +264,9 @@ runFunction = interpret $ \case
         addr <- alloc name
         tvar <- Var <$> fresh
         -- TODO: Declare name in the scope graph?
-        -- declare name
-        -- assign tvar values to names in the frame of the function
-        -- assign functionFrameAddress (Declaration name) tvar
+        -- span <- get @Span
+        -- address <- declare (Declaration name) span Nothing
+        -- assign tvar values to names in the frame of the function?
         bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
     -- TODO: Probably declare name and create a new scope in the scope graph
       (zeroOrMoreProduct tvars :->) <$> locally (catchReturn (bindAll env *> runFunction (Evaluator body)))

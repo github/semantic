@@ -65,7 +65,7 @@ toName = name . T.pack . unPath
 --
 -- NB: TypeScript has a couple of different strategies, but the main one (and the
 -- only one we support) mimics Node.js.
-resolveWithNodejsStrategy :: ( Member (Modules address) effects
+resolveWithNodejsStrategy :: ( Member (Modules address value) effects
                              , Member (Reader M.ModuleInfo) effects
                              , Member (Reader PackageInfo) effects
                              , Member (Reader Span) effects
@@ -85,7 +85,7 @@ resolveWithNodejsStrategy (ImportPath path _)    exts        = resolveRelativePa
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: ( Member (Modules address) effects
+resolveRelativePath :: ( Member (Modules address value) effects
                        , Member (Reader M.ModuleInfo) effects
                        , Member (Reader PackageInfo) effects
                        , Member (Reader Span) effects
@@ -114,7 +114,7 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: ( Member (Modules address) effects
+resolveNonRelativePath :: ( Member (Modules address value) effects
                           , Member (Reader M.ModuleInfo) effects
                           , Member (Reader PackageInfo) effects
                           , Member (Reader Span) effects
@@ -140,7 +140,7 @@ resolveNonRelativePath name exts = do
     notFound xs = throwResolutionError $ NotFoundError name xs Language.TypeScript
 
 -- | Resolve a module name to a ModulePath.
-resolveModule :: ( Member (Modules address) effects
+resolveModule :: ( Member (Modules address value) effects
                  , Member (Reader PackageInfo) effects
                  , Member Trace effects
                  )
@@ -167,7 +167,7 @@ evalRequire :: ( AbstractValue address value effects
                , Member (Allocator address) effects
                , Member (Deref value) effects
                , Member (Env address) effects
-               , Member (Modules address) effects
+               , Member (Modules address value) effects
                , Member (State (Heap address address value)) effects
                , Ord address
                )
