@@ -206,7 +206,7 @@ type ConcreteEffects address rest
   ': State Span
   ': Reader PackageInfo
   ': Modules address
-  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))
+  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))
   ': Resumable (BaseError (ValueError address (ConcreteEff address rest)))
   ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
   ': Resumable (BaseError ResolutionError)

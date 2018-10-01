@@ -118,7 +118,7 @@ graphingPackages recur m =
 
 -- | Add vertices to the graph for imported modules.
 graphingModules :: forall term address value effects a
-                .  ( Member (Modules address) effects
+                .  ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (State (Graph ControlFlowVertex)) effects
                    , Member (Reader ControlFlowVertex) effects
@@ -130,7 +130,7 @@ graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
   local (const v) $
-    eavesdrop @(Modules address) (\ m -> case m of
+    eavesdrop @(Modules address value) (\ m -> case m of
       Load path -> includeModule path
       Lookup path -> includeModule path
       _ -> pure ())
@@ -142,7 +142,7 @@ graphingModules recur m = do
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: forall term address value effects a
-                   .  ( Member (Modules address) effects
+                   .  ( Member (Modules address value) effects
                       , Member (Reader ModuleInfo) effects
                       , Member (State (Graph ModuleInfo)) effects
                       , PureEffects effects
@@ -151,7 +151,7 @@ graphingModuleInfo :: forall term address value effects a
                    -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
-  eavesdrop @(Modules address) (\ eff -> case eff of
+  eavesdrop @(Modules address value) (\ eff -> case eff of
     Load path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     Lookup path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _ -> pure ())

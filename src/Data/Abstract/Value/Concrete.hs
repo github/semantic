@@ -5,7 +5,6 @@ module Data.Abstract.Value.Concrete
   , ClosureBody (..)
   , runFunction
   , runBoolean
-  , materializeEnvironment
   , runValueError
   , runValueErrorWith
   ) where
@@ -38,9 +37,9 @@ data Value address body
   | String Text
   | Symbol Text
   | Regex Text
-  | Tuple [address]
-  | Array [address]
-  | Class Name [address] (Bindings address)
+  | Tuple [(Value address body)]
+  | Array [(Value address body)]
+  | Class Declaration [address] (Bindings address)
   | Namespace Name (Maybe address) (Bindings address)
   | KVPair (Value address body) (Value address body)
   | Hash [Value address body]
@@ -76,6 +75,8 @@ runFunction :: forall address effects body a. ( Member (Allocator address) effec
                , Member (Reader Span) effects
                , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                , Member (Resumable (BaseError (ValueError address body))) effects
+               , Member (Resumable (BaseError (ScopeError address))) effects
+               , Member (Resumable (BaseError (HeapError address))) effects
                , Member (State (Heap address address (Value address body))) effects
                , Member (State (ScopeGraph address)) effects
                , Ord address
@@ -90,20 +91,27 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
     packageInfo <- currentPackage
     moduleInfo <- currentModule
     i <- fresh
-    currentScope' <- (currentScope :: Evaluator address (Value address body) effects address)
+    -- TODO: Declare all params
+    currentScope' <- currentScope
     let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    scope <- (newScope lexicalEdges :: Evaluator address (Value address body) effects address)
+    scope <- newScope lexicalEdges
     pure $ (Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) (scope :: address))
   Abstract.Call op self params -> do
     case op of
-      Closure packageInfo moduleInfo _ names (ClosureBody _ body) env -> do
+      Closure packageInfo moduleInfo _ names (ClosureBody _ body) scope -> do
         -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
         -- charge them to the closure's origin.
         withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-          let fnCtx = EvalContext (Just self) (Env.push env)
-          withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction toEvaluator fromEvaluator (toEvaluator body)))
-      _ -> throwValueError (CallError op) >>= box
+          currentScope' <- currentScope
+          currentFrame' <- currentFrame
+          let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+          frameAddress <- newFrame scope frameEdges
+          withFrame frameAddress $ do
+            catchReturn (runFunction toEvaluator fromEvaluator (toEvaluator body))
+
+          -- bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
+          -- let fnCtx = EvalContext (Just self) (Env.push env)
+      _ -> throwValueError (CallError op)
 
 runBoolean :: ( Member (Reader ModuleInfo) effects
               , Member (Reader Span) effects
@@ -139,32 +147,32 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
-materializeEnvironment :: ( Member (Deref (Value address body)) effects
-                          , Member (Reader ModuleInfo) effects
-                          , Member (Reader Span) effects
-                          , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
-                          , Member (State (Heap address address (Value address body))) effects
-                          , Ord address
-                          )
-                       => Value address body
-                       -> Evaluator address (Value address body) effects (Maybe (Environment address))
-materializeEnvironment val = do
-  ancestors <- rec val
-  pure (Env.Environment <$> nonEmpty ancestors)
-    where
-      rec val = do
-        supers <- concat <$> traverse (deref >=> rec) (parents val)
-        pure . maybe [] (: supers) $ bindsFrom val
+-- materializeEnvironment :: ( Member (Deref (Value address body)) effects
+--                           , Member (Reader ModuleInfo) effects
+--                           , Member (Reader Span) effects
+--                           , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
+--                           , Member (State (Heap address address (Value address body))) effects
+--                           , Ord address
+--                           )
+--                        => Value address body
+--                        -> Evaluator address (Value address body) effects (Maybe (Environment address))
+-- materializeEnvironment val = do
+--   ancestors <- rec val
+--   pure (Env.Environment <$> nonEmpty ancestors)
+--     where
+--       rec val = do
+--         supers <- concat <$> traverse (deref >=> rec) (parents val)
+--         pure . maybe [] (: supers) $ bindsFrom val
 
-      bindsFrom = \case
-        Class _ _ binds -> Just binds
-        Namespace _ _ binds -> Just binds
-        _ -> Nothing
+--       bindsFrom = \case
+--         Class _ _ binds -> Just binds
+--         Namespace _ _ binds -> Just binds
+--         _ -> Nothing
 
-      parents = \case
-        Class _ supers _ -> supers
-        Namespace _ supers _ -> toList supers
-        _ -> []
+--       parents = \case
+--         Class _ supers _ -> supers
+--         Namespace _ supers _ -> toList supers
+--         _ -> []
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Coercible body (Eff effects)
@@ -172,8 +180,8 @@ instance ( Coercible body (Eff effects)
          , Member (Abstract.Boolean (Value address body)) effects
          , Member (Deref (Value address body)) effects
          , Member (Env address) effects
-         , Member (Exc (LoopControl address)) effects
-         , Member (Exc (Return address)) effects
+         , Member (Exc (LoopControl (Value address body))) effects
+         , Member (Exc (Return (Value address body))) effects
          , Member Fresh effects
          , Member (Reader ModuleInfo) effects
          , Member (Reader PackageInfo) effects
@@ -200,20 +208,20 @@ instance ( Coercible body (Eff effects)
   klass n supers binds = do
     pure $ Class n supers binds
 
-  namespace name super binds = do
-    maybeNs <- lookupEnv name >>= traverse deref
-    binds' <- maybe (pure lowerBound) asNamespaceBinds maybeNs
-    let super' = (maybeNs >>= asNamespaceSuper) <|> super
-    pure (Namespace name super' (binds <> binds'))
-    where
-      asNamespaceSuper = \case
-        Namespace _ super _ -> super
-        _ -> Nothing
-      asNamespaceBinds v
-        | Namespace _ _ binds' <- v = pure binds'
-        | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
+  namespace name super binds = undefined -- do
+    -- maybeNs <- lookupEnv name >>= traverse deref
+    -- binds' <- maybe (pure lowerBound) asNamespaceBinds maybeNs
+    -- let super' = (maybeNs >>= asNamespaceSuper) <|> super
+    -- pure (Namespace name super' (binds <> binds'))
+    -- where
+    --   asNamespaceSuper = \case
+    --     Namespace _ super _ -> super
+    --     _ -> Nothing
+    --   asNamespaceBinds v
+    --     | Namespace _ _ binds' <- v = pure binds'
+    --     | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
-  scopedEnvironment = deref >=> materializeEnvironment
+  -- scopedEnvironment = deref >=> materializeEnvironment
 
   asString v
     | String n <- v = pure n
@@ -222,12 +230,12 @@ instance ( Coercible body (Eff effects)
 
   index = go where
     tryIdx list ii
-      | ii > genericLength list = box =<< throwValueError (BoundsError list ii)
+      | ii > genericLength list = throwValueError (BoundsError list ii)
       | otherwise               = pure (genericIndex list ii)
     go arr idx
       | (Array arr, Integer (Number.Integer i)) <- (arr, idx) = tryIdx arr i
       | (Tuple tup, Integer (Number.Integer i)) <- (arr, idx) = tryIdx tup i
-      | otherwise = box =<< throwValueError (IndexError arr idx)
+      | otherwise = throwValueError (IndexError arr idx)
 
   liftNumeric f arg
     | Integer (Number.Integer i) <- arg = pure . integer  $ f i
@@ -306,7 +314,7 @@ instance ( Coercible body (Eff effects)
         ourShift a b = toInteger (shiftR a b)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
-    Break value -> deref value
+    Break value -> pure value
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
     Continue _  -> loop x)
 
@@ -327,11 +335,11 @@ data ValueError address body resume where
   BitwiseError           :: Value address body                       -> ValueError address body (Value address body)
   Bitwise2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
   KeyValueError          :: Value address body                       -> ValueError address body (Value address body, Value address body)
-  ArrayError             :: Value address body                       -> ValueError address body [address]
+  ArrayError             :: Value address body                       -> ValueError address body [(Value address body)]
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
   ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
   -- Out-of-bounds error
-  BoundsError            :: [address]          -> Prelude.Integer    -> ValueError address body (Value address body)
+  BoundsError            :: [Value address body]          -> Prelude.Integer    -> ValueError address body (Value address body)
 
 
 instance Eq address => Eq1 (ValueError address body) where

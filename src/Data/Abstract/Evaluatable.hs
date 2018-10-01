@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -55,18 +55,16 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Boolean value) effects
           , Member (Deref value) effects
           , Member (State (ScopeGraph address)) effects
-          , Member (Env address) effects
-          , Member (Exc (LoopControl address)) effects
-          , Member (Exc (Return address)) effects
+          , Member (Exc (LoopControl value)) effects
+          , Member (Exc (Return value)) effects
           , Member Fresh effects
           , Member (Function address value) effects
-          , Member (Modules address) effects
+          , Member (Modules address value) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , Member (Reader Span) effects
           , Member (State Span) effects
           , Member (Resumable (BaseError (AddressError address value))) effects
-          , Member (Resumable (BaseError (EnvironmentError address))) effects
           , Member (Resumable (BaseError (UnspecializedError value))) effects
           , Member (Resumable (BaseError EvalError)) effects
           , Member (Resumable (BaseError ResolutionError)) effects
@@ -74,17 +72,16 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member Trace effects
           , Ord address
           )
-       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address))
+       => SubtermAlgebra constr term (Evaluator address value effects (ValueRef address value))
   eval expr = do
-    traverse_ subtermValue expr
+    traverse_ subtermRef expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
 
 type ModuleEffects address value rest
-  =  Exc (LoopControl address)
-  ': Exc (Return address)
-  ': Env address
+  =  Exc (LoopControl value)
+  ': Exc (Return value)
   ': State (ScopeGraph address)
   ': Deref value
   ': Allocator address
@@ -96,7 +93,7 @@ type ValueEffects address value rest
   ': Boolean value
   ': rest
 
-evaluate :: ( AbstractValue address value valueEffects
+evaluate :: forall address value valueEffects term  moduleEffects effects proxy lang. ( AbstractValue address value valueEffects
             , Declarations term
             , Effects effects
             , Evaluatable (Base term)
@@ -104,13 +101,12 @@ evaluate :: ( AbstractValue address value valueEffects
             , HasPostlude lang
             , HasPrelude lang
             , Member Fresh effects
-            , Member (Modules address) effects
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
+            , Member (Modules address value) effects
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (State Span) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
-            , Member (Resumable (BaseError (EnvironmentError address))) effects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
@@ -122,36 +118,38 @@ evaluate :: ( AbstractValue address value valueEffects
             , valueEffects ~ ValueEffects address value moduleEffects
             )
          => proxy lang
-         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects address))
-         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address)))
+         -> (SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects value)           -> SubtermAlgebra Module      term (TermEvaluator term address value moduleEffects value))
+         -> (SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address value)) -> SubtermAlgebra (Base term) term (TermEvaluator term address value valueEffects (ValueRef address value)))
          -> (forall x . Evaluator address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator address value (Reader ModuleInfo ': effects) x)
          -> (forall x . Evaluator address value valueEffects x -> Evaluator address value moduleEffects x)
          -> [Module term]
-         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
-  (_, (preludeBinds, _)) <- TermEvaluator . runInModule lowerBound moduleInfoFromCallStack . runValue $ do
+         -> TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address value))))
+evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = ((do
+  (_, _) <- TermEvaluator . runInModule moduleInfoFromCallStack . runValue $ do
     definePrelude lang
-    box unit
-  foldr (run preludeBinds) ask modules
-  where run preludeBinds m rest = do
-          evaluated <- coerce
-            (runInModule preludeBinds (moduleInfo m))
-            (analyzeModule (subtermRef . moduleBody)
-            (evalModuleBody <$> m))
-          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
+    pure unit
+  foldr run ask modules) :: TermEvaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address value)))))
+  where
+    run :: Module term -> TermEvaluator term address value effects a -> TermEvaluator term address value effects a
+    run m rest = do
+      evaluated <- (raiseHandler
+        (runInModule (moduleInfo m))
+        (analyzeModule (subtermRef . moduleBody)
+        (evalModuleBody <$> m)) :: TermEvaluator term address value effects (ScopeGraph address, value))
+      -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
+      local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModuleBody term = Subterm term (coerce runValue (do
-          result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . address
-          result <$ TermEvaluator (postlude lang)))
+    evalModuleBody term = Subterm term (coerce runValue (do
+      result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . value
+      result <$ TermEvaluator (postlude lang)))
 
-        runInModule preludeBinds info
-          = runReader info
-          . runAllocDeref
-          . runScopeEnv
-          . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
-          . runReturn
-          . runLoopControl
+    runInModule :: ModuleInfo -> Evaluator address value moduleEffects value -> Evaluator address value effects (ScopeGraph address, value)
+    runInModule info
+      = runReader info
+      . runAllocDeref
+      . runState lowerBound
+      . runReturn
+      . runLoopControl
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator address value effects ()
@@ -165,13 +163,11 @@ class HasPrelude (language :: Language) where
                    , HasCallStack
                    , Member (Allocator address) effects
                    , Member (Deref value) effects
-                   , Member (Env address) effects
                    , Member Fresh effects
                    , Member (Function address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
                    , Member (Resumable (BaseError (AddressError address value))) effects
-                   , Member (Resumable (BaseError (EnvironmentError address))) effects
                    , Member (State (Heap address address value)) effects
                    , Member Trace effects
                    , Ord address
@@ -187,24 +183,24 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    define (name "print") builtInPrint
+    define (Declaration (X.name "print")) builtInPrint
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    define (name "puts") builtInPrint
+    define (X.name "puts") builtInPrint
 
-    defineClass (name "Object") [] $ do
-      define (name "inspect") (lambda (box (string "<object>")))
+    defineClass (X.name "Object") [] $ do
+      define (X.name "inspect") (lambda (box (string "<object>")))
 
 instance HasPrelude 'TypeScript where
   definePrelude _ =
-    defineNamespace (name "console") $ do
-      define (name "log") builtInPrint
+    defineNamespace (X.name "console") $ do
+      define (X.name "log") builtInPrint
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    defineNamespace (name "console") $ do
-      define (name "log") builtInPrint
+    defineNamespace (X.name "console") $ do
+      define (X.name "log") builtInPrint
 
 -- Postludes
 
@@ -213,11 +209,9 @@ class HasPostlude (language :: Language) where
               , HasCallStack
               , Member (Allocator address) effects
               , Member (Deref value) effects
-              , Member (Env address) effects
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects
               , Member (Reader Span) effects
-              , Member (Resumable (BaseError (EnvironmentError address))) effects
               , Member Trace effects
               )
            => proxy language

@@ -21,7 +21,7 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: ( Member (Modules address) effects
+resolveRubyName :: ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
                    , Member (Resumable (BaseError ResolutionError)) effects
@@ -35,7 +35,7 @@ resolveRubyName name = do
   maybeM (throwResolutionError $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: ( Member (Modules address) effects
+resolveRubyPath :: ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
                    , Member (Resumable (BaseError ResolutionError)) effects
@@ -91,7 +91,7 @@ instance Evaluatable Require where
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( Member (Boolean value) effects
-             , Member (Modules address) effects
+             , Member (Modules address value) effects
              )
           => M.ModulePath
           -> Evaluator address value effects (Bindings address, value)
@@ -120,7 +120,7 @@ instance Evaluatable Load where
 
 doLoad :: ( Member (Boolean value) effects
           , Member (Env address) effects
-          , Member (Modules address) effects
+          , Member (Modules address value) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           , Member (Resumable (BaseError ResolutionError)) effects

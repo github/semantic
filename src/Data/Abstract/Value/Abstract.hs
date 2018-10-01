@@ -9,6 +9,7 @@ import Control.Abstract as Abstract
 import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Prologue
+import qualified Data.Map.Strict as Map
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
@@ -17,10 +18,13 @@ data Abstract = Abstract
 runFunction :: ( Member (Allocator address) effects
                , Member (Deref Abstract) effects
                , Member (Env address) effects
-               , Member (Exc (Return address)) effects
+               , Member (Exc (Return Abstract)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
+               , Member (State (ScopeGraph address)) effects
+               , Member (Resumable (BaseError (ScopeError address))) effects
+               , Member (Resumable (BaseError (HeapError address))) effects
                , Member (Resumable (BaseError (AddressError address Abstract))) effects
                , Member (State (Heap address address Abstract)) effects
                , Ord address
@@ -29,16 +33,25 @@ runFunction :: ( Member (Allocator address) effects
             => Evaluator address Abstract (Function address Abstract ': effects) a
             -> Evaluator address Abstract effects a
 runFunction = interpret $ \case
-  Function _ params _ body -> do
-    env <- foldr (\ name rest -> do
-      addr <- alloc name
-      assign addr Abstract
-      Env.insert name addr <$> rest) (pure lowerBound) params
-    addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
-    deref addr
+  Function name params _ body -> do
+    functionSpan <- ask @Span -- TODO: This might be wrong
+    declare (Declaration name) functionSpan Nothing
+    currentScope' <- currentScope
+    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+    functionScope <- newScope lexicalEdges
+    currentFrame' <- currentFrame
+    let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+    functionFrame <- newFrame functionScope frameEdges
+    withScopeAndFrame functionFrame $ do
+    -- TODO: Use scope graph and heap graph
+      env <- foldr (\ name rest -> do
+        addr <- alloc name
+        -- TODO: Declare name in the scope graph?
+        -- assign addr Abstract
+        Env.insert name addr <$> rest) (pure lowerBound) params
+      locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
   Call _ _ params -> do
-    traverse_ deref params
-    box Abstract
+    pure Abstract
 
 runBoolean :: ( Member NonDet effects
               , PureEffects effects
@@ -90,7 +103,7 @@ instance ( Member (Allocator address) effects
   asPair _ = pure (Abstract, Abstract)
   asArray _ = pure mempty
 
-  index _ _ = box Abstract
+  index _ _ = pure Abstract
 
   liftNumeric _ _ = pure Abstract
   liftNumeric2 _ _ _ = pure Abstract

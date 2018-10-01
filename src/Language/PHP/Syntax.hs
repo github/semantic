@@ -38,7 +38,7 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: ( Member (Modules address) effects
+resolvePHPName :: ( Member (Modules address value) effects
                   , Member (Reader ModuleInfo) effects
                   , Member (Reader Span) effects
                   , Member (Resumable (BaseError ResolutionError)) effects
@@ -54,7 +54,7 @@ resolvePHPName n = do
 include :: ( AbstractValue address value effects
            , Member (Deref value) effects
            , Member (Env address) effects
-           , Member (Modules address) effects
+           , Member (Modules address value) effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
            , Member (Resumable (BaseError (AddressError address value))) effects
@@ -65,7 +65,7 @@ include :: ( AbstractValue address value effects
            , Ord address
            )
         => Subterm term (Evaluator address value effects (ValueRef address))
-        -> (ModulePath -> Evaluator address value effects (ModuleResult address))
+        -> (ModulePath -> Evaluator address value effects (ModuleResult address value))
         -> Evaluator address value effects (ValueRef address)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString

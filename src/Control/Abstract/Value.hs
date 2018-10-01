@@ -19,8 +19,8 @@ module Control.Abstract.Value
 , makeNamespace
 , evaluateInScopedEnv
 -- , address
--- , value
--- , rvalBox
+, value
+, rvalBox
 -- , subtermValue
 -- , subtermAddress
 ) where
@@ -29,6 +29,7 @@ import Control.Abstract.ScopeGraph (Declaration)
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap hiding (address)
+import Control.Abstract.ScopeGraph (Allocator)
 import qualified Control.Abstract.Heap as Heap
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
@@ -178,7 +179,7 @@ class AbstractIntro value => AbstractValue address value effects where
   -- | Construct an array of zero or more values.
   array :: [value] -> Evaluator address value effects value
 
-  asArray :: value -> Evaluator address value effects [address]
+  asArray :: value -> Evaluator address value effects [value]
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator address value effects (value, value)
@@ -274,20 +275,20 @@ evaluateInScopedEnv receiver term = do
   withEvalContext (EvalContext (Just receiver) env) term
 
 
--- -- | Evaluates a 'Value' returning the referenced value
--- value :: ( AbstractValue address value effects
---          , Member (Deref value) effects
---          , Member (Env address) effects
---          , Member (Reader ModuleInfo) effects
---          , Member (Reader Span) effects
---          , Member (Resumable (BaseError (AddressError address value))) effects
---          , Member (Resumable (BaseError (EnvironmentError address))) effects
---          , Member (State (Heap address address value)) effects
---          , Ord address
---          )
---       => ValueRef address
---       -> Evaluator address value effects value
--- value = deref <=< address
+-- | Evaluates a 'Value' returning the referenced value
+value :: ( AbstractValue address value effects
+         , Member (Deref value) effects
+         , Member (Reader ModuleInfo) effects
+         , Member (Reader Span) effects
+         , Member (Resumable (BaseError (AddressError address value))) effects
+         , Member (State (Heap address address value)) effects
+         , Ord address
+         )
+      => ValueRef address value
+      -> Evaluator address value effects value
+value (Rval val) = pure val
+value (LvalLocal name) = undefined
+value (LvalMember lhs rhs) = undefined
 
 -- -- | Evaluates a 'Subterm' to its rval
 -- subtermValue :: ( AbstractValue address value effects
@@ -328,13 +329,13 @@ evaluateInScopedEnv receiver term = do
 --                -> Evaluator address value effects address
 -- subtermAddress = address <=< subtermRef
 
--- -- | Convenience function for boxing a raw value and wrapping it in an Rval
--- rvalBox :: ( Member (Allocator address) effects
---            , Member (Deref value) effects
---            , Member Fresh effects
---            , Member (State (Heap address address value)) effects
---            , Ord address
---            )
---         => value
---         -> Evaluator address value effects (ValueRef address)
--- rvalBox val = Rval <$> box val
+-- | Convenience function for boxing a raw value and wrapping it in an Rval
+rvalBox :: ( Member (Allocator address) effects
+           , Member (Deref value) effects
+           , Member Fresh effects
+           , Member (State (Heap address address value)) effects
+           , Ord address
+           )
+        => value
+        -> Evaluator address value effects (ValueRef address value)
+rvalBox val = pure (Rval val)
