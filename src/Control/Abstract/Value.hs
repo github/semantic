@@ -323,7 +323,7 @@ subtermValue = value <=< subtermRef
 --                   , Member (Reader Span) effects
 --                   , Member (Resumable (BaseError (EnvironmentError address))) effects
 --                   )
---                => Subterm term (Evaluator address value effects (ValueRef address))
+--                => Subterm term (Evaluator address value effects (ValueRef address value))
 --                -> Evaluator address value effects address
 -- subtermAddress = address <=< subtermRef
 
