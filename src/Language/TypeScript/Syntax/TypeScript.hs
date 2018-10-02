@@ -9,7 +9,7 @@ import qualified Data.Text as T
 import           Proto3.Suite
 
 import qualified Data.Abstract.Environment as Env
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable as Evaluatable
 import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.JSON.Fields
 import           Diffing.Algorithm
@@ -279,7 +279,7 @@ newtype TypeIdentifier a = TypeIdentifier { contents :: T.Text }
   deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
 instance Declarations1 TypeIdentifier where
-  liftDeclaredName _ (TypeIdentifier identifier) = Just (name identifier)
+  liftDeclaredName _ (TypeIdentifier identifier) = Just (Evaluatable.name identifier)
 
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
 instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
@@ -288,7 +288,7 @@ instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeIdentifier where
   eval TypeIdentifier{..} = do
     -- Add a reference to the type identifier in the current scope.
-    reference (Reference (name contents)) (Declaration (name contents))
+    reference (Reference (Evaluatable.name contents)) (Declaration (Evaluatable.name contents))
     rvalBox unit
 
 data NestedIdentifier a = NestedIdentifier { left :: !a, right :: !a }
