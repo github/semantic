@@ -46,7 +46,6 @@ defineClass :: ( AbstractValue address value effects
                , HasCallStack
                , Member (Allocator (Address address)) effects
                , Member (Deref value) effects
-               , Member (Env address) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
                , Member (Resumable (BaseError (ScopeError address))) effects
@@ -66,7 +65,6 @@ defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator (Address address)) effects
                    , Member (Deref value) effects
-                   , Member (Env address) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
                    , Member (Resumable (BaseError (ScopeError address))) effects
