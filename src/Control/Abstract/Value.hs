@@ -21,7 +21,7 @@ module Control.Abstract.Value
 -- , address
 , value
 , rvalBox
--- , subtermValue
+, subtermValue
 -- , subtermAddress
 ) where
 
@@ -290,20 +290,18 @@ value (Rval val) = pure val
 value (LvalLocal name) = undefined
 value (LvalMember lhs rhs) = undefined
 
--- -- | Evaluates a 'Subterm' to its rval
--- subtermValue :: ( AbstractValue address value effects
---                 , Member (Deref value) effects
---                 , Member (Env address) effects
---                 , Member (Reader ModuleInfo) effects
---                 , Member (Reader Span) effects
---                 , Member (Resumable (BaseError (AddressError address value))) effects
---                 , Member (Resumable (BaseError (EnvironmentError address))) effects
---                 , Member (State (Heap address address value)) effects
---                 , Ord address
---                 )
---              => Subterm term (Evaluator address value effects (ValueRef address))
---              -> Evaluator address value effects value
--- subtermValue = value <=< subtermRef
+-- | Evaluates a 'Subterm' to its rval
+subtermValue :: ( AbstractValue address value effects
+                , Member (Deref value) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Member (Resumable (BaseError (AddressError address value))) effects
+                , Member (State (Heap address address value)) effects
+                , Ord address
+                )
+             => Subterm term (Evaluator address value effects (ValueRef address value))
+             -> Evaluator address value effects value
+subtermValue = value <=< subtermRef
 
 -- | Returns the address of a value referenced by a 'ValueRef'
 -- address :: ( AbstractValue address value effects
