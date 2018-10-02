@@ -7,7 +7,6 @@ module Data.Abstract.Declarations
 import Data.Abstract.Name
 import Data.Sum
 import Data.Term
-import Prologue
 
 class Declarations syntax where
   declaredName :: syntax -> Maybe Name
@@ -19,9 +18,6 @@ class Declarations1 syntax where
   -- Note that not all syntax will have a declared name; in general it’s reserved for syntax where the user has provided a single, unambiguous name for whatever term is being introduced. Examples would be (non-anonymous) functions, methods, and classes; but not (generally) literals or blocks of imperative statements.
   liftDeclaredName :: (a -> Maybe Name) -> syntax a -> Maybe Name
   liftDeclaredName _ _ = Nothing
-
-instance Declarations t => Declarations (Subterm t a) where
-  declaredName = declaredName . subterm
 
 deriving instance Declarations1 syntax => Declarations (Term syntax ann)
 
