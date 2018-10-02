@@ -27,7 +27,6 @@ import           Prologue
 define :: ( HasCallStack
           , Member (Allocator (Address address)) effects
           , Member (Deref value) effects
-          , Member (Env address) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           , Member (State (Heap address address value)) effects
@@ -42,8 +41,6 @@ define declaration def = withCurrentCallStack callStack $ do
   span <- ask @Span -- TODO: This Span is most definitely wrong
   addr <- declare declaration span Nothing
   def >>= assign addr
-  -- TODO: This probably needs to declare something in the scope graph.
-  bind (name declaration) (Control.Abstract.Heap.address addr) -- TODO: Insert something in the heap
 
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
