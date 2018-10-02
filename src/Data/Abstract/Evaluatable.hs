@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables, InstanceSigs, ScopedTypeVariables #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -101,12 +101,15 @@ evaluate :: forall address value valueEffects term  moduleEffects effects proxy 
             , HasPostlude lang
             , HasPrelude lang
             , Member Fresh effects
+            , Member (Allocator (Address address)) effects
             , Member (Modules address value) effects
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) effects
             , Member (Reader PackageInfo) effects
             , Member (Reader Span) effects
             , Member (State Span) effects
+            , Member (Resumable (BaseError (HeapError address))) effects
             , Member (Resumable (BaseError (AddressError address value))) effects
+            , Member (Resumable (BaseError (ScopeError address))) effects
             , Member (Resumable (BaseError EvalError)) effects
             , Member (Resumable (BaseError ResolutionError)) effects
             , Member (Resumable (BaseError (UnspecializedError value))) effects
@@ -161,7 +164,11 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue address value effects
                    , HasCallStack
+                   , Member (Allocator (Address address)) effects
                    , Member (Allocator address) effects
+                   , Member (State (ScopeGraph address)) effects
+                   , Member (Resumable (BaseError (ScopeError address))) effects
+                   , Member (Resumable (BaseError (HeapError address))) effects
                    , Member (Deref value) effects
                    , Member Fresh effects
                    , Member (Function address value) effects
@@ -186,28 +193,47 @@ instance HasPrelude 'Python where
     define (Declaration (X.name "print")) builtInPrint
 
 instance HasPrelude 'Ruby where
+  definePrelude :: forall address value effects proxy. ( AbstractValue address value effects
+                   , HasCallStack
+                   , Member (Allocator (Address address)) effects
+                   , Member (Allocator address) effects
+                   , Member (State (ScopeGraph address)) effects
+                   , Member (Resumable (BaseError (ScopeError address))) effects
+                   , Member (Resumable (BaseError (HeapError address))) effects
+                   , Member (Deref value) effects
+                   , Member Fresh effects
+                   , Member (Function address value) effects
+                   , Member (Reader ModuleInfo) effects
+                   , Member (Reader Span) effects
+                   , Member (Resumable (BaseError (AddressError address value))) effects
+                   , Member (State (Heap address address value)) effects
+                   , Member Trace effects
+                   , Ord address
+                   )
+                => proxy 'Ruby
+                -> Evaluator address value effects ()
   definePrelude _ = do
-    define (X.name "puts") builtInPrint
+    define (Declaration (X.name "puts")) builtInPrint
 
-    defineClass (X.name "Object") [] $ do
-      define (X.name "inspect") (lambda (box (string "<object>")))
+    defineClass (Declaration (X.name "Object")) [] $ do
+      define (Declaration (X.name "inspect")) (lambda @address @value @effects @(Evaluator address value effects value) (pure (string "<object>")))
 
 instance HasPrelude 'TypeScript where
   definePrelude _ =
-    defineNamespace (X.name "console") $ do
-      define (X.name "log") builtInPrint
+    defineNamespace (Declaration (X.name "console")) $ do
+      define (Declaration (X.name "log")) builtInPrint
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    defineNamespace (X.name "console") $ do
-      define (X.name "log") builtInPrint
+    defineNamespace (Declaration (X.name "console")) $ do
+      define (Declaration (X.name "log")) builtInPrint
 
 -- Postludes
 
 class HasPostlude (language :: Language) where
   postlude :: ( AbstractValue address value effects
               , HasCallStack
-              , Member (Allocator address) effects
+              , Member (Allocator (Address address)) effects
               , Member (Deref value) effects
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects
