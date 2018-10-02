@@ -39,7 +39,7 @@ data Value address body
   | Regex Text
   | Tuple [(Value address body)]
   | Array [(Value address body)]
-  | Class Declaration [address] (Bindings address)
+  | Class Declaration [address] address
   | Namespace Name (Maybe address) (Bindings address)
   | KVPair (Value address body) (Value address body)
   | Hash [Value address body]
