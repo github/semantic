@@ -125,7 +125,6 @@ self = ctxSelf <$> getEvalContext
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: ( Member (Reader ModuleInfo) effects
             , Member (Reader Span) effects
-            , Member (Resumable (BaseError (EnvironmentError address))) effects
             )
          => Name
          -> Evaluator address value effects (Address address)
