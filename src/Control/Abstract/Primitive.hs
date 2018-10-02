@@ -135,13 +135,11 @@ builtInPrint :: forall address value effects. ( AbstractValue address value effe
                 , HasCallStack
                 , Member (Allocator address) effects
                 , Member (Deref value) effects
-                , Member (Env address) effects
                 , Member Fresh effects
                 , Member (Function address value) effects
                 , Member (Reader ModuleInfo) effects
                 , Member (Reader Span) effects
                 , Member (Resumable (BaseError (AddressError address value))) effects
-                , Member (Resumable (BaseError (EnvironmentError address))) effects
                 , Member (State (Heap address address value)) effects
                 , Member (State (ScopeGraph address)) effects
                 , Member (Resumable (BaseError (HeapError address))) effects
