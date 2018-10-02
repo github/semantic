@@ -193,7 +193,7 @@ class AbstractIntro value => AbstractValue address value effects where
   -- | Build a class value from a name and environment.
   klass :: Declaration      -- ^ The new class's identifier
         -> [address]        -- ^ A list of superclasses
-        -> Bindings address -- ^ The environment to capture
+        -> address          -- ^ The frame address to capture
         -> Evaluator address value effects value
 
   -- | Build a namespace value from a name and environment stack
