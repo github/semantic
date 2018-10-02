@@ -24,8 +24,6 @@ module Control.Abstract.Value
 , address
 , value
 , rvalBox
-, subtermValue
-, subtermAddress
 ) where
 
 import Control.Abstract.Environment
@@ -297,21 +295,6 @@ value :: ( AbstractValue term address value effects
       -> Evaluator term address value effects value
 value = deref <=< address
 
--- | Evaluates a 'Subterm' to its rval
-subtermValue :: ( AbstractValue term address value effects
-                , Member (Deref value) effects
-                , Member (Env address) effects
-                , Member (Reader ModuleInfo) effects
-                , Member (Reader Span) effects
-                , Member (Resumable (BaseError (AddressError address value))) effects
-                , Member (Resumable (BaseError (EnvironmentError address))) effects
-                , Member (State (Heap address value)) effects
-                , Ord address
-                )
-             => Subterm term (Evaluator term address value effects (ValueRef address))
-             -> Evaluator term address value effects value
-subtermValue = value <=< subtermRef
-
 -- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue term address value effects
            , Member (Env address) effects
@@ -324,17 +307,6 @@ address :: ( AbstractValue term address value effects
 address (LvalLocal var)       = variable var
 address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
 address (Rval addr)           = pure addr
-
--- | Evaluates a 'Subterm' to the address of its rval
-subtermAddress :: ( AbstractValue term address value effects
-                  , Member (Env address) effects
-                  , Member (Reader ModuleInfo) effects
-                  , Member (Reader Span) effects
-                  , Member (Resumable (BaseError (EnvironmentError address))) effects
-                  )
-               => Subterm term (Evaluator term address value effects (ValueRef address))
-               -> Evaluator term address value effects address
-subtermAddress = address <=< subtermRef
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: ( Member (Allocator address) effects
