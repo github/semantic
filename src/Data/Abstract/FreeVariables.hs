@@ -24,9 +24,6 @@ class FreeVariables1 syntax where
   default liftFreeVariables :: (Foldable syntax) => (a -> Set Name) -> syntax a -> Set Name
   liftFreeVariables = foldMap
 
-instance FreeVariables t => FreeVariables (Subterm t a) where
-  freeVariables = freeVariables . subterm
-
 deriving instance FreeVariables1 syntax => FreeVariables (Term syntax ann)
 
 instance (FreeVariables recur, FreeVariables1 syntax) => FreeVariables (TermF syntax ann recur) where
