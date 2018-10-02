@@ -55,7 +55,7 @@ defineClass :: ( AbstractValue address value effects
                , Ord address
                )
             => Declaration
-            -> [address]
+            -> [value]
             -> Evaluator address value effects a
             -> Evaluator address value effects ()
 defineClass declaration superclasses body = define declaration $ do
