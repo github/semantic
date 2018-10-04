@@ -24,8 +24,6 @@ import           Data.List (uncons)
 import           Data.Project hiding (readFile)
 import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
-import           Language.Haskell.HsColour
-import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (weaken)
 import           Semantic.Config
@@ -35,7 +33,7 @@ import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
-import           Text.Show.Pretty (ppShow)
+
 
 justEvaluating
   = runM
@@ -144,9 +142,5 @@ mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (
 
 reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) (Either (SomeExc exc4) (Either (SomeExc exc5) (Either (SomeExc exc6) (Either (SomeExc exc7) result)))))) -> Either (SomeExc (Sum '[exc7, exc6, exc5, exc4, exc3, exc2, exc1])) result
 reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . Right
-
-
-prettyShow :: Show a => a -> IO ()
-prettyShow = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: String) #-}
