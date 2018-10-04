@@ -80,7 +80,7 @@ testJSONFile = do
 
 renameKey :: ( Literal.TextElement :< fs
              , Apply Functor fs
-             , term ~ Term (Sum fs) (Record History)
+             , term ~ Term (Sum fs) History
              )
           => Rewrite (env, term) (Literal.KeyValue term)
 renameKey = do
@@ -95,7 +95,7 @@ testRenameKey = do
   pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-increaseNumbers :: (term ~ Term (Sum fs) (Record (History : fields))) => Rewrite (env, term) (Literal.Float term)
+increaseNumbers :: (term ~ Term (Sum fs) History) => Rewrite (env, term) (Literal.Float term)
 increaseNumbers = do
   (Literal.Float c) <- id
   pure (Literal.Float (c <> "0"))
@@ -104,7 +104,7 @@ addKVPair :: ( Literal.TextElement :< syn
              , Literal.KeyValue :< syn
              , Literal.Array :< syn
              , Apply Functor syn
-             , term ~ Term (Sum syn) (Record History)
+             , term ~ Term (Sum syn) History
              ) => Rewrite (env, term) (Literal.Hash term)
 addKVPair = do
   Literal.Hash els <- id
@@ -127,7 +127,7 @@ testOverwriteFloats = do
   pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-kvMatcher :: forall fs ann term .
+kvMatcher :: forall fs term .
   ( Literal.KeyValue :< fs
   , Literal.TextElement :< fs
   , term ~ Term (Sum fs) History
@@ -142,7 +142,7 @@ kvMatcher name = matchM projectTerm target <* matchKey where
 changeKV :: ( Apply Functor syntax
             , Literal.Array :< syntax
             , Literal.Float :< syntax
-            , term ~ Term (Sum syntax) (Record (History : fields))
+            , term ~ Term (Sum syntax) History
             )
          => Rewrite (env, term) (Literal.KeyValue term)
 changeKV = do
