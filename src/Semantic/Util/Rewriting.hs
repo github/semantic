@@ -15,7 +15,6 @@ import           Data.Blob
 import           Data.History
 import qualified Data.Language as Language
 import           Data.Project hiding (readFile)
-import           Data.Record
 import qualified Data.Source as Source
 import qualified Data.Syntax.Literal as Literal
 import           Data.Term
@@ -81,7 +80,7 @@ testJSONFile = do
 
 renameKey :: ( Literal.TextElement :< fs
              , Apply Functor fs
-             , term ~ Term (Sum fs) (Record (History : fields))
+             , term ~ Term (Sum fs) (Record History)
              )
           => Rewrite (env, term) (Literal.KeyValue term)
 renameKey = do
@@ -105,7 +104,7 @@ addKVPair :: ( Literal.TextElement :< syn
              , Literal.KeyValue :< syn
              , Literal.Array :< syn
              , Apply Functor syn
-             , term ~ Term (Sum syn) (Record (History : fields))
+             , term ~ Term (Sum syn) (Record History)
              ) => Rewrite (env, term) (Literal.Hash term)
 addKVPair = do
   Literal.Hash els <- id
@@ -131,7 +130,7 @@ testOverwriteFloats = do
 kvMatcher :: forall fs ann term .
   ( Literal.KeyValue :< fs
   , Literal.TextElement :< fs
-  , term ~ Term (Sum fs) ann
+  , term ~ Term (Sum fs) History
   ) =>
   Text -> Matcher term (Literal.KeyValue term)
 kvMatcher name = matchM projectTerm target <* matchKey where

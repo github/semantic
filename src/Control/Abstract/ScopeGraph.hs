@@ -34,28 +34,28 @@ data ScopeEnv address (m :: * -> *) a where
     Local :: address -> m a -> ScopeEnv address m a
     AssociatedScope :: Declaration -> ScopeEnv address m (Maybe address)
 
-lookup :: forall address value effects. Member (ScopeEnv address) effects => Reference -> Evaluator address value effects (Maybe address)
+lookup :: forall term address value effects. Member (ScopeEnv address) effects => Reference -> Evaluator term address value effects (Maybe address)
 lookup = send . Lookup @address
 
-declare :: forall address value effects. Member (ScopeEnv address) effects => Declaration -> Span -> Maybe address -> Evaluator address value effects ()
+declare :: forall term address value effects. Member (ScopeEnv address) effects => Declaration -> Span -> Maybe address -> Evaluator term address value effects ()
 declare = ((send .) .) . Declare @address
 
-putDeclarationScope :: forall address value effects. Member (ScopeEnv address) effects => Declaration -> address -> Evaluator address value effects ()
+putDeclarationScope :: forall term address value effects. Member (ScopeEnv address) effects => Declaration -> address -> Evaluator term address value effects ()
 putDeclarationScope = (send .) . PutDeclarationScope @address
 
-reference :: forall address value effects. Member (ScopeEnv address) effects => Reference -> Declaration -> Evaluator address value effects ()
+reference :: forall term address value effects. Member (ScopeEnv address) effects => Reference -> Declaration -> Evaluator term address value effects ()
 reference = (send .) . Reference @address
 
-newScope :: forall address value effects. (Member (ScopeEnv address) effects) => Map EdgeLabel [address]  -> Evaluator address value effects address
+newScope :: forall term address value effects. (Member (ScopeEnv address) effects) => Map EdgeLabel [address]  -> Evaluator term address value effects address
 newScope map = send (NewScope map)
 
-currentScope :: forall address value effects. Member (ScopeEnv address) effects => Evaluator address value effects (Maybe address)
+currentScope :: forall term address value effects. Member (ScopeEnv address) effects => Evaluator term address value effects (Maybe address)
 currentScope = send CurrentScope
 
-associatedScope :: forall address value effects. Member (ScopeEnv address) effects => Declaration -> Evaluator address value effects (Maybe address)
+associatedScope :: forall term address value effects. Member (ScopeEnv address) effects => Declaration -> Evaluator term address value effects (Maybe address)
 associatedScope = send . AssociatedScope
 
-withScope :: forall address value effects m a. (Effectful (m address value), Member (ScopeEnv address) effects) => address -> m address value effects a -> m address value effects a
+withScope :: forall term address value effects a. Member (ScopeEnv address) effects => address -> Evaluator term address value effects a -> Evaluator term address value effects a
 withScope scope action = send (Local scope (lowerEff action))
 
 instance PureEffect (ScopeEnv address)
@@ -71,13 +71,13 @@ instance Effect (ScopeEnv address) where
 
 
 runScopeEnv :: (Ord address, Effects effects, Member Fresh effects, Member (Allocator address) effects)
-            => Evaluator address value (ScopeEnv address ': effects) a
-            -> Evaluator address value effects (ScopeGraph address, a)
+            => Evaluator term address value (ScopeEnv address ': effects) a
+            -> Evaluator term address value effects (ScopeGraph address, a)
 runScopeEnv evaluator = runState lowerBound (reinterpret handleScopeEnv evaluator)
 
-handleScopeEnv :: forall address value effects a. (Ord address, Member Fresh effects, Member (Allocator address) effects, Effects effects)
+handleScopeEnv :: forall term address value effects a. (Ord address, Member Fresh effects, Member (Allocator address) effects, Effects effects)
           => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
-          -> Evaluator address value (State (ScopeGraph address) ': effects) a
+          -> Evaluator term address value (State (ScopeGraph address) ': effects) a
 handleScopeEnv = \case
     Lookup ref -> ScopeGraph.scopeOfRef ref <$> get
     Declare decl span scope -> modify @(ScopeGraph address) (ScopeGraph.declare decl span scope)

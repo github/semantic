@@ -111,7 +111,6 @@ import           Data.Machine.Runner
 import           Data.Text.Prettyprint.Doc
 import           Data.Text.Prettyprint.Doc.Render.Text
 
-import           Data.Record
 import           Data.Reprinting.Errors
 import           Data.Reprinting.Scope
 import           Data.Reprinting.Splice
@@ -125,14 +124,10 @@ import           Reprinting.Typeset
 
 -- | Run the reprinting pipeline given the original 'Source', a language
 -- specific machine (`ProcessT`) and the provided 'Term'.
-runReprinter ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runReprinter :: Tokenize a
   => Source.Source
   -> ProcessT Translator Fragment Splice
-  -> Term a (Record fields)
+  -> Term a History
   -> Either TranslationError Source.Source
 runReprinter src translating tree
   = fmap go
@@ -147,25 +142,17 @@ runReprinter src translating tree
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
 
 -- | Run the reprinting pipeline up to tokenizing.
-runTokenizing ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runTokenizing :: Tokenize a
   => Source.Source
-  -> Term a (Record fields)
+  -> Term a History
   -> [Token]
 runTokenizing src tree
   = Data.Machine.run $ source (tokenizing src tree)
 
 -- | Run the reprinting pipeline up to contextualizing.
-runContextualizing ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runContextualizing :: Tokenize a
   => Source.Source
-  -> Term a (Record fields)
+  -> Term a History
   -> Either TranslationError [Fragment]
 runContextualizing src tree
   = Effect.run
@@ -175,14 +162,10 @@ runContextualizing src tree
   . runT $ source (tokenizing src tree)
       ~> contextualizing
 
-runTranslating ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runTranslating :: Tokenize a
   => Source.Source
   -> ProcessT Translator Fragment Splice
-  -> Term a (Record fields)
+  -> Term a History
   -> Either TranslationError [Splice]
 runTranslating src translating tree
   = Effect.run

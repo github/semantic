@@ -33,7 +33,7 @@ instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Specialize Evaluatable for Type to unify the inferred type of the subject with the specified type
 instance Evaluatable Annotation where
-  eval Annotation{annotationSubject = Subterm _ action} = action
+  eval eval Annotation{..} = eval annotationSubject
 
 instance Tokenize Annotation where
   -- FIXME: This ignores annotationType.

@@ -34,7 +34,7 @@ throwBaseError :: ( Member (Resumable (BaseError exc)) effects
                   , Member (Reader S.Span) effects
                   )
                 => exc resume
-                -> Evaluator address value effects resume
+                -> Evaluator term address value effects resume
 throwBaseError err = do
   moduleInfo <- currentModule
   span <- currentSpan

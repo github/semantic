@@ -47,7 +47,6 @@ library
                      , Control.Abstract.PythonPackage
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
-                     , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
                      -- Rewriting
                      , Control.Rewriting
@@ -91,6 +90,7 @@ library
                      , Data.History
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Location
                      , Data.Map.Monoidal
                      , Data.Proto.DiffTree
                      , Data.Proto.ParseTree
@@ -98,7 +98,6 @@ library
                      , Data.Project
                      , Data.Quieterm
                      , Data.Range
-                     , Data.Record
                      , Data.Reprinting.Errors
                      , Data.Reprinting.Fragment
                      , Data.Reprinting.Operator
@@ -109,7 +108,6 @@ library
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
-                     , Data.SplitDiff
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
@@ -392,6 +390,27 @@ test-suite lint
   ghc-options:         -dynamic -threaded -j
   build-depends:       base
                      , hlint
+
+test-suite parse-examples
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Examples.hs
+  default-language:    Haskell2010
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j
+  build-depends:       base
+                     , bytestring
+                     , directory
+                     , effects
+                     , fastsum
+                     , filepath
+                     , Glob
+                     , hspec >= 2.4.1
+                     , hspec-core
+                     , hspec-expectations-pretty-diff
+                     , process
+                     , semantic
+  default-extensions:  RecordWildCards
+                     , FlexibleContexts
 
 test-suite doctests
   type:                exitcode-stdio-1.0

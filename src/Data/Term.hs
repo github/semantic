@@ -11,14 +11,12 @@ module Data.Term
 , termSize
 , hoistTerm
 , hoistTermF
-, stripTerm
 , Annotated (..)
 ) where
 
 import Prologue
 import Data.Aeson
 import Data.JSON.Fields
-import Data.Record
 import Text.Show
 import qualified Data.Sum as Sum
 import Proto3.Suite.Class
@@ -76,10 +74,6 @@ hoistTerm f = go where go (Term r) = Term (hoistTermF f (fmap go r))
 
 hoistTermF :: (forall a. f a -> g a) -> TermF f a b -> TermF g a b
 hoistTermF f = go where go (In a r) = In a (f r)
-
--- | Strips the head annotation off a term annotated with non-empty records.
-stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
-stripTerm = fmap rtail
 
 
 type instance Base (Term f a) = TermF f a

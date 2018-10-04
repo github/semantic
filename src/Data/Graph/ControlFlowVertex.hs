@@ -22,7 +22,7 @@ import           Data.Abstract.Package (PackageInfo (..))
 import           Data.Aeson
 import           Data.Graph (VertexTag (..))
 import qualified Data.Graph as G
-import           Data.Record
+import           Data.Location
 import           Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
@@ -155,20 +155,20 @@ instance Message (G.Edge ControlFlowVertex) where
 -- 'Name's for terms with symbolic names like Identifiers and Declarations.
 
 class VertexDeclaration syntax where
-  toVertex :: (Declarations1 syntax, Foldable syntax, HasField fields Span)
-           => Record fields
+  toVertex :: (Declarations1 syntax, Foldable syntax)
+           => Location
            -> ModuleInfo
-           -> syntax (Term syntax (Record fields))
+           -> syntax (Term syntax Location)
            -> Maybe (ControlFlowVertex, Name)
 
 instance (VertexDeclaration' syntax syntax) => VertexDeclaration syntax where
   toVertex = toVertex'
 
 class VertexDeclaration' whole syntax where
-  toVertex' :: (Declarations1 whole, Foldable whole, HasField fields Span)
-            => Record fields
+  toVertex' :: (Declarations1 whole, Foldable whole)
+            => Location
             -> ModuleInfo
-            -> syntax (Term whole (Record fields))
+            -> syntax (Term whole Location)
             -> Maybe (ControlFlowVertex, Name)
 
 instance (VertexDeclarationStrategy syntax ~ strategy, VertexDeclarationWithStrategy strategy whole syntax) => VertexDeclaration' whole syntax where
@@ -185,11 +185,11 @@ type family VertexDeclarationStrategy syntax where
   VertexDeclarationStrategy syntax  = 'Default
 
 class VertexDeclarationWithStrategy (strategy :: Strategy) whole syntax where
-  toVertexWithStrategy :: (Declarations1 whole, Foldable whole, HasField fields Span)
+  toVertexWithStrategy :: (Declarations1 whole, Foldable whole)
                        => proxy strategy
-                       -> Record fields
+                       -> Location
                        -> ModuleInfo
-                       -> syntax (Term whole (Record fields))
+                       -> syntax (Term whole Location)
                        -> Maybe (ControlFlowVertex, Name)
 
 -- | The 'Default' strategy produces 'Nothing'.
@@ -200,16 +200,16 @@ instance Apply (VertexDeclaration' whole) fs => VertexDeclarationWithStrategy 'C
   toVertexWithStrategy _ ann info = apply @(VertexDeclaration' whole) (toVertex' ann info)
 
 instance VertexDeclarationWithStrategy 'Custom whole Syntax.Identifier where
-  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (getField ann), name)
+  toVertexWithStrategy _ ann info (Syntax.Identifier name) = Just (variableVertex (formatName name) info (locationSpan ann), name)
 
 instance VertexDeclarationWithStrategy 'Custom whole Declaration.Function where
-  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
+  toVertexWithStrategy _ ann info term@Declaration.Function{} = (\n -> (functionVertex (formatName n) info (locationSpan ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole Declaration.Method where
-  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (getField ann), n)) <$> liftDeclaredName declaredName term
+  toVertexWithStrategy _ ann info term@Declaration.Method{} = (\n -> (methodVertex (formatName n) info (locationSpan ann), n)) <$> liftDeclaredName declaredName term
 
 instance VertexDeclarationWithStrategy 'Custom whole whole => VertexDeclarationWithStrategy 'Custom whole Expression.MemberAccess where
   toVertexWithStrategy proxy ann info (Expression.MemberAccess (Term (In lhsAnn lhs)) name) =
     case toVertexWithStrategy proxy lhsAnn info lhs of
-      Just (Variable n _ _, _) -> Just (variableVertex (n <> "." <> formatName name) info (getField ann), name)
-      _ -> Just (variableVertex (formatName name) info (getField ann), name)
+      Just (Variable n _ _, _) -> Just (variableVertex (n <> "." <> formatName name) info (locationSpan ann), name)
+      _ -> Just (variableVertex (formatName name) info (locationSpan ann), name)
