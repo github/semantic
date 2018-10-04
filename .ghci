@@ -3,7 +3,7 @@
 
 -- See docs/💡ProTip!.md
 :undef pretty
-:def pretty \ _ -> return (unlines [":set -interactive-print Semantic.Util.prettyShow"])
+:def pretty \ _ -> return ":set -interactive-print Semantic.Util.Pretty.prettyShow"
 
 -- See docs/💡ProTip!.md
 :undef no-pretty
