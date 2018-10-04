@@ -54,7 +54,7 @@ instance Ord Range where
   a <= b = start a <= start b
 
 instance Show Range where
-  showsPrec _ Range{..} = showChar '[' . shows start . showString " - " . shows end . showChar ']'
+  showsPrec _ Range{..} = showChar '[' . shows start . showString " .. " . shows end . showChar ']'
 
 instance ToJSONFields Range where
   toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
