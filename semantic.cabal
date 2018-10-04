@@ -197,6 +197,7 @@ library
                      , Semantic.Telemetry.Stat
                      , Semantic.Timeout
                      , Semantic.Util
+                     , Semantic.Util.Pretty
                      , Semantic.Util.Rewriting
                      , Semantic.Version
                      -- Serialization
