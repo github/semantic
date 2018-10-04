@@ -34,7 +34,6 @@ import           Data.History
 import           Data.List (intersperse)
 import qualified Data.Machine as Machine
 import           Data.Range
-import           Data.Record
 import           Data.Reprinting.Scope (Scope)
 import qualified Data.Reprinting.Scope as Scope
 import           Data.Reprinting.Token as Token
@@ -133,13 +132,13 @@ forbidData = modify (\x -> x { filter = ForbidData })
 move :: Int -> Tokenizer ()
 move c = modify (\x -> x { cursor = c })
 
-withHistory :: (Annotated t (Record fields), HasField fields History)
+withHistory :: Annotated t History
             => t
             -> Tokenizer a
             -> Tokenizer a
 withHistory t act = do
   old <- asks history
-  modify (\x -> x { history = getField (annotation t)})
+  modify (\x -> x { history = annotation t })
   act <* modify (\x -> x { history = old })
 
 withStrategy :: Strategy -> Tokenizer a -> Tokenizer a
@@ -154,7 +153,7 @@ withStrategy s act = do
 -- The reprinting algorithm.
 
 -- | A subterm algebra inspired by the /Scrap Your Reprinter/ algorithm.
-descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
+descend :: Tokenize constr => SubtermAlgebra constr (Term a History) (Tokenizer ())
 descend t = do
   (State src hist strat crs _) <- asks id
   let into s = withHistory (subterm s) (subtermRef s)
@@ -230,13 +229,13 @@ class (Show1 constr, Traversable constr) => Tokenize constr where
   -- | Should emit control and data tokens.
   tokenize :: FAlgebra constr (Tokenizer ())
 
-tokenizing :: (Show (Record fields), Tokenize a, HasField fields History)
+tokenizing :: Tokenize a
            => Source
-           -> Term a (Record fields)
+           -> Term a History
            -> Machine.Source Token
 tokenizing src term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
-        state = State src (getField (termAnnotation term)) Reprinting 0 ForbidData
+        state = State src (termAnnotation term) Reprinting 0 ForbidData
         go    = forbidData *> foldSubterms descend term <* finish
 
 -- | Sums of reprintable terms are reprintable.
@@ -244,7 +243,7 @@ instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable
   tokenize = apply @Tokenize tokenize
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
-instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize (TermF a (Record fields)) where
+instance Tokenize a => Tokenize (TermF a History) where
   tokenize t = withHistory t (tokenize (termFOut t))
 
 instance Tokenize [] where

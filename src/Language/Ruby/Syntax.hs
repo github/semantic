@@ -28,7 +28,7 @@ resolveRubyName :: ( Member (Modules address) effects
                    , Member (Resumable (BaseError ResolutionError)) effects
                    )
                 => Text
-                -> Evaluator address value effects M.ModulePath
+                -> Evaluator term address value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
@@ -42,7 +42,7 @@ resolveRubyPath :: ( Member (Modules address) effects
                    , Member (Resumable (BaseError ResolutionError)) effects
                    )
                 => Text
-                -> Evaluator address value effects M.ModulePath
+                -> Evaluator term address value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
@@ -59,13 +59,13 @@ instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
-  eval Send{..} = do
+  eval eval Send{..} = do
     let sel = case sendSelector of
-          Just sel -> subtermAddress sel
+          Just sel -> eval sel >>= address
           Nothing  -> variable (name "call")
-    recv <- maybe (self >>= maybeM (box unit)) subtermAddress sendReceiver
+    recv <- maybe (self >>= maybeM (box unit)) (eval >=> address) sendReceiver
     func <- deref =<< evaluateInScopedEnv recv sel
-    args <- traverse subtermAddress sendArgs
+    args <- traverse (eval >=> address) sendArgs
     Rval <$> call func recv args -- TODO pass through sendBlock
 
 instance Tokenize Send where
@@ -83,8 +83,8 @@ instance Ord1 Require where liftCompare = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval (Require _ x) = do
-    name <- subtermValue x >>= asString
+  eval eval (Require _ x) = do
+    name <- eval x >>= value >>= asString
     path <- resolveRubyName name
     traceResolve name path
     (importedEnv, v) <- doRequire path
@@ -95,7 +95,7 @@ doRequire :: ( Member (Boolean value) effects
              , Member (Modules address) effects
              )
           => M.ModulePath
-          -> Evaluator address value effects (Bindings address, value)
+          -> Evaluator term address value effects (Bindings address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
@@ -111,12 +111,12 @@ instance Ord1 Load where liftCompare = genericLiftCompare
 instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Load where
-  eval (Load x Nothing) = do
-    path <- subtermValue x >>= asString
+  eval eval (Load x Nothing) = do
+    path <- eval x >>= value >>= asString
     rvalBox =<< doLoad path False
-  eval (Load x (Just wrap)) = do
-    path <- subtermValue x >>= asString
-    shouldWrap <- subtermValue wrap >>= asBool
+  eval eval (Load x (Just wrap)) = do
+    path <- eval x >>= value >>= asString
+    shouldWrap <- eval wrap >>= value >>= asBool
     rvalBox =<< doLoad path shouldWrap
 
 doLoad :: ( Member (Boolean value) effects
@@ -129,7 +129,7 @@ doLoad :: ( Member (Boolean value) effects
           )
        => Text
        -> Bool
-       -> Evaluator address value effects value
+       -> Evaluator term address value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
@@ -150,11 +150,11 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval Class{..} = do
-    super <- traverse subtermAddress classSuperClass
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
+  eval eval Class{..} = do
+    super <- traverse (eval >=> address) classSuperClass
+    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
     rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr super (void (subtermAddress classBody)))
+      makeNamespace name addr super (void (eval classBody)))
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -164,17 +164,17 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval (Module iden xs) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
+  eval eval (Module iden xs) = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr Nothing (void (eval xs)))
+      makeNamespace name addr Nothing (traverse_ eval xs))
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
 
 instance Evaluatable LowPrecedenceAnd where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval t = rvalBox =<< go (fmap subtermValue t) where
+  eval eval t = rvalBox =<< go (fmap (eval >=> value) t) where
     go (LowPrecedenceAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
@@ -188,7 +188,7 @@ data LowPrecedenceOr a = LowPrecedenceOr { lhs :: a, rhs :: a }
 
 instance Evaluatable LowPrecedenceOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval t = rvalBox =<< go (fmap subtermValue t) where
+  eval eval t = rvalBox =<< go (fmap (eval >=> value) t) where
     go (LowPrecedenceOr a b) = do
       cond <- a
       ifthenelse cond (pure cond) b

@@ -4,13 +4,11 @@ module Data.Syntax where
 
 import Data.Abstract.Evaluatable
 import Data.Aeson (ToJSON(..), object)
-import Data.AST
 import Data.Char (toLower)
 import Data.JSON.Fields
 import Data.Range
-import Data.Record
+import Data.Location
 import qualified Data.Set as Set
-import Data.Span
 import Data.Sum
 import Data.Term
 import GHC.Types (Constraint)
@@ -54,16 +52,16 @@ makeTerm1' syntax = case toList syntax of
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
+emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
-  where startLocation ann = Range (start (getField ann)) (start (getField ann)) :. Span (spanStart (getField ann)) (spanStart (getField ann)) :. Nil
+  where startLocation Location{..} = Location (Range (start locationByteRange) (start locationByteRange)) (Span (spanStart locationSpan) (spanStart locationSpan))
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location)) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
+handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
+parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -164,7 +162,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = pure (LvalLocal name)
+  eval _ (Identifier name) = pure (LvalLocal name)
 
 instance Tokenize Identifier where
   tokenize = yield . Run . formatName . Data.Syntax.name
@@ -199,7 +197,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = rvalBox unit
+  eval _ _ = rvalBox unit
 
 instance Tokenize Empty where
   tokenize = ignore
@@ -305,7 +303,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval Context{..} = subtermRef contextSubject
+  eval eval Context{..} = eval contextSubject
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

@@ -21,25 +21,25 @@ instance Show Monovariant where
 
 
 runAllocator :: PureEffects effects
-             => Evaluator Monovariant value (Allocator Monovariant ': effects) a
-             -> Evaluator Monovariant value effects a
+             => Evaluator term Monovariant value (Allocator Monovariant ': effects) a
+             -> Evaluator term Monovariant value effects a
 runAllocator = interpret handleAllocator
 
-handleAllocator :: Allocator Monovariant (Eff (Allocator Monovariant ': effects)) a -> Evaluator Monovariant value effects a
+handleAllocator :: Allocator Monovariant (Eff (Allocator Monovariant ': effects)) a -> Evaluator term Monovariant value effects a
 handleAllocator (Alloc name) = pure (Monovariant name)
 
 runDeref :: ( Member NonDet effects
             , Ord value
             , PureEffects effects
             )
-         => Evaluator Monovariant value (Deref value ': effects) a
-         -> Evaluator Monovariant value effects a
+         => Evaluator term Monovariant value (Deref value ': effects) a
+         -> Evaluator term Monovariant value effects a
 runDeref = interpret handleDeref
 
 handleDeref :: ( Member NonDet effects
                , Ord value
                )
             => Deref value (Eff (Deref value ': effects)) a
-            -> Evaluator Monovariant value effects a
+            -> Evaluator term Monovariant value effects a
 handleDeref (DerefCell        cell) = traverse (foldMapA pure) (nonEmpty (toList cell))
 handleDeref (AssignCell value cell) = pure (Set.insert value cell)

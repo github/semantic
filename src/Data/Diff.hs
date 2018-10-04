@@ -12,7 +12,6 @@ module Data.Diff
 , mergeF
 , merging
 , diffPatches
-, stripDiff
 ) where
 
 import Data.Aeson
@@ -23,7 +22,6 @@ import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Patch
-import Data.Record
 import Data.Term
 import Text.Show
 import Prologue
@@ -86,13 +84,6 @@ diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Pa
 diffPatches = para $ \ diff -> case diff of
   Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch
   Merge merge -> foldMap snd merge
-
-
--- | Strips the head annotation off a diff annotated with non-empty records.
-stripDiff :: Functor syntax
-          => Diff syntax (Record (h1 ': t1)) (Record (h2 ': t2))
-          -> Diff syntax (Record        t1)  (Record        t2)
-stripDiff = bimap rtail rtail
 
 
 type instance Base (Diff syntax ann1 ann2) = DiffF syntax ann1 ann2

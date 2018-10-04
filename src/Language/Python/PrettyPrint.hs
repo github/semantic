@@ -36,7 +36,7 @@ step (Defer el cs)  = case (el, cs) of
 
   -- If statements
   (Open,  If:_)                -> emit "if" *> space
-  (hen,  If:_)                -> emit ":"
+  (Then,  If:_)                -> emit ":"
   (Else,  If:xs)               -> endContext (imperativeDepth xs) *> emit "else:"
   (Close, If:_)                -> pure ()
 

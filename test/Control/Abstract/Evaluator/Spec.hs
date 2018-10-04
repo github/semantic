@@ -7,6 +7,7 @@ import Control.Abstract
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.BaseError
 import Data.Abstract.Environment
+import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package
@@ -26,7 +27,7 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (_, expected) <- evaluate $ do
-      identity <- function Nothing [name "x"] lowerBound (variable (name "x"))
+      identity <- function Nothing [name "x"] (coerce (variable (name "x")))
       recv <- box unit
       addr <- box (integer 123)
       call identity recv [addr]
@@ -34,6 +35,7 @@ spec = parallel $ do
 
 evaluate
   = runM
+  . runIgnoringTrace
   . runState (lowerBound @(Heap Precise Val))
   . runFresh 0
   . runReader (PackageInfo (name "test") mempty)
@@ -43,21 +45,21 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . Precise.runDeref @_ @Val
+  . Precise.runDeref @_ @_ @Val
   . Precise.runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
   . runLoopControl
   . Value.runBoolean
-  . Value.runFunction coerce coerce
+  . Value.runFunction coerce
 
 reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
 reassociate = mergeExcs . mergeExcs . mergeExcs . Right
 
-type Val = Value Precise SpecEff
-newtype SpecEff a = SpecEff
-  { runSpecEff :: Eff '[ Function Precise Val
+type Val = Value SpecEff Precise
+newtype SpecEff = SpecEff
+  { runSpecEff :: Eff '[ Function SpecEff Precise Val
                        , Boolean Val
                        , Exc (LoopControl Precise)
                        , Exc (Return Precise)
@@ -66,12 +68,17 @@ newtype SpecEff a = SpecEff
                        , Deref Val
                        , Resumable (BaseError (AddressError Precise Val))
                        , Resumable (BaseError (EnvironmentError Precise))
-                       , Resumable (BaseError (ValueError Precise SpecEff))
+                       , Resumable (BaseError (ValueError SpecEff Precise))
                        , Reader Span
                        , Reader ModuleInfo
                        , Reader PackageInfo
                        , Fresh
                        , State (Heap Precise Val)
+                       , Trace
                        , Lift IO
-                       ] a
+                       ] Precise
   }
+
+instance Eq SpecEff where _ == _ = True
+instance Show SpecEff where show _ = "_"
+instance FreeVariables SpecEff where freeVariables _ = lowerBound

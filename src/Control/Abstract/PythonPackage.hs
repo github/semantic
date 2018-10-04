@@ -5,43 +5,41 @@ module Control.Abstract.PythonPackage
 import           Control.Abstract.Evaluator (LoopControl, Return)
 import           Control.Abstract.Heap (Allocator, Deref, deref)
 import           Control.Abstract.Value
-import           Control.Monad.Effect (Effectful (..))
 import qualified Control.Monad.Effect as Eff
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..), ValueError (..))
-import           Data.Coerce
 import qualified Data.Map as Map
 import           Prologue
 
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
-runPythonPackaging :: forall effects address body a. (
+runPythonPackaging :: forall effects term address a. (
                       Eff.PureEffects effects
                       , Ord address
                       , Show address
+                      , Show term
                       , Member Trace effects
-                      , Member (Boolean (Value address body)) effects
-                      , Member (State (Heap address (Value address body))) effects
-                      , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
-                      , Member (Resumable (BaseError (ValueError address body))) effects
+                      , Member (Boolean (Value term address)) effects
+                      , Member (State (Heap address (Value term address))) effects
+                      , Member (Resumable (BaseError (AddressError address (Value term address)))) effects
+                      , Member (Resumable (BaseError (ValueError term address))) effects
                       , Member Fresh effects
-                      , Coercible body (Eff.Eff effects)
                       , Member (State Strategy) effects
                       , Member (Allocator address) effects
-                      , Member (Deref (Value address body)) effects
+                      , Member (Deref (Value term address)) effects
                       , Member (Env address) effects
                       , Member (Eff.Exc (LoopControl address)) effects
                       , Member (Eff.Exc (Return address)) effects
                       , Member (Eff.Reader ModuleInfo) effects
                       , Member (Eff.Reader PackageInfo) effects
                       , Member (Eff.Reader Span) effects
-                      , Member (Function address (Value address body)) effects)
-                   => Evaluator address (Value address body) effects a
-                   -> Evaluator address (Value address body) effects a
-runPythonPackaging = Eff.interpose @(Function address (Value address body)) $ \case
+                      , Member (Function term address (Value term address)) effects)
+                   => Evaluator term address (Value term address) effects a
+                   -> Evaluator term address (Value term address) effects a
+runPythonPackaging = Eff.interpose @(Function term address (Value term address)) $ \case
   Call callName super params -> do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
@@ -63,4 +61,5 @@ runPythonPackaging = Eff.interpose @(Function address (Value address body)) $ \c
           _ -> pure ()
       _ -> pure ()
     call callName super params
-  Function name params vars body ->  function name params vars (raiseEff body)
+  Function name params body ->  function name params body
+  BuiltIn b -> builtIn b

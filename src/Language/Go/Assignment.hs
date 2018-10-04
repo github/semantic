@@ -12,7 +12,6 @@ import Prologue
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (Name, name)
-import           Data.Record
 import           Data.Syntax
     (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError)
 import qualified Data.Syntax as Syntax
@@ -131,7 +130,7 @@ type Syntax =
    , Literal.EscapeSequence
    ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 -- For Protobuf serialization
@@ -535,7 +534,7 @@ varDeclaration :: Assignment Term
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
 variadicArgument :: Assignment Term
-variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic [] <$> expression)
+variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic [] <$> expressions)
 
 variadicParameterDeclaration :: Assignment Term
 variadicParameterDeclaration =  makeTerm <$> symbol VariadicParameterDeclaration <*> children (flip Go.Syntax.Variadic <$> (expression <|> emptyTerm) <* token AnonDotDotDot <*> many expression)

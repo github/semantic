@@ -29,7 +29,7 @@ import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
-import Data.Record
+import Data.Location
 import Data.Semigroup (Semigroup(..))
 import Data.Source
 import Data.Blob
@@ -199,13 +199,6 @@ instance Listable1 f => Listable2 (Diff f) where
 
 instance (Listable1 syntax, Listable ann1, Listable ann2) => Listable (Diff syntax ann1 ann2) where
   tiers = tiers2
-
-
-instance (Listable head, Listable (Record tail)) => Listable (Record (head ': tail)) where
-  tiers = cons2 (:.)
-
-instance Listable (Record '[]) where
-  tiers = cons0 Nil
 
 
 instance Listable2 Patch where
@@ -519,9 +512,9 @@ instance Listable Text where
 
 instance Listable Declaration where
   tiers
-    =  cons4 MethodDeclaration
-    \/ cons3 FunctionDeclaration
-    \/ cons2 (\ a b -> ErrorDeclaration a b Language.Unknown)
+    =  cons5 MethodDeclaration
+    \/ cons4 FunctionDeclaration
+    \/ cons3 (\ a b c -> ErrorDeclaration a b c Language.Unknown)
 
 instance Listable CyclomaticComplexity where
   tiers = cons1 CyclomaticComplexity
@@ -534,9 +527,11 @@ instance Listable Language.Language where
     \/ cons0 Language.Ruby
     \/ cons0 Language.TypeScript
 
+instance Listable Location where
+  tiers = cons2 Location
+
 instance Listable Range where
   tiers = cons2 Range
-
 
 instance Listable Pos where
   tiers = cons2 Pos

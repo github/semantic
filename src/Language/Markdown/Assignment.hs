@@ -12,7 +12,6 @@ import Prologue
 import           Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
-import           Data.Record
 import           Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import qualified Data.Term as Term
@@ -49,7 +48,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment (Term.TermF [] CMarkGFM.NodeType) Grammar
 
 -- For Protobuf serialization

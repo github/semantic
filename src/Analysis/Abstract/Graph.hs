@@ -29,11 +29,11 @@ import           Data.Abstract.Package (PackageInfo (..))
 import           Data.ByteString.Builder
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex
-import           Data.Record
 import           Data.Term
+import           Data.Location
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as T
-import           Prologue hiding (project)
+import           Prologue
 
 style :: Style ControlFlowVertex Builder
 style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
@@ -68,41 +68,38 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (State (Graph ControlFlowVertex)) effects
                  , Member (State (Map (Hole context (Located address)) ControlFlowVertex)) effects
                  , Member (Resumable (BaseError (EnvironmentError (Hole context (Located address))))) effects
-                 , AbstractValue (Hole context (Located address)) value effects
+                 , AbstractValue term (Hole context (Located address)) value effects
                  , Member (Reader ControlFlowVertex) effects
-                 , HasField fields Span
                  , VertexDeclaration syntax
                  , Declarations1 syntax
                  , Ord address
                  , Ord context
                  , Foldable syntax
-                 , Functor syntax
-                 , term ~ Term syntax (Record fields)
+                 , term ~ Term syntax Location
                  )
-              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
-              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
-graphingTerms recur term@(In a syntax) = do
+              => Open (Open (term -> Evaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address)))))
+graphingTerms recur0 recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
-  case toVertex a definedInModule (subterm <$> syntax) of
+  case toVertex a definedInModule syntax of
     Just (v@Function{}, _) -> recurWithContext v
     Just (v@Method{}, _) -> recurWithContext v
     Just (v@Variable{..}, name) -> do
       variableDefinition v
-      maybeAddr <- TermEvaluator (lookupEnv name)
+      maybeAddr <- lookupEnv name
       case maybeAddr of
         Just a -> do
           defined <- gets (Map.lookup a)
           maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
         _ -> pure ()
-      recur term
-    _ -> recur term
+      recur0 recur term
+    _ -> recur0 recur term
   where
     recurWithContext v = do
       variableDefinition v
       moduleInclusion v
       local (const v) $ do
-        valRef <- recur term
-        addr <- TermEvaluator (Control.Abstract.address valRef)
+        valRef <- recur0 recur term
+        addr <- Control.Abstract.address valRef
         modify' (Map.insert addr v)
         pure valRef
 
@@ -111,8 +108,7 @@ graphingPackages :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph ControlFlowVertex)) effects
                     , Member (Reader ControlFlowVertex) effects
                     )
-                 => SubtermAlgebra Module term (TermEvaluator term address value effects a)
-                 -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                 => Open (Module term -> Evaluator term address value effects a)
 graphingPackages recur m =
   let v = moduleVertex (moduleInfo m) in packageInclusion v *> local (const v) (recur m)
 
@@ -124,8 +120,7 @@ graphingModules :: forall term address value effects a
                    , Member (Reader ControlFlowVertex) effects
                    , PureEffects effects
                    )
-                => SubtermAlgebra Module term (TermEvaluator term address value effects a)
-                -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                => Open (Module term -> Evaluator term address value effects a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
@@ -147,8 +142,7 @@ graphingModuleInfo :: forall term address value effects a
                       , Member (State (Graph ModuleInfo)) effects
                       , PureEffects effects
                       )
-                   => SubtermAlgebra Module term (TermEvaluator term address value effects a)
-                   -> SubtermAlgebra Module term (TermEvaluator term address value effects a)
+                   => Open (Module term -> Evaluator term address value effects a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
   eavesdrop @(Modules address) (\ eff -> case eff of
@@ -158,25 +152,21 @@ graphingModuleInfo recur m = do
     (recur m)
 
 -- | Add an edge from the current package to the passed vertex.
-packageInclusion :: ( Effectful m
-                    , Member (Reader PackageInfo) effects
+packageInclusion :: ( Member (Reader PackageInfo) effects
                     , Member (State (Graph ControlFlowVertex)) effects
-                    , Monad (m effects)
                     )
                  => ControlFlowVertex
-                 -> m effects ()
+                 -> Evaluator term address value effects ()
 packageInclusion v = do
   p <- currentPackage
   appendGraph (vertex (packageVertex p) `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
-moduleInclusion :: ( Effectful m
-                   , Member (Reader ModuleInfo) effects
+moduleInclusion :: ( Member (Reader ModuleInfo) effects
                    , Member (State (Graph ControlFlowVertex)) effects
-                   , Monad (m effects)
                    )
                 => ControlFlowVertex
-                -> m effects ()
+                -> Evaluator term address value effects ()
 moduleInclusion v = do
   m <- currentModule
   appendGraph (vertex (moduleVertex m) `connect` vertex v)
@@ -186,15 +176,15 @@ variableDefinition :: ( Member (State (Graph ControlFlowVertex)) effects
                       , Member (Reader ControlFlowVertex) effects
                       )
                    => ControlFlowVertex
-                   -> TermEvaluator term (Hole context (Located address)) value effects ()
+                   -> Evaluator term (Hole context (Located address)) value effects ()
 variableDefinition var = do
   context <- ask
   appendGraph $ vertex context `connect` vertex var
 
-appendGraph :: (Effectful m, Member (State (Graph v)) effects) => Graph v -> m effects ()
+appendGraph :: Member (State (Graph v)) effects => Graph v -> Evaluator term address value effects ()
 appendGraph = modify' . (<>)
 
 
-graphing :: (Effectful m, Effects effects, Functor (m (State (Graph ControlFlowVertex) : effects)))
-         => m (State (Map (Hole context (Located address)) ControlFlowVertex) ': State (Graph ControlFlowVertex) ': effects) result -> m effects (Graph ControlFlowVertex, result)
+graphing :: Effects effects
+         => Evaluator term (Hole context (Located address)) value (State (Map (Hole context (Located address)) ControlFlowVertex) ': State (Graph ControlFlowVertex) ': effects) result -> Evaluator term (Hole context (Located address)) value effects (Graph ControlFlowVertex, result)
 graphing = runState mempty . fmap snd . runState lowerBound

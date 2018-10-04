@@ -10,7 +10,6 @@ module Language.TypeScript.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.Name (Name, name)
 import qualified Assigning.Assignment as Assignment
-import Data.Record
 import Data.Sum
 import Data.Syntax
     ( contextualize
@@ -207,7 +206,7 @@ type Syntax = '[
   , []
   ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 instance Named1 (Sum Syntax) where

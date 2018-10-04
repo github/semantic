@@ -4,6 +4,7 @@ module Language.Go.Syntax where
 
 import Prologue
 
+import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -11,6 +12,9 @@ import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import           Data.Aeson
 import           Data.JSON.Fields
+import qualified Data.Map as Map
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Proto3.Suite.Class
@@ -60,7 +64,7 @@ resolveGoImport :: ( Member (Modules address) effects
                    , Member Trace effects
                    )
                 => ImportPath
-                -> Evaluator address value effects [ModulePath]
+                -> Evaluator term address value effects [ModulePath]
 resolveGoImport (ImportPath path Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
@@ -89,7 +93,7 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import importPath _) = do
+  eval _ (Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
@@ -109,9 +113,9 @@ instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport importPath aliasTerm) = do
+  eval _ (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     void . letrec' alias $ \addr -> do
       makeNamespace alias addr Nothing . for_ paths $ \p -> do
         traceResolve (unPath importPath) p
@@ -128,7 +132,7 @@ instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
-  eval (SideEffectImport importPath _) = do
+  eval _ (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
     for_ paths require
@@ -297,7 +301,11 @@ instance Ord1 Package where liftCompare = genericLiftCompare
 instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
-  eval (Package _ xs) = eval xs
+  eval eval (Package _ xs) = do
+    currentScope' <- currentScope
+    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+    scope <- newScope edges
+    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).

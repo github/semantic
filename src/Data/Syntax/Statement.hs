@@ -10,7 +10,7 @@ import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Proto3.Suite.Class
 
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable as Abstract
 import Control.Abstract.ScopeGraph
 import Data.JSON.Fields
 import Diffing.Algorithm
@@ -32,11 +32,11 @@ instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
 instance ToJSON1 Statements
 
 instance Evaluatable Statements where
-  eval (Statements xs) = do
+  eval eval (Statements xs) = do
     currentScope' <- currentScope
     let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
     scope <- newScope edges
-    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
+    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
@@ -50,9 +50,9 @@ instance Ord1 If where liftCompare = genericLiftCompare
 instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable If where
-  eval (If cond if' else') = do
-    bool <- subtermValue cond
-    Rval <$> ifthenelse bool (subtermAddress if') (subtermAddress else')
+  eval eval (If cond if' else') = do
+    bool <- eval cond >>= Abstract.value
+    Rval <$> ifthenelse bool (eval if' >>= address) (eval else' >>= address)
 
 instance Tokenize If where
   tokenize If{..} = within' Scope.If $ do
@@ -120,10 +120,10 @@ instance Ord1 Let where liftCompare = genericLiftCompare
 instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Let where
-  eval Let{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm letVariable))
-    addr <- snd <$> letrec name (subtermValue letValue)
-    Rval <$> locally (bind name addr *> subtermAddress letBody)
+  eval eval Let{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName letVariable)
+    addr <- snd <$> letrec name (eval letValue >>= Abstract.value)
+    Rval <$> locally (bind name addr *> (eval letBody >>= address))
 
 
 -- Assignment
@@ -140,13 +140,13 @@ instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
-  eval Assignment{..} = do
-    lhs <- subtermRef assignmentTarget
-    rhs <- subtermAddress assignmentValue
+  eval eval Assignment{..} = do
+    lhs <- eval assignmentTarget
+    rhs <- eval assignmentValue >>= address
 
     case lhs of
       LvalLocal name -> do
-        case declaredName (subterm assignmentValue) of
+        case declaredName assignmentValue of
           Just rhsName -> do
             assocScope <- associatedScope (Declaration rhsName)
             case assocScope of
@@ -224,7 +224,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
+  eval eval (Return x) = Rval <$> (eval x >>= address >>= earlyReturn)
 
 instance Tokenize Return where
   tokenize (Return x) = within' Scope.Return x
@@ -248,7 +248,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval (Break x) = Rval <$> (subtermAddress x >>= throwBreak)
+  eval eval (Break x) = Rval <$> (eval x >>= address >>= throwBreak)
 
 newtype Continue a = Continue { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -258,7 +258,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval (Continue x) = Rval <$> (subtermAddress x >>= throwContinue)
+  eval eval (Continue x) = Rval <$> (eval x >>= address >>= throwContinue)
 
 newtype Retry a = Retry { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -279,7 +279,7 @@ instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NoOp where
-  eval _ = rvalBox unit
+  eval _ _ = rvalBox unit
 
 -- Loops
 
@@ -291,7 +291,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval (fmap subtermValue -> For before cond step body) = rvalBox =<< forLoop before cond step body
+  eval eval (fmap (eval >=> Abstract.value) -> For before cond step body) = rvalBox =<< forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -313,7 +313,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval While{..} = rvalBox =<< while (subtermValue whileCondition) (subtermValue whileBody)
+  eval eval While{..} = rvalBox =<< while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -323,7 +323,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval DoWhile{..} = rvalBox =<< doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
+  eval eval DoWhile{..} = rvalBox =<< doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
 
 -- Exception handling
 

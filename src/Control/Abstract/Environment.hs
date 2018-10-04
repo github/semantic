@@ -36,22 +36,22 @@ import Data.Span
 import Prologue
 
 -- | Retrieve the current execution context
-getEvalContext :: Member (Env address) effects => Evaluator address value effects (EvalContext address)
+getEvalContext :: Member (Env address) effects => Evaluator term address value effects (EvalContext address)
 getEvalContext = send GetCtx
 
 -- | Retrieve the current environment
 getEnv :: Member (Env address) effects
-       => Evaluator address value effects (Environment address)
+       => Evaluator term address value effects (Environment address)
 getEnv = ctxEnvironment <$> getEvalContext
 
 -- | Replace the execution context. This is only for use in Analysis.Abstract.Caching.
-putEvalContext :: Member (Env address) effects => EvalContext address -> Evaluator address value effects ()
+putEvalContext :: Member (Env address) effects => EvalContext address -> Evaluator term address value effects ()
 putEvalContext = send . PutCtx
 
 withEvalContext :: Member (Env address) effects
                 => EvalContext address
-                -> Evaluator address value effects a
-                -> Evaluator address value effects a
+                -> Evaluator term address value effects a
+                -> Evaluator term address value effects a
 withEvalContext ctx comp = do
   oldCtx <- getEvalContext
   putEvalContext ctx
@@ -60,30 +60,30 @@ withEvalContext ctx comp = do
   pure value
 
 -- | Add an export to the global export state.
-export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator address value effects ()
+export :: Member (Env address) effects => Name -> Name -> Maybe address -> Evaluator term address value effects ()
 export name alias addr = send (Export name alias addr)
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: Member (Env address) effects => Name -> Evaluator address value effects (Maybe address)
+lookupEnv :: Member (Env address) effects => Name -> Evaluator term address value effects (Maybe address)
 lookupEnv name = send (Lookup name)
 
 -- | Bind a 'Name' to an address in the current scope.
-bind :: Member (Env address) effects => Name -> address -> Evaluator address value effects ()
+bind :: Member (Env address) effects => Name -> address -> Evaluator term address value effects ()
 bind name addr = send (Bind name addr)
 
 -- | Bind all of the names from an 'Environment' in the current scope.
-bindAll :: Member (Env address) effects => Bindings address -> Evaluator address value effects ()
+bindAll :: Member (Env address) effects => Bindings address -> Evaluator term address value effects ()
 bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.pairs
 
 -- | Run an action in a new local scope.
-locally :: forall address value effects a . Member (Env address) effects => Evaluator address value effects a -> Evaluator address value effects a
+locally :: forall term address value effects a . Member (Env address) effects => Evaluator term address value effects a -> Evaluator term address value effects a
 locally = send . Locally @_ @_ @address . lowerEff
 
-close :: Member (Env address) effects => Set Name -> Evaluator address value effects (Environment address)
+close :: Member (Env address) effects => Set Name -> Evaluator term address value effects (Environment address)
 close = send . Close
 
-self :: Member (Env address) effects => Evaluator address value effects (Maybe address)
+self :: Member (Env address) effects => Evaluator term address value effects (Maybe address)
 self = ctxSelf <$> getEvalContext
 
 -- | Look up or allocate an address for a 'Name'.
@@ -91,7 +91,7 @@ lookupOrAlloc :: ( Member (Allocator address) effects
                  , Member (Env address) effects
                  )
               => Name
-              -> Evaluator address value effects address
+              -> Evaluator term address value effects address
 lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
 
 letrec :: ( Member (Allocator address) effects
@@ -101,8 +101,8 @@ letrec :: ( Member (Allocator address) effects
           , Ord address
           )
        => Name
-       -> Evaluator address value effects value
-       -> Evaluator address value effects (value, address)
+       -> Evaluator term address value effects value
+       -> Evaluator term address value effects (value, address)
 letrec name body = do
   addr <- lookupOrAlloc name
   v <- locally (bind name addr *> body)
@@ -114,8 +114,8 @@ letrec' :: ( Member (Allocator address) effects
            , Member (Env address) effects
            )
         => Name
-        -> (address -> Evaluator address value effects a)
-        -> Evaluator address value effects a
+        -> (address -> Evaluator term address value effects a)
+        -> Evaluator term address value effects a
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- locally (body addr)
@@ -128,7 +128,7 @@ variable :: ( Member (Env address) effects
             , Member (Resumable (BaseError (EnvironmentError address))) effects
             )
          => Name
-         -> Evaluator address value effects address
+         -> Evaluator term address value effects address
 variable name = lookupEnv name >>= maybeM (freeVariableError name)
 
 -- Effects
@@ -156,8 +156,8 @@ instance Effect (Env address) where
 --   New bindings created in the computation are returned.
 runEnv :: Effects effects
        => EvalContext address
-       -> Evaluator address value (Env address ': effects) a
-       -> Evaluator address value effects (Bindings address, a)
+       -> Evaluator term address value (Env address ': effects) a
+       -> Evaluator term address value effects (Bindings address, a)
 runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState initial . reinterpret2 handleEnv
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
@@ -166,9 +166,9 @@ runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . r
           | Exports.null ports = (binds, a)
           | otherwise          = (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds, a)
 
-handleEnv :: forall address value effects a . Effects effects
+handleEnv :: forall term address value effects a . Effects effects
           => Env address (Eff (Env address ': effects)) a
-          -> Evaluator address value (State (EvalContext address) ': State (Exports address) ': effects) a
+          -> Evaluator term address value (State (EvalContext address) ': State (Exports address) ': effects) a
 handleEnv = \case
   Lookup name -> Env.lookupEnv' name . ctxEnvironment <$> get
   Bind name addr -> modify (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment))
@@ -186,7 +186,7 @@ freeVariableError :: ( Member (Reader ModuleInfo) effects
                      , Member (Resumable (BaseError (EnvironmentError address))) effects
                      )
                   => Name
-                  -> Evaluator address value effects address
+                  -> Evaluator term address value effects address
 freeVariableError = throwEnvironmentError . FreeVariable
 
 runEnvironmentError :: (Effectful (m address value), Effects effects)
@@ -205,5 +205,5 @@ throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError addres
                          , Member (Reader Span) effects
                          )
                       => EnvironmentError address resume
-                      -> Evaluator address value effects resume
+                      -> Evaluator term address value effects resume
 throwEnvironmentError = throwBaseError
