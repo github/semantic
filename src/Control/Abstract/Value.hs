@@ -25,7 +25,7 @@ module Control.Abstract.Value
 -- , subtermAddress
 ) where
 
-import Control.Abstract.ScopeGraph (Declaration)
+import Control.Abstract.ScopeGraph (Declaration, ScopeGraph, ScopeError)
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap hiding (address)
@@ -247,8 +247,18 @@ doWhile body cond = loop $ \ continue -> body *> do
 -- TODO rethink whether this function is necessary.
 makeNamespace :: ( AbstractValue address value effects
                  , Member (Deref value) effects
+                 , Member (Reader ModuleInfo) effects
+                 , Member (State (ScopeGraph address)) effects
+                 , Member (Allocator address) effects
+                 , Member (Reader Span) effects
+                 , Member (Resumable (BaseError (HeapError address))) effects
+                 , Member (Resumable (BaseError (AddressError address value))) effects
+                 , Member (Allocator address) effects
+                 , Member (Allocator (Address address)) effects
+                 , Member (Resumable (BaseError (ScopeError address))) effects
                  , Member (Env address) effects
                  , Member (State (Heap address address value)) effects
+                 , Member Fresh effects
                  , Ord address
                  )
               => Declaration
@@ -257,9 +267,10 @@ makeNamespace :: ( AbstractValue address value effects
               -> Evaluator address value effects ()
               -> Evaluator address value effects value
 makeNamespace declaration addr super body = do
-  namespaceBinds <- Env.head <$> locally (body >> getEnv)
-  v <- namespace declaration (Heap.address <$> super) namespaceBinds
-  v <$ assign addr v
+  super' <- traverse deref super
+  define declaration . withChildFrame declaration $ \frame -> do
+      _ <- body
+      namespace declaration super' frame
 
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
