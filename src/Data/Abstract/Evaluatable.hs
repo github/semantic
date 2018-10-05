@@ -190,7 +190,7 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    define (Declaration (X.name "print")) builtInPrint
+    void $ define (Declaration (X.name "print")) builtInPrint
 
 instance HasPrelude 'Ruby where
   definePrelude :: forall address value effects proxy. ( AbstractValue address value effects
