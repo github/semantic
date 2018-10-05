@@ -26,6 +26,15 @@ import           Reprinting.Pipeline
 import           Semantic.IO as IO
 import           Semantic.Task
 
+debugTree act = do
+  (src, tree') <- act
+  let tree = mark Unmodified tree'
+  putStrLn "*** Original file ***"
+  pPrint tree
+  putStrLn "\n\n*** Tokenizing ***"
+  pPrint (runTokenizing src tree)
+  putStrLn "\n\n*** Done ***"
+
 testPythonFile = do
   let path = "test/fixtures/python/reprinting/function.py"
   src  <- blobSource <$> readBlobFromPath (File path Language.Python)
