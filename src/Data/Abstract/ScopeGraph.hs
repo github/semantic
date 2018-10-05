@@ -7,6 +7,7 @@ module Data.Abstract.ScopeGraph
   , EdgeLabel(..)
   , insertDeclarationScope
   , newScope
+  , insertScope
   , Path(..)
   , pathDeclaration
   , pathOfRef
@@ -15,6 +16,8 @@ module Data.Abstract.ScopeGraph
   , reference
   , Reference(..) -- TODO don't export these constructors
   , ScopeGraph(..)
+  , lookupScope
+  , Scope(..)
   , scopeOfRef
   ) where
 
@@ -93,8 +96,10 @@ declare declaration ddata assocScope g@ScopeGraph{..} = fromMaybe (g, Nothing) $
 -- Returns the original scope graph if the declaration could not be found.
 reference :: Ord scope => Reference -> Declaration -> ScopeGraph scope -> ScopeGraph scope
 reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
+  -- Start from the current address
   currentAddress <- currentScope
   currentScope' <- lookupScope currentAddress g
+  -- Build a path up to the declaration
   go currentAddress currentScope' currentAddress id
   where
     declDataOfScope address = do
@@ -128,9 +133,10 @@ insertDeclarationScope decl address g@ScopeGraph{..} = fromMaybe g $ do
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
-newScope address edges g@ScopeGraph{..} = g { graph = Map.insert address newScope graph }
-  where
-    newScope = Scope edges mempty mempty
+newScope address edges = insertScope address (Scope edges mempty mempty)
+
+insertScope :: Ord address => address -> Scope address -> ScopeGraph address -> ScopeGraph address
+insertScope address scope g@ScopeGraph{..} = g { graph = Map.insert address scope graph }
 
 -- | Returns the scope of a reference in the scope graph.
 scopeOfRef :: Ord scope => Reference -> ScopeGraph scope -> Maybe scope
