@@ -27,9 +27,12 @@ import           Prologue
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
                , Member (Allocator (Address address)) effects
+               , Member (Allocator address) effects
                , Member (Deref value) effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
+               , Member Fresh effects
+               , Member (Resumable (BaseError (HeapError address))) effects
                , Member (Resumable (BaseError (ScopeError address))) effects
                , Member (State (Heap address address value)) effects
                , Member (State (ScopeGraph address)) effects
@@ -39,13 +42,17 @@ defineClass :: ( AbstractValue address value effects
             -> [value]
             -> Evaluator address value effects a
             -> Evaluator address value effects ()
-defineClass declaration superclasses body = define declaration $ do
-  binds <- Env.head <$> locally (body >> getEnv)
-  klass declaration superclasses binds
+defineClass declaration superclasses body = void . define declaration $ do
+  withChildFrame declaration $ \frame -> do
+    _ <- body
+    klass declaration superclasses frame
 
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
                    , Member (Allocator (Address address)) effects
+                   , Member (Allocator address) effects
+                   , Member (Resumable (BaseError (HeapError address))) effects
+                   , Member Fresh effects
                    , Member (Deref value) effects
                    , Member (Reader ModuleInfo) effects
                    , Member (Reader Span) effects
@@ -57,9 +64,10 @@ defineNamespace :: ( AbstractValue address value effects
                 => Declaration
                 -> Evaluator address value effects a
                 -> Evaluator address value effects ()
-defineNamespace declaration scope = define declaration $ do
-  binds <- Env.head <$> locally (scope >> getEnv)
-  namespace declaration Nothing binds
+defineNamespace declaration body = void . define declaration $ do
+  withChildFrame declaration $ \frame -> do
+    _ <- body
+    namespace declaration Nothing frame
 
 -- | Construct a function from a Haskell function taking 'Name's as arguments.
 --
