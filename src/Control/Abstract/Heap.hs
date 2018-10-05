@@ -14,6 +14,8 @@ module Control.Abstract.Heap
 , newFrame
 , currentFrame
 , withScopeAndFrame
+, withChildFrame
+, define
 , withFrame
 -- * Garbage collection
 , gc
@@ -24,6 +26,7 @@ module Control.Abstract.Heap
 , runAddressErrorWith
 ) where
 
+import Control.Abstract.Context (withCurrentCallStack)
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
 import Data.Abstract.Configuration
@@ -38,6 +41,7 @@ import Data.Span (Span)
 import qualified Data.Set as Set
 import Prologue
 
+-- | Evaluates an action locally the scope and frame of the given frame address.
 withScopeAndFrame :: forall address value effects m a. (
                       Effectful (m address value)
                     , Member (Reader ModuleInfo) effects
@@ -78,7 +82,9 @@ currentFrame :: forall address value effects. ( Member (State (Heap address addr
              => Evaluator address value effects address
 currentFrame = maybeM (throwHeapError EmptyHeapError) =<< (Heap.currentFrame <$> get @(Heap address address value))
 
-newFrame :: forall address value effects. ( Member (State (Heap address address value)) effects
+-- | Inserts a new frame into the heap with the given scope and links.
+newFrame :: forall address value effects. (
+            Member (State (Heap address address value)) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           , Member (Resumable (BaseError (HeapError address))) effects
@@ -96,7 +102,16 @@ newFrame scope links = do
   modify @(Heap address address value) (Heap.newFrame scope address links)
   pure address
 
-withFrame :: forall address effects m value a. (Member (Resumable (BaseError (HeapError address))) effects, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Effectful (m address value), Member (State (Heap address address value)) effects) => address -> m address value effects a -> m address value effects a
+-- | Evaluates the action within the frame of the given frame address.
+withFrame :: forall address effects m value a. (
+             Member (Resumable (BaseError (HeapError address))) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (Reader Span) effects
+           , Effectful (m address value)
+           , Member (State (Heap address address value)) effects)
+          => address
+          -> m address value effects a
+          -> m address value effects a
 withFrame address action = raiseEff $ do
     prevFrame <- (lowerEff (currentFrame @address @value))
     modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
@@ -117,6 +132,47 @@ withFrame address action = raiseEff $ do
 --   addr <- alloc name
 --   assign addr (Declaration name) val -- TODO This is probably wrong
 --   pure addr
+
+-- | Define a declaration and assign the value of an action in the current frame.
+define :: ( HasCallStack
+          , Member (Allocator (Address address)) effects
+          , Member (Deref value) effects
+          , Member (Reader ModuleInfo) effects
+          , Member (Reader Span) effects
+          , Member (State (Heap address address value)) effects
+          , Member (State (ScopeGraph address)) effects
+          , Member (Resumable (BaseError (ScopeError address))) effects
+          , Ord address
+          )
+       => Declaration
+       -> Evaluator address value effects value
+       -> Evaluator address value effects value
+define declaration def = withCurrentCallStack callStack $ do
+  span <- ask @Span -- TODO: This Span is most definitely wrong
+  addr <- declare declaration span Nothing
+  value <- def
+  value <$ assign addr value
+
+-- | Associate an empty child scope with a declaration and then locally evaluate the body within an associated frame.
+withChildFrame :: ( Member (Allocator address) effects
+                  , Member (State (Heap address address value)) effects
+                  , Member (State (ScopeGraph address)) effects
+                  , Member Fresh effects
+                  , Member (Reader ModuleInfo) effects
+                  , Member (Reader Span) effects
+                  , Member (Resumable (BaseError (HeapError address))) effects
+                  , Member (Resumable (BaseError (ScopeError address))) effects
+                  , Member (Deref value) effects
+                  , Ord address
+                  )
+                => Declaration
+                -> (address -> Evaluator address value effects a)
+                -> Evaluator address value effects a
+withChildFrame declaration body = do
+  scope <- newScope mempty
+  putDeclarationScope declaration scope
+  frame <- newFrame scope mempty
+  withScopeAndFrame frame (body frame)
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
 deref :: ( Member (Deref value) effects

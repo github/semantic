@@ -24,24 +24,6 @@ import qualified Data.Map.Strict as Map
 import           Data.Text (unpack)
 import           Prologue
 
-define :: ( HasCallStack
-          , Member (Allocator (Address address)) effects
-          , Member (Deref value) effects
-          , Member (Reader ModuleInfo) effects
-          , Member (Reader Span) effects
-          , Member (State (Heap address address value)) effects
-          , Member (State (ScopeGraph address)) effects
-          , Member (Resumable (BaseError (ScopeError address))) effects
-          , Ord address
-          )
-       => Declaration
-       -> Evaluator address value effects value
-       -> Evaluator address value effects ()
-define declaration def = withCurrentCallStack callStack $ do
-  span <- ask @Span -- TODO: This Span is most definitely wrong
-  addr <- declare declaration span Nothing
-  def >>= assign addr
-
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
                , Member (Allocator (Address address)) effects
