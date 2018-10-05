@@ -33,9 +33,6 @@ import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
 import           System.FilePath.Posix (takeDirectory)
-import           Text.Show.Pretty (ppShow)
-import qualified Semantic.Util.Rewriting as R
-
 
 justEvaluating
   = runM
