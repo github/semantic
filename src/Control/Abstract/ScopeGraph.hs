@@ -23,8 +23,9 @@ import           Control.Abstract.Evaluator hiding (Local)
 import           Data.Abstract.Module
 import           Data.Abstract.BaseError
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Address(..))
+import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Address(..), Scope(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Map.Strict as Map
 import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
@@ -57,7 +58,26 @@ putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
 reference :: forall address effects value. (Ord address, Member (State (ScopeGraph address)) effects) => Reference -> Declaration -> Evaluator address value effects ()
 reference ref = modify @(ScopeGraph address) . (ScopeGraph.reference ref)
 
-newScope :: (Member Fresh effects, Member (Allocator address) effects, Ord address, Member (State (ScopeGraph address)) effects) => Map EdgeLabel [address]  -> Evaluator address value effects address
+-- | Bind all of the scopes from a 'ScopeGraph' and construct an edge from the current scope to the given scope graph's current scope.
+bindAll :: ( Ord address, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError (ScopeError address))) effects, Member (State (ScopeGraph address)) effects ) => ScopeGraph address -> Evaluator address value effects ()
+bindAll oldGraph = do
+  currentGraph <- get
+  let newGraph = ScopeGraph.graph currentGraph <> ScopeGraph.graph oldGraph
+  currentScopeAddress <- currentScope
+  scope <- lookupScope currentScopeAddress
+  case ScopeGraph.currentScope oldGraph of
+    Just oldScope ->
+      let newScope = scope { ScopeGraph.edges = Map.insert ScopeGraph.Import [ oldScope ] (ScopeGraph.edges scope) }
+      in put (ScopeGraph.insertScope currentScopeAddress newScope (currentGraph { ScopeGraph.graph = newGraph }))
+
+-- | Inserts a new scope into the scope graph with the given edges.
+newScope :: ( Member (Allocator address) effects
+            , Member (State (ScopeGraph address)) effects
+            , Ord address
+            , Member Fresh effects
+            )
+         => Map EdgeLabel [address]
+         -> Evaluator address value effects address
 newScope edges = do
   -- Take the edges and construct a new scope, update the current scope to the new scope
   name <- gensym
@@ -71,6 +91,16 @@ currentScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
                 )
              => Evaluator address value effects address
 currentScope = maybeM (throwScopeError CurrentScopeError) . ScopeGraph.currentScope =<< get
+
+lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Member (State (ScopeGraph address)) effects
+                , Ord address
+                )
+             => address
+             -> Evaluator address value effects (Scope address)
+lookupScope address = maybeM (throwScopeError LookupError) . ScopeGraph.lookupScope address =<< get
 
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) effects) => Declaration -> Evaluator address value effects (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
@@ -101,6 +131,7 @@ throwScopeError = throwBaseError
 
 data ScopeError address return where
   ScopeError :: Declaration -> Span -> ScopeError address (Address address)
+  LookupError :: ScopeError address (Scope address)
   CurrentScopeError :: ScopeError address address
 
 deriving instance Eq (ScopeError address return)
@@ -109,6 +140,7 @@ instance Show address => Show1 (ScopeError address) where liftShowsPrec _ _ = sh
 instance Eq address => Eq1 (ScopeError address) where
   liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
   liftEq _ CurrentScopeError CurrentScopeError = True
+  liftEq _ LookupError LookupError = True
   liftEq _ _ _ = False
 
 alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
