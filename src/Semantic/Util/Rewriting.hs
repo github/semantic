@@ -85,7 +85,7 @@ renameKey :: ( Literal.TextElement :< fs
           => Rewrite (env, term) (Literal.KeyValue term)
 renameKey = do
   Literal.KeyValue k v <- id
-  guard (projectTerm k == (Just (Literal.TextElement "\"foo\"")))
+  guard (projectTerm k == Just (Literal.TextElement "\"foo\""))
   new <- modified (Literal.TextElement "\"fooA\"")
   pure (Literal.KeyValue new v)
 
@@ -110,7 +110,7 @@ addKVPair = do
   Literal.Hash els <- id
   k <- modified $ Literal.TextElement "\"added\""
   v <- modified $ Literal.Array []
-  pair <- modified $ (Literal.KeyValue k v)
+  pair <- modified $ Literal.KeyValue k v
   pure (Literal.Hash (pair : els))
 
 testAddKVPair = do
