@@ -5,7 +5,6 @@ module Analysis.Declaration
 , declarationAlgebra
 ) where
 
-import Data.Abstract.Name (formatName)
 import Data.Blob
 import Data.Error (Error(..), showExpectation)
 import Data.Language as Language
@@ -15,21 +14,20 @@ import Data.Source as Source
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Expression as Expression
 import Data.Term
 import qualified Data.Text as T
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Ruby.Syntax as Ruby.Syntax
+import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import Prologue hiding (project)
 
 -- | A declaration’s identifier and type.
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language, declarationReceiver :: Maybe T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
-  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)] }
+  | ModuleDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language, declarationLevel :: Int }
-  | CallReference       { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language, declarationImportIdentifier :: [T.Text] }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
   deriving (Eq, Generic, Show)
 
@@ -122,20 +120,16 @@ instance CustomHasDeclaration whole Ruby.Syntax.Class where
   customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Class (Term (In identifierAnn _), _) _ _)
     = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getRubyClassSource blob (In ann decl)) (locationSpan ann) blobLanguage
 
+instance CustomHasDeclaration whole Ruby.Syntax.Module where
+  customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Module (Term (In identifierAnn _), _) _)
+    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) (getRubyModuleSource blob (In ann decl)) (locationSpan ann) blobLanguage
+
+instance CustomHasDeclaration whole TypeScript.Syntax.Module where
+  customToDeclaration blob@Blob{..} ann decl@(TypeScript.Syntax.Module (Term (In identifierAnn _), _) _)
+    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) (getTypeScriptModuleSource blob (In ann decl)) (locationSpan ann) blobLanguage
+
 getSource :: Source -> Location -> Text
 getSource blobSource = toText . flip Source.slice blobSource . locationByteRange
-
-instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Sum fs) Expression.Call where
-  customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
-    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) name) <- project fromF = Just $ CallReference (formatName name) mempty (locationSpan fromAnn) blobLanguage (memberAccess leftAnn leftF)
-    | Just (Syntax.Identifier name) <- project fromF = Just $ CallReference (formatName name) mempty (locationSpan fromAnn) blobLanguage []
-    | otherwise = Just $ CallReference (getSource fromAnn) mempty (locationSpan fromAnn) blobLanguage []
-    where
-      memberAccess modAnn termFOut
-        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) name) <- project termFOut
-        = memberAccess leftAnn leftF <> [formatName name]
-        | otherwise = [getSource modAnn]
-      getSource = toText . flip Source.slice blobSource . locationByteRange
 
 -- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Sum fs) where
@@ -160,10 +154,11 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Ruby.Syntax.Class = 'Custom
+  DeclarationStrategy Ruby.Syntax.Module = 'Custom
+  DeclarationStrategy TypeScript.Syntax.Module = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
-  DeclarationStrategy Expression.Call = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Sum fs) = 'Custom
   DeclarationStrategy a = 'Default
@@ -204,4 +199,20 @@ getRubyClassSource Blob{..} (In a r)
   = let declRange = locationByteRange a
         bodyRange = locationByteRange <$> case r of
           Ruby.Syntax.Class _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getRubyModuleSource :: Blob -> TermF Ruby.Syntax.Module Location (Term syntax Location, a) -> T.Text
+getRubyModuleSource Blob{..} (In a r)
+  = let declRange = locationByteRange a
+        bodyRange = locationByteRange <$> case r of
+          Ruby.Syntax.Module _ [(Term (In a' _), _)] -> Just a'
+          _ -> Nothing
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getTypeScriptModuleSource :: Blob -> TermF TypeScript.Syntax.Module Location (Term syntax Location, a) -> T.Text
+getTypeScriptModuleSource Blob{..} (In a r)
+  = let declRange = locationByteRange a
+        bodyRange = locationByteRange <$> case r of
+          TypeScript.Syntax.Module _ [(Term (In a' _), _)] -> Just a'
+          _ -> Nothing
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
