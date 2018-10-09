@@ -19,6 +19,7 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.AdjacencyMap as A
 import           Algebra.Graph.Class (connect, overlay, vertex)
 import qualified Algebra.Graph.Class as Class
+import qualified Algebra.Graph.ToGraph as Class
 import           Control.Monad.Effect
 import           Control.Monad.Effect.State
 import           Data.Aeson
@@ -26,7 +27,7 @@ import qualified Data.Set as Set
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph { unGraph :: G.Graph vertex }
-  deriving (Alternative, Applicative, Eq, Foldable, Functor, Class.Graph, Monad, Show, Class.ToGraph, Traversable)
+  deriving (Alternative, Applicative, Eq, Foldable, Functor, Monad, Show, Class.Graph, Class.ToGraph, Traversable)
 
 
 simplify :: Ord vertex => Graph vertex -> Graph vertex
@@ -56,7 +57,7 @@ simplify (Graph graph) = Graph (G.simplify graph)
 -- >>> topologicalSort (Class.path "aba")
 -- "ab"
 topologicalSort :: forall v . Ord v => Graph v -> [v]
-topologicalSort = go . toAdjacencyMap . G.transpose . unGraph
+topologicalSort = go . Class.toAdjacencyMap . G.transpose . unGraph
   where go :: A.AdjacencyMap v -> [v]
         go graph
           = visitedOrder . fst
@@ -82,9 +83,6 @@ extendVisited f (Visited a b) = Visited (f a) b
 
 extendOrder :: ([v] -> [v]) -> Visited v -> Visited v
 extendOrder f (Visited a b) = Visited a (f b)
-
-toAdjacencyMap :: Ord v => G.Graph v -> A.AdjacencyMap v
-toAdjacencyMap = Class.toGraph
 
 vertexList :: Ord v => Graph v -> [v]
 vertexList = G.vertexList . unGraph
