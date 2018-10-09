@@ -4,7 +4,7 @@ name: ansi-terminal
 version: 0.8.1
 summary: Simple ANSI terminal support, with Windows compatibility
 homepage: https://github.com/feuerbach/ansi-terminal
-license: other
+license: bsd-3-clause
 ---
 Copyright (c) 2008, Maximilian Bolingbroke
 All rights reserved.
