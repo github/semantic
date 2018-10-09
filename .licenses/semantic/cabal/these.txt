@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: these
-version: 0.7.4
+version: 0.7.5
 summary: An either-or-both data type & a generalized 'zip with padding' typeclass
 homepage: https://github.com/isomorphism/these
 license: bsd-3-clause

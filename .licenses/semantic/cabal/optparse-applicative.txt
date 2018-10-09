@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: optparse-applicative
-version: 0.14.2.0
+version: 0.14.3.0
 summary: Utilities and combinators for parsing command line options
 homepage: https://github.com/pcapriotti/optparse-applicative
 license: bsd-3-clause
