@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: StateVar
-version: 1.1.1.0
+version: 1.1.1.1
 summary: State variables
 homepage: https://github.com/haskell-opengl/StateVar
 license: bsd-3-clause

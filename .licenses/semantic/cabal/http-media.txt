@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: http-media
-version: 0.7.1.2
+version: 0.7.1.3
 summary: Processing HTTP Content-Type and Accept headers
 homepage: https://github.com/zmthy/http-media
 license: mit
