@@ -155,8 +155,8 @@ diffTOC = fmap entrySummary . dedupe . filter extraDeclarations . tableOfContent
   where
     extraDeclarations :: Entry Declaration -> Bool
     extraDeclarations entry = case entryPayload entry of
-      ImportDeclaration{..} -> False
-      CallReference{..} -> False
+      ClassDeclaration{..} -> False
+      ModuleDeclaration{..} -> False
       _ -> True
 
 renderToCTerm :: (Foldable f, Functor f) => Blob -> Term f (Maybe Declaration) -> Summaries
@@ -172,9 +172,8 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
   ClassDeclaration{} -> "Class"
-  ImportDeclaration{} -> "Import"
+  ModuleDeclaration{} -> "Module"
   FunctionDeclaration{} -> "Function"
   MethodDeclaration{} -> "Method"
-  CallReference{} -> "Call"
   HeadingDeclaration _ _ _ _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
