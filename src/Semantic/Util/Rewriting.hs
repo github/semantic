@@ -26,19 +26,10 @@ import           Reprinting.Pipeline
 import           Semantic.IO as IO
 import           Semantic.Task
 
-debugTree act = do
-  (src, tree') <- act
-  let tree = mark Unmodified tree'
-  putStrLn "*** Original file ***"
-  pPrint tree
-  putStrLn "\n\n*** Tokenizing ***"
-  pPrint (runTokenizing src tree)
-  putStrLn "\n\n*** Done ***"
-
 testPythonFile = do
   let path = "test/fixtures/python/reprinting/function.py"
   src  <- blobSource <$> readBlobFromPath (File path Language.Python)
-  tree <- parseFile miniPythonParser path
+  tree <- parseFile' miniPythonParser path
   pure (src, tree)
 
 testPythonPipeline = do
@@ -60,7 +51,7 @@ testPythonPipeline''' = do
 testRubyFile = do
   let path = "test/fixtures/ruby/reprinting/infix.rb"
   src  <- blobSource <$> readBlobFromPath (File path Language.Ruby)
-  tree <- parseFile miniRubyParser path
+  tree <- parseFile' miniRubyParser path
   pure (src, tree)
 
 testRubyPipeline = do
@@ -84,7 +75,7 @@ printToTerm = either (putStrLn . show) (BC.putStr . Source.sourceBytes)
 testJSONFile = do
   let path = "test/fixtures/javascript/reprinting/map.json"
   src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
-  tree <- parseFile jsonParser path
+  tree <- parseFile' jsonParser path
   pure (src, tree)
 
 renameKey :: ( Literal.TextElement :< fs
@@ -166,5 +157,5 @@ testChangeKV = do
   let (Right tagged) = rewrite (somewhere' changeKV) () (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-parseFile :: Parser term -> FilePath -> IO term
-parseFile parser = runTask . (parse parser <=< readBlob . file)
+parseFile' :: Parser term -> FilePath -> IO term
+parseFile' parser = runTask . (parse parser <=< readBlob . file)
