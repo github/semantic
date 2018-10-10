@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: unix-compat
-version: 0.5.0.1
+version: 0.5.1
 summary: Portable POSIX-compatibility layer.
 homepage: https://github.com/jystic/unix-compat
 license: bsd-3-clause
