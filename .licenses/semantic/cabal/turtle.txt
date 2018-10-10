@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: turtle
-version: 1.5.10
+version: 1.5.12
 summary: Shell programming, Haskell-style
 homepage: 
 license: bsd-3-clause

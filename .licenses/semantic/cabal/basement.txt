@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: basement
-version: 0.0.7
+version: 0.0.8
 summary: Foundation scrap box of array & string
 homepage: https://github.com/haskell-foundation/foundation
 license: bsd-3-clause

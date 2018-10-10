@@ -1,9 +1,9 @@
 ---
 type: cabal
 name: haskell-lexer
-version: 1.0.1
+version: 1.0.2
 summary: A fully compliant Haskell 98 lexer.
-homepage: 
+homepage: https://github.com/yav/haskell-lexer
 license: mit
 ---
 Copyright (c) 2008 Thomas Hallgren

@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: ansi-terminal
-version: 0.8.0.4
+version: 0.8.1
 summary: Simple ANSI terminal support, with Windows compatibility
 homepage: https://github.com/feuerbach/ansi-terminal
 license: bsd-3-clause

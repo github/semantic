@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: time-locale-compat
-version: 0.1.1.4
+version: 0.1.1.5
 summary: Compatibile module for time-format locale
 homepage: https://github.com/khibino/haskell-time-locale-compat
 license: bsd-3-clause
