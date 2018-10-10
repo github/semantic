@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: invariant
-version: '0.5'
+version: 0.5.1
 summary: Haskell98 invariant functors
 homepage: https://github.com/nfrisby/invariant-functors
 license: bsd-2-clause
