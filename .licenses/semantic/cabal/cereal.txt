@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: cereal
-version: 0.5.5.0
+version: 0.5.7.0
 summary: A binary serialization library
 homepage: https://github.com/GaloisInc/cereal
 license: bsd-3-clause

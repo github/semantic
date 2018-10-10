@@ -7,7 +7,7 @@ module Serializing.Format
 , Options(..)
 ) where
 
-import Algebra.Graph.Class
+import Algebra.Graph.ToGraph
 import Data.Aeson (ToJSON(..), fromEncoding)
 import Data.ByteString.Builder
 import Language.Haskell.HsColour

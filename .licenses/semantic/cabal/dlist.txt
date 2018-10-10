@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: dlist
-version: 0.8.0.4
+version: 0.8.0.5
 summary: Difference lists
 homepage: https://github.com/spl/dlist
 license: bsd-3-clause
