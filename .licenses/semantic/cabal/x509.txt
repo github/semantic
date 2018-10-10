@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: x509
-version: 1.7.3
+version: 1.7.4
 summary: X509 reader and writer
 homepage: https://github.com/vincenthz/hs-certificate
 license: bsd-3-clause
