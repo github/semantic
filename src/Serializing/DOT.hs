@@ -4,7 +4,7 @@ module Serializing.DOT
 , serializeDOT
 ) where
 
-import Algebra.Graph.Class
+import Algebra.Graph.ToGraph
 import Algebra.Graph.Export hiding ((<+>))
 import Algebra.Graph.Export.Dot hiding (export)
 import Data.List
