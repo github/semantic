@@ -54,7 +54,7 @@ import Data.Traversable as X
 import Data.Typeable as X (Typeable)
 
 -- Generics
-import GHC.Generics as X hiding (moduleName)
+import GHC.Generics as X (Generic, Generic1)
 import GHC.Stack as X
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.

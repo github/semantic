@@ -18,6 +18,7 @@ import Control.Monad.Free.Freer
 import Data.Diff
 import Data.Sum
 import Data.Term
+import GHC.Generics
 import Prologue
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
