@@ -18,6 +18,7 @@ module Semantic.Task
 , writeLog
 , writeStat
 , time
+, time'
 -- * High-level flow
 , parse
 , analyze
