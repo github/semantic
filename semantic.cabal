@@ -230,6 +230,7 @@ library
                      , Glob
                      , hashable
                      , haskeline
+                     , higher-order-effects
                      , hscolour
                      , http-client
                      , http-client-tls
