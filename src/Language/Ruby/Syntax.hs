@@ -22,13 +22,14 @@ import           Reprinting.Tokenize
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: ( Member (Modules address) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Span) effects
-                   , Member (Resumable (BaseError ResolutionError)) effects
+resolveRubyName :: ( Member (Modules address) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Member (Resumable (BaseError ResolutionError)) sig
+                   , Carrier sig m
                    )
                 => Text
-                -> Evaluator term address value effects M.ModulePath
+                -> Evaluator term address value m M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
@@ -36,13 +37,14 @@ resolveRubyName name = do
   maybeM (throwResolutionError $ NotFoundError name' paths Language.Ruby) modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: ( Member (Modules address) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Span) effects
-                   , Member (Resumable (BaseError ResolutionError)) effects
+resolveRubyPath :: ( Member (Modules address) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Member (Resumable (BaseError ResolutionError)) sig
+                   , Carrier sig m
                    )
                 => Text
-                -> Evaluator term address value effects M.ModulePath
+                -> Evaluator term address value m M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
@@ -91,11 +93,12 @@ instance Evaluatable Require where
     bindAll importedEnv
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: ( Member (Boolean value) effects
-             , Member (Modules address) effects
+doRequire :: ( Member (Boolean value) sig
+             , Member (Modules address) sig
+             , Carrier sig m
              )
           => M.ModulePath
-          -> Evaluator term address value effects (Bindings address, value)
+          -> Evaluator term address value m (Bindings address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
@@ -119,17 +122,18 @@ instance Evaluatable Load where
     shouldWrap <- eval wrap >>= value >>= asBool
     rvalBox =<< doLoad path shouldWrap
 
-doLoad :: ( Member (Boolean value) effects
-          , Member (Env address) effects
-          , Member (Modules address) effects
-          , Member (Reader ModuleInfo) effects
-          , Member (Reader Span) effects
-          , Member (Resumable (BaseError ResolutionError)) effects
-          , Member Trace effects
+doLoad :: ( Member (Boolean value) sig
+          , Member (Env address) sig
+          , Member (Modules address) sig
+          , Member (Reader ModuleInfo) sig
+          , Member (Reader Span) sig
+          , Member (Resumable (BaseError ResolutionError)) sig
+          , Member Trace sig
+          , Carrier sig m
           )
        => Text
        -> Bool
-       -> Evaluator term address value effects value
+       -> Evaluator term address value m value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'

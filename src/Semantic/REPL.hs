@@ -14,6 +14,7 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
+import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
@@ -40,15 +41,16 @@ import System.Console.Haskeline
 import System.Directory (createDirectoryIfMissing, getHomeDirectory)
 import System.FilePath
 
-data REPL (m :: * -> *) result where
-  Prompt :: REPL m (Maybe String)
-  Output :: String -> REPL m ()
+data REPL (m :: * -> *) k
+  = Prompt (Maybe String -> k)
+  | Output String k
+  deriving (Functor)
 
-prompt :: (Effectful m, Member REPL effects) => m effects (Maybe String)
-prompt = send Prompt
+prompt :: (Member REPL sig, Carrier sig m) => m (Maybe String)
+prompt = send (Prompt gen)
 
-output :: (Effectful m, Member REPL effects) => String -> m effects ()
-output s = send (Output s)
+output :: (Member REPL sig, Carrier sig m) => String -> m ()
+output s = send (Output s (gen ()))
 
 
 data Quit = Quit
@@ -57,10 +59,12 @@ data Quit = Quit
 instance Exception Quit
 
 
-instance PureEffect REPL
+instance HFunctor REPL where
+  hmap _ = coerce
+
 instance Effect REPL where
-  handleState state handler (Request Prompt k) = Request Prompt (handler . (<$ state) . k)
-  handleState state handler (Request (Output s) k) = Request (Output s) (handler . (<$ state) . k)
+  handleState state handler (Prompt k) = Prompt (handler . (<$ state) . k)
+  handleState state handler (Output s k) = Output s (handler . (<$ state) . k)
 
 
 runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => Prefs -> Settings IO -> m (REPL ': effects) a -> m effects a
@@ -110,25 +114,33 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without
 
-runTelemetryIgnoringStat :: (Effectful m, MonadIO (m effects), PureEffects effects) => LogOptions -> m (Telemetry : effects) a -> m effects a
-runTelemetryIgnoringStat logOptions = interpret $ \case
-  WriteStat{} -> pure ()
-  WriteLog level message pairs -> do
-    time <- liftIO Time.getCurrentTime
-    zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
-    writeLogMessage logOptions (Message level message pairs zonedTime)
+runTelemetryIgnoringStat :: (Carrier sig m, MonadIO m) => LogOptions -> Eff (TelemetryIgnoringStatC m) a -> m a
+runTelemetryIgnoringStat logOptions = flip runTelemetryIgnoringStatC logOptions . interpret
 
-step :: ( Member (Env address) effects
-        , Member (Exc SomeException) effects
-        , Member REPL effects
-        , Member (Reader ModuleInfo) effects
-        , Member (Reader Span) effects
-        , Member (Reader Step) effects
-        , Member (State [Breakpoint]) effects
+newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: LogOptions -> m a }
+
+instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgnoringStatC m) where
+  gen = TelemetryIgnoringStatC . const . gen
+  alg op = TelemetryIgnoringStatC (\ logOptions -> (algT logOptions \/ (alg . handlePure (flip runTelemetryIgnoringStatC logOptions))) op)
+    where algT logOptions (WriteStat _ k) = runTelemetryIgnoringStatC k logOptions
+          algT logOptions (WriteLog level message pairs k) = do
+            time <- liftIO Time.getCurrentTime
+            zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
+            writeLogMessage logOptions (Message level message pairs zonedTime)
+            runTelemetryIgnoringStatC k logOptions
+
+step :: ( Member (Env address) sig
+        , Member (Exc SomeException) sig
+        , Member REPL sig
+        , Member (Reader ModuleInfo) sig
+        , Member (Reader Span) sig
+        , Member (Reader Step) sig
+        , Member (State [Breakpoint]) sig
         , Show address
+        , Carrier sig m
         )
      => [(ModulePath, Blob)]
-     -> Open (Open (term -> Evaluator term address value effects a))
+     -> Open (Open (term -> Evaluator term address value m a))
 step blobs recur0 recur term = do
   break <- shouldBreak
   if break then do
@@ -188,7 +200,7 @@ data Step
 
 -- TODO: StepLocal/StepModule
 
-shouldBreak :: (Member (State [Breakpoint]) effects, Member (Reader Span) effects, Member (Reader Step) effects) => Evaluator term address value effects Bool
+shouldBreak :: (Member (State [Breakpoint]) sig, Member (Reader Span) sig, Member (Reader Step) sig, Carrier sig m) => Evaluator term address value m Bool
 shouldBreak = do
   step <- ask
   case step of

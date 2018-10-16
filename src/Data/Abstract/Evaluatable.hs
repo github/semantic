@@ -2,8 +2,8 @@
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
-, ModuleEffects
-, ValueEffects
+, ModuleC
+, ValueC
 , evaluate
 , traceResolve
 -- * Preludes
@@ -36,8 +36,8 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
+import Data.Abstract.ScopeGraph (ScopeGraph)
 import Data.Abstract.Ref as X
-import Data.Coerce
 import Data.Language
 import Data.Function
 import Data.Scientific (Scientific)
@@ -49,141 +49,154 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
-  eval :: ( AbstractValue term address value effects
+  eval :: ( AbstractValue term address value m
+          , Carrier sig m
           , Declarations term
           , FreeVariables term
-          , Member (Allocator address) effects
-          , Member (Boolean value) effects
-          , Member (While value) effects
-          , Member (Deref value) effects
-          , Member (ScopeEnv address) effects
-          , Member (Env address) effects
-          , Member (Exc (LoopControl address)) effects
-          , Member (Exc (Return address)) effects
-          , Member Fresh effects
-          , Member (Function term address value) effects
-          , Member (Modules address) effects
-          , Member (Reader ModuleInfo) effects
-          , Member (Reader PackageInfo) effects
-          , Member (Reader Span) effects
-          , Member (State Span) effects
-          , Member (Resumable (BaseError (AddressError address value))) effects
-          , Member (Resumable (BaseError (EnvironmentError address))) effects
-          , Member (Resumable (BaseError (UnspecializedError value))) effects
-          , Member (Resumable (BaseError EvalError)) effects
-          , Member (Resumable (BaseError ResolutionError)) effects
-          , Member (State (Heap address value)) effects
-          , Member Trace effects
+          , Member (Allocator address) sig
+          , Member (Boolean value) sig
+          , Member (While value) sig
+          , Member (Deref value) sig
+          , Member (ScopeEnv address) sig
+          , Member (Env address) sig
+          , Member (Error (LoopControl address)) sig
+          , Member (Error (Return address)) sig
+          , Member Fresh sig
+          , Member (Function term address value) sig
+          , Member (Modules address) sig
+          , Member (Reader ModuleInfo) sig
+          , Member (Reader PackageInfo) sig
+          , Member (Reader Span) sig
+          , Member (State Span) sig
+          , Member (Resumable (BaseError (AddressError address value))) sig
+          , Member (Resumable (BaseError (EnvironmentError address))) sig
+          , Member (Resumable (BaseError (UnspecializedError value))) sig
+          , Member (Resumable (BaseError EvalError)) sig
+          , Member (Resumable (BaseError ResolutionError)) sig
+          , Member (State (Heap address value)) sig
+          , Member Trace sig
           , Ord address
           )
-       => (term -> Evaluator term address value effects (ValueRef address))
-       -> (constr term -> Evaluator term address value effects (ValueRef address))
+       => (term -> Evaluator term address value m (ValueRef address))
+       -> (constr term -> Evaluator term address value m (ValueRef address))
   eval recur expr = do
     traverse_ recur expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
 
 
-type ModuleEffects address value rest
-  =  Exc (LoopControl address)
-  ': Exc (Return address)
-  ': Env address
-  ': ScopeEnv address
-  ': Deref value
-  ': Allocator address
-  ': Reader ModuleInfo
-  ': rest
+type ModuleC term address value m
+  = ErrorC (LoopControl address) (Evaluator term address value
+  ( ErrorC (Return address)      (Evaluator term address value
+  ( EnvC                         (Evaluator term address value
+  ( StateC (EvalContext address) (Evaluator term address value
+  ( StateC (Exports address)     (Evaluator term address value
+  ( ScopeEnvC                    (Evaluator term address value
+  ( StateC (ScopeGraph address)  (Evaluator term address value
+  ( DerefC                       (Evaluator term address value
+  ( AllocatorC                   (Evaluator term address value
+  ( ReaderC ModuleInfo           (Evaluator term address value m)))))))))))))))))))
 
-type ValueEffects term address value rest
-  =  Function term address value
-  ': While value
-  ': Boolean value
-  ': rest
+type ValueC term address value m
+  = FunctionC term address value (Evaluator term address value
+  ( WhileC                       (Evaluator term address value
+  ( BooleanC                     (Evaluator term address value m)))))
 
-evaluate :: ( AbstractValue term address value valueEffects
+evaluate :: ( AbstractValue term address value valueC
+            , Carrier sig c
+            , allocatorC ~ AllocatorC (Evaluator term address value (ReaderC ModuleInfo (Evaluator term address value c)))
+            , Carrier (Allocator address :+: Reader ModuleInfo :+: sig) allocatorC
+            , Carrier (Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig) (DerefC (Evaluator term address value allocatorC))
+            , booleanC ~ BooleanC (Evaluator term address value moduleC)
+            , Carrier (Boolean value :+: moduleSig) booleanC
+            , whileC ~ WhileC (Evaluator term address value booleanC)
+            , moduleSig ~ (Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
+            , Carrier (While value :+: Boolean value :+: moduleSig) whileC
+            , Carrier (Function term address value :+: While value :+: Boolean value :+: moduleSig) valueC
             , Declarations term
-            , Effects effects
+            , Effect sig
             , Evaluatable (Base term)
             , FreeVariables term
             , HasPostlude lang
             , HasPrelude lang
-            , Member Fresh effects
-            , Member (Modules address) effects
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) effects
-            , Member (Reader PackageInfo) effects
-            , Member (Reader Span) effects
-            , Member (State Span) effects
-            , Member (Resumable (BaseError (AddressError address value))) effects
-            , Member (Resumable (BaseError (EnvironmentError address))) effects
-            , Member (Resumable (BaseError EvalError)) effects
-            , Member (Resumable (BaseError ResolutionError)) effects
-            , Member (Resumable (BaseError (UnspecializedError value))) effects
-            , Member (State (Heap address value)) effects
-            , Member Trace effects
+            , Member Fresh sig
+            , Member (Modules address) sig
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
+            , Member (Reader PackageInfo) sig
+            , Member (Reader Span) sig
+            , Member (State Span) sig
+            , Member (Resumable (BaseError (AddressError address value))) sig
+            , Member (Resumable (BaseError (EnvironmentError address))) sig
+            , Member (Resumable (BaseError EvalError)) sig
+            , Member (Resumable (BaseError ResolutionError)) sig
+            , Member (Resumable (BaseError (UnspecializedError value))) sig
+            , Member (State (Heap address value)) sig
+            , Member Trace sig
             , Ord address
             , Recursive term
-            , moduleEffects ~ ModuleEffects address value effects
-            , valueEffects ~ ValueEffects term address value moduleEffects
+            , moduleC ~ ModuleC term address value c
+            , valueC ~ ValueC term address value moduleC
             )
          => proxy lang
-         -> Open (Module term -> Evaluator term address value moduleEffects address)
-         -> Open (Open (term -> Evaluator term address value valueEffects (ValueRef address)))
-         -> (forall x . Evaluator term address value (Deref value ': Allocator address ': Reader ModuleInfo ': effects) x -> Evaluator term address value (Reader ModuleInfo ': effects) x)
-         -> (forall x . (term -> Evaluator term address value valueEffects address) -> Evaluator term address value valueEffects x -> Evaluator term address value moduleEffects x)
+         -> Open (Module term -> Evaluator term address value moduleC address)
+         -> Open (Open (term -> Evaluator term address value valueC (ValueRef address)))
          -> [Module term]
-         -> Evaluator term address value effects (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = do
-  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runValue evalTerm $ do
+         -> Evaluator term address value c (ModuleTable (NonEmpty (Module (ModuleResult address))))
+evaluate lang analyzeModule analyzeTerm modules = do
+  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
   foldr (run preludeBinds) ask modules
   where run preludeBinds m rest = do
-          evaluated <- coerce
-            (runInModule preludeBinds (moduleInfo m))
+          evaluated <- runInModule preludeBinds (moduleInfo m)
             (analyzeModule (evalModuleBody . moduleBody)
             m)
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModuleBody term = runValue evalTerm (do
+        evalModuleBody term = runValue (do
           result <- evalTerm term
           result <$ postlude lang)
 
         evalTerm = fix (analyzeTerm ((. project) . eval)) >=> address
 
+        runValue = runBoolean . runWhile . runFunction evalTerm
+
         runInModule preludeBinds info
-          = runReader info
-          . runAllocDeref
+          = runReader info . runEvaluator
+          . runAllocator
+          . runDeref
           . runScopeEnv
           . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
           . runReturn
           . runLoopControl
 
 
-traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator term address value effects ()
+traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
 -- Preludes
 
 class HasPrelude (language :: Language) where
-  definePrelude :: ( AbstractValue term address value effects
+  definePrelude :: ( AbstractValue term address value m
+                   , Carrier sig m
                    , HasCallStack
-                   , Member (Allocator address) effects
-                   , Member (Deref value) effects
-                   , Member (Env address) effects
-                   , Member Fresh effects
-                   , Member (Function term address value) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Span) effects
-                   , Member (Resumable (BaseError (AddressError address value))) effects
-                   , Member (Resumable (BaseError (EnvironmentError address))) effects
-                   , Member (State (Heap address value)) effects
-                   , Member Trace effects
+                   , Member (Allocator address) sig
+                   , Member (Deref value) sig
+                   , Member (Env address) sig
+                   , Member Fresh sig
+                   , Member (Function term address value) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Member (Resumable (BaseError (AddressError address value))) sig
+                   , Member (Resumable (BaseError (EnvironmentError address))) sig
+                   , Member (State (Heap address value)) sig
+                   , Member Trace sig
                    , Ord address
                    )
                 => proxy language
-                -> Evaluator term address value effects ()
+                -> Evaluator term address value m ()
   definePrelude _ = pure ()
 
 instance HasPrelude 'Go
@@ -215,19 +228,20 @@ instance HasPrelude 'JavaScript where
 -- Postludes
 
 class HasPostlude (language :: Language) where
-  postlude :: ( AbstractValue term address value effects
+  postlude :: ( AbstractValue term address value m
+              , Carrier sig m
               , HasCallStack
-              , Member (Allocator address) effects
-              , Member (Deref value) effects
-              , Member (Env address) effects
-              , Member Fresh effects
-              , Member (Reader ModuleInfo) effects
-              , Member (Reader Span) effects
-              , Member (Resumable (BaseError (EnvironmentError address))) effects
-              , Member Trace effects
+              , Member (Allocator address) sig
+              , Member (Deref value) sig
+              , Member (Env address) sig
+              , Member Fresh sig
+              , Member (Reader ModuleInfo) sig
+              , Member (Reader Span) sig
+              , Member (Resumable (BaseError (EnvironmentError address))) sig
+              , Member Trace sig
               )
            => proxy language
-           -> Evaluator term address value effects ()
+           -> Evaluator term address value m ()
   postlude _ = pure ()
 
 instance HasPostlude 'Go
@@ -269,18 +283,19 @@ instance Eq1 EvalError where
 instance Show1 EvalError where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: Effects effects => Evaluator term address value (Resumable (BaseError EvalError) ': effects) a -> Evaluator term address value effects (Either (SomeExc (BaseError EvalError)) a)
-runEvalError = runResumable
+runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError EvalError) (Evaluator term address value m)) a -> Evaluator term address value m (Either (SomeError (BaseError EvalError)) a)
+runEvalError = runResumable . runEvaluator
 
-runEvalErrorWith :: Effects effects => (forall resume . (BaseError EvalError) resume -> Evaluator term address value effects resume) -> Evaluator term address value (Resumable (BaseError EvalError) ': effects) a -> Evaluator term address value effects a
-runEvalErrorWith = runResumableWith
+runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError EvalError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError EvalError) (Evaluator term address value m)) a -> Evaluator term address value m a
+runEvalErrorWith f = runResumableWith f . runEvaluator
 
-throwEvalError :: ( Member (Reader ModuleInfo) effects
-                  , Member (Reader Span) effects
-                  , Member (Resumable (BaseError EvalError)) effects
+throwEvalError :: ( Member (Reader ModuleInfo) sig
+                  , Member (Reader Span) sig
+                  , Member (Resumable (BaseError EvalError)) sig
+                  , Carrier sig m
                   )
                => EvalError resume
-               -> Evaluator term address value effects resume
+               -> Evaluator term address value m resume
 throwEvalError = throwBaseError
 
 
@@ -296,23 +311,24 @@ instance Eq1 (UnspecializedError a) where
 instance Show1 (UnspecializedError a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: Effects effects
-                 => Evaluator term address value (Resumable (BaseError (UnspecializedError value)) ': effects) a
-                 -> Evaluator term address value effects (Either (SomeExc (BaseError (UnspecializedError value))) a)
-runUnspecialized = runResumable
+runUnspecialized :: (Carrier sig m, Effect sig)
+                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError value)) (Evaluator term address value m)) a
+                 -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError value))) a)
+runUnspecialized = runResumable . runEvaluator
 
-runUnspecializedWith :: Effects effects
-                     => (forall resume . BaseError (UnspecializedError value) resume -> Evaluator term address value effects resume)
-                     -> Evaluator term address value (Resumable (BaseError (UnspecializedError value)) ': effects) a
-                     -> Evaluator term address value effects a
-runUnspecializedWith = runResumableWith
+runUnspecializedWith :: Carrier sig m
+                     => (forall resume . BaseError (UnspecializedError value) resume -> Evaluator term address value m resume)
+                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Evaluator term address value m)) a
+                     -> Evaluator term address value m a
+runUnspecializedWith f = runResumableWith f . runEvaluator
 
-throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) effects
-                           , Member (Reader ModuleInfo) effects
-                           , Member (Reader Span) effects
+throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) sig
+                           , Member (Reader ModuleInfo) sig
+                           , Member (Reader Span) sig
+                           , Carrier sig m
                            )
                         => UnspecializedError value resume
-                        -> Evaluator term address value effects resume
+                        -> Evaluator term address value m resume
 throwUnspecializedError = throwBaseError
 
 

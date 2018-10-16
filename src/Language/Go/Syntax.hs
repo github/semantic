@@ -56,15 +56,16 @@ importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathT
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . T.pack . takeFileName . unPath
 
-resolveGoImport :: ( Member (Modules address) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Package.PackageInfo) effects
-                   , Member (Reader Span) effects
-                   , Member (Resumable (BaseError ResolutionError)) effects
-                   , Member Trace effects
+resolveGoImport :: ( Member (Modules address) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Package.PackageInfo) sig
+                   , Member (Reader Span) sig
+                   , Member (Resumable (BaseError ResolutionError)) sig
+                   , Member Trace sig
+                   , Carrier sig m
                    )
                 => ImportPath
-                -> Evaluator term address value effects [ModulePath]
+                -> Evaluator term address value m [ModulePath]
 resolveGoImport (ImportPath path Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule

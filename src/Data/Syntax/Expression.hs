@@ -3,13 +3,13 @@
 module Data.Syntax.Expression where
 
 import Prelude hiding (null)
-import Prologue hiding (Member, This, index, null)
+import Prologue hiding (This, index, null)
 
 import Data.Fixed
 import Proto3.Suite.Class
 
 import           Control.Abstract.ScopeGraph as ScopeGraph
-import           Data.Abstract.Evaluatable as Abstract hiding (Member)
+import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope

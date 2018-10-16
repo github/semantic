@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   , Open
@@ -16,28 +16,23 @@ module Control.Abstract.Evaluator
   , module X
   ) where
 
-import Control.Monad.Effect           as X
-import Control.Monad.Effect.Fresh     as X
-import Control.Monad.Effect.Exception as X
-import qualified Control.Monad.Effect.Internal as Eff
-import Control.Monad.Effect.NonDet    as X
-import Control.Monad.Effect.Reader    as X
-import Control.Monad.Effect.Resumable as X
-import Control.Monad.Effect.State     as X
-import Control.Monad.Effect.Trace     as X
+import Control.Effect           as X
 import Control.Monad.IO.Class
-import Prologue hiding (MonadError(..))
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
 --
 --   These parameters enable us to constrain the types of effects using them s.t. we can avoid both ambiguous types when they aren’t mentioned outside of the context, and lengthy, redundant annotations on the use sites of functions employing these effects.
 --
 --   These effects will typically include the environment, heap, module table, etc. effects necessary for evaluation of modules and terms, but may also include any other effects so long as they’re eventually handled.
-newtype Evaluator term address value effects a = Evaluator { runEvaluator :: Eff effects a }
-  deriving (Applicative, Effectful, Functor, Monad)
+newtype Evaluator term address value m a = Evaluator { runEvaluator :: Eff m a }
+  deriving (Applicative, Functor, Monad)
 
-deriving instance Member NonDet effects => Alternative (Evaluator term address value effects)
-deriving instance Member (Lift IO) effects => MonadIO (Evaluator term address value effects)
+deriving instance (Member NonDet sig, Carrier sig m) => Alternative (Evaluator term address value m)
+deriving instance (Member (Lift IO) sig, Carrier sig m) => MonadIO (Evaluator term address value m)
+
+instance Carrier sig m => Carrier sig (Evaluator term address value m) where
+  gen = Evaluator . gen
+  alg = Evaluator . alg . handlePure runEvaluator
 
 
 -- | An open-recursive function.
@@ -50,16 +45,16 @@ type Open a = a -> a
 newtype Return address = Return { unReturn :: address }
   deriving (Eq, Ord, Show)
 
-earlyReturn :: Member (Exc (Return address)) effects
+earlyReturn :: (Member (Error (Return address)) sig, Carrier sig m)
             => address
-            -> Evaluator term address value effects address
+            -> Evaluator term address value m address
 earlyReturn = throwError . Return
 
-catchReturn :: Member (Exc (Return address)) effects => Evaluator term address value effects address -> Evaluator term address value effects address
-catchReturn = Eff.raiseHandler (handleError (\ (Return addr) -> pure addr))
+catchReturn :: (Member (Error (Return address)) sig, Carrier sig m) => Evaluator term address value m address -> Evaluator term address value m address
+catchReturn = flip catchError (\ (Return addr) -> pure addr)
 
-runReturn :: Effects effects => Evaluator term address value (Exc (Return address) ': effects) address -> Evaluator term address value effects address
-runReturn = Eff.raiseHandler (fmap (either unReturn id) . runError)
+runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return address) (Evaluator term address value m)) address -> Evaluator term address value m address
+runReturn = fmap (either unReturn id) . runError . runEvaluator
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -69,22 +64,23 @@ data LoopControl address
   | Abort
   deriving (Eq, Ord, Show)
 
-throwBreak :: Member (Exc (LoopControl address)) effects
+throwBreak :: (Member (Error (LoopControl address)) sig, Carrier sig m)
            => address
-           -> Evaluator term address value effects address
+           -> Evaluator term address value m address
 throwBreak = throwError . Break
 
-throwContinue :: Member (Exc (LoopControl address)) effects
+throwContinue :: (Member (Error (LoopControl address)) sig, Carrier sig m)
               => address
-              -> Evaluator term address value effects address
+              -> Evaluator term address value m address
 throwContinue = throwError . Continue
 
-throwAbort :: forall term address effects value a . Member (Exc (LoopControl address)) effects
-           => Evaluator term address value effects a
+throwAbort :: forall term address sig m value a
+           .  (Member (Error (LoopControl address)) sig, Carrier sig m)
+           => Evaluator term address value m a
 throwAbort = throwError (Abort @address)
 
-catchLoopControl :: Member (Exc (LoopControl address)) effects => Evaluator term address value effects a -> (LoopControl address -> Evaluator term address value effects a) -> Evaluator term address value effects a
+catchLoopControl :: (Member (Error (LoopControl address)) sig, Carrier sig m) => Evaluator term address value m a -> (LoopControl address -> Evaluator term address value m a) -> Evaluator term address value m a
 catchLoopControl = catchError
 
-runLoopControl :: Effects effects => Evaluator term address value (Exc (LoopControl address) ': effects) address -> Evaluator term address value effects address
-runLoopControl = Eff.raiseHandler (fmap (either unLoopControl id) . runError)
+runLoopControl :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (LoopControl address) (Evaluator term address value m)) address -> Evaluator term address value m address
+runLoopControl = fmap (either unLoopControl id) . runError . runEvaluator

@@ -19,7 +19,7 @@ module SpecHelpers
 
 import Control.Abstract
 import Control.Arrow ((&&&))
-import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
+import Control.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
 import Control.Monad ((>=>))
 import Data.Abstract.Address.Precise as X
 import Data.Abstract.Environment as Env
@@ -96,18 +96,17 @@ readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
 type TestEvaluatingEffects term
-  = '[ Resumable (BaseError (ValueError term Precise))
-     , Resumable (BaseError (AddressError Precise (Val term)))
-     , Resumable (BaseError ResolutionError)
-     , Resumable (BaseError EvalError)
-     , Resumable (BaseError (EnvironmentError Precise))
-     , Resumable (BaseError (UnspecializedError (Val term)))
-     , Resumable (BaseError (LoadError Precise))
-     , Fresh
-     , State (Heap Precise (Val term))
-     , Trace
-     , Lift IO
-     ]
+  = Eff (ResumableC (BaseError (ValueError term Precise))
+  ( Eff (ResumableC (BaseError (AddressError Precise (Val term)))
+  ( Eff (ResumableC (BaseError ResolutionError)
+  ( Eff (ResumableC (BaseError EvalError)
+  ( Eff (ResumableC (BaseError (EnvironmentError Precise))
+  ( Eff (ResumableC (BaseError (UnspecializedError (Val term)))
+  ( Eff (ResumableC (BaseError (LoadError Precise))
+  ( Eff (FreshC
+  ( Eff (StateC (Heap Precise (Val term))
+  ( Eff (TraceC
+  ( Eff (LiftC IO)))))))))))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (ValueError term Precise)
      , BaseError (AddressError Precise (Val term))
@@ -121,8 +120,7 @@ testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingEffects term)
                -> IO
                  ( [String]
                  , ( Heap Precise (Val term)
-                   , Either (SomeExc (Data.Sum.Sum (TestEvaluatingErrors term)))
-                            a
+                   , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
                    )
                  )
 testEvaluating
@@ -131,13 +129,13 @@ testEvaluating
   . runState lowerBound
   . runFresh 0
   . fmap reassociate
-  . runLoadError
-  . runUnspecialized
-  . runEnvironmentError
-  . runEvalError
-  . runResolutionError
-  . runAddressError
-  . runValueError @_ @_ @Precise
+  . Evaluator . runLoadError
+  . Evaluator . runUnspecialized
+  . Evaluator . runEnvironmentError
+  . Evaluator . runEvalError
+  . Evaluator . runResolutionError
+  . Evaluator . runAddressError
+  . Evaluator . runValueError @_ @_ @Precise
   . fmap snd
 
 type Val term = Value term Precise
@@ -155,7 +153,7 @@ namespaceScope :: Heap Precise (Value term Precise)
 namespaceScope heap ns@(Namespace _ _ _)
   = either (const Nothing) (snd . snd)
   . run
-  . runFresh 0
+  . runFresh
   . runAddressError
   . runState heap
   . runState (lowerBound @Span)

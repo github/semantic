@@ -13,7 +13,11 @@ module Control.Abstract.Heap
 , gc
 -- * Effects
 , Allocator(..)
+, runAllocator
+, AllocatorC(..)
 , Deref(..)
+, runDeref
+, DerefC(..)
 , AddressError(..)
 , runAddressError
 , runAddressErrorWith
@@ -30,73 +34,77 @@ import Data.Span (Span)
 import Prologue
 
 -- | Retrieve the heap.
-getHeap :: Member (State (Heap address value)) effects => Evaluator term address value effects (Heap address value)
+getHeap :: (Member (State (Heap address value)) sig, Carrier sig m) => Evaluator term address value m (Heap address value)
 getHeap = get
 
 -- | Set the heap.
-putHeap :: Member (State (Heap address value)) effects => Heap address value -> Evaluator term address value effects ()
+putHeap :: (Member (State (Heap address value)) sig, Carrier sig m) => Heap address value -> Evaluator term address value m ()
 putHeap = put
 
 -- | Update the heap.
-modifyHeap :: Member (State (Heap address value)) effects => (Heap address value -> Heap address value) -> Evaluator term address value effects ()
+modifyHeap :: (Member (State (Heap address value)) sig, Carrier sig m) => (Heap address value -> Heap address value) -> Evaluator term address value m ()
 modifyHeap = modify'
 
-box :: ( Member (Allocator address) effects
-       , Member (Deref value) effects
-       , Member Fresh effects
-       , Member (State (Heap address value)) effects
+box :: ( Member (Allocator address) sig
+       , Member (Deref value) sig
+       , Member Fresh sig
+       , Member (State (Heap address value)) sig
        , Ord address
+       , Carrier sig m
        )
     => value
-    -> Evaluator term address value effects address
+    -> Evaluator term address value m address
 box val = do
   name <- gensym
   addr <- alloc name
   assign addr val
   pure addr
 
-alloc :: Member (Allocator address) effects => Name -> Evaluator term address value effects address
-alloc = send . Alloc
+alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator term address value m address
+alloc = send . flip Alloc gen
 
-dealloc :: (Member (State (Heap address value)) effects, Ord address) => address -> Evaluator term address value effects ()
+dealloc :: (Member (State (Heap address value)) sig, Ord address, Carrier sig m) => address -> Evaluator term address value m ()
 dealloc addr = modifyHeap (heapDelete addr)
 
 -- | Dereference the given address in the heap, or fail if the address is uninitialized.
-deref :: ( Member (Deref value) effects
-         , Member (Reader ModuleInfo) effects
-         , Member (Reader Span) effects
-         , Member (Resumable (BaseError (AddressError address value))) effects
-         , Member (State (Heap address value)) effects
+deref :: ( Member (Deref value) sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address value))) sig
+         , Member (State (Heap address value)) sig
          , Ord address
+         , Carrier sig m
          )
       => address
-      -> Evaluator term address value effects value
-deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress addr))
+      -> Evaluator term address value m value
+deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . flip DerefCell gen >>= maybeM (throwAddressError (UninitializedAddress addr))
 
 
 -- | Write a value to the given address in the 'Allocator'.
-assign :: ( Member (Deref value) effects
-          , Member (State (Heap address value)) effects
+assign :: ( Member (Deref value) sig
+          , Member (State (Heap address value)) sig
           , Ord address
+          , Carrier sig m
           )
        => address
        -> value
-       -> Evaluator term address value effects ()
+       -> Evaluator term address value m ()
 assign addr value = do
   heap <- getHeap
-  cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)))
+  cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)) gen)
   putHeap (heapInit addr cell heap)
 
 
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: ( Member (State (Heap address value)) effects
+gc :: ( Member (State (Heap address value)) sig
       , Ord address
       , ValueRoots address value
+      , Carrier sig m
       )
    => Live address                       -- ^ The set of addresses to consider rooted.
-   -> Evaluator term address value effects ()
+   -> Evaluator term address value m ()
 gc roots = modifyHeap (heapRestrict <*> reachable roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
@@ -116,23 +124,45 @@ reachable roots heap = go mempty roots
 
 -- Effects
 
-data Allocator address (m :: * -> *) return where
-  Alloc   :: Name    -> Allocator address m address
+data Allocator address (m :: * -> *) k
+  = Alloc Name (address -> k)
+  deriving (Functor)
 
-data Deref value (m :: * -> *) return where
-  DerefCell  :: Set value          -> Deref value m (Maybe value)
-  AssignCell :: value -> Set value -> Deref value m (Set value)
-
-instance PureEffect (Allocator address)
+instance HFunctor (Allocator address) where
+  hmap _ (Alloc name k) = Alloc name k
 
 instance Effect (Allocator address) where
-  handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
+  handle state handler (Alloc name k) = Alloc name (handler . (<$ state) . k)
 
-instance PureEffect (Deref value)
+runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC (Evaluator term address value m))
+             => Evaluator term address value (AllocatorC (Evaluator term address value m)) a
+             -> Evaluator term address value m a
+runAllocator = runAllocatorC . interpret . runEvaluator
+
+newtype AllocatorC m a = AllocatorC { runAllocatorC :: m a }
+
+
+data Deref value (m :: * -> *) k
+  = DerefCell        (Set value) (Maybe value -> k)
+  | AssignCell value (Set value) (Set value   -> k)
+  deriving (Functor)
+
+instance HFunctor (Deref value) where
+  hmap _ (DerefCell        cell k) = DerefCell        cell k
+  hmap _ (AssignCell value cell k) = AssignCell value cell k
 
 instance Effect (Deref value) where
-  handleState c dist (Request (DerefCell cell) k) = Request (DerefCell cell) (dist . (<$ c) . k)
-  handleState c dist (Request (AssignCell value cell) k) = Request (AssignCell  value cell) (dist . (<$ c) . k)
+  handle state handler (DerefCell        cell k) = DerefCell        cell (handler . (<$ state) . k)
+  handle state handler (AssignCell value cell k) = AssignCell value cell (handler . (<$ state) . k)
+
+runDeref :: Carrier (Deref value :+: sig) (DerefC (Evaluator term address value m))
+         => Evaluator term address value (DerefC (Evaluator term address value m)) a
+         -> Evaluator term address value m a
+runDeref = runDerefC . interpret . runEvaluator
+
+newtype DerefC m a = DerefC { runDerefC :: m a }
+
+
 
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Set value)
@@ -147,21 +177,22 @@ instance Eq address => Eq1 (AddressError address value) where
   liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
   liftEq _ _                        _                        = False
 
-throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))) effects
-                     , Member (Reader ModuleInfo) effects
-                     , Member (Reader Span) effects
+throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))) sig
+                     , Member (Reader ModuleInfo) sig
+                     , Member (Reader Span) sig
+                     , Carrier sig m
                      )
                   => AddressError address body resume
-                  -> Evaluator term address value effects resume
+                  -> Evaluator term address value m resume
 throwAddressError = throwBaseError
 
-runAddressError :: Effects effects
-                => Evaluator term address value (Resumable (BaseError (AddressError address value)) ': effects) a
-                -> Evaluator term address value effects (Either (SomeExc (BaseError (AddressError address value))) a)
-runAddressError = runResumable
+runAddressError :: (Carrier sig m, Effect sig)
+                => Evaluator term address value (ResumableC (BaseError (AddressError address value)) (Evaluator term address value m)) a
+                -> Evaluator term address value m (Either (SomeError (BaseError (AddressError address value))) a)
+runAddressError = runResumable . runEvaluator
 
-runAddressErrorWith :: Effects effects
-                    => (forall resume . (BaseError (AddressError address value)) resume -> Evaluator term address value effects resume)
-                    -> Evaluator term address value (Resumable (BaseError (AddressError address value)) ': effects) a
-                    -> Evaluator term address value effects a
-runAddressErrorWith = runResumableWith
+runAddressErrorWith :: Carrier sig m
+                    => (forall resume . (BaseError (AddressError address value)) resume -> Evaluator term address value m resume)
+                    -> Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) (Evaluator term address value m)) a
+                    -> Evaluator term address value m a
+runAddressErrorWith f = runResumableWith f . runEvaluator

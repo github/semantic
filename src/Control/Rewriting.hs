@@ -67,8 +67,7 @@ import Prologue hiding (apply, try)
 
 import           Control.Arrow
 import           Control.Category
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Trace
+import           Control.Effect hiding (Local)
 import           Data.Functor.Identity
 import           Data.Profunctor
 import qualified Data.Sum as Sum hiding (apply)
@@ -242,7 +241,7 @@ apply rule x = pure x >>> rule
 -- @
 --  tracing "rule fired" >>> someRule >>> tracing "rule completed"
 -- @
-tracing :: Member Trace effs => String -> RewriteM env (Eff effs) item
+tracing :: (Member Trace sig, Carrier sig m, Functor m) => String -> RewriteM env m item
 tracing s = id >>= (\t -> promote (t <$ trace s))
 
 --

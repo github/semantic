@@ -5,7 +5,6 @@ module Control.Abstract.PythonPackage
 import           Control.Abstract.Evaluator (LoopControl, Return)
 import           Control.Abstract.Heap (Allocator, Deref, deref)
 import           Control.Abstract.Value
-import qualified Control.Monad.Effect as Eff
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
@@ -16,29 +15,30 @@ import           Prologue
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
-runPythonPackaging :: forall effects term address a. (
-                      Eff.PureEffects effects
+runPythonPackaging :: forall sig m term address a.
+                      ( Carrier sig m
                       , Ord address
                       , Show address
                       , Show term
-                      , Member Trace effects
-                      , Member (Boolean (Value term address)) effects
-                      , Member (State (Heap address (Value term address))) effects
-                      , Member (Resumable (BaseError (AddressError address (Value term address)))) effects
-                      , Member (Resumable (BaseError (ValueError term address))) effects
-                      , Member Fresh effects
-                      , Member (State Strategy) effects
-                      , Member (Allocator address) effects
-                      , Member (Deref (Value term address)) effects
-                      , Member (Env address) effects
-                      , Member (Eff.Exc (LoopControl address)) effects
-                      , Member (Eff.Exc (Return address)) effects
-                      , Member (Eff.Reader ModuleInfo) effects
-                      , Member (Eff.Reader PackageInfo) effects
-                      , Member (Eff.Reader Span) effects
-                      , Member (Function term address (Value term address)) effects)
-                   => Evaluator term address (Value term address) effects a
-                   -> Evaluator term address (Value term address) effects a
+                      , Member Trace sig
+                      , Member (Boolean (Value term address)) sig
+                      , Member (State (Heap address (Value term address))) sig
+                      , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+                      , Member (Resumable (BaseError (ValueError term address))) sig
+                      , Member Fresh sig
+                      , Member (State Strategy) sig
+                      , Member (Allocator address) sig
+                      , Member (Deref (Value term address)) sig
+                      , Member (Env address) sig
+                      , Member (Error (LoopControl address)) sig
+                      , Member (Error (Return address)) sig
+                      , Member (Reader ModuleInfo) sig
+                      , Member (Reader PackageInfo) sig
+                      , Member (Reader Span) sig
+                      , Member (Function term address (Value term address)) sig
+                      )
+                   => Evaluator term address (Value term address) m a
+                   -> Evaluator term address (Value term address) m a
 runPythonPackaging = Eff.interpose @(Function term address (Value term address)) $ \case
   Call callName super params -> do
     case callName of

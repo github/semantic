@@ -1,10 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Monovariant
 ( Monovariant(..)
-, runAllocator
-, handleAllocator
-, runDeref
-, handleDeref
 ) where
 
 import Control.Abstract
@@ -20,26 +16,14 @@ instance Show Monovariant where
   showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
 
 
-runAllocator :: PureEffects effects
-             => Evaluator term Monovariant value (Allocator Monovariant ': effects) a
-             -> Evaluator term Monovariant value effects a
-runAllocator = interpret handleAllocator
+instance Carrier sig m => Carrier (Allocator Monovariant :+: sig) (AllocatorC (Evaluator term Monovariant value m)) where
+  gen = AllocatorC . gen
+  alg = AllocatorC . (algA \/ (alg . handlePure runAllocatorC))
+    where algA (Alloc name k) = runAllocatorC (k (Monovariant name))
 
-handleAllocator :: Allocator Monovariant (Eff (Allocator Monovariant ': effects)) a -> Evaluator term Monovariant value effects a
-handleAllocator (Alloc name) = pure (Monovariant name)
 
-runDeref :: ( Member NonDet effects
-            , Ord value
-            , PureEffects effects
-            )
-         => Evaluator term Monovariant value (Deref value ': effects) a
-         -> Evaluator term Monovariant value effects a
-runDeref = interpret handleDeref
-
-handleDeref :: ( Member NonDet effects
-               , Ord value
-               )
-            => Deref value (Eff (Deref value ': effects)) a
-            -> Evaluator term Monovariant value effects a
-handleDeref (DerefCell        cell) = traverse (foldMapA pure) (nonEmpty (toList cell))
-handleDeref (AssignCell value cell) = pure (Set.insert value cell)
+instance (Member NonDet sig, Ord value, Carrier sig m) => Carrier (Deref value :+: sig) (DerefC (Evaluator term Monovariant value m)) where
+  gen = DerefC . gen
+  alg = DerefC . (algD \/ (alg . handlePure runDerefC))
+    where algD (DerefCell cell k) = traverse (foldMapA pure) (nonEmpty (toList cell)) >>= runDerefC . k
+          algD (AssignCell value cell k) = runDerefC (k (Set.insert value cell))
