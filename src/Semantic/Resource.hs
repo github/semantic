@@ -30,6 +30,7 @@ runResource :: (Member (Lift IO) effects, PureEffects effects)
             -> Eff (Resource ': effects) a
             -> Eff effects a
 runResource handler = interpret (\(Resource fore aft go)
-                                 -> liftIO (Exc.bracket (handler (runResource handler fore))
-                                           (handler . runResource handler . aft)
-                                           (handler . runResource handler . go)
+                                 -> liftIO (Exc.bracket
+                                            (handler (runResource handler fore))
+                                            (handler . runResource handler . aft)
+                                            (handler . runResource handler . go)))
