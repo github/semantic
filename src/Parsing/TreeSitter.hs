@@ -9,7 +9,6 @@ import Prologue hiding (bracket)
 import           Control.Concurrent.Async
 import qualified Control.Exception as Exc (bracket)
 import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception hiding (bracket)
 import           Control.Monad.Effect.Trace
 import           Control.Monad.IO.Class
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
@@ -64,7 +63,6 @@ parseToAST :: ( Bounded grammar
               , Member Resource effects
               , Member Timeout effects
               , Member Trace effects
-              , PureEffects effects
               )
            => Duration
            -> Ptr TS.Language
