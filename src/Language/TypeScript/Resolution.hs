@@ -24,6 +24,7 @@ import           System.FilePath.Posix
 
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
+import Control.Abstract.ScopeGraph (Allocator)
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
 import           Data.Abstract.Path
@@ -166,7 +167,6 @@ javascriptExtensions = ["js"]
 evalRequire :: ( AbstractValue address value effects
                , Member (Allocator address) effects
                , Member (Deref value) effects
-               , Member (Env address) effects
                , Member (Modules address value) effects
                , Member (State (Heap address address value)) effects
                , Ord address

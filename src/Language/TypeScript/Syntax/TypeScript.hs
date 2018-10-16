@@ -8,7 +8,6 @@ import           Data.Aeson
 import qualified Data.Text as T
 import           Proto3.Suite
 
-import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable as Evaluatable
 import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.JSON.Fields
