@@ -67,7 +67,6 @@ instance Ord address => ValueRoots address (Value address body) where
 
 runFunction :: forall address effects body a. ( Member (Allocator address) effects
                , Member (Deref (Value address body)) effects
-               , Member (Env address) effects
                , Member (Exc (Return (Value address body))) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
