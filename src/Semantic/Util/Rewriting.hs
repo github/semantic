@@ -23,7 +23,7 @@ import           Language.Ruby.PrettyPrint
 import           Language.Python.PrettyPrint
 import           Matching.Core
 import           Parsing.Parser
-import           Prologue hiding (weaken)
+import           Prologue
 import           Reprinting.Pipeline
 import           Semantic.IO as IO
 import           Semantic.Task
@@ -99,15 +99,16 @@ increaseNumbers p = case Sum.project (termOut p) of
   Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
   Nothing                -> Term (fmap increaseNumbers (unTerm p))
 
-addKVPair :: forall effs syntax term .
+addKVPair :: forall m syntax term .
   ( Apply Functor syntax
   , Literal.Hash :< syntax
   , Literal.Array :< syntax
   , Literal.TextElement :< syntax
   , Literal.KeyValue :< syntax
   , term ~ Term (Sum syntax) History
+  , Monad m
   ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.Hash term)) term
+  ProcessT m (Either term (term, Literal.Hash term)) term
 addKVPair = repeatedly $ do
   t <- await
   Data.Machine.yield (either id injKVPair t)
@@ -126,12 +127,13 @@ testAddKVPair = do
   tagged <- runM $ cata (toAlgebra (fromMatcher matchHash ~> addKVPair)) (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-overwriteFloats :: forall effs syntax term .
+overwriteFloats :: forall m syntax term .
   ( Apply Functor syntax
   , Literal.Float :< syntax
   , term ~ Term (Sum syntax) History
+  , Monad m
   ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.Float term)) term
+  ProcessT m (Either term (term, Literal.Float term)) term
 overwriteFloats = repeatedly $ do
   t <- await
   Data.Machine.yield (either id injFloat t)
@@ -147,8 +149,9 @@ findKV ::
   ( Literal.KeyValue :< syntax
   , Literal.TextElement :< syntax
   , term ~ Term (Sum syntax) History
+  , Monad m
   ) =>
-  Text -> ProcessT (Eff effs) term (Either term (term, Literal.KeyValue term))
+  Text -> ProcessT m term (Either term (term, Literal.KeyValue term))
 findKV name = fromMatcher (kvMatcher name)
 
 kvMatcher :: forall fs term .
@@ -163,14 +166,15 @@ kvMatcher name = matchM projectTerm target <* matchKey where
         match Literal.textElementContent $
           ensure (== name)
 
-changeKV :: forall effs syntax term .
+changeKV :: forall m syntax term .
   ( Apply Functor syntax
   , Literal.KeyValue :< syntax
   , Literal.Array :< syntax
   , Literal.Float :< syntax
   , term ~ Term (Sum syntax) History
+  , Monad m
   ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.KeyValue term)) term
+  ProcessT m (Either term (term, Literal.KeyValue term)) term
 changeKV = auto $ either id injKV
   where
     injKV :: (term, Literal.KeyValue term) -> term
@@ -187,13 +191,13 @@ testChangeKV = do
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
 -- Temporary, until new KURE system lands.
-fromMatcher :: Matcher from to -> ProcessT (Eff effs) from (Either from (from, to))
+fromMatcher :: Monad m => Matcher from to -> ProcessT m from (Either from (from, to))
 fromMatcher m = auto go where go x = maybe (Left x) (\y -> Right (x, y)) (stepMatcher x m)
 
 -- Turn a 'ProccessT' into an FAlgebra.
-toAlgebra :: (Traversable (Base t), Corecursive t)
-          => ProcessT (Eff effs) t t
-          -> FAlgebra (Base t) (Eff effs t)
+toAlgebra :: (Traversable (Base t), Corecursive t, Monad m)
+          => ProcessT m t t
+          -> FAlgebra (Base t) (m t)
 toAlgebra m t = do
   inner <- sequenceA t
   res <- runT1 (source (Just (embed inner)) ~> m)

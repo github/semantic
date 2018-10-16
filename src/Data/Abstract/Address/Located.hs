@@ -1,10 +1,6 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Located
 ( Located(..)
-, runAllocator
-, handleAllocator
-, runDeref
-, handleDeref
 ) where
 
 import Control.Abstract
@@ -22,37 +18,28 @@ data Located address = Located
   deriving (Eq, Ord, Show)
 
 
-relocate :: Evaluator term address1 value effects a -> Evaluator term address2 value effects a
-relocate = raiseEff . lowerEff
+demote :: Evaluator term (Located address) value m a -> Evaluator term address value m a
+demote = Evaluator . runEvaluator
+
+promote :: Evaluator term address value m a -> Evaluator term (Located address) value m a
+promote = Evaluator . runEvaluator
 
 
-runAllocator :: ( Member (Reader ModuleInfo) effects
-                , Member (Reader PackageInfo) effects
-                , Member (Reader Span) effects
-                , PureEffects effects
-                )
-             => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator term address value effects x)
-             -> Evaluator term (Located address) value (Allocator (Located address) ': effects) a
-             -> Evaluator term (Located address) value effects a
-runAllocator handler = interpret (handleAllocator handler)
+instance ( Carrier (Allocator address :+: sig) (AllocatorC (Evaluator term address value m))
+         , Carrier sig m
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader PackageInfo) sig
+         , Member (Reader Span) sig
+         )
+      => Carrier (Allocator (Located address) :+: sig) (AllocatorC (Evaluator term (Located address) value m)) where
+  gen = AllocatorC . promote . gen
+  alg = AllocatorC . (algA \/ (alg . handlePure runAllocatorC))
+    where algA (Alloc name k) = promote (Located <$> runAllocatorC (alg (L (Alloc name gen))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= demote . runAllocatorC . k)
 
-handleAllocator :: ( Member (Reader ModuleInfo) effects
-                   , Member (Reader PackageInfo) effects
-                   , Member (Reader Span) effects
-                   )
-                => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator term address value effects x)
-                -> Allocator (Located address) (Eff (Allocator (Located address) ': effects)) a
-                -> Evaluator term (Located address) value effects a
-handleAllocator handler (Alloc name) = relocate (Located <$> handler (Alloc name) <*> currentPackage <*> currentModule <*> pure name <*> ask)
 
-runDeref :: PureEffects effects
-         => (forall x. Deref value (Eff (Deref value ': effects)) x -> Evaluator term address value effects x)
-         -> Evaluator term (Located address) value (Deref value ': effects) a
-         -> Evaluator term (Located address) value effects a
-runDeref handler = interpret (handleDeref handler)
-
-handleDeref :: (forall x. Deref value (Eff (Deref value ': effects)) x -> Evaluator term address value effects x)
-            -> Deref value (Eff (Deref value ': effects)) a
-            -> Evaluator term (Located address) value effects a
-handleDeref handler (DerefCell        cell) = relocate (handler (DerefCell        cell))
-handleDeref handler (AssignCell value cell) = relocate (handler (AssignCell value cell))
+instance (Carrier (Deref value :+: sig) (DerefC (Evaluator term address value m)), Carrier sig m)
+      => Carrier (Deref value :+: sig) (DerefC (Evaluator term (Located address) value m)) where
+  gen = DerefC . promote . gen
+  alg = DerefC . (algD \/ (alg . handlePure runDerefC))
+    where algD (DerefCell cell k) = promote (runDerefC (alg (L (DerefCell cell gen))) >>= demote . runDerefC . k)
+          algD (AssignCell value cell k) = promote (runDerefC (alg (L (AssignCell value cell gen))) >>= demote . runDerefC . k)

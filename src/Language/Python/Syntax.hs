@@ -65,14 +65,15 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: ( Member (Modules address) effects
-                        , Member (Reader ModuleInfo) effects
-                        , Member (Reader Span) effects
-                        , Member (Resumable (BaseError ResolutionError)) effects
-                        , Member Trace effects
+resolvePythonModules :: ( Member (Modules address) sig
+                        , Member (Reader ModuleInfo) sig
+                        , Member (Reader Span) sig
+                        , Member (Resumable (BaseError ResolutionError)) sig
+                        , Member Trace sig
+                        , Carrier sig m
                         )
                      => QualifiedName
-                     -> Evaluator term address value effects (NonEmpty ModulePath)
+                     -> Evaluator term address value m (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -155,15 +156,16 @@ instance Evaluatable Import where
 
 
 -- Evaluate a qualified import
-evalQualifiedImport :: ( AbstractValue term address value effects
-                       , Member (Allocator address) effects
-                       , Member (Deref value) effects
-                       , Member (Env address) effects
-                       , Member (Modules address) effects
-                       , Member (State (Heap address value)) effects
+evalQualifiedImport :: ( AbstractValue term address value m
+                       , Carrier sig m
+                       , Member (Allocator address) sig
+                       , Member (Deref value) sig
+                       , Member (Env address) sig
+                       , Member (Modules address) sig
+                       , Member (State (Heap address value)) sig
                        , Ord address
                        )
-                    => Name -> ModulePath -> Evaluator term address value effects value
+                    => Name -> ModulePath -> Evaluator term address value m value
 evalQualifiedImport name path = letrec' name $ \addr -> do
   unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 

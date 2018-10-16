@@ -5,33 +5,33 @@ module Analysis.Abstract.Tracing
 ) where
 
 import Control.Abstract hiding (trace)
-import Control.Monad.Effect.Writer
 import Data.Abstract.Environment
 import Data.Semigroup.Reducer as Reducer
 
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-tracingTerms :: ( Member (Env address) effects
-                , Member (State (Heap address value)) effects
-                , Member (Writer (trace (Configuration term address value))) effects
+tracingTerms :: ( Member (Env address) sig
+                , Member (State (Heap address value)) sig
+                , Member (Writer (trace (Configuration term address value))) sig
+                , Carrier sig m
                 , Reducer (Configuration term address value) (trace (Configuration term address value))
                 )
              => trace (Configuration term address value)
-             -> Open (Open (term -> Evaluator term address value effects a))
+             -> Open (Open (term -> Evaluator term address value m a))
 tracingTerms proxy recur0 recur term = getConfiguration term >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur0 recur term
 
-trace :: Member (Writer (trace (Configuration term address value))) effects => trace (Configuration term address value) -> Evaluator term address value effects ()
+trace :: (Member (Writer (trace (Configuration term address value))) sig, Carrier sig m) => trace (Configuration term address value) -> Evaluator term address value m ()
 trace = tell
 
-tracing :: (Monoid (trace (Configuration term address value)), Effects effects) => Evaluator term address value (Writer (trace (Configuration term address value)) ': effects) a -> Evaluator term address value effects (trace (Configuration term address value), a)
-tracing = runWriter
+tracing :: (Monoid (trace (Configuration term address value)), Carrier sig m, Effect sig) => Evaluator term address value (WriterC (trace (Configuration term address value)) (Evaluator term address value m)) a -> Evaluator term address value m (trace (Configuration term address value), a)
+tracing = runWriter . runEvaluator
 
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Env address) effects, Member (State (Heap address value)) effects)
+getConfiguration :: (Member (Env address) sig, Member (State (Heap address value)) sig, Carrier sig m)
                  => term
-                 -> Evaluator term address value effects (Configuration term address value)
+                 -> Evaluator term address value m (Configuration term address value)
 getConfiguration term = Configuration term <$> getEvalContext <*> getHeap
 
 -- | A single point in a program’s execution.

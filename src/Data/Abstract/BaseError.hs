@@ -29,12 +29,13 @@ instance (Eq1 exc) => Eq1 (BaseError exc) where
 instance Show1 exc => Show1 (BaseError exc) where
   liftShowsPrec sl sp d (BaseError _ _ exc) = liftShowsPrec sl sp d exc
 
-throwBaseError :: ( Member (Resumable (BaseError exc)) effects
-                  , Member (Reader M.ModuleInfo) effects
-                  , Member (Reader S.Span) effects
+throwBaseError :: ( Member (Resumable (BaseError exc)) sig
+                  , Member (Reader M.ModuleInfo) sig
+                  , Member (Reader S.Span) sig
+                  , Carrier sig m
                   )
                 => exc resume
-                -> Evaluator term address value effects resume
+                -> Evaluator term address value m resume
 throwBaseError err = do
   moduleInfo <- currentModule
   span <- currentSpan

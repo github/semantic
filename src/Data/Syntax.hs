@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
 module Data.Syntax where
 
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (Empty, Error)
 import Data.Aeson (ToJSON(..), object)
 import Data.Char (toLower)
 import Data.JSON.Fields

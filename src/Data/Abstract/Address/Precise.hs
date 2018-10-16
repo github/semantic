@@ -1,10 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Precise
 ( Precise(..)
-, runAllocator
-, handleAllocator
-, runDeref
-, handleDeref
 ) where
 
 import Control.Abstract
@@ -19,21 +15,14 @@ instance Show Precise where
   showsPrec d = showsUnaryWith showsPrec "Precise" d . unPrecise
 
 
-runAllocator :: ( Member Fresh effects
-                , PureEffects effects
-                )
-             => Evaluator term Precise value (Allocator Precise ': effects) a
-             -> Evaluator term Precise value effects a
-runAllocator = interpret handleAllocator
+instance (Member Fresh sig, Carrier sig m) => Carrier (Allocator Precise :+: sig) (AllocatorC (Evaluator term Precise value m)) where
+  gen = AllocatorC . gen
+  alg = AllocatorC . (algA \/ (alg . handlePure runAllocatorC))
+    where algA (Alloc _ k) = Precise <$> fresh >>= runAllocatorC . k
 
-handleAllocator :: Member Fresh effects => Allocator Precise (Eff (Allocator Precise ': effects)) a -> Evaluator term Precise value effects a
-handleAllocator (Alloc _) = Precise <$> fresh
 
-runDeref :: PureEffects effects
-         => Evaluator term Precise value (Deref value ': effects) a
-         -> Evaluator term Precise value effects a
-runDeref = interpret handleDeref
-
-handleDeref :: Deref value (Eff (Deref value ': effects)) a -> Evaluator term Precise value effects a
-handleDeref (DerefCell        cell) = pure (fst <$> Set.minView cell)
-handleDeref (AssignCell value _)    = pure (Set.singleton value)
+instance Carrier sig m => Carrier (Deref value :+: sig) (DerefC (Evaluator term Precise value m)) where
+  gen = DerefC . gen
+  alg = DerefC . (algD \/ (alg . handlePure runDerefC))
+    where algD (DerefCell cell k) = runDerefC (k (fst <$> Set.minView cell))
+          algD (AssignCell value _ k) = runDerefC (k (Set.singleton value))

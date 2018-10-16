@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Type where
 
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (Void)
 import Data.JSON.Fields
 import Diffing.Algorithm
 import Prelude hiding (Bool, Float, Int, Double)

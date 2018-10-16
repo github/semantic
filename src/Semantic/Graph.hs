@@ -65,11 +65,11 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
 
-runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs, Effects effs)
+runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m)
          => GraphType
          -> Bool
          -> Project
-         -> Eff effs (Graph ControlFlowVertex)
+         -> m (Graph ControlFlowVertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser (lang' :: Proxy lang) <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
@@ -92,14 +92,14 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
                 , Recursive term
                 , HasPrelude lang
                 , HasPostlude lang
-                , Member Trace effs
-                , Effects effs
+                , Member Trace sig
+                , Carrier sig m
                 )
              => Proxy lang
              -> Bool
              -> [Module term]
              -> Package term
-             -> Eff effs (Graph ControlFlowVertex)
+             -> m (Graph ControlFlowVertex)
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
@@ -108,7 +108,7 @@ runCallGraph lang includePackages modules package = do
         = graphing @_ @_ @(Maybe Name) @Monovariant
         . runHeap
         . caching
-        . runFresh 0
+        . runFresh
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -132,14 +132,14 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , FreeVariables term
                                , HasPrelude lang
                                , HasPostlude lang
-                               , Member Trace effs
+                               , Member Trace sig
                                , Recursive term
-                               , Effects effs
+                               , Carrier sig m
                                , Show term
                                )
                             => Proxy lang
                             -> Package term
-                            -> Eff effs (Graph ControlFlowVertex)
+                            -> m (Graph ControlFlowVertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
@@ -148,14 +148,14 @@ runImportGraphToModules :: ( Declarations term
                            , FreeVariables term
                            , HasPrelude lang
                            , HasPostlude lang
-                           , Member Trace effs
+                           , Member Trace sig
                            , Recursive term
-                           , Effects effs
+                           , Carrier sig m
                            , Show term
                            )
                         => Proxy lang
                         -> Package term
-                        -> Eff effs (Graph (Module term))
+                        -> m (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
 
@@ -164,22 +164,22 @@ runImportGraph :: ( Declarations term
                   , FreeVariables term
                   , HasPrelude lang
                   , HasPostlude lang
-                  , Member Trace effs
+                  , Member Trace sig
                   , Recursive term
-                  , Effects effs
+                  , Carrier sig m
                   , Show term
                   )
                => Proxy lang
                -> Package term
                -> (ModuleInfo -> Graph vertex)
-               -> Eff effs (Graph vertex)
+               -> m (Graph vertex)
 runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
       extractGraph (graph, _) = graph >>= f
       runImportGraphAnalysis
         = runState lowerBound
         . runHeap
-        . runFresh 0
+        . runFresh
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -198,14 +198,14 @@ runImportGraph lang (package :: Package term) f =
   in extractGraph <$> runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise)) (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (fmap (Concrete.runBoolean . Concrete.runWhile) . Concrete.runFunction) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 
-runHeap :: Effects effects => Evaluator term address value (State (Heap address value) ': effects) a -> Evaluator term address value effects (Heap address value, a)
+runHeap :: Carrier sig m => Evaluator term address value (StateC (Heap address value) (Evaluator term address value m)) a -> Evaluator term address value m (Heap address value, a)
 runHeap = runState lowerBound
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
-             -> Eff effs (Package (Blob, term))
+             -> m (Package (Blob, term))
 parsePackage parser project = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
@@ -216,7 +216,7 @@ parsePackage parser project = do
     n = name (projectName project)
 
 -- | Parse all files in a project into 'Module's.
-parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module (Blob, term)]
+parseModules :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Parser term -> Project -> m [Module (Blob, term)]
 parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
 
@@ -227,7 +227,7 @@ parsePythonPackage :: forall syntax effs term.
                    , FreeVariables1 syntax
                    , Functor syntax
                    , term ~ Term syntax Location
-                   , Member (Exc SomeException) effs
+                   , Member (Error SomeException) effs
                    , Member Distribute effs
                    , Member Resolution effs
                    , Member Trace effs
@@ -240,7 +240,7 @@ parsePythonPackage parser project = do
   let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
         . runState PythonPackage.Unknown
         . runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise))))
-        . runFresh 0
+        . runFresh
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -288,7 +288,7 @@ parsePythonPackage parser project = do
         resMap <- Task.resolutionMap p
         pure (Package.fromModules (name $ projectName p) modules resMap)
 
-parseModule :: (Member (Exc SomeException) effs, Member Task effs)
+parseModule :: (Member (Error SomeException) effs, Member Task effs)
             => Project
             -> Parser term
             -> File

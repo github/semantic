@@ -65,16 +65,17 @@ toName = name . T.pack . unPath
 --
 -- NB: TypeScript has a couple of different strategies, but the main one (and the
 -- only one we support) mimics Node.js.
-resolveWithNodejsStrategy :: ( Member (Modules address) effects
-                             , Member (Reader M.ModuleInfo) effects
-                             , Member (Reader PackageInfo) effects
-                             , Member (Reader Span) effects
-                             , Member (Resumable (BaseError ResolutionError)) effects
-                             , Member Trace effects
+resolveWithNodejsStrategy :: ( Member (Modules address) sig
+                             , Member (Reader M.ModuleInfo) sig
+                             , Member (Reader PackageInfo) sig
+                             , Member (Reader Span) sig
+                             , Member (Resumable (BaseError ResolutionError)) sig
+                             , Member Trace sig
+                             , Carrier sig m
                              )
                           => ImportPath
                           -> [String]
-                          -> Evaluator term address value effects M.ModulePath
+                          -> Evaluator term address value m M.ModulePath
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path _)    exts        = resolveRelativePath path exts
 
@@ -85,16 +86,17 @@ resolveWithNodejsStrategy (ImportPath path _)    exts        = resolveRelativePa
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: ( Member (Modules address) effects
-                       , Member (Reader M.ModuleInfo) effects
-                       , Member (Reader PackageInfo) effects
-                       , Member (Reader Span) effects
-                       , Member (Resumable (BaseError ResolutionError)) effects
-                       , Member Trace effects
+resolveRelativePath :: ( Member (Modules address) sig
+                       , Member (Reader M.ModuleInfo) sig
+                       , Member (Reader PackageInfo) sig
+                       , Member (Reader Span) sig
+                       , Member (Resumable (BaseError ResolutionError)) sig
+                       , Member Trace sig
+                       , Carrier sig m
                        )
                     => FilePath
                     -> [String]
-                    -> Evaluator term address value effects M.ModulePath
+                    -> Evaluator term address value m M.ModulePath
 resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
@@ -114,16 +116,17 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: ( Member (Modules address) effects
-                          , Member (Reader M.ModuleInfo) effects
-                          , Member (Reader PackageInfo) effects
-                          , Member (Reader Span) effects
-                          , Member (Resumable (BaseError ResolutionError)) effects
-                          , Member Trace effects
+resolveNonRelativePath :: ( Member (Modules address) sig
+                          , Member (Reader M.ModuleInfo) sig
+                          , Member (Reader PackageInfo) sig
+                          , Member (Reader Span) sig
+                          , Member (Resumable (BaseError ResolutionError)) sig
+                          , Member Trace sig
+                          , Carrier sig m
                           )
                        => FilePath
                        -> [String]
-                       -> Evaluator term address value effects M.ModulePath
+                       -> Evaluator term address value m M.ModulePath
 resolveNonRelativePath name exts = do
   M.ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -140,13 +143,14 @@ resolveNonRelativePath name exts = do
     notFound xs = throwResolutionError $ NotFoundError name xs Language.TypeScript
 
 -- | Resolve a module name to a ModulePath.
-resolveModule :: ( Member (Modules address) effects
-                 , Member (Reader PackageInfo) effects
-                 , Member Trace effects
+resolveModule :: ( Member (Modules address) sig
+                 , Member (Reader PackageInfo) sig
+                 , Member Trace sig
+                 , Carrier sig m
                  )
               => FilePath -- ^ Module path used as directory to search in
               -> [String] -- ^ File extensions to look for
-              -> Evaluator term address value effects (Either [FilePath] M.ModulePath)
+              -> Evaluator term address value m (Either [FilePath] M.ModulePath)
 resolveModule path' exts = do
   let path = makeRelative "." path'
   PackageInfo{..} <- currentPackage
@@ -163,16 +167,17 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: ( AbstractValue term address value effects
-               , Member (Allocator address) effects
-               , Member (Deref value) effects
-               , Member (Env address) effects
-               , Member (Modules address) effects
-               , Member (State (Heap address value)) effects
+evalRequire :: ( AbstractValue term address value m
+               , Member (Allocator address) sig
+               , Member (Deref value) sig
+               , Member (Env address) sig
+               , Member (Modules address) sig
+               , Member (State (Heap address value)) sig
                , Ord address
+               , Carrier sig m
                )
             => M.ModulePath
             -> Name
-            -> Evaluator term address value effects value
+            -> Evaluator term address value m value
 evalRequire modulePath alias = letrec' alias $ \addr ->
   unit <$ makeNamespace alias addr Nothing (bindAll . fst . snd =<< require modulePath)
