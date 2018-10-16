@@ -38,7 +38,7 @@ runParse QuietTermRenderer            = distributeFoldMap $ \blob ->
   where
     showTiming Blob{..} (res, duration) =
       let status = if isLeft res then "ERR" else "OK"
-      in stringUtf8 (status <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")
+      in stringUtf8 (status <> "\t" <> show blobLanguage <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")
 
 -- | For testing and running parse-examples.
 runParse' :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs Builder
