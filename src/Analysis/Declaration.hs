@@ -1,34 +1,37 @@
-{-# LANGUAGE TypeOperators, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Declaration
 ( Declaration(..)
 , HasDeclaration
 , declarationAlgebra
 ) where
 
-import Data.Blob
-import Data.Error (Error(..), showExpectation)
-import Data.Language as Language
-import Data.Range
-import Data.Location
-import Data.Source as Source
-import Data.Sum
+import Prologue hiding (first, project)
+
+import           Control.Arrow hiding (first)
+import qualified Data.Text as T
+
+import           Control.Rewriting hiding (apply)
+import           Data.Blob
+import           Data.Error (Error (..), showExpectation)
+import           Data.Language as Language
+import           Data.Location
+import           Data.Range
+import           Data.Source as Source
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import Data.Term
-import qualified Data.Text as T
+import           Data.Term
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Ruby.Syntax as Ruby.Syntax
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
-import Prologue hiding (project)
 
 -- | A declaration’s identifier and type.
 data Declaration
-  = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language, declarationReceiver :: Maybe T.Text }
-  | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
-  | ModuleDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
-  | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
-  | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language, declarationLevel :: Int }
-  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationSpan :: Span, declarationLanguage :: Language }
+  = MethodDeclaration   { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language, declarationReceiver :: Maybe Text }
+  | ClassDeclaration    { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
+  | ModuleDeclaration   { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
+  | FunctionDeclaration { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
+  | HeadingDeclaration  { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language, declarationLevel :: Int }
+  | ErrorDeclaration    { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
   deriving (Eq, Generic, Show)
 
 
@@ -96,37 +99,63 @@ instance CustomHasDeclaration whole Declaration.Function where
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) (getFunctionSource blob (In ann decl)) (locationSpan ann) blobLanguage
+    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) functionSource (locationSpan ann) blobLanguage
     where isEmpty = (== 0) . rangeLength . locationByteRange
+          functionSource = getIdentifier (arr Declaration.functionBody) blob (In ann decl)
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) (locationSpan ann) blobLanguage Nothing
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) blobLanguage Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage == Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) (locationSpan ann) blobLanguage (Just (getSource blobSource receiverType))
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) blobLanguage (Just (getSource blobSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) (locationSpan ann) blobLanguage (Just (getSource blobSource receiverAnn))
-    where isEmpty = (== 0) . rangeLength . locationByteRange
+    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) methodSource (locationSpan ann) blobLanguage (Just (getSource blobSource receiverAnn))
+    where
+      isEmpty = (== 0) . rangeLength . locationByteRange
+      methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)
 
 -- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
 instance CustomHasDeclaration whole Declaration.Class where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
-    = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getClassSource blob (In ann decl)) (locationSpan ann) blobLanguage
+    = Just $ ClassDeclaration (getSource blobSource identifierAnn) classSource (locationSpan ann) blobLanguage
+      where classSource = getIdentifier (arr Declaration.classBody) blob (In ann decl)
 
 instance CustomHasDeclaration whole Ruby.Syntax.Class where
   customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Class (Term (In identifierAnn _), _) _ _)
-    = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getRubyClassSource blob (In ann decl)) (locationSpan ann) blobLanguage
+    = Just $ ClassDeclaration (getSource blobSource identifierAnn) rubyClassSource (locationSpan ann) blobLanguage
+      where rubyClassSource = getIdentifier (arr Ruby.Syntax.classBody) blob (In ann decl)
 
 instance CustomHasDeclaration whole Ruby.Syntax.Module where
   customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Module (Term (In identifierAnn _), _) _)
-    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) (getRubyModuleSource blob (In ann decl)) (locationSpan ann) blobLanguage
+    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) rubyModuleSource (locationSpan ann) blobLanguage
+      where rubyModuleSource = getIdentifier (arr Ruby.Syntax.moduleStatements >>> first) blob (In ann decl)
 
 instance CustomHasDeclaration whole TypeScript.Syntax.Module where
   customToDeclaration blob@Blob{..} ann decl@(TypeScript.Syntax.Module (Term (In identifierAnn _), _) _)
-    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) (getTypeScriptModuleSource blob (In ann decl)) (locationSpan ann) blobLanguage
+    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) tsModuleSource (locationSpan ann) blobLanguage
+      where tsModuleSource = getIdentifier (arr TypeScript.Syntax.moduleStatements >>> first) blob (In ann decl)
+
+-- When encountering a Declaration-annotated term, we need to extract a Text
+-- for the resulting Declaration's 'declarationIdentifier' field. This text
+-- is constructed by slicing out text from the original blob corresponding
+-- to a location, which is found via the passed-in rule.
+getIdentifier :: Functor m
+           => Rule () (m (Term syntax Location)) (Term syntax Location)
+           -> Blob
+           -> TermF m Location (Term syntax Location, a)
+           -> Text
+getIdentifier finder Blob{..} (In a r)
+  = let declRange = locationByteRange a
+        bodyRange = locationByteRange <$> rewrite (finder >>^ annotation) () (fmap fst r)
+        -- Text-based gyrations to slice the identifier out of the provided blob source
+        sliceFrom = T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange
+    in either (const mempty) sliceFrom bodyRange
+
+first :: Rule env [a] a
+first = target >>= maybeM (Prologue.fail "empty list") . listToMaybe
 
 getSource :: Source -> Location -> Text
 getSource blobSource = toText . flip Source.slice blobSource . locationByteRange
@@ -171,48 +200,3 @@ instance HasDeclarationWithStrategy 'Default whole syntax where
 -- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
 instance CustomHasDeclaration whole syntax => HasDeclarationWithStrategy 'Custom whole syntax where
   toDeclarationWithStrategy _ = customToDeclaration
-
-
-getMethodSource :: Blob -> TermF Declaration.Method Location (Term syntax Location, a) -> T.Text
-getMethodSource Blob{..} (In a r)
-  = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> case r of
-          Declaration.Method _ _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getFunctionSource :: Blob -> TermF Declaration.Function Location (Term syntax Location, a) -> T.Text
-getFunctionSource Blob{..} (In a r)
-  = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> case r of
-          Declaration.Function _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getClassSource :: Blob -> TermF Declaration.Class Location (Term syntax Location, a) -> T.Text
-getClassSource Blob{..} (In a r)
-  = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> case r of
-          Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getRubyClassSource :: Blob -> TermF Ruby.Syntax.Class Location (Term syntax Location, a) -> T.Text
-getRubyClassSource Blob{..} (In a r)
-  = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> case r of
-          Ruby.Syntax.Class _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getRubyModuleSource :: Blob -> TermF Ruby.Syntax.Module Location (Term syntax Location, a) -> T.Text
-getRubyModuleSource Blob{..} (In a r)
-  = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> case r of
-          Ruby.Syntax.Module _ [(Term (In a' _), _)] -> Just a'
-          _ -> Nothing
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getTypeScriptModuleSource :: Blob -> TermF TypeScript.Syntax.Module Location (Term syntax Location, a) -> T.Text
-getTypeScriptModuleSource Blob{..} (In a r)
-  = let declRange = locationByteRange a
-        bodyRange = locationByteRange <$> case r of
-          TypeScript.Syntax.Module _ [(Term (In a' _), _)] -> Just a'
-          _ -> Nothing
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
