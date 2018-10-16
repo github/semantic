@@ -188,7 +188,7 @@ deref :: ( Member (Deref value) effects
 deref addr@Address{..} = gets (Heap.getSlot addr) >>= maybeM (throwAddressError (UnallocatedAddress address)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress address))
 
 
--- | Write a value to the given address in the 'Heap'.
+-- | Write a value to the given frame address in the 'Heap'.
 assign :: ( Member (Deref value) effects
           , Member (State (Heap address address value)) effects
           , Ord address
