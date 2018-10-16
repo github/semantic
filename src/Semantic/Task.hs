@@ -85,6 +85,7 @@ import           Semantic.Distribute
 import           Semantic.Timeout
 import qualified Semantic.IO as IO
 import           Semantic.Resolution
+import           Semantic.Resource
 import           Semantic.Telemetry
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)
@@ -98,6 +99,7 @@ type TaskEff = Eff '[ Task
                     , Telemetry
                     , Exc SomeException
                     , Timeout
+                    , Resource
                     , Distribute
                     , Lift IO
                     ]
@@ -151,7 +153,8 @@ runTaskWithConfig options logger statter task = do
         run
           = runM
           . runDistribute
-          . runTimeout (runM . runDistribute)
+          . runResource (runM . runDistribute)
+          . runTimeout (runM . runDistribute . runResource (runM . runDistribute))
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
@@ -186,7 +189,7 @@ instance Effect Task where
   handleState c dist (Request (Serialize format input) k) = Request (Serialize format input) (dist . (<$ c) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Timeout effs, Member Trace effs, PureEffects effs) => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Resource effs, Member Telemetry effs, Member Timeout effs, Member Trace effs, PureEffects effs) => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
@@ -208,7 +211,7 @@ data ParserCancelled = ParserTimedOut FilePath Language | AssignmentTimedOut Fil
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Telemetry effs, Member Timeout effs, Member Trace effs, PureEffects effs) => Blob -> Parser term -> Eff effs term
+runParser :: (Member (Exc SomeException) effs, Member (Lift IO) effs, Member (Reader Config) effs, Member Resource effs, Member Telemetry effs, Member Timeout effs, Member Trace effs, PureEffects effs) => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $ do
@@ -238,6 +241,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Member Telemetry effs
                          , Member Timeout effs
                          , Member Trace effs
+                         , Member Resource effs
                          , PureEffects effs
                          )
                       => (Source -> assignment (Term (Sum syntaxes) Assignment.Location) -> ast -> Either (Error.Error String) (Term (Sum syntaxes) Assignment.Location))
