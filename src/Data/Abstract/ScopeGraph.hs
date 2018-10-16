@@ -6,6 +6,7 @@ module Data.Abstract.ScopeGraph
   , declare
   , EdgeLabel(..)
   , insertDeclarationScope
+  , insertImportReference
   , newScope
   , insertScope
   , Path(..)
@@ -117,6 +118,27 @@ reference ref declaration g@ScopeGraph{..} = fromMaybe g $ do
               -- Return the first path to the declaration through the scopes.
               getFirst (foldMap (First . ap (go currentAddress currentScope) ((path .) . EPath edge)) scopes)
             in traverseEdges Import <|> traverseEdges Lexical
+
+-- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
+insertImportReference :: Ord address => Reference -> Declaration -> ScopeGraph address -> address -> Scope address -> Maybe (Scope address)
+insertImportReference ref decl g@ScopeGraph{..} scopeAddress scope = do
+  currentAddress <- currentScope
+  go currentAddress (EPath Import scopeAddress)
+  where
+    go address path =
+      case declDataOfScope address of
+        Just (_, index) ->
+          Just $ scope { references = Map.insert ref (path (DPath decl index)) (references scope) }
+        Nothing -> traverseEdges Import <|> traverseEdges Lexical
+          where
+            traverseEdges edge = do
+              linkMap <- linksOfScope address g
+              scopes <- Map.lookup edge linkMap
+              -- Return the first path to the declaration through the scopes.
+              getFirst (foldMap (First . ap go ((path .) . EPath edge)) scopes)
+    declDataOfScope address = do
+      dataMap <- ddataOfScope address g
+      lookupDeclaration decl dataMap
 
 lookupDeclaration :: Declaration -> Seq (Declaration, (Span, Maybe address)) -> Maybe ((Declaration, (Span, Maybe address)), Position)
 lookupDeclaration declaration seq = do
