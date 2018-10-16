@@ -8,11 +8,12 @@ import           Data.Foldable
 import           Data.Functor.Foldable (cata, embed)
 import qualified Data.Machine as Machine
 
+import           Control.Rewriting hiding (context)
 import           Data.Algebra
 import           Data.Blob
 import qualified Data.Language as Language
-import           Data.Reprinting.Token
 import           Data.Reprinting.Scope
+import           Data.Reprinting.Token
 import           Data.Sum
 import qualified Data.Syntax.Literal as Literal
 import           Language.JSON.PrettyPrint
@@ -60,7 +61,7 @@ spec = describe "reprinting" $ do
         printed `shouldBe` Right src
 
       it "should be able to parse the output of a refactor" $ do
-        let tagged = increaseNumbers (mark Refactored tree)
+        let (Right tagged) = rewrite (somewhere increaseNumbers markRefactored) () (mark Unmodified tree)
         let (Right printed) = runReprinter src defaultJSONPipeline tagged
         tree' <- runTask (parse jsonParser (Blob printed path Language.JSON))
         length tree' `shouldSatisfy` (/= 0)
