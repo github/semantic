@@ -4,6 +4,7 @@ module Control.Abstract.ScopeGraph
   , declare
   , reference
   , newScope
+  , bindAll
   , Declaration(..)
   , ScopeGraph
   , ScopeError
@@ -58,17 +59,12 @@ putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
 reference :: forall address effects value. (Ord address, Member (State (ScopeGraph address)) effects) => Reference -> Declaration -> Evaluator address value effects ()
 reference ref = modify @(ScopeGraph address) . (ScopeGraph.reference ref)
 
--- | Bind all of the scopes from a 'ScopeGraph' and construct an edge from the current scope to the given scope graph's current scope.
+-- | Bind all of the scopes from a 'ScopeGraph'.
 bindAll :: ( Ord address, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError (ScopeError address))) effects, Member (State (ScopeGraph address)) effects ) => ScopeGraph address -> Evaluator address value effects ()
 bindAll oldGraph = do
   currentGraph <- get
-  let newGraph = ScopeGraph.graph currentGraph <> ScopeGraph.graph oldGraph
-  currentScopeAddress <- currentScope
-  scope <- lookupScope currentScopeAddress
-  case ScopeGraph.currentScope oldGraph of
-    Just oldScope ->
-      let newScope = scope { ScopeGraph.edges = Map.insert ScopeGraph.Import [ oldScope ] (ScopeGraph.edges scope) }
-      in put (ScopeGraph.insertScope currentScopeAddress newScope (currentGraph { ScopeGraph.graph = newGraph }))
+  let newGraph = ScopeGraph.graph oldGraph <> ScopeGraph.graph currentGraph
+  put (currentGraph { ScopeGraph.graph = newGraph })
 
 -- | Inserts a new scope into the scope graph with the given edges.
 newScope :: ( Member (Allocator address) effects
@@ -79,7 +75,7 @@ newScope :: ( Member (Allocator address) effects
          => Map EdgeLabel [address]
          -> Evaluator address value effects address
 newScope edges = do
-  -- Take the edges and construct a new scope, update the current scope to the new scope
+  -- Take the edges and construct a new scope
   name <- gensym
   address <- alloc name
   address <$ modify (ScopeGraph.newScope address edges)
