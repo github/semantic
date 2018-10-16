@@ -17,7 +17,6 @@ data Abstract = Abstract
 
 runFunction :: ( Member (Allocator address) effects
                , Member (Deref Abstract) effects
-               , Member (Env address) effects
                , Member (Exc (Return Abstract)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
