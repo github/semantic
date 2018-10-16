@@ -14,7 +14,6 @@ import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), raiseHandler)
 import Control.Monad.Effect.Internal (raiseHandler)
-import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
@@ -232,7 +231,6 @@ instance Ord address => ValueRoots address Type where
 
 runFunction :: ( Member (Allocator address) effects
                , Member (Deref Type) effects
-               , Member (Env address) effects
                , Member (Exc (Return Type)) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
