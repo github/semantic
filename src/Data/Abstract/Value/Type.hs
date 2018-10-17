@@ -235,6 +235,7 @@ runFunction :: ( Member (Allocator address) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
+               , Member (State Span) effects
                , Member (Resumable (BaseError TypeError)) effects
                , Member (Resumable (BaseError (AddressError address Type))) effects
                , Member (State (Heap address address Type)) effects
@@ -251,23 +252,25 @@ runFunction = interpret $ \case
   Abstract.Function name params _ body -> do
     functionSpan <- ask @Span -- TODO: This might be wrong
     declare (Declaration name) functionSpan Nothing
+
     currentScope' <- currentScope
     let lexicalEdges = Map.singleton Lexical [ currentScope' ]
     functionScope <- newScope lexicalEdges
     currentFrame' <- currentFrame
     let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
     functionFrame <- newFrame functionScope frameEdges
+    -- TODO: Store the frame
     withScopeAndFrame functionFrame $ do
-      (env, tvars) <- foldr (\ name rest -> do
-        addr <- alloc name
+      (_, tvars) <- foldr (\ name rest -> do
         tvar <- Var <$> fresh
-        -- TODO: Declare name in the scope graph?
-        -- span <- get @Span
-        -- address <- declare (Declaration name) span Nothing
+        span <- get @Span -- TODO: This span is probably wrong
+        declare (Declaration name) span Nothing
+        address <- lookupDeclaration (Declaration name)
         -- assign tvar values to names in the frame of the function?
-        bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
-    -- TODO: Probably declare name and create a new scope in the scope graph
-      (zeroOrMoreProduct tvars :->) <$> locally (catchReturn (bindAll env *> runFunction (Evaluator body)))
+        assign address tvar
+        bimap id (tvar :) <$> rest) (pure (undefined, [])) params
+      -- TODO: We may still want to represent this as a closure and not a function type
+      (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator body)))
 
   Abstract.Call op _ paramTypes -> do
     tvar <- fresh
