@@ -1,8 +1,12 @@
+{-# LANGUAGE DeriveAnyClass #-}
+
 module Data.Location
   ( Location(..)
   , Span(..)
   , Range(..)
   ) where
+
+import Prologue (Generic (..), NFData (..))
 
 import Data.JSON.Fields
 import Data.Range
@@ -13,7 +17,7 @@ data Location
   { locationByteRange :: {-# UNPACK #-} Range
   , locationSpan  :: {-# UNPACK #-} Span
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 instance ToJSONFields Location where
   toJSONFields Location{..} = toJSONFields locationByteRange <> toJSONFields locationSpan

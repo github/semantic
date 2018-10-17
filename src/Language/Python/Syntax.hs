@@ -25,7 +25,7 @@ import qualified Proto3.Wire.Decode as Decode
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
   | RelativeQualifiedName { path :: FilePath, maybeQualifiedName ::  Maybe QualifiedName }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message, NFData)
 
 instance MessageField QualifiedName where
   encodeMessageField num QualifiedName{..} = Encode.embedded num (encodeMessageField 1 paths)
@@ -103,14 +103,14 @@ resolvePythonModules q = do
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 FutureImport where liftEq = genericLiftEq
 instance Ord1 FutureImport where liftCompare = genericLiftCompare
@@ -119,7 +119,7 @@ instance Show1 FutureImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable FutureImport where
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
-  deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON)
+  deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON, NFData)
 
 toTuple :: Alias -> (Name, Name)
 toTuple Alias{..} = (aliasValue, aliasName)
@@ -168,7 +168,7 @@ evalQualifiedImport name path = letrec' name $ \addr -> do
   unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Message1 QualifiedImport where
   liftEncodeMessage _ _ QualifiedImport{..} = encodeMessageField 1 qualifiedImportFrom
@@ -200,7 +200,7 @@ instance Evaluatable QualifiedImport where
         makeNamespace name addr Nothing (void (require path >> go (NonEmpty.fromList xs)))
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -222,7 +222,7 @@ instance Evaluatable QualifiedAliasedImport where
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Ord1 Ellipsis where liftCompare = genericLiftCompare
@@ -233,7 +233,7 @@ instance Evaluatable Ellipsis
 
 
 data Redirect a = Redirect { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Ord1 Redirect where liftCompare = genericLiftCompare

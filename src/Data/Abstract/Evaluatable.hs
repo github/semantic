@@ -257,6 +257,18 @@ data EvalError return where
 deriving instance Eq (EvalError return)
 deriving instance Show (EvalError return)
 
+instance NFData1 EvalError where
+  liftRnf _ x = case x of
+    NoNameError -> ()
+    IntegerFormatError i -> rnf i
+    FloatFormatError i -> rnf i
+    RationalFormatError i -> rnf i
+    DefaultExportError -> ()
+    ExportError p n -> rnf p `seq` rnf n
+
+instance NFData return => NFData (EvalError return) where
+  rnf = liftRnf rnf
+
 instance Eq1 EvalError where
   liftEq _ NoNameError        NoNameError                  = True
   liftEq _ DefaultExportError DefaultExportError           = True
@@ -287,8 +299,15 @@ throwEvalError = throwBaseError
 data UnspecializedError a b where
   UnspecializedError :: String -> UnspecializedError value value
 
+instance NFData1 (UnspecializedError a) where
+  liftRnf _ (UnspecializedError s) = rnf s
+
+instance NFData b => NFData (UnspecializedError a b) where
+  rnf = liftRnf rnf
+
 deriving instance Eq (UnspecializedError a b)
 deriving instance Show (UnspecializedError a b)
+
 
 instance Eq1 (UnspecializedError a) where
   liftEq _ (UnspecializedError a) (UnspecializedError b) = a == b

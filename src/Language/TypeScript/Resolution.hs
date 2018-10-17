@@ -30,7 +30,7 @@ import           Data.Abstract.Path
 import qualified Data.Language as Language
 
 data IsRelative = Unknown | Relative | NonRelative
-  deriving (Bounded, Enum, Finite, MessageField, Named, Eq, Generic, Hashable, Ord, Show, ToJSON)
+  deriving (Bounded, Enum, Finite, MessageField, Named, Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
 
 instance Primitive IsRelative where
   encodePrimitive = Encode.enum
@@ -41,7 +41,7 @@ instance HasDefault IsRelative where
   def = Unknown
 
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
-  deriving (Eq, Generic, Hashable, Message, Named, Ord, Show, ToJSON)
+  deriving (Eq, Generic, Hashable, Message, Named, Ord, Show, ToJSON, NFData)
 
 instance MessageField ImportPath where
   encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
