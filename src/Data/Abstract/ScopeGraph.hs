@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DeriveAnyClass, GADTs #-}
 module Data.Abstract.ScopeGraph
   ( ScopeGraph(..)
   , Path
@@ -40,7 +40,7 @@ data Scope scopeAddress = Scope {
     edges        :: Map EdgeLabel [scopeAddress] -- Maybe Map EdgeLabel [Path scope]?
   , references   :: Map Reference (Path scopeAddress)
   , declarations :: Map Declaration (Span, Maybe scopeAddress)
-  } deriving (Eq, Show, Ord)
+  } deriving (Eq, Show, Ord, Generic, NFData)
 
 
 data ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope), currentScope :: Maybe scope }
@@ -51,6 +51,8 @@ instance Ord scope => Lower (ScopeGraph scope) where
 deriving instance Eq address => Eq (ScopeGraph address)
 deriving instance Show address => Show (ScopeGraph address)
 deriving instance Ord address => Ord (ScopeGraph address)
+deriving instance Generic (ScopeGraph address)
+deriving instance NFData scope => NFData (ScopeGraph scope)
 
 data Path scope where
   -- | Construct a direct path to a declaration.
@@ -61,6 +63,8 @@ data Path scope where
 deriving instance Eq scope => Eq (Path scope)
 deriving instance Show scope => Show (Path scope)
 deriving instance Ord scope => Ord (Path scope)
+deriving instance Generic (Path scope)
+deriving instance NFData scope => NFData (Path scope)
 
 -- Returns the declaration of a path.
 pathDeclaration :: Path scope -> Declaration
@@ -167,15 +171,15 @@ associatedScope declaration g@ScopeGraph{..} = go (Map.keys graph)
     go [] = Nothing
 
 newtype Reference = Reference Name
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 newtype Declaration = Declaration Name
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | The type of edge from a scope to its parent scopes.
 -- Either a lexical edge or an import edge in the case of non-lexical edges.
 data EdgeLabel = Lexical | Import
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 data Frame scopeAddress frameAddress value = Frame {
     scopeAddress :: scopeAddress

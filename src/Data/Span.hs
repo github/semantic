@@ -24,14 +24,14 @@ data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
   }
-  deriving (Eq, Ord, Generic, Hashable)
+  deriving (Eq, Ord, Generic, Hashable, NFData)
 
 -- | A Span of position information
 data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
   }
-  deriving (Eq, Ord, Generic, Hashable, Named)
+  deriving (Eq, Ord, Generic, Hashable, Named, NFData)
 
 
 -- Instances

@@ -138,6 +138,14 @@ data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Set value)
   UninitializedAddress :: address -> AddressError address value value
 
+instance (NFData address, NFData value) => NFData1 (AddressError address value) where
+  liftRnf _ x = case x of
+    UnallocatedAddress a -> rnf a
+    UninitializedAddress a -> rnf a
+
+instance (NFData address, NFData value, NFData resume) => NFData (AddressError address value resume) where
+  rnf = liftRnf rnf
+
 deriving instance Eq address => Eq (AddressError address value resume)
 deriving instance Show address => Show (AddressError address value resume)
 instance Show address => Show1 (AddressError address value) where

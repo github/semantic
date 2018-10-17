@@ -9,6 +9,8 @@ import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
+import qualified Language.TypeScript.Assignment as Ruby
+import qualified Data.Syntax.Literal as Literal
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
@@ -22,6 +24,7 @@ import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
 import           Data.Project hiding (readFile)
+import           Data.Term
 import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
 import           Parsing.Parser
@@ -82,6 +85,8 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
   pure (x, (() <$) <$> modules)
 
 evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
+
+nfPythonProject = rnf ((injectTerm () (Literal.Float "5.0")) :: Term (Sum Ruby.Syntax) ())
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
 

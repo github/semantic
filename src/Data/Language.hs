@@ -33,7 +33,7 @@ data Language
     | Ruby
     | TypeScript
     | PHP
-    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField)
+    deriving (Eq, Generic, Ord, Read, Show, Bounded, Hashable, ToJSON, Named, Enum, MessageField, NFData)
 
 class SLanguage (lang :: Language) where
   reflect :: proxy lang -> Language
