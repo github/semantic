@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs #-}
 
 module Data.Abstract.Environment
   ( Environment(..)
@@ -74,7 +74,7 @@ data EnvironmentError address return where
 instance NFData1 (EnvironmentError address) where
   liftRnf _ (FreeVariable n) = rnf n
 
-instance (NFData address, NFData return) => NFData (EnvironmentError address return) where
+instance (NFData return) => NFData (EnvironmentError address return) where
   rnf = liftRnf rnf
 
 deriving instance Eq (EnvironmentError address return)
