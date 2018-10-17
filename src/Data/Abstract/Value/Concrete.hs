@@ -72,6 +72,7 @@ runFunction :: forall address effects body a. ( Member (Allocator address) effec
                , Member (Reader ModuleInfo) effects
                , Member (Reader PackageInfo) effects
                , Member (Reader Span) effects
+               , Member (State Span) effects
                , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
                , Member (Resumable (BaseError (ValueError address body))) effects
                , Member (Resumable (BaseError (ScopeError address))) effects
@@ -91,10 +92,22 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
     moduleInfo <- currentModule
     i <- fresh
     -- TODO: Declare all params
+    span <- get @Span
+    declare (Declaration name) span Nothing
+
     currentScope' <- currentScope
     let lexicalEdges = Map.singleton Lexical [ currentScope' ]
     scope <- newScope lexicalEdges
-    pure $ (Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) (scope :: address))
+
+    withScope scope $ do
+      for_ params $ \name -> do
+        span <- get @Span -- TODO: This is definitely wrong
+        declare (Declaration name) span Nothing
+
+    let closure = (Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) scope)
+    address <- lookupDeclaration (Declaration name)
+    assign address closure
+    pure closure
   Abstract.Call op self params -> do
     case op of
       Closure packageInfo moduleInfo _ names (ClosureBody _ body) scope -> do
@@ -106,10 +119,10 @@ runFunction toEvaluator fromEvaluator = interpret $ \case
           let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
           frameAddress <- newFrame scope frameEdges
           withFrame frameAddress $ do
+            for_ (zip names params) $ \(name, param) -> do
+              addr <- lookupDeclaration (Declaration name)
+              assign addr param
             catchReturn (runFunction toEvaluator fromEvaluator (toEvaluator body))
-
-          -- bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-          -- let fnCtx = EvalContext (Just self) (Env.push env)
       _ -> throwValueError (CallError op)
 
 runBoolean :: ( Member (Reader ModuleInfo) effects
@@ -178,7 +191,6 @@ instance ( Coercible body (Eff effects)
          , Member (Allocator address) effects
          , Member (Abstract.Boolean (Value address body)) effects
          , Member (Deref (Value address body)) effects
-         , Member (Env address) effects
          , Member (Exc (LoopControl (Value address body))) effects
          , Member (Exc (Return (Value address body))) effects
          , Member Fresh effects
