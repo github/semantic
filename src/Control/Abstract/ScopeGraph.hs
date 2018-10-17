@@ -12,10 +12,13 @@ module Control.Abstract.ScopeGraph
   , Reference(..)
   , EdgeLabel(..)
   , currentScope
+  , insertEdge
   , withScope
   , associatedScope
   , putDeclarationScope
+  , insertImportReference
   , lookupScopePath
+  , lookupScope
   , Allocator(..)
   , alloc
   , Address(..)
@@ -60,6 +63,13 @@ putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
 reference :: forall address effects value. (Ord address, Member (State (ScopeGraph address)) effects) => Reference -> Declaration -> Evaluator address value effects ()
 reference ref = modify @(ScopeGraph address) . (ScopeGraph.reference ref)
 
+-- |
+insertEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+           => EdgeLabel
+           -> scopeAddress
+           -> Evaluator scopeAddress value effects ()
+insertEdge label target = modify (ScopeGraph.insertEdge label target)
+
 -- | Bind all of the scopes from a 'ScopeGraph'.
 bindAll :: ( Ord address, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError (ScopeError address))) effects, Member (State (ScopeGraph address)) effects ) => ScopeGraph address -> Evaluator address value effects ()
 bindAll oldGraph = do
@@ -98,6 +108,33 @@ lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
              => address
              -> Evaluator address value effects (Scope address)
 lookupScope address = maybeM (throwScopeError LookupError) . ScopeGraph.lookupScope address =<< get
+
+insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) effects
+                        , Member (Reader ModuleInfo) effects
+                        , Member (Reader Span) effects
+                        , Member (State (ScopeGraph address)) effects
+                        , Ord address
+                        )
+                      => Reference
+                      -> Declaration
+                      -> ScopeGraph address
+                      -> address
+                      -> Scope address
+                      -> Evaluator address value effects ()
+insertImportReference ref decl g scopeAddress scope = do
+  newScope <- maybeM (throwScopeError LookupError) (ScopeGraph.insertImportReference ref decl g scopeAddress scope)
+  insertScope scopeAddress newScope
+
+insertScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
+               , Member (Reader ModuleInfo) effects
+               , Member (Reader Span) effects
+               , Member (State (ScopeGraph address)) effects
+               , Ord address
+               )
+            => address
+            -> Scope address
+            -> Evaluator address value effects ()
+insertScope scopeAddress scope = modify (ScopeGraph.insertScope scopeAddress scope)
 
 lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) effects
                 , Member (Reader ModuleInfo) effects
