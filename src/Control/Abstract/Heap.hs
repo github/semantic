@@ -9,6 +9,7 @@ module Control.Abstract.Heap
 , getHeap
 , putHeap
 , alloc
+, lookupDeclaration
 , deref
 , assign
 , newFrame
