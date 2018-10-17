@@ -6,6 +6,7 @@ module Parsing.TreeSitter
 
 import Prologue hiding (bracket)
 
+import           Control.Concurrent.Async
 import qualified Control.Exception as Exc (bracket)
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Resource
@@ -74,8 +75,10 @@ parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (l
 
   trace $ "tree-sitter: beginning parsing " <> blobPath
 
+  parsing <- liftIO . async $ runParser parser blobSource
+
   -- Kick the parser off asynchronously and wait according to the provided timeout.
-  res <- timeout parseTimeout $ liftIO (runParser parser blobSource)
+  res <- timeout parseTimeout $ liftIO (wait parsing)
 
   case res of
     Just Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
