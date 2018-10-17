@@ -1,8 +1,8 @@
 {-# LANGUAGE CPP #-}
 #ifdef COMPUTE_GIT_SHA
 {-# OPTIONS_GHC -fforce-recomp #-} -- So that gitHash is correct.
-#endif
 {-# LANGUAGE TemplateHaskell #-}
+#endif
 module Semantic.Version
   ( buildSHA
   , buildVersion
