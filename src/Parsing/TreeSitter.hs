@@ -6,10 +6,9 @@ module Parsing.TreeSitter
 
 import Prologue hiding (bracket)
 
-import           Control.Concurrent.Async
 import qualified Control.Exception as Exc (bracket)
 import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception
+import           Control.Monad.Effect.Resource
 import           Control.Monad.Effect.Trace
 import           Control.Monad.IO.Class
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
@@ -57,18 +56,26 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Timeout effects, Member Trace effects, PureEffects effects) => Duration -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
-parseToAST parseTimeout language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+parseToAST :: ( Bounded grammar
+              , Enum grammar
+              , Member (Lift IO) effects
+              , Member Resource effects
+              , Member Timeout effects
+              , Member Trace effects
+              )
+           => Duration
+           -> Ptr TS.Language
+           -> Blob
+           -> Eff effects (Maybe (AST [] grammar))
+parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
   liftIO $ do
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
 
   trace $ "tree-sitter: beginning parsing " <> blobPath
 
-  parsing <- liftIO . async $ runParser parser blobSource
-
   -- Kick the parser off asynchronously and wait according to the provided timeout.
-  res <- timeout parseTimeout $ liftIO (wait parsing)
+  res <- timeout parseTimeout $ liftIO (runParser parser blobSource)
 
   case res of
     Just Failed          -> Nothing  <$ trace ("tree-sitter: parsing failed " <> blobPath)
