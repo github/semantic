@@ -15,6 +15,7 @@ module Control.Abstract.ScopeGraph
   , withScope
   , associatedScope
   , putDeclarationScope
+  , lookupScopePath
   , Allocator(..)
   , alloc
   , Address(..)
@@ -98,6 +99,16 @@ lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
              -> Evaluator address value effects (Scope address)
 lookupScope address = maybeM (throwScopeError LookupError) . ScopeGraph.lookupScope address =<< get
 
+lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) effects
+                , Member (Reader ModuleInfo) effects
+                , Member (Reader Span) effects
+                , Member (State (ScopeGraph address)) effects
+                , Ord address
+                )
+             => Declaration
+             -> Evaluator address value effects (ScopeGraph.Path address)
+lookupScopePath declaration = maybeM (throwScopeError LookupPathError) . ScopeGraph.lookupScopePath declaration =<< get
+
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) effects) => Declaration -> Evaluator address value effects (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
@@ -128,6 +139,7 @@ throwScopeError = throwBaseError
 data ScopeError address return where
   ScopeError :: Declaration -> Span -> ScopeError address (Address address)
   LookupError :: ScopeError address (Scope address)
+  LookupPathError :: ScopeError address (ScopeGraph.Path address)
   CurrentScopeError :: ScopeError address address
 
 deriving instance Eq (ScopeError address return)
@@ -137,6 +149,7 @@ instance Eq address => Eq1 (ScopeError address) where
   liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
   liftEq _ CurrentScopeError CurrentScopeError = True
   liftEq _ LookupError LookupError = True
+  liftEq _ LookupPathError LookupPathError = True
   liftEq _ _ _ = False
 
 alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
