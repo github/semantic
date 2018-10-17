@@ -49,7 +49,11 @@ instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
-    rvalBox =<< evalRequire modulePath alias
+    span <- get @Span
+    (scopeGraph, value) <- require modulePath
+    bindAll scopeGraph
+    declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph)
+    rvalBox unit
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
