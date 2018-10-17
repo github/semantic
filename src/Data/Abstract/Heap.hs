@@ -12,10 +12,12 @@ module Data.Abstract.Heap
   , heapSize
   , currentFrame
   , Position(..)
+  , pathPosition
+  , pathDeclaration
   ) where
 
 import Data.Abstract.Live
-import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Address(..))
+import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Address(..), pathPosition, pathDeclaration)
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
@@ -58,13 +60,13 @@ setSlot Address{..} value h@Heap{} =
         h { heap = Map.insert address (frame { slots = IntMap.insert (unPosition position) value slotMap }) (heap h) }
       Nothing -> h
 
-lookup :: (Ord address, Ord scope) => Heap scope address value -> address -> Path scope -> Declaration -> Maybe scope
-lookup heap address (DPath d _) declaration = guard (d == declaration) >> scopeLookup address heap
-lookup heap address (EPath label scope path) declaration = do
+lookup :: (Ord address, Ord scope) => address -> Path scope -> Declaration -> Heap scope address value -> Maybe scope
+lookup address (DPath d _) declaration heap = guard (d == declaration) >> scopeLookup address heap
+lookup address (EPath label scope path) declaration heap = do
     frame <- frameLookup address heap
     scopeMap <- Map.lookup label (links frame)
     nextAddress <- Map.lookup scope scopeMap
-    lookup heap nextAddress path declaration
+    lookup nextAddress path declaration heap
 
 newFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Heap scope address value -> Heap scope address value
 newFrame scope address links = insertFrame address (Frame scope links mempty)
