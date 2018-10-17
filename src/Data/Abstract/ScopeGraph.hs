@@ -134,10 +134,26 @@ insertImportReference ref decl g@ScopeGraph{..} scopeAddress scope = do
               -- Return the first path to the declaration through the scopes.
               getFirst (foldMap (First . (\scope -> go scope (path . EPath edge scope))) scopes)
 
-lookupDeclaration :: Declaration -> Seq (Declaration, (Span, Maybe address)) -> Maybe ((Declaration, (Span, Maybe address)), Position)
-lookupDeclaration declaration seq = do
-      index <- Seq.findIndexR ((declaration ==) . fst) seq
-      (, Position index) <$> Seq.lookup index seq
+lookupScopePath :: Ord scopeAddress => Declaration -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+lookupScopePath declaration g@ScopeGraph{..} = do
+  currentAddress <- currentScope
+  go currentAddress id
+  where
+    go address path =
+      case lookupDeclaration declaration address g of
+        Just (_, index) -> Just $ path (DPath declaration index)
+        Nothing -> traverseEdges Import <|> traverseEdges Lexical
+          where
+            traverseEdges edge = do
+              linkMap <- linksOfScope address g
+              scopes <- Map.lookup edge linkMap
+              getFirst (foldMap (First . (\scope -> go scope (path . EPath edge scope))) scopes)
+
+lookupDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe ((Declaration, (Span, Maybe scopeAddress)), Position)
+lookupDeclaration declaration scope g = do
+  dataSeq <- ddataOfScope scope g
+  index <- Seq.findIndexR ((declaration ==) . fst) dataSeq
+  (, Position index) <$> Seq.lookup index dataSeq
 
 -- | Insert associate the given address to a declaration in the scope graph.
 insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
