@@ -189,7 +189,6 @@ library
                      , Semantic.Parse
                      , Semantic.REPL
                      , Semantic.Resolution
-                     , Semantic.Resource
                      , Semantic.Task
                      , Semantic.Telemetry
                      , Semantic.Telemetry.AsyncQueue

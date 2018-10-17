@@ -62,6 +62,7 @@ import           Control.Monad
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
+import           Control.Monad.Effect.Resource
 import           Control.Monad.Effect.Trace
 import           Data.Blob
 import           Data.Bool
@@ -86,7 +87,6 @@ import           Semantic.Distribute
 import           Semantic.Timeout
 import qualified Semantic.IO as IO
 import           Semantic.Resolution
-import           Semantic.Resource
 import           Semantic.Telemetry
 import           Serializing.Format hiding (Options)
 import           System.Exit (die)

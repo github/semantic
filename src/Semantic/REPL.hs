@@ -5,6 +5,7 @@ module Semantic.REPL
 ) where
 
 import Control.Abstract hiding (Continue, List, string)
+import Control.Monad.Effect.Resource
 import Control.Monad.IO.Class
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
@@ -31,7 +32,6 @@ import Semantic.Distribute
 import Semantic.Graph
 import Semantic.IO as IO
 import Semantic.Resolution
-import Semantic.Resource
 import Semantic.Task hiding (Error)
 import Semantic.Telemetry
 import Semantic.Timeout

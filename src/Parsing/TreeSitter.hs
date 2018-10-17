@@ -8,6 +8,7 @@ import Prologue hiding (bracket)
 
 import qualified Control.Exception as Exc (bracket)
 import           Control.Monad.Effect
+import           Control.Monad.Effect.Resource
 import           Control.Monad.Effect.Trace
 import           Control.Monad.IO.Class
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
@@ -22,7 +23,6 @@ import Data.Location
 import Data.Source
 import Data.Span
 import Data.Term
-import Semantic.Resource
 import Semantic.Timeout
 
 import qualified TreeSitter.Language as TS
