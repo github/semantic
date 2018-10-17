@@ -16,7 +16,7 @@ import Data.Sum
 import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
-import Data.Union
+import Data.Union hiding (forAll)
 import Diffing.Algorithm
 import Diffing.Interpreter
 import Prelude
