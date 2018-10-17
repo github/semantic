@@ -9,7 +9,8 @@ import qualified Data.Text as T
 import           Proto3.Suite
 
 import           Data.Abstract.Evaluatable as Evaluatable
-import           Control.Abstract.ScopeGraph hiding (Import)
+import           Control.Abstract.ScopeGraph hiding (Import, currentScope)
+import           qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
@@ -25,13 +26,17 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedBinds <- fst . snd <$> require modulePath
-    bindAll (renamed importedBinds)
+    (scopeGraph, value) <- require modulePath
+    bindAll scopeGraph
+    if Prologue.null symbols then
+      maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+    else do
+      scopeAddress <- newScope mempty
+      scope <- lookupScope scopeAddress
+      for_ symbols $ \Alias{..} ->
+        insertImportReference (Reference aliasName) (Declaration aliasValue) scopeGraph scopeAddress scope
+      insertEdge ScopeGraph.Import scopeAddress
     rvalBox unit
-    where
-      renamed importedBinds
-        | Prologue.null symbols = importedBinds
-        | otherwise = Env.aliasBindings (toTuple <$> symbols) importedBinds
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
