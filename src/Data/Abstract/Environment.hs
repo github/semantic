@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs #-}
 
 module Data.Abstract.Environment
   ( Environment(..)
@@ -40,7 +40,8 @@ import           Prologue
 
 -- | A map of names to values. Represents a single scope level of an environment chain.
 newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
-  deriving (Eq, Ord)
+  deriving stock (Eq, Ord, Generic)
+  deriving anyclass (NFData)
 
 instance Semigroup (Bindings address) where
   (<>) (Bindings a) (Bindings b) = Bindings (a <> b)
@@ -60,14 +61,21 @@ instance Show address => Show (Bindings address) where
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
 newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings address) }
-  deriving (Eq, Ord)
+  deriving stock (Eq, Ord, Generic)
+  deriving anyclass (NFData)
 
 data EvalContext address = EvalContext { ctxSelf :: Maybe address, ctxEnvironment :: Environment address }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | Errors involving the environment.
 data EnvironmentError address return where
   FreeVariable :: Name -> EnvironmentError address address
+
+instance NFData1 (EnvironmentError address) where
+  liftRnf _ (FreeVariable n) = rnf n
+
+instance (NFData return) => NFData (EnvironmentError address return) where
+  rnf = liftRnf rnf
 
 deriving instance Eq (EnvironmentError address return)
 deriving instance Show (EnvironmentError address return)

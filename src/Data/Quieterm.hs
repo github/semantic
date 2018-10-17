@@ -4,6 +4,7 @@ module Data.Quieterm
 , quieterm
 ) where
 
+import Control.DeepSeq
 import Data.Abstract.Declarations (Declarations)
 import Data.Abstract.FreeVariables (FreeVariables)
 import Data.Functor.Classes
@@ -35,6 +36,12 @@ instance Show1 syntax => Show1 (Quieterm syntax) where
 
 instance Show1 syntax => Show (Quieterm syntax ann) where
   showsPrec = liftShowsPrec (const (const id)) (const id)
+
+instance NFData1 f => NFData1 (Quieterm f) where
+  liftRnf rnf = go where go x = liftRnf2 rnf go (unQuieterm x)
+
+instance (NFData1 f, NFData a) => NFData (Quieterm f a) where
+  rnf = liftRnf rnf
 
 quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
 quieterm = cata Quieterm

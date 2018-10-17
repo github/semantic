@@ -17,7 +17,7 @@ import Proto3.Wire.Decode as Decode
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
-  deriving (Eq, Generic, Named)
+  deriving (Eq, Generic, Named, NFData)
 
 emptyRange :: Range
 emptyRange = Range 0 0
