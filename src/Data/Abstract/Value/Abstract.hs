@@ -21,6 +21,7 @@ runFunction :: ( Member (Allocator address) effects
                , Member Fresh effects
                , Member (Reader ModuleInfo) effects
                , Member (Reader Span) effects
+               , Member (State Span) effects
                , Member (State (ScopeGraph address)) effects
                , Member (Resumable (BaseError (ScopeError address))) effects
                , Member (Resumable (BaseError (HeapError address))) effects
@@ -43,12 +44,13 @@ runFunction = interpret $ \case
     functionFrame <- newFrame functionScope frameEdges
     withScopeAndFrame functionFrame $ do
     -- TODO: Use scope graph and heap graph
-      env <- foldr (\ name rest -> do
-        addr <- alloc name
-        -- TODO: Declare name in the scope graph?
-        -- assign addr Abstract
-        Env.insert name addr <$> rest) (pure lowerBound) params
-      locally (bindAll env *> catchReturn (runFunction (Evaluator body)))
+      for_ params $ \name -> do
+        span <- get @Span -- TODO: This span is probably wrong
+        declare (Declaration name) span Nothing
+        address <- lookupDeclaration (Declaration name)
+        -- assign tvar values to names in the frame of the function?
+        assign address Abstract
+      catchReturn (runFunction (Evaluator body))
   Call _ _ params -> do
     pure Abstract
 
