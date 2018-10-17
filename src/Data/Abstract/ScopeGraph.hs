@@ -9,6 +9,7 @@ module Data.Abstract.ScopeGraph
   , insertImportReference
   , newScope
   , insertScope
+  , insertEdge
   , Path(..)
   , pathDeclaration
   , pathOfRef
@@ -155,6 +156,15 @@ lookupDeclaration declaration scope g = do
   dataSeq <- ddataOfScope scope g
   index <- Seq.findIndexR ((declaration ==) . fst) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
+
+insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+insertEdge label target g@ScopeGraph{..} = fromMaybe g $ do
+  scopeAddress <- currentScope
+  currentScope' <- lookupScope scopeAddress g
+  scopes <- Map.lookup label (edges currentScope')
+  let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
+  pure (g { graph = Map.insert scopeAddress newScope graph })
+
 
 -- | Insert associate the given address to a declaration in the scope graph.
 insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
