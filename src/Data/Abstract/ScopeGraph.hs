@@ -18,6 +18,7 @@ module Data.Abstract.ScopeGraph
   , Reference(..) -- TODO don't export these constructors
   , ScopeGraph(..)
   , lookupScope
+  , lookupScopePath
   , Scope(..)
   , scopeOfRef
   ) where
