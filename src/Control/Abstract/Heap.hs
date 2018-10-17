@@ -32,6 +32,7 @@ import Control.Abstract.Roots
 import Data.Abstract.Configuration
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
+import Data.Abstract.ScopeGraph (Path(..))
 import Data.Abstract.Heap (Heap, Position(..))
 import Control.Abstract.ScopeGraph
 import Data.Abstract.Live
@@ -39,6 +40,7 @@ import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Span (Span)
 import qualified Data.Set as Set
+import qualified Data.Map.Strict as Map
 import Prologue
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
@@ -151,7 +153,7 @@ define declaration def = withCurrentCallStack callStack $ do
   span <- ask @Span -- TODO: This Span is most definitely wrong
   addr <- declare declaration span Nothing
   value <- def
-  value <$ assign addr value
+  value <$ assign addr value -- TODO: Stop passing in an Address of scopes.
 
 -- | Associate an empty child scope with a declaration and then locally evaluate the body within an associated frame.
 withChildFrame :: ( Member (Allocator address) effects
@@ -186,6 +188,64 @@ deref :: ( Member (Deref value) effects
       -> Evaluator address value effects value
 -- TODO: THIS IS WRONG we need to call Heap.lookup
 deref addr@Address{..} = gets (Heap.getSlot addr) >>= maybeM (throwAddressError (UnallocatedAddress address)) >>= send . DerefCell >>= maybeM (throwAddressError (UninitializedAddress address))
+
+
+lookupDeclaration :: ( Member (State (Heap address address value)) effects
+                     , Member (State (ScopeGraph address)) effects
+                     , Member (Resumable (BaseError (ScopeError address))) effects
+                     , Member
+                     (Resumable (BaseError (HeapError address))) effects
+                     , Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     , Ord address
+                     )
+                  => Declaration
+                  -> Evaluator address value effects (Address address)
+lookupDeclaration decl = do
+  path <- lookupScopePath decl
+  frameAddress <- lookupFrameAddress path
+  pure (Address frameAddress (Heap.pathPosition path))
+
+-- | Follow a path through the heap and return the frame address associated with the declaration.
+lookupFrameAddress :: ( Member (State (Heap address address value)) effects
+                     , Member (State (ScopeGraph address)) effects
+                     , Member (Reader ModuleInfo) effects
+                     , Member (Reader Span) effects
+                     , Member (Resumable (BaseError (HeapError address))) effects
+                     , Ord address
+                     )
+                  => Path address
+                  -> Evaluator address value effects address
+lookupFrameAddress path = do
+  frameAddress <- currentFrame
+  go path frameAddress
+  where
+    go path address = case path of
+      DPath decl position -> pure address
+      EPath edge nextScopeAddress path' -> do
+        linkMap <- frameLinks address
+        let frameAddress = do
+              scopeMap <- Map.lookup edge linkMap
+              Map.lookup nextScopeAddress scopeMap
+        maybe (throwHeapError $ LookupPathError path') (go path') frameAddress
+
+frameLinks :: forall address value effects. ( Member (State (Heap address address value)) effects
+              , Member (Resumable (BaseError (HeapError address))) effects
+              , Member (Reader ModuleInfo) effects
+              , Member (Reader Span) effects
+              , Ord address
+              )
+          => address
+          -> Evaluator address value effects (Map EdgeLabel (Map address address)) -- TODO: Change this to Map scope address
+frameLinks address = maybeM (throwHeapError $ LookupLinksError address) . Heap.frameLinks address =<< get @(Heap address address value)
+
+
+
+-- lookupDeclaration :: Declaration -> address -> ScopeGraph address -> Maybe (Address address)
+-- lookupDeclaration decl address g = do
+--   dataMap <- ddataOfScope address g
+--   (_, position) <- lookupDeclaration decl dataMap
+--   pure (Address address position)
 
 
 -- | Write a value to the given frame address in the 'Heap'.
@@ -245,6 +305,8 @@ instance Effect (Deref value) where
 data HeapError address resume where
   EmptyHeapError :: HeapError address address
   LookupError :: address -> HeapError address address
+  LookupLinksError :: address ->  HeapError address (Map EdgeLabel (Map address address))
+  LookupPathError :: Path address ->  HeapError address address
 
 deriving instance Eq address => Eq (HeapError address resume)
 deriving instance Show address => Show (HeapError address resume)
@@ -252,6 +314,8 @@ instance Show address => Show1 (HeapError address) where
   liftShowsPrec _ _ = showsPrec
 instance Eq address => Eq1 (HeapError address) where
   liftEq _ EmptyHeapError EmptyHeapError = True
+  liftEq _ (LookupError a) (LookupError b) = a == b
+  liftEq _ (LookupLinksError a) (LookupLinksError b) = a == b
 
 throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) effects
                    , Member (Reader ModuleInfo) effects
