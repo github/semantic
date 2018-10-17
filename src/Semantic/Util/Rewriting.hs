@@ -1,29 +1,27 @@
 {-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-{-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists #-}
+{-# OPTIONS_GHC -Wno-missing-signatures -Wno-missing-export-lists -Wno-incomplete-uni-patterns #-}
 module Semantic.Util.Rewriting where
 
-import Prelude hiding (id, (.), readFile)
+import Prelude hiding (id, readFile, (.))
+import Prologue
 
-import           Control.Abstract
-import           Control.Abstract.Matching
 import           Control.Category
-import           Data.Blob
 import qualified Data.ByteString.Char8 as BC
+import           Text.Show.Pretty (pPrint)
+
+import           Control.Abstract.Matching
+import           Control.Rewriting hiding (fromMatcher, target)
+import           Data.Blob
 import           Data.History
 import qualified Data.Language as Language
-import           Data.Machine
-import           Data.Machine.Runner
 import           Data.Project hiding (readFile)
 import qualified Data.Source as Source
-import qualified Data.Sum as Sum
 import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 import           Language.JSON.PrettyPrint
-import           Language.Ruby.PrettyPrint
 import           Language.Python.PrettyPrint
-import           Matching.Core
+import           Language.Ruby.PrettyPrint
 import           Parsing.Parser
-import           Prologue hiding (weaken)
 import           Reprinting.Pipeline
 import           Semantic.IO as IO
 import           Semantic.Task
@@ -31,7 +29,7 @@ import           Semantic.Task
 testPythonFile = do
   let path = "test/fixtures/python/reprinting/function.py"
   src  <- blobSource <$> readBlobFromPath (File path Language.Python)
-  tree <- parseFile miniPythonParser path
+  tree <- parseFile' miniPythonParser path
   pure (src, tree)
 
 testPythonPipeline = do
@@ -53,7 +51,7 @@ testPythonPipeline''' = do
 testRubyFile = do
   let path = "test/fixtures/ruby/reprinting/infix.rb"
   src  <- blobSource <$> readBlobFromPath (File path Language.Ruby)
-  tree <- parseFile miniRubyParser path
+  tree <- parseFile' miniRubyParser path
   pure (src, tree)
 
 testRubyPipeline = do
@@ -77,79 +75,57 @@ printToTerm = either (putStrLn . show) (BC.putStr . Source.sourceBytes)
 testJSONFile = do
   let path = "test/fixtures/javascript/reprinting/map.json"
   src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
-  tree <- parseFile jsonParser path
+  tree <- parseFile' jsonParser path
   pure (src, tree)
 
-renameKey :: (Literal.TextElement :< fs, Literal.KeyValue :< fs, Apply Functor fs) => Term (Sum fs) History -> Term (Sum fs) History
-renameKey p = case projectTerm p of
-  Just (Literal.KeyValue k v)
-    | Just (Literal.TextElement x) <- Sum.project (termOut k)
-    , x == "\"foo\""
-    -> let newKey = termIn (termAnnotation k) (inject (Literal.TextElement "\"fooA\""))
-       in remark Refactored (termIn (termAnnotation p) (inject (Literal.KeyValue newKey v)))
-  _ -> Term (fmap renameKey (unTerm p))
+renameKey :: ( Literal.TextElement :< fs
+             , Apply Functor fs
+             , term ~ Term (Sum fs) History
+             )
+          => Rewrite (env, term) (Literal.KeyValue term)
+renameKey = do
+  Literal.KeyValue k v <- id
+  guard (projectTerm k == Just (Literal.TextElement "\"foo\""))
+  new <- modified (Literal.TextElement "\"fooA\"")
+  pure (Literal.KeyValue new v)
 
 testRenameKey = do
   (src, tree) <- testJSONFile
-  let tagged = renameKey (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere' renameKey) () (mark Unmodified tree)
+  pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-increaseNumbers :: (Literal.Float :< fs, Apply Functor fs) => Term (Sum fs) History -> Term (Sum fs) History
-increaseNumbers p = case Sum.project (termOut p) of
-  Just (Literal.Float t) -> remark Refactored (termIn (termAnnotation p) (inject (Literal.Float (t <> "0"))))
-  Nothing                -> Term (fmap increaseNumbers (unTerm p))
+increaseNumbers :: (term ~ Term (Sum fs) History) => Rewrite (env, term) (Literal.Float term)
+increaseNumbers = do
+  (Literal.Float c) <- id
+  pure (Literal.Float (c <> "0"))
 
-addKVPair :: forall effs syntax term .
-  ( Apply Functor syntax
-  , Literal.Hash :< syntax
-  , Literal.Array :< syntax
-  , Literal.TextElement :< syntax
-  , Literal.KeyValue :< syntax
-  , term ~ Term (Sum syntax) History
-  ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.Hash term)) term
-addKVPair = repeatedly $ do
-  t <- await
-  Data.Machine.yield (either id injKVPair t)
-  where
-    injKVPair :: (term, Literal.Hash term) -> term
-    injKVPair (origTerm, Literal.Hash xs) =
-      remark Refactored (injectTerm ann (Literal.Hash (xs <> [newItem])))
-      where
-        newItem = termIn ann (inject (Literal.KeyValue k v))
-        k = termIn ann (inject (Literal.TextElement "\"added\""))
-        v = termIn ann (inject (Literal.Array []))
-        ann = termAnnotation origTerm
+addKVPair :: ( Literal.TextElement :< syn
+             , Literal.KeyValue :< syn
+             , Literal.Array :< syn
+             , Apply Functor syn
+             , term ~ Term (Sum syn) History
+             ) => Rewrite (env, term) (Literal.Hash term)
+addKVPair = do
+  Literal.Hash els <- id
+  k <- modified $ Literal.TextElement "\"added\""
+  v <- modified $ Literal.Array []
+  pair <- modified $ Literal.KeyValue k v
+  pure (Literal.Hash (pair : els))
 
 testAddKVPair = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (fromMatcher matchHash ~> addKVPair)) (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere addKVPair markRefactored) () (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
-overwriteFloats :: forall effs syntax term .
-  ( Apply Functor syntax
-  , Literal.Float :< syntax
-  , term ~ Term (Sum syntax) History
-  ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.Float term)) term
-overwriteFloats = repeatedly $ do
-  t <- await
-  Data.Machine.yield (either id injFloat t)
-  where injFloat :: (term, Literal.Float term) -> term
-        injFloat (term, _) = remark Refactored (termIn (termAnnotation term) (inject (Literal.Float "0")))
+overwriteFloats :: Rewrite (env, term) (Literal.Float term)
+overwriteFloats = pure (Literal.Float "0")
 
 testOverwriteFloats = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (fromMatcher matchFloat ~> overwriteFloats)) (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere overwriteFloats markRefactored) () (mark Unmodified tree)
+  pPrint tagged
   printToTerm $ runReprinter src defaultJSONPipeline tagged
-
-findKV ::
-  ( Literal.KeyValue :< syntax
-  , Literal.TextElement :< syntax
-  , term ~ Term (Sum syntax) History
-  ) =>
-  Text -> ProcessT (Eff effs) term (Either term (term, Literal.KeyValue term))
-findKV name = fromMatcher (kvMatcher name)
 
 kvMatcher :: forall fs term .
   ( Literal.KeyValue :< fs
@@ -163,41 +139,23 @@ kvMatcher name = matchM projectTerm target <* matchKey where
         match Literal.textElementContent $
           ensure (== name)
 
-changeKV :: forall effs syntax term .
-  ( Apply Functor syntax
-  , Literal.KeyValue :< syntax
-  , Literal.Array :< syntax
-  , Literal.Float :< syntax
-  , term ~ Term (Sum syntax) History
-  ) =>
-  ProcessT (Eff effs) (Either term (term, Literal.KeyValue term)) term
-changeKV = auto $ either id injKV
-  where
-    injKV :: (term, Literal.KeyValue term) -> term
-    injKV (term, Literal.KeyValue k v) = case projectTerm v of
-      Just (Literal.Array elems) -> remark Refactored (termIn ann (inject (Literal.KeyValue k (newArray elems))))
-      _ -> term
-      where newArray xs = termIn ann (inject (Literal.Array (xs <> [float])))
-            float = termIn ann (inject (Literal.Float "4"))
-            ann = termAnnotation term
+changeKV :: ( Apply Functor syntax
+            , Literal.Array :< syntax
+            , Literal.Float :< syntax
+            , term ~ Term (Sum syntax) History
+            )
+         => Rewrite (env, term) (Literal.KeyValue term)
+changeKV = do
+  (Literal.KeyValue k v) <- id
+  (Literal.Array vals) <- guardTerm v
+  let float = remark Refactored (injectTerm (annotation v) (Literal.Float "4"))
+  let newArr = remark Refactored (injectTerm (annotation v) (Literal.Array (float:vals)))
+  pure (Literal.KeyValue k newArr)
 
 testChangeKV = do
   (src, tree) <- testJSONFile
-  tagged <- runM $ cata (toAlgebra (findKV "\"bar\"" ~> changeKV)) (mark Unmodified tree)
+  let (Right tagged) = rewrite (somewhere' changeKV) () (mark Unmodified tree)
   printToTerm $ runReprinter src defaultJSONPipeline tagged
 
--- Temporary, until new KURE system lands.
-fromMatcher :: Matcher from to -> ProcessT (Eff effs) from (Either from (from, to))
-fromMatcher m = auto go where go x = maybe (Left x) (\y -> Right (x, y)) (stepMatcher x m)
-
--- Turn a 'ProccessT' into an FAlgebra.
-toAlgebra :: (Traversable (Base t), Corecursive t)
-          => ProcessT (Eff effs) t t
-          -> FAlgebra (Base t) (Eff effs t)
-toAlgebra m t = do
-  inner <- sequenceA t
-  res <- runT1 (source (Just (embed inner)) ~> m)
-  pure (fromMaybe (embed inner) res)
-
-parseFile :: Parser term -> FilePath -> IO term
-parseFile parser = runTask . (parse parser <=< readBlob . file)
+parseFile' :: Parser term -> FilePath -> IO term
+parseFile' parser = runTask . (parse parser <=< readBlob . file)
