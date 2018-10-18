@@ -15,7 +15,7 @@ import Development.GitRev
 import Paths_semantic (version)
 
 -- The SHA1 hash of this build of semantic.
--- If compiled as a development build, this will be all zeroes.
+-- If compiled as a development build, this will be @<development>@.
 buildSHA :: String
 #ifdef COMPUTE_GIT_SHA
 buildSHA = $(gitHash)
