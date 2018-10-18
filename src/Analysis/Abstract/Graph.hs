@@ -109,7 +109,7 @@ graphingPackages :: ( Member (Reader PackageInfo) sig
                     , Member (State (Graph ControlFlowVertex)) sig
                     , Member (Reader ControlFlowVertex) sig
                     , Carrier sig m
-                    , Applicative m
+                    , Monad m
                     )
                  => Open (Module term -> m a)
 graphingPackages recur m =
@@ -190,7 +190,7 @@ variableDefinition var = do
   context <- ask
   appendGraph (vertex context `connect` vertex var)
 
-appendGraph :: (Member (State (Graph v)) sig, Carrier sig m) => Graph v -> m ()
+appendGraph :: (Member (State (Graph v)) sig, Carrier sig m, Monad m) => Graph v -> m ()
 appendGraph = modify . (<>)
 
 
