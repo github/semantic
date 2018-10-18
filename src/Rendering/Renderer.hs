@@ -61,6 +61,8 @@ data TermRenderer output where
   DOTTermRenderer :: TermRenderer (Graph TermVertex)
   -- | Render to a 'ByteString' formatted using the 'Show' instance.
   ShowTermRenderer :: TermRenderer Builder
+  -- | Render just to tracking timing metrics
+  QuietTermRenderer :: TermRenderer Builder
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)

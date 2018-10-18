@@ -6,6 +6,8 @@ import           Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import           Analysis.PackageDef (HasPackageDef)
 import           Control.Monad.Effect.Exception
 import           Data.Blob
+import           Data.Either
+import           Data.ByteString.Builder (stringUtf8)
 import           Data.Graph.TermVertex
 import           Data.JSON.Fields
 import           Data.Quieterm
@@ -22,7 +24,7 @@ import           Semantic.Task
 import           Serializing.Format
 
 -- | Using the specified renderer, parse a list of 'Blob's to produce a 'Builder' output.
-runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => TermRenderer output -> [Blob] -> Eff effs Builder
+runParse :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs, Member (Lift IO) effs) => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlobs' renderJSONError (render . renderJSONTerm) >=> serialize JSON
 runParse JSONGraphTermRenderer        = withParsedBlobs' renderJSONError (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph TermVertex (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON
@@ -31,6 +33,12 @@ runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpr
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show . quieterm))
 runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
+runParse QuietTermRenderer            = distributeFoldMap $ \blob ->
+  showTiming blob <$> time' ((parseSomeBlob blob >>= withSomeTerm (fmap (const (Right ())) . serialize Show . quieterm)) `catchError` \(SomeException e) -> pure (Left (show e)))
+  where
+    showTiming Blob{..} (res, duration) =
+      let status = if isLeft res then "ERR" else "OK"
+      in stringUtf8 (status <> "\t" <> show blobLanguage <> "\t" <> blobPath <> "\t" <> show duration <> " ms\n")
 
 -- | For testing and running parse-examples.
 runParse' :: (Member (Exc SomeException) effs, Member Task effs) => Blob -> Eff effs Builder
