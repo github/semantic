@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies #-}
+
 module Data.Abstract.Module
 ( Module(..)
 , moduleForBlob
@@ -13,7 +15,8 @@ import Prologue
 import System.FilePath.Posix
 
 data Module body = Module { moduleInfo :: ModuleInfo, moduleBody :: body }
-  deriving (Eq, Foldable, Functor, Ord, Traversable)
+  deriving stock (Eq, Foldable, Functor, Ord, Traversable, Generic)
+  deriving anyclass (NFData)
 
 instance Show body => Show (Module body) where
   showsPrec d Module{..} = showsBinaryWith showsPrec showsPrec "Module" d (modulePath moduleInfo) moduleBody
@@ -32,7 +35,8 @@ moduleForBlob rootDir Blob{..} = Module info
 type ModulePath = FilePath
 
 newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
-  deriving (Eq, Ord)
+  deriving stock (Eq, Ord, Generic)
+  deriving anyclass (NFData)
 
 instance Show ModuleInfo where
   showsPrec d = showsUnaryWith showsPrec "ModuleInfo" d . modulePath

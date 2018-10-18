@@ -11,7 +11,7 @@ import Reprinting.Tokenize as Token
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
@@ -30,7 +30,7 @@ instance Tokenize Comment where
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
 newtype HashBang a = HashBang { value :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 HashBang where liftEq = genericLiftEq
 instance Ord1 HashBang where liftCompare = genericLiftCompare

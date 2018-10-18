@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances, LambdaCase #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
@@ -46,7 +46,7 @@ data Value term address
   | Hash [Value term address]
   | Null
   | Hole
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 
 instance Ord address => ValueRoots address (Value term address) where
@@ -357,6 +357,25 @@ data ValueError term address resume where
   -- Out-of-bounds error
   BoundsError            :: [address]          -> Prelude.Integer    -> ValueError term address (Value term address)
 
+instance (NFData term, NFData address) => NFData1 (ValueError term address) where
+  liftRnf _ x = case x of
+    StringError i       -> rnf i
+    BoolError   i       -> rnf i
+    IndexError  i j     -> rnf i `seq` rnf j
+    NamespaceError i    -> rnf i
+    CallError i         -> rnf i
+    NumericError i      -> rnf i
+    Numeric2Error i j   -> rnf i `seq` rnf j
+    ComparisonError i j -> rnf i `seq` rnf j
+    BitwiseError i      -> rnf i
+    Bitwise2Error i j   -> rnf i `seq` rnf j
+    KeyValueError i     -> rnf i
+    ArrayError i        -> rnf i
+    ArithmeticError i   -> i `seq` ()
+    BoundsError i j     -> rnf i `seq` rnf j
+
+instance (NFData term, NFData address, NFData resume) => NFData (ValueError term address resume) where
+  rnf = liftRnf rnf
 
 instance (Eq address, Eq term) => Eq1 (ValueError term address) where
   liftEq _ (StringError a) (StringError b)                       = a == b

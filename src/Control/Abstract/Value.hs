@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, Rank2Types #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -69,7 +69,7 @@ function name params body = sendFunction (Function name params body)
 data BuiltIn
   = Print
   | Show
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 builtIn :: Member (Function term address value) effects => BuiltIn -> Evaluator term address value effects value
 builtIn = sendFunction . BuiltIn

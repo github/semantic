@@ -18,7 +18,7 @@ import           Text.Read (readMaybe)
 -- Boolean
 
 newtype Boolean a = Boolean { booleanContent :: Bool }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 true :: Boolean a
 true = Boolean True
@@ -40,7 +40,7 @@ instance Tokenize Boolean where
 
 -- | A literal integer of unspecified width. No particular base is implied.
 newtype Integer a = Integer { integerContent :: Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
@@ -57,7 +57,7 @@ instance Tokenize Data.Syntax.Literal.Integer where
 -- | A literal float of unspecified width.
 
 newtype Float a = Float { floatContent :: Text }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
@@ -72,7 +72,7 @@ instance Tokenize Data.Syntax.Literal.Float where
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational { value :: Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Literal.Rational where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Rational where liftCompare = genericLiftCompare
@@ -87,7 +87,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
 
 -- Complex literals e.g. `3 + 2i`
 newtype Complex a = Complex { value :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Literal.Complex where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Complex where liftCompare = genericLiftCompare
@@ -99,7 +99,7 @@ instance Evaluatable Complex
 -- Strings, symbols
 
 newtype String a = String { stringElements :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Literal.String where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.String where liftCompare = genericLiftCompare
@@ -111,7 +111,7 @@ instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShows
 instance Evaluatable Data.Syntax.Literal.String
 
 newtype Character a = Character { characterContent :: Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Literal.Character where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Character where liftCompare = genericLiftCompare
@@ -121,7 +121,7 @@ instance Evaluatable Data.Syntax.Literal.Character
 
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 InterpolationElement where liftEq = genericLiftEq
 instance Ord1 InterpolationElement where liftCompare = genericLiftCompare
@@ -132,7 +132,7 @@ instance Evaluatable InterpolationElement
 
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
@@ -146,7 +146,7 @@ instance Tokenize TextElement where
 
 -- | A sequence of textual contents within a string literal.
 newtype EscapeSequence a = EscapeSequence { value :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 EscapeSequence where liftEq = genericLiftEq
 instance Ord1 EscapeSequence where liftCompare = genericLiftCompare
@@ -156,7 +156,7 @@ instance Show1 EscapeSequence where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable EscapeSequence
 
 data Null a = Null
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Null where liftEq = genericLiftEq
 instance Ord1 Null where liftCompare = genericLiftCompare
@@ -168,7 +168,7 @@ instance Tokenize Null where
   tokenize _ = yield Nullity
 
 newtype Symbol a = Symbol { symbolElements :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Ord1 Symbol where liftCompare = genericLiftCompare
@@ -178,7 +178,7 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Symbol
 
 newtype SymbolElement a = SymbolElement { symbolContent :: Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 SymbolElement where liftEq = genericLiftEq
 instance Ord1 SymbolElement where liftCompare = genericLiftCompare
@@ -188,7 +188,7 @@ instance Evaluatable SymbolElement where
   eval _ (SymbolElement s) = rvalBox (symbol s)
 
 newtype Regex a = Regex { regexContent :: Text }
-  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Regex where liftEq = genericLiftEq
 instance Ord1 Regex where liftCompare = genericLiftCompare
@@ -203,7 +203,7 @@ instance Evaluatable Regex where
 -- Collections
 
 newtype Array a = Array { arrayElements :: [a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Array where liftEq = genericLiftEq
 instance Ord1 Array where liftCompare = genericLiftCompare
@@ -216,7 +216,7 @@ instance Tokenize Array where
   tokenize = list . arrayElements
 
 newtype Hash a = Hash { hashElements :: [a] }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Hash where liftEq = genericLiftEq
 instance Ord1 Hash where liftCompare = genericLiftCompare
@@ -229,7 +229,7 @@ instance Tokenize Hash where
   tokenize = Tok.hash . hashElements
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Ord1 KeyValue where liftCompare = genericLiftCompare
@@ -243,7 +243,7 @@ instance Tokenize KeyValue where
   tokenize (KeyValue k v) = pair k v
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Ord1 Tuple where liftCompare = genericLiftCompare
@@ -253,7 +253,7 @@ instance Evaluatable Tuple where
   eval eval (Tuple cs) = rvalBox =<< tuple =<< traverse (eval >=> address) cs
 
 newtype Set a = Set { setElements :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Set where liftEq = genericLiftEq
 instance Ord1 Set where liftCompare = genericLiftCompare
@@ -267,7 +267,7 @@ instance Evaluatable Set
 
 -- | A declared pointer (e.g. var pointer *int in Go)
 newtype Pointer a = Pointer { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Pointer where liftEq = genericLiftEq
 instance Ord1 Pointer where liftCompare = genericLiftCompare
@@ -279,7 +279,7 @@ instance Evaluatable Pointer
 
 -- | A reference to a pointer's address (e.g. &pointer in Go)
 newtype Reference a = Reference { value :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Reference where liftEq = genericLiftEq
 instance Ord1 Reference where liftCompare = genericLiftCompare
