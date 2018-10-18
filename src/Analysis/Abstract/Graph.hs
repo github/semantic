@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -116,8 +116,7 @@ graphingPackages recur m =
   let v = moduleVertex (moduleInfo m) in packageInclusion v *> local (const v) (recur m)
 
 -- | Add vertices to the graph for imported modules.
-graphingModules :: forall term address value sig m a
-                .  ( Member (Modules address) sig
+graphingModules :: ( Member (Modules address) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (State (Graph ControlFlowVertex)) sig
                    , Member (Reader ControlFlowVertex) sig
@@ -129,7 +128,7 @@ graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
   local (const v) $
-    eavesdrop @(Modules address) (runEvaluator (recur m)) $ \case
+    eavesdrop (runEvaluator (recur m)) $ \case
       Load   path _ -> includeModule path
       Lookup path _ -> includeModule path
       _             -> pure ()
@@ -139,8 +138,7 @@ graphingModules recur m = do
       in moduleInclusion (moduleVertex (ModuleInfo path'))
 
 -- | Add vertices to the graph for imported modules.
-graphingModuleInfo :: forall term address value sig m a
-                   .  ( Member (Modules address) sig
+graphingModuleInfo :: ( Member (Modules address) sig
                       , Member (Reader ModuleInfo) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
