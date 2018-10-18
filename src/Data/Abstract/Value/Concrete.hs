@@ -149,13 +149,13 @@ instance ( Carrier sig m
 
               ifthenelse cond' body' (runWhileC (k unit))
             where
-              loop x = catchLoopControl (fix x) (\ control -> case control of
+              loop x = catchLoopControl (fix x) $ \case
                 Break value -> deref value
                 Abort -> pure unit
                 -- FIXME: Figure out how to deal with this. Ruby treats this as the result
                 -- of the current block iteration, while PHP specifies a breakout level
                 -- and TypeScript appears to take a label.
-                Continue _  -> loop x)
+                Continue _  -> loop x
 
 
 interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
