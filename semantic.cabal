@@ -134,6 +134,12 @@ library
                      , Language.Haskell.Grammar
                      , Language.Haskell.Assignment
                      , Language.Haskell.Syntax
+                     , Language.Haskell.Syntax.Constructor
+                     , Language.Haskell.Syntax.Haskell
+                     , Language.Haskell.Syntax.Identifier
+                     , Language.Haskell.Syntax.Pattern
+                     , Language.Haskell.Syntax.QuasiQuote
+                     , Language.Haskell.Syntax.Type
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
