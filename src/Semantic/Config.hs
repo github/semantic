@@ -25,7 +25,7 @@ import qualified Semantic.Telemetry.Haystack as Haystack
 import qualified Semantic.Telemetry.Stat as Stat
 import           Semantic.Version
 import           System.Environment
-import           System.IO (hIsTerminalDevice, stderr)
+import           System.IO (hIsTerminalDevice, stdout)
 import           System.Posix.Process
 import           System.Posix.Types
 
@@ -65,7 +65,7 @@ defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
   pid <- getProcessID
   hostName <- getHostName
-  isTerminal <- hIsTerminalDevice stderr
+  isTerminal <- hIsTerminalDevice stdout
   haystackURL <- lookupEnv "HAYSTACK_URL"
   (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
