@@ -144,10 +144,10 @@ instance ( Carrier sig m
               -- loop, otherwise under concrete semantics we run the risk of the
               -- conditional always being true and getting stuck in an infinite loop.
               let body' = interpose @(Resumable (BaseError (UnspecializedError (Value term address))))
-                    (\(Resumable (BaseError _ _ (UnspecializedError _))) -> throwAbort) $
-                    runWhile (raiseEff body) *> continue
+                    (\(Resumable (BaseError _ _ (UnspecializedError _)) k) -> throwAbort) $
+                    runEvaluator (runWhileC body *> continue)
 
-              ifthenelse cond' body' (pure unit)
+              ifthenelse cond' body' (runWhileC (k unit))
             where
               loop x = catchLoopControl (fix x) (\ control -> case control of
                 Break value -> deref value
@@ -156,6 +156,24 @@ instance ( Carrier sig m
                 -- of the current block iteration, while PHP specifies a breakout level
                 -- and TypeScript appears to take a label.
                 Continue _  -> loop x)
+
+
+interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
+          => (forall v. eff m (m v) -> m v)
+          -> Eff (InterposeC eff m) a
+          -> m a
+interpose handler = runInterposeC handler . interpret
+
+newtype InterposeC eff m a = InterposeC ((forall x . eff m (m x) -> m x) -> m a)
+
+runInterposeC :: (forall x . eff m (m x) -> m x) -> InterposeC eff m a -> m a
+runInterposeC f (InterposeC m) = m f
+
+instance (Member eff sig, HFunctor eff, Carrier sig m) => Carrier sig (InterposeC eff m) where
+  gen a = InterposeC (const (gen a))
+  alg op
+    | Just e <- prj op = InterposeC (\ handler -> handler (handlePure (runInterposeC handler) e))
+    | otherwise        = InterposeC (\ handler -> alg (handlePure (runInterposeC handler) op))
 
 
 instance AbstractHole (Value term address) where
