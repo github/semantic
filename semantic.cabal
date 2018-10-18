@@ -295,7 +295,7 @@ library
   if flag(release)
     ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j -DCOMPUTE_GIT_SHA
   else
-    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j
+    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j +RTS -A128m -n2m -RTS
   ghc-prof-options:    -fprof-auto
 
 executable semantic
