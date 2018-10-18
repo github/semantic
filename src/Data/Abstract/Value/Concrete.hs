@@ -137,7 +137,7 @@ instance ( Carrier sig m
   gen = WhileC . gen
   alg = WhileC . (algW \/ (alg . handlePure runWhileC))
     where algW = \case
-            Abstract.While cond body k -> loop $ \continue -> do
+            Abstract.While cond body k -> loop (\continue -> do
               cond' <- runWhileC cond
 
               -- `interpose` is used to handle 'UnspecializedError's and abort out of the
@@ -147,7 +147,7 @@ instance ( Carrier sig m
                     (\(Resumable (BaseError _ _ (UnspecializedError _)) k) -> throwAbort) $
                     runEvaluator (runWhileC body *> continue)
 
-              ifthenelse cond' body' (runWhileC (k unit))
+              ifthenelse cond' body' (pure unit)) >>= runWhileC . k
             where
               loop x = catchLoopControl (fix x) $ \case
                 Break value -> deref value
