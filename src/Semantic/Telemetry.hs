@@ -42,6 +42,7 @@ module Semantic.Telemetry
 , writeLog
 , writeStat
 , time
+, time'
 , Telemetry(..)
 , runTelemetry
 , ignoreTelemetry
@@ -127,6 +128,9 @@ time statName tags task = do
   (a, stat) <- withTiming statName tags task
   a <$ writeStat stat
 
+-- | A task which measures and returns the timing of another task.
+time' :: (Member (Lift IO) effs) => Eff effs output -> Eff effs (output, Double)
+time' = withTiming'
 
 -- | Statting and logging effects.
 data Telemetry (m :: * -> *) output where
