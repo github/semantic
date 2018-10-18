@@ -133,7 +133,7 @@ instance ( Carrier sig m
          , Show address
          , Show term
          )
-      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Evaluator term address (Value term address) m)) where
+      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Evaluator term address (Value term address) (InterposeC (Resumable (BaseError (UnspecializedError (Value term address)))) (Evaluator term address (Value term address) m)))) where
   gen = WhileC . gen
   alg = WhileC . (algW \/ (alg . handlePure runWhileC))
     where algW = \case
