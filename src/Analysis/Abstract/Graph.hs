@@ -123,14 +123,15 @@ graphingModules :: forall term address value sig m a
                    , Member (Reader ControlFlowVertex) sig
                    , Carrier sig m
                    )
-                => Open (Module term -> Evaluator term address value m a)
+                => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Evaluator term address value m)) a)
+                -> (Module term -> Evaluator term address value m a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
   local (const v) $
     eavesdrop @(Modules address) (runEvaluator (recur m)) $ \case
-      Load   path k -> includeModule path
-      Lookup path k -> includeModule path
+      Load   path _ -> includeModule path
+      Lookup path _ -> includeModule path
       _             -> pure ()
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
@@ -144,12 +145,14 @@ graphingModuleInfo :: forall term address value sig m a
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => Open (Module term -> Evaluator term address value (EavesdropC (Modules address) (Evaluator term address value m)) a)
+                   => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Evaluator term address value m)) a)
+                   -> (Module term -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
   eavesdrop (runEvaluator (recur m)) $ \case
-    Load   path k -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
-    Lookup path k -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    _             -> pure ()
 
 eavesdrop :: (HFunctor eff, Carrier sig m, Member eff sig, Applicative m)
           => Eff (EavesdropC eff m) a
