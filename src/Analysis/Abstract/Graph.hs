@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -128,11 +128,10 @@ graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
   local (const v) $
-    eavesdrop @(Modules address) (\ m -> case m of
-      Load   path -> includeModule path
-      Lookup path -> includeModule path
-      _           -> pure ())
-      (recur m)
+    eavesdrop @(Modules address) (runEvaluator (recur m)) $ \case
+      Load   path k -> includeModule path
+      Lookup path k -> includeModule path
+      _             -> pure ()
   where
     -- NB: path is null for Languages like Ruby that have module imports that require concrete value semantics.
     includeModule path = let path' = if Prologue.null path then "unknown, concrete semantics required" else path
@@ -145,14 +144,30 @@ graphingModuleInfo :: forall term address value sig m a
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => Open (Module term -> Evaluator term address value m a)
+                   => Open (Module term -> Evaluator term address value (EavesdropC (Modules address) (Evaluator term address value m)) a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
-  eavesdrop @(Modules address) (\ eff -> case eff of
-    Load   path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
-    Lookup path -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
-    _           -> pure ())
-    (recur m)
+  eavesdrop (runEvaluator (recur m)) $ \case
+    Load   path k -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Lookup path k -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+
+eavesdrop :: (HFunctor eff, Carrier sig m, Member eff sig, Applicative m)
+          => Eff (EavesdropC eff m) a
+          -> (forall x . eff m (m x) -> m ())
+          -> m a
+eavesdrop m f = runEavesdropC f (interpret m)
+
+newtype EavesdropC eff m a = EavesdropC ((forall x . eff m (m x) -> m ()) -> m a)
+
+runEavesdropC :: (forall x . eff m (m x) -> m ()) -> EavesdropC eff m a -> m a
+runEavesdropC f (EavesdropC m) = m f
+
+instance (Carrier sig m, HFunctor eff, Member eff sig, Applicative m) => Carrier sig (EavesdropC eff m) where
+  gen a = EavesdropC (const (gen a))
+  alg op
+    | Just m <- prj op = case m of
+      eff -> EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
+    | otherwise        = EavesdropC (\ handler -> alg (handlePure (runEavesdropC handler) op))
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
