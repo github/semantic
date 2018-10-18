@@ -269,6 +269,7 @@ runParser blob@Blob{..} parser = case parser of
                   Just "ParseError" -> do
                     writeStat (increment "parse.parse_errors" languageTag)
                     logError config Warning blob err (("task", "parse") : blobFields)
+                    when (optionsFailOnParseError (configOptions config)) $ throwError (toException err)
                   _ -> do
                     writeStat (increment "parse.assign_warnings" languageTag)
                     logError config Warning blob err (("task", "assign") : blobFields)
