@@ -134,6 +134,12 @@ library
                      , Language.Haskell.Grammar
                      , Language.Haskell.Assignment
                      , Language.Haskell.Syntax
+                     , Language.Haskell.Syntax.Constructor
+                     , Language.Haskell.Syntax.Haskell
+                     , Language.Haskell.Syntax.Identifier
+                     , Language.Haskell.Syntax.Pattern
+                     , Language.Haskell.Syntax.QuasiQuote
+                     , Language.Haskell.Syntax.Type
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
@@ -218,6 +224,7 @@ library
                      , cmark-gfm
                      , containers
                      , cryptohash
+                     , deepseq
                      , directory
                      , directory-tree
                      , effects
@@ -423,7 +430,7 @@ test-suite doctests
                      , doctest
 
 benchmark evaluation
-  hs-source-dirs:      bench
+  hs-source-dirs:      bench/evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O1
