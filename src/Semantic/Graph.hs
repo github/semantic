@@ -65,7 +65,7 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
 
-runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m)
+runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m)
          => GraphType
          -> Bool
          -> Project
@@ -202,7 +202,7 @@ runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (
 runHeap = runState lowerBound
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m)
+parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
              -> m (Package (Blob, term))
@@ -216,7 +216,7 @@ parsePackage parser project = do
     n = name (projectName project)
 
 -- | Parse all files in a project into 'Module's.
-parseModules :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Parser term -> Project -> m [Module (Blob, term)]
+parseModules :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Parser term -> Project -> m [Module (Blob, term)]
 parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
 
