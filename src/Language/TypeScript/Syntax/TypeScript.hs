@@ -9,11 +9,12 @@ import qualified Data.Text as T
 import           Proto3.Suite
 
 import           Data.Abstract.Evaluatable as Evaluatable
-import           Control.Abstract.ScopeGraph hiding (Import, currentScope)
+import           Control.Abstract.ScopeGraph hiding (Import)
 import           qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
+import qualified Data.Map.Strict as Map
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -79,9 +80,23 @@ instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
   eval (QualifiedExport exportSymbols) = do
-    -- Insert the aliases with no addresses.
-    for_ exportSymbols $ \Alias{..} ->
-      export aliasValue aliasName Nothing
+    -- Create a Lexical edge from the qualifed export's scope to the current scope.
+    currentScopeAddress <- currentScope
+    let edges = Map.singleton Lexical [ currentScopeAddress ]
+    scopeAddress <- newScope edges
+    putCurrentScope scopeAddress
+
+    for_ exportSymbols $ \Alias{..} -> do
+      reference (Reference aliasName) (Declaration aliasValue)
+
+      associatedScope' <- associatedScope (Declaration aliasValue)
+      span <- ask @Span -- TODO: This is wrong. We should store the span of the aliasName not the span of the qualifed export.
+      declare (Declaration aliasName) span associatedScope'
+
+    -- Create an export edge from a new scope to the qualifed export's scope.
+    let edges = Map.singleton Export [ scopeAddress ]
+    nextScope <- newScope edges
+    putCurrentScope nextScope
     rvalBox unit
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
