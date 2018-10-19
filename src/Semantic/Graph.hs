@@ -122,10 +122,7 @@ runCallGraph lang includePackages modules package = do
         . providingLiveSet
         . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
         . runModules (ModuleTable.modulePaths (packageModules package))
-      runAddressEffects
-        = Hole.runAllocator (Located.handleAllocator Monovariant.handleAllocator)
-        . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects (fmap (Abstract.runBoolean . Abstract.runWhile) . Abstract.runFunction) modules))
+  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
 
 runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
@@ -192,10 +189,7 @@ runImportGraph lang (package :: Package term) f =
         . runReader (packageInfo package)
         . runState (lowerBound @Span)
         . runReader (lowerBound @Span)
-      runAddressEffects
-        = Hole.runAllocator Precise.handleAllocator
-        . Hole.runDeref Precise.handleDeref
-  in extractGraph <$> runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise)) (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (fmap (Concrete.runBoolean . Concrete.runWhile) . Concrete.runFunction) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+  in extractGraph <$> runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise)) (runImportGraphAnalysis (evaluate lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 
 runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Evaluator term address value m)) a -> Evaluator term address value m (Heap address value, a)
@@ -255,14 +249,11 @@ parsePythonPackage parser project = do
         . runReader (PackageInfo (name "setup") lowerBound)
         . runState (lowerBound @Span)
         . runReader (lowerBound @Span)
-      runAddressEffects
-        = Hole.runAllocator Precise.handleAllocator
-        . Hole.runDeref Precise.handleDeref
 
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
-      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id runAddressEffects (\ eval -> Concrete.runBoolean . Concrete.runWhile . Concrete.runFunction eval . runPythonPackaging) [ setupModule ])
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id runPythonPackaging [ setupModule ])
     Nothing -> pure PythonPackage.Unknown
   case strat of
     PythonPackage.Unknown -> do
