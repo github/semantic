@@ -50,16 +50,17 @@ data Config
 -- Options configurable via command line arguments.
 data Options
   = Options
-  { optionsLogLevel      :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsRequestID     :: Maybe String  -- ^ Optional request id for tracing across systems.
-  , optionsFailOnWarning :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
+  { optionsLogLevel         :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disables logging.
+  , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
+  , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
+  , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) Nothing False
+defaultOptions = Options (Just Warning) Nothing False False
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) Nothing False
+debugOptions = Options (Just Debug) Nothing False False
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
