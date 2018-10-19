@@ -109,6 +109,7 @@ runCallGraph lang includePackages modules package = do
         . runHeap
         . caching
         . runFresh
+        . runEvaluator
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -119,6 +120,7 @@ runCallGraph lang includePackages modules package = do
         . runReader (lowerBound @Span)
         . runState (lowerBound @Span)
         . runReader (lowerBound @ControlFlowVertex)
+        . runEvaluator
         . providingLiveSet
         . runModuleTable
         . runModules (ModuleTable.modulePaths (packageModules package))
@@ -183,6 +185,7 @@ runImportGraph lang (package :: Package term) f =
         = runState lowerBound
         . runHeap
         . runFresh
+        . runEvaluator
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -199,7 +202,7 @@ runImportGraph lang (package :: Package term) f =
 
 
 runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Evaluator term address value m)) a -> Evaluator term address value m (Heap address value, a)
-runHeap = runState lowerBound
+runHeap = runState lowerBound . runEvaluator
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m)
@@ -243,6 +246,7 @@ parsePythonPackage parser project = do
         . runState PythonPackage.Unknown
         . runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise))))
         . runFresh
+        . runEvaluator
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -398,7 +402,7 @@ resumingEnvironmentError :: ( Carrier sig m
                          => Evaluator term (Hole (Maybe Name) address) value (ResumableWithC (BaseError (EnvironmentError (Hole (Maybe Name) address)))
                            (Evaluator term (Hole (Maybe Name) address) value m)) a
                          -> Evaluator term (Hole (Maybe Name) address) value m a
-resumingEnvironmentError = runResumableWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError))
+resumingEnvironmentError = runResumableWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError)) . runEvaluator
 
 resumingTypeError :: ( Carrier sig m
                      , Member NonDet sig
