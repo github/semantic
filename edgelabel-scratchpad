@@ -1,0 +1,174 @@
+data EdgeLabel = Lexical | Import
+data EdgeLabel = Lexical | Import | Public
+
+-- module A
+-- Scope 1
+function foo() {} -- Declaration
+function b() {} -- Declaration
+export b; -- Create a new scope 2, move declaration b from scope 1 to 2, and make a public edge from scope 1 to 2.
+
+-- module 2
+-- Scope 2
+import A; -- Lookup A for associated scope, construct a Public edge to A's scope.
+importEverything A; -- Lookup A for associated scope, construct a Import edge to A's scope.
+
+foo
+0
+
+   Import
+1  -->---   2
+   Lexical
+   --<---
+   Public
+   -----   3
+
+P∗ ·I(_,_)∗
+P* I(_,_)*
+P* . I(_R,_) . I(_TR,_)*
+
+--
+import foo from bar; -- construct a new scope
+
+Public -> * -> Public -> *
+            -> Import -> *
+
+Import -> * -> Public -> *
+            -> Import -> *
+
+Import -> * -> Public -> *
+            -> Import -> *
+
+Public . Public
+Public . Public
+       . Private
+
+-- TypeScript
+
+-- Script
+x = 2
+function foo() {
+
+}
+
+-- Module A
+-- Scope 1
+function foo () {} -- declare foo() {}
+function bar() {} -- declare bar() {}
+export { bar }; -- scope 2 Import Scope 1, add a reference to bar
+function baz() {} -- declare baz in scope 2
+
+import A; -- Create a Public edge to Scope 1
+module A { -- Scope 1
+    function foo () {} -- declare foo -- Scope 2 to scope 1
+    function bar() {} -- declare bar -- Scope 3 to Scope 2
+    export { foo, bar }; -- Lookup the declaration and create a public edge to scope 2
+    function baz() {} -- declare baz in scope 2
+
+    export { foo } -- create scope 3 add a public edge from scope 1 to 3, add a reference path to foo
+
+    function lol() {}
+
+}
+
+import A (foo) ; -- Create a new scope with an Import edge to scope 5
+
+(Import | Public)* . Public
+
+--
+
+
+import A (bar, foo); Ghost scope -> Scope 1
+
+baz
+
+
+isWellFormedPath :: [EdgeLabel] -> Bool
+isWellFormedPath =
+Lexical* . Import*
+Lexical* . Import* . Public
+Lexical* . (Public* | Protected*) Private
+Lexical* . Protected . Import* . Public
+
+Lexical* . Protected . Protected -> *
+Lexical* . Protected . Import -> *
+
+Lexical* . Import*
+Lexical* . Import*
+Lexical* . Import
+Lexical* . (Public* | Import*)
+
+-- Class
+
+class A { -- Scope 1
+    public a = 2; -- declare a in scope 1, make a new scope with a public edge to 1
+    private b = 3; -- declare b in scope 2, make a new scope with a private edge to 2
+    protected c = 4; -- declare c in scope 3, make a new scope with a protected edge to 3
+    private d = 3; -- declare b in scope 2, make a new scope with a private edge to 2
+}
+
+predicate :: [EdgeLabel] -> Bool -> [EdgeLabel] -> Bool
+predicate =
+
+instance Evaluatable Class where
+    eval = do
+        ...
+        withPredicate publicOrProtectedThroughSuperclassesOrAnythingLocal . locally (eval body)
+
+class B < A {
+
+    class C < D { -- C has a Lexical edge to B and an import edge to D
+        withPredicate publicOrProtectedThroughSuperclassesOrAnythingLocal . locally (eval body)
+    }
+
+    function bar() {
+        var x = c; lookupDeclaration id (Declaration c) currentScope;
+        return c; -- lookupDeclaration id (Declaration name) currentScope
+    }
+
+    c -- Lexical* . (Protected | Private | Public | Import)* . (Protected | Public)
+      -- Lexical* . (Private | Protected | Public)* . (Import . (Protected | Private | Public)* . (Protected | Public))*
+
+}
+
+x = new A(); -- Create a scope for x with an import edge to scope 4
+x.c -- Import . (Protected | Private)* . Public
+
+y = new B();
+y.a -- lookupDeclaration onlyLookForPublicThingsThroughSuperclasses (Declaration name) associatedScopeOfY
+
+
+-- Scope 1
+package p; -- Declare p with span 1 with associated scope 2
+class C{} -- declare in scope 2 with span 2
+
+--
+
+package p; -- declare p with span 3 with associated scope 3 in scope 1
+class D{}; -- declare in scope 3 with span 4
+
+--
+
+import p;
+
+--
+
+
+package p;
+
+import r.*;
+import q.E;
+
+public class C {}
+
+class D {}
+
+
+--
+
+package q;
+
+import p.*;
+
+C
+
+--
