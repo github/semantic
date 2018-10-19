@@ -84,7 +84,8 @@ runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult addr
               , Carrier sig m
               )
            => Set ModulePath
-           -> Evaluator term address value (ModulesC (Evaluator term address value m)) a
+           -> Evaluator term address value (ModulesC
+             (Evaluator term address value m)) a
            -> Evaluator term address value m a
 runModules paths = flip runModulesC paths . interpret . runEvaluator
 
