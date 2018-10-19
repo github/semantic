@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
@@ -15,8 +15,7 @@ import           Prologue
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
-runPythonPackaging :: forall sig m term address a.
-                      ( Carrier sig m
+runPythonPackaging :: ( Carrier sig m
                       , Ord address
                       , Show address
                       , Show term
@@ -37,14 +36,15 @@ runPythonPackaging :: forall sig m term address a.
                       , Member (Reader Span) sig
                       , Member (Function term address (Value term address)) sig
                       )
-                   => Evaluator term address (Value term address) m a
+                   => Evaluator term address (Value term address) (InterposeC (Function term address (Value term address))
+                     (Evaluator term address (Value term address) m)) a
                    -> Evaluator term address (Value term address) m a
-runPythonPackaging = Eff.interpose @(Function term address (Value term address)) $ \case
-  Call callName super params -> do
+runPythonPackaging = interpose (\case
+  Call callName super params k -> k =<< do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
-        let bindings = foldr (\ (name, addr) rest -> Map.insert name addr rest) lowerBound (zip paramNames params)
-        let asStrings address = (deref >=> asArray) address >>= traverse (deref >=> asString)
+        let bindings = foldr (\ (name, addr) -> Map.insert name addr) lowerBound (zip paramNames params)
+        let asStrings = deref >=> asArray >=> traverse (deref >=> asString)
 
         case name' of
           Just n
@@ -61,5 +61,23 @@ runPythonPackaging = Eff.interpose @(Function term address (Value term address))
           _ -> pure ()
       _ -> pure ()
     call callName super params
-  Function name params body ->  function name params body
-  BuiltIn b -> builtIn b
+  Function name params body k -> function name params body >>= k
+  BuiltIn b k -> builtIn b >>= k)
+  . runEvaluator
+
+interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
+          => (forall v. eff m (m v) -> m v)
+          -> Eff (InterposeC eff m) a
+          -> m a
+interpose handler = runInterposeC handler . interpret
+
+newtype InterposeC eff m a = InterposeC ((forall x . eff m (m x) -> m x) -> m a)
+
+runInterposeC :: (forall x . eff m (m x) -> m x) -> InterposeC eff m a -> m a
+runInterposeC f (InterposeC m) = m f
+
+instance (Member eff sig, HFunctor eff, Carrier sig m) => Carrier sig (InterposeC eff m) where
+  gen a = InterposeC (const (gen a))
+  alg op
+    | Just e <- prj op = InterposeC (\ handler -> handler (handlePure (runInterposeC handler) e))
+    | otherwise        = InterposeC (\ handler -> alg (handlePure (runInterposeC handler) op))
