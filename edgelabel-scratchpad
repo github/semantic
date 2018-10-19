@@ -60,15 +60,22 @@ function baz() {} -- declare baz in scope 2
 import A; -- Create a Public edge to Scope 1
 module A { -- Scope 1
     function foo () {} -- declare foo -- Scope 2 to scope 1
+
     function bar() {} -- declare bar -- Scope 3 to Scope 2
     export { foo, bar }; -- Lookup the declaration and create a public edge to scope 2
     function baz() {} -- declare baz in scope 2
 
     export { foo } -- create scope 3 add a public edge from scope 1 to 3, add a reference path to foo
 
-    function lol() {}
+    function lol() {} -- Insert declaration into current scope, create new scope, create edge from new to current
+    function lol'() {} -- Insert declaration into current scope, create new scope, create edge from new to current
+    lol'()
+    function lol''() {}
+    * -> Public -> (lol'', (reference to lol')) -> Private -> lol' -> Public -> lol
 
 }
+
+lol'
 
 import A (foo) ; -- Create a new scope with an Import edge to scope 5
 
@@ -125,13 +132,14 @@ class B < A {
         return c; -- lookupDeclaration id (Declaration name) currentScope
     }
 
-    c -- Lexical* . (Protected | Private | Public | Import)* . (Protected | Public)
-      -- Lexical* . (Private | Protected | Public)* . (Import . (Protected | Private | Public)* . (Protected | Public))*
-
+    -- Inheritance edge predicate
+    -- Lexical* . (Private | Protected | Public)* . (Import . (Protected | Private | Public)* . (Protected | Public))*
+    -- Instance edge predicate
+    -- Import . (Protected | Private)* . Public
 }
 
 x = new A(); -- Create a scope for x with an import edge to scope 4
-x.c -- Import . (Protected | Private)* . Public
+x.c
 
 y = new B();
 y.a -- lookupDeclaration onlyLookForPublicThingsThroughSuperclasses (Declaration name) associatedScopeOfY
@@ -172,3 +180,58 @@ import p.*;
 C
 
 --
+
+-- module ModuleWithBar
+-- function bar() {} * Lexical
+
+-- module B
+-- import ModuleWithBar * Import
+-- function foo() {} * Lexical
+-- function bar() {} * Lexical
+-- export { foo as bar } * Export -> (Scope (reference to foo) (declaration bar with associated scope foo)) -> :point_up:
+
+-- bar  -- (Lexical | Export)* . Lexical
+
+-- module ModuleWithBar
+-- function bar() {} * Lexical
+
+-- module B
+-- import ModuleWithBar * Import
+-- function foo() {} * Lexical
+-- export { foo, bar } * Export
+
+-- bar  -- (Lexical | Export | Import)* . Lexical
+--      -- ((Lexical | Export)* . Lexical) | (Lexical | Export)* . (Import . (Lexical | Export)* . Lexical)*
+
+-- module ModuleWithBaz
+-- function baz() {} * Lexical
+-- export { baz } * Export -> :point_up:
+
+-- module B
+-- import ModuleWithBar * Import
+-- function foo() {} * Lexical
+-- export { foo as bar, baz } * Export
+
+-- internalLookup = (Lexical | Export)* . Lexical
+-- externalLookup = (Lexical | Export)* . Import . ((Lexical | Export)* . Export)*
+-- Module A
+-- import B * Import
+-- baz  -- (internalLookup | externalLookup)
+
+-- module ModuleWithBaz
+-- function baz() {} * Lexical
+-- export { baz }
+
+-- module B
+-- import ModuleWithBaz * Import
+-- function foo() {} * Lexical
+
+
+-- Module A
+-- import B * Import
+-- baz  -- internalLookup | externalLookup
+
+-- -- (Lexical | Import | Export)* . Export . Lexical
+-- -- Import . Lexical
+
+-- -- Lexical* . Protected
