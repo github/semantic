@@ -403,6 +403,7 @@ resumingEnvironmentError = runResumableWith (\ baseError -> traceError "Environm
 resumingTypeError :: ( Carrier sig m
                      , Member NonDet sig
                      , Member Trace sig
+                     , Effect sig
                      )
                   => Evaluator term address Type (ResumableWithC (BaseError TypeError)
                     (Evaluator term address Type (StateC TypeMap
