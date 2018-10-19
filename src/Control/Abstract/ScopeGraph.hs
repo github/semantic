@@ -16,6 +16,7 @@ module Control.Abstract.ScopeGraph
   , withScope
   , associatedScope
   , putDeclarationScope
+  , putCurrentScope
   , insertImportReference
   , lookupScopePath
   , lookupScope
@@ -164,6 +165,9 @@ withScope scope action = raiseEff $ do
     value <- (lowerEff action)
     modify (\g -> g { ScopeGraph.currentScope = Just prevScope })
     pure value
+
+putCurrentScope :: (Ord address, Member (State (ScopeGraph address)) effects) => address -> Evaluator address value effects ()
+putCurrentScope scope = modify (\g -> g { ScopeGraph.currentScope = Just scope })
 
 throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) effects
                    , Member (Reader ModuleInfo) effects
