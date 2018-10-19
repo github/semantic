@@ -42,7 +42,7 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete
-    (Value, ValueError (..), runWhile, runBoolean, runFunction, runValueErrorWith)
+    (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
 import           Data.Graph
