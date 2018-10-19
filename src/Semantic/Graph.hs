@@ -120,9 +120,15 @@ runCallGraph lang includePackages modules package = do
         . runState (lowerBound @Span)
         . runReader (lowerBound @ControlFlowVertex)
         . providingLiveSet
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
+        . runModuleTable
         . runModules (ModuleTable.modulePaths (packageModules package))
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
+
+runModuleTable :: Carrier sig m
+               => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address))))
+                 (Evaluator term address value m)) a
+               -> Evaluator term address value m a
+runModuleTable = runReader lowerBound . runEvaluator
 
 runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
@@ -184,7 +190,7 @@ runImportGraph lang (package :: Package term) f =
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) Precise))))))
+        . runModuleTable
         . runModules (ModuleTable.modulePaths (packageModules package))
         . runReader (packageInfo package)
         . runState (lowerBound @Span)
@@ -244,7 +250,7 @@ parsePythonPackage parser project = do
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) Precise))))))
+        . runModuleTable
         . runModules lowerBound
         . runReader (PackageInfo (name "setup") lowerBound)
         . runState (lowerBound @Span)
