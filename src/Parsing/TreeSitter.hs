@@ -92,7 +92,7 @@ toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base
 toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
-    _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nodePtr childNodesPtr (fromIntegral count))
+    _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nodePtr childNodesPtr)
     peekArray count childNodesPtr
   pure $! In (Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (Location (nodeRange node) (nodeSpan node))) children
 
