@@ -27,16 +27,24 @@ promote :: Evaluator term address value m a -> Evaluator term (Located address) 
 promote = Evaluator . runEvaluator
 
 
-instance ( Carrier (Allocator address :+: sig) (AllocatorC (Evaluator term address value m))
+demoteA :: AllocatorC (Located address) m a -> AllocatorC address m a
+demoteA = AllocatorC . runAllocatorC
+
+promoteA :: AllocatorC address m address -> AllocatorC (Located address) m address
+promoteA = AllocatorC . runAllocatorC
+
+
+instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          , Carrier sig m
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
          , Member (Reader Span) sig
+         , Monad m
          )
-      => Carrier (Allocator (Located address) :+: sig) (AllocatorC (Evaluator term (Located address) value m)) where
-  ret = AllocatorC . promote . ret
+      => Carrier (Allocator (Located address) :+: sig) (AllocatorC (Located address) m) where
+  ret = AllocatorC . ret
   eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
-    where alg (Alloc name k) = promote (Located <$> runAllocatorC (eff (L (Alloc name ret))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= demote . runAllocatorC . k)
+    where alg (Alloc name k) = Located <$> runAllocatorC (promoteA (eff (L (Alloc name ret)))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= runAllocatorC . demoteA . k
 
 
 instance (Carrier (Deref value :+: sig) (DerefC (Evaluator term address value m)), Carrier sig m)
