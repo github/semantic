@@ -127,10 +127,9 @@ runCallGraph lang includePackages modules package = do
   extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
 
 runModuleTable :: Carrier sig m
-               => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address))))
-                 (Evaluator term address value m)) a
+               => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address)))) (Eff m)) a
                -> Evaluator term address value m a
-runModuleTable = runReader lowerBound . runEvaluator
+runModuleTable = Evaluator . runReader lowerBound . runEvaluator
 
 runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
@@ -317,8 +316,8 @@ withTermSpans recur0 recur term = let
 resumingResolutionError :: ( Member Trace sig
                            , Carrier sig m
                            )
-                         => Evaluator term address value (ResumableWithC (BaseError ResolutionError)
-                           (Evaluator term address value m)) a
+                         => Evaluator term address value (ResumableWithC (BaseError ResolutionError) (Eff
+                                                         m)) a
                          -> Evaluator term address value m a
 resumingResolutionError = runResolutionErrorWith (\ baseError -> traceError "ResolutionError" baseError *> case baseErrorException baseError of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
@@ -329,8 +328,8 @@ resumingLoadError :: ( AbstractHole address
                      , Member Trace sig
                      , Ord address
                      )
-                  => Evaluator term address value (ResumableWithC (BaseError (LoadError address))
-                    (Evaluator term address value m)) a
+                  => Evaluator term address value (ResumableWithC (BaseError (LoadError address)) (Eff
+                                                  m)) a
                   -> Evaluator term address value m a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
   ModuleNotFoundError _ -> pure (lowerBound, (lowerBound, hole)))
@@ -339,8 +338,8 @@ resumingEvalError :: ( Carrier sig m
                      , Member Fresh sig
                      , Member Trace sig
                      )
-                  => Evaluator term address value (ResumableWithC (BaseError EvalError)
-                    (Evaluator term address value m)) a
+                  => Evaluator term address value (ResumableWithC (BaseError EvalError) (Eff
+                                                  m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
   DefaultExportError{}  -> pure ()
@@ -354,8 +353,8 @@ resumingUnspecialized :: ( AbstractHole value
                          , Carrier sig m
                          , Member Trace sig
                          )
-                      => Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value))
-                        (Evaluator term address value m)) a
+                      => Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff
+                                                      m)) a
                       -> Evaluator term address value m a
 resumingUnspecialized = runUnspecializedWith (\ baseError -> traceError "UnspecializedError" baseError *> case baseErrorException baseError of
   UnspecializedError _ -> pure hole)
@@ -365,8 +364,8 @@ resumingAddressError :: ( AbstractHole value
                         , Member Trace sig
                         , Show address
                         )
-                     => Evaluator term address value (ResumableWithC (BaseError (AddressError address value))
-                       (Evaluator term address value m)) a
+                     => Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) (Eff
+                                                     m)) a
                      -> Evaluator term address value m a
 resumingAddressError = runAddressErrorWith $ \ baseError -> traceError "AddressError" baseError *> case baseErrorException baseError of
   UnallocatedAddress   _ -> pure lowerBound
@@ -377,8 +376,8 @@ resumingValueError :: ( Carrier sig m
                       , Show address
                       , Show term
                       )
-                   => Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address))
-                     (Evaluator term address (Value term address) m)) a
+                   => Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) (Eff
+                                                                  m)) a
                    -> Evaluator term address (Value term address) m a
 resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
   CallError val     -> pure val
@@ -399,19 +398,19 @@ resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" b
 resumingEnvironmentError :: ( Carrier sig m
                             , Member Trace sig
                             )
-                         => Evaluator term (Hole (Maybe Name) address) value (ResumableWithC (BaseError (EnvironmentError (Hole (Maybe Name) address)))
-                           (Evaluator term (Hole (Maybe Name) address) value m)) a
+                         => Evaluator term (Hole (Maybe Name) address) value (ResumableWithC (BaseError (EnvironmentError (Hole (Maybe Name) address))) (Eff
+                                                                             m)) a
                          -> Evaluator term (Hole (Maybe Name) address) value m a
-resumingEnvironmentError = runResumableWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError)) . runEvaluator
+resumingEnvironmentError = runEnvironmentErrorWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError))
 
 resumingTypeError :: ( Carrier sig m
                      , Member NonDet sig
                      , Member Trace sig
                      , Effect sig
                      )
-                  => Evaluator term address Type (ResumableWithC (BaseError TypeError)
-                    (Evaluator term address Type (StateC TypeMap
-                    (Evaluator term address Type m)))) a
+                  => Evaluator term address Type (ResumableWithC (BaseError TypeError) (Eff
+                                                 (StateC TypeMap (Eff
+                                                 m)))) a
                   -> Evaluator term address Type m a
 resumingTypeError = runTypesWith (\ baseError -> traceError "TypeError" baseError *> case baseErrorException baseError of
   UnificationError l r -> pure l <|> pure r
