@@ -332,15 +332,15 @@ instance Show1 (UnspecializedError a) where
   liftShowsPrec _ _ = showsPrec
 
 runUnspecialized :: (Carrier sig m, Effect sig)
-                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError value)) (Evaluator term address value m)) a
+                 => Evaluator term address value (ResumableC (BaseError (UnspecializedError value)) (Eff m)) a
                  -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError value))) a)
-runUnspecialized = runResumable . runEvaluator
+runUnspecialized = Evaluator . runResumable . runEvaluator
 
 runUnspecializedWith :: Carrier sig m
                      => (forall resume . BaseError (UnspecializedError value) resume -> Evaluator term address value m resume)
-                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Evaluator term address value m)) a
+                     -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff m)) a
                      -> Evaluator term address value m a
-runUnspecializedWith f = runResumableWith f . runEvaluator
+runUnspecializedWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
 throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) sig
                            , Member (Reader ModuleInfo) sig
