@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Heap
 ( Heap
 , Live
@@ -25,6 +25,7 @@ module Control.Abstract.Heap
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
+import Control.Applicative (Alternative)
 import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import Data.Abstract.Heap
@@ -141,6 +142,7 @@ runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC address (Eff m))
 runAllocator = Evaluator . runAllocatorC . interpret . runEvaluator
 
 newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
+  deriving (Alternative, Applicative, Functor, Monad)
 
 
 data Deref value (m :: * -> *) k
@@ -162,6 +164,7 @@ runDeref :: Carrier (Deref value :+: sig) (DerefC (Evaluator term address value 
 runDeref = runDerefC . interpret . runEvaluator
 
 newtype DerefC m a = DerefC { runDerefC :: m a }
+  deriving (Alternative, Applicative, Functor, Monad)
 
 
 
