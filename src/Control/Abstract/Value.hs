@@ -140,13 +140,12 @@ instance HFunctor (Boolean value) where
   hmap _ (AsBool v         k) = AsBool v  k
   hmap f (Disjunction a b  k) = Disjunction (f a) (f b) k
 
-runBoolean :: Carrier (Boolean value :+: sig) (BooleanC (Evaluator term address value m))
-           => Evaluator term address value (BooleanC
-             (Evaluator term address value m)) a
+runBoolean :: Carrier (Boolean value :+: sig) (BooleanC value (Eff m))
+           => Evaluator term address value (BooleanC value (Eff m)) a
            -> Evaluator term address value m a
-runBoolean = runBooleanC . interpret . runEvaluator
+runBoolean = raiseHandler $ runBooleanC . interpret
 
-newtype BooleanC m a = BooleanC { runBooleanC :: m a }
+newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
 
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.

@@ -101,14 +101,14 @@ type ModuleC address value m
 type ValueC term address value m
   = FunctionC term address value (Evaluator term address value
   ( WhileC                       (Evaluator term address value
-  ( BooleanC                     (Evaluator term address value m)))))
+  ( BooleanC value               (Eff m)))))
 
 evaluate :: ( AbstractValue term address value valueC
             , Carrier sig c
             , allocatorC ~ AllocatorC address (Eff (ReaderC ModuleInfo (Eff c)))
             , Carrier (Allocator address :+: Reader ModuleInfo :+: sig) allocatorC
             , Carrier (Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig) (DerefC address value (Eff allocatorC))
-            , booleanC ~ BooleanC (Evaluator term address value moduleC)
+            , booleanC ~ BooleanC value (Eff moduleC)
             , Carrier (Boolean value :+: moduleSig) booleanC
             , whileC ~ WhileC (Evaluator term address value booleanC)
             , moduleSig ~ (Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)

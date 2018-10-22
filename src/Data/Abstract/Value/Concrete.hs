@@ -103,18 +103,21 @@ instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
          , Carrier sig m
+         , Monad m
          )
-      => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Evaluator term address (Value term address) m)) where
+      => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Value term address) m) where
   ret = BooleanC . ret
   eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
-    where alg :: Abstract.Boolean (Value term address) (BooleanC (Evaluator term address (Value term address) m)) (BooleanC (Evaluator term address (Value term address) m) a) -> Evaluator term address (Value term address) m a
+    where alg :: Abstract.Boolean (Value term address) (BooleanC (Value term address) m) (BooleanC (Value term address) m a) -> m a
           alg = \case
             Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
             Abstract.AsBool (Boolean b) k -> runBooleanC (k b)
-            Abstract.AsBool other       k -> (throwValueError $! BoolError other) >>= runBooleanC . k
+            Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k
             Abstract.Disjunction a b    k -> do
               a' <- runBooleanC a
-              a'' <- runBoolean (asBool a')
+              a'' <- case a' of
+                Boolean b -> pure b
+                other     -> throwBaseError (BoolError other)
               if a'' then
                 runBooleanC (k a')
               else
