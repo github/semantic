@@ -48,6 +48,8 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
+                     -- Effects
+                     , Control.Effect.Resource
                      -- Rewriting
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
@@ -134,6 +136,12 @@ library
                      , Language.Haskell.Grammar
                      , Language.Haskell.Assignment
                      , Language.Haskell.Syntax
+                     , Language.Haskell.Syntax.Constructor
+                     , Language.Haskell.Syntax.Haskell
+                     , Language.Haskell.Syntax.Identifier
+                     , Language.Haskell.Syntax.Pattern
+                     , Language.Haskell.Syntax.QuasiQuote
+                     , Language.Haskell.Syntax.Type
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
@@ -218,6 +226,7 @@ library
                      , cmark-gfm
                      , containers
                      , cryptohash
+                     , deepseq
                      , directory
                      , directory-tree
                      , fastsum
@@ -286,16 +295,16 @@ library
                      , StrictData
                      , TypeApplications
   if flag(release)
-    ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j
+    ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j -DCOMPUTE_GIT_SHA
   else
-    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j
+    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j +RTS -A128m -n2m -RTS
   ghc-prof-options:    -fprof-auto
 
 executable semantic
   hs-source-dirs:      app
   main-is:             Main.hs
   if flag(release)
-    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O1 -j
+    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O1 -j -DCOMPUTE_GIT_SHA
   else
     ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O0 -j
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
@@ -423,7 +432,7 @@ test-suite doctests
                      , doctest
 
 benchmark evaluation
-  hs-source-dirs:      bench
+  hs-source-dirs:      bench/evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O1

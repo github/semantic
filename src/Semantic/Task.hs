@@ -17,6 +17,7 @@ module Semantic.Task
 , writeLog
 , writeStat
 , time
+, time'
 -- * High-level flow
 , parse
 , analyze
@@ -57,6 +58,7 @@ import qualified Assigning.Assignment as Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified Control.Abstract as Analysis
 import           Control.Effect
+import           Control.Effect.Resource
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Blob
@@ -97,8 +99,9 @@ type TaskEff
   ( Eff (TelemetryC
   ( Eff (ErrorC SomeException
   ( Eff (TimeoutC
+  ( Eff (ResourceC
   ( Eff (DistributeC
-  ( Eff (LiftC IO)))))))))))))))))))
+  ( Eff (LiftC IO)))))))))))))))))))))
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -146,16 +149,7 @@ serialize format input = send (Serialize format input gen)
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
 -- > runTask = runTaskWithOptions defaultOptions
-runTask :: Eff (TaskC
-          (Eff (ResolutionC
-          (Eff (IO.FilesC
-          (Eff (ReaderC Config
-          (Eff (TraceInTelemetryC
-          (Eff (TelemetryC
-          (Eff (ErrorC SomeException
-          (Eff (TimeoutC
-          (Eff (DistributeC
-          (Eff (LiftC IO))))))))))))))))))) a
+runTask :: TaskEff a
         -> IO a
 runTask = runTaskWithOptions defaultOptions
 
@@ -184,7 +178,8 @@ runTaskWithConfig options logger statter task = do
         run
           = runM
           . runDistribute
-          . runTimeout (runM . runDistribute)
+          . runResource (runM . runDistribute)
+          . runTimeout (runM . runDistribute . runResource (runM . runDistribute))
           . runError
           . runTelemetry logger statter
           . runTraceInTelemetry
@@ -231,14 +226,23 @@ instance Effect Task where
   handle state handler (Serialize format input k) = Serialize format input (handler . (<$ state) . k)
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
+runTaskF :: ( Member (Error SomeException) sig
+            , Member (Lift IO) sig
+            , Member (Reader Config) sig
+            , Member Resource sig
+            , Member Telemetry sig
+            , Member Timeout sig
+            , Member Trace sig
+            , Carrier sig m
+            , MonadIO m
+            )
          => Eff (TaskC m) a
          -> m a
 runTaskF = runTaskC . interpret
 
 newtype TaskC m a = TaskC { runTaskC :: m a }
 
-instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
+instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   gen = TaskC . gen
   alg = TaskC . (algT \/ (alg . handlePure runTaskC))
     where algT = \case
@@ -268,7 +272,7 @@ data ParserCancelled = ParserTimedOut FilePath Language | AssignmentTimedOut Fil
 instance Exception ParserCancelled
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
+runParser :: (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m)
           => Blob
           -> Parser term
           -> m term
@@ -298,6 +302,7 @@ runParser blob@Blob{..} parser = case parser of
                          , Member (Error SomeException) sig
                          , Member (Lift IO) sig
                          , Member (Reader Config) sig
+                         , Member Resource sig
                          , Member Telemetry sig
                          , Member Timeout sig
                          , Member Trace sig
@@ -328,6 +333,7 @@ runParser blob@Blob{..} parser = case parser of
                   Just "ParseError" -> do
                     writeStat (increment "parse.parse_errors" languageTag)
                     logError config Warning blob err (("task", "parse") : blobFields)
+                    when (optionsFailOnParseError (configOptions config)) $ throwError (toException err)
                   _ -> do
                     writeStat (increment "parse.assign_warnings" languageTag)
                     logError config Warning blob err (("task", "assign") : blobFields)

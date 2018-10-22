@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, Rank2Types, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, KindSignatures, Rank2Types, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -76,7 +76,7 @@ function name params body = sendFunction (Function name params body gen)
 data BuiltIn
   = Print
   | Show
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => BuiltIn -> Evaluator term address value m value
 builtIn = sendFunction . flip BuiltIn gen
