@@ -86,8 +86,8 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 
 type ModuleC term address value m
-  = ErrorC (LoopControl address) (Evaluator term address value
-  ( ErrorC (Return address)      (Evaluator term address value
+  = ErrorC (LoopControl address) (Eff
+  ( ErrorC (Return address)      (Eff
   ( EnvC                         (Evaluator term address value
   ( StateC (EvalContext address) (Evaluator term address value
   ( StateC (Exports address)     (Evaluator term address value
