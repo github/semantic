@@ -168,15 +168,15 @@ instance NFData1 ResolutionError where
     GoImportError p      -> rnf p
 
 runResolutionError :: (Carrier sig m, Effect sig)
-                   => Evaluator term address value (ResumableC (BaseError ResolutionError) (Evaluator term address value m)) a
+                   => Evaluator term address value (ResumableC (BaseError ResolutionError) (Eff m)) a
                    -> Evaluator term address value m (Either (SomeError (BaseError ResolutionError)) a)
-runResolutionError = runResumable . runEvaluator
+runResolutionError = Evaluator . runResumable . runEvaluator
 
 runResolutionErrorWith :: Carrier sig m
                        => (forall resume . (BaseError ResolutionError) resume -> Evaluator term address value m resume)
-                       -> Evaluator term address value (ResumableWithC (BaseError ResolutionError) (Evaluator term address value m)) a
+                       -> Evaluator term address value (ResumableWithC (BaseError ResolutionError) (Eff m)) a
                        -> Evaluator term address value m a
-runResolutionErrorWith f = runResumableWith f . runEvaluator
+runResolutionErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
 throwResolutionError :: ( Member (Reader ModuleInfo) sig
                         , Member (Reader Span) sig
