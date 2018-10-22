@@ -86,18 +86,18 @@ runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult addr
               , Carrier sig m
               )
            => Set ModulePath
-           -> Evaluator term address value (ModulesC
-             (Evaluator term address value m)) a
+           -> Evaluator term address value (ModulesC address (Eff m)) a
            -> Evaluator term address value m a
-runModules paths = flip runModulesC paths . interpret . runEvaluator
+runModules paths = raiseHandler $ flip runModulesC paths . interpret
 
-newtype ModulesC m a = ModulesC { runModulesC :: Set ModulePath -> m a }
+newtype ModulesC address m a = ModulesC { runModulesC :: Set ModulePath -> m a }
 
 instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
          , Member (Resumable (BaseError (LoadError address))) sig
          , Carrier sig m
+         , Monad m
          )
-      => Carrier (Modules address :+: sig) (ModulesC (Evaluator term address value m)) where
+      => Carrier (Modules address :+: sig) (ModulesC address m) where
   ret = ModulesC . const . ret
   eff op = ModulesC (\ paths -> (alg paths \/ (eff . handlePure (flip runModulesC paths))) op)
     where alg paths (Load    name  k) = askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
@@ -105,7 +105,7 @@ instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))
           alg paths (Resolve names k) = runModulesC (k (find (`Set.member` paths) names)) paths
           alg paths (List    dir   k) = runModulesC (k (filter ((dir ==) . takeDirectory) (toList paths))) paths
 
-askModuleTable :: (Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig, Carrier sig m) => Evaluator term address value m (ModuleTable (NonEmpty (Module (ModuleResult address))))
+askModuleTable :: (Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig, Carrier sig m) => m (ModuleTable (NonEmpty (Module (ModuleResult address))))
 askModuleTable = ask
 
 
@@ -142,7 +142,7 @@ runLoadErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwLoadError :: (Member (Resumable (BaseError (LoadError address))) sig, Carrier sig m)
                => LoadError address resume
-               -> Evaluator term address value m resume
+               -> m resume
 throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name) emptySpan err
 
 
