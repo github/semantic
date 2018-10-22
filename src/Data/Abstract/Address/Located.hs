@@ -42,9 +42,9 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          , Monad m
          )
       => Carrier (Allocator (Located address) :+: sig) (AllocatorC (Located address) m) where
-  ret = AllocatorC . ret
-  eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
-    where alg (Alloc name k) = Located <$> runAllocatorC (promoteA (eff (L (Alloc name ret)))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= runAllocatorC . demoteA . k
+  ret = demoteA . ret
+  eff = alg \/ AllocatorC . eff . handlePure runAllocatorC
+    where alg (Alloc name k) = Located <$> promoteA (eff (L (Alloc name ret))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= k
 
 
 instance (Carrier (Deref value :+: sig) (DerefC (Evaluator term address value m)), Carrier sig m)
