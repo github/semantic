@@ -138,7 +138,7 @@ instance ( Member (Reader ModuleInfo) sig
 --          , Show address
 --          , Show term
 --          )
---       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Evaluator term address (Value term address) (InterposeC (Resumable (BaseError (UnspecializedError (Value term address)))) (Evaluator term address (Value term address) m)))) where
+--       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff (InterposeC (Resumable (BaseError (UnspecializedError (Value term address)))) m))) where
 --   ret = WhileC . ret
 --   eff = WhileC . (alg \/ (eff . handlePure runWhileC))
 --     where alg = \case

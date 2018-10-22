@@ -48,19 +48,20 @@ instance ( Member (Allocator address) sig
 
 instance (Carrier sig m, Alternative m, Monad m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
   ret = BooleanC . ret
-  eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
+  eff = BooleanC . (alg \/ eff . handlePure runBooleanC)
     where alg (Boolean _ k) = runBooleanC (k Abstract)
           alg (AsBool _ k) = runBooleanC (k True) <|> runBooleanC (k False)
           alg (Disjunction a b k) = (runBooleanC a <|> runBooleanC b) >>= runBooleanC . k
 
 
 instance ( Member (Abstract.Boolean Abstract) sig
-         , Member NonDet sig
          , Carrier sig m
+         , Alternative m
+         , Monad m
          )
-      => Carrier (While Abstract :+: sig) (WhileC (Evaluator term address Abstract m)) where
+      => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
   ret = WhileC . ret
-  eff = WhileC . (alg \/ (eff . handlePure runWhileC))
+  eff = WhileC . (alg \/ eff . handlePure runWhileC)
     where alg (Abstract.While cond body k) = do
             cond' <- runWhileC cond
             ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit))
