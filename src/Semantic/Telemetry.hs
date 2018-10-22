@@ -42,6 +42,7 @@ module Semantic.Telemetry
 , writeLog
 , writeStat
 , time
+, time'
 , Telemetry(..)
 , runTelemetry
 , TelemetryC(..)
@@ -130,6 +131,9 @@ time statName tags task = do
   (a, stat) <- withTiming statName tags task
   a <$ writeStat stat
 
+-- | A task which measures and returns the timing of another task.
+time' :: MonadIO m => m output -> m (output, Double)
+time' = withTiming'
 
 -- | Statting and logging effects.
 data Telemetry (m :: * -> *) k

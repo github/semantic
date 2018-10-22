@@ -23,7 +23,7 @@ import qualified Proto3.Wire.Encode as Encode
 data Name
   = Name Text
   | I Int
-  deriving (Eq, Ord, MessageField)
+  deriving (Eq, Ord, MessageField, Generic, NFData)
 
 instance HasDefault Name where
   def = Name mempty

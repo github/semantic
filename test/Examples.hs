@@ -49,6 +49,7 @@ main = withOptions opts $ \ config logger statter -> hspec . parallel $ do
           Left (SomeException e) -> case cast e of
             -- We have a number of known assignment timeouts, consider these pending specs instead of failing the build.
             Just (AssignmentTimedOut _ _) -> pendingWith $ show (displayException e)
+            Just (ParserTimedOut _ _) -> pendingWith $ show (displayException e)
             -- Other exceptions are true failures
             _ -> expectationFailure (show (displayException e))
           _ -> if file `elem` knownFailures

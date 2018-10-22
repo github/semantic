@@ -17,7 +17,7 @@ import Prologue
 
 -- | A map of addresses onto cells holding their values.
 newtype Heap address value = Heap { unHeap :: Monoidal.Map address (Set value) }
-  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup)
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Generic, NFData)
 
 -- | Look up the cell of values for an 'Address' in a 'Heap', if any.
 heapLookup :: Ord address => address -> Heap address value -> Maybe (Set value)
