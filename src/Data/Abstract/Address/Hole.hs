@@ -39,9 +39,9 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          , Monad m
          )
       => Carrier (Allocator (Hole context address) :+: sig) (AllocatorC (Hole context address) m) where
-  ret = AllocatorC . ret
-  eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
-    where alg (Alloc name k) = Total <$> runAllocatorC (promoteA (eff (L (Alloc name ret)))) >>= runAllocatorC . demoteA . k
+  ret = demoteA . ret
+  eff = alg \/ AllocatorC . eff . handlePure runAllocatorC
+    where alg (Alloc name k) = Total <$> promoteA (eff (L (Alloc name ret))) >>= k
 
 
 instance (Carrier (Deref value :+: sig) (DerefC (Evaluator term address value m)), Carrier sig m)
