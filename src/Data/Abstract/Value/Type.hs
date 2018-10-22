@@ -88,11 +88,11 @@ instance Ord1  TypeError where
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
-runTypeError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError TypeError) (Evaluator term address value m)) a -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
-runTypeError = runResumable . runEvaluator
+runTypeError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
+runTypeError = Evaluator . runResumable . runEvaluator
 
-runTypeErrorWith :: Carrier sig m => (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError TypeError) (Evaluator term address value m)) a -> Evaluator term address value m a
-runTypeErrorWith f = runResumableWith f . runEvaluator
+runTypeErrorWith :: Carrier sig m => (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m a
+runTypeErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
 throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
                   , Member (Reader ModuleInfo) sig
@@ -104,23 +104,22 @@ throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
 throwTypeError = throwBaseError
 
 runTypeMap :: (Carrier sig m, Effect sig)
-           => Evaluator term address Type (StateC TypeMap
-             (Evaluator term address Type m)) a
+           => Evaluator term address Type (StateC TypeMap (Eff m)) a
            -> Evaluator term address Type m a
-runTypeMap = fmap snd . runState emptyTypeMap . runEvaluator
+runTypeMap = Evaluator . fmap snd . runState emptyTypeMap . runEvaluator
 
 runTypes :: (Carrier sig m, Effect sig)
-         => Evaluator term address Type (ResumableC (BaseError TypeError)
-           (Evaluator term address Type (StateC TypeMap
-           (Evaluator term address Type m)))) a
+         => Evaluator term address Type (ResumableC (BaseError TypeError) (Eff
+                                        (StateC TypeMap (Eff
+                                        m)))) a
          -> Evaluator term address Type m (Either (SomeError (BaseError TypeError)) a)
 runTypes = runTypeMap . runTypeError
 
 runTypesWith :: (Carrier sig m, Effect sig)
-             => (forall resume . (BaseError TypeError) resume -> Evaluator term address Type (StateC TypeMap (Evaluator term address Type m)) resume)
-             -> Evaluator term address Type (ResumableWithC (BaseError TypeError)
-               (Evaluator term address Type (StateC TypeMap
-               (Evaluator term address Type m)))) a
+             => (forall resume . (BaseError TypeError) resume -> Evaluator term address Type (StateC TypeMap (Eff m)) resume)
+             -> Evaluator term address Type (ResumableWithC (BaseError TypeError) (Eff
+                                            (StateC TypeMap (Eff
+                                            m)))) a
              -> Evaluator term address Type m a
 runTypesWith with = runTypeMap . runTypeErrorWith with
 
