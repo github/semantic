@@ -58,7 +58,12 @@ import qualified Assigning.Assignment as Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified Control.Abstract as Analysis
 import           Control.Effect
+import           Control.Effect.Carrier
+import           Control.Effect.Error
+import           Control.Effect.Reader
 import           Control.Effect.Resource
+import           Control.Effect.Sum
+import           Control.Effect.Trace
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Blob
@@ -111,40 +116,40 @@ parse :: (Member Task sig, Carrier sig m)
       => Parser term
       -> Blob
       -> m term
-parse parser blob = send (Parse parser blob gen)
+parse parser blob = send (Parse parser blob ret)
 
 -- | A task running some 'Analysis.Evaluator' to completion.
 analyze :: (Member Task sig, Carrier sig m)
         => (Analysis.Evaluator term address value m a -> result)
         -> Analysis.Evaluator term address value m a
         -> m result
-analyze interpret analysis = send (Analyze interpret analysis gen)
+analyze interpret analysis = send (Analyze interpret analysis ret)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member Task sig, Carrier sig m)
          => RAlgebra (TermF f Location) (Term f Location) field
          -> Term f Location
          -> m (Term f field)
-decorate algebra term = send (Decorate algebra term gen)
+decorate algebra term = send (Decorate algebra term ret)
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
 diff :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task sig, Carrier sig m)
      => These (Term syntax ann) (Term syntax ann)
      -> m (Diff syntax ann ann)
-diff terms = send (Semantic.Task.Diff terms gen)
+diff terms = send (Semantic.Task.Diff terms ret)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
 render :: (Member Task sig, Carrier sig m)
        => Renderer input output
        -> input
        -> m output
-render renderer input = send (Render renderer input gen)
+render renderer input = send (Render renderer input ret)
 
 serialize :: (Member Task sig, Carrier sig m)
           => Format input
           -> input
           -> m Builder
-serialize format input = send (Serialize format input gen)
+serialize format input = send (Serialize format input ret)
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
@@ -199,8 +204,8 @@ runTraceInTelemetry = runTraceInTelemetryC . interpret
 newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a }
 
 instance (Member Telemetry sig, Carrier sig m, Monad m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
-  gen = TraceInTelemetryC . gen
-  alg = TraceInTelemetryC . ((\ (Trace str k) -> writeLog Debug str [] >> runTraceInTelemetryC k) \/ (alg . handlePure runTraceInTelemetryC))
+  ret = TraceInTelemetryC . ret
+  eff = TraceInTelemetryC . ((\ (Trace str k) -> writeLog Debug str [] >> runTraceInTelemetryC k) \/ (eff . handlePure runTraceInTelemetryC))
 
 
 -- | An effect describing high-level tasks to be performed.
@@ -243,9 +248,9 @@ runTaskF = runTaskC . interpret
 newtype TaskC m a = TaskC { runTaskC :: m a }
 
 instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
-  gen = TaskC . gen
-  alg = TaskC . (algT \/ (alg . handlePure runTaskC))
-    where algT = \case
+  ret = TaskC . ret
+  eff = TaskC . (alg \/ (eff . handlePure runTaskC))
+    where alg = \case
             Parse parser blob k -> runParser blob parser >>= runTaskC . k
             Analyze interpret analysis k -> runTaskC (k (interpret analysis))
             Decorate algebra term k -> runTaskC (k (decoratorWithAlgebra algebra term))

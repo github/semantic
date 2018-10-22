@@ -7,6 +7,8 @@ module Data.Abstract.Value.Abstract
 ) where
 
 import Control.Abstract as Abstract
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Prologue
@@ -28,9 +30,9 @@ instance ( Member (Allocator address) sig
          , Carrier sig m
          )
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Evaluator term address Abstract m)) where
-  gen = FunctionC . const . gen
-  alg op = FunctionC (\ eval -> (algF eval \/ (alg . handlePure (flip runFunctionC eval))) op)
-    where algF eval = \case
+  ret = FunctionC . const . ret
+  eff op = FunctionC (\ eval -> (alg eval \/ (eff . handlePure (flip runFunctionC eval))) op)
+    where alg eval = \case
             Function _ params body k -> do
               env <- foldr (\ name rest -> do
                 addr <- alloc name
@@ -45,11 +47,11 @@ instance ( Member (Allocator address) sig
 
 
 instance (Carrier sig m, Member NonDet sig) => Carrier (Boolean Abstract :+: sig) (BooleanC (Evaluator term address Abstract m)) where
-  gen = BooleanC . gen
-  alg = BooleanC . (algB \/ (alg . handlePure runBooleanC))
-    where algB (Boolean _ k) = runBooleanC (k Abstract)
-          algB (AsBool _ k) = runBooleanC (k True) <|> runBooleanC (k False)
-          algB (Disjunction a b k) = (runBooleanC a <|> runBooleanC b) >>= runBooleanC . k
+  ret = BooleanC . ret
+  eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
+    where alg (Boolean _ k) = runBooleanC (k Abstract)
+          alg (AsBool _ k) = runBooleanC (k True) <|> runBooleanC (k False)
+          alg (Disjunction a b k) = (runBooleanC a <|> runBooleanC b) >>= runBooleanC . k
 
 
 instance ( Member (Abstract.Boolean Abstract) sig
@@ -57,9 +59,9 @@ instance ( Member (Abstract.Boolean Abstract) sig
          , Carrier sig m
          )
       => Carrier (While Abstract :+: sig) (WhileC (Evaluator term address Abstract m)) where
-  gen = WhileC . gen
-  alg = WhileC . (algW \/ (alg . handlePure runWhileC))
-    where algW (Abstract.While cond body k) = do
+  ret = WhileC . ret
+  eff = WhileC . (alg \/ (eff . handlePure runWhileC))
+    where alg (Abstract.While cond body k) = do
             cond' <- runWhileC cond
             ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit))
 

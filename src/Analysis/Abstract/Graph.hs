@@ -18,6 +18,8 @@ module Analysis.Abstract.Graph
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Data.Abstract.Address.Hole
 import           Data.Abstract.Address.Located
 import           Data.Abstract.BaseError
@@ -101,7 +103,7 @@ graphingTerms recur0 recur term@(Term (In a syntax)) = do
       local (const v) $ do
         valRef <- recur0 recur term
         addr <- Control.Abstract.address valRef
-        modify' (Map.insert addr v)
+        modify (Map.insert addr v)
         pure valRef
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
@@ -164,11 +166,11 @@ runEavesdropC :: (forall x . eff m (m x) -> m ()) -> EavesdropC eff m a -> m a
 runEavesdropC f (EavesdropC m) = m f
 
 instance (Carrier sig m, HFunctor eff, Member eff sig, Applicative m) => Carrier sig (EavesdropC eff m) where
-  gen a = EavesdropC (const (gen a))
-  alg op
+  ret a = EavesdropC (const (ret a))
+  eff op
     | Just m <- prj op = case m of
       eff -> EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
-    | otherwise        = EavesdropC (\ handler -> alg (handlePure (runEavesdropC handler) op))
+    | otherwise        = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig

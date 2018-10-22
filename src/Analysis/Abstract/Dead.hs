@@ -24,7 +24,7 @@ killAll = put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
 revive :: (Member (State (Dead term)) sig, Carrier sig m, Ord term) => term -> Evaluator term address value m ()
-revive t = modify' (Dead . delete t . unDead)
+revive t = modify (Dead . delete t . unDead)
 
 -- | Compute the set of all subterms recursively.
 subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term

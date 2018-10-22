@@ -5,6 +5,7 @@ module Analysis.Abstract.Tracing
 ) where
 
 import Control.Abstract hiding (trace)
+import Control.Effect.Writer
 import Data.Abstract.Environment
 import Data.Semigroup.Reducer as Reducer
 

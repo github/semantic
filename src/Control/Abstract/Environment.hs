@@ -27,6 +27,8 @@ module Control.Abstract.Environment
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Environment (Bindings, Environment, EvalContext(..), EnvironmentError(..))
 import qualified Data.Abstract.Environment as Env
@@ -38,7 +40,7 @@ import Prologue
 
 -- | Retrieve the current execution context
 getEvalContext :: (Member (Env address) sig, Carrier sig m) => Evaluator term address value m (EvalContext address)
-getEvalContext = send (GetCtx gen)
+getEvalContext = send (GetCtx ret)
 
 -- | Retrieve the current environment
 getEnv :: (Member (Env address) sig, Carrier sig m)
@@ -47,7 +49,7 @@ getEnv = ctxEnvironment <$> getEvalContext
 
 -- | Replace the execution context. This is only for use in Analysis.Abstract.Caching.
 putEvalContext :: (Member (Env address) sig, Carrier sig m) => EvalContext address -> Evaluator term address value m ()
-putEvalContext context = send (PutCtx context (gen ()))
+putEvalContext context = send (PutCtx context (ret ()))
 
 withEvalContext :: (Member (Env address) sig, Carrier sig m)
                 => EvalContext address
@@ -62,16 +64,16 @@ withEvalContext ctx comp = do
 
 -- | Add an export to the global export state.
 export :: (Member (Env address) sig, Carrier sig m) => Name -> Name -> Maybe address -> Evaluator term address value m ()
-export name alias addr = send (Export name alias addr (gen ()))
+export name alias addr = send (Export name alias addr (ret ()))
 
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: (Member (Env address) sig, Carrier sig m) => Name -> Evaluator term address value m (Maybe address)
-lookupEnv name = send (Lookup name gen)
+lookupEnv name = send (Lookup name ret)
 
 -- | Bind a 'Name' to an address in the current scope.
 bind :: (Member (Env address) sig, Carrier sig m) => Name -> address -> Evaluator term address value m ()
-bind name addr = send (Bind name addr (gen ()))
+bind name addr = send (Bind name addr (ret ()))
 
 -- | Bind all of the names from an 'Environment' in the current scope.
 bindAll :: (Member (Env address) sig, Carrier sig m) => Bindings address -> Evaluator term address value m ()
@@ -79,10 +81,10 @@ bindAll = foldr ((>>) . uncurry bind) (pure ()) . Env.pairs
 
 -- | Run an action in a new local scope.
 locally :: forall term address value sig m a . (Member (Env address) sig, Carrier sig m) => Evaluator term address value m a -> Evaluator term address value m a
-locally m = send (Locally @address m gen)
+locally m = send (Locally @address m ret)
 
 close :: (Member (Env address) sig, Carrier sig m) => Set Name -> Evaluator term address value m (Environment address)
-close fvs = send (Close fvs gen)
+close fvs = send (Close fvs ret)
 
 self :: (Member (Env address) sig, Carrier sig m) => Evaluator term address value m (Maybe address)
 self = ctxSelf <$> getEvalContext
@@ -187,20 +189,20 @@ runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . r
 newtype EnvC m a = EnvC { runEnvC :: m a }
 
 instance (Carrier (State (EvalContext address) :+: State (Exports address) :+: sig) m, HFunctor sig) => Carrier (Env address :+: sig) (EnvC (Evaluator term address value m)) where
-  gen = EnvC . gen
-  alg = EnvC . (algE \/ (alg . R . R . handlePure runEnvC))
-    where algE = \case
+  ret = EnvC . ret
+  eff = EnvC . (alg \/ (eff . R . R . handlePure runEnvC))
+    where alg = \case
             Lookup name k -> gets (Env.lookupEnv' name . ctxEnvironment) >>= runEnvC . k
-            Bind name addr k -> modify' (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment)) >> runEnvC k
+            Bind name addr k -> modify (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment)) >> runEnvC k
             Close names k -> gets (Env.intersect names . ctxEnvironment) >>= runEnvC . k
             Locally action k -> do
-              modify' (\EvalContext{..} -> EvalContext ctxSelf (Env.push @address ctxEnvironment))
+              modify (\EvalContext{..} -> EvalContext ctxSelf (Env.push @address ctxEnvironment))
               a <- runEnvC action
-              modify' (\EvalContext{..} -> EvalContext ctxSelf (Env.pop @address ctxEnvironment))
+              modify (\EvalContext{..} -> EvalContext ctxSelf (Env.pop @address ctxEnvironment))
               runEnvC (k a)
             GetCtx k -> get >>= runEnvC . k
             PutCtx e k -> put e >> runEnvC k
-            Export name alias addr k -> modify' (Exports.insert name alias addr) >> runEnvC k
+            Export name alias addr k -> modify (Exports.insert name alias addr) >> runEnvC k
 
 freeVariableError :: ( Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig

@@ -6,7 +6,9 @@ module Control.Effect.Resource
 , ResourceC(..)
 ) where
 
-import           Control.Effect hiding (bracket)
+import           Control.Effect
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import qualified Control.Exception as Exc
 import           Control.Monad.IO.Class
 
@@ -26,7 +28,7 @@ bracket :: (Member Resource sig, Carrier sig m)
         -> (resource -> m any)
         -> (resource -> m a)
         -> m a
-bracket acquire release use = send (Resource acquire release use gen)
+bracket acquire release use = send (Resource acquire release use ret)
 
 
 runResource :: (Carrier sig m, MonadIO m)
@@ -41,10 +43,10 @@ runResourceC :: (forall x . m x -> IO x) -> ResourceC m a -> m a
 runResourceC handler (ResourceC m) = m handler
 
 instance (Carrier sig m, MonadIO m) => Carrier (Resource :+: sig) (ResourceC m) where
-  gen a = ResourceC (const (gen a))
-  alg op = ResourceC (\ handler -> (algR handler \/ alg . handlePure (runResourceC handler)) op)
-    where algR :: MonadIO m => (forall x . m x -> IO x) -> Resource (ResourceC m) (ResourceC m a) -> m a
-          algR handler (Resource acquire release use k) = liftIO (Exc.bracket
+  ret a = ResourceC (const (ret a))
+  eff op = ResourceC (\ handler -> (alg handler \/ eff . handlePure (runResourceC handler)) op)
+    where alg :: MonadIO m => (forall x . m x -> IO x) -> Resource (ResourceC m) (ResourceC m a) -> m a
+          alg handler (Resource acquire release use k) = liftIO (Exc.bracket
             (handler (runResourceC handler acquire))
             (handler . runResourceC handler . release)
             (handler . runResourceC handler . use))

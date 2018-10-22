@@ -4,6 +4,8 @@ module Data.Abstract.Address.Precise
 ) where
 
 import Control.Abstract
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import qualified Data.Set as Set
 import Prologue
 
@@ -16,13 +18,13 @@ instance Show Precise where
 
 
 instance (Member Fresh sig, Carrier sig m) => Carrier (Allocator Precise :+: sig) (AllocatorC (Evaluator term Precise value m)) where
-  gen = AllocatorC . gen
-  alg = AllocatorC . (algA \/ (alg . handlePure runAllocatorC))
-    where algA (Alloc _ k) = Precise <$> fresh >>= runAllocatorC . k
+  ret = AllocatorC . ret
+  eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
+    where alg (Alloc _ k) = Precise <$> fresh >>= runAllocatorC . k
 
 
 instance Carrier sig m => Carrier (Deref value :+: sig) (DerefC (Evaluator term Precise value m)) where
-  gen = DerefC . gen
-  alg = DerefC . (algD \/ (alg . handlePure runDerefC))
-    where algD (DerefCell cell k) = runDerefC (k (fst <$> Set.minView cell))
-          algD (AssignCell value _ k) = runDerefC (k (Set.singleton value))
+  ret = DerefC . ret
+  eff = DerefC . (alg \/ (eff . handlePure runDerefC))
+    where alg (DerefCell cell k) = runDerefC (k (fst <$> Set.minView cell))
+          alg (AssignCell value _ k) = runDerefC (k (Set.singleton value))

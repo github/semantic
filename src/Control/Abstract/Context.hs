@@ -13,6 +13,8 @@ module Control.Abstract.Context
 ) where
 
 import Control.Effect
+import Control.Effect.Reader
+import Control.Effect.State
 import Data.Abstract.Module
 import Data.Abstract.Package
 import Data.Span
@@ -44,7 +46,7 @@ withCurrentSpan :: (Member (Reader Span) sig, Carrier sig m) => Span -> m a -> m
 withCurrentSpan = local . const
 
 modifyChildSpan :: (Member (State Span) sig, Carrier sig m, Monad m) => Span -> m a -> m a
-modifyChildSpan span m = m >>= \a -> modify' (const span) >> pure a
+modifyChildSpan span m = m <* put span
 
 -- | Run an action with locally-replaced 'ModuleInfo' & 'Span' derived from the passed 'SrcLoc'.
 withCurrentSrcLoc :: (Member (Reader ModuleInfo) sig, Member (Reader Span) sig, Carrier sig m) => SrcLoc -> m a -> m a

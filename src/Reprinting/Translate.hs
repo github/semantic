@@ -7,6 +7,8 @@ module Reprinting.Translate
 
 import           Control.Monad
 import           Control.Effect
+import           Control.Effect.Error
+import           Control.Effect.State
 import           Control.Monad.Trans
 import           Data.Machine
 
@@ -34,8 +36,8 @@ contextualizing = repeatedly $ await >>= \case
 
 enterScope, exitScope :: Scope -> PlanT k Fragment Translator ()
 
-enterScope c = lift (modify' (c :))
+enterScope c = lift (modify (c :))
 
 exitScope c = lift get >>= \case
-  (x:xs) -> when (x == c) (lift (modify' (const xs)))
+  (x:xs) -> when (x == c) (lift (modify (const xs)))
   cs     -> lift (throwError (UnbalancedPair c cs))

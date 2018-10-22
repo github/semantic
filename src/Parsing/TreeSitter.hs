@@ -8,8 +8,9 @@ import Prologue hiding (bracket)
 
 import           Control.Concurrent.Async
 import qualified Control.Exception as Exc (bracket)
-import           Control.Effect hiding (bracket)
+import           Control.Effect
 import           Control.Effect.Resource
+import           Control.Effect.Trace
 import           Control.Monad.IO.Class
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign

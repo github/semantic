@@ -25,6 +25,7 @@ module Control.Abstract.Heap
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Roots
+import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import Data.Abstract.Heap
 import Data.Abstract.Live
@@ -43,7 +44,7 @@ putHeap = put
 
 -- | Update the heap.
 modifyHeap :: (Member (State (Heap address value)) sig, Carrier sig m) => (Heap address value -> Heap address value) -> Evaluator term address value m ()
-modifyHeap = modify'
+modifyHeap = modify
 
 box :: ( Member (Allocator address) sig
        , Member (Deref value) sig
@@ -61,7 +62,7 @@ box val = do
   pure addr
 
 alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator term address value m address
-alloc = send . flip Alloc gen
+alloc = send . flip Alloc ret
 
 dealloc :: (Member (State (Heap address value)) sig, Ord address, Carrier sig m) => address -> Evaluator term address value m ()
 dealloc addr = modifyHeap (heapDelete addr)
@@ -77,7 +78,7 @@ deref :: ( Member (Deref value) sig
          )
       => address
       -> Evaluator term address value m value
-deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . flip DerefCell gen >>= maybeM (throwAddressError (UninitializedAddress addr))
+deref addr = gets (heapLookup addr) >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError (UninitializedAddress addr))
 
 
 -- | Write a value to the given address in the 'Allocator'.
@@ -91,7 +92,7 @@ assign :: ( Member (Deref value) sig
        -> Evaluator term address value m ()
 assign addr value = do
   heap <- getHeap
-  cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)) gen)
+  cell <- send (AssignCell value (fromMaybe lowerBound (heapLookup addr heap)) ret)
   putHeap (heapInit addr cell heap)
 
 

@@ -4,6 +4,8 @@ module Data.Abstract.Address.Monovariant
 ) where
 
 import Control.Abstract
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.Name
 import qualified Data.Set as Set
 import Prologue
@@ -17,13 +19,13 @@ instance Show Monovariant where
 
 
 instance Carrier sig m => Carrier (Allocator Monovariant :+: sig) (AllocatorC (Evaluator term Monovariant value m)) where
-  gen = AllocatorC . gen
-  alg = AllocatorC . (algA \/ (alg . handlePure runAllocatorC))
-    where algA (Alloc name k) = runAllocatorC (k (Monovariant name))
+  ret = AllocatorC . ret
+  eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
+    where alg (Alloc name k) = runAllocatorC (k (Monovariant name))
 
 
 instance (Member NonDet sig, Ord value, Carrier sig m) => Carrier (Deref value :+: sig) (DerefC (Evaluator term Monovariant value m)) where
-  gen = DerefC . gen
-  alg = DerefC . (algD \/ (alg . handlePure runDerefC))
-    where algD (DerefCell cell k) = traverse (foldMapA pure) (nonEmpty (toList cell)) >>= runDerefC . k
-          algD (AssignCell value cell k) = runDerefC (k (Set.insert value cell))
+  ret = DerefC . ret
+  eff = DerefC . (alg \/ (eff . handlePure runDerefC))
+    where alg (DerefCell cell k) = traverse (foldMapA pure) (nonEmpty (toList cell)) >>= runDerefC . k
+          alg (AssignCell value cell k) = runDerefC (k (Set.insert value cell))

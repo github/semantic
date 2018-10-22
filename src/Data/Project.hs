@@ -20,6 +20,7 @@ import Prelude hiding (readFile)
 import Prologue hiding (throwError)
 
 import           Control.Effect
+import           Control.Effect.Error
 import           Data.Blob
 import           Data.Language
 import qualified Data.Text as T

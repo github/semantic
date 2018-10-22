@@ -13,6 +13,8 @@ module Data.Abstract.Value.Type
 
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
@@ -134,7 +136,7 @@ modifyTypeMap :: ( Member (State TypeMap) sig
                  )
               => (Map.Map TName Type -> Map.Map TName Type)
               -> m ()
-modifyTypeMap f = modify' (TypeMap . f . unTypeMap)
+modifyTypeMap f = modify (TypeMap . f . unTypeMap)
 
 -- | Prunes substituted type variables
 prune :: ( Member (State TypeMap) sig
@@ -247,9 +249,9 @@ instance ( Member (Allocator address) sig
          , Carrier sig m
          )
       => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Evaluator term address Type m)) where
-  gen = FunctionC . const . gen
-  alg op = FunctionC (\ eval -> (algF eval \/ (alg . handlePure (flip runFunctionC eval))) op)
-    where algF eval = \case
+  ret = FunctionC . const . ret
+  eff op = FunctionC (\ eval -> (alg eval \/ (eff . handlePure (flip runFunctionC eval))) op)
+    where alg eval = \case
             Abstract.Function _ params body k -> do
               (env, tvars) <- foldr (\ name rest -> do
                 addr <- alloc name
@@ -278,11 +280,11 @@ instance ( Member NonDet sig
          , Carrier sig m
          )
       => Carrier (Abstract.Boolean Type :+: sig) (BooleanC (Evaluator term address Type m)) where
-  gen = BooleanC . gen
-  alg = BooleanC . (algB \/ (alg . handlePure runBooleanC))
-    where algB (Abstract.Boolean _ k) = runBooleanC (k Bool)
-          algB (Abstract.AsBool t k) = unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False))
-          algB (Abstract.Disjunction t1 t2 k) = ((runBooleanC t1 >>= unify Bool) <|> (runBooleanC t2 >>= unify Bool) >>= runBooleanC . k)
+  ret = BooleanC . ret
+  eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
+    where alg (Abstract.Boolean _ k) = runBooleanC (k Bool)
+          alg (Abstract.AsBool t k) = unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False))
+          alg (Abstract.Disjunction t1 t2 k) = ((runBooleanC t1 >>= unify Bool) <|> (runBooleanC t2 >>= unify Bool) >>= runBooleanC . k)
 
 
 instance ( Member (Abstract.Boolean Type) sig
@@ -290,9 +292,9 @@ instance ( Member (Abstract.Boolean Type) sig
          , Carrier sig m
          )
       => Carrier (Abstract.While Type :+: sig) (WhileC (Evaluator term address Type m)) where
-  gen = WhileC . gen
-  alg = WhileC . (algW \/ (alg . handlePure runWhileC))
-    where algW (Abstract.While cond body k) = do
+  ret = WhileC . ret
+  eff = WhileC . (alg \/ (eff . handlePure runWhileC))
+    where alg (Abstract.While cond body k) = do
             cond' <- runWhileC cond
             ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit))
 

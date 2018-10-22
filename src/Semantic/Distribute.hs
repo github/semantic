@@ -10,6 +10,8 @@ module Semantic.Distribute
 
 import qualified Control.Concurrent.Async as Async
 import           Control.Effect
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Control.Parallel.Strategies
 import           Control.Monad.IO.Class
 import           Prologue hiding (MonadError (..))
@@ -18,7 +20,7 @@ import           Prologue hiding (MonadError (..))
 --
 --   This is a concurrent analogue of 'sequenceA'.
 distribute :: (Member Distribute sig, Traversable t, Carrier sig m, Applicative m) => t (m output) -> m (t output)
-distribute = fmap (withStrategy (parTraversable rseq)) <$> traverse (send . flip Distribute gen)
+distribute = fmap (withStrategy (parTraversable rseq)) <$> traverse (send . flip Distribute ret)
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
 --
@@ -53,5 +55,5 @@ runDistribute = runDistributeC . interpret
 newtype DistributeC m a = DistributeC { runDistributeC :: m a }
 
 instance Carrier (Distribute :+: Lift IO) (DistributeC (Eff (LiftC IO))) where
-  gen = DistributeC . gen
-  alg = DistributeC . ((\ (Distribute task k) -> liftIO (Async.runConcurrently (Async.Concurrently (runM (runDistributeC task)))) >>= runDistributeC . k) \/ (alg . handlePure runDistributeC))
+  ret = DistributeC . ret
+  eff = DistributeC . ((\ (Distribute task k) -> liftIO (Async.runConcurrently (Async.Concurrently (runM (runDistributeC task)))) >>= runDistributeC . k) \/ (eff . handlePure runDistributeC))

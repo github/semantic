@@ -35,6 +35,7 @@ module Control.Abstract.Value
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
+import Control.Effect.Carrier
 import Data.Coerce
 import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
@@ -71,7 +72,7 @@ data Comparator
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
 function :: (Member (Function term address value) sig, Carrier sig m) => Maybe Name -> [Name] -> term -> Evaluator term address value m value
-function name params body = sendFunction (Function name params body gen)
+function name params body = sendFunction (Function name params body ret)
 
 data BuiltIn
   = Print
@@ -79,10 +80,10 @@ data BuiltIn
   deriving (Eq, Ord, Show, Generic, NFData)
 
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => BuiltIn -> Evaluator term address value m value
-builtIn = sendFunction . flip BuiltIn gen
+builtIn = sendFunction . flip BuiltIn ret
 
 call :: (Member (Function term address value) sig, Carrier sig m) => value -> address -> [address] -> Evaluator term address value m address
-call fn self args = sendFunction (Call fn self args gen)
+call fn self args = sendFunction (Call fn self args ret)
 
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
 sendFunction = send
@@ -114,11 +115,11 @@ newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> 
 
 -- | Construct a boolean value in the abstract domain.
 boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> Evaluator term address value m value
-boolean = send . flip Boolean gen
+boolean = send . flip Boolean ret
 
 -- | Extract a 'Bool' from a given value.
 asBool :: (Member (Boolean value) sig, Carrier sig m) => value -> Evaluator term address value m Bool
-asBool = send . flip AsBool gen
+asBool = send . flip AsBool ret
 
 -- | Eliminate boolean values. TODO: s/boolean/truthy
 ifthenelse :: (Member (Boolean value) sig, Carrier sig m) => value -> Evaluator term address value m a -> Evaluator term address value m a -> Evaluator term address value m a
@@ -126,7 +127,7 @@ ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 
 -- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
 disjunction :: (Member (Boolean value) sig, Carrier sig m) => Evaluator term address value m value -> Evaluator term address value m value -> Evaluator term address value m value
-disjunction a b = send (Disjunction a b gen)
+disjunction a b = send (Disjunction a b ret)
 
 data Boolean value m k
   = Boolean Bool (value -> k)
@@ -153,7 +154,7 @@ while :: (Member (While value) sig, Carrier sig m)
       => Evaluator term address value m value -- ^ Condition
       -> Evaluator term address value m value -- ^ Body
       -> Evaluator term address value m value
-while cond body = send (While cond body gen)
+while cond body = send (While cond body ret)
 
 -- | Do-while loop, built on top of while.
 doWhile :: (Member (While value) sig, Carrier sig m)

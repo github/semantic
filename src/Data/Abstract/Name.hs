@@ -9,6 +9,7 @@ module Data.Abstract.Name
 ) where
 
 import           Control.Effect
+import           Control.Effect.Fresh
 import           Data.Aeson
 import qualified Data.Char as Char
 import           Data.Text (Text)

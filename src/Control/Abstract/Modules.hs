@@ -20,6 +20,8 @@ module Control.Abstract.Modules
 ) where
 
 import Control.Abstract.Evaluator
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.Environment
 import Data.Abstract.BaseError
 import Data.Abstract.Module
@@ -37,14 +39,14 @@ type ModuleResult address = (ScopeGraph address, (Bindings address, address))
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address))
-lookupModule = sendModules . flip Lookup gen
+lookupModule = sendModules . flip Lookup ret
 
 -- | Resolve a list of module paths to a possible module table entry.
 resolve :: (Member (Modules address) sig, Carrier sig m) => [FilePath] -> Evaluator term address value m (Maybe ModulePath)
-resolve = sendModules . flip Resolve gen
+resolve = sendModules . flip Resolve ret
 
 listModulesInDir :: (Member (Modules address) sig, Carrier sig m) => FilePath -> Evaluator term address value m [ModulePath]
-listModulesInDir = sendModules . flip List gen
+listModulesInDir = sendModules . flip List ret
 
 
 -- | Require/import another module by name and return its environment and value.
@@ -57,7 +59,7 @@ require path = lookupModule path >>= maybeM (load path)
 --
 -- Always loads/evaluates.
 load :: (Member (Modules address) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (ModuleResult address)
-load path = sendModules (Load path gen)
+load path = sendModules (Load path ret)
 
 
 data Modules address (m :: * -> *) k
@@ -96,12 +98,12 @@ instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))
          , Carrier sig m
          )
       => Carrier (Modules address :+: sig) (ModulesC (Evaluator term address value m)) where
-  gen = ModulesC . const . gen
-  alg op = ModulesC (\ paths -> (algM paths \/ (alg . handlePure (flip runModulesC paths))) op)
-    where algM paths (Load    name  k) = askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
-          algM paths (Lookup  path  k) = askModuleTable >>= flip runModulesC paths . k . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path
-          algM paths (Resolve names k) = runModulesC (k (find (`Set.member` paths) names)) paths
-          algM paths (List    dir   k) = runModulesC (k (filter ((dir ==) . takeDirectory) (toList paths))) paths
+  ret = ModulesC . const . ret
+  eff op = ModulesC (\ paths -> (alg paths \/ (eff . handlePure (flip runModulesC paths))) op)
+    where alg paths (Load    name  k) = askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
+          alg paths (Lookup  path  k) = askModuleTable >>= flip runModulesC paths . k . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path
+          alg paths (Resolve names k) = runModulesC (k (find (`Set.member` paths) names)) paths
+          alg paths (List    dir   k) = runModulesC (k (filter ((dir ==) . takeDirectory) (toList paths))) paths
 
 askModuleTable :: (Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig, Carrier sig m) => Evaluator term address value m (ModuleTable (NonEmpty (Module (ModuleResult address))))
 askModuleTable = ask
