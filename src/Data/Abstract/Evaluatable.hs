@@ -85,7 +85,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     rvalBox v
 
 
-type ModuleC term address value m
+type ModuleC address value m
   = ErrorC (LoopControl address) (Eff
   ( ErrorC (Return address)      (Eff
   ( EnvC                         (Eff
@@ -135,7 +135,7 @@ evaluate :: ( AbstractValue term address value valueC
             , Member Trace sig
             , Ord address
             , Recursive term
-            , moduleC ~ ModuleC term address value c
+            , moduleC ~ ModuleC address value c
             , valueC ~ ValueC term address value moduleC
             )
          => proxy lang
