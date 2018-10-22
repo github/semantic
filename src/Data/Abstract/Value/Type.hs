@@ -99,9 +99,10 @@ throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
                   , Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
                   , Carrier sig m
+                  , Monad m
                   )
                => TypeError resume
-               -> Evaluator term address Type m resume
+               -> m resume
 throwTypeError = throwBaseError
 
 runTypeMap :: (Carrier sig m, Effect sig)
