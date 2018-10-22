@@ -419,15 +419,15 @@ instance (Show address, Show term) => Show1 (ValueError term address) where
   liftShowsPrec _ _ = showsPrec
 
 runValueError :: (Carrier sig m, Effect sig)
-              => Evaluator term address (Value term address) (ResumableC (BaseError (ValueError term address)) (Evaluator term address (Value term address) m)) a
+              => Evaluator term address (Value term address) (ResumableC (BaseError (ValueError term address)) (Eff m)) a
               -> Evaluator term address (Value term address) m (Either (SomeError (BaseError (ValueError term address))) a)
-runValueError = runResumable . runEvaluator
+runValueError = Evaluator . runResumable . runEvaluator
 
 runValueErrorWith :: Carrier sig m
                   => (forall resume . BaseError (ValueError term address) resume -> Evaluator term address (Value term address) m resume)
-                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) (Evaluator term address (Value term address) m)) a
+                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) (Eff m)) a
                   -> Evaluator term address (Value term address) m a
-runValueErrorWith f = runResumableWith f . runEvaluator
+runValueErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
 throwValueError :: ( Member (Resumable (BaseError (ValueError term address))) sig
                    , Member (Reader ModuleInfo) sig
