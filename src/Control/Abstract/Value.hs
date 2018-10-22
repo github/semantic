@@ -180,13 +180,12 @@ instance HFunctor (While value) where
   hmap f (While cond body k) = While (f cond) (f body) k
 
 
-runWhile :: Carrier (While value :+: sig) (WhileC (Evaluator term address value m))
-         => Evaluator term address value (WhileC
-           (Evaluator term address value m)) a
+runWhile :: Carrier (While value :+: sig) (WhileC value (Eff m))
+         => Evaluator term address value (WhileC value (Eff m)) a
          -> Evaluator term address value m a
-runWhile = runWhileC . interpret . runEvaluator
+runWhile = raiseHandler $ runWhileC . interpret
 
-newtype WhileC m a = WhileC { runWhileC :: m a }
+newtype WhileC value m a = WhileC { runWhileC :: m a }
 
 
 class Show value => AbstractIntro value where

@@ -292,10 +292,11 @@ instance ( Member (Reader ModuleInfo) sig
 
 
 instance ( Member (Abstract.Boolean Type) sig
-         , Member NonDet sig
          , Carrier sig m
+         , Alternative m
+         , Monad m
          )
-      => Carrier (Abstract.While Type :+: sig) (WhileC (Evaluator term address Type m)) where
+      => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
   ret = WhileC . ret
   eff = WhileC . (alg \/ (eff . handlePure runWhileC))
     where alg (Abstract.While cond body k) = do
