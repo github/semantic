@@ -173,12 +173,12 @@ instance Effect (Env address) where
 --   New bindings created in the computation are returned.
 runEnv :: (Carrier sig m, Effect sig)
        => EvalContext address
-       -> Evaluator term address value (EnvC
-         (Evaluator term address value (StateC (EvalContext address)
-         (Evaluator term address value (StateC (Exports address)
-         (Evaluator term address value m)))))) a
+       -> Evaluator term address value (EnvC (Eff
+                                       (StateC (EvalContext address) (Eff
+                                       (StateC (Exports address) (Eff
+                                       m)))))) a
        -> Evaluator term address value m (Bindings address, a)
-runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runEvaluator . runState initial . runEvaluator . runEnvC . interpret . runEvaluator
+runEnv initial = Evaluator . fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState initial . runEnvC . interpret . runEvaluator
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
@@ -188,7 +188,7 @@ runEnv initial = fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . r
 
 newtype EnvC m a = EnvC { runEnvC :: m a }
 
-instance (Carrier (State (EvalContext address) :+: State (Exports address) :+: sig) m, HFunctor sig) => Carrier (Env address :+: sig) (EnvC (Evaluator term address value m)) where
+instance (Carrier (State (EvalContext address) :+: State (Exports address) :+: sig) m, HFunctor sig, Monad m) => Carrier (Env address :+: sig) (EnvC m) where
   ret = EnvC . ret
   eff = EnvC . (alg \/ (eff . R . R . handlePure runEnvC))
     where alg = \case
