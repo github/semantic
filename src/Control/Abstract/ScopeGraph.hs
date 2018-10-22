@@ -88,15 +88,15 @@ instance Effect (ScopeEnv address) where
 
 
 runScopeEnv :: (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier sig m, Effect sig)
-            => Evaluator term address value (ScopeEnvC
-              (Evaluator term address value (StateC (ScopeGraph address)
-              (Evaluator term address value m)))) a
+            => Evaluator term address value (ScopeEnvC (Eff
+                                            (StateC (ScopeGraph address) (Eff
+                                            m)))) a
             -> Evaluator term address value m (ScopeGraph address, a)
-runScopeEnv = runState lowerBound . runEvaluator . runScopeEnvC . interpret . runEvaluator
+runScopeEnv = Evaluator . runState lowerBound . runScopeEnvC . interpret . runEvaluator
 
 newtype ScopeEnvC m a = ScopeEnvC { runScopeEnvC :: m a }
 
-instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier (State (ScopeGraph address) :+: sig) m, Effect sig) => Carrier (ScopeEnv address :+: sig) (ScopeEnvC (Evaluator term address value m)) where
+instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier (State (ScopeGraph address) :+: sig) m, Effect sig) => Carrier (ScopeEnv address :+: sig) (ScopeEnvC (Eff m)) where
   ret = ScopeEnvC . ret
   eff = ScopeEnvC . (alg \/ (eff . R . handlePure runScopeEnvC))
     where alg (Lookup ref k) = gets (ScopeGraph.scopeOfRef ref) >>= runScopeEnvC . k
@@ -106,7 +106,7 @@ instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier
           alg (NewScope edges k) = do
             -- Take the edges and construct a new scope, update the current scope to the new scope
             name <- gensym
-            address <- alloc name
+            address <- runEvaluator (alloc name)
             modify @(ScopeGraph address) (ScopeGraph.newScope address edges)
             runScopeEnvC (k address)
           alg (CurrentScope k) = gets ScopeGraph.currentScope >>= runScopeEnvC . k
