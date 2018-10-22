@@ -108,19 +108,17 @@ runCallGraph lang includePackages modules package = do
         = graphing @_ @_ @(Maybe Name) @Monovariant
         . runHeap
         . caching
-        . runFresh
-        . runEvaluator
+        . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
-        . runReader (packageInfo package)
-        . runReader (lowerBound @Span)
-        . runState (lowerBound @Span)
-        . runReader (lowerBound @ControlFlowVertex)
-        . runEvaluator
+        . raiseHandler (runReader (packageInfo package))
+        . raiseHandler (runReader (lowerBound @Span))
+        . raiseHandler (runState (lowerBound @Span))
+        . raiseHandler (runReader (lowerBound @ControlFlowVertex))
         . providingLiveSet
         . runModuleTable
         . runModules (ModuleTable.modulePaths (packageModules package))
@@ -183,8 +181,7 @@ runImportGraph lang (package :: Package term) f =
       runImportGraphAnalysis
         = runState lowerBound
         . runHeap
-        . runFresh
-        . runEvaluator
+        . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -194,14 +191,14 @@ runImportGraph lang (package :: Package term) f =
         . resumingValueError
         . runModuleTable
         . runModules (ModuleTable.modulePaths (packageModules package))
-        . runReader (packageInfo package)
-        . runState (lowerBound @Span)
-        . runReader (lowerBound @Span)
+        . raiseHandler (runReader (packageInfo package))
+        . raiseHandler (runState (lowerBound @Span))
+        . raiseHandler (runReader (lowerBound @Span))
   in extractGraph <$> runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise)) (runImportGraphAnalysis (evaluate lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
 
 
-runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Evaluator term address value m)) a -> Evaluator term address value m (Heap address value, a)
-runHeap = runState lowerBound . runEvaluator
+runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Eff m)) a -> Evaluator term address value m (Heap address value, a)
+runHeap = raiseHandler (runState lowerBound)
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m)
