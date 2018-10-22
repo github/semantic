@@ -213,8 +213,8 @@ appendGraph = modify . (<>)
 
 
 graphing :: (Carrier sig m, Effect sig)
-         => Evaluator term address value (StateC (Map address ControlFlowVertex)
-           (Evaluator term address value (StateC (Graph ControlFlowVertex)
-           (Evaluator term address value m)))) result
+         => Evaluator term address value (StateC (Map address ControlFlowVertex) (Eff
+                                         (StateC (Graph ControlFlowVertex) (Eff
+                                         m)))) result
          -> Evaluator term address value m (Graph ControlFlowVertex, result)
-graphing = runState mempty . runEvaluator . fmap snd . runState lowerBound . runEvaluator
+graphing = raiseHandler $ runState mempty . fmap snd . runState lowerBound
