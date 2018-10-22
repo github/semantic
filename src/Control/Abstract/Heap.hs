@@ -158,12 +158,12 @@ instance Effect (Deref value) where
   handle state handler (DerefCell        cell k) = DerefCell        cell (handler . (<$ state) . k)
   handle state handler (AssignCell value cell k) = AssignCell value cell (handler . (<$ state) . k)
 
-runDeref :: Carrier (Deref value :+: sig) (DerefC (Evaluator term address value m))
-         => Evaluator term address value (DerefC (Evaluator term address value m)) a
+runDeref :: Carrier (Deref value :+: sig) (DerefC address value (Eff m))
+         => Evaluator term address value (DerefC address value (Eff m)) a
          -> Evaluator term address value m a
-runDeref = runDerefC . interpret . runEvaluator
+runDeref = Evaluator . runDerefC . interpret . runEvaluator
 
-newtype DerefC m a = DerefC { runDerefC :: m a }
+newtype DerefC address value m a = DerefC { runDerefC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
 
 

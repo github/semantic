@@ -93,7 +93,7 @@ type ModuleC term address value m
   ( StateC (Exports address)     (Eff
   ( ScopeEnvC                    (Evaluator term address value
   ( StateC (ScopeGraph address)  (Evaluator term address value
-  ( DerefC                       (Evaluator term address value
+  ( DerefC address value         (Eff
   ( AllocatorC address           (Eff
   ( ReaderC ModuleInfo           (Evaluator term address value m)))))))))))))))))))
 
@@ -106,7 +106,7 @@ evaluate :: ( AbstractValue term address value valueC
             , Carrier sig c
             , allocatorC ~ AllocatorC address (Eff (ReaderC ModuleInfo (Evaluator term address value c)))
             , Carrier (Allocator address :+: Reader ModuleInfo :+: sig) allocatorC
-            , Carrier (Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig) (DerefC (Evaluator term address value allocatorC))
+            , Carrier (Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig) (DerefC address value (Eff allocatorC))
             , booleanC ~ BooleanC (Evaluator term address value moduleC)
             , Carrier (Boolean value :+: moduleSig) booleanC
             , whileC ~ WhileC (Evaluator term address value booleanC)

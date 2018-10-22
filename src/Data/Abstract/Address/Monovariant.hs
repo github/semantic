@@ -24,7 +24,7 @@ instance Carrier sig m => Carrier (Allocator Monovariant :+: sig) (AllocatorC Mo
     where alg (Alloc name k) = runAllocatorC (k (Monovariant name))
 
 
-instance (Member NonDet sig, Ord value, Carrier sig m) => Carrier (Deref value :+: sig) (DerefC (Evaluator term Monovariant value m)) where
+instance (Ord value, Carrier sig m, Alternative m, Monad m) => Carrier (Deref value :+: sig) (DerefC Monovariant value m) where
   ret = DerefC . ret
   eff = DerefC . (alg \/ (eff . handlePure runDerefC))
     where alg (DerefCell cell k) = traverse (foldMapA pure) (nonEmpty (toList cell)) >>= runDerefC . k

@@ -23,7 +23,7 @@ instance (Member Fresh sig, Carrier sig m, Monad m) => Carrier (Allocator Precis
     where alg (Alloc _ k) = Precise <$> fresh >>= runAllocatorC . k
 
 
-instance Carrier sig m => Carrier (Deref value :+: sig) (DerefC (Evaluator term Precise value m)) where
+instance Carrier sig m => Carrier (Deref value :+: sig) (DerefC Precise value m) where
   ret = DerefC . ret
   eff = DerefC . (alg \/ (eff . handlePure runDerefC))
     where alg (DerefCell cell k) = runDerefC (k (fst <$> Set.minView cell))
