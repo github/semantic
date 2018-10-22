@@ -135,15 +135,15 @@ getConfiguration term = Configuration term <$> askRoots <*> getEvalContext <*> g
 
 
 caching :: (Carrier sig m, Effect sig)
-        => Evaluator term address value (AltC []
-          (Evaluator term address value (ReaderC (Cache term address value)
-          (Evaluator term address value (StateC (Cache term address value)
-          (Evaluator term address value m)))))) a
+        => Evaluator term address value (AltC [] (Eff
+                                        (ReaderC (Cache term address value) (Eff
+                                        (StateC (Cache term address value) (Eff
+                                        m)))))) a
         -> Evaluator term address value m (Cache term address value, [a])
 caching
-  = runState  lowerBound . runEvaluator
-  . runReader lowerBound . runEvaluator
-  . runNonDet            . runEvaluator
+  = raiseHandler (runState  lowerBound)
+  . raiseHandler (runReader lowerBound)
+  . raiseHandler runNonDet
 
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
