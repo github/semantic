@@ -199,12 +199,12 @@ throwAddressError :: ( Member (Resumable (BaseError (AddressError address body))
 throwAddressError = throwBaseError
 
 runAddressError :: (Carrier sig m, Effect sig)
-                => Evaluator term address value (ResumableC (BaseError (AddressError address value)) (Evaluator term address value m)) a
+                => Evaluator term address value (ResumableC (BaseError (AddressError address value)) (Eff m)) a
                 -> Evaluator term address value m (Either (SomeError (BaseError (AddressError address value))) a)
-runAddressError = runResumable . runEvaluator
+runAddressError = Evaluator . runResumable . runEvaluator
 
 runAddressErrorWith :: Carrier sig m
                     => (forall resume . (BaseError (AddressError address value)) resume -> Evaluator term address value m resume)
-                    -> Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) (Evaluator term address value m)) a
+                    -> Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) (Eff m)) a
                     -> Evaluator term address value m a
-runAddressErrorWith f = runResumableWith f . runEvaluator
+runAddressErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
