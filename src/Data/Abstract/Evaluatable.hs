@@ -296,11 +296,11 @@ instance Eq1 EvalError where
 instance Show1 EvalError where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError EvalError) (Evaluator term address value m)) a -> Evaluator term address value m (Either (SomeError (BaseError EvalError)) a)
-runEvalError = runResumable . runEvaluator
+runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError EvalError)) a)
+runEvalError = Evaluator . runResumable . runEvaluator
 
-runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError EvalError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError EvalError) (Evaluator term address value m)) a -> Evaluator term address value m a
-runEvalErrorWith f = runResumableWith f . runEvaluator
+runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError EvalError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m a
+runEvalErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
 throwEvalError :: ( Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
