@@ -9,6 +9,8 @@ module Rendering.Graph
 import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
 import Control.Effect
+import Control.Effect.Fresh
+import Control.Effect.Reader
 import Data.Diff
 import Data.Graph
 import Data.Graph.TermVertex

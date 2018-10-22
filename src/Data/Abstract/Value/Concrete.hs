@@ -9,6 +9,8 @@ module Data.Abstract.Value.Concrete
 
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..))
 import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
@@ -71,9 +73,9 @@ instance ( FreeVariables term
          , Show term
          )
       => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Evaluator term address (Value term address) m)) where
-  gen = FunctionC . const . gen
-  alg op = FunctionC (\ eval -> (algF eval \/ (alg . handlePure (flip runFunctionC eval))) op)
-    where algF eval = \case
+  ret = FunctionC . const . ret
+  eff op = FunctionC (\ eval -> (alg eval \/ (eff . handlePure (flip runFunctionC eval))) op)
+    where alg eval = \case
             Abstract.Function name params body k -> do
               packageInfo <- currentPackage
               moduleInfo <- currentModule
@@ -103,10 +105,10 @@ instance ( Member (Reader ModuleInfo) sig
          , Carrier sig m
          )
       => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Evaluator term address (Value term address) m)) where
-  gen = BooleanC . gen
-  alg = BooleanC . (algB \/ (alg . handlePure runBooleanC))
-    where algB :: Abstract.Boolean (Value term address) (BooleanC (Evaluator term address (Value term address) m)) (BooleanC (Evaluator term address (Value term address) m) a) -> Evaluator term address (Value term address) m a
-          algB = \case
+  ret = BooleanC . ret
+  eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
+    where alg :: Abstract.Boolean (Value term address) (BooleanC (Evaluator term address (Value term address) m)) (BooleanC (Evaluator term address (Value term address) m) a) -> Evaluator term address (Value term address) m a
+          alg = \case
             Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
             Abstract.AsBool (Boolean b) k -> runBooleanC (k b)
             Abstract.AsBool other       k -> (throwValueError $! BoolError other) >>= runBooleanC . k
@@ -134,9 +136,9 @@ instance ( Member (Reader ModuleInfo) sig
 --          , Show term
 --          )
 --       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Evaluator term address (Value term address) (InterposeC (Resumable (BaseError (UnspecializedError (Value term address)))) (Evaluator term address (Value term address) m)))) where
---   gen = WhileC . gen
---   alg = WhileC . (algW \/ (alg . handlePure runWhileC))
---     where algW = \case
+--   ret = WhileC . ret
+--   eff = WhileC . (alg \/ (eff . handlePure runWhileC))
+--     where alg = \case
 --             Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address))))
 --                   (\(Resumable (BaseError _ _ (UnspecializedError _)) k) -> throwAbort) (runEvaluator (loop (\continue -> do
 --               cond' <- runWhileC cond
@@ -168,10 +170,10 @@ runInterposeC :: (forall x . eff m (m x) -> m x) -> InterposeC eff m a -> m a
 runInterposeC f (InterposeC m) = m f
 
 instance (Member eff sig, HFunctor eff, Carrier sig m) => Carrier sig (InterposeC eff m) where
-  gen a = InterposeC (const (gen a))
-  alg op
+  ret a = InterposeC (const (ret a))
+  eff op
     | Just e <- prj op = InterposeC (\ handler -> handler (handlePure (runInterposeC handler) e))
-    | otherwise        = InterposeC (\ handler -> alg (handlePure (runInterposeC handler) op))
+    | otherwise        = InterposeC (\ handler -> eff (handlePure (runInterposeC handler) op))
 
 
 instance AbstractHole (Value term address) where

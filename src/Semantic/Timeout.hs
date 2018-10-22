@@ -8,6 +8,8 @@ module Semantic.Timeout
 ) where
 
 import           Control.Effect
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Control.Monad.IO.Class
 import           Data.Duration
 import qualified System.Timeout as System
@@ -16,7 +18,7 @@ import qualified System.Timeout as System
 -- within the specified duration. Uses 'System.Timeout.timeout' so all caveats
 -- about not operating over FFI boundaries apply.
 timeout :: (Member Timeout sig, Carrier sig m) => Duration -> m output -> m (Maybe output)
-timeout n = send . flip (Timeout n) gen
+timeout n = send . flip (Timeout n) ret
 
 -- | 'Timeout' effects run other effects, aborting them if they exceed the
 -- specified duration.
@@ -45,8 +47,8 @@ runTimeoutC :: (forall x . m x -> IO x) -> TimeoutC m a -> m a
 runTimeoutC f (TimeoutC m) = m f
 
 instance (Carrier sig m, MonadIO m) => Carrier (Timeout :+: sig) (TimeoutC m) where
-  gen a = TimeoutC (const (gen a))
-  alg op = TimeoutC (\ handler ->
+  ret a = TimeoutC (const (ret a))
+  eff op = TimeoutC (\ handler ->
     ((\ (Timeout n task k) -> liftIO (System.timeout (toMicroseconds n) (handler (runTimeoutC handler task))) >>= runTimeoutC handler . k)
-    \/ (alg . handlePure (runTimeoutC handler)))
+    \/ (eff . handlePure (runTimeoutC handler)))
       op)

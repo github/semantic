@@ -5,6 +5,7 @@ import           Analysis.ConstructorName (ConstructorName)
 import           Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import           Analysis.PackageDef (HasPackageDef)
 import           Control.Effect
+import           Control.Effect.Error
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.Either

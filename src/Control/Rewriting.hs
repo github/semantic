@@ -67,7 +67,8 @@ import Prologue hiding (apply, try)
 
 import           Control.Arrow
 import           Control.Category
-import           Control.Effect hiding (Local)
+import           Control.Effect
+import           Control.Effect.Trace
 import           Data.Functor.Identity
 import           Data.Profunctor
 import qualified Data.Sum as Sum hiding (apply)

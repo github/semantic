@@ -21,6 +21,7 @@ import           Algebra.Graph.Class (connect, overlay, vertex)
 import qualified Algebra.Graph.Class as Class
 import qualified Algebra.Graph.ToGraph as Class
 import           Control.Effect
+import           Control.Effect.State
 import           Data.Aeson
 import qualified Data.Set as Set
 

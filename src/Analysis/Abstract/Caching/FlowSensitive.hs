@@ -40,9 +40,9 @@ cachingConfiguration :: (Cacheable term address value, Member (State (Cache term
                      -> Evaluator term address value m (ValueRef address)
                      -> Evaluator term address value m (ValueRef address)
 cachingConfiguration configuration values action = do
-  modify' (cacheSet configuration values)
+  modify (cacheSet configuration values)
   result <- Cached <$> action <*> getHeap
-  cachedValue result <$ modify' (cacheInsert configuration result)
+  cachedValue result <$ modify (cacheInsert configuration result)
 
 putCache :: (Member (State (Cache term address value)) sig, Carrier sig m)
          => Cache term address value

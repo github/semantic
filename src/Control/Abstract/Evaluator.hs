@@ -17,6 +17,14 @@ module Control.Abstract.Evaluator
   ) where
 
 import Control.Effect           as X
+import Control.Effect.Carrier
+import Control.Effect.Error     as X
+import Control.Effect.Fresh     as X
+import Control.Effect.NonDet    as X
+import Control.Effect.Reader    as X
+import Control.Effect.Resumable as X
+import Control.Effect.State     as X
+import Control.Effect.Trace     as X
 import Control.Monad.IO.Class
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
@@ -31,8 +39,8 @@ deriving instance (Member NonDet sig, Carrier sig m) => Alternative (Evaluator t
 deriving instance (Member (Lift IO) sig, Carrier sig m) => MonadIO (Evaluator term address value m)
 
 instance Carrier sig m => Carrier sig (Evaluator term address value m) where
-  gen = Evaluator . gen
-  alg = Evaluator . alg . handlePure runEvaluator
+  ret = Evaluator . ret
+  eff = Evaluator . eff . handlePure runEvaluator
 
 
 -- | An open-recursive function.

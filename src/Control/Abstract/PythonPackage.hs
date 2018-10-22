@@ -5,6 +5,8 @@ module Control.Abstract.PythonPackage
 import           Control.Abstract.Evaluator (LoopControl, Return)
 import           Control.Abstract.Heap (Allocator, Deref, deref)
 import           Control.Abstract.Value
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
@@ -77,7 +79,7 @@ runInterposeC :: (forall x . eff m (m x) -> m x) -> InterposeC eff m a -> m a
 runInterposeC f (InterposeC m) = m f
 
 instance (Member eff sig, HFunctor eff, Carrier sig m) => Carrier sig (InterposeC eff m) where
-  gen a = InterposeC (const (gen a))
-  alg op
+  ret a = InterposeC (const (ret a))
+  eff op
     | Just e <- prj op = InterposeC (\ handler -> handler (handlePure (runInterposeC handler) e))
-    | otherwise        = InterposeC (\ handler -> alg (handlePure (runInterposeC handler) op))
+    | otherwise        = InterposeC (\ handler -> eff (handlePure (runInterposeC handler) op))

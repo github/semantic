@@ -104,6 +104,8 @@ module Reprinting.Pipeline
   ) where
 
 import           Control.Effect as Effect
+import           Control.Effect.Error as Effect
+import           Control.Effect.State as Effect
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
 import           Data.Text.Prettyprint.Doc

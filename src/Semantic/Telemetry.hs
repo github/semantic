@@ -50,7 +50,9 @@ module Semantic.Telemetry
 , IgnoreTelemetryC(..)
 ) where
 
-import           Control.Effect hiding (bracket)
+import           Control.Effect
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Control.Exception
 import           Control.Monad.IO.Class
 import           Data.Coerce
@@ -119,11 +121,11 @@ queueStat q = liftIO . writeAsyncQueue q
 
 -- | A task which logs a message at a specific log level to stderr.
 writeLog :: (Member Telemetry sig, Carrier sig m) => Level -> String -> [(String, String)] -> m ()
-writeLog level message pairs = send (WriteLog level message pairs (gen ()))
+writeLog level message pairs = send (WriteLog level message pairs (ret ()))
 
 -- | A task which writes a stat.
 writeStat :: (Member Telemetry sig, Carrier sig m) => Stat -> m ()
-writeStat stat = send (WriteStat stat (gen ()))
+writeStat stat = send (WriteStat stat (ret ()))
 
 -- | A task which measures and stats the timing of another task.
 time :: (Member Telemetry sig, Carrier sig m, MonadIO m) => String -> [(String, String)] -> m output -> m output
@@ -155,10 +157,10 @@ runTelemetry logger statter = flip runTelemetryC (logger, statter) . interpret
 newtype TelemetryC m a = TelemetryC { runTelemetryC :: (LogQueue, StatQueue) -> m a }
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
-  gen = TelemetryC . const . gen
-  alg op = TelemetryC (\ queues -> (algT queues \/ (alg . handlePure (flip runTelemetryC queues))) op)
-    where algT queues (WriteStat stat k) = queueStat (snd queues) stat *> runTelemetryC k queues
-          algT queues (WriteLog level message pairs k) = queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues
+  ret = TelemetryC . const . ret
+  eff op = TelemetryC (\ queues -> (alg queues \/ (eff . handlePure (flip runTelemetryC queues))) op)
+    where alg queues (WriteStat stat k) = queueStat (snd queues) stat *> runTelemetryC k queues
+          alg queues (WriteLog level message pairs k) = queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues
 
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
@@ -168,7 +170,7 @@ ignoreTelemetry = runIgnoreTelemetryC . interpret
 newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
 
 instance Carrier sig m => Carrier (Telemetry :+: sig) (IgnoreTelemetryC m) where
-  gen = IgnoreTelemetryC . gen
-  alg = algT \/ (IgnoreTelemetryC . alg . handlePure runIgnoreTelemetryC)
-    where algT (WriteStat _ k) = k
-          algT (WriteLog _ _ _ k) = k
+  ret = IgnoreTelemetryC . ret
+  eff = alg \/ (IgnoreTelemetryC . eff . handlePure runIgnoreTelemetryC)
+    where alg (WriteStat _ k) = k
+          alg (WriteLog _ _ _ k) = k
