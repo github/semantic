@@ -135,12 +135,12 @@ instance HFunctor (Allocator address) where
 instance Effect (Allocator address) where
   handle state handler (Alloc name k) = Alloc name (handler . (<$ state) . k)
 
-runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC (Evaluator term address value m))
-             => Evaluator term address value (AllocatorC (Evaluator term address value m)) a
+runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC address (Eff m))
+             => Evaluator term address value (AllocatorC address (Eff m)) a
              -> Evaluator term address value m a
-runAllocator = runAllocatorC . interpret . runEvaluator
+runAllocator = Evaluator . runAllocatorC . interpret . runEvaluator
 
-newtype AllocatorC m a = AllocatorC { runAllocatorC :: m a }
+newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
 
 
 data Deref value (m :: * -> *) k

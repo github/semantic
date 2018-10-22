@@ -27,13 +27,21 @@ promote :: Evaluator term address value m a -> Evaluator term (Hole context addr
 promote = Evaluator . runEvaluator
 
 
-instance ( Carrier (Allocator address :+: sig) (AllocatorC (Evaluator term address value m))
+demoteA :: AllocatorC (Hole context address) m a -> AllocatorC address m a
+demoteA = AllocatorC . runAllocatorC
+
+promoteA :: AllocatorC address m address -> AllocatorC (Hole context address) m address
+promoteA = AllocatorC . runAllocatorC
+
+
+instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          , Carrier sig m
+         , Monad m
          )
-      => Carrier (Allocator (Hole context address) :+: sig) (AllocatorC (Evaluator term (Hole context address) value m)) where
-  ret = AllocatorC . promote . ret
+      => Carrier (Allocator (Hole context address) :+: sig) (AllocatorC (Hole context address) m) where
+  ret = AllocatorC . ret
   eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
-    where alg (Alloc name k) = promote (Total <$> runAllocatorC (eff (L (Alloc name ret))) >>= demote . runAllocatorC . k)
+    where alg (Alloc name k) = Total <$> runAllocatorC (promoteA (eff (L (Alloc name ret)))) >>= runAllocatorC . demoteA . k
 
 
 instance (Carrier (Deref value :+: sig) (DerefC (Evaluator term address value m)), Carrier sig m)

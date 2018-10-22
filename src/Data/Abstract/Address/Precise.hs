@@ -17,7 +17,7 @@ instance Show Precise where
   showsPrec d = showsUnaryWith showsPrec "Precise" d . unPrecise
 
 
-instance (Member Fresh sig, Carrier sig m) => Carrier (Allocator Precise :+: sig) (AllocatorC (Evaluator term Precise value m)) where
+instance (Member Fresh sig, Carrier sig m, Monad m) => Carrier (Allocator Precise :+: sig) (AllocatorC Precise m) where
   ret = AllocatorC . ret
   eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
     where alg (Alloc _ k) = Precise <$> fresh >>= runAllocatorC . k

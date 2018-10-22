@@ -18,7 +18,7 @@ instance Show Monovariant where
   showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unMonovariant
 
 
-instance Carrier sig m => Carrier (Allocator Monovariant :+: sig) (AllocatorC (Evaluator term Monovariant value m)) where
+instance Carrier sig m => Carrier (Allocator Monovariant :+: sig) (AllocatorC Monovariant m) where
   ret = AllocatorC . ret
   eff = AllocatorC . (alg \/ (eff . handlePure runAllocatorC))
     where alg (Alloc name k) = runAllocatorC (k (Monovariant name))
