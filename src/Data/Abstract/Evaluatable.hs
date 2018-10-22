@@ -91,8 +91,8 @@ type ModuleC term address value m
   ( EnvC                         (Eff
   ( StateC (EvalContext address) (Eff
   ( StateC (Exports address)     (Eff
-  ( ScopeEnvC                    (Evaluator term address value
-  ( StateC (ScopeGraph address)  (Evaluator term address value
+  ( ScopeEnvC                    (Eff
+  ( StateC (ScopeGraph address)  (Eff
   ( DerefC address value         (Eff
   ( AllocatorC address           (Eff
   ( ReaderC ModuleInfo           (Eff
