@@ -95,7 +95,8 @@ type ModuleC term address value m
   ( StateC (ScopeGraph address)  (Evaluator term address value
   ( DerefC address value         (Eff
   ( AllocatorC address           (Eff
-  ( ReaderC ModuleInfo           (Evaluator term address value m)))))))))))))))))))
+  ( ReaderC ModuleInfo           (Eff
+    m)))))))))))))))))))
 
 type ValueC term address value m
   = FunctionC term address value (Evaluator term address value
@@ -104,7 +105,7 @@ type ValueC term address value m
 
 evaluate :: ( AbstractValue term address value valueC
             , Carrier sig c
-            , allocatorC ~ AllocatorC address (Eff (ReaderC ModuleInfo (Evaluator term address value c)))
+            , allocatorC ~ AllocatorC address (Eff (ReaderC ModuleInfo (Eff c)))
             , Carrier (Allocator address :+: Reader ModuleInfo :+: sig) allocatorC
             , Carrier (Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig) (DerefC address value (Eff allocatorC))
             , booleanC ~ BooleanC (Evaluator term address value moduleC)
@@ -163,7 +164,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
         runValue = runBoolean . runWhile . runFunction evalTerm
 
         runInModule preludeBinds info
-          = runReader info . runEvaluator
+          = Evaluator . runReader info . runEvaluator
           . runAllocator
           . runDeref
           . runScopeEnv
