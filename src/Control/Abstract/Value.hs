@@ -114,15 +114,15 @@ newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> 
 
 
 -- | Construct a boolean value in the abstract domain.
-boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> Evaluator term address value m value
+boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> m value
 boolean = send . flip Boolean ret
 
 -- | Extract a 'Bool' from a given value.
-asBool :: (Member (Boolean value) sig, Carrier sig m) => value -> Evaluator term address value m Bool
+asBool :: (Member (Boolean value) sig, Carrier sig m) => value -> m Bool
 asBool = send . flip AsBool ret
 
 -- | Eliminate boolean values. TODO: s/boolean/truthy
-ifthenelse :: (Member (Boolean value) sig, Carrier sig m) => value -> Evaluator term address value m a -> Evaluator term address value m a -> Evaluator term address value m a
+ifthenelse :: (Member (Boolean value) sig, Carrier sig m, Monad m) => value -> m a -> m a -> m a
 ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 
 -- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
