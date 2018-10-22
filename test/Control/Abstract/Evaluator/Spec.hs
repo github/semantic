@@ -54,8 +54,8 @@ evaluate
   . Value.runBoolean
   . Value.runFunction coerce
 
-reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
-reassociate = mergeExcs . mergeExcs . mergeExcs . Right
+reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) result)) -> Either (SomeError (Sum '[exc3, exc2, exc1])) result
+reassociate = mergeErrors . mergeErrors . mergeErrors . Right
 
 type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
