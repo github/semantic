@@ -92,7 +92,7 @@ runScopeEnv :: (Ord address, Member Fresh sig, Member (Allocator address) sig, C
                                             (StateC (ScopeGraph address) (Eff
                                             m)))) a
             -> Evaluator term address value m (ScopeGraph address, a)
-runScopeEnv = Evaluator . runState lowerBound . runScopeEnvC . interpret . runEvaluator
+runScopeEnv = raiseHandler $ runState lowerBound . runScopeEnvC . interpret
 
 newtype ScopeEnvC m a = ScopeEnvC { runScopeEnvC :: m a }
 

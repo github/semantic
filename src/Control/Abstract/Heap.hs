@@ -139,7 +139,7 @@ instance Effect (Allocator address) where
 runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC address (Eff m))
              => Evaluator term address value (AllocatorC address (Eff m)) a
              -> Evaluator term address value m a
-runAllocator = Evaluator . runAllocatorC . interpret . runEvaluator
+runAllocator = raiseHandler $ runAllocatorC . interpret
 
 newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
@@ -161,7 +161,7 @@ instance Effect (Deref value) where
 runDeref :: Carrier (Deref value :+: sig) (DerefC address value (Eff m))
          => Evaluator term address value (DerefC address value (Eff m)) a
          -> Evaluator term address value m a
-runDeref = Evaluator . runDerefC . interpret . runEvaluator
+runDeref = raiseHandler $ runDerefC . interpret
 
 newtype DerefC address value m a = DerefC { runDerefC :: m a }
   deriving (Alternative, Applicative, Functor, Monad)
@@ -201,10 +201,10 @@ throwAddressError = throwBaseError
 runAddressError :: (Carrier sig m, Effect sig)
                 => Evaluator term address value (ResumableC (BaseError (AddressError address value)) (Eff m)) a
                 -> Evaluator term address value m (Either (SomeError (BaseError (AddressError address value))) a)
-runAddressError = Evaluator . runResumable . runEvaluator
+runAddressError = raiseHandler runResumable
 
 runAddressErrorWith :: Carrier sig m
                     => (forall resume . (BaseError (AddressError address value)) resume -> Evaluator term address value m resume)
                     -> Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) (Eff m)) a
                     -> Evaluator term address value m a
-runAddressErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runAddressErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
