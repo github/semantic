@@ -211,10 +211,11 @@ unify :: ( Member (Reader ModuleInfo) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (State TypeMap) sig
          , Carrier sig m
+         , Monad m
          )
       => Type
       -> Type
-      -> Evaluator term address Type m Type
+      -> m Type
 unify a b = do
   a' <- prune a
   b' <- prune b
