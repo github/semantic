@@ -275,14 +275,15 @@ instance ( Member (Allocator address) sig
               runFunctionC (k boxed) eval
 
 
-instance ( Member NonDet sig
-         , Member (Reader ModuleInfo) sig
+instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (State TypeMap) sig
          , Carrier sig m
+         , Alternative m
+         , Monad m
          )
-      => Carrier (Abstract.Boolean Type :+: sig) (BooleanC (Evaluator term address Type m)) where
+      => Carrier (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
   ret = BooleanC . ret
   eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
     where alg (Abstract.Boolean _ k) = runBooleanC (k Bool)

@@ -46,7 +46,7 @@ instance ( Member (Allocator address) sig
               box Abstract >>= flip runFunctionC eval . k
 
 
-instance (Carrier sig m, Member NonDet sig) => Carrier (Boolean Abstract :+: sig) (BooleanC (Evaluator term address Abstract m)) where
+instance (Carrier sig m, Alternative m, Monad m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
   ret = BooleanC . ret
   eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
     where alg (Boolean _ k) = runBooleanC (k Abstract)
