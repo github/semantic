@@ -192,10 +192,11 @@ substitute :: ( Member (Reader ModuleInfo) sig
               , Member (Resumable (BaseError TypeError)) sig
               , Member (State TypeMap) sig
               , Carrier sig m
+              , Monad m
               )
            => TName
            -> Type
-           -> Evaluator term address Type m Type
+           -> m Type
 substitute id ty = do
   infiniteType <- occur id ty
   ty <- if infiniteType
