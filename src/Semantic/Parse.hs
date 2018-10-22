@@ -25,7 +25,7 @@ import           Semantic.Task
 import           Serializing.Format
 
 -- | Using the specified renderer, parse a list of 'Blob's to produce a 'Builder' output.
-runParse :: (Member Distribute sig, Member (Exc SomeException) sig, Member Task sig, Carrier sig m, MonadIO m) => TermRenderer output -> [Blob] -> m Builder
+runParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, MonadIO m) => TermRenderer output -> [Blob] -> m Builder
 runParse JSONTermRenderer             = withParsedBlobs' renderJSONError (render . renderJSONTerm) >=> serialize JSON
 runParse JSONGraphTermRenderer        = withParsedBlobs' renderJSONError (render . renderAdjGraph) >=> serialize JSON
   where renderAdjGraph :: (Recursive t, ToTreeGraph TermVertex (Base t)) => Blob -> t -> JSON.JSON "trees" SomeJSON

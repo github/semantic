@@ -131,7 +131,7 @@ instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgn
             runTelemetryIgnoringStatC k logOptions
 
 step :: ( Member (Env address) sig
-        , Member (Exc SomeException) sig
+        , Member (Error SomeException) sig
         , Member REPL sig
         , Member (Reader ModuleInfo) sig
         , Member (Reader Span) sig
