@@ -45,6 +45,7 @@ instance Carrier sig m => Carrier sig (Evaluator term address value m) where
   eff = Evaluator . eff . handlePure runEvaluator
 
 
+-- | Raise a handler on 'Eff's into a handler on 'Evaluator's.
 raiseHandler :: (Eff m a -> Eff n b)
              -> Evaluator term address value m a
              -> Evaluator term address value n b
