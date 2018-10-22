@@ -214,15 +214,15 @@ freeVariableError :: ( Member (Reader ModuleInfo) sig
 freeVariableError = throwEnvironmentError . FreeVariable
 
 runEnvironmentError :: (Carrier sig m, Effect sig)
-                    => Evaluator term address value (ResumableC (BaseError (EnvironmentError address)) (Evaluator term address value m)) a
+                    => Evaluator term address value (ResumableC (BaseError (EnvironmentError address)) (Eff m)) a
                     -> Evaluator term address value m (Either (SomeError (BaseError (EnvironmentError address))) a)
-runEnvironmentError = runResumable . runEvaluator
+runEnvironmentError = Evaluator . runResumable . runEvaluator
 
 runEnvironmentErrorWith :: Carrier sig m
                         => (forall resume . BaseError (EnvironmentError address) resume -> Evaluator term address value m resume)
-                        -> Evaluator term address value (ResumableWithC (BaseError (EnvironmentError address)) (Evaluator term address value m)) a
+                        -> Evaluator term address value (ResumableWithC (BaseError (EnvironmentError address)) (Eff m)) a
                         -> Evaluator term address value m a
-runEnvironmentErrorWith f = runResumableWith f . runEvaluator
+runEnvironmentErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
 throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError address))) sig
                          , Member (Reader ModuleInfo) sig
