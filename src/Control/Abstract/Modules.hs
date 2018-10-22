@@ -130,15 +130,15 @@ instance NFData1 (LoadError address) where
   liftRnf _ (ModuleNotFoundError p) = rnf p
 
 runLoadError :: (Carrier sig m, Effect sig)
-             => Evaluator term address value (ResumableC (BaseError (LoadError address)) (Evaluator term address value m)) a
+             => Evaluator term address value (ResumableC (BaseError (LoadError address)) (Eff m)) a
              -> Evaluator term address value m (Either (SomeError (BaseError (LoadError address))) a)
-runLoadError = runResumable . runEvaluator
+runLoadError = Evaluator . runResumable . runEvaluator
 
 runLoadErrorWith :: Carrier sig m
                  => (forall resume . (BaseError (LoadError address)) resume -> Evaluator term address value m resume)
-                 -> Evaluator term address value (ResumableWithC (BaseError (LoadError address)) (Evaluator term address value m)) a
+                 -> Evaluator term address value (ResumableWithC (BaseError (LoadError address)) (Eff m)) a
                  -> Evaluator term address value m a
-runLoadErrorWith f = runResumableWith f . runEvaluator
+runLoadErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
 throwLoadError :: (Member (Resumable (BaseError (LoadError address))) sig, Carrier sig m)
                => LoadError address resume
