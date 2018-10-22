@@ -70,7 +70,7 @@ catchReturn :: (Member (Error (Return address)) sig, Carrier sig m) => Evaluator
 catchReturn = flip catchError (\ (Return addr) -> pure addr)
 
 runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return address) (Eff m)) address -> Evaluator term address value m address
-runReturn = Evaluator . fmap (either unReturn id) . runError . runEvaluator
+runReturn = raiseHandler $ fmap (either unReturn id) . runError
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -99,4 +99,4 @@ catchLoopControl :: (Member (Error (LoopControl address)) sig, Carrier sig m) =>
 catchLoopControl = catchError
 
 runLoopControl :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (LoopControl address) (Eff m)) address -> Evaluator term address value m address
-runLoopControl = Evaluator . fmap (either unLoopControl id) . runError . runEvaluator
+runLoopControl = raiseHandler $ fmap (either unLoopControl id) . runError

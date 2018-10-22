@@ -164,7 +164,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
         runValue = runBoolean . runWhile . runFunction evalTerm
 
         runInModule preludeBinds info
-          = Evaluator . runReader info . runEvaluator
+          = raiseHandler (runReader info)
           . runAllocator
           . runDeref
           . runScopeEnv
@@ -297,10 +297,10 @@ instance Show1 EvalError where
   liftShowsPrec _ _ = showsPrec
 
 runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError EvalError)) a)
-runEvalError = Evaluator . runResumable . runEvaluator
+runEvalError = raiseHandler runResumable
 
 runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError EvalError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m a
-runEvalErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runEvalErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwEvalError :: ( Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
@@ -334,13 +334,14 @@ instance Show1 (UnspecializedError a) where
 runUnspecialized :: (Carrier sig m, Effect sig)
                  => Evaluator term address value (ResumableC (BaseError (UnspecializedError value)) (Eff m)) a
                  -> Evaluator term address value m (Either (SomeError (BaseError (UnspecializedError value))) a)
-runUnspecialized = Evaluator . runResumable . runEvaluator
+runUnspecialized = raiseHandler runResumable
 
 runUnspecializedWith :: Carrier sig m
                      => (forall resume . BaseError (UnspecializedError value) resume -> Evaluator term address value m resume)
                      -> Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff m)) a
                      -> Evaluator term address value m a
-runUnspecializedWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runUnspecializedWith f = raiseHandler $ runResumableWith (runEvaluator . f)
+
 
 throwUnspecializedError :: ( Member (Resumable (BaseError (UnspecializedError value))) sig
                            , Member (Reader ModuleInfo) sig

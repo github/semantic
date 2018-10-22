@@ -178,7 +178,7 @@ runEnv :: (Carrier sig m, Effect sig)
                                        (StateC (Exports address) (Eff
                                        m)))))) a
        -> Evaluator term address value m (Bindings address, a)
-runEnv initial = Evaluator . fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState initial . runEnvC . interpret . runEvaluator
+runEnv initial = raiseHandler $ fmap (filterEnv . fmap (first (Env.head . ctxEnvironment))) . runState lowerBound . runState initial . runEnvC . interpret
   where -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
         -- languages. We need better semantics rather than doing it ad-hoc.
@@ -216,13 +216,13 @@ freeVariableError = throwEnvironmentError . FreeVariable
 runEnvironmentError :: (Carrier sig m, Effect sig)
                     => Evaluator term address value (ResumableC (BaseError (EnvironmentError address)) (Eff m)) a
                     -> Evaluator term address value m (Either (SomeError (BaseError (EnvironmentError address))) a)
-runEnvironmentError = Evaluator . runResumable . runEvaluator
+runEnvironmentError = raiseHandler runResumable
 
 runEnvironmentErrorWith :: Carrier sig m
                         => (forall resume . BaseError (EnvironmentError address) resume -> Evaluator term address value m resume)
                         -> Evaluator term address value (ResumableWithC (BaseError (EnvironmentError address)) (Eff m)) a
                         -> Evaluator term address value m a
-runEnvironmentErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runEnvironmentErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwEnvironmentError :: ( Member (Resumable (BaseError (EnvironmentError address))) sig
                          , Member (Reader ModuleInfo) sig

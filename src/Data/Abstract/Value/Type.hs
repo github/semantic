@@ -89,10 +89,11 @@ instance Ord1  TypeError where
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
 runTypeError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
-runTypeError = Evaluator . runResumable . runEvaluator
+runTypeError = raiseHandler runResumable
 
 runTypeErrorWith :: Carrier sig m => (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m a
-runTypeErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runTypeErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
+
 
 throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
                   , Member (Reader ModuleInfo) sig
@@ -106,7 +107,7 @@ throwTypeError = throwBaseError
 runTypeMap :: (Carrier sig m, Effect sig)
            => Evaluator term address Type (StateC TypeMap (Eff m)) a
            -> Evaluator term address Type m a
-runTypeMap = Evaluator . fmap snd . runState emptyTypeMap . runEvaluator
+runTypeMap = raiseHandler $ fmap snd . runState emptyTypeMap
 
 runTypes :: (Carrier sig m, Effect sig)
          => Evaluator term address Type (ResumableC (BaseError TypeError) (Eff

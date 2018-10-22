@@ -132,13 +132,13 @@ instance NFData1 (LoadError address) where
 runLoadError :: (Carrier sig m, Effect sig)
              => Evaluator term address value (ResumableC (BaseError (LoadError address)) (Eff m)) a
              -> Evaluator term address value m (Either (SomeError (BaseError (LoadError address))) a)
-runLoadError = Evaluator . runResumable . runEvaluator
+runLoadError = raiseHandler runResumable
 
 runLoadErrorWith :: Carrier sig m
                  => (forall resume . (BaseError (LoadError address)) resume -> Evaluator term address value m resume)
                  -> Evaluator term address value (ResumableWithC (BaseError (LoadError address)) (Eff m)) a
                  -> Evaluator term address value m a
-runLoadErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runLoadErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwLoadError :: (Member (Resumable (BaseError (LoadError address))) sig, Carrier sig m)
                => LoadError address resume
@@ -170,13 +170,13 @@ instance NFData1 ResolutionError where
 runResolutionError :: (Carrier sig m, Effect sig)
                    => Evaluator term address value (ResumableC (BaseError ResolutionError) (Eff m)) a
                    -> Evaluator term address value m (Either (SomeError (BaseError ResolutionError)) a)
-runResolutionError = Evaluator . runResumable . runEvaluator
+runResolutionError = raiseHandler runResumable
 
 runResolutionErrorWith :: Carrier sig m
                        => (forall resume . (BaseError ResolutionError) resume -> Evaluator term address value m resume)
                        -> Evaluator term address value (ResumableWithC (BaseError ResolutionError) (Eff m)) a
                        -> Evaluator term address value m a
-runResolutionErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
+runResolutionErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwResolutionError :: ( Member (Reader ModuleInfo) sig
                         , Member (Reader Span) sig
