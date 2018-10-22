@@ -124,13 +124,13 @@ graphingModules :: ( Member (Modules address) sig
                    , Member (Reader ControlFlowVertex) sig
                    , Carrier sig m
                    )
-                => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Evaluator term address value m)) a)
+                => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Eff m)) a)
                 -> (Module term -> Evaluator term address value m a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
   local (const v) $
-    eavesdrop (runEvaluator (recur m)) $ \case
+    Evaluator $ eavesdrop (runEvaluator (recur m)) $ \case
       Load   path _ -> includeModule path
       Lookup path _ -> includeModule path
       _             -> pure ()
@@ -145,11 +145,11 @@ graphingModuleInfo :: ( Member (Modules address) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Evaluator term address value m)) a)
+                   => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Eff m)) a)
                    -> (Module term -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
-  eavesdrop (runEvaluator (recur m)) $ \case
+  Evaluator $ eavesdrop (runEvaluator (recur m)) $ \case
     Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _             -> pure ()
