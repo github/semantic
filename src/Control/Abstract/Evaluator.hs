@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
+  , raiseHandler
   , Open
   -- * Effects
   , Return(..)
@@ -26,6 +27,7 @@ import Control.Effect.Resumable as X
 import Control.Effect.State     as X
 import Control.Effect.Trace     as X
 import Control.Monad.IO.Class
+import Data.Coerce
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
 --
@@ -41,6 +43,12 @@ deriving instance (Member (Lift IO) sig, Carrier sig m) => MonadIO (Evaluator te
 instance Carrier sig m => Carrier sig (Evaluator term address value m) where
   ret = Evaluator . ret
   eff = Evaluator . eff . handlePure runEvaluator
+
+
+raiseHandler :: (Eff m a -> Eff n b)
+             -> Evaluator term address value m a
+             -> Evaluator term address value n b
+raiseHandler = coerce
 
 
 -- | An open-recursive function.
