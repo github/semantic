@@ -257,7 +257,6 @@ runParser blob@Blob{..} parser = case parser of
             writeLog Error "failed parsing" (("task", "parse") : blobFields)
             throwError (toException err)
 
-          -- TODO: Could give assignment a dedicated config for it's timeout.
           res <- timeout (configAssignmentTimeout config) . time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
