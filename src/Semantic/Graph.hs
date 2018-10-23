@@ -263,7 +263,8 @@ parsePythonPackage parser project = do
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
-      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id runPythonPackaging [ setupModule ])
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id [ setupModule ])
+      -- FIXME: what are we gonna do about runPythonPackaging
     Nothing -> pure PythonPackage.Unknown
   case strat of
     PythonPackage.Unknown -> do
