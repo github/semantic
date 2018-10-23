@@ -102,10 +102,11 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . fmap snd
     . runState ([] @Breakpoint)
     . runReader Step
+    . runEvaluator
     . id @(Evaluator _ Precise (Value _ Precise) _ _)
     . runPrintingTrace
     . runHeap
-    . runFresh 0
+    . raiseHandler runFresh
     . fmap reassociate
     . runLoadError
     . runUnspecialized
@@ -116,9 +117,9 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . runValueError
     . runModuleTable
     . runModules (ModuleTable.modulePaths (packageModules (snd <$> package)))
-    . runReader (packageInfo package)
-    . runState (lowerBound @Span)
-    . runReader (lowerBound @Span)
+    . raiseHandler (runReader (packageInfo package))
+    . raiseHandler (runState (lowerBound @Span))
+    . raiseHandler (runReader (lowerBound @Span))
     $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) modules
 
 -- TODO: REPL for typechecking/abstract semantics
