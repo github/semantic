@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: text
-version: 1.2.3.1
+version: 1.2.3.0
 summary: An efficient packed Unicode text type.
 homepage: https://github.com/haskell/text
 license: bsd-2-clause
