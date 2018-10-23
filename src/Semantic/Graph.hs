@@ -65,7 +65,7 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
 
-runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m)
+runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m, Effect sig)
          => GraphType
          -> Bool
          -> Project
@@ -94,6 +94,7 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
                 , HasPostlude lang
                 , Member Trace sig
                 , Carrier sig m
+                , Effect sig
                 )
              => Proxy lang
              -> Bool
@@ -138,6 +139,7 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , Recursive term
                                , Carrier sig m
                                , Show term
+                               , Effect sig
                                )
                             => Proxy lang
                             -> Package term
@@ -154,6 +156,7 @@ runImportGraphToModules :: ( Declarations term
                            , Recursive term
                            , Carrier sig m
                            , Show term
+                           , Effect sig
                            )
                         => Proxy lang
                         -> Package term
@@ -170,6 +173,7 @@ runImportGraph :: ( Declarations term
                   , Recursive term
                   , Carrier sig m
                   , Show term
+                  , Effect sig
                   )
                => Proxy lang
                -> Package term
