@@ -172,9 +172,8 @@ runEavesdropC f (EavesdropC m) = m f
 instance (Carrier sig m, HFunctor eff, Member eff sig, Applicative m) => Carrier sig (EavesdropC eff m) where
   ret a = EavesdropC (const (ret a))
   eff op
-    | Just m <- prj op = case m of
-      eff -> EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
-    | otherwise        = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
+    | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
+    | otherwise          = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
