@@ -5,7 +5,8 @@ module Semantic.REPL
 ) where
 
 import Control.Abstract hiding (Continue, List, string)
-import Control.Monad.Effect.Resource
+import Control.Effect.Carrier
+import Control.Effect.Resource
 import Control.Monad.IO.Class
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
