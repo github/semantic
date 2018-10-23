@@ -151,6 +151,12 @@ data B a = B (B a) (B a) | L a | E
   deriving (Foldable, Functor, Traversable)
 
 
+instance Applicative B where
+  pure = L
+  E     <*> _ = E
+  L f   <*> a = fmap f a
+  B l r <*> a = B (l <*> a) (r <*> a)
+
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache term address = Cache { unCache :: Monoidal.Map (Configuration term address) (Set (ValueRef address)) }
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term address, ValueRef address), Semigroup)
