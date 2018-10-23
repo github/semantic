@@ -69,10 +69,17 @@ instance Effect REPL where
   handle state handler (Output s k) = Output s (handler . (<$ state) . k)
 
 
-runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => Prefs -> Settings IO -> m (REPL ': effects) a -> m effects a
-runREPL prefs settings = interpret $ \case
-  Prompt   -> liftIO (runInputTWithPrefs prefs settings (getInputLine (cyan <> "repl: " <> plain)))
-  Output s -> liftIO (runInputTWithPrefs prefs settings (outputStrLn s))
+runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff m (REPLC m) a -> m a
+runREPL prefs settings = runREPLC (prefs, settings) . interpret
+
+newtype REPLC m a = REPLC { runREPLC :: (Prefs, Settings IO) -> m a }
+
+instance (Carrier sig m, MonadIO m) => Carrier (REPL :+: sig) (REPLC m) where
+  ret = REPLC . const . ret
+  eff op = REPLC (\ args -> (alg args \/ eff . handleReader args runREPLC) op)
+    where alg (prefs, settings) = \case
+            Prompt   -> liftIO (runInputTWithPrefs prefs settings (getInputLine (cyan <> "repl: " <> plain)))
+            Output s -> liftIO (runInputTWithPrefs prefs settings (outputStrLn s))
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
