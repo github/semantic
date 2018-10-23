@@ -25,7 +25,7 @@ import qualified Semantic.Telemetry.Haystack as Haystack
 import qualified Semantic.Telemetry.Stat as Stat
 import           Semantic.Version
 import           System.Environment
-import           System.IO (hIsTerminalDevice, stderr)
+import           System.IO (hIsTerminalDevice, stdout)
 import           System.Posix.Process
 import           System.Posix.Types
 
@@ -50,22 +50,23 @@ data Config
 -- Options configurable via command line arguments.
 data Options
   = Options
-  { optionsLogLevel      :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsRequestID     :: Maybe String  -- ^ Optional request id for tracing across systems.
-  , optionsFailOnWarning :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
+  { optionsLogLevel         :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disables logging.
+  , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
+  , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
+  , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) Nothing False
+defaultOptions = Options (Just Warning) Nothing False False
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) Nothing False
+debugOptions = Options (Just Debug) Nothing False False
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
   pid <- getProcessID
   hostName <- getHostName
-  isTerminal <- hIsTerminalDevice stderr
+  isTerminal <- hIsTerminalDevice stdout
   haystackURL <- lookupEnv "HAYSTACK_URL"
   (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
