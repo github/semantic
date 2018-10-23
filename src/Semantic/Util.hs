@@ -51,7 +51,7 @@ justEvaluating
 checking
   = runM @_ @IO
   . runTraceByPrinting
-  . runState (lowerBound @(Heap Monovariant Type))
+  . runHeap
   . runFresh
   . caching
   . providingLiveSet
