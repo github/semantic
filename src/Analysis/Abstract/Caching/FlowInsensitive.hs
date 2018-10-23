@@ -137,7 +137,7 @@ getConfiguration term = Configuration term <$> askRoots <*> getEvalContext
 
 
 caching :: (Carrier sig m, Effect sig)
-        => Evaluator term address value (AltC [] (Eff
+        => Evaluator term address value (AltC B (Eff
                                         (ReaderC (Cache term address) (Eff
                                         (StateC (Cache term address) (Eff
                                         m)))))) a
@@ -145,6 +145,7 @@ caching :: (Carrier sig m, Effect sig)
 caching
   = raiseHandler (runState  lowerBound)
   . raiseHandler (runReader lowerBound)
+  . fmap toList
   . raiseHandler runNonDet
 
 data B a = B (B a) (B a) | L a | E
