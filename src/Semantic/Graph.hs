@@ -69,7 +69,7 @@ runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Res
          => GraphType
          -> Bool
          -> Project
-         -> m (Graph ControlFlowVertex)
+         -> Eff m (Graph ControlFlowVertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser (lang' :: Proxy lang) <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
@@ -99,7 +99,7 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
              -> Bool
              -> [Module term]
              -> Package term
-             -> m (Graph ControlFlowVertex)
+             -> Eff m (Graph ControlFlowVertex)
 runCallGraph lang includePackages modules package = do
   let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
@@ -141,7 +141,7 @@ runImportGraphToModuleInfos :: ( Declarations term
                                )
                             => Proxy lang
                             -> Package term
-                            -> m (Graph ControlFlowVertex)
+                            -> Eff m (Graph ControlFlowVertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
@@ -157,7 +157,7 @@ runImportGraphToModules :: ( Declarations term
                            )
                         => Proxy lang
                         -> Package term
-                        -> m (Graph (Module term))
+                        -> Eff m (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
 
@@ -174,7 +174,7 @@ runImportGraph :: ( Declarations term
                => Proxy lang
                -> Package term
                -> (ModuleInfo -> Graph vertex)
-               -> m (Graph vertex)
+               -> Eff m (Graph vertex)
 runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
       extractGraph (graph, _) = graph >>= f
