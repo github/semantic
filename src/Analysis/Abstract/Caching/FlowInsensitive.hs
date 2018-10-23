@@ -157,6 +157,11 @@ instance Applicative B where
   L f   <*> a = fmap f a
   B l r <*> a = B (l <*> a) (r <*> a)
 
+instance Alternative B where
+  empty = E
+  (<|>) = B
+
+
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache term address = Cache { unCache :: Monoidal.Map (Configuration term address) (Set (ValueRef address)) }
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term address, ValueRef address), Semigroup)
