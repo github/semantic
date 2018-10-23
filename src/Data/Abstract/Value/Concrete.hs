@@ -26,7 +26,7 @@ import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Data.Text (pack)
 import Data.Word
-import Prologue hiding (catchError)
+import Prologue hiding (catchError, throwError)
 
 data Value term address
   = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) (Environment address)
@@ -125,41 +125,40 @@ instance ( Member (Reader ModuleInfo) sig
                 runBooleanC b >>= runBooleanC . k
 
 
--- instance ( Carrier sig m
---          , Member (Deref (Value term address)) sig
---          , Member (Abstract.Boolean (Value term address)) sig
---          , Member (Error (LoopControl address)) sig
---          , Member (Reader ModuleInfo) sig
---          , Member (Reader Span) sig
---          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
---          , Member (Resumable (BaseError (ValueError term address))) sig
---          , Member (Resumable (BaseError (UnspecializedError (Value term address)))) sig
---          , Member (State (Heap address (Value term address))) sig
---          , Ord address
---          , Show address
---          , Show term
---          )
---       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff (InterposeC (Resumable (BaseError (UnspecializedError (Value term address)))) m))) where
---   ret = WhileC . ret
---   eff = WhileC . (alg \/ eff . handleCoercible)
---     where alg = \case
---             Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address))))
---                   (\(Resumable (BaseError _ _ (UnspecializedError _)) k) -> throwAbort) (runEvaluator (loop (\continue -> do
---               cond' <- runWhileC cond
---
---               -- `interpose` is used to handle 'UnspecializedError's and abort out of the
---               -- loop, otherwise under concrete semantics we run the risk of the
---               -- conditional always being true and getting stuck in an infinite loop.
---
---               ifthenelse cond' (runWhileC body *> continue) (pure unit)))) >>= runWhileC . k
---             where
---               loop x = catchLoopControl (fix x) $ \case
---                 Break value -> deref value
---                 Abort -> pure unit
---                 -- FIXME: Figure out how to deal with this. Ruby treats this as the result
---                 -- of the current block iteration, while PHP specifies a breakout level
---                 -- and TypeScript appears to take a label.
---                 Continue _  -> loop x
+instance ( Carrier sig m
+         , Member (Deref (Value term address)) sig
+         , Member (Abstract.Boolean (Value term address)) sig
+         , Member (Error (LoopControl address)) sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+         , Member (Resumable (BaseError (UnspecializedError (Value term address)))) sig
+         , Member (State (Heap address (Value term address))) sig
+         , Ord address
+         , Show address
+         , Show term
+         )
+      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
+  ret = WhileC . ret
+  eff = WhileC . (alg \/ eff . handleCoercible)
+    where alg = \case
+            Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address))))
+                  (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address)) (runEvaluator (loop (\continue -> do
+              cond' <- Evaluator (runWhileC cond)
+
+              -- `interpose` is used to handle 'UnspecializedError's and abort out of the
+              -- loop, otherwise under concrete semantics we run the risk of the
+              -- conditional always being true and getting stuck in an infinite loop.
+
+              ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit)))) >>= runWhileC . k
+            where
+              loop x = catchLoopControl @address (fix x) $ \case
+                Break value -> deref value
+                Abort -> pure unit
+                -- FIXME: Figure out how to deal with this. Ruby treats this as the result
+                -- of the current block iteration, while PHP specifies a breakout level
+                -- and TypeScript appears to take a label.
+                Continue _  -> loop x
 
 
 interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
