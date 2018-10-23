@@ -105,7 +105,7 @@ runCallGraph lang includePackages modules package = do
       analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
       extractGraph (graph, _) = simplify graph
       runGraphAnalysis
-        = graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant))
+        = graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
         . runHeap
         . caching
         . raiseHandler runFresh
