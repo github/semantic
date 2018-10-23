@@ -101,9 +101,9 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
-       (runReader (packageInfo package)
-       (runState (lowerBound @Span)
-       (runReader (lowerBound @Span)
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy id withTermSpans modules)))))))
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
@@ -114,9 +114,9 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
   pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
-       (runReader (packageInfo package)
-       (runState (lowerBound @Span)
-       (runReader (lowerBound @Span)
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy id withTermSpans modules)))))))
 
 
@@ -124,9 +124,9 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
   project <- readProject Nothing path (Language.reflect proxy) []
   package <- fmap (quieterm . snd) <$> parsePackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
-  pure (runReader (packageInfo package)
-       (runState (lowerBound @Span)
-       (runReader (lowerBound @Span)
+  pure (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (evaluate proxy id withTermSpans modules))))))
