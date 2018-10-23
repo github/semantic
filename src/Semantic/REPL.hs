@@ -69,7 +69,7 @@ instance Effect REPL where
   handle state handler (Output s k) = Output s (handler . (<$ state) . k)
 
 
-runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff m (REPLC m) a -> m a
+runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff (REPLC m) a -> m a
 runREPL prefs settings = runREPLC (prefs, settings) . interpret
 
 newtype REPLC m a = REPLC { runREPLC :: (Prefs, Settings IO) -> m a }
