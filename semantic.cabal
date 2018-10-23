@@ -286,6 +286,7 @@ library
                      , DeriveTraversable
                      , FlexibleContexts
                      , FlexibleInstances
+                     , MonadFailDesugaring
                      , MultiParamTypeClasses
                      , OverloadedStrings
                      , RecordWildCards
@@ -384,6 +385,7 @@ test-suite test
                      , DeriveGeneric
                      , FlexibleContexts
                      , FlexibleInstances
+                     , MonadFailDesugaring
                      , MultiParamTypeClasses
                      , OverloadedStrings
                      , RecordWildCards
