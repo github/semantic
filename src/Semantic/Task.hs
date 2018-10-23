@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, ExistentialQuantification, GADTs, KindSignatures, LambdaCase, ScopedTypeVariables, StandaloneDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
+, TaskEff
 , Level(..)
 , RAlgebra
 -- * I/O
