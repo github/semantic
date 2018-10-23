@@ -7,6 +7,7 @@ module Semantic.REPL
 import Control.Abstract hiding (Continue, List, string)
 import Control.Effect.Carrier
 import Control.Effect.Resource
+import Control.Effect.Sum
 import Control.Monad.IO.Class
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
