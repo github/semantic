@@ -243,7 +243,7 @@ newtype FilesC m a = FilesC { runFilesC :: m a }
 
 instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   ret = FilesC . ret
-  eff = FilesC . (alg \/ (eff . handlePure runFilesC))
+  eff = FilesC . (alg \/ eff . handleCoercible)
     where alg = \case
             Read (FromPath path) k -> (readBlobFromPath path `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
             Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k

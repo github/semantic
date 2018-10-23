@@ -31,7 +31,7 @@ instance ( Member (Allocator address) sig
          )
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Evaluator term address Abstract m)) where
   ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> (alg eval \/ (eff . handlePure (flip runFunctionC eval))) op)
+  eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
     where alg eval = \case
             Function _ params body k -> do
               env <- foldr (\ name rest -> do
@@ -48,7 +48,7 @@ instance ( Member (Allocator address) sig
 
 instance (Carrier sig m, Alternative m, Monad m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
   ret = BooleanC . ret
-  eff = BooleanC . (alg \/ eff . handlePure runBooleanC)
+  eff = BooleanC . (alg \/ eff . handleCoercible)
     where alg (Boolean _ k) = runBooleanC (k Abstract)
           alg (AsBool _ k) = runBooleanC (k True) <|> runBooleanC (k False)
           alg (Disjunction a b k) = (runBooleanC a <|> runBooleanC b) >>= runBooleanC . k
@@ -61,7 +61,7 @@ instance ( Member (Abstract.Boolean Abstract) sig
          )
       => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
   ret = WhileC . ret
-  eff = WhileC . (alg \/ eff . handlePure runWhileC)
+  eff = WhileC . (alg \/ eff . handleCoercible)
     where alg (Abstract.While cond body k) = do
             cond' <- runWhileC cond
             ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit))

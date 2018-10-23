@@ -56,4 +56,4 @@ newtype DistributeC m a = DistributeC { runDistributeC :: m a }
 
 instance Carrier (Distribute :+: Lift IO) (DistributeC (Eff (LiftC IO))) where
   ret = DistributeC . ret
-  eff = DistributeC . ((\ (Distribute task k) -> liftIO (Async.runConcurrently (Async.Concurrently (runM (runDistributeC task)))) >>= runDistributeC . k) \/ (eff . handlePure runDistributeC))
+  eff = DistributeC . ((\ (Distribute task k) -> liftIO (Async.runConcurrently (Async.Concurrently (runM (runDistributeC task)))) >>= runDistributeC . k) \/ eff . handleCoercible)

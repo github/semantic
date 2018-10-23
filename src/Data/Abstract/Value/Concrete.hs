@@ -74,7 +74,7 @@ instance ( FreeVariables term
          )
       => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Evaluator term address (Value term address) m)) where
   ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> (alg eval \/ (eff . handlePure (flip runFunctionC eval))) op)
+  eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
     where alg eval = \case
             Abstract.Function name params body k -> do
               packageInfo <- currentPackage
@@ -107,7 +107,7 @@ instance ( Member (Reader ModuleInfo) sig
          )
       => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Value term address) m) where
   ret = BooleanC . ret
-  eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
+  eff = BooleanC . (alg \/ eff . handleCoercible)
     where alg :: Abstract.Boolean (Value term address) (BooleanC (Value term address) m) (BooleanC (Value term address) m a) -> m a
           alg = \case
             Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
@@ -140,7 +140,7 @@ instance ( Member (Reader ModuleInfo) sig
 --          )
 --       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff (InterposeC (Resumable (BaseError (UnspecializedError (Value term address)))) m))) where
 --   ret = WhileC . ret
---   eff = WhileC . (alg \/ (eff . handlePure runWhileC))
+--   eff = WhileC . (alg \/ eff . handleCoercible)
 --     where alg = \case
 --             Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address))))
 --                   (\(Resumable (BaseError _ _ (UnspecializedError _)) k) -> throwAbort) (runEvaluator (loop (\continue -> do

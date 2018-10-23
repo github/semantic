@@ -99,7 +99,7 @@ instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))
          )
       => Carrier (Modules address :+: sig) (ModulesC address m) where
   ret = ModulesC . const . ret
-  eff op = ModulesC (\ paths -> (alg paths \/ (eff . handlePure (flip runModulesC paths))) op)
+  eff op = ModulesC (\ paths -> (alg paths \/ eff . handleReader paths runModulesC) op)
     where alg paths (Load    name  k) = askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
           alg paths (Lookup  path  k) = askModuleTable >>= flip runModulesC paths . k . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path
           alg paths (Resolve names k) = runModulesC (k (find (`Set.member` paths) names)) paths

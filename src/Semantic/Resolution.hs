@@ -63,6 +63,6 @@ newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
 
 instance (Member Files sig, Carrier sig m, Monad m) => Carrier (Resolution :+: sig) (ResolutionC m) where
   ret = ResolutionC . ret
-  eff = ResolutionC . (alg \/ (eff . handlePure runResolutionC))
+  eff = ResolutionC . (alg \/ eff . handleCoercible)
     where alg (NodeJSResolution dir prop excludeDirs k) = nodeJSResolutionMap dir prop excludeDirs >>= runResolutionC . k
           alg (NoResolution k) = runResolutionC (k Map.empty)

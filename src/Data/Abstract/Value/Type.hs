@@ -253,7 +253,7 @@ instance ( Member (Allocator address) sig
          )
       => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Evaluator term address Type m)) where
   ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> (alg eval \/ (eff . handlePure (flip runFunctionC eval))) op)
+  eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
     where alg eval = \case
             Abstract.Function _ params body k -> do
               (env, tvars) <- foldr (\ name rest -> do
@@ -285,7 +285,7 @@ instance ( Member (Reader ModuleInfo) sig
          )
       => Carrier (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
   ret = BooleanC . ret
-  eff = BooleanC . (alg \/ (eff . handlePure runBooleanC))
+  eff = BooleanC . (alg \/ eff . handleCoercible)
     where alg (Abstract.Boolean _ k) = runBooleanC (k Bool)
           alg (Abstract.AsBool t k) = unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False))
           alg (Abstract.Disjunction t1 t2 k) = ((runBooleanC t1 >>= unify Bool) <|> (runBooleanC t2 >>= unify Bool) >>= runBooleanC . k)
@@ -298,7 +298,7 @@ instance ( Member (Abstract.Boolean Type) sig
          )
       => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
   ret = WhileC . ret
-  eff = WhileC . (alg \/ (eff . handlePure runWhileC))
+  eff = WhileC . (alg \/ eff . handleCoercible)
     where alg (Abstract.While cond body k) = do
             cond' <- runWhileC cond
             ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit))
