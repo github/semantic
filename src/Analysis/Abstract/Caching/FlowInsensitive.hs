@@ -162,6 +162,9 @@ instance Foldable B where
           go (L a)   = f a
           go (B a b) = go a <> go b
 
+  null E = True
+  null _ = False
+
 instance Applicative B where
   pure = L
   E     <*> _ = E
