@@ -38,7 +38,7 @@ justEvaluating
   = runM
   . runTraceByPrinting
   . runHeap
-  . runFresh 0
+  . runFresh
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -52,7 +52,7 @@ checking
   = runM @_ @IO
   . runTraceByPrinting
   . runState (lowerBound @(Heap Monovariant Type))
-  . runFresh 0
+  . runFresh
   . caching
   . providingLiveSet
   . fmap reassociate
