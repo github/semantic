@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , ControlFlowVertex(..)
@@ -19,6 +19,7 @@ module Analysis.Abstract.Graph
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
 import           Control.Effect.Carrier
+import           Control.Effect.Internal
 import           Control.Effect.Sum
 import           Data.Abstract.Address.Hole
 import           Data.Abstract.Address.Located
@@ -118,19 +119,19 @@ graphingPackages recur m =
   let v = moduleVertex (moduleInfo m) in packageInclusion v *> local (const v) (recur m)
 
 -- | Add vertices to the graph for imported modules.
-graphingModules :: ( Member (Modules address) sig
+graphingModules :: forall term address value m sig a
+                .  ( Member (Modules address) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (State (Graph ControlFlowVertex)) sig
                    , Member (Reader ControlFlowVertex) sig
                    , Carrier sig m
                    )
-                => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Eff m)) a)
-                -> (Module term -> Evaluator term address value m a)
+                => Open (Module term -> Evaluator term address value m a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
   local (const v) $
-    Evaluator $ eavesdrop (runEvaluator (recur m)) $ \case
+    eavesdrop @(Modules address) (recur m) $ \case
       Load   path _ -> includeModule path
       Lookup path _ -> includeModule path
       _             -> pure ()
@@ -140,25 +141,25 @@ graphingModules recur m = do
       in moduleInclusion (moduleVertex (ModuleInfo path'))
 
 -- | Add vertices to the graph for imported modules.
-graphingModuleInfo :: ( Member (Modules address) sig
+graphingModuleInfo :: forall term address value m sig a
+                   .  ( Member (Modules address) sig
                       , Member (Reader ModuleInfo) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => (Module term -> Evaluator term address value (EavesdropC (Modules address) (Eff m)) a)
-                   -> (Module term -> Evaluator term address value m a)
+                   => Open (Module term -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
-  Evaluator $ eavesdrop (runEvaluator (recur m)) $ \case
+  eavesdrop @(Modules address) (recur m) $ \case
     Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _             -> pure ()
 
-eavesdrop :: (HFunctor eff, Carrier sig m, Member eff sig, Applicative m)
-          => Eff (EavesdropC eff m) a
-          -> (forall x . eff m (m x) -> m ())
-          -> m a
-eavesdrop m f = runEavesdropC f (interpret m)
+eavesdrop :: (HFunctor eff, Carrier sig m, Member eff sig)
+          => Evaluator term address value m a
+          -> (forall x . eff (Eff m) (Eff m x) -> Eff m ())
+          -> Evaluator term address value m a
+eavesdrop m f = raiseHandler (runEavesdropC f . interpret) (raiseHandler upcast m)
 
 upcast :: Eff m a -> Eff (EavesdropC eff (Eff m)) a
 upcast m = Eff (\ k -> EavesdropC (\ f -> m >>= runEavesdropC f . k))
