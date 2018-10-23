@@ -183,7 +183,7 @@ runImportGraph lang (package :: Package term) f =
   let analyzeModule = graphingModuleInfo
       extractGraph (graph, _) = graph >>= f
       runImportGraphAnalysis
-        = runState lowerBound
+        = raiseHandler (runState lowerBound)
         . runHeap
         . raiseHandler runFresh
         . resumingLoadError
