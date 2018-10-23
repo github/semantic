@@ -148,7 +148,7 @@ caching
   . fmap toList
   . raiseHandler runNonDet
 
-data B a = B (B a) (B a) | L a | E
+data B a = E | L a | B (B a) (B a)
   deriving (Functor, Traversable)
 
 instance Foldable B where
