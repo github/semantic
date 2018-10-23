@@ -43,13 +43,13 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          )
       => Carrier (Allocator (Located address) :+: sig) (AllocatorC (Located address) m) where
   ret = demoteA . ret
-  eff = alg \/ AllocatorC . eff . handlePure runAllocatorC
+  eff = alg \/ AllocatorC . eff . handleCoercible
     where alg (Alloc name k) = Located <$> promoteA (eff (L (Alloc name ret))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= k
 
 
 instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m, Monad m)
       => Carrier (Deref value :+: sig) (DerefC (Located address) value m) where
   ret = demoteD . ret
-  eff = alg \/ DerefC . eff . handlePure runDerefC
+  eff = alg \/ DerefC . eff . handleCoercible
     where alg (DerefCell cell k) = promoteD (eff (L (DerefCell cell ret))) >>= k
           alg (AssignCell value cell k) = promoteD (eff (L (AssignCell value cell ret))) >>= k

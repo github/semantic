@@ -205,7 +205,7 @@ newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a 
 
 instance (Member Telemetry sig, Carrier sig m, Monad m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
   ret = TraceInTelemetryC . ret
-  eff = TraceInTelemetryC . ((\ (Trace str k) -> writeLog Debug str [] >> runTraceInTelemetryC k) \/ (eff . handlePure runTraceInTelemetryC))
+  eff = TraceInTelemetryC . ((\ (Trace str k) -> writeLog Debug str [] >> runTraceInTelemetryC k) \/ eff . handleCoercible)
 
 
 -- | An effect describing high-level tasks to be performed.
@@ -249,7 +249,7 @@ newtype TaskC m a = TaskC { runTaskC :: m a }
 
 instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   ret = TaskC . ret
-  eff = TaskC . (alg \/ (eff . handlePure runTaskC))
+  eff = TaskC . (alg \/ eff . handleCoercible)
     where alg = \case
             Parse parser blob k -> runParser blob parser >>= runTaskC . k
             Analyze interpret analysis k -> runTaskC (k (interpret analysis))

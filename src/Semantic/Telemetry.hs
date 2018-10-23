@@ -158,7 +158,7 @@ newtype TelemetryC m a = TelemetryC { runTelemetryC :: (LogQueue, StatQueue) -> 
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
   ret = TelemetryC . const . ret
-  eff op = TelemetryC (\ queues -> (alg queues \/ (eff . handlePure (flip runTelemetryC queues))) op)
+  eff op = TelemetryC (\ queues -> (alg queues \/ eff . handleReader queues runTelemetryC) op)
     where alg queues (WriteStat stat k) = queueStat (snd queues) stat *> runTelemetryC k queues
           alg queues (WriteLog level message pairs k) = queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues
 
