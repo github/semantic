@@ -163,10 +163,10 @@ instance ( Member (Reader ModuleInfo) sig
 
 
 interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
-          => (forall v. eff m (m v) -> m v)
-          -> Eff (InterposeC eff m) a
-          -> m a
-interpose handler = runInterposeC handler . interpret
+          => (forall v. eff (Eff m) (Eff m v) -> Eff m v)
+          -> Eff m a
+          -> Eff m a
+interpose handler = runInterposeC handler . interpret . upcast
 
 upcast :: Eff m a -> Eff (InterposeC eff (Eff m)) a
 upcast m = Eff (\ k -> InterposeC (\ f -> m >>= runInterposeC f . k))
