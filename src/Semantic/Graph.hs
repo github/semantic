@@ -240,7 +240,7 @@ parsePythonPackage :: forall syntax sig m term.
                    )
                    => Parser term      -- ^ A parser.
                    -> Project          -- ^ Project to parse into a package.
-                   -> m (Package term)
+                   -> Eff m (Package term)
 parsePythonPackage parser project = do
   let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
         . raiseHandler (runState PythonPackage.Unknown)
