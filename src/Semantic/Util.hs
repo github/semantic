@@ -8,7 +8,7 @@ import           Analysis.Abstract.Caching.FlowSensitive
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Exception (displayException)
-import           Control.Monad.Effect.Trace (runPrintingTrace)
+import           Control.Effect.Trace (runTraceByPrinting)
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
@@ -36,7 +36,7 @@ import           System.FilePath.Posix (takeDirectory)
 
 justEvaluating
   = runM
-  . runPrintingTrace
+  . runTraceByPrinting
   . runHeap
   . runFresh 0
   . fmap reassociate
@@ -50,7 +50,7 @@ justEvaluating
 
 checking
   = runM @_ @IO
-  . runPrintingTrace
+  . runTraceByPrinting
   . runState (lowerBound @(Heap Monovariant Type))
   . runFresh 0
   . caching
