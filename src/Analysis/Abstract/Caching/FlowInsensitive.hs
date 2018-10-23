@@ -149,7 +149,7 @@ caching
   . raiseHandler runNonDet
 
 data B a = E | L a | B (B a) (B a)
-  deriving (Functor, Traversable)
+  deriving (Functor)
 
 instance Foldable B where
   toList = flip go []
@@ -164,6 +164,12 @@ instance Foldable B where
 
   null E = True
   null _ = False
+
+instance Traversable B where
+  traverse f = go
+    where go E       = pure E
+          go (L a)   = L <$> f a
+          go (B a b) = B <$> go a <*> go b
 
 instance Applicative B where
   pure = L
