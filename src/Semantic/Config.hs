@@ -71,8 +71,9 @@ defaultConfig options@Options{..} = do
   haystackURL <- lookupEnv "HAYSTACK_URL"
   (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
-  parseTimeout <- envLookupNum 10000 "TREE_SITTER_PARSE_TIMEOUT" -- Default is 10 seconds
-  assignTimeout <- envLookupNum 10000 "TREE_SITTER_ASSIGNMENT_TIMEOUT" -- Same for assignment
+  -- Defaults for these values are commensurate with the Dockerfile
+  parseTimeout <- envLookupNum 6000 "TREE_SITTER_PARSE_TIMEOUT"
+  assignTimeout <- envLookupNum 4000 "TREE_SITTER_ASSIGNMENT_TIMEOUT"
   pure Config
     { configAppName = "semantic"
     , configHostName = hostName
