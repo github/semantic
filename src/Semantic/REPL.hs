@@ -114,7 +114,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . runResolutionError
     . runAddressError
     . runValueError
-    . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+    . runModuleTable
     . runModules (ModuleTable.modulePaths (packageModules (snd <$> package)))
     . runReader (packageInfo package)
     . runState (lowerBound @Span)
