@@ -66,7 +66,7 @@ instance HFunctor REPL where
 
 instance Effect REPL where
   handle state handler (Prompt k) = Prompt (handler . (<$ state) . k)
-  handle state handler (Output s k) = Output s (handler . (<$ state) . k)
+  handle state handler (Output s k) = Output s (handler (k <$ state))
 
 
 runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff (REPLC m) a -> m a
