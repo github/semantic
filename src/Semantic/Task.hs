@@ -258,7 +258,7 @@ runParser blob@Blob{..} parser = case parser of
             throwError (toException err)
 
           -- TODO: Could give assignment a dedicated config for it's timeout.
-          res <- timeout (fromSeconds 3) . time "parse.assign" languageTag $
+          res <- timeout (configAssignmentTimeout config) . time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
                 writeStat (increment "parse.assign_errors" languageTag)
