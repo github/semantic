@@ -36,9 +36,10 @@ import           System.FilePath.Posix (takeDirectory)
 
 justEvaluating
   = runM
-  . runTraceByPrinting
+  . runEvaluator
+  . raiseHandler runTraceByPrinting
   . runHeap
-  . runFresh
+  . raiseHandler runFresh
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -49,10 +50,11 @@ justEvaluating
   . runValueError
 
 checking
-  = runM @_ @IO
-  . runTraceByPrinting
+  = runM
+  . runEvaluator
+  . raiseHandler runTraceByPrinting
   . runHeap
-  . runFresh
+  . raiseHandler runFresh
   . caching
   . providingLiveSet
   . fmap reassociate
