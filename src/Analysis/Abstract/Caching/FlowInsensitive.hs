@@ -161,6 +161,12 @@ instance Alternative B where
   empty = E
   (<|>) = B
 
+instance Monad B where
+  return = pure
+  E     >>= _ = E
+  L a   >>= f = f a
+  B l r >>= f = B (l >>= f) (r >>= f)
+
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache term address = Cache { unCache :: Monoidal.Map (Configuration term address) (Set (ValueRef address)) }
