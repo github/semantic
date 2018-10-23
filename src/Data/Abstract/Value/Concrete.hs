@@ -10,6 +10,7 @@ module Data.Abstract.Value.Concrete
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
+import Control.Effect.Internal
 import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..))
@@ -166,6 +167,9 @@ interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
           -> Eff (InterposeC eff m) a
           -> m a
 interpose handler = runInterposeC handler . interpret
+
+upcast :: Eff m a -> Eff (InterposeC eff (Eff m)) a
+upcast m = Eff (\ k -> InterposeC (\ f -> m >>= runInterposeC f . k))
 
 newtype InterposeC eff m a = InterposeC ((forall x . eff m (m x) -> m x) -> m a)
 
