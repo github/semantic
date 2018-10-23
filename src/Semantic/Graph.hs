@@ -237,6 +237,7 @@ parsePythonPackage :: forall syntax sig m term.
                    , Member Task sig
                    , Carrier sig m
                    , Monad m
+                   , Effect sig
                    )
                    => Parser term      -- ^ A parser.
                    -> Project          -- ^ Project to parse into a package.
