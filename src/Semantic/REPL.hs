@@ -65,8 +65,8 @@ instance HFunctor REPL where
   hmap _ = coerce
 
 instance Effect REPL where
-  handleState state handler (Prompt k) = Prompt (handler . (<$ state) . k)
-  handleState state handler (Output s k) = Output s (handler . (<$ state) . k)
+  handle state handler (Prompt k) = Prompt (handler . (<$ state) . k)
+  handle state handler (Output s k) = Output s (handler . (<$ state) . k)
 
 
 runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => Prefs -> Settings IO -> m (REPL ': effects) a -> m effects a
