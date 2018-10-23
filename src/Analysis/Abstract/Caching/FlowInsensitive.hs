@@ -152,6 +152,11 @@ data B a = B (B a) (B a) | L a | E
   deriving (Functor, Traversable)
 
 instance Foldable B where
+  toList = flip go []
+    where go E       rest = rest
+          go (L a)   rest = a : rest
+          go (B a b) rest = go a (go b rest)
+
   foldMap f = go
     where go E       = mempty
           go (L a)   = f a
