@@ -68,7 +68,6 @@ import           Data.Blob
 import           Data.Bool
 import           Data.ByteString.Builder
 import           Data.Diff
-import           Data.Duration
 import qualified Data.Error as Error
 import           Data.Language (Language)
 import           Data.Location
