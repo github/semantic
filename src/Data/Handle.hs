@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GADTs #-}
 
 module Data.Handle
   ( Handle (..)
