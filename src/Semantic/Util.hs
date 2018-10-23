@@ -25,7 +25,7 @@ import           Data.Project hiding (readFile)
 import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
 import           Parsing.Parser
-import           Prologue hiding (weaken)
+import           Prologue
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.IO as IO
@@ -124,12 +124,13 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
   project <- readProject Nothing path (Language.reflect proxy) []
   package <- fmap (quieterm . snd) <$> parsePackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
-  pure (raiseHandler (runReader (packageInfo package))
+  pure (id @(Evaluator _ Monovariant _ _ _)
+       (raiseHandler (runReader (packageInfo package))
        (raiseHandler (runState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
-       (evaluate proxy id withTermSpans modules))))))
+       (evaluate proxy id withTermSpans modules)))))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
