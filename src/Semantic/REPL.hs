@@ -49,10 +49,10 @@ data REPL (m :: * -> *) k
   deriving (Functor)
 
 prompt :: (Member REPL sig, Carrier sig m) => m (Maybe String)
-prompt = send (Prompt gen)
+prompt = send (Prompt ret)
 
 output :: (Member REPL sig, Carrier sig m) => String -> m ()
-output s = send (Output s (gen ()))
+output s = send (Output s (ret ()))
 
 
 data Quit = Quit
@@ -129,8 +129,8 @@ runTelemetryIgnoringStat logOptions = flip runTelemetryIgnoringStatC logOptions 
 newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: LogOptions -> m a }
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgnoringStatC m) where
-  gen = TelemetryIgnoringStatC . const . gen
-  alg op = TelemetryIgnoringStatC (\ logOptions -> (algT logOptions \/ (alg . handlePure (flip runTelemetryIgnoringStatC logOptions))) op)
+  ret = TelemetryIgnoringStatC . const . ret
+  eff op = TelemetryIgnoringStatC (\ logOptions -> (algT logOptions \/ eff . handleReader logOptions runTelemetryIgnoringStatC) op)
     where algT logOptions (WriteStat _ k) = runTelemetryIgnoringStatC k logOptions
           algT logOptions (WriteLog level message pairs k) = do
             time <- liftIO Time.getCurrentTime
