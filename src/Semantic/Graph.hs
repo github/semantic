@@ -10,6 +10,7 @@ module Semantic.Graph
 , ControlFlowVertex
 , style
 , runHeap
+, runModuleTable
 , parsePackage
 , parsePythonPackage
 , withTermSpans
