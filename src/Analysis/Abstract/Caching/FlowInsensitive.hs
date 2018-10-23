@@ -149,8 +149,13 @@ caching
   . raiseHandler runNonDet
 
 data B a = B (B a) (B a) | L a | E
-  deriving (Foldable, Functor, Traversable)
+  deriving (Functor, Traversable)
 
+instance Foldable B where
+  foldMap f = go
+    where go E       = mempty
+          go (L a)   = f a
+          go (B a b) = go a <> go b
 
 instance Applicative B where
   pure = L
