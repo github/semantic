@@ -160,6 +160,9 @@ eavesdrop :: (HFunctor eff, Carrier sig m, Member eff sig, Applicative m)
           -> m a
 eavesdrop m f = runEavesdropC f (interpret m)
 
+upcast :: Eff m a -> Eff (EavesdropC eff (Eff m)) a
+upcast m = Eff (\ k -> EavesdropC (\ f -> m >>= runEavesdropC f . k))
+
 newtype EavesdropC eff m a = EavesdropC ((forall x . eff m (m x) -> m ()) -> m a)
 
 runEavesdropC :: (forall x . eff m (m x) -> m ()) -> EavesdropC eff m a -> m a
