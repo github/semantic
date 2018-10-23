@@ -6,7 +6,7 @@ module Data.Location
   , Range(..)
   ) where
 
-import Prologue (Generic (..), NFData (..))
+import Prologue (Generic, NFData (..))
 
 import Data.JSON.Fields
 import Data.Range
