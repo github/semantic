@@ -30,7 +30,7 @@ promoteD = DerefC . runDerefC
 demoteA :: AllocatorC (Hole context address) m a -> AllocatorC address m a
 demoteA = AllocatorC . runAllocatorC
 
-promoteA :: AllocatorC address m address -> AllocatorC (Hole context address) m address
+promoteA :: AllocatorC address m a -> AllocatorC (Hole context address) m a
 promoteA = AllocatorC . runAllocatorC
 
 
@@ -39,14 +39,14 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          , Monad m
          )
       => Carrier (Allocator (Hole context address) :+: sig) (AllocatorC (Hole context address) m) where
-  ret = demoteA . ret
+  ret = promoteA . ret
   eff = alg \/ AllocatorC . eff . handleCoercible
     where alg (Alloc name k) = Total <$> promoteA (eff (L (Alloc name ret))) >>= k
 
 
 instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m, Monad m)
       => Carrier (Deref value :+: sig) (DerefC (Hole context address) value m) where
-  ret = demoteD . ret
+  ret = promoteD . ret
   eff = alg \/ DerefC . eff . handleCoercible
     where alg (DerefCell cell k) = promoteD (eff (L (DerefCell cell ret))) >>= k
           alg (AssignCell value cell k) = promoteD (eff (L (AssignCell value cell ret))) >>= k
