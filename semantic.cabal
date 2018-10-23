@@ -48,8 +48,6 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
-                     -- Effects
-                     , Control.Effect.Resource
                      -- Rewriting
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
