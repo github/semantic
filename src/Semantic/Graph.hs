@@ -65,7 +65,7 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
 
-runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m, Effect sig)
+runGraph :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Effect sig)
          => GraphType
          -> Bool
          -> Project
@@ -236,7 +236,6 @@ parsePythonPackage :: forall syntax sig m term.
                    , Member Trace sig
                    , Member Task sig
                    , Carrier sig m
-                   , Monad m
                    , Effect sig
                    )
                    => Parser term      -- ^ A parser.
