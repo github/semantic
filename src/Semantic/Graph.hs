@@ -243,10 +243,9 @@ parsePythonPackage :: forall syntax sig m term.
                    -> m (Package term)
 parsePythonPackage parser project = do
   let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
-        . runState PythonPackage.Unknown
-        . runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise))))
-        . runFresh
-        . runEvaluator
+        . raiseHandler (runState PythonPackage.Unknown)
+        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
+        . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
         . resumingEnvironmentError
@@ -256,9 +255,9 @@ parsePythonPackage parser project = do
         . resumingValueError
         . runModuleTable
         . runModules lowerBound
-        . runReader (PackageInfo (name "setup") lowerBound)
-        . runState (lowerBound @Span)
-        . runReader (lowerBound @Span)
+        . raiseHandler (runReader (PackageInfo (name "setup") lowerBound))
+        . raiseHandler (runState (lowerBound @Span))
+        . raiseHandler (runReader (lowerBound @Span))
 
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
