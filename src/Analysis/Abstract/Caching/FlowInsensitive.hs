@@ -147,6 +147,9 @@ caching
   . raiseHandler (runReader lowerBound)
   . raiseHandler runNonDet
 
+data B a = B (B a) (B a) | L a | E
+  deriving (Foldable, Functor, Traversable)
+
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache term address = Cache { unCache :: Monoidal.Map (Configuration term address) (Set (ValueRef address)) }
