@@ -20,19 +20,8 @@ toMaybe (Partial _) = Nothing
 toMaybe (Total a)   = Just a
 
 
-demoteD :: DerefC (Hole context address) value m a -> DerefC address value m a
-demoteD = DerefC . runDerefC
-
-promoteD :: DerefC address value m a -> DerefC (Hole context address) value m a
-promoteD = DerefC . runDerefC
-
-
-demoteA :: AllocatorC (Hole context address) m a -> AllocatorC address m a
-demoteA = AllocatorC . runAllocatorC
-
 promoteA :: AllocatorC address m a -> AllocatorC (Hole context address) m a
 promoteA = AllocatorC . runAllocatorC
-
 
 instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          , Carrier sig m
@@ -43,6 +32,9 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
   eff = alg \/ AllocatorC . eff . handleCoercible
     where alg (Alloc name k) = Total <$> promoteA (eff (L (Alloc name ret))) >>= k
 
+
+promoteD :: DerefC address value m a -> DerefC (Hole context address) value m a
+promoteD = DerefC . runDerefC
 
 instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m, Monad m)
       => Carrier (Deref value :+: sig) (DerefC (Hole context address) value m) where
