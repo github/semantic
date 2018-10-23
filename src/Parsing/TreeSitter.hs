@@ -11,7 +11,6 @@ import qualified Control.Exception as Exc (bracket)
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Resource
 import           Control.Monad.Effect.Trace
-import           Control.Monad.IO.Class
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
