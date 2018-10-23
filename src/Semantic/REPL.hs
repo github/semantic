@@ -179,7 +179,7 @@ step blobs recur0 recur term = do
         runCommand run [":step"]     = local (const Step) run
         runCommand run [":continue"] = local (const Continue) run
         runCommand run [":break", s]
-          | [(i, "")] <- readDec s = modify' (OnLine i :) >> runCommands run
+          | [(i, "")] <- readDec s = modify (OnLine i :) >> runCommands run
         -- TODO: :show breakpoints
         -- TODO: :delete breakpoints
         runCommand run [":list"] = list >> runCommands run
