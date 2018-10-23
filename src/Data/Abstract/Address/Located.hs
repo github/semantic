@@ -20,19 +20,8 @@ data Located address = Located
   deriving (Eq, Ord, Show)
 
 
-demoteD :: DerefC (Located address) value m a -> DerefC address value m a
-demoteD = DerefC . runDerefC
-
-promoteD :: DerefC address value m a -> DerefC (Located address) value m a
-promoteD = DerefC . runDerefC
-
-
-demoteA :: AllocatorC (Located address) m a -> AllocatorC address m a
-demoteA = AllocatorC . runAllocatorC
-
 promoteA :: AllocatorC address m a -> AllocatorC (Located address) m a
 promoteA = AllocatorC . runAllocatorC
-
 
 instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          , Carrier sig m
@@ -46,6 +35,9 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
   eff = alg \/ AllocatorC . eff . handleCoercible
     where alg (Alloc name k) = Located <$> promoteA (eff (L (Alloc name ret))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= k
 
+
+promoteD :: DerefC address value m a -> DerefC (Located address) value m a
+promoteD = DerefC . runDerefC
 
 instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m, Monad m)
       => Carrier (Deref value :+: sig) (DerefC (Located address) value m) where
