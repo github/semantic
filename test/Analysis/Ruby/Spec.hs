@@ -6,7 +6,7 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Number as Number
 import Data.Abstract.Value.Concrete as Value
 import Data.AST
-import Control.Monad.Effect (SomeExc(..))
+import Control.Effect.Resumable (SomeError(..))
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Sum
 import qualified Language.Ruby.Assignment as Ruby
