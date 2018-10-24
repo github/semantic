@@ -11,9 +11,7 @@ module Data.Project (
   , projectName
   , projectFiles
   , readFile
-  -- * Files
-  , File (..)
-  , file
+  , readProjectFromPaths
   ) where
 
 import Prelude hiding (readFile)
@@ -22,10 +20,12 @@ import Prologue hiding (throwError)
 import           Control.Effect
 import           Control.Effect.Error
 import           Data.Blob
+import           Data.File
 import           Data.Language
 import qualified Data.Text as T
 import           Proto3.Suite
 import           System.FilePath.Posix
+import           Semantic.IO
 
 -- | A 'ProjectF' contains all the information that semantic needs
 -- to execute an analysis, diffing, or graphing pass. It is higher-kinded
@@ -73,20 +73,6 @@ projectExtensions = extensionsForLanguage . projectLanguage
 projectFiles :: Project -> [File]
 projectFiles = fmap toFile . projectBlobs
 
-data File = File
-  { filePath     :: FilePath
-  , fileLanguage :: Language
-  } deriving (Eq, Ord, Show)
-
-file :: FilePath -> File
-file path = File path (languageForFilePath path)
-  where languageForFilePath = languageForType . takeExtension
-
--- This is kind of a wart; Blob and File should be two views of
--- the same higher-kinded datatype.
-toFile :: Blob -> File
-toFile (Blob _ p l) = File p l
-
 newtype ProjectException
   = FileNotFound FilePath
     deriving (Show, Eq, Typeable, Exception)
@@ -102,3 +88,17 @@ readFile Project{..} f =
     | p == "/dev/null"  -> pure Nothing
     | isJust candidate  -> pure candidate
     | otherwise         -> throwError (SomeException (FileNotFound p))
+
+readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
+readProjectFromPaths maybeRoot path lang excludeDirs = do
+  isDir <- isDirectory path
+  let rootDir = if isDir
+      then fromMaybe path maybeRoot
+      else fromMaybe (takeDirectory path) maybeRoot
+
+  paths <- liftIO $ findFilesInDir rootDir exts excludeDirs
+  blobs <- liftIO $ traverse (readBlobFromFile' . toFile) paths
+  pure $ Project rootDir blobs lang excludeDirs
+  where
+    toFile path = File path lang
+    exts = extensionsForLanguage lang
