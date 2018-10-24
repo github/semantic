@@ -155,11 +155,12 @@ namespaceScope heap ns@(Namespace _ _ _)
   = either (const Nothing) (snd . snd)
   . run
   . runFresh
+  . runEvaluator
   . runAddressError
-  . runState heap
-  . runState (lowerBound @Span)
-  . runReader (lowerBound @Span)
-  . runReader (ModuleInfo "SpecHelper.hs")
+  . raiseHandler (runState heap)
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runReader (ModuleInfo "SpecHelper.hs"))
   . runDeref
   $ materializeEnvironment ns
 
