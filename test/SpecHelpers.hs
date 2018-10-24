@@ -96,17 +96,17 @@ readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
 type TestEvaluatingC term
-  = Eff (ResumableC (BaseError (ValueError term Precise))
-  ( Eff (ResumableC (BaseError (AddressError Precise (Val term)))
-  ( Eff (ResumableC (BaseError ResolutionError)
-  ( Eff (ResumableC (BaseError EvalError)
-  ( Eff (ResumableC (BaseError (EnvironmentError Precise))
-  ( Eff (ResumableC (BaseError (UnspecializedError (Val term)))
-  ( Eff (ResumableC (BaseError (LoadError Precise))
-  ( Eff (FreshC
-  ( Eff (StateC (Heap Precise (Val term))
-  ( Eff (TraceByReturningC
-  ( Eff (LiftC IO)))))))))))))))))))))
+  = ResumableC (BaseError (ValueError term Precise)) (Eff
+  ( ResumableC (BaseError (AddressError Precise (Val term))) (Eff
+  ( ResumableC (BaseError ResolutionError) (Eff
+  ( ResumableC (BaseError EvalError) (Eff
+  ( ResumableC (BaseError (EnvironmentError Precise)) (Eff
+  ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
+  ( ResumableC (BaseError (LoadError Precise)) (Eff
+  ( FreshC (Eff
+  ( StateC (Heap Precise (Val term)) (Eff
+  ( TraceByReturningC (Eff
+  ( LiftC IO))))))))))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (ValueError term Precise)
      , BaseError (AddressError Precise (Val term))
@@ -128,6 +128,7 @@ testEvaluating
   . runTraceByReturning
   . runState lowerBound
   . runFresh
+  . runEvaluator
   . fmap reassociate
   . runLoadError
   . runUnspecialized
