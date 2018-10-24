@@ -14,7 +14,6 @@ import Data.Either
 import Data.List (intersperse)
 
 import           Control.Monad.Effect.Exception
-import           Control.Monad.IO.Class
 import           Data.AST
 import           Data.Blob
 import           Parsing.Parser

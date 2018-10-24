@@ -6,10 +6,11 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
-import           Control.Monad.IO.Class
-import           Data.Language (ensureLanguage)
+import           Data.File
+import           Data.Language (ensureLanguage, languageForFilePath)
 import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
+import           Data.Handle
 import           Data.Project
 import           Options.Applicative hiding (style)
 import           Prologue
@@ -18,9 +19,9 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Diff as Diff
 import qualified Semantic.Graph as Graph
-import           Semantic.IO as IO
 import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
+import           Semantic.Task.Files
 import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
 import           System.FilePath
@@ -119,7 +120,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
           <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
     makeReadProjectFromPathsTask language maybePaths = do
       paths <- maybeM (liftIO (many getLine)) maybePaths
-      blobs <- traverse IO.readBlob (flip File language <$> paths)
+      blobs <- traverse readBlobFromFile' (flip File language <$> paths)
       pure $! Project (takeDirectory (maybe "/" fst (uncons paths))) blobs language []
     readProjectRecursively = makeReadProjectRecursivelyTask
       <$> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))

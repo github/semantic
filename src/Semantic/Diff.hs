@@ -17,7 +17,6 @@ import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
 import Rendering.Renderer
-import Semantic.IO (noLanguageForBlob)
 import Semantic.Telemetry as Stat
 import Semantic.Task as Task
 import Serializing.Format
