@@ -19,7 +19,7 @@ module SpecHelpers
 
 import Control.Abstract
 import Control.Arrow ((&&&))
-import Control.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
+import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
 import Data.Abstract.Address.Precise as X
 import Data.Abstract.Environment as Env
