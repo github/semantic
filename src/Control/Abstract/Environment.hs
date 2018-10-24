@@ -187,7 +187,7 @@ newtype EnvC address m a = EnvC { runEnvC :: Eff (StateC (EvalContext address) (
 
 instance (Carrier sig m, Effect sig) => Carrier (Env address :+: sig) (EnvC address m) where
   ret = EnvC . ret
-  eff = EnvC . (alg \/ eff . R . R . handlePure runEnvC)
+  eff = EnvC . (alg \/ eff . R . R . handleCoercible)
     where alg = \case
             Lookup name k -> gets (Env.lookupEnv' name . ctxEnvironment) >>= runEnvC . k
             Bind name addr k -> modify (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment)) >> runEnvC k
