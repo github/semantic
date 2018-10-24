@@ -67,14 +67,15 @@ sendScope :: (Member (ScopeEnv address) sig, Carrier sig m) => ScopeEnv address 
 sendScope = send
 
 instance HFunctor (ScopeEnv address) where
-  hmap _ (Lookup ref                          k) = Lookup ref k
-  hmap _ (Declare decl span assocScope        k) = Declare decl span assocScope k
-  hmap _ (PutDeclarationScope decl assocScope k) = PutDeclarationScope decl assocScope k
-  hmap _ (Reference ref decl                  k) = Reference ref decl k
-  hmap _ (NewScope edges                      k) = NewScope edges k
-  hmap _ (CurrentScope                        k) = CurrentScope k
-  hmap _ (AssociatedScope decl                k) = AssociatedScope decl k
-  hmap f (Local scope action                  k) = Local scope (f action) k
+  hmap f = \case
+    Lookup ref                          k -> Lookup ref k
+    Declare decl span assocScope        k -> Declare decl span assocScope k
+    PutDeclarationScope decl assocScope k -> PutDeclarationScope decl assocScope k
+    Reference ref decl                  k -> Reference ref decl k
+    NewScope edges                      k -> NewScope edges k
+    CurrentScope                        k -> CurrentScope k
+    AssociatedScope decl                k -> AssociatedScope decl k
+    Local scope action                  k -> Local scope (f action) k
 
 instance Effect (ScopeEnv address) where
   handle state handler = \case
