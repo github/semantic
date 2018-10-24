@@ -173,7 +173,7 @@ instance Effect (Env address) where
 --   New bindings created in the computation are returned.
 runEnv :: (Carrier sig m, Effect sig)
        => EvalContext address
-       -> Evaluator term address value (EnvC (Eff
+       -> Evaluator term address value (EnvC address (Eff
                                        (StateC (EvalContext address) (Eff
                                        (StateC (Exports address) (Eff
                                        m)))))) a
@@ -186,9 +186,9 @@ runEnv initial = raiseHandler $ fmap (filterEnv . fmap (first (Env.head . ctxEnv
           | Exports.null ports = (binds, a)
           | otherwise          = (Exports.toBindings ports <> Env.aliasBindings (Exports.aliases ports) binds, a)
 
-newtype EnvC m a = EnvC { runEnvC :: m a }
+newtype EnvC address m a = EnvC { runEnvC :: m a }
 
-instance (Carrier (State (EvalContext address) :+: State (Exports address) :+: sig) m, HFunctor sig, Monad m) => Carrier (Env address :+: sig) (EnvC m) where
+instance (Carrier (State (EvalContext address) :+: State (Exports address) :+: sig) m, HFunctor sig, Monad m) => Carrier (Env address :+: sig) (EnvC address m) where
   ret = EnvC . ret
   eff = EnvC . (alg \/ (eff . R . R . handlePure runEnvC))
     where alg = \case
