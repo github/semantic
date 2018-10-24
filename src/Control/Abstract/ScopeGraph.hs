@@ -98,7 +98,7 @@ newtype ScopeEnvC m a = ScopeEnvC { runScopeEnvC :: m a }
 
 instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier (State (ScopeGraph address) :+: sig) m, Effect sig) => Carrier (ScopeEnv address :+: sig) (ScopeEnvC (Eff m)) where
   ret = ScopeEnvC . ret
-  eff = ScopeEnvC . (alg \/ (eff . R . handlePure runScopeEnvC))
+  eff = ScopeEnvC . (alg \/ eff . R . handlePure runScopeEnvC)
     where alg (Lookup ref k) = gets (ScopeGraph.scopeOfRef ref) >>= runScopeEnvC . k
           alg (Declare decl span scope k) = modify @(ScopeGraph address) (ScopeGraph.declare decl span scope) *> runScopeEnvC k
           alg (PutDeclarationScope decl scope k) = modify @(ScopeGraph address) (ScopeGraph.insertDeclarationScope decl scope) *> runScopeEnvC k
