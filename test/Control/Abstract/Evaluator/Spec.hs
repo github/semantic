@@ -45,14 +45,14 @@ evaluate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . Precise.runDeref @_ @_ @Val
-  . Precise.runAllocator
+  . runDeref @_ @_ @Val
+  . runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
   . runLoopControl
-  . Value.runBoolean
-  . Value.runFunction coerce
+  . runBoolean
+  . runFunction coerce
 
 reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) result)) -> Either (SomeError (Sum '[exc3, exc2, exc1])) result
 reassociate = mergeErrors . mergeErrors . mergeErrors . Right
