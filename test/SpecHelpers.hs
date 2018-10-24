@@ -105,7 +105,7 @@ type TestEvaluatingEffects term
   ( Eff (ResumableC (BaseError (LoadError Precise))
   ( Eff (FreshC
   ( Eff (StateC (Heap Precise (Val term))
-  ( Eff (TraceC
+  ( Eff (TraceByReturningC
   ( Eff (LiftC IO)))))))))))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (ValueError term Precise)
