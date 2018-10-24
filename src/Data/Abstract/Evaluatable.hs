@@ -37,7 +37,6 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
-import Data.Abstract.ScopeGraph (ScopeGraph)
 import Data.Abstract.Ref as X
 import Data.Language
 import Data.Function
@@ -92,11 +91,10 @@ type ModuleC address value m
   ( ErrorC (Return address)      (Eff
   ( EnvC address                 (Eff
   ( ScopeEnvC address            (Eff
-  ( StateC (ScopeGraph address)  (Eff
   ( DerefC address value         (Eff
   ( AllocatorC address           (Eff
   ( ReaderC ModuleInfo           (Eff
-    m)))))))))))))))))
+    m)))))))))))))))
 
 type ValueC term address value m
   = FunctionC term address value (Eff

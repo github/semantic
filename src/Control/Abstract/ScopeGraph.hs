@@ -88,15 +88,13 @@ instance Effect (ScopeEnv address) where
 
 
 runScopeEnv :: (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier sig m, Effect sig)
-            => Evaluator term address value (ScopeEnvC address (Eff
-                                            (StateC (ScopeGraph address) (Eff
-                                            m)))) a
+            => Evaluator term address value (ScopeEnvC address (Eff m)) a
             -> Evaluator term address value m (ScopeGraph address, a)
 runScopeEnv = raiseHandler $ runState lowerBound . runScopeEnvC . interpret
 
-newtype ScopeEnvC address m a = ScopeEnvC { runScopeEnvC :: m a }
+newtype ScopeEnvC address m a = ScopeEnvC { runScopeEnvC :: Eff (StateC (ScopeGraph address) m) a }
 
-instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier (State (ScopeGraph address) :+: sig) m, Effect sig) => Carrier (ScopeEnv address :+: sig) (ScopeEnvC address (Eff m)) where
+instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier sig m, Effect sig) => Carrier (ScopeEnv address :+: sig) (ScopeEnvC address m) where
   ret = ScopeEnvC . ret
   eff = ScopeEnvC . (alg \/ eff . R . handleCoercible)
     where alg = \case
