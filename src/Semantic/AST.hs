@@ -10,7 +10,6 @@ module Semantic.AST
 import Prologue hiding (catchError)
 
 import Data.ByteString.Builder
-import Data.Either
 import Data.List (intersperse)
 
 import           Control.Monad.Effect.Exception
@@ -18,7 +17,6 @@ import           Data.AST
 import           Data.Blob
 import           Parsing.Parser
 import           Rendering.JSON (renderJSONAST)
-import           Semantic.IO (noLanguageForBlob)
 import           Semantic.Task
 import qualified Serializing.Format as F
 
