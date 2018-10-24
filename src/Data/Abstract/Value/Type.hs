@@ -288,7 +288,7 @@ instance ( Member (Reader ModuleInfo) sig
   eff = BooleanC . (alg \/ eff . handleCoercible)
     where alg (Abstract.Boolean _ k) = runBooleanC (k Bool)
           alg (Abstract.AsBool t k) = unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False))
-          alg (Abstract.Disjunction t1 t2 k) = ((runBooleanC t1 >>= unify Bool) <|> (runBooleanC t2 >>= unify Bool) >>= runBooleanC . k)
+          alg (Abstract.Disjunction t1 t2 k) = (runBooleanC t1 >>= unify Bool) <|> (runBooleanC t2 >>= unify Bool) >>= runBooleanC . k
 
 
 instance ( Member (Abstract.Boolean Type) sig
