@@ -1,12 +1,12 @@
 ---
 type: cabal
-name: text
-version: 1.2.3.1
-summary: An efficient packed Unicode text type.
-homepage: https://github.com/haskell/text
+name: mwc-random
+version: 0.13.3.2
+summary: Fast, high quality pseudo random number generation
+homepage: https://github.com/bos/mwc-random
 license: bsd-2-clause
 ---
-Copyright (c) 2008-2009, Tom Harper
+Copyright (c) 2009, Bryan O'Sullivan
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

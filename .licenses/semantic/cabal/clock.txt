@@ -1,17 +1,19 @@
 ---
 type: cabal
-name: text
-version: 1.2.3.1
-summary: An efficient packed Unicode text type.
-homepage: https://github.com/haskell/text
-license: bsd-2-clause
+name: clock
+version: 0.7.2
+summary: 'High-resolution clock functions: monotonic, realtime, cputime.'
+homepage: https://github.com/corsis/clock
+license: bsd-3-clause
 ---
-Copyright (c) 2008-2009, Tom Harper
+Copyright (c) 2009-2012, Cetin Sert
+Copyright (c) 2010, Eugene Kirpichov
+
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
+modification, are permitted provided that the following conditions are
+met:
 
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
@@ -20,6 +22,10 @@ are met:
       copyright notice, this list of conditions and the following
       disclaimer in the documentation and/or other materials provided
       with the distribution.
+
+    * The names of contributors may not be used to endorse or promote
+      products derived from this software without specific prior
+      written permission. 
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT

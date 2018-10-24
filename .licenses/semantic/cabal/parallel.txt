@@ -1,11 +1,17 @@
 ---
 type: cabal
-name: stm
-version: 2.4.5.1
-summary: Software Transactional Memory
-homepage: https://wiki.haskell.org/Software_transactional_memory
+name: parallel
+version: 3.2.2.0
+summary: Parallel programming library
+homepage: 
 license: bsd-3-clause
 ---
+This library (libraries/parallel) is derived from code from
+the GHC project which is largely (c) The University of
+Glasgow, and distributable under a BSD-style license (see below).
+
+-----------------------------------------------------------------------------
+
 The Glasgow Haskell Compiler License
 
 Copyright 2004, The University Court of the University of Glasgow. 
@@ -37,3 +43,5 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
 LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGE.
+
+-----------------------------------------------------------------------------
