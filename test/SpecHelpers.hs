@@ -125,9 +125,9 @@ testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingEffects term)
                  )
 testEvaluating
   = runM
-  . runReturningTrace
+  . runTraceByReturning
   . runState lowerBound
-  . runFresh 0
+  . runFresh
   . fmap reassociate
   . Evaluator . runLoadError
   . Evaluator . runUnspecialized
