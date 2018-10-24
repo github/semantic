@@ -1,9 +1,9 @@
 ---
 type: cabal
-name: stm
-version: 2.4.5.1
-summary: Software Transactional Memory
-homepage: https://wiki.haskell.org/Software_transactional_memory
+name: haskell-src
+version: 1.0.3.0
+summary: Support for manipulating Haskell source code
+homepage: 
 license: bsd-3-clause
 ---
 The Glasgow Haskell Compiler License
