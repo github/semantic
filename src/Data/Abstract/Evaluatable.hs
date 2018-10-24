@@ -91,7 +91,7 @@ type ModuleC address value m
   ( ErrorC (LoopControl address) (Eff
   ( ErrorC (Return address)      (Eff
   ( EnvC address                 (Eff
-  ( ScopeEnvC                    (Eff
+  ( ScopeEnvC address            (Eff
   ( StateC (ScopeGraph address)  (Eff
   ( DerefC address value         (Eff
   ( AllocatorC address           (Eff
