@@ -73,19 +73,19 @@ instance ( FreeVariables term
          , Show address
          , Show term
          )
-      => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Evaluator term address (Value term address) m)) where
+      => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
     where alg eval = \case
-            Abstract.Function name params body k -> do
+            Abstract.Function name params body k -> runEvaluator $ do
               packageInfo <- currentPackage
               moduleInfo <- currentModule
-              Closure packageInfo moduleInfo name params (Right body) <$> close (foldr Set.delete (freeVariables body) params) >>= flip runFunctionC eval . k
+              Closure packageInfo moduleInfo name params (Right body) <$> close (foldr Set.delete (freeVariables body) params) >>= Evaluator . flip runFunctionC eval . k
             Abstract.BuiltIn builtIn k -> do
               packageInfo <- currentPackage
               moduleInfo <- currentModule
               runFunctionC (k (Closure packageInfo moduleInfo Nothing [] (Left builtIn) lowerBound)) eval
-            Abstract.Call op self params k -> do
+            Abstract.Call op self params k -> runEvaluator $ do
               boxed <- case op of
                 Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> box Unit
                 Closure _ _ _ _ (Left Show) _ -> deref self >>= box . String . pack . show
@@ -95,9 +95,9 @@ instance ( FreeVariables term
                   withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
                     bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
                     let fnCtx = EvalContext (Just self) (Env.push env)
-                    withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction eval (eval body)))
+                    withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction (Evaluator . eval) (Evaluator (eval body))))
                 _ -> throwValueError (CallError op) >>= box
-              runFunctionC (k boxed) eval
+              Evaluator $ runFunctionC (k boxed) eval
 
 
 instance ( Member (Reader ModuleInfo) sig

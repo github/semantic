@@ -29,21 +29,21 @@ instance ( Member (Allocator address) sig
          , Ord address
          , Carrier sig m
          )
-      => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Evaluator term address Abstract m)) where
+      => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
     where alg eval = \case
-            Function _ params body k -> do
+            Function _ params body k -> runEvaluator $ do
               env <- foldr (\ name rest -> do
                 addr <- alloc name
                 assign addr Abstract
                 Env.insert name addr <$> rest) (pure lowerBound) params
-              addr <- locally (bindAll env *> catchReturn (runFunction eval (eval body)))
-              deref addr >>= flip runFunctionC eval . k
+              addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
+              deref addr >>= Evaluator . flip runFunctionC eval . k
             BuiltIn _ k -> runFunctionC (k Abstract) eval
-            Call _ _ params k -> do
+            Call _ _ params k -> runEvaluator $ do
               traverse_ deref params
-              box Abstract >>= flip runFunctionC eval . k
+              box Abstract >>= Evaluator . flip runFunctionC eval . k
 
 
 instance (Carrier sig m, Alternative m, Monad m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where

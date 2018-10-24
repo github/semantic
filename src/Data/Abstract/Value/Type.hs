@@ -251,20 +251,20 @@ instance ( Member (Allocator address) sig
          , Ord address
          , Carrier sig m
          )
-      => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Evaluator term address Type m)) where
+      => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
     where alg eval = \case
-            Abstract.Function _ params body k -> do
+            Abstract.Function _ params body k -> runEvaluator $ do
               (env, tvars) <- foldr (\ name rest -> do
                 addr <- alloc name
                 tvar <- Var <$> fresh
                 assign addr tvar
                 bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
-              (zeroOrMoreProduct tvars :->) <$> (locally (catchReturn (bindAll env *> runFunction eval (eval body))) >>= deref) >>= flip runFunctionC eval . k
+              locally (catchReturn (bindAll env *> runFunction (Evaluator . eval) (Evaluator (eval body)))) >>= deref >>= Evaluator . flip runFunctionC eval . k . (zeroOrMoreProduct tvars :->)
             Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
             Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval
-            Abstract.Call op _ params k -> do
+            Abstract.Call op _ params k -> runEvaluator $ do
               tvar <- fresh
               paramTypes <- traverse deref params
               let needed = zeroOrMoreProduct paramTypes :-> Var tvar
@@ -272,7 +272,7 @@ instance ( Member (Allocator address) sig
               boxed <- case unified of
                 _ :-> ret -> box ret
                 actual    -> throwTypeError (UnificationError needed actual) >>= box
-              runFunctionC (k boxed) eval
+              Evaluator $ runFunctionC (k boxed) eval
 
 
 instance ( Member (Reader ModuleInfo) sig

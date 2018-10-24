@@ -27,7 +27,7 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (_, expected) <- evaluate $ do
-      identity <- function Nothing [name "x"] (coerce (variable (name "x")))
+      identity <- function Nothing [name "x"] (SpecEff (variable (name "x")))
       recv <- box unit
       addr <- box (integer 123)
       call identity recv [addr]
@@ -41,31 +41,32 @@ evaluate
   . runReader (PackageInfo (name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . runReader (lowerBound @Span)
+  . runEvaluator
   . fmap reassociate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . runDeref @_ @_ @Val
+  . runDeref @Val
   . runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
   . runLoopControl
   . runBoolean
-  . runFunction coerce
+  . runFunction runSpecEff
 
 reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) result)) -> Either (SomeError (Sum '[exc3, exc2, exc1])) result
 reassociate = mergeErrors . mergeErrors . mergeErrors . Right
 
 type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
-  { runSpecEff :: Eff (FunctionC SpecEff Precise Val
+  { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
                  (Eff (BooleanC Val
                  (Eff (ErrorC (LoopControl Precise)
                  (Eff (ErrorC (Return Precise)
                  (Eff (EnvC Precise
                  (Eff (AllocatorC Precise
-                 (Eff (DerefC Val
+                 (Eff (DerefC Precise Val
                  (Eff (ResumableC (BaseError (AddressError Precise Val))
                  (Eff (ResumableC (BaseError (EnvironmentError Precise))
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
