@@ -8,7 +8,6 @@ module Semantic.Telemetry.Log
   , writeLogMessage
   ) where
 
-import           Control.Monad.IO.Class
 import           Data.Error (withSGRCode)
 import           Data.List (intersperse)
 import qualified Data.Time.Format as Time
