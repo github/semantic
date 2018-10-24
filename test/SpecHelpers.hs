@@ -129,13 +129,13 @@ testEvaluating
   . runState lowerBound
   . runFresh
   . fmap reassociate
-  . Evaluator . runLoadError
-  . Evaluator . runUnspecialized
-  . Evaluator . runEnvironmentError
-  . Evaluator . runEvalError
-  . Evaluator . runResolutionError
-  . Evaluator . runAddressError
-  . Evaluator . runValueError @_ @_ @Precise
+  . runLoadError
+  . runUnspecialized
+  . runEnvironmentError
+  . runEvalError
+  . runResolutionError
+  . runAddressError
+  . runValueError @_ @_ @_ @Precise
   . fmap snd
 
 type Val term = Value term Precise
