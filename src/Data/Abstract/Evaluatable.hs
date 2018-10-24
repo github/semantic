@@ -89,14 +89,12 @@ type ModuleC address value m
   = ErrorC (LoopControl address) (Eff
   ( ErrorC (Return address)      (Eff
   ( EnvC address                 (Eff
-  ( StateC (EvalContext address) (Eff
-  ( StateC (Exports address)     (Eff
   ( ScopeEnvC                    (Eff
   ( StateC (ScopeGraph address)  (Eff
   ( DerefC address value         (Eff
   ( AllocatorC address           (Eff
   ( ReaderC ModuleInfo           (Eff
-    m)))))))))))))))))))
+    m)))))))))))))))
 
 type ValueC term address value m
   = FunctionC term address value (Evaluator term address value
