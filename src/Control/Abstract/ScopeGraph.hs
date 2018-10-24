@@ -77,14 +77,15 @@ instance HFunctor (ScopeEnv address) where
   hmap f (Local scope action                  k) = Local scope (f action) k
 
 instance Effect (ScopeEnv address) where
-  handle state handler (Lookup ref                          k) = Lookup ref (handler . (<$ state) . k)
-  handle state handler (Declare decl span assocScope        k) = Declare decl span assocScope (handler (k <$ state))
-  handle state handler (PutDeclarationScope decl assocScope k) = PutDeclarationScope decl assocScope (handler (k <$ state))
-  handle state handler (Reference ref decl                  k) = Reference ref decl (handler (k <$ state))
-  handle state handler (NewScope edges                      k) = NewScope edges (handler . (<$ state) . k)
-  handle state handler (CurrentScope                        k) = CurrentScope (handler . (<$ state) . k)
-  handle state handler (AssociatedScope decl                k) = AssociatedScope decl (handler . (<$ state) . k)
-  handle state handler (Local scope action                  k) = Local scope (handler (action <$ state)) (handler . fmap k)
+  handle state handler = \case
+    Lookup ref                          k -> Lookup ref (handler . (<$ state) . k)
+    Declare decl span assocScope        k -> Declare decl span assocScope (handler (k <$ state))
+    PutDeclarationScope decl assocScope k -> PutDeclarationScope decl assocScope (handler (k <$ state))
+    Reference ref decl                  k -> Reference ref decl (handler (k <$ state))
+    NewScope edges                      k -> NewScope edges (handler . (<$ state) . k)
+    CurrentScope                        k -> CurrentScope (handler . (<$ state) . k)
+    AssociatedScope decl                k -> AssociatedScope decl (handler . (<$ state) . k)
+    Local scope action                  k -> Local scope (handler (action <$ state)) (handler . fmap k)
 
 
 runScopeEnv :: (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier sig m, Effect sig)
