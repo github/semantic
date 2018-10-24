@@ -45,7 +45,7 @@ runPythonPackaging = interpose (\case
   Call callName super params k -> k =<< do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
-        let bindings = foldr (\ (name, addr) -> Map.insert name addr) lowerBound (zip paramNames params)
+        let bindings = foldr (uncurry Map.insert) lowerBound (zip paramNames params)
         let asStrings = deref >=> asArray >=> traverse (deref >=> asString)
 
         case name' of
