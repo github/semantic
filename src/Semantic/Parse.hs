@@ -21,7 +21,6 @@ import           Rendering.Graph
 import           Rendering.JSON (SomeJSON (..))
 import qualified Rendering.JSON as JSON
 import           Rendering.Renderer
-import           Semantic.IO (noLanguageForBlob)
 import           Semantic.Task
 import           Serializing.Format
 

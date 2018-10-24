@@ -14,12 +14,13 @@ import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
 import           Data.Coerce
+import           Data.File
 import           Data.Project
 import qualified Data.Map as Map
 import           Data.Source
 import           Data.Language
 import           Prologue
-import           Semantic.IO
+import           Semantic.Task.Files
 import           System.FilePath.Posix
 
 

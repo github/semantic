@@ -36,6 +36,8 @@ import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
+import qualified Data.File as F
+import Data.File as X hiding (readFilePair)
 import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
@@ -88,12 +90,12 @@ diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= 
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: TaskConfig -> FilePath -> IO ByteString
-parseFilePath (TaskConfig config logger statter) path = (fromJust <$> IO.readFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFromFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
-                     runBothWith IO.readFilePair paths'
+                     runBothWith F.readFilePair paths'
 
 type TestEvaluatingC term
   = ResumableC (BaseError (ValueError term Precise)) (Eff

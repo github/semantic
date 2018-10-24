@@ -18,6 +18,7 @@ import           Data.Abstract.Package
 import           Data.Abstract.Value.Concrete as Concrete
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
+import           Data.File
 import           Data.Graph (topologicalSort)
 import qualified Data.Language as Language
 import           Data.List (uncons)
@@ -28,7 +29,6 @@ import           Parsing.Parser
 import           Prologue
 import           Semantic.Config
 import           Semantic.Graph
-import           Semantic.IO as IO
 import           Semantic.Task
 import           Semantic.Telemetry (LogQueue, StatQueue)
 import           System.Exit (die)
@@ -77,7 +77,7 @@ typecheckGoFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Langu
 typecheckRubyFile = checking <=< evaluateProjectWithCaching (Proxy :: Proxy 'Language.Ruby) rubyParser
 
 callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
-  blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)
+  blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap snd <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   x <- runCallGraph proxy False modules package
@@ -94,7 +94,7 @@ evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger 
 data TaskConfig = TaskConfig Config LogQueue StatQueue
 
 evaluateProject' (TaskConfig config logger statter) proxy parser paths = either (die . displayException) pure <=< runTaskWithConfig config logger statter $ do
-  blobs <- catMaybes <$> traverse readFile (flip File (Language.reflect proxy) <$> paths)
+  blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap (quieterm . snd) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
