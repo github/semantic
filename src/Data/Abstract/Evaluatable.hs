@@ -112,7 +112,7 @@ evaluate :: ( AbstractValue term address value valueC
             , booleanC ~ BooleanC value (Eff moduleC)
             , Carrier (Boolean value :+: moduleSig) booleanC
             , whileC ~ WhileC value (Eff booleanC)
-            , moduleSig ~ (EavesdropC (Modules address) :+: Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
+            , moduleSig ~ (Eavesdrop (Modules address) :+: Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
             , Carrier (While value :+: Boolean value :+: moduleSig) whileC
             , Carrier (Function term address value :+: While value :+: Boolean value :+: moduleSig) valueC
             , Declarations term
