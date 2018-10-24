@@ -95,7 +95,7 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluatingEffects term
+type TestEvaluatingC term
   = Eff (ResumableC (BaseError (ValueError term Precise))
   ( Eff (ResumableC (BaseError (AddressError Precise (Val term)))
   ( Eff (ResumableC (BaseError ResolutionError)
@@ -116,7 +116,7 @@ type TestEvaluatingErrors term
      , BaseError (UnspecializedError (Val term))
      , BaseError (LoadError Precise)
      ]
-testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingEffects term) (Span, a)
+testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) (Span, a)
                -> IO
                  ( [String]
                  , ( Heap Precise (Val term)
