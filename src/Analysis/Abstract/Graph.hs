@@ -18,9 +18,7 @@ module Analysis.Abstract.Graph
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract hiding (Function(..))
-import           Control.Effect.Carrier
-import           Control.Effect.Internal
-import           Control.Effect.Sum
+import           Control.Effect.Eavesdrop
 import           Data.Abstract.Address.Hole
 import           Data.Abstract.Address.Located
 import           Data.Abstract.BaseError
@@ -120,7 +118,7 @@ graphingPackages recur m =
 
 -- | Add vertices to the graph for imported modules.
 graphingModules :: forall term address value m sig a
-                .  ( Member (Modules address) sig
+                .  ( Member (Eavesdrop (Modules address)) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (State (Graph ControlFlowVertex)) sig
                    , Member (Reader ControlFlowVertex) sig
@@ -142,7 +140,7 @@ graphingModules recur m = do
 
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: forall term address value m sig a
-                   .  ( Member (Modules address) sig
+                   .  ( Member (Eavesdrop (Modules address)) sig
                       , Member (Reader ModuleInfo) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
@@ -154,26 +152,6 @@ graphingModuleInfo recur m = do
     Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _             -> pure ()
-
-eavesdrop :: (HFunctor eff, Carrier sig m, Member eff sig)
-          => Evaluator term address value m a
-          -> (forall x . eff (Eff m) (Eff m x) -> Eff m ())
-          -> Evaluator term address value m a
-eavesdrop m f = raiseHandler (runEavesdropC f . interpret) (raiseHandler upcast m)
-
-upcast :: Eff m a -> Eff (EavesdropC eff (Eff m)) a
-upcast m = Eff (\ k -> EavesdropC (\ f -> m >>= runEavesdropC f . k))
-
-newtype EavesdropC eff m a = EavesdropC ((forall x . eff m (m x) -> m ()) -> m a)
-
-runEavesdropC :: (forall x . eff m (m x) -> m ()) -> EavesdropC eff m a -> m a
-runEavesdropC f (EavesdropC m) = m f
-
-instance (Carrier sig m, HFunctor eff, Member eff sig, Applicative m) => Carrier sig (EavesdropC eff m) where
-  ret a = EavesdropC (const (ret a))
-  eff op
-    | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
-    | otherwise          = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
