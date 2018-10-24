@@ -97,7 +97,7 @@ type ModuleC address value m
     m)))))))))))))))
 
 type ValueC term address value m
-  = FunctionC term address value (Evaluator term address value
+  = FunctionC term address value (Eff
   ( WhileC value                 (Eff
   ( BooleanC value               (Eff
     m)))))

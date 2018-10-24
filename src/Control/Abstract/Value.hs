@@ -103,14 +103,13 @@ instance Effect (Function term address value) where
   handle state handler (Call fn self addrs        k) = Call fn self addrs        (handler . (<$ state) . k)
 
 
-runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Evaluator term address value m))
-            => (term -> Evaluator term address value (FunctionC term address value (Evaluator term address value m)) address)
-            -> Evaluator term address value (FunctionC term address value
-              (Evaluator term address value m)) a
+runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
+            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) address)
+            -> Evaluator term address value (FunctionC term address value (Eff m)) a
             -> Evaluator term address value m a
-runFunction eval = flip runFunctionC eval . interpret . runEvaluator
+runFunction eval = raiseHandler (flip runFunctionC (runEvaluator . eval) . interpret)
 
-newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Evaluator term address value (FunctionC term address value m) address) -> m a }
+newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) address) -> m a }
 
 
 -- | Construct a boolean value in the abstract domain.
