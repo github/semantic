@@ -31,7 +31,7 @@ module Parsing.Parser
 import           Assigning.Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
-import           Data.Abstract.Evaluatable (HasPostlude, HasPrelude)
+import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
 import           Data.Kind
@@ -73,7 +73,6 @@ data SomeAnalysisParser typeclasses ann where
                         , Apply (VertexDeclaration' (Sum fs)) fs
                         , Element Syntax.Identifier fs
                         , HasPrelude lang
-                        , HasPostlude lang
                         )
                      => Parser (Term (Sum fs) ann)
                      -> Proxy lang
