@@ -6,7 +6,7 @@ module Language.JSON.PrettyPrint
   , minimizingJSON
   ) where
 
-import Prologue hiding (throwError)
+import Prologue
 
 import Control.Effect
 import Control.Effect.Error

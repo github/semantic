@@ -45,7 +45,7 @@ import Data.Abstract.Number as Number
 import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Span
-import Prologue hiding (TypeError, catchError)
+import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to

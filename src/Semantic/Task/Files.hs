@@ -28,7 +28,7 @@ import           Data.Handle
 import           Data.Language
 import           Data.Project hiding (readFile)
 import           Prelude hiding (readFile)
-import           Prologue hiding (MonadError (..), fail)
+import           Prologue
 import           Semantic.IO
 import qualified System.IO as IO
 

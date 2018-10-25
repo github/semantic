@@ -58,7 +58,7 @@ import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
-import           Prologue hiding (MonadError (..), TypeError (..))
+import           Prologue hiding (TypeError (..))
 import           Semantic.Task as Task
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)

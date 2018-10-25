@@ -12,7 +12,7 @@ import Control.Monad
 import Data.AST
 import Data.Blob
 import Parsing.Parser
-import Prologue hiding (MonadError(..))
+import Prologue
 import Rendering.JSON (renderJSONAST)
 import Semantic.Task
 import qualified Serializing.Format as F

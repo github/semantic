@@ -29,7 +29,7 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Numeric (readDec)
 import Parsing.Parser (rubyParser)
-import Prologue hiding (throwError)
+import Prologue
 import Semantic.Config (logOptionsFromConfig)
 import Semantic.Distribute
 import Semantic.Graph

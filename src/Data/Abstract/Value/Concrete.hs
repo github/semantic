@@ -26,7 +26,7 @@ import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Data.Text (pack)
 import Data.Word
-import Prologue hiding (catchError, throwError)
+import Prologue
 
 data Value term address
   = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) (Environment address)
