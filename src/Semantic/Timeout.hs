@@ -39,7 +39,6 @@ runTimeout :: (Carrier sig m, MonadIO m)
            -> Eff (TimeoutC m) a
            -> m a
 runTimeout handler = runTimeoutC handler . interpret
--- runTimeout handler = interpret (\ (Timeout n task) -> liftIO (System.timeout (toMicroseconds n) (handler (runTimeout handler task))))
 
 newtype TimeoutC m a = TimeoutC ((forall x . m x -> IO x) -> m a)
 
