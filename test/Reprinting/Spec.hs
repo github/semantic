@@ -29,7 +29,7 @@ spec = describe "reprinting" $ do
   context "JSON" $ do
     let path = "test/fixtures/javascript/reprinting/map.json"
     (src, tree) <- runIO $ do
-      src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
+      src  <- blobSource <$> readBlobFromFile' (File path Language.JSON)
       tree <- parseFile jsonParser path
       pure (src, tree)
 

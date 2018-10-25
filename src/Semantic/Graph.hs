@@ -45,6 +45,7 @@ import           Data.Abstract.Value.Concrete as Concrete
     (Value, ValueError (..), runWhile, runBoolean, runFunction, runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
+import           Data.File
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Language as Language
