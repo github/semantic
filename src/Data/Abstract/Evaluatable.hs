@@ -157,16 +157,32 @@ evaluate lang analyzeModule analyzeTerm modules = do
 
         runValue = runBoolean . runWhile . runFunction evalTerm
 
-        runInModule preludeBinds info
-          = raiseHandler (runReader info)
-          . runAllocator
-          . runDeref
-          . runScopeEnv
-          . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
-          . runReturn
-          . runLoopControl
-          . raiseHandler runInterpose
-          . raiseHandler runEavesdrop
+runInModule :: ( Carrier sig m
+               , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff m))))
+               , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: sig)
+               , Carrier allocatorSig allocatorC
+               , Carrier (Deref value :+: allocatorSig) (DerefC address value (Eff allocatorC))
+               , Effect sig
+               , Member Fresh sig
+               , Member (Modules address) sig
+               , Member (Resumable (BaseError (UnspecializedError value))) sig
+               , Ord address
+               )
+            => Bindings address
+            -> ModuleInfo
+            -> Evaluator term address value (ModuleC address value m) address
+            -> Evaluator term address value m (ModuleResult address)
+runInModule prelude info
+  = raiseHandler (runReader info)
+  . runAllocator
+  . runDeref
+  . runScopeEnv
+  . runEnv (EvalContext Nothing (X.push (newEnv prelude)))
+  . runReturn
+  . runLoopControl
+  . raiseHandler runInterpose
+  . raiseHandler runEavesdrop
+
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
