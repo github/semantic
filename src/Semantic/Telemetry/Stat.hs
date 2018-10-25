@@ -27,7 +27,6 @@ module Semantic.Telemetry.Stat
 ) where
 
 
-import           Control.Monad.IO.Class
 import qualified Data.ByteString.Char8 as B
 import           Data.List (intercalate)
 import           Data.List.Split (splitOneOf)

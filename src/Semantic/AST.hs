@@ -12,7 +12,6 @@ import Data.Blob
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.JSON (renderJSONAST)
-import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
 import qualified Serializing.Format as F
 

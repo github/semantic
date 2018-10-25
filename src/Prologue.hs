@@ -36,6 +36,7 @@ import Control.Arrow as X ((&&&), (***))
 import Control.Monad as X hiding (fail, return)
 import Control.Monad.Except as X (MonadError (..))
 import Control.Monad.Fail as X (MonadFail (..))
+import Control.Monad.IO.Class as X (MonadIO (..))
 import Data.Algebra as X
 import Data.Bifoldable as X
 import Data.Bifunctor as X (Bifunctor (..))

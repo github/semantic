@@ -6,7 +6,6 @@ module Semantic.REPL
 
 import Control.Abstract hiding (Continue, List, string)
 import Control.Monad.Effect.Resource
-import Control.Monad.IO.Class
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable hiding (string)
@@ -16,6 +15,7 @@ import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
 import Data.Error (showExcerpt)
+import Data.File (File (..), readBlobFromFile)
 import Data.Graph (topologicalSort)
 import Data.Language as Language
 import Data.List (uncons)
@@ -30,9 +30,9 @@ import Prologue hiding (throwError)
 import Semantic.Config (logOptionsFromConfig)
 import Semantic.Distribute
 import Semantic.Graph
-import Semantic.IO as IO
 import Semantic.Resolution
 import Semantic.Task hiding (Error)
+import qualified Semantic.Task.Files as Files
 import Semantic.Telemetry
 import Semantic.Timeout
 import Semantic.Telemetry.Log (LogOptions, Message(..), writeLogMessage)
@@ -71,8 +71,8 @@ runREPL prefs settings = interpret $ \case
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
-repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @_ @_ @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader config . IO.runFiles . runResolution . runTaskF $ do
-  blobs <- catMaybes <$> traverse IO.readFile (flip File (Language.reflect proxy) <$> paths)
+repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runDistribute . runResource (runM . runDistribute) . runTimeout (runM . runDistribute . runResource (runM . runDistribute)) . runError @_ @_ @SomeException . runTelemetryIgnoringStat (logOptionsFromConfig config) . runTraceInTelemetry . runReader config . Files.runFiles . runResolution . runTaskF $ do
+  blobs <- catMaybes <$> traverse readBlobFromFile (flip File (Language.reflect proxy) <$> paths)
   package <- fmap (fmap quieterm) <$> parsePackage parser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs (Language.reflect proxy) [])
   modules <- topologicalSort <$> runImportGraphToModules proxy (snd <$> package)
   homeDir <- liftIO getHomeDirectory
