@@ -8,8 +8,6 @@ module Data.Abstract.Evaluatable
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
--- * Postludes
-, HasPostlude(..)
 -- * Effects
 , EvalError(..)
 , throwEvalError
@@ -223,36 +221,6 @@ instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineNamespace (name "console") $ do
       define (name "log") (builtIn Print)
-
--- Postludes
-
-class HasPostlude (language :: Language) where
-  postlude :: ( AbstractValue term address value m
-              , Carrier sig m
-              , HasCallStack
-              , Member (Allocator address) sig
-              , Member (Deref value) sig
-              , Member (Env address) sig
-              , Member Fresh sig
-              , Member (Reader ModuleInfo) sig
-              , Member (Reader Span) sig
-              , Member (Resumable (BaseError (EnvironmentError address))) sig
-              , Member Trace sig
-              )
-           => proxy language
-           -> Evaluator term address value m ()
-  postlude _ = pure ()
-
-instance HasPostlude 'Go
-instance HasPostlude 'Haskell
-instance HasPostlude 'Java
-instance HasPostlude 'PHP
-instance HasPostlude 'Python
-instance HasPostlude 'Ruby
-instance HasPostlude 'TypeScript
-
-instance HasPostlude 'JavaScript where
-  postlude _ = trace "JS postlude"
 
 
 -- Effects
