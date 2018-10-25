@@ -119,7 +119,6 @@ evaluate :: ( AbstractValue term address value valueC
             , Effect sig
             , Evaluatable (Base term)
             , FreeVariables term
-            , HasPostlude lang
             , HasPrelude lang
             , Member Fresh sig
             , Member (Modules address) sig
@@ -151,14 +150,10 @@ evaluate lang analyzeModule analyzeTerm modules = do
   foldr (run preludeBinds) ask modules
   where run preludeBinds m rest = do
           evaluated <- runInModule preludeBinds (moduleInfo m)
-            (analyzeModule (evalModuleBody . moduleBody)
+            (analyzeModule (runValue . evalTerm . moduleBody)
             m)
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
-
-        evalModuleBody term = runValue (do
-          result <- evalTerm term
-          result <$ postlude lang)
 
         evalTerm = fix (analyzeTerm ((. project) . eval)) >=> address
 
