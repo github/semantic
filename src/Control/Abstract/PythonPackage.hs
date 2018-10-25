@@ -7,7 +7,7 @@ import           Control.Abstract.Heap (Allocator, Deref, deref)
 import           Control.Abstract.Value
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable hiding (InterposeC)
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..), ValueError (..))

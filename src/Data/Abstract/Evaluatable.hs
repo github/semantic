@@ -30,6 +30,7 @@ import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..)
 import Control.Abstract.Value as X hiding (Boolean(..), Function(..), While(..))
 import Control.Abstract.ScopeGraph
 import Control.Effect.Eavesdrop
+import Control.Effect.Interpose
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.BaseError as X
@@ -86,15 +87,16 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
 
 
 type ModuleC address value m
-  = EavesdropC (Modules address) (Eff
-  ( ErrorC (LoopControl address) (Eff
-  ( ErrorC (Return address)      (Eff
-  ( EnvC address                 (Eff
-  ( ScopeEnvC address            (Eff
-  ( DerefC address value         (Eff
-  ( AllocatorC address           (Eff
-  ( ReaderC ModuleInfo           (Eff
-    m)))))))))))))))
+  = EavesdropC (Modules address)                                  (Eff
+  ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
+  ( ErrorC (LoopControl address)                                  (Eff
+  ( ErrorC (Return address)                                       (Eff
+  ( EnvC address                                                  (Eff
+  ( ScopeEnvC address                                             (Eff
+  ( DerefC address value                                          (Eff
+  ( AllocatorC address                                            (Eff
+  ( ReaderC ModuleInfo                                            (Eff
+    m)))))))))))))))))
 
 type ValueC term address value m
   = FunctionC term address value (Eff
@@ -110,7 +112,7 @@ evaluate :: ( AbstractValue term address value valueC
             , booleanC ~ BooleanC value (Eff moduleC)
             , Carrier (Boolean value :+: moduleSig) booleanC
             , whileC ~ WhileC value (Eff booleanC)
-            , moduleSig ~ (Eavesdrop (Modules address) :+: Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
+            , moduleSig ~ (Eavesdrop (Modules address) :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
             , Carrier (While value :+: Boolean value :+: moduleSig) whileC
             , Carrier (Function term address value :+: While value :+: Boolean value :+: moduleSig) valueC
             , Declarations term
@@ -170,6 +172,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
           . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
           . runReturn
           . runLoopControl
+          . raiseHandler runInterpose
           . raiseHandler runEavesdrop
 
 
