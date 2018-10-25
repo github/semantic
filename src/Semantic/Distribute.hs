@@ -10,7 +10,6 @@ module Semantic.Distribute
 import qualified Control.Concurrent.Async as Async
 import           Control.Parallel.Strategies
 import           Control.Monad.Effect
-import           Control.Monad.IO.Class
 import           Prologue hiding (MonadError (..))
 
 -- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.

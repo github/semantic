@@ -5,12 +5,12 @@ module Semantic.Task
 , Level(..)
 , RAlgebra
 -- * I/O
-, IO.readBlob
-, IO.readBlobs
-, IO.readBlobPairs
-, IO.readProject
-, IO.findFiles
-, IO.write
+, Files.readBlob
+, Files.readBlobs
+, Files.readBlobPairs
+, Files.readProject
+, Files.findFiles
+, Files.write
 -- * Module Resolution
 , resolutionMap
 , Resolution
@@ -83,8 +83,8 @@ import           Parsing.TreeSitter
 import           Prologue hiding (MonadError (..), project)
 import           Semantic.Config
 import           Semantic.Distribute
+import qualified Semantic.Task.Files as Files
 import           Semantic.Timeout
-import qualified Semantic.IO as IO
 import           Semantic.Resolution
 import           Semantic.Telemetry
 import           Serializing.Format hiding (Options)
@@ -93,7 +93,7 @@ import           System.Exit (die)
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff = Eff '[ Task
                     , Resolution
-                    , IO.Files
+                    , Files.Files
                     , Reader Config
                     , Trace
                     , Telemetry
@@ -159,7 +159,7 @@ runTaskWithConfig options logger statter task = do
           . runTelemetry logger statter
           . runTraceInTelemetry
           . runReader options
-          . IO.runFiles
+          . Files.runFiles
           . runResolution
           . runTaskF
     run task

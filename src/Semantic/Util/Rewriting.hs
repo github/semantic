@@ -12,9 +12,9 @@ import           Text.Show.Pretty (pPrint)
 import           Control.Abstract.Matching
 import           Control.Rewriting hiding (fromMatcher, target)
 import           Data.Blob
+import           Data.File
 import           Data.History
 import qualified Data.Language as Language
-import           Data.Project hiding (readFile)
 import qualified Data.Source as Source
 import qualified Data.Syntax.Literal as Literal
 import           Data.Term
@@ -23,12 +23,11 @@ import           Language.Python.PrettyPrint
 import           Language.Ruby.PrettyPrint
 import           Parsing.Parser
 import           Reprinting.Pipeline
-import           Semantic.IO as IO
 import           Semantic.Task
 
 testPythonFile = do
   let path = "test/fixtures/python/reprinting/function.py"
-  src  <- blobSource <$> readBlobFromPath (File path Language.Python)
+  src  <- blobSource <$> readBlobFromFile' (File path Language.Python)
   tree <- parseFile' miniPythonParser path
   pure (src, tree)
 
@@ -50,7 +49,7 @@ testPythonPipeline''' = do
 
 testRubyFile = do
   let path = "test/fixtures/ruby/reprinting/infix.rb"
-  src  <- blobSource <$> readBlobFromPath (File path Language.Ruby)
+  src  <- blobSource <$> readBlobFromFile' (File path Language.Ruby)
   tree <- parseFile' miniRubyParser path
   pure (src, tree)
 
@@ -74,7 +73,7 @@ printToTerm = either (putStrLn . show) (BC.putStr . Source.sourceBytes)
 
 testJSONFile = do
   let path = "test/fixtures/javascript/reprinting/map.json"
-  src  <- blobSource <$> readBlobFromPath (File path Language.JSON)
+  src  <- blobSource <$> readBlobFromFile' (File path Language.JSON)
   tree <- parseFile' jsonParser path
   pure (src, tree)
 
