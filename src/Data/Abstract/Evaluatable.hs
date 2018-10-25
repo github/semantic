@@ -148,7 +148,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
   evaluateModules (run preludeBinds <$> modules)
   where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runValue . evalTerm . moduleBody) m)
 
-        evalTerm = fix (analyzeTerm ((. project) . eval)) >=> address
+        evalTerm = fix (analyzeTerm (\ ev -> eval ev . project)) >=> address
 
         runValue = runBoolean . runWhile . runFunction evalTerm
 
