@@ -49,5 +49,5 @@ runASTParse Quiet       = distributeFoldMap $ \blob -> do
   pure . mconcat . intersperse "\t" $ [ either (const "ERR") (const "OK") (fst result)
                                       , stringUtf8 (show (blobLanguage blob))
                                       , stringUtf8 (blobPath blob)
-                                      , doubleDec (snd result) <> "ms\n"
+                                      , doubleDec (snd result) <> " ms\n"
                                       ]

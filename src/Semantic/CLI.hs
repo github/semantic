@@ -91,7 +91,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
     symbolFieldsReader = eitherReader (Right . parseSymbolFields)
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
-tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
+tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Don't produce output, but show timing stats"))
   where
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
