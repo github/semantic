@@ -16,7 +16,7 @@ import           Data.Quieterm
 import           Data.Location
 import           Data.Term
 import           Parsing.Parser
-import           Prologue hiding (MonadError (..))
+import           Prologue
 import           Rendering.Graph
 import           Rendering.JSON (SomeJSON (..))
 import qualified Rendering.JSON as JSON

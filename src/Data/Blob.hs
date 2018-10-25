@@ -18,7 +18,7 @@ module Data.Blob
 , pathKeyForBlobPair
 ) where
 
-import Prologue hiding (throwError)
+import Prologue
 
 import           Control.Effect
 import           Control.Effect.Error

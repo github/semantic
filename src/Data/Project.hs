@@ -15,7 +15,7 @@ module Data.Project (
   ) where
 
 import Prelude hiding (readFile)
-import Prologue hiding (throwError)
+import Prologue
 
 import           Control.Effect
 import           Control.Effect.Error

@@ -13,7 +13,7 @@ import           Control.Effect
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
 import           Control.Parallel.Strategies
-import           Prologue hiding (MonadError (..))
+import           Prologue
 
 -- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
 --

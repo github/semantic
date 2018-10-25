@@ -85,7 +85,7 @@ import           Diffing.Interpreter
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
-import           Prologue hiding (MonadError (..), project)
+import           Prologue hiding (project)
 import           Semantic.Config
 import           Semantic.Distribute
 import qualified Semantic.Task.Files as Files

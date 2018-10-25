@@ -16,7 +16,7 @@ import Data.Term
 import Data.Graph.DiffVertex
 import Diffing.Algorithm (Diffable)
 import Parsing.Parser
-import Prologue hiding (MonadError(..))
+import Prologue
 import Rendering.Graph
 import Rendering.Renderer
 import Semantic.Telemetry as Stat

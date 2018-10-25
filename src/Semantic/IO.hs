@@ -5,7 +5,7 @@ module Semantic.IO
   ) where
 
 import Prelude hiding (readFile)
-import Prologue hiding (MonadError (..), fail)
+import Prologue
 
 import           System.Directory (doesDirectoryExist)
 import           System.Directory.Tree (AnchoredDirTree (..))
