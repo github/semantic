@@ -93,7 +93,6 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
                 , FreeVariables term
                 , Recursive term
                 , HasPrelude lang
-                , HasPostlude lang
                 , Member Trace sig
                 , Carrier sig m
                 , Effect sig
@@ -136,7 +135,6 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
                                , FreeVariables term
                                , HasPrelude lang
-                               , HasPostlude lang
                                , Member Trace sig
                                , Recursive term
                                , Carrier sig m
@@ -153,7 +151,6 @@ runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
                            , FreeVariables term
                            , HasPrelude lang
-                           , HasPostlude lang
                            , Member Trace sig
                            , Recursive term
                            , Carrier sig m
@@ -170,7 +167,6 @@ runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
-                  , HasPostlude lang
                   , Member Trace sig
                   , Recursive term
                   , Carrier sig m
