@@ -145,13 +145,8 @@ evaluate lang analyzeModule analyzeTerm modules = do
   (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runValue $ do
     definePrelude lang
     box unit
-  foldr (run preludeBinds) ask modules
-  where run preludeBinds m rest = do
-          evaluated <- runInModule preludeBinds (moduleInfo m)
-            (analyzeModule (runValue . evalTerm . moduleBody)
-            m)
-          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
+  evaluateModules (run preludeBinds <$> modules)
+  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runValue . evalTerm . moduleBody) m)
 
         evalTerm = fix (analyzeTerm ((. project) . eval)) >=> address
 
@@ -183,6 +178,16 @@ runInModule prelude info
   . raiseHandler runInterpose
   . raiseHandler runEavesdrop
 
+evaluateModules :: ( Carrier sig m
+                   , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
+                   )
+         => [Evaluator term address value m (Module (ModuleResult address))]
+         -> Evaluator term address value m (ModuleTable (NonEmpty (Module (ModuleResult address))))
+evaluateModules = foldr run ask
+  where run evaluator rest = do
+          evaluated <- evaluator
+          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
+          local (ModuleTable.insert (modulePath (moduleInfo evaluated)) (evaluated :| [])) rest
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
