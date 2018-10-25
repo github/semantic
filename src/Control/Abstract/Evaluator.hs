@@ -25,7 +25,6 @@ import Control.Monad.Effect.Reader    as X
 import Control.Monad.Effect.Resumable as X
 import Control.Monad.Effect.State     as X
 import Control.Monad.Effect.Trace     as X
-import Control.Monad.IO.Class
 import Prologue hiding (MonadError(..))
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.

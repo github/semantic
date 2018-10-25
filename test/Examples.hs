@@ -8,10 +8,10 @@ import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Either
+import           Data.File (file)
 import           Data.Foldable
 import           Data.List
 import           Data.Maybe
-import           Data.Project (file)
 import           Data.Quieterm
 import           Data.Typeable (cast)
 import           Data.Void
@@ -21,6 +21,7 @@ import           Semantic.Config (Config (..), Options (..), defaultOptions)
 import qualified Semantic.IO as IO
 import           Semantic.Parse
 import           Semantic.Task
+import           Semantic.Task.Files
 import           Semantic.Util (TaskConfig (..))
 import           System.Directory
 import           System.Exit (die)
@@ -99,7 +100,7 @@ languages =
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
   ]
 
-parseFilePath :: (Member (Exc SomeException) effs, Member Task effs, Member IO.Files effs) => FilePath -> Eff effs Bool
+parseFilePath :: (Member (Exc SomeException) effs, Member Task effs, Member Files effs) => FilePath -> Eff effs Bool
 parseFilePath path = readBlob (file path) >>= runParse' >>= const (pure True)
 
 languagesDir :: FilePath
