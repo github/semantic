@@ -10,7 +10,7 @@ module Data.Abstract.Value.Concrete
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
-import Control.Effect.Internal
+import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..))
@@ -129,10 +129,10 @@ instance ( Carrier sig m
          , Member (Deref (Value term address)) sig
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Error (LoopControl address)) sig
+         , Member (Interpose (Resumable (BaseError (UnspecializedError (Value term address))))) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (Resumable (BaseError (UnspecializedError (Value term address)))) sig
          , Member (State (Heap address (Value term address))) sig
          , Ord address
          , Show address
@@ -142,15 +142,16 @@ instance ( Carrier sig m
   ret = WhileC . ret
   eff = WhileC . (alg \/ eff . handleCoercible)
     where alg = \case
-            Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address))))
-                  (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address)) (runEvaluator (loop (\continue -> do
+            Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
               cond' <- Evaluator (runWhileC cond)
 
               -- `interpose` is used to handle 'UnspecializedError's and abort out of the
               -- loop, otherwise under concrete semantics we run the risk of the
               -- conditional always being true and getting stuck in an infinite loop.
 
-              ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit)))) >>= runWhileC . k
+              ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
+              (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address))
+                >>= runWhileC . k
             where
               loop x = catchLoopControl @address (fix x) $ \case
                 Break value -> deref value
@@ -159,27 +160,6 @@ instance ( Carrier sig m
                 -- of the current block iteration, while PHP specifies a breakout level
                 -- and TypeScript appears to take a label.
                 Continue _  -> loop x
-
-
-interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
-          => (forall v. eff (Eff m) (Eff m v) -> Eff m v)
-          -> Eff m a
-          -> Eff m a
-interpose handler = runInterposeC handler . interpret . upcast
-
-upcast :: Eff m a -> Eff (InterposeC eff (Eff m)) a
-upcast m = Eff (\ k -> InterposeC (\ f -> m >>= runInterposeC f . k))
-
-newtype InterposeC eff m a = InterposeC ((forall x . eff m (m x) -> m x) -> m a)
-
-runInterposeC :: (forall x . eff m (m x) -> m x) -> InterposeC eff m a -> m a
-runInterposeC f (InterposeC m) = m f
-
-instance (Member eff sig, HFunctor eff, Carrier sig m) => Carrier sig (InterposeC eff m) where
-  ret a = InterposeC (const (ret a))
-  eff op
-    | Just e <- prj op = InterposeC (\ handler -> handler (handlePure (runInterposeC handler) e))
-    | otherwise        = InterposeC (\ handler -> eff (handlePure (runInterposeC handler) op))
 
 
 instance AbstractHole (Value term address) where
