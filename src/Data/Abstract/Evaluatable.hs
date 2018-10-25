@@ -26,7 +26,6 @@ import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catc
 import Control.Abstract.Heap as X hiding (runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Boolean(..), Function(..), While(..))
-import Control.Abstract.ScopeGraph
 import Control.Effect.Eavesdrop
 import Control.Effect.Interpose
 import Data.Abstract.Declarations as X
