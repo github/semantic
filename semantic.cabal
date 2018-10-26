@@ -186,6 +186,7 @@ library
                      , Reprinting.Typeset
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.Analysis
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
