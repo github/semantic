@@ -6,7 +6,7 @@ module Semantic.Analysis
 , evalModule
 , evalTerm
 , runInModule
-, runInTerm
+, runValueEffects
 ) where
 
 import Control.Abstract
@@ -126,32 +126,32 @@ runInModule prelude info
   . runReturn
   . runLoopControl
 
-runInTerm :: ( AbstractValue term address value (ValueC term address value m)
-             , Carrier sig m
-             , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff m)))
-             , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: sig)
-             , Carrier booleanSig booleanC
-             , whileC ~ WhileC value (Eff booleanC)
-             , whileSig ~ (While value :+: booleanSig)
-             , Carrier whileSig whileC
-             , functionC ~ FunctionC term address value (Eff whileC)
-             , functionSig ~ (Function term address value :+: whileSig)
-             , Carrier functionSig functionC
-             , HasPrelude lang
-             , Member (Allocator address) sig
-             , Member (Deref value) sig
-             , Member (Env address) sig
-             , Member Fresh sig
-             , Member (Reader ModuleInfo) sig
-             , Member (Reader Span) sig
-             , Member (Resumable (BaseError (AddressError address value))) sig
-             , Member (Resumable (BaseError (EnvironmentError address))) sig
-             , Member (Resumable (BaseError (UnspecializedError value))) sig
-             , Member (State (Heap address value)) sig
-             , Member Trace sig
-             , Ord address
-             )
-          => (term -> Evaluator term address value (ValueC term address value m) address)
-          -> Either (proxy lang) term
-          -> Evaluator term address value m address
-runInTerm evalTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction evalTerm . either ((*> box unit) . definePrelude) evalTerm
+runValueEffects :: ( AbstractValue term address value (ValueC term address value m)
+                   , Carrier sig m
+                   , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff m)))
+                   , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: sig)
+                   , Carrier booleanSig booleanC
+                   , whileC ~ WhileC value (Eff booleanC)
+                   , whileSig ~ (While value :+: booleanSig)
+                   , Carrier whileSig whileC
+                   , functionC ~ FunctionC term address value (Eff whileC)
+                   , functionSig ~ (Function term address value :+: whileSig)
+                   , Carrier functionSig functionC
+                   , HasPrelude lang
+                   , Member (Allocator address) sig
+                   , Member (Deref value) sig
+                   , Member (Env address) sig
+                   , Member Fresh sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Member (Resumable (BaseError (AddressError address value))) sig
+                   , Member (Resumable (BaseError (EnvironmentError address))) sig
+                   , Member (Resumable (BaseError (UnspecializedError value))) sig
+                   , Member (State (Heap address value)) sig
+                   , Member Trace sig
+                   , Ord address
+                   )
+                => (term -> Evaluator term address value (ValueC term address value m) address)
+                -> Either (proxy lang) term
+                -> Evaluator term address value m address
+runValueEffects evalTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction evalTerm . either ((*> box unit) . definePrelude) evalTerm
