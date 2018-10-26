@@ -68,6 +68,9 @@ evaluate lang perModule runTerm modules = do
                   . runReturn
                   . runLoopControl
 
+-- | Evaluate a term recursively, applying the passed function at every recursive position.
+--
+--   This calls out to the 'Evaluatable' instances, will be passed to 'runValueEffects', and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
 evalTerm :: ( Carrier sig m
             , Declarations term
             , Evaluatable (Base term)
