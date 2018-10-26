@@ -38,11 +38,10 @@ runPythonPackaging :: ( Carrier sig m
                       , Member (Reader Span) sig
                       , Member (Function term address (Value term address)) sig
                       )
-                   => Evaluator term address (Value term address) (InterposeC (Function term address (Value term address))
-                     (Evaluator term address (Value term address) m)) a
+                   => Evaluator term address (Value term address) (InterposeC (Function term address (Value term address)) (Eff m)) a
                    -> Evaluator term address (Value term address) m a
-runPythonPackaging = interpose (\case
-  Call callName super params k -> k =<< do
+runPythonPackaging = raiseHandler $ interpose (runEvaluator . \case
+  Call callName super params k -> Evaluator . k =<< do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
         let bindings = foldr (uncurry Map.insert) lowerBound (zip paramNames params)
@@ -63,9 +62,8 @@ runPythonPackaging = interpose (\case
           _ -> pure ()
       _ -> pure ()
     call callName super params
-  Function name params body k -> function name params body >>= k
-  BuiltIn b k -> builtIn b >>= k)
-  . runEvaluator
+  Function name params body k -> function name params body >>= Evaluator . k
+  BuiltIn b k -> builtIn b >>= Evaluator . k)
 
 interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
           => (forall v. eff m (m v) -> m v)
