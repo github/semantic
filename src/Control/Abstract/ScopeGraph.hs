@@ -1,6 +1,7 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ExistentialQuantification, GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.ScopeGraph
   ( runScopeEnv
+  , ScopeEnvC(..)
   , ScopeEnv
   , lookup
   , declare
@@ -17,6 +18,8 @@ module Control.Abstract.ScopeGraph
 
 import           Control.Abstract.Evaluator hiding (Local)
 import           Control.Abstract.Heap
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Data.Abstract.Name
 import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
@@ -24,75 +27,94 @@ import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
 
-data ScopeEnv address (m :: * -> *) a where
-    Lookup :: Reference -> ScopeEnv address m (Maybe address)
-    Declare :: Declaration -> Span -> Maybe address -> ScopeEnv address m ()
-    PutDeclarationScope :: Declaration -> address -> ScopeEnv address m ()
-    Reference :: Reference -> Declaration -> ScopeEnv address m ()
-    NewScope :: Map EdgeLabel [address] -> ScopeEnv address m address
-    CurrentScope :: ScopeEnv address m (Maybe address)
-    Local :: address -> m a -> ScopeEnv address m a
-    AssociatedScope :: Declaration -> ScopeEnv address m (Maybe address)
+data ScopeEnv address (m :: * -> *) k
+  = Lookup Reference (Maybe address -> k)
+  | Declare Declaration Span (Maybe address) k
+  | PutDeclarationScope Declaration address k
+  | Reference Reference Declaration k
+  | NewScope (Map EdgeLabel [address]) (address -> k)
+  | CurrentScope (Maybe address -> k)
+  | forall a . Local address (m a) (a -> k)
+  | AssociatedScope Declaration (Maybe address -> k)
 
-lookup :: forall term address value effects. Member (ScopeEnv address) effects => Reference -> Evaluator term address value effects (Maybe address)
-lookup = send . Lookup @address
+deriving instance Functor (ScopeEnv address m)
 
-declare :: forall term address value effects. Member (ScopeEnv address) effects => Declaration -> Span -> Maybe address -> Evaluator term address value effects ()
-declare = ((send .) .) . Declare @address
+lookup :: (Member (ScopeEnv address) sig, Carrier sig m) => Reference -> Evaluator term address value m (Maybe address)
+lookup ref = sendScope (Lookup ref ret)
 
-putDeclarationScope :: forall term address value effects. Member (ScopeEnv address) effects => Declaration -> address -> Evaluator term address value effects ()
-putDeclarationScope = (send .) . PutDeclarationScope @address
+declare :: (Member (ScopeEnv address) sig, Carrier sig m) => Declaration -> Span -> Maybe address -> Evaluator term address value m ()
+declare decl span addr = sendScope (Declare decl span addr (ret ()))
 
-reference :: forall term address value effects. Member (ScopeEnv address) effects => Reference -> Declaration -> Evaluator term address value effects ()
-reference = (send .) . Reference @address
+putDeclarationScope :: (Member (ScopeEnv address) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
+putDeclarationScope decl addr = sendScope (PutDeclarationScope decl addr (ret ()))
 
-newScope :: forall term address value effects. (Member (ScopeEnv address) effects) => Map EdgeLabel [address]  -> Evaluator term address value effects address
-newScope map = send (NewScope map)
+reference :: (Member (ScopeEnv address) sig, Carrier sig m) => Reference -> Declaration -> Evaluator term address value m ()
+reference ref decl = sendScope (Reference ref decl (ret ()))
 
-currentScope :: forall term address value effects. Member (ScopeEnv address) effects => Evaluator term address value effects (Maybe address)
-currentScope = send CurrentScope
+newScope :: (Member (ScopeEnv address) sig, Carrier sig m) => Map EdgeLabel [address]  -> Evaluator term address value m address
+newScope map = send (NewScope map ret)
 
-associatedScope :: forall term address value effects. Member (ScopeEnv address) effects => Declaration -> Evaluator term address value effects (Maybe address)
-associatedScope = send . AssociatedScope
+currentScope :: (Member (ScopeEnv address) sig, Carrier sig m) => Evaluator term address value m (Maybe address)
+currentScope = send (CurrentScope ret)
 
-withScope :: forall term address value effects a. Member (ScopeEnv address) effects => address -> Evaluator term address value effects a -> Evaluator term address value effects a
-withScope scope action = send (Local scope (lowerEff action))
+associatedScope :: (Member (ScopeEnv address) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
+associatedScope = send . flip AssociatedScope ret
 
-instance PureEffect (ScopeEnv address)
+withScope :: (Member (ScopeEnv address) sig, Carrier sig m) => address -> Evaluator term address value m a -> Evaluator term address value m a
+withScope scope action = send (Local scope action ret)
+
+sendScope :: (Member (ScopeEnv address) sig, Carrier sig m) => ScopeEnv address (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
+sendScope = send
+
+instance HFunctor (ScopeEnv address) where
+  hmap f = \case
+    Lookup ref                          k -> Lookup ref k
+    Declare decl span assocScope        k -> Declare decl span assocScope k
+    PutDeclarationScope decl assocScope k -> PutDeclarationScope decl assocScope k
+    Reference ref decl                  k -> Reference ref decl k
+    NewScope edges                      k -> NewScope edges k
+    CurrentScope                        k -> CurrentScope k
+    AssociatedScope decl                k -> AssociatedScope decl k
+    Local scope action                  k -> Local scope (f action) k
+
 instance Effect (ScopeEnv address) where
-  handleState c dist (Request (Lookup ref) k)         = Request (Lookup ref) (dist . (<$ c) . k)
-  handleState c dist (Request (Declare decl span assocScope) k) = Request (Declare decl span assocScope) (dist . (<$ c) . k)
-  handleState c dist (Request (PutDeclarationScope decl assocScope) k) = Request (PutDeclarationScope decl assocScope) (dist . (<$ c) . k)
-  handleState c dist (Request (Reference ref decl) k) = Request (Reference ref decl) (dist . (<$ c) . k)
-  handleState c dist (Request (NewScope edges) k)       = Request (NewScope edges) (dist . (<$ c) . k)
-  handleState c dist (Request CurrentScope k)         = Request CurrentScope (dist . (<$ c) . k)
-  handleState c dist (Request (AssociatedScope decl) k)         = Request (AssociatedScope decl) (dist . (<$ c) . k)
-  handleState c dist (Request (Local scope action) k) = Request (Local scope (dist (action <$ c))) (dist . fmap k)
+  handle state handler = \case
+    Lookup ref                          k -> Lookup ref (handler . (<$ state) . k)
+    Declare decl span assocScope        k -> Declare decl span assocScope (handler (k <$ state))
+    PutDeclarationScope decl assocScope k -> PutDeclarationScope decl assocScope (handler (k <$ state))
+    Reference ref decl                  k -> Reference ref decl (handler (k <$ state))
+    NewScope edges                      k -> NewScope edges (handler . (<$ state) . k)
+    CurrentScope                        k -> CurrentScope (handler . (<$ state) . k)
+    AssociatedScope decl                k -> AssociatedScope decl (handler . (<$ state) . k)
+    Local scope action                  k -> Local scope (handler (action <$ state)) (handler . fmap k)
 
 
-runScopeEnv :: (Ord address, Effects effects, Member Fresh effects, Member (Allocator address) effects)
-            => Evaluator term address value (ScopeEnv address ': effects) a
-            -> Evaluator term address value effects (ScopeGraph address, a)
-runScopeEnv evaluator = runState lowerBound (reinterpret handleScopeEnv evaluator)
+runScopeEnv :: (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier sig m, Effect sig)
+            => Evaluator term address value (ScopeEnvC address (Eff m)) a
+            -> Evaluator term address value m (ScopeGraph address, a)
+runScopeEnv = raiseHandler $ runState lowerBound . runScopeEnvC . interpret
 
-handleScopeEnv :: forall term address value effects a. (Ord address, Member Fresh effects, Member (Allocator address) effects, Effects effects)
-          => ScopeEnv address (Eff (ScopeEnv address ': effects)) a
-          -> Evaluator term address value (State (ScopeGraph address) ': effects) a
-handleScopeEnv = \case
-    Lookup ref -> ScopeGraph.scopeOfRef ref <$> get
-    Declare decl span scope -> modify @(ScopeGraph address) (ScopeGraph.declare decl span scope)
-    PutDeclarationScope decl scope -> modify @(ScopeGraph address) (ScopeGraph.insertDeclarationScope decl scope)
-    Reference ref decl -> modify @(ScopeGraph address) (ScopeGraph.reference ref decl)
-    NewScope edges -> do
-        -- Take the edges and construct a new scope, update the current scope to the new scope
-        name <- gensym
-        address <- alloc name
-        address <$ modify @(ScopeGraph address) (ScopeGraph.newScope address edges)
-    CurrentScope -> ScopeGraph.currentScope <$> get
-    AssociatedScope decl -> ScopeGraph.associatedScope decl <$> get
-    Local scope action -> do
-        prevScope <- ScopeGraph.currentScope <$> get
-        modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = Just scope })
-        value <- reinterpret handleScopeEnv (raiseEff action)
-        modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = prevScope })
-        pure value
+newtype ScopeEnvC address m a = ScopeEnvC { runScopeEnvC :: Eff (StateC (ScopeGraph address) m) a }
+
+instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier sig m, Effect sig) => Carrier (ScopeEnv address :+: sig) (ScopeEnvC address m) where
+  ret = ScopeEnvC . ret
+  eff = ScopeEnvC . (alg \/ eff . R . handleCoercible)
+    where alg = \case
+            Lookup ref                     k -> gets (ScopeGraph.scopeOfRef ref) >>= runScopeEnvC . k
+            Declare decl span scope        k -> modify @(ScopeGraph address) (ScopeGraph.declare decl span scope) *> runScopeEnvC k
+            PutDeclarationScope decl scope k -> modify @(ScopeGraph address) (ScopeGraph.insertDeclarationScope decl scope) *> runScopeEnvC k
+            Reference ref decl             k -> modify @(ScopeGraph address) (ScopeGraph.reference ref decl) *> runScopeEnvC k
+            NewScope edges                 k -> do
+              -- Take the edges and construct a new scope, update the current scope to the new scope
+              name <- gensym
+              address <- runEvaluator (alloc name)
+              modify @(ScopeGraph address) (ScopeGraph.newScope address edges)
+              runScopeEnvC (k address)
+            CurrentScope                   k -> gets ScopeGraph.currentScope >>= runScopeEnvC . k
+            AssociatedScope decl           k -> gets (ScopeGraph.associatedScope decl) >>= runScopeEnvC . k
+            Local scope action             k -> do
+              prevScope <- gets ScopeGraph.currentScope
+              modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = Just scope })
+              value <- runScopeEnvC action
+              modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = prevScope })
+              runScopeEnvC (k value)

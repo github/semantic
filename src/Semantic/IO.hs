@@ -5,7 +5,7 @@ module Semantic.IO
   ) where
 
 import Prelude hiding (readFile)
-import Prologue hiding (MonadError (..), fail)
+import Prologue
 
 import           System.Directory (doesDirectoryExist)
 import           System.Directory.Tree (AnchoredDirTree (..))
@@ -16,7 +16,7 @@ isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path)
 
 -- Recursively find files in a directory.
-findFilesInDir :: forall m. MonadIO m => FilePath -> [String] -> [FilePath] -> m [FilePath]
+findFilesInDir :: MonadIO m => FilePath -> [String] -> [FilePath] -> m [FilePath]
 findFilesInDir path exts excludeDirs = do
   _:/dir <- liftIO $ Tree.build path
   pure $ (onlyFiles . Tree.filterDir (withExtensions exts) . Tree.filterDir (notIn excludeDirs)) dir

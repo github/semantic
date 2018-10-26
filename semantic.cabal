@@ -230,7 +230,6 @@ library
                      , deepseq
                      , directory
                      , directory-tree
-                     , effects
                      , fastsum
                      , filepath
                      , free
@@ -240,6 +239,7 @@ library
                      , Glob
                      , hashable
                      , haskeline
+                     , higher-order-effects
                      , hscolour
                      , http-client
                      , http-client-tls
@@ -359,13 +359,13 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , containers
-                     , effects
                      , fastsum
                      , filepath
                      , free
                      , Glob
                      , hashable
                      , haskell-tree-sitter
+                     , higher-order-effects
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
@@ -413,10 +413,10 @@ test-suite parse-examples
   build-depends:       base
                      , bytestring
                      , directory
-                     , effects
                      , fastsum
                      , filepath
                      , Glob
+                     , higher-order-effects
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff

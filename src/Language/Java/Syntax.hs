@@ -5,7 +5,7 @@ module Language.Java.Syntax where
 import Data.Abstract.Evaluatable
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Prologue hiding (Constructor)
+import Prologue
 import Proto3.Suite.Class
 
 newtype Import a = Import { imports :: [a]}
