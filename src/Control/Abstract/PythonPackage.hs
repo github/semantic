@@ -7,7 +7,7 @@ import           Control.Abstract.Heap (Allocator, Deref, deref)
 import           Control.Abstract.Value
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
-import           Data.Abstract.Evaluatable hiding (InterposeC)
+import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..), ValueError (..))
@@ -38,7 +38,7 @@ runPythonPackaging :: ( Carrier sig m
                       , Member (Reader Span) sig
                       , Member (Function term address (Value term address)) sig
                       )
-                   => Evaluator term address (Value term address) (InterposeC (Function term address (Value term address)) (Eff m)) a
+                   => Evaluator term address (Value term address) (PythonPackagingC (Function term address (Value term address)) (Eff m)) a
                    -> Evaluator term address (Value term address) m a
 runPythonPackaging = raiseHandler $ interpose (runEvaluator . \case
   Call callName super params k -> Evaluator . k =<< do
@@ -67,17 +67,17 @@ runPythonPackaging = raiseHandler $ interpose (runEvaluator . \case
 
 interpose :: (Member eff sig, HFunctor eff, Carrier sig m)
           => (forall v. eff m (m v) -> m v)
-          -> Eff (InterposeC eff m) a
+          -> Eff (PythonPackagingC eff m) a
           -> m a
-interpose handler = runInterposeC handler . interpret
+interpose handler = runPythonPackagingC handler . interpret
 
-newtype InterposeC eff m a = InterposeC ((forall x . eff m (m x) -> m x) -> m a)
+newtype PythonPackagingC eff m a = PythonPackagingC ((forall x . eff m (m x) -> m x) -> m a)
 
-runInterposeC :: (forall x . eff m (m x) -> m x) -> InterposeC eff m a -> m a
-runInterposeC f (InterposeC m) = m f
+runPythonPackagingC :: (forall x . eff m (m x) -> m x) -> PythonPackagingC eff m a -> m a
+runPythonPackagingC f (PythonPackagingC m) = m f
 
-instance (Member eff sig, HFunctor eff, Carrier sig m) => Carrier sig (InterposeC eff m) where
-  ret a = InterposeC (const (ret a))
+instance (Member eff sig, HFunctor eff, Carrier sig m) => Carrier sig (PythonPackagingC eff m) where
+  ret a = PythonPackagingC (const (ret a))
   eff op
-    | Just e <- prj op = InterposeC (\ handler -> handler (handlePure (runInterposeC handler) e))
-    | otherwise        = InterposeC (\ handler -> eff (handlePure (runInterposeC handler) op))
+    | Just e <- prj op = PythonPackagingC (\ handler -> handler (handlePure (runPythonPackagingC handler) e))
+    | otherwise        = PythonPackagingC (\ handler -> eff (handlePure (runPythonPackagingC handler) op))
