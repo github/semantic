@@ -121,7 +121,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . raiseHandler (runReader (packageInfo package))
     . raiseHandler (runState (lowerBound @Span))
     . raiseHandler (runReader (lowerBound @Span))
-    $ evaluate proxy (evalModule id (runInTerm (evalTerm (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package))))))) modules
+    $ evaluate proxy (evalModule id (runValueEffects (evalTerm (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package))))))) modules
 
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without
