@@ -102,7 +102,7 @@ evalTerm :: ( Carrier sig m
             )
          => Open (Open (term -> Evaluator term address value m (ValueRef address)))
          -> term -> Evaluator term address value m address
-evalTerm analyzeTerm = fix (analyzeTerm (\ ev -> eval ev . project)) >=> address
+evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project)) >=> address
 
 runValueEffects :: ( AbstractValue term address value (ValueC term address value m)
                    , Carrier sig m
