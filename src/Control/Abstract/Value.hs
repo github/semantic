@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, KindSignatures, Rank2Types, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, KindSignatures, LambdaCase, Rank2Types, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -128,16 +128,19 @@ ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 disjunction :: (Member (Boolean value) sig, Carrier sig m, Monad m) => m value -> m value -> m value
 disjunction a b = a >>= \ a' -> ifthenelse a' (pure a') b
 
-data Boolean value m k
+data Boolean value (m :: * -> *) k
   = Boolean Bool (value -> k)
   | AsBool value (Bool -> k)
-  | Disjunction (m value) (m value) (value -> k)
   deriving (Functor)
 
 instance HFunctor (Boolean value) where
-  hmap _ (Boolean b        k) = Boolean b k
-  hmap _ (AsBool v         k) = AsBool v  k
-  hmap f (Disjunction a b  k) = Disjunction (f a) (f b) k
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Boolean value) where
+  handle state handler = \case
+    Boolean b k -> Boolean b (handler . (<$ state) . k)
+    AsBool  v k -> AsBool  v (handler . (<$ state) . k)
 
 runBoolean :: Carrier (Boolean value :+: sig) (BooleanC value (Eff m))
            => Evaluator term address value (BooleanC value (Eff m)) a
