@@ -114,15 +114,6 @@ instance ( Member (Reader ModuleInfo) sig
             Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
             Abstract.AsBool (Boolean b) k -> runBooleanC (k b)
             Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k
-            Abstract.Disjunction a b    k -> do
-              a' <- runBooleanC a
-              a'' <- case a' of
-                Boolean b -> pure b
-                other     -> throwBaseError (BoolError other)
-              if a'' then
-                runBooleanC (k a')
-              else
-                runBooleanC b >>= runBooleanC . k
 
 
 instance ( Carrier sig m

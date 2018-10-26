@@ -46,12 +46,11 @@ instance ( Member (Allocator address) sig
               box Abstract >>= Evaluator . flip runFunctionC eval . k
 
 
-instance (Carrier sig m, Alternative m, Monad m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
+instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
   ret = BooleanC . ret
   eff = BooleanC . (alg \/ eff . handleCoercible)
     where alg (Boolean _ k) = runBooleanC (k Abstract)
           alg (AsBool _ k) = runBooleanC (k True) <|> runBooleanC (k False)
-          alg (Disjunction a b k) = (runBooleanC a <|> runBooleanC b) >>= runBooleanC . k
 
 
 instance ( Member (Abstract.Boolean Abstract) sig
