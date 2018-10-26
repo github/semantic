@@ -64,16 +64,15 @@ evaluate :: ( AbstractValue term address value valueC
             , valueC ~ ValueC term address value moduleC
             )
          => proxy lang
-         -> Open (Module term -> Evaluator term address value moduleC address)
+         -> Open (Module (Either (proxy lang) term) -> Evaluator term address value moduleC address)
          -> (term -> Evaluator term address value valueC address)
          -> [Module term]
          -> Evaluator term address value c (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule evalTerm modules = do
-  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm evalTerm $ do
-    definePrelude lang
-    box unit
-  evaluateModules (run preludeBinds <$> modules)
-  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runInTerm evalTerm . evalTerm . moduleBody) m)
+  let prelude = Module moduleInfoFromCallStack (Left lang)
+  Module _ (_, (preludeBinds, _)) <- run lowerBound prelude
+  evaluateModules (run preludeBinds . fmap Right <$> modules)
+  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runInTerm evalTerm . either ((*> box unit) . definePrelude) evalTerm . moduleBody) m)
 
 evalTerm :: ( Carrier sig m
             , Declarations term
