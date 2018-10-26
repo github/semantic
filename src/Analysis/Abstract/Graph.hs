@@ -141,6 +141,21 @@ graphingModules recur m = do
 
 {-# ANN graphingModules ("HLint: ignore Use ." :: String) #-}
 
+-- | Add vertices to the graph for imported modules.
+graphingModuleInfo :: ( Member (Modules address) sig
+                      , Member (Reader ModuleInfo) sig
+                      , Member (State (Graph ModuleInfo)) sig
+                      , Carrier sig m
+                      )
+                   => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
+                   -> (Module body -> Evaluator term address value m a)
+graphingModuleInfo recur m = do
+  appendGraph (vertex (moduleInfo m))
+  eavesdrop (recur m) $ \case
+    Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
+    _             -> pure ()
+
 eavesdrop :: (Carrier sig m, Member (Modules address) sig)
           => Evaluator term address value (EavesdropC address (Eff m)) a
           -> (forall x . Modules address (Eff m) (Eff m x) -> Evaluator term address value m ())
@@ -158,21 +173,6 @@ instance (Carrier sig m, Member (Modules address) sig, Applicative m) => Carrier
     | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
     | otherwise          = EavesdropC (\ handler -> eff (handlePure (runEavesdropC handler) op))
 
-
--- | Add vertices to the graph for imported modules.
-graphingModuleInfo :: ( Member (Modules address) sig
-                      , Member (Reader ModuleInfo) sig
-                      , Member (State (Graph ModuleInfo)) sig
-                      , Carrier sig m
-                      )
-                   => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
-                   -> (Module body -> Evaluator term address value m a)
-graphingModuleInfo recur m = do
-  appendGraph (vertex (moduleInfo m))
-  eavesdrop (recur m) $ \case
-    Load   path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
-    Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
-    _             -> pure ()
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: ( Member (Reader PackageInfo) sig
