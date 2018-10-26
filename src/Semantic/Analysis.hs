@@ -89,7 +89,7 @@ evalModule :: ( AbstractValue term address value (ValueC term address value inne
            -> Bindings address
            -> Module body
            -> Evaluator term address value m (ModuleResult address)
-evalModule perModule perTerm prelude m = runInModule prelude (moduleInfo m) (perModule (runInTerm perTerm . either ((*> box unit) . definePrelude) perTerm . moduleBody) m)
+evalModule perModule perTerm prelude m = runInModule prelude (moduleInfo m) (perModule (runInTerm perTerm . moduleBody) m)
 
 evalTerm :: ( Carrier sig m
             , Declarations term
@@ -147,7 +147,8 @@ runInModule prelude info
   . runReturn
   . runLoopControl
 
-runInTerm :: ( Carrier sig m
+runInTerm :: ( AbstractValue term address value (ValueC term address value m)
+             , Carrier sig m
              , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff m)))
              , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: sig)
              , Carrier booleanSig booleanC
@@ -157,12 +158,24 @@ runInTerm :: ( Carrier sig m
              , functionC ~ FunctionC term address value (Eff whileC)
              , functionSig ~ (Function term address value :+: whileSig)
              , Carrier functionSig functionC
+             , HasPrelude lang
+             , Member (Allocator address) sig
+             , Member (Deref value) sig
+             , Member (Env address) sig
+             , Member Fresh sig
+             , Member (Reader ModuleInfo) sig
+             , Member (Reader Span) sig
+             , Member (Resumable (BaseError (AddressError address value))) sig
+             , Member (Resumable (BaseError (EnvironmentError address))) sig
              , Member (Resumable (BaseError (UnspecializedError value))) sig
+             , Member (State (Heap address value)) sig
+             , Member Trace sig
+             , Ord address
              )
           => (term -> Evaluator term address value (ValueC term address value m) address)
-          -> Evaluator term address value (ValueC term address value m) a
-          -> Evaluator term address value m a
-runInTerm evalTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction evalTerm
+          -> Either (proxy lang) term
+          -> Evaluator term address value m address
+runInTerm evalTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction evalTerm . either ((*> box unit) . definePrelude) evalTerm
 
 evaluateModules :: ( Carrier sig m
                    , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
