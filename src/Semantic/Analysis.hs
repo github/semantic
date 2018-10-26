@@ -102,6 +102,7 @@ evalTerm :: ( Carrier sig m
          -> term -> Evaluator term address value m address
 evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project)) >=> address
 
+-- | Run a set of value effects, for which a 'Carrier' is assumed to exist.
 runValueEffects :: ( AbstractValue term address value (ValueC term address value m)
                    , Carrier sig m
                    , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff m)))
