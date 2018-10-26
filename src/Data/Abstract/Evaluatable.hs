@@ -154,7 +154,7 @@ evaluate lang analyzeModule analyzeTerm modules = do
 evalTerm :: ( Carrier sig m
             , Declarations term
             , Evaluatable (Base term)
-            , FreeVariables term, Ord address, Recursive term
+            , FreeVariables term
             , AbstractValue term address value m
             , Member (Allocator address) sig
             , Member (Boolean value) sig
@@ -178,6 +178,8 @@ evalTerm :: ( Carrier sig m
             , Member (State Span) sig
             , Member Trace sig
             , Member (While value) sig
+            , Ord address
+            , Recursive term
             )
          => Open (Open (term -> Evaluator term address value m (ValueRef address)))
          -> term -> Evaluator term address value m address
