@@ -1,8 +1,6 @@
 {-# LANGUAGE TypeFamilies, TypeOperators #-}
 module Semantic.Analysis
-( ModuleC
-, ValueC
-, evaluate
+( evaluate
 , evalTerm
 , runValueEffects
 ) where
