@@ -93,10 +93,11 @@ convergingModules :: ( AbstractValue term address value m
                      , Carrier sig m
                      , Effect sig
                      )
-                  => (Module term -> Evaluator term address value (AltC Maybe (Eff m)) address)
-                  -> (Module term -> Evaluator term address value m address)
-convergingModules recur m = do
-  c <- getConfiguration (moduleBody m)
+                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) address)
+                  -> (Module (Either prelude term) -> Evaluator term address value m address)
+convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
+convergingModules recur m@(Module _ (Right term)) = do
+  c <- getConfiguration term
   heap <- getHeap
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   (cache, _) <- converge (lowerBound, heap) (\ (prevCache, _) -> isolateCache $ do

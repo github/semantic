@@ -91,8 +91,7 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
                 , Functor syntax
                 , Evaluatable syntax
                 , term ~ Term syntax Location
-                , FreeVariables term
-                , Recursive term
+                , FreeVariables1 syntax
                 , HasPrelude lang
                 , Member Trace sig
                 , Carrier sig m
@@ -122,13 +121,10 @@ runCallGraph lang includePackages modules package
   . raiseHandler (runReader (lowerBound @ControlFlowVertex))
   . providingLiveSet
   . runModuleTable
-  . runModules (ModuleTable.modulePaths (packageModules package)) $ do
-    -- (_, (prelude, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm (evalTerm perTerm) $ do
-    --   definePrelude lang
-    --   box unit
-    let run m = (<$ m) <$> runInModule lowerBound (moduleInfo m) (perModule (runInTerm (evalTerm perTerm) . evalTerm perTerm . moduleBody) m)
-    evaluateModules (map run modules)
-  where perTerm = withTermSpans . graphingTerms . cachingTerms
+  . runModules (ModuleTable.modulePaths (packageModules package))
+  $ evaluate lang (evalModule perModule perTerm) modules
+
+  where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
         perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
 
 
@@ -200,12 +196,8 @@ runImportGraph lang (package :: Package term) f
   . runModules (ModuleTable.modulePaths (packageModules package))
   . raiseHandler (runReader (packageInfo package))
   . raiseHandler (runState (lowerBound @Span))
-  . raiseHandler (runReader (lowerBound @Span)) $ do
-    -- (_, (prelude, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm (evalTerm id) $ do
-    --   definePrelude lang
-    --   box unit
-    let run m = (<$ m) <$> runInModule lowerBound (moduleInfo m) (graphingModuleInfo (runInTerm (evalTerm id) . evalTerm id . moduleBody) m)
-    evaluateModules (map run (ModuleTable.toPairs (packageModules package) >>= toList . snd))
+  . raiseHandler (runReader (lowerBound @Span))
+  $ evaluate lang (evalModule graphingModuleInfo (evalTerm id)) (ModuleTable.toPairs (packageModules package) >>= toList . snd)
 
 
 runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Eff m)) a -> Evaluator term address value m (Heap address value, a)
@@ -269,7 +261,7 @@ parsePythonPackage parser project = do
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
-      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id (evalTerm id) [ setupModule ])
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) (evalModule id (evalTerm id)) [ setupModule ])
       -- FIXME: what are we gonna do about runPythonPackaging
     Nothing -> pure PythonPackage.Unknown
   case strat of

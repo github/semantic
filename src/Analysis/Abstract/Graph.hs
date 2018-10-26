@@ -124,8 +124,8 @@ graphingModules :: ( Member (Modules address) sig
                    , Member (Reader ControlFlowVertex) sig
                    , Carrier sig m
                    )
-                => (Module term -> Evaluator term address value (EavesdropC address (Eff m)) a)
-                -> (Module term -> Evaluator term address value m a)
+                => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
+                -> (Module body -> Evaluator term address value m a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
   appendGraph (vertex v)
@@ -165,8 +165,8 @@ graphingModuleInfo :: ( Member (Modules address) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => (Module term -> Evaluator term address value (EavesdropC address (Eff m)) a)
-                   -> (Module term -> Evaluator term address value m a)
+                   => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
+                   -> (Module body -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
   eavesdrop (recur m) $ \case

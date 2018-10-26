@@ -3,6 +3,7 @@ module Semantic.Analysis
 ( ModuleC
 , ValueC
 , evaluate
+, evalModule
 , evalTerm
 , runInModule
 , runInTerm
@@ -37,42 +38,20 @@ type ValueC term address value m
   ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
     m)))))))))
 
-evaluate :: ( AbstractValue term address value valueC
-            , Carrier sig c
-            , allocatorC ~ AllocatorC address (Eff (ReaderC ModuleInfo (Eff c)))
-            , Carrier (Allocator address :+: Reader ModuleInfo :+: sig) allocatorC
-            , Carrier (Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig) (DerefC address value (Eff allocatorC))
-            , booleanC ~ BooleanC value (Eff (EavesdropC (Modules address) (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff moduleC)))))
-            , Carrier (Boolean value :+: moduleSig) booleanC
-            , whileC ~ WhileC value (Eff booleanC)
-            , moduleSig ~ (Eavesdrop (Modules address) :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
-            , Carrier (While value :+: Boolean value :+: moduleSig) whileC
-            , Carrier (Function term address value :+: While value :+: Boolean value :+: moduleSig) valueC
-            , Effect sig
-            , HasPrelude lang
-            , Member Fresh sig
-            , Member (Modules address) sig
+evaluate :: ( Carrier sig m
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
-            , Member (Reader Span) sig
-            , Member (Resumable (BaseError (AddressError address value))) sig
-            , Member (Resumable (BaseError (EnvironmentError address))) sig
-            , Member (Resumable (BaseError (UnspecializedError value))) sig
-            , Member (State (Heap address value)) sig
-            , Member Trace sig
-            , Ord address
-            , moduleC ~ ModuleC address value c
-            , valueC ~ ValueC term address value moduleC
             )
-         => proxy lang
-         -> Open (Module (Either (proxy lang) term) -> Evaluator term address value moduleC address)
-         -> (term -> Evaluator term address value valueC address)
+         => lang
+         -> (Bindings address -> Module (Either lang term) -> Evaluator term address value m (ModuleResult address))
          -> [Module term]
-         -> Evaluator term address value c (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule evalTerm modules = do
+         -> Evaluator term address value m (ModuleTable (NonEmpty (Module (ModuleResult address))))
+evaluate lang evalModule modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
   Module _ (_, (preludeBinds, _)) <- run lowerBound prelude
   evaluateModules (run preludeBinds . fmap Right <$> modules)
-  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runInTerm evalTerm . either ((*> box unit) . definePrelude) evalTerm . moduleBody) m)
+  where run prelude m = (<$ m) <$> evalModule prelude m
+
+evalModule perModule perTerm prelude m = runInModule prelude (moduleInfo m) (perModule (runInTerm perTerm . either ((*> box unit) . definePrelude) perTerm . moduleBody) m)
 
 evalTerm :: ( Carrier sig m
             , Declarations term
