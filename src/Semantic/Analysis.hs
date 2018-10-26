@@ -2,7 +2,6 @@
 module Semantic.Analysis
 ( evaluate
 , evalTerm
-, runValueEffects
 ) where
 
 import Control.Abstract
@@ -32,22 +31,45 @@ type ValueC term address value m
     m)))))))
 
 -- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
-evaluate :: ( Carrier outerSig outer
+evaluate :: ( AbstractValue term address value (ValueC term address value inner)
+            , Carrier innerSig inner
+            , Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
             , derefC ~ (DerefC address value (Eff allocatorC))
             , Carrier derefSig derefC
             , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
             , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
             , Carrier allocatorSig allocatorC
+            , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))
+            , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
+            , Carrier booleanSig booleanC
+            , whileC ~ WhileC value (Eff booleanC)
+            , whileSig ~ (While value :+: booleanSig)
+            , Carrier whileSig whileC
+            , functionC ~ FunctionC term address value (Eff whileC)
+            , functionSig ~ (Function term address value :+: whileSig)
+            , Carrier functionSig functionC
             , Effect outerSig
+            , HasPrelude lang
             , Member Fresh outerSig
+            , Member (Allocator address) innerSig
+            , Member (Deref value) innerSig
+            , Member (Env address) innerSig
+            , Member Fresh innerSig
+            , Member (Reader ModuleInfo) innerSig
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) outerSig
+            , Member (Reader Span) innerSig
+            , Member (Resumable (BaseError (AddressError address value))) innerSig
+            , Member (Resumable (BaseError (EnvironmentError address))) innerSig
+            , Member (Resumable (BaseError (UnspecializedError value))) innerSig
+            , Member (State (Heap address value)) innerSig
+            , Member Trace innerSig
             , Ord address
             )
-         => lang
-         -> (  (Module (Either lang term) -> Evaluator term address value inner address)
-            -> (Module (Either lang term) -> Evaluator term address value (ModuleC address value outer) address))
-         -> (Either lang term -> Evaluator term address value inner address)
+         => proxy lang
+         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner address)
+            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) address))
+         -> (term -> Evaluator term address value (ValueC term address value inner) address)
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang perModule runTerm modules = do
@@ -59,7 +81,7 @@ evaluate lang perModule runTerm modules = do
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModule prelude m = runInModule (perModule (runTerm . moduleBody) m)
+        evalModule prelude m = runInModule (perModule (runValueEffects . moduleBody) m)
           where runInModule
                   = raiseHandler (runReader (moduleInfo m))
                   . runAllocator
@@ -68,6 +90,8 @@ evaluate lang perModule runTerm modules = do
                   . runEnv (EvalContext Nothing (Env.push (newEnv prelude)))
                   . runReturn
                   . runLoopControl
+
+        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> box unit) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
@@ -105,34 +129,3 @@ evalTerm :: ( Carrier sig m
          => Open (Open (term -> Evaluator term address value m (ValueRef address)))
          -> term -> Evaluator term address value m address
 evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project)) >=> address
-
--- | Run a set of value effects, for which a 'Carrier' is assumed to exist.
-runValueEffects :: ( AbstractValue term address value (ValueC term address value m)
-                   , Carrier sig m
-                   , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff m)))
-                   , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: sig)
-                   , Carrier booleanSig booleanC
-                   , whileC ~ WhileC value (Eff booleanC)
-                   , whileSig ~ (While value :+: booleanSig)
-                   , Carrier whileSig whileC
-                   , functionC ~ FunctionC term address value (Eff whileC)
-                   , functionSig ~ (Function term address value :+: whileSig)
-                   , Carrier functionSig functionC
-                   , HasPrelude lang
-                   , Member (Allocator address) sig
-                   , Member (Deref value) sig
-                   , Member (Env address) sig
-                   , Member Fresh sig
-                   , Member (Reader ModuleInfo) sig
-                   , Member (Reader Span) sig
-                   , Member (Resumable (BaseError (AddressError address value))) sig
-                   , Member (Resumable (BaseError (EnvironmentError address))) sig
-                   , Member (Resumable (BaseError (UnspecializedError value))) sig
-                   , Member (State (Heap address value)) sig
-                   , Member Trace sig
-                   , Ord address
-                   )
-                => (term -> Evaluator term address value (ValueC term address value m) address)
-                -> Either (proxy lang) term
-                -> Evaluator term address value m address
-runValueEffects evalTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction evalTerm . either ((*> box unit) . definePrelude) evalTerm
