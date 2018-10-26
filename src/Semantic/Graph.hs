@@ -37,7 +37,7 @@ import           Data.Abstract.Address.Located as Located
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError (..))
-import           Data.Abstract.Evaluatable as Eval
+import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
@@ -59,6 +59,7 @@ import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (TypeError (..))
+import           Semantic.Analysis
 import           Semantic.Task as Task
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
