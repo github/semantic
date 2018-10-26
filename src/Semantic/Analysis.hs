@@ -51,6 +51,47 @@ evaluate lang evalModule modules = do
   evaluateModules (run preludeBinds . fmap Right <$> modules)
   where run prelude m = (<$ m) <$> evalModule prelude m
 
+evalModule :: ( AbstractValue term address value (ValueC term address value inner)
+              , Carrier sig m
+              , Carrier innerSig inner
+              , functionSig ~ (Function term address value :+: whileSig)
+              , functionC ~ FunctionC term address value (Eff whileC)
+              , Carrier functionSig functionC
+              , whileSig ~ (While value :+: booleanSig)
+              , whileC ~ WhileC value (Eff booleanC)
+              , Carrier whileSig whileC
+              , booleanSig ~ (Boolean value :+: Eavesdrop (Modules address) :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
+              , booleanC ~ BooleanC value (Eff (EavesdropC (Modules address) (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))))
+              , Carrier booleanSig booleanC
+              , derefSig ~ (Deref value :+: allocatorSig)
+              , derefC ~ (DerefC address value (Eff allocatorC))
+              , Carrier derefSig derefC
+              , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: sig)
+              , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff m))))
+              , Carrier allocatorSig allocatorC
+              , Effect sig
+              , HasPrelude language
+              , Member Fresh sig
+              , Member (Allocator address) innerSig
+              , Member (Deref value) innerSig
+              , Member (Modules address) innerSig
+              , Member (Env address) innerSig
+              , Member Fresh innerSig
+              , Member (Reader ModuleInfo) innerSig
+              , Member (Reader Span) innerSig
+              , Member (Resumable (BaseError (AddressError address value))) innerSig
+              , Member (Resumable (BaseError (UnspecializedError value))) innerSig
+              , Member (Resumable (BaseError (EnvironmentError address))) innerSig
+              , Member (State (Heap address value)) innerSig
+              , Member Trace innerSig
+              , Ord address
+              )
+           => (  (Module (Either (proxy language) term) -> Evaluator term address value inner address)
+              -> (Module body                           -> Evaluator term address value (ModuleC address value m) address))
+           -> (term -> Evaluator term address value (ValueC term address value inner) address)
+           -> Bindings address
+           -> Module body
+           -> Evaluator term address value m (ModuleResult address)
 evalModule perModule perTerm prelude m = runInModule prelude (moduleInfo m) (perModule (runInTerm perTerm . either ((*> box unit) . definePrelude) perTerm . moduleBody) m)
 
 evalTerm :: ( Carrier sig m
