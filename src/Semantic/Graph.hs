@@ -37,7 +37,7 @@ import           Data.Abstract.Address.Located as Located
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError (..))
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable as Eval
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
@@ -102,29 +102,34 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
              -> [Module term]
              -> Package term
              -> Eff m (Graph ControlFlowVertex)
-runCallGraph lang includePackages modules package = do
-  let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
-      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
-      extractGraph (graph, _) = simplify graph
-      runGraphAnalysis
-        = graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
-        . runHeap
-        . caching
-        . raiseHandler runFresh
-        . resumingLoadError
-        . resumingUnspecialized
-        . resumingEnvironmentError
-        . resumingEvalError
-        . resumingResolutionError
-        . resumingAddressError
-        . raiseHandler (runReader (packageInfo package))
-        . raiseHandler (runReader (lowerBound @Span))
-        . raiseHandler (runState (lowerBound @Span))
-        . raiseHandler (runReader (lowerBound @ControlFlowVertex))
-        . providingLiveSet
-        . runModuleTable
-        . runModules (ModuleTable.modulePaths (packageModules package))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
+runCallGraph lang includePackages modules package
+  = fmap (simplify . fst)
+  . runEvaluator
+  . graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
+  . runHeap
+  . caching
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingEnvironmentError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . raiseHandler (runReader (packageInfo package))
+  . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @ControlFlowVertex))
+  . providingLiveSet
+  . runModuleTable
+  . runModules (ModuleTable.modulePaths (packageModules package)) $ do
+    -- (_, (prelude, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm (evalTerm perTerm) $ do
+    --   definePrelude lang
+    --   box unit
+    let run m = (<$ m) <$> runInModule lowerBound (moduleInfo m) (perModule (runInTerm (evalTerm perTerm) . evalTerm perTerm . moduleBody) m)
+    evaluateModules (map run modules)
+  where perTerm = withTermSpans . graphingTerms . cachingTerms
+        perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
+
 
 runModuleTable :: Carrier sig m
                => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address)))) (Eff m)) a
@@ -177,26 +182,29 @@ runImportGraph :: ( Declarations term
                -> Package term
                -> (ModuleInfo -> Graph vertex)
                -> Eff m (Graph vertex)
-runImportGraph lang (package :: Package term) f =
-  let analyzeModule = graphingModuleInfo
-      extractGraph (graph, _) = graph >>= f
-      runImportGraphAnalysis
-        = raiseHandler (runState lowerBound)
-        . runHeap
-        . raiseHandler runFresh
-        . resumingLoadError
-        . resumingUnspecialized
-        . resumingEnvironmentError
-        . resumingEvalError
-        . resumingResolutionError
-        . resumingAddressError
-        . resumingValueError
-        . runModuleTable
-        . runModules (ModuleTable.modulePaths (packageModules package))
-        . raiseHandler (runReader (packageInfo package))
-        . raiseHandler (runState (lowerBound @Span))
-        . raiseHandler (runReader (lowerBound @Span))
-  in extractGraph <$> runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise)) (runImportGraphAnalysis (evaluate lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+runImportGraph lang (package :: Package term) f
+  = fmap (fst >=> f)
+  . runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise))
+  . raiseHandler (runState lowerBound)
+  . runHeap
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingEnvironmentError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . resumingValueError
+  . runModuleTable
+  . runModules (ModuleTable.modulePaths (packageModules package))
+  . raiseHandler (runReader (packageInfo package))
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @Span)) $ do
+    -- (_, (prelude, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm (evalTerm id) $ do
+    --   definePrelude lang
+    --   box unit
+    let run m = (<$ m) <$> runInModule lowerBound (moduleInfo m) (graphingModuleInfo (runInTerm (evalTerm id) . evalTerm id . moduleBody) m)
+    evaluateModules (map run (ModuleTable.toPairs (packageModules package) >>= toList . snd))
 
 
 runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Eff m)) a -> Evaluator term address value m (Heap address value, a)
