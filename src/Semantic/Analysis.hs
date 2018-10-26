@@ -7,7 +7,6 @@ module Semantic.Analysis
 , evalTerm
 , runInModule
 , runInTerm
-, evaluateModules
 ) where
 
 import Control.Abstract
@@ -45,9 +44,12 @@ evaluate :: ( Carrier sig m
          -> Evaluator term address value m (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang evalModule modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
-  Module _ (_, (preludeBinds, _)) <- run lowerBound prelude
-  evaluateModules (run preludeBinds . fmap Right <$> modules)
-  where run prelude m = (<$ m) <$> evalModule prelude m
+  (_, (preludeBinds, _)) <- evalModule lowerBound prelude
+  foldr (run preludeBinds . fmap Right) ask modules
+  where run prelude m rest = do
+          evaluated <- evalModule prelude m
+          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
+          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
 evalModule :: ( AbstractValue term address value (ValueC term address value inner)
               , Carrier outerSig outer
@@ -176,14 +178,3 @@ runInTerm :: ( AbstractValue term address value (ValueC term address value m)
           -> Either (proxy lang) term
           -> Evaluator term address value m address
 runInTerm evalTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction evalTerm . either ((*> box unit) . definePrelude) evalTerm
-
-evaluateModules :: ( Carrier sig m
-                   , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
-                   )
-         => [Evaluator term address value m (Module (ModuleResult address))]
-         -> Evaluator term address value m (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluateModules = foldr run ask
-  where run evaluator rest = do
-          evaluated <- evaluator
-          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          local (ModuleTable.insert (modulePath (moduleInfo evaluated)) (evaluated :| [])) rest
