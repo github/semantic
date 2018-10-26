@@ -122,8 +122,7 @@ runCallGraph lang includePackages modules package
   . providingLiveSet
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
-  $ evaluate lang (evalModule perModule perTerm) modules
-
+  $ evaluate lang (evalModule perModule (runInTerm perTerm)) modules
   where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
         perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
 
@@ -197,7 +196,7 @@ runImportGraph lang (package :: Package term) f
   . raiseHandler (runReader (packageInfo package))
   . raiseHandler (runState (lowerBound @Span))
   . raiseHandler (runReader (lowerBound @Span))
-  $ evaluate lang (evalModule graphingModuleInfo (evalTerm id)) (ModuleTable.toPairs (packageModules package) >>= toList . snd)
+  $ evaluate lang (evalModule graphingModuleInfo (runInTerm (evalTerm id))) (ModuleTable.toPairs (packageModules package) >>= toList . snd)
 
 
 runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Eff m)) a -> Evaluator term address value m (Heap address value, a)
@@ -261,7 +260,7 @@ parsePythonPackage parser project = do
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
-      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) (evalModule id (evalTerm id)) [ setupModule ])
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) (evalModule id (runInTerm (evalTerm id))) [ setupModule ])
       -- FIXME: what are we gonna do about runPythonPackaging
     Nothing -> pure PythonPackage.Unknown
   case strat of
