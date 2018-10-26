@@ -8,9 +8,9 @@ import Prologue hiding (bracket)
 
 import           Control.Concurrent.Async
 import qualified Control.Exception as Exc (bracket)
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Resource
-import           Control.Monad.Effect.Trace
+import           Control.Effect
+import           Control.Effect.Resource
+import           Control.Effect.Trace
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
@@ -57,16 +57,17 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
 parseToAST :: ( Bounded grammar
+              , Carrier sig m
               , Enum grammar
-              , Member (Lift IO) effects
-              , Member Resource effects
-              , Member Timeout effects
-              , Member Trace effects
+              , Member Resource sig
+              , Member Timeout sig
+              , Member Trace sig
+              , MonadIO m
               )
            => Duration
            -> Ptr TS.Language
            -> Blob
-           -> Eff effects (Maybe (AST [] grammar))
+           -> m (Maybe (AST [] grammar))
 parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
   liftIO $ do
     TS.ts_parser_halt_on_error parser (CBool 1)

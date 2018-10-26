@@ -30,7 +30,7 @@ import qualified Data.Syntax.Expression as Expression
 import           Data.Term
 import qualified Data.Text as T
 import           GHC.Exts (fromList)
-import           Prologue hiding (packageName)
+import           Prologue
 import           Proto3.Suite
 import qualified Proto3.Suite as PB
 import qualified Proto3.Wire.Encode as Encode

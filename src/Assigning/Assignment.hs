@@ -97,6 +97,7 @@ module Assigning.Assignment
 import Prologue
 import Prelude hiding (fail)
 import qualified Assigning.Assignment.Table as Table
+import Control.Monad.Except (MonadError (..))
 import Control.Monad.Free.Freer
 import Data.AST
 import Data.Error

@@ -2,8 +2,8 @@
 
 module Language.Python.PrettyPrint ( printingPython ) where
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Exception (Exc, throwError)
+import Control.Effect
+import Control.Effect.Error
 import Control.Monad.Trans (lift)
 import Data.Machine
 
@@ -14,10 +14,10 @@ import Data.Reprinting.Scope
 import Data.Reprinting.Operator
 
 -- | Print Python syntax.
-printingPython :: (Member (Exc TranslationError) effs) => ProcessT (Eff effs) Fragment Splice
+printingPython :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => ProcessT m Fragment Splice
 printingPython = repeatedly (await >>= step)
 
-step :: (Member (Exc TranslationError) effs) => Fragment -> PlanT k Splice (Eff effs) ()
+step :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => Fragment -> PlanT k Splice m ()
 step (Verbatim txt) = emit txt
 step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of

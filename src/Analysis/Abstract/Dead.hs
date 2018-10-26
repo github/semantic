@@ -19,31 +19,33 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: Member (State (Dead term)) effects => Dead term -> Evaluator term address value effects ()
+killAll :: (Member (State (Dead term)) sig, Carrier sig m) => Dead term -> Evaluator term address value m ()
 killAll = put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Member (State (Dead term)) effects, Ord term) => term -> Evaluator term address value effects ()
-revive t = modify' (Dead . delete t . unDead)
+revive :: (Member (State (Dead term)) sig, Carrier sig m, Ord term) => term -> Evaluator term address value m ()
+revive t = modify (Dead . delete t . unDead)
 
 -- | Compute the set of all subterms recursively.
 subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-revivingTerms :: ( Member (State (Dead term)) effects
+revivingTerms :: ( Member (State (Dead term)) sig
                  , Ord term
+                 , Carrier sig m
                  )
-              => Open (Open (term -> Evaluator term address value effects a))
+              => Open (Open (term -> Evaluator term address value m a))
 revivingTerms recur0 recur term = revive term *> recur0 recur term
 
 killingModules :: ( Foldable (Base term)
-                  , Member (State (Dead term)) effects
+                  , Member (State (Dead term)) sig
                   , Ord term
                   , Recursive term
+                  , Carrier sig m
                   )
-               => Open (Module term -> Evaluator term address value effects a)
+               => Open (Module term -> Evaluator term address value m a)
 killingModules recur m = killAll (subterms (moduleBody m)) *> recur m
 
-providingDeadSet :: Effects effects => Evaluator term address value (State (Dead term) ': effects) a -> Evaluator term address value effects (Dead term, a)
-providingDeadSet = runState lowerBound
+providingDeadSet :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Dead term) (Evaluator term address value m)) a -> Evaluator term address value m (Dead term, a)
+providingDeadSet = runState lowerBound . runEvaluator

@@ -4,12 +4,16 @@ module Semantic.Resolution
   , nodeJSResolutionMap
   , resolutionMap
   , runResolution
+  , ResolutionC(..)
   ) where
 
-import           Control.Monad.Effect
+import           Control.Effect
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
+import           Data.Coerce
 import           Data.File
 import           Data.Project
 import qualified Data.Map as Map
@@ -20,7 +24,7 @@ import           Semantic.Task.Files
 import           System.FilePath.Posix
 
 
-nodeJSResolutionMap :: Member Files effs => FilePath -> Text -> [FilePath] -> Eff effs (Map FilePath FilePath)
+nodeJSResolutionMap :: (Member Files sig, Carrier sig m, Monad m) => FilePath -> Text -> [FilePath] -> m (Map FilePath FilePath)
 nodeJSResolutionMap rootDir prop excludeDirs = do
   files <- findFiles rootDir [".json"] excludeDirs
   let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
@@ -35,22 +39,31 @@ nodeJSResolutionMap rootDir prop excludeDirs = do
       where relPkgDotJSONPath = makeRelative rootDir path
             relEntryPath x = takeDirectory relPkgDotJSONPath </> x
 
-resolutionMap :: Member Resolution effs => Project -> Eff effs (Map FilePath FilePath)
+resolutionMap :: (Member Resolution sig, Carrier sig m) => Project -> m (Map FilePath FilePath)
 resolutionMap Project{..} = case projectLanguage of
-  TypeScript -> send (NodeJSResolution projectRootDir "types" projectExcludeDirs)
-  JavaScript -> send (NodeJSResolution projectRootDir "main" projectExcludeDirs)
-  _          -> send NoResolution
+  TypeScript -> send (NodeJSResolution projectRootDir "types" projectExcludeDirs ret)
+  JavaScript -> send (NodeJSResolution projectRootDir "main"  projectExcludeDirs ret)
+  _          -> send (NoResolution ret)
 
-data Resolution (m :: * -> *) output where
-  NodeJSResolution :: FilePath -> Text -> [FilePath] -> Resolution m (Map FilePath FilePath)
-  NoResolution     ::                                   Resolution m (Map FilePath FilePath)
+data Resolution (m :: * -> *) k
+  = NodeJSResolution FilePath Text [FilePath] (Map FilePath FilePath -> k)
+  | NoResolution                              (Map FilePath FilePath -> k)
+  deriving (Functor)
 
-instance PureEffect Resolution
+instance HFunctor Resolution where
+  hmap _ = coerce
+
 instance Effect Resolution where
-  handleState c dist (Request (NodeJSResolution path key paths) k) = Request (NodeJSResolution path key paths) (dist . (<$ c) . k)
-  handleState c dist (Request NoResolution k) = Request NoResolution (dist . (<$ c) . k)
+  handle state handler (NodeJSResolution path key paths k) = NodeJSResolution path key paths (handler . (<$ state) . k)
+  handle state handler (NoResolution k) = NoResolution (handler . (<$ state) . k)
 
-runResolution :: (Member Files effs, PureEffects effs) => Eff (Resolution ': effs) a -> Eff effs a
-runResolution = interpret $ \ res -> case res of
-  NodeJSResolution dir prop excludeDirs -> nodeJSResolutionMap dir prop excludeDirs
-  NoResolution                          -> pure Map.empty
+runResolution :: (Member Files sig, Carrier sig m, Monad m) => Eff (ResolutionC m) a -> m a
+runResolution = runResolutionC . interpret
+
+newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
+
+instance (Member Files sig, Carrier sig m, Monad m) => Carrier (Resolution :+: sig) (ResolutionC m) where
+  ret = ResolutionC . ret
+  eff = ResolutionC . (alg \/ eff . handleCoercible)
+    where alg (NodeJSResolution dir prop excludeDirs k) = nodeJSResolutionMap dir prop excludeDirs >>= runResolutionC . k
+          alg (NoResolution k) = runResolutionC (k Map.empty)
