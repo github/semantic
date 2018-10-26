@@ -3,7 +3,6 @@ module Semantic.Analysis
 ( ModuleC
 , ValueC
 , evaluate
-, evalModule
 , evalTerm
 , runValueEffects
 ) where
@@ -34,14 +33,25 @@ type ValueC term address value m
   ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
     m)))))))
 
-evaluate :: ( Carrier sig m
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
+evaluate :: ( Carrier outerSig outer
+            , derefSig ~ (Deref value :+: allocatorSig)
+            , derefC ~ (DerefC address value (Eff allocatorC))
+            , Carrier derefSig derefC
+            , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
+            , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
+            , Carrier allocatorSig allocatorC
+            , Effect outerSig
+            , Member Fresh outerSig
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) outerSig
+            , Ord address
             )
          => lang
-         -> (Bindings address -> Module (Either lang term) -> Evaluator term address value m (ModuleResult address))
+         -> (  (Module (Either lang term) -> Evaluator term address value inner address)
+            -> (Module (Either lang term) -> Evaluator term address value (ModuleC address value outer) address))
+         -> (Either lang term -> Evaluator term address value inner address)
          -> [Module term]
-         -> Evaluator term address value m (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang evalModule modules = do
+         -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address))))
+evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
   (_, (preludeBinds, _)) <- evalModule lowerBound prelude
   foldr (run preludeBinds . fmap Right) ask modules
@@ -50,32 +60,15 @@ evaluate lang evalModule modules = do
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-evalModule :: ( Carrier outerSig outer
-              , derefSig ~ (Deref value :+: allocatorSig)
-              , derefC ~ (DerefC address value (Eff allocatorC))
-              , Carrier derefSig derefC
-              , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
-              , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
-              , Carrier allocatorSig allocatorC
-              , Effect outerSig
-              , Member Fresh outerSig
-              , Ord address
-              )
-           => (  (Module body -> Evaluator term address value inner address)
-              -> (Module body -> Evaluator term address value (ModuleC address value outer) address))
-           -> (body -> Evaluator term address value inner address)
-           -> Bindings address
-           -> Module body
-           -> Evaluator term address value outer (ModuleResult address)
-evalModule perModule runTerm prelude m = runInModule (perModule (runTerm . moduleBody) m)
-  where runInModule
-          = raiseHandler (runReader (moduleInfo m))
-          . runAllocator
-          . runDeref
-          . runScopeEnv
-          . runEnv (EvalContext Nothing (Env.push (newEnv prelude)))
-          . runReturn
-          . runLoopControl
+        evalModule prelude m = runInModule (perModule (runTerm . moduleBody) m)
+          where runInModule
+                  = raiseHandler (runReader (moduleInfo m))
+                  . runAllocator
+                  . runDeref
+                  . runScopeEnv
+                  . runEnv (EvalContext Nothing (Env.push (newEnv prelude)))
+                  . runReturn
+                  . runLoopControl
 
 evalTerm :: ( Carrier sig m
             , Declarations term
