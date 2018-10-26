@@ -5,6 +5,7 @@ module Data.Abstract.Evaluatable
 , ModuleC
 , ValueC
 , evaluate
+, evalTerm
 , runInModule
 , runInTerm
 , evaluateModules
@@ -144,13 +145,43 @@ evaluate :: ( AbstractValue term address value valueC
          -> [Module term]
          -> Evaluator term address value c (ModuleTable (NonEmpty (Module (ModuleResult address))))
 evaluate lang analyzeModule analyzeTerm modules = do
-  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm evalTerm $ do
+  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm (evalTerm analyzeTerm) $ do
     definePrelude lang
     box unit
   evaluateModules (run preludeBinds <$> modules)
-  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runInTerm evalTerm . evalTerm . moduleBody) m)
+  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runInTerm (evalTerm analyzeTerm) . evalTerm analyzeTerm . moduleBody) m)
 
-        evalTerm = fix (analyzeTerm (\ ev -> eval ev . project)) >=> address
+evalTerm :: ( Carrier sig m
+            , Declarations term
+            , Evaluatable (Base term)
+            , FreeVariables term, Ord address, Recursive term
+            , AbstractValue term address value m
+            , Member (Allocator address) sig
+            , Member (Boolean value) sig
+            , Member (Deref value) sig
+            , Member (Env address) sig
+            , Member (Error (LoopControl address)) sig
+            , Member (Error (Return address)) sig
+            , Member Fresh sig
+            , Member (Function term address value) sig
+            , Member (Modules address) sig
+            , Member (Reader ModuleInfo) sig
+            , Member (Reader PackageInfo) sig
+            , Member (Reader Span) sig
+            , Member (Resumable (BaseError (AddressError address value))) sig
+            , Member (Resumable (BaseError (EnvironmentError address))) sig
+            , Member (Resumable (BaseError EvalError)) sig
+            , Member (Resumable (BaseError ResolutionError)) sig
+            , Member (Resumable (BaseError (UnspecializedError value))) sig
+            , Member (ScopeEnv address) sig
+            , Member (State (Heap address value)) sig
+            , Member (State Span) sig
+            , Member Trace sig
+            , Member (While value) sig
+            )
+         => Open (Open (term -> Evaluator term address value m (ValueRef address)))
+         -> term -> Evaluator term address value m address
+evalTerm analyzeTerm = fix (analyzeTerm (\ ev -> eval ev . project)) >=> address
 
 runInModule :: ( Carrier sig m
                , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff m))))
