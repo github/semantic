@@ -31,6 +31,7 @@ type ValueC term address value m
   ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
     m)))))))
 
+-- | Evaluate a list of modules with the prelude for the passed language available, and applying the passed function to every module.
 evaluate :: ( Carrier outerSig outer
             , derefSig ~ (Deref value :+: allocatorSig)
             , derefC ~ (DerefC address value (Eff allocatorC))
