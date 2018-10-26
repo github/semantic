@@ -116,40 +116,32 @@ evaluate :: ( AbstractValue term address value valueC
             , moduleSig ~ (Eavesdrop (Modules address) :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
             , Carrier (While value :+: Boolean value :+: moduleSig) whileC
             , Carrier (Function term address value :+: While value :+: Boolean value :+: moduleSig) valueC
-            , Declarations term
             , Effect sig
-            , Evaluatable (Base term)
-            , FreeVariables term
             , HasPrelude lang
             , Member Fresh sig
             , Member (Modules address) sig
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
-            , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
-            , Member (State Span) sig
             , Member (Resumable (BaseError (AddressError address value))) sig
             , Member (Resumable (BaseError (EnvironmentError address))) sig
-            , Member (Resumable (BaseError EvalError)) sig
-            , Member (Resumable (BaseError ResolutionError)) sig
             , Member (Resumable (BaseError (UnspecializedError value))) sig
             , Member (State (Heap address value)) sig
             , Member Trace sig
             , Ord address
-            , Recursive term
             , moduleC ~ ModuleC address value c
             , valueC ~ ValueC term address value moduleC
             )
          => proxy lang
          -> Open (Module term -> Evaluator term address value moduleC address)
-         -> Open (Open (term -> Evaluator term address value valueC (ValueRef address)))
+         -> (term -> Evaluator term address value valueC address)
          -> [Module term]
          -> Evaluator term address value c (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule analyzeTerm modules = do
-  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm (evalTerm analyzeTerm) $ do
+evaluate lang analyzeModule evalTerm modules = do
+  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runInTerm evalTerm $ do
     definePrelude lang
     box unit
   evaluateModules (run preludeBinds <$> modules)
-  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runInTerm (evalTerm analyzeTerm) . evalTerm analyzeTerm . moduleBody) m)
+  where run preludeBinds m = (<$ m) <$> runInModule preludeBinds (moduleInfo m) (analyzeModule (runInTerm evalTerm . evalTerm . moduleBody) m)
 
 evalTerm :: ( Carrier sig m
             , Declarations term
