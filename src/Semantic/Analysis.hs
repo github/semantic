@@ -5,7 +5,6 @@ module Semantic.Analysis
 , evaluate
 , evalModule
 , evalTerm
-, runInModule
 , runValueEffects
 ) where
 
@@ -68,7 +67,15 @@ evalModule :: ( Carrier outerSig outer
            -> Bindings address
            -> Module body
            -> Evaluator term address value outer (ModuleResult address)
-evalModule perModule runTerm prelude m = runInModule prelude (moduleInfo m) (perModule (runTerm . moduleBody) m)
+evalModule perModule runTerm prelude m = runInModule (perModule (runTerm . moduleBody) m)
+  where runInModule
+          = raiseHandler (runReader (moduleInfo m))
+          . runAllocator
+          . runDeref
+          . runScopeEnv
+          . runEnv (EvalContext Nothing (Env.push (newEnv prelude)))
+          . runReturn
+          . runLoopControl
 
 evalTerm :: ( Carrier sig m
             , Declarations term
@@ -103,28 +110,6 @@ evalTerm :: ( Carrier sig m
          => Open (Open (term -> Evaluator term address value m (ValueRef address)))
          -> term -> Evaluator term address value m address
 evalTerm analyzeTerm = fix (analyzeTerm (\ ev -> eval ev . project)) >=> address
-
-runInModule :: ( Carrier sig m
-               , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff m))))
-               , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: sig)
-               , Carrier allocatorSig allocatorC
-               , Carrier (Deref value :+: allocatorSig) (DerefC address value (Eff allocatorC))
-               , Effect sig
-               , Member Fresh sig
-               , Ord address
-               )
-            => Bindings address
-            -> ModuleInfo
-            -> Evaluator term address value (ModuleC address value m) address
-            -> Evaluator term address value m (ModuleResult address)
-runInModule prelude info
-  = raiseHandler (runReader info)
-  . runAllocator
-  . runDeref
-  . runScopeEnv
-  . runEnv (EvalContext Nothing (Env.push (newEnv prelude)))
-  . runReturn
-  . runLoopControl
 
 runValueEffects :: ( AbstractValue term address value (ValueC term address value m)
                    , Carrier sig m
