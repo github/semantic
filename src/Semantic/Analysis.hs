@@ -50,7 +50,7 @@ evaluate lang evalModule modules = do
   where run prelude m = (<$ m) <$> evalModule prelude m
 
 evalModule :: ( AbstractValue term address value (ValueC term address value inner)
-              , Carrier sig m
+              , Carrier outerSig outer
               , Carrier innerSig inner
               , functionSig ~ (Function term address value :+: whileSig)
               , functionC ~ FunctionC term address value (Eff whileC)
@@ -64,12 +64,12 @@ evalModule :: ( AbstractValue term address value (ValueC term address value inne
               , derefSig ~ (Deref value :+: allocatorSig)
               , derefC ~ (DerefC address value (Eff allocatorC))
               , Carrier derefSig derefC
-              , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: sig)
-              , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff m))))
+              , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
+              , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
               , Carrier allocatorSig allocatorC
-              , Effect sig
+              , Effect outerSig
               , HasPrelude language
-              , Member Fresh sig
+              , Member Fresh outerSig
               , Member (Allocator address) innerSig
               , Member (Deref value) innerSig
               , Member (Env address) innerSig
@@ -84,11 +84,11 @@ evalModule :: ( AbstractValue term address value (ValueC term address value inne
               , Ord address
               )
            => (  (Module (Either (proxy language) term) -> Evaluator term address value inner address)
-              -> (Module body                           -> Evaluator term address value (ModuleC address value m) address))
+              -> (Module body                           -> Evaluator term address value (ModuleC address value outer) address))
            -> (term -> Evaluator term address value (ValueC term address value inner) address)
            -> Bindings address
            -> Module body
-           -> Evaluator term address value m (ModuleResult address)
+           -> Evaluator term address value outer (ModuleResult address)
 evalModule perModule perTerm prelude m = runInModule prelude (moduleInfo m) (perModule (runInTerm perTerm . moduleBody) m)
 
 evalTerm :: ( Carrier sig m
