@@ -125,8 +125,8 @@ ifthenelse :: (Member (Boolean value) sig, Carrier sig m, Monad m) => value -> m
 ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 
 -- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
-disjunction :: (Member (Boolean value) sig, Carrier sig m) => m value -> m value -> m value
-disjunction a b = send (Disjunction a b ret)
+disjunction :: (Member (Boolean value) sig, Carrier sig m, Monad m) => m value -> m value -> m value
+disjunction a b = a >>= \ a' -> ifthenelse a' (pure a') b
 
 data Boolean value m k
   = Boolean Bool (value -> k)
