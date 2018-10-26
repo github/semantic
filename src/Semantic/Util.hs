@@ -27,6 +27,7 @@ import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
 import           Parsing.Parser
 import           Prologue
+import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
