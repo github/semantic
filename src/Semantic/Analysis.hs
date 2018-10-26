@@ -11,7 +11,6 @@ module Semantic.Analysis
 ) where
 
 import Control.Abstract
-import Control.Effect.Eavesdrop
 import Control.Effect.Interpose
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
@@ -34,9 +33,8 @@ type ValueC term address value m
   = FunctionC term address value                                  (Eff
   ( WhileC value                                                  (Eff
   ( BooleanC value                                                (Eff
-  ( EavesdropC (Modules address)                                  (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
-    m)))))))))
+    m)))))))
 
 evaluate :: ( Carrier sig m
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
@@ -60,8 +58,8 @@ evalModule :: ( AbstractValue term address value (ValueC term address value inne
               , whileSig ~ (While value :+: booleanSig)
               , whileC ~ WhileC value (Eff booleanC)
               , Carrier whileSig whileC
-              , booleanSig ~ (Boolean value :+: Eavesdrop (Modules address) :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
-              , booleanC ~ BooleanC value (Eff (EavesdropC (Modules address) (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))))
+              , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
+              , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))
               , Carrier booleanSig booleanC
               , derefSig ~ (Deref value :+: allocatorSig)
               , derefC ~ (DerefC address value (Eff allocatorC))
@@ -74,7 +72,6 @@ evalModule :: ( AbstractValue term address value (ValueC term address value inne
               , Member Fresh sig
               , Member (Allocator address) innerSig
               , Member (Deref value) innerSig
-              , Member (Modules address) innerSig
               , Member (Env address) innerSig
               , Member Fresh innerSig
               , Member (Reader ModuleInfo) innerSig
@@ -151,8 +148,8 @@ runInModule prelude info
   . runLoopControl
 
 runInTerm :: ( Carrier sig m
-             , booleanC ~ BooleanC value (Eff (EavesdropC (Modules address) (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff m)))))
-             , booleanSig ~ (Boolean value :+: Eavesdrop (Modules address) :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: sig)
+             , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff m)))
+             , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: sig)
              , Carrier booleanSig booleanC
              , whileC ~ WhileC value (Eff booleanC)
              , whileSig ~ (While value :+: booleanSig)
@@ -160,13 +157,12 @@ runInTerm :: ( Carrier sig m
              , functionC ~ FunctionC term address value (Eff whileC)
              , functionSig ~ (Function term address value :+: whileSig)
              , Carrier functionSig functionC
-             , Member (Modules address) sig
              , Member (Resumable (BaseError (UnspecializedError value))) sig
              )
           => (term -> Evaluator term address value (ValueC term address value m) address)
           -> Evaluator term address value (ValueC term address value m) a
           -> Evaluator term address value m a
-runInTerm evalTerm = raiseHandler runInterpose . raiseHandler runEavesdrop . runBoolean . runWhile . runFunction evalTerm
+runInTerm evalTerm = raiseHandler runInterpose . runBoolean . runWhile . runFunction evalTerm
 
 evaluateModules :: ( Carrier sig m
                    , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
