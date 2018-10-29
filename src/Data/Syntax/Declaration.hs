@@ -212,11 +212,11 @@ instance Evaluatable Class where
       name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
       associatedScope (Declaration name)
 
-    let imports = (Import,) <$> (fmap pure . catMaybes $ supers)
-        current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
-        edges = Map.fromList (imports <> current)
-    childScope <- newScope edges
-    declare (Declaration name) span (Just childScope)
+    -- let imports = (Import,) <$> (fmap pure . catMaybes $ supers)
+        -- current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
+        -- edges = Map.fromList (imports <> current)
+    -- childScope <- newScope edges
+    -- declare (Declaration name) span (Just childScope)
 
     -- withScope childScope $ do
     --   (_, addr) <- letrec name $ do
