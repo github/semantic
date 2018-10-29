@@ -17,7 +17,7 @@ module Analysis.Abstract.Graph
 ) where
 
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract hiding (Function(..), EavesdropC)
+import           Control.Abstract hiding (Function(..))
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
 import           Data.Abstract.Address.Hole
