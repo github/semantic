@@ -10,6 +10,9 @@ import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
+import           Control.Abstract.ScopeGraph hiding (Import)
+import           qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Map.Strict as Map
 
 data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -21,8 +24,17 @@ instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JavaScriptRequire where
   eval (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
-    rvalBox =<< evalRequire modulePath alias
+    (scopeGraph, value) <- require modulePath
+    bindAll scopeGraph
+    case declaredName (subterm aliasTerm) of
+      Just alias -> do
+        span <- get @Span
+        void $ declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph) -- TODO: declare shouldn't return a fake (Address address)
+      Nothing -> do
+        -- TODO: Throw a resumable exception if no current scope in imported scope graph.
+        -- Or better yet get rid of the Maybe in ScopeGraph { currentScope :: Maybe scope, ... }
+        maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+    rvalBox unit
 
 data Debugger a = Debugger
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)

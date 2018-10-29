@@ -32,6 +32,7 @@ import           Prologue
 import qualified Data.Sequence as Seq
 
 data Address address = Address { address :: address, position :: Position }
+    deriving (Eq, Show, Ord)
 
 -- Offsets and frame addresses in the heap should be addresses?
 data Scope address = Scope {

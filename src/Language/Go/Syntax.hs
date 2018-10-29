@@ -18,6 +18,7 @@ import           Proto3.Suite
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import           System.FilePath.Posix
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data IsRelative = Unknown | Relative | NonRelative
   deriving (Bounded, Enum, Finite, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField)
@@ -93,8 +94,9 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      importedEnv <- fst . snd <$> require path
-      bindAll importedEnv
+      scopeGraph <- fst <$> require path
+      bindAll scopeGraph
+      insertEdge ScopeGraph.Import (currentScope scopeGraph)
     rvalBox unit
 
 

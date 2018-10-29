@@ -21,6 +21,8 @@ import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named
 import qualified Proto3.Suite as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
+import Control.Abstract.ScopeGraph (Allocator, bindAll, insertEdge, declare, Declaration(..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
@@ -131,7 +133,11 @@ instance Evaluatable Import where
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
-    rvalBox =<< evalQualifiedImport aliasValue path
+    scopeGraph <- fst <$> require path
+    bindAll scopeGraph
+    span <- ask @Span
+    declare (Declaration aliasValue) span (ScopeGraph.currentScope scopeGraph)
+    rvalBox unit
 
   -- from a import b
   -- from a import b as c
@@ -145,27 +151,18 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    importedBinds <- fst . snd <$> require path
-    bindAll (select importedBinds)
+    scopeGraph <- fst <$> require path
+    bindAll scopeGraph
+    if Prologue.null xs then
+      maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+    else
+      for_ xs $ \Alias{..} -> do
+        -- TODO: Add an Alias Edge to resolve qualified export froms
+        -- Scope 1 -> alias (bar, foo) -> Export 3 -> Export -> Scope 4
+        pure ()
+
     rvalBox unit
-    where
-      select importedBinds
-        | Prologue.null xs = importedBinds
-        | otherwise = Env.aliasBindings (toTuple <$> xs) importedBinds
 
-
--- Evaluate a qualified import
-evalQualifiedImport :: ( AbstractValue address value effects
-                       , Member (Allocator address) effects
-                       , Member (Deref value) effects
-                       , Member (Env address) effects
-                       , Member (Modules address value) effects
-                       , Member (State (Heap address address value)) effects
-                       , Ord address
-                       )
-                    => Name -> ModulePath -> Evaluator address value effects value
-evalQualifiedImport name path = letrec' name $ \addr -> do
-  unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -190,14 +187,15 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
-    rvalBox =<< go (NonEmpty.zip (name . T.pack <$> qualifiedName) modulePaths)
+    -- rvalBox =<< go (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
+    rvalBox unit
     where
-      -- Evaluate and import the last module, updating the environment
-      go ((name, path) :| []) = evalQualifiedImport name path
-      -- Evaluate each parent module, just creating a namespace
-      go ((name, path) :| xs) = letrec' name $ \addr -> do
-        void $ require path
-        makeNamespace name addr Nothing (void (require path >> go (NonEmpty.fromList xs)))
+      -- -- Evaluate and import the last module, updating the environment
+      -- go ((name, path) :| []) = evalQualifiedImport name path
+      -- -- Evaluate each parent module, just creating a namespace
+      -- go ((name, path) :| xs) = letrec' name $ \addr -> do
+      --   void $ require path
+      --   makeNamespace name addr Nothing (void (require path >> go (NonEmpty.fromList xs)))
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -216,9 +214,10 @@ instance Evaluatable QualifiedAliasedImport where
 
     -- Evaluate and import the last module, aliasing and updating the environment
     alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
-    rvalBox =<< letrec' alias (\addr -> do
-      let path = NonEmpty.last modulePaths
-      unit <$ makeNamespace alias addr Nothing (void (bindAll . fst . snd =<< require path)))
+    rvalBox unit
+    -- rvalBox =<< letrec' alias (\addr -> do
+    --   let path = NonEmpty.last modulePaths
+    --   unit <$ makeNamespace alias addr Nothing (void (bindAll . fst . snd =<< require path)))
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
