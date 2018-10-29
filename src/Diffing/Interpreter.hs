@@ -20,7 +20,7 @@ diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax)
           => Term syntax ann
           -> Term syntax ann
           -> Diff.Diff syntax ann ann
-diffTerms t1 t2 = stripDiff (fromMaybe (Diff.replacing t1' t2') (run (runNonDet (runDiff (algorithmForTerms t1' t2')))))
+diffTerms t1 t2 = stripDiff (fromMaybe (Diff.replacing t1' t2') (run (runNonDetOnce (runDiff (algorithmForTerms t1' t2')))))
   where (t1', t2') = ( defaultFeatureVectorDecorator t1
                      , defaultFeatureVectorDecorator t2)
 
