@@ -301,9 +301,11 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable TypeAlias where
   eval TypeAlias{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasIdentifier))
-    addr <- subtermAddress typeAliasKind
-    bind name addr
-    pure (Rval addr)
+    kindName <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasKind))
+    span <- ask @Span
+    address <- declare (Declaration name) span Nothing -- TODO: Also need to declare the alias via an Alias edge?
+    kindAddress <- lookupDeclaration (Declaration kindName) -- TODO: Validate the path? Also assumes the type is declared.
+    rvalBox unit -- TODO: Return Address here?
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier
