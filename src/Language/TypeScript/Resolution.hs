@@ -8,7 +8,7 @@ module Language.TypeScript.Resolution
   , resolveModule
   , resolveNonRelativePath
   , javascriptExtensions
-  , evalRequire
+  -- , evalRequire
   , typescriptExtensions
   ) where
 
@@ -164,15 +164,15 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: ( AbstractValue address value effects
-               , Member (Allocator address) effects
-               , Member (Deref value) effects
-               , Member (Modules address value) effects
-               , Member (State (Heap address address value)) effects
-               , Ord address
-               )
-            => M.ModulePath
-            -> Name
-            -> Evaluator address value effects value
-evalRequire modulePath alias = letrec' alias $ \addr ->
-  unit <$ makeNamespace alias addr Nothing (bindAll . fst . snd =<< require modulePath)
+-- evalRequire :: ( AbstractValue address value effects
+--                , Member (Allocator address) effects
+--                , Member (Deref value) effects
+--                , Member (Modules address value) effects
+--                , Member (State (Heap address address value)) effects
+--                , Ord address
+--                )
+--             => M.ModulePath
+--             -> Name
+--             -> Evaluator address value effects value
+-- evalRequire modulePath alias = letrec' alias $ \addr ->
+--   unit <$ makeNamespace alias addr Nothing (bindAll . fst . snd =<< require modulePath)

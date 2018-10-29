@@ -299,7 +299,7 @@ value :: ( AbstractValue address value effects
       -> Evaluator address value effects value
 value (Rval val) = pure val
 value (LvalLocal name) = undefined
-value (LvalMember lhs rhs) = undefined
+value (LvalMember slot) = undefined
 
 -- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( AbstractValue address value effects

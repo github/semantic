@@ -12,6 +12,9 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue hiding (Text)
 import           Proto3.Suite.Class
+import Control.Abstract.ScopeGraph
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Map.Strict as Map
 
 newtype Text a = Text { value :: T.Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -53,13 +56,13 @@ resolvePHPName n = do
 
 include :: ( AbstractValue address value effects
            , Member (Deref value) effects
-           , Member (Env address) effects
            , Member (Modules address value) effects
            , Member (Reader ModuleInfo) effects
            , Member (Reader Span) effects
            , Member (Resumable (BaseError (AddressError address value))) effects
+           , Member (Resumable (BaseError (ScopeError address))) effects
+           , Member (State (ScopeGraph address)) effects
            , Member (Resumable (BaseError ResolutionError)) effects
-           , Member (Resumable (BaseError (EnvironmentError address))) effects
            , Member (State (Heap address address value)) effects
            , Member Trace effects
            , Ord address
@@ -71,8 +74,9 @@ include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (_, (importedEnv, v)) <- f path
-  bindAll importedEnv
+  (scopeGraph, v) <- f path
+  bindAll scopeGraph
+  maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
   pure (Rval v)
 
 newtype Require a = Require { value :: a }
@@ -210,9 +214,24 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (QualifiedName name iden) = do
-    namePtr <- subtermAddress name
-    Rval <$> evaluateInScopedEnv namePtr (subtermAddress iden)
+  eval (QualifiedName obj iden) = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm obj))
+    reference (Reference name) (Declaration name)
+    childScope <- associatedScope (Declaration name)
+
+    propName <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
+    case childScope of
+      Just childScope -> do
+        currentScopeAddress <- currentScope
+        currentFrameAddress <- currentFrame
+        frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
+        withScopeAndFrame frameAddress $ do
+          reference (Reference propName) (Declaration propName)
+          address <- lookupDeclaration (Declaration propName)
+          pure $! LvalMember address
+      Nothing ->
+        -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
+        rvalBox unit
 
 newtype NamespaceName a = NamespaceName { names :: NonEmpty a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
@@ -223,8 +242,9 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
-    where f ns id = ns >>= flip evaluateInScopedEnv id
+  eval (NamespaceName xs) = rvalBox unit
+    -- Rval <$> foldl1 f (fmap subtermAddress xs)
+    -- where f ns id = ns >>= flip evaluateInScopedEnv id
 
 newtype ConstDeclaration a = ConstDeclaration { values :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

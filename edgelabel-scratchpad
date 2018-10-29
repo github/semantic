@@ -106,15 +106,62 @@ Lexical* . (Public* | Import*)
 
 -- Class
 
+predicate :: [EdgeLabel] -> Bool -> [EdgeLabel] -> Bool
+predicate =
+
 class A { -- Scope 1
     public a = 2; -- declare a in scope 1, make a new scope with a public edge to 1
+
     private b = 3; -- declare b in scope 2, make a new scope with a private edge to 2
     protected c = 4; -- declare c in scope 3, make a new scope with a protected edge to 3
     private d = 3; -- declare b in scope 2, make a new scope with a private edge to 2
+
+    function e () {
+      this.f();
+    }
+
+    function f () {
+        if (true) e();
+    }
+
 }
 
-predicate :: [EdgeLabel] -> Bool -> [EdgeLabel] -> Bool
-predicate =
+a
+|
+Public
+|
+b
+|
+Private
+|
+c
+|
+Protected
+|
+d
+|
+Private
+|
+*
+
+*
+|
+Public
+|
+a
+|
+Private
+|
+b
+|
+Protected
+|
+c
+|
+Private
+|
+d
+
 
 instance Evaluatable Class where
     eval = do
@@ -122,6 +169,9 @@ instance Evaluatable Class where
         withPredicate publicOrProtectedThroughSuperclassesOrAnythingLocal . locally (eval body)
 
 class B < A {
+    public c;
+    private c;
+    protected c;
 
     class C < D { -- C has a Lexical edge to B and an import edge to D
         withPredicate publicOrProtectedThroughSuperclassesOrAnythingLocal . locally (eval body)
@@ -133,7 +183,8 @@ class B < A {
     }
 
     -- Inheritance edge predicate
-    -- Lexical* . (Private | Protected | Public)* . (Import . (Protected | Private | Public)* . (Protected | Public))*
+    -- Lexical* . (Private | Protected | Public)* .
+         ((Private | Protected | Public) | (Import . (Protected | Private | Public)* . (Protected | Public))*)
     -- Instance edge predicate
     -- Import . (Protected | Private)* . Public
 }
@@ -183,6 +234,13 @@ C
 
 -- module ModuleWithBar
 -- function bar() {} * Lexical
+
+bar
+|
+Lexical
+|
+Import
+*
 
 -- module B
 -- import ModuleWithBar * Import

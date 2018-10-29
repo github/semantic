@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.TypeScript.Syntax.TypeScript where
 
@@ -15,6 +15,8 @@ import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import qualified Data.Map.Strict as Map
+import Data.Semigroup.App
+import Data.Semigroup.Foldable (foldMap1)
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -116,11 +118,14 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    importedBinds <- fst . snd <$> require modulePath
+    scopeGraph <- fst <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \Alias{..} -> do
-      let address = Env.lookup aliasValue importedBinds
-      maybe (throwEvalError $ ExportError modulePath aliasValue) (export aliasValue aliasName . Just) address
+      -- TODO: Add an Alias Edge to resolve qualified export froms
+      -- Scope 1 -> alias (bar, foo) -> Export 3 -> Export -> Scope 4
+      pure ()
+      -- let address = Env.lookup aliasValue importedBinds
+      -- maybe (throwEvalError $ ExportError modulePath aliasValue) (export aliasValue aliasName . Just) address
     rvalBox unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
@@ -133,10 +138,10 @@ instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable DefaultExport where
   eval (DefaultExport term) = do
     case declaredName term of
-      Just name -> do
-        addr <- subtermAddress term
-        export name name Nothing
-        bind name addr
+      Just name -> pure ()
+        -- addr <- subtermAddress term
+        -- export name name Nothing
+        -- bind name addr
       Nothing -> throwEvalError DefaultExportError
     rvalBox unit
 
@@ -530,9 +535,10 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
-    rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr Nothing (void (eval xs)))
+    currentScopeAddress <- currentScope
+    let edges = Map.singleton Lexical [ currentScopeAddress ]
+    scope <- newScope edges
+    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 
 data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
@@ -544,9 +550,10 @@ instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
-    rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr Nothing (void (eval xs)))
+    currentScopeAddress <- currentScope
+    let edges = Map.singleton Lexical [ currentScopeAddress ]
+    scope <- newScope edges
+    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier
@@ -580,9 +587,24 @@ instance Declarations a => Declarations (AbstractClass a) where
 instance Evaluatable AbstractClass where
   eval AbstractClass{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm abstractClassIdentifier))
-    supers <- traverse subtermAddress classHeritage
-    (v, addr) <- letrec name $ do
+    span <- ask @Span
+    -- Run the action within the class's scope.
+    currentScopeAddress <- currentScope
+
+    supers <- for classHeritage $ \superclass -> do
+      name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
+      scope <- associatedScope (Declaration name)
+      (scope,) <$> subtermValue superclass
+
+    let imports = (ScopeGraph.Import, ) <$> (pure . catMaybes $ fst <$> supers)
+        current = pure (Lexical, [ currentScopeAddress ])
+        edges = Map.fromList (imports <> current)
+    childScope <- newScope edges
+    declare (Declaration name) span (Just childScope)
+
+    frame <- newFrame childScope mempty -- TODO: Instantiate frames for superclasses
+    withScopeAndFrame frame $ do
       void $ subtermValue classBody
-      classBinds <- Env.head <$> getEnv
-      klass name supers classBinds
-    rvalBox =<< (v <$ bind name addr)
+      klass (Declaration name) (snd <$> supers) frame
+
+    rvalBox unit

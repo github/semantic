@@ -63,6 +63,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader Span) effects
           , Member (State Span) effects
           , Member (Resumable (BaseError (ScopeError address))) effects
+          , Member (Resumable (BaseError (HeapError address))) effects
           , Member (Resumable (BaseError (AddressError address value))) effects
           , Member (Resumable (BaseError (UnspecializedError value))) effects
           , Member (Resumable (BaseError EvalError)) effects
