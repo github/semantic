@@ -57,7 +57,9 @@ instance ( Alternative m
          , Monad m
          , Traversable syntax
          )
-      => Carrier (Diff (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann)) (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)) :+: sig) (DiffC (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann)) (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)) m) where
+      => Carrier
+        (Diff (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann)) (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)) :+: sig)
+        (DiffC (Term syntax (FeatureVector, ann)) (Term syntax (FeatureVector, ann)) (Diff.Diff syntax (FeatureVector, ann) (FeatureVector, ann)) m) where
   ret = DiffC . ret
   eff = DiffC . handleSum (eff . handleCoercible) (\case
     Diff t1 t2 k -> runDiff (algorithmForTerms t1 t2) <|> pure (Diff.replacing t1 t2) >>= runDiffC . k
