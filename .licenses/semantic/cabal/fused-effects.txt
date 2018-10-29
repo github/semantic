@@ -1,9 +1,9 @@
 ---
 type: cabal
-name: higher-order-effects
+name: fused-effects
 version: 0.1.0.0
 summary: Semilattices
-homepage: https://github.com/robrix/higher-order-effects
+homepage: https://github.com/robrix/fused-effects
 license: bsd-3-clause
 ---
 Copyright (c) 2018, Rob Rix
