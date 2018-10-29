@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry
 (
   -- Async telemetry interface
@@ -158,9 +158,9 @@ newtype TelemetryC m a = TelemetryC { runTelemetryC :: (LogQueue, StatQueue) -> 
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryC m) where
   ret = TelemetryC . const . ret
-  eff op = TelemetryC (\ queues -> (alg queues \/ eff . handleReader queues runTelemetryC) op)
-    where alg queues (WriteStat stat k) = queueStat (snd queues) stat *> runTelemetryC k queues
-          alg queues (WriteLog level message pairs k) = queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues
+  eff op = TelemetryC (\ queues -> handleSum (eff . handleReader queues runTelemetryC) (\case
+    WriteStat stat               k -> queueStat (snd queues) stat *> runTelemetryC k queues
+    WriteLog level message pairs k -> queueLogMessage (fst queues) level message pairs *> runTelemetryC k queues) op)
 
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
@@ -171,6 +171,6 @@ newtype IgnoreTelemetryC m a = IgnoreTelemetryC { runIgnoreTelemetryC :: m a }
 
 instance Carrier sig m => Carrier (Telemetry :+: sig) (IgnoreTelemetryC m) where
   ret = IgnoreTelemetryC . ret
-  eff = alg \/ (IgnoreTelemetryC . eff . handlePure runIgnoreTelemetryC)
-    where alg (WriteStat _ k) = k
-          alg (WriteLog _ _ _ k) = k
+  eff = handleSum (IgnoreTelemetryC . eff . handlePure runIgnoreTelemetryC) (\case
+    WriteStat _    k -> k
+    WriteLog _ _ _ k -> k)

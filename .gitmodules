@@ -13,6 +13,6 @@
 [submodule "vendor/semilattices"]
 	path = vendor/semilattices
 	url = https://github.com/robrix/semilattices.git
-[submodule "vendor/higher-order-effects"]
-	path = vendor/higher-order-effects
-	url = https://github.com/robrix/higher-order-effects.git
+[submodule "vendor/fused-effects"]
+	path = vendor/fused-effects
+	url = https://github.com/robrix/fused-effects.git
