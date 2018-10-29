@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GADTs, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GADTs, KindSignatures, LambdaCase, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution
   ( Resolution (..)
   , nodeJSResolutionMap
@@ -64,6 +64,6 @@ newtype ResolutionC m a = ResolutionC { runResolutionC :: m a }
 
 instance (Member Files sig, Carrier sig m, Monad m) => Carrier (Resolution :+: sig) (ResolutionC m) where
   ret = ResolutionC . ret
-  eff = ResolutionC . (alg \/ eff . handleCoercible)
-    where alg (NodeJSResolution dir prop excludeDirs k) = nodeJSResolutionMap dir prop excludeDirs >>= runResolutionC . k
-          alg (NoResolution k) = runResolutionC (k Map.empty)
+  eff = ResolutionC . handleSum (eff . handleCoercible) (\case
+    NodeJSResolution dir prop excludeDirs k -> nodeJSResolutionMap dir prop excludeDirs >>= runResolutionC . k
+    NoResolution                          k -> runResolutionC (k Map.empty))
