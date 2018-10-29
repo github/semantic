@@ -210,22 +210,21 @@ instance Evaluatable Class where
 
     supers <- for classSuperclasses $ \superclass -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
-      scope <- associatedScope (Declaration name)
-      (scope,) <$> subtermAddress superclass
+      associatedScope (Declaration name)
 
-    let imports = (Import,) <$> (fmap pure . catMaybes $ fst <$> supers)
+    let imports = (Import,) <$> (fmap pure . catMaybes $ supers)
         current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
         edges = Map.fromList (imports <> current)
     childScope <- newScope edges
     declare (Declaration name) span (Just childScope)
 
-    withScope childScope $ do
-      (_, addr) <- letrec name $ do
-        void $ subtermValue classBody
-        classBinds <- Env.head <$> getEnv
-        klass name (snd <$> supers) classBinds
-      bind name addr
-      pure (Rval addr)
+    -- withScope childScope $ do
+    --   (_, addr) <- letrec name $ do
+    --     void $ subtermValue classBody
+    --     classBinds <- Env.head <$> getEnv
+    --     klass (Declaration name) (catMaybes supers) classBinds -- TODO: Update klass definition
+    -- pure (Rval addr)
+    rvalBox unit
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
