@@ -8,8 +8,8 @@ module Data.Abstract.Name
 , formatName
 ) where
 
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Fresh
+import           Control.Effect
+import           Control.Effect.Fresh
 import           Data.Aeson
 import qualified Data.Char as Char
 import           Data.Text (Text)
@@ -36,7 +36,7 @@ instance Primitive Name where
   primType _ = Bytes
 
 -- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
-gensym :: (Functor (m effs), Member Fresh effs, Effectful m) => m effs Name
+gensym :: (Member Fresh sig, Carrier sig m, Functor m) => m Name
 gensym = I <$> fresh
 
 -- | Construct a 'Name' from a 'Text'.

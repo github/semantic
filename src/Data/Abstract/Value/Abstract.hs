@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runFunction
@@ -7,6 +7,8 @@ module Data.Abstract.Value.Abstract
 ) where
 
 import Control.Abstract as Abstract
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Prologue
@@ -15,65 +17,54 @@ data Abstract = Abstract
   deriving (Eq, Ord, Show)
 
 
-runFunction :: ( Member (Allocator address) effects
-               , Member (Deref Abstract) effects
-               , Member (Env address) effects
-               , Member (Exc (Return address)) effects
-               , Member Fresh effects
-               , Member (Reader ModuleInfo) effects
-               , Member (Reader Span) effects
-               , Member (Resumable (BaseError (AddressError address Abstract))) effects
-               , Member (State (Heap address Abstract)) effects
-               , Ord address
-               , PureEffects effects
-               )
-            => (term -> Evaluator term address Abstract (Abstract.Function term address Abstract ': effects) address)
-            -> Evaluator term address Abstract (Function term address Abstract ': effects) a
-            -> Evaluator term address Abstract effects a
-runFunction eval = interpret $ \case
-  Function _ params body -> do
-    env <- foldr (\ name rest -> do
-      addr <- alloc name
-      assign addr Abstract
-      Env.insert name addr <$> rest) (pure lowerBound) params
-    addr <- locally (bindAll env *> catchReturn (runFunction eval (eval body)))
-    deref addr
-  BuiltIn _ -> pure Abstract
-  Call _ _ params -> do
-    traverse_ deref params
-    box Abstract
+instance ( Member (Allocator address) sig
+         , Member (Deref Abstract) sig
+         , Member (Env address) sig
+         , Member (Error (Return address)) sig
+         , Member Fresh sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address Abstract))) sig
+         , Member (State (Heap address Abstract)) sig
+         , Ord address
+         , Carrier sig m
+         )
+      => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
+  ret = FunctionC . const . ret
+  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
+    Function _ params body k -> runEvaluator $ do
+      env <- foldr (\ name rest -> do
+        addr <- alloc name
+        assign addr Abstract
+        Env.insert name addr <$> rest) (pure lowerBound) params
+      addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
+      deref addr >>= Evaluator . flip runFunctionC eval . k
+    BuiltIn _ k -> runFunctionC (k Abstract) eval
+    Call _ _ params k -> runEvaluator $ do
+      traverse_ deref params
+      box Abstract >>= Evaluator . flip runFunctionC eval . k) op)
 
-runBoolean :: ( Member NonDet effects
-              , PureEffects effects
-              )
-           => Evaluator term address Abstract (Boolean Abstract ': effects) a
-           -> Evaluator term address Abstract effects a
-runBoolean = interpret $ \case
-  Boolean _       -> pure Abstract
-  AsBool  _       -> pure True <|> pure False
-  Disjunction a b -> runBoolean (Evaluator (a <|> b))
 
-runWhile ::
-  ( Member (Allocator address) effects
-  , Member (Deref Abstract) effects
-  , Member (Abstract.Boolean Abstract) effects
-  , Member NonDet effects
-  , Member (Env address) effects
-  , Member (Exc (Return address)) effects
-  , Member Fresh effects
-  , Member (Reader ModuleInfo) effects
-  , Member (Reader Span) effects
-  , Member (Resumable (BaseError (AddressError address Abstract))) effects
-  , Member (State (Heap address Abstract)) effects
-  , Ord address
-  , PureEffects effects
-  )
-  => Evaluator term address Abstract (While Abstract ': effects) a
-  -> Evaluator term address Abstract effects a
-runWhile = interpret $ \case
-  Abstract.While cond body -> do
-    cond' <- runWhile (raiseEff cond)
-    ifthenelse cond' (runWhile (raiseEff body) *> empty) (pure unit)
+instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
+  ret = BooleanC . ret
+  eff = BooleanC . handleSum (eff . handleCoercible) (\case
+    Boolean _ k -> runBooleanC (k Abstract)
+    AsBool  _ k -> runBooleanC (k True) <|> runBooleanC (k False))
+
+
+instance ( Member (Abstract.Boolean Abstract) sig
+         , Carrier sig m
+         , Alternative m
+         , Monad m
+         )
+      => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
+  ret = WhileC . ret
+  eff = WhileC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.While cond body k) -> do
+      cond' <- runWhileC cond
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+
 
 instance Ord address => ValueRoots address Abstract where
   valueRoots = mempty
@@ -93,13 +84,14 @@ instance AbstractIntro Abstract where
   kvPair _ _ = Abstract
   null       = Abstract
 
-instance ( Member (Allocator address) effects
-         , Member (Deref Abstract) effects
-         , Member Fresh effects
-         , Member (State (Heap address Abstract)) effects
+instance ( Member (Allocator address) sig
+         , Member (Deref Abstract) sig
+         , Member Fresh sig
+         , Member (State (Heap address Abstract)) sig
          , Ord address
+         , Carrier sig m
          )
-      => AbstractValue term address Abstract effects where
+      => AbstractValue term address Abstract m where
   array _ = pure Abstract
 
   tuple _ = pure Abstract

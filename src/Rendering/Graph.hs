@@ -8,9 +8,9 @@ module Rendering.Graph
 
 import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
-import Control.Monad.Effect
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.Reader
+import Control.Effect
+import Control.Effect.Fresh
+import Control.Effect.Reader
 import Data.Diff
 import Data.Graph
 import Data.Graph.TermVertex
@@ -25,8 +25,11 @@ import Prologue
 renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -> Graph vertex
 renderTreeGraph = simplify . runGraph . cata toTreeGraph
 
-runGraph :: Eff '[Reader (Graph vertex), Fresh] (Graph vertex) -> Graph vertex
-runGraph = run . runFresh 0 . runReader mempty
+runGraph :: Eff (ReaderC (Graph vertex)
+           (Eff (FreshC
+           (Eff VoidC)))) (Graph vertex)
+         -> Graph vertex
+runGraph = run . runFresh . runReader mempty
 
 -- | GraphViz styling for terms
 termStyle :: (IsString string, Monoid string) => String -> Style TermVertex string
@@ -48,7 +51,7 @@ diffStyle name = (defaultStyle (fromString . show . diffVertexId))
         vertexAttributes (DiffVertex _ (Merged MergedTerm{..}))     = [ "label" := fromString mergedTermName ]
 
 class ToTreeGraph vertex t | t -> vertex where
-  toTreeGraph :: (Member Fresh effs, Member (Reader (Graph vertex)) effs) => t (Eff effs (Graph vertex)) -> Eff effs (Graph vertex)
+  toTreeGraph :: (Member Fresh sig, Member (Reader (Graph vertex)) sig, Carrier sig m, Monad m) => t (m (Graph vertex)) -> m (Graph vertex)
 
 instance (ConstructorName syntax, Foldable syntax) =>
   ToTreeGraph TermVertex (TermF syntax Location) where
@@ -56,11 +59,13 @@ instance (ConstructorName syntax, Foldable syntax) =>
     termAlgebra ::
       ( ConstructorName syntax
       , Foldable syntax
-      , Member Fresh effs
-      , Member (Reader (Graph TermVertex)) effs
+      , Member Fresh sig
+      , Member (Reader (Graph TermVertex)) sig
+      , Carrier sig m
+      , Monad m
       )
-      => TermF syntax Location (Eff effs (Graph TermVertex))
-      -> Eff effs (Graph TermVertex)
+      => TermF syntax Location (m (Graph TermVertex))
+      -> m (Graph TermVertex)
     termAlgebra (In ann syntax) = do
       i <- fresh
       parent <- ask
@@ -86,9 +91,11 @@ instance (ConstructorName syntax, Foldable syntax) =>
       ann a = TermAnnotation (locationByteRange a) (locationSpan a)
       diffAlgebra ::
         ( Foldable f
-        , Member Fresh effs
-        , Member (Reader (Graph DiffVertex)) effs
-        ) => f (Eff effs (Graph DiffVertex)) -> DiffVertexTerm -> Eff effs (Graph DiffVertex)
+        , Member Fresh sig
+        , Member (Reader (Graph DiffVertex)) sig
+        , Carrier sig m
+        , Monad m
+        ) => f (m (Graph DiffVertex)) -> DiffVertexTerm -> m (Graph DiffVertex)
       diffAlgebra syntax a = do
         i <- fresh
         parent <- ask

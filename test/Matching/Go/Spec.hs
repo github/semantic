@@ -2,7 +2,7 @@
 
 module Matching.Go.Spec (spec) where
 
-import           Control.Abstract.Matching
+import           Control.Matching
 import           Data.Abstract.Module
 import           Data.List
 import           Data.Sum

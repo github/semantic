@@ -67,14 +67,14 @@ import Prologue hiding (apply, try)
 
 import           Control.Arrow
 import           Control.Category
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Trace
+import           Control.Effect
+import           Control.Effect.Trace
 import           Data.Functor.Identity
 import           Data.Profunctor
 import qualified Data.Sum as Sum hiding (apply)
 import           Data.Text (pack)
 
-import Control.Abstract.Matching (Matcher, stepMatcher)
+import Control.Matching (Matcher, stepMatcher)
 import Data.History as History
 import Data.Term
 
@@ -242,7 +242,7 @@ apply rule x = pure x >>> rule
 -- @
 --  tracing "rule fired" >>> someRule >>> tracing "rule completed"
 -- @
-tracing :: Member Trace effs => String -> RewriteM env (Eff effs) item
+tracing :: (Member Trace sig, Carrier sig m, Functor m) => String -> RewriteM env m item
 tracing s = id >>= (\t -> promote (t <$ trace s))
 
 --

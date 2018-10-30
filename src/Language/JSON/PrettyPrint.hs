@@ -6,10 +6,10 @@ module Language.JSON.PrettyPrint
   , minimizingJSON
   ) where
 
-import Prologue hiding (throwError)
+import Prologue
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Exception (Exc, throwError)
+import Control.Effect
+import Control.Effect.Error
 import Control.Monad.Trans (lift)
 import Data.Machine
 
@@ -19,8 +19,8 @@ import Data.Reprinting.Token
 import Data.Reprinting.Scope
 
 -- | Default printing pipeline for JSON.
-defaultJSONPipeline :: (Member (Exc TranslationError) effs)
-  => ProcessT (Eff effs) Fragment Splice
+defaultJSONPipeline :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+  => ProcessT m Fragment Splice
 defaultJSONPipeline
   = printingJSON
   ~> beautifyingJSON defaultBeautyOpts
@@ -56,8 +56,8 @@ defaultBeautyOpts :: JSONBeautyOpts
 defaultBeautyOpts = JSONBeautyOpts 2 False
 
 -- | Produce JSON with configurable whitespace and layout.
-beautifyingJSON :: (Member (Exc TranslationError) effs)
-  => JSONBeautyOpts -> ProcessT (Eff effs) Fragment Splice
+beautifyingJSON :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+  => JSONBeautyOpts -> ProcessT m Fragment Splice
 beautifyingJSON _ = repeatedly (await >>= step) where
   step (Defer el cs)   = lift (throwError (NoTranslation el cs))
   step (Verbatim txt)  = emit txt
@@ -70,8 +70,8 @@ beautifyingJSON _ = repeatedly (await >>= step) where
     _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.
-minimizingJSON :: (Member (Exc TranslationError) effs)
-  => ProcessT (Eff effs) Fragment Splice
+minimizingJSON :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+  => ProcessT m Fragment Splice
 minimizingJSON = repeatedly (await >>= step) where
   step (Defer el cs)  = lift (throwError (NoTranslation el cs))
   step (Verbatim txt) = emit txt

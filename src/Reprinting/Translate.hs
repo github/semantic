@@ -6,10 +6,9 @@ module Reprinting.Translate
   ) where
 
 import           Control.Monad
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception (Exc)
-import qualified Control.Monad.Effect.Exception as Exc
-import           Control.Monad.Effect.State
+import           Control.Effect
+import           Control.Effect.Error
+import           Control.Effect.State
 import           Control.Monad.Trans
 import           Data.Machine
 
@@ -19,7 +18,10 @@ import           Data.Reprinting.Token
 import           Data.Reprinting.Scope
 import qualified Data.Source as Source
 
-type Translator = Eff '[State [Scope], Exc TranslationError]
+type Translator
+  = Eff (StateC [Scope]
+  ( Eff (ErrorC TranslationError
+  ( Eff VoidC))))
 
 contextualizing :: ProcessT Translator Token Fragment
 contextualizing = repeatedly $ await >>= \case
@@ -34,8 +36,8 @@ contextualizing = repeatedly $ await >>= \case
 
 enterScope, exitScope :: Scope -> PlanT k Fragment Translator ()
 
-enterScope c = lift (modify' (c :))
+enterScope c = lift (modify (c :))
 
 exitScope c = lift get >>= \case
-  (x:xs) -> when (x == c) (lift (modify' (const xs)))
-  cs     -> lift (Exc.throwError (UnbalancedPair c cs))
+  (x:xs) -> when (x == c) (lift (modify (const xs)))
+  cs     -> lift (throwError (UnbalancedPair c cs))

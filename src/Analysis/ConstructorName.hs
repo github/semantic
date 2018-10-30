@@ -4,6 +4,7 @@ module Analysis.ConstructorName
 ) where
 
 import Data.Sum
+import GHC.Generics
 import Prologue
 
 -- | A typeclass to retrieve the name of the data constructor for a value.
