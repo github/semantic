@@ -54,13 +54,14 @@ data Options
   , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
   , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
+  , optionsSHA              :: Maybe String
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) Nothing False False
+defaultOptions = Options (Just Warning) Nothing False False Nothing
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) Nothing False False
+debugOptions = Options (Just Debug) Nothing False False Nothing
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
