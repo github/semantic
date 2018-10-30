@@ -6,6 +6,8 @@ module Semantic.Diff
 
 import Analysis.ConstructorName (ConstructorName)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
+import Control.Effect
+import Control.Monad.IO.Class
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields
@@ -14,7 +16,7 @@ import Data.Term
 import Data.Graph.DiffVertex
 import Diffing.Algorithm (Diffable)
 import Parsing.Parser
-import Prologue hiding (MonadError(..))
+import Prologue
 import Rendering.Graph
 import Rendering.Renderer
 import Semantic.Telemetry as Stat
@@ -24,7 +26,7 @@ import Rendering.JSON (SomeJSON (..))
 import qualified Rendering.JSON as JSON
 
 -- | Using the specified renderer, diff a list of 'BlobPair's to produce a 'Builder' output.
-runDiff :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => DiffRenderer output -> [BlobPair] -> Eff effs Builder
+runDiff :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Member Telemetry sig, MonadIO m, Carrier sig m) => DiffRenderer output -> [BlobPair] -> m Builder
 runDiff ToCDiffRenderer         = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderToCDiff) >=> serialize JSON
 runDiff JSONDiffRenderer        = withParsedBlobPairs (const pure) (render . renderJSONDiff) >=> serialize JSON
 runDiff JSONGraphDiffRenderer   = withParsedBlobPairs (const pure) (render . renderAdjGraph) >=> serialize JSON
@@ -40,28 +42,28 @@ data SomeTermPair typeclasses ann where
 withSomeTermPair :: (forall syntax . ApplyAll typeclasses syntax => Join These (Term syntax ann) -> a) -> SomeTermPair typeclasses ann -> a
 withSomeTermPair with (SomeTermPair terms) = with terms
 
-diffBlobTOCPairs :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => [BlobPair] -> Eff effs ([TOCSummary], [TOCSummary])
+diffBlobTOCPairs :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Member Telemetry sig, MonadIO m, Carrier sig m) => [BlobPair] -> m ([TOCSummary], [TOCSummary])
 diffBlobTOCPairs = withParsedBlobPairs (decorate . declarationAlgebra) (render . renderRPCToCDiff)
 
 type CanDiff syntax = (ConstructorName syntax, Diffable syntax, Eq1 syntax, HasDeclaration syntax, Hashable1 syntax, Show1 syntax, ToJSONFields1 syntax, Traversable syntax)
-type Decorate effs a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> Eff effs (Term syntax b)
+type Decorate m a b = forall syntax . CanDiff syntax => Blob -> Term syntax a -> m (Term syntax b)
 
-withParsedBlobPairs :: (Member Distribute effs, Member (Exc SomeException) effs, Member (Lift IO) effs, Member Task effs, Member Telemetry effs, Monoid output)
-                    => Decorate effs Location ann
-                    -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> Eff effs output)
+withParsedBlobPairs :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Member Telemetry sig, MonadIO m, Monoid output, Carrier sig m)
+                    => Decorate m Location ann
+                    -> (forall syntax . CanDiff syntax => BlobPair -> Diff syntax ann ann -> m output)
                     -> [BlobPair]
-                    -> Eff effs output
+                    -> m output
 withParsedBlobPairs decorate render = distributeFoldMap (\ blobs -> withParsedBlobPair decorate blobs >>= withSomeTermPair (diffTerms blobs >=> render blobs))
-  where diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member (Lift IO) effs, Member Task effs, Member Telemetry effs) => BlobPair -> Join These (Term syntax ann) -> Eff effs (Diff syntax ann ann)
+  where diffTerms :: (Diffable syntax, Eq1 syntax, Hashable1 syntax, Traversable syntax, Member Task sig, Member Telemetry sig, Carrier sig m, MonadIO m) => BlobPair -> Join These (Term syntax ann) -> m (Diff syntax ann ann)
         diffTerms blobs terms = time "diff" languageTag $ do
           diff <- diff (runJoin terms)
           diff <$ writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
           where languageTag = languageTagForBlobPair blobs
 
-withParsedBlobPair :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs)
-                   => Decorate effs Location ann
+withParsedBlobPair :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m)
+                   => Decorate m Location ann
                    -> BlobPair
-                   -> Eff effs (SomeTermPair '[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] ann)
+                   -> m (SomeTermPair '[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] ann)
 withParsedBlobPair decorate blobs
   | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, HasDeclaration, Hashable1, Show1, ToJSONFields1, Traversable] (languageForBlobPair blobs)
     = SomeTermPair <$> distributeFor blobs (\ blob -> parse parser blob >>= decorate blob)

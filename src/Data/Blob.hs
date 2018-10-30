@@ -18,10 +18,10 @@ module Data.Blob
 , pathKeyForBlobPair
 ) where
 
-import Prologue hiding (throwError)
+import Prologue
 
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception
+import           Control.Effect
+import           Control.Effect.Error
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
 import           Proto3.Suite
@@ -67,7 +67,7 @@ decodeBlobs = fmap blobs <$> eitherDecode
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
   deriving (Eq, Exception, Ord, Show, Typeable)
 
-noLanguageForBlob :: Member (Exc SomeException) effs => FilePath -> Eff effs a
+noLanguageForBlob :: (Member (Error SomeException) sig, Carrier sig m) => FilePath -> m a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
 -- | Represents a blobs suitable for diffing which can be either a blob to

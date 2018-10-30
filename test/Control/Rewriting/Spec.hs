@@ -8,7 +8,7 @@ import qualified Data.ByteString as B
 import           Data.Either
 import           Data.Text (Text)
 
-import           Control.Abstract.Matching as Matching
+import           Control.Matching as Matching
 import           Control.Rewriting as Rewriting
 import           Data.History as History
 import qualified Data.Source as Source
@@ -21,7 +21,7 @@ import           Reprinting.Pipeline
 onTrees :: ( Literal.TextElement :< syn
            , Literal.KeyValue :< syn
            , Apply Functor syn
-           , term ~ Term (Sum syn) History 
+           , term ~ Term (Sum syn) History
            ) => Rewrite (env, term) (Literal.Hash term)
 onTrees = do
   Literal.Hash els <- Rewriting.target

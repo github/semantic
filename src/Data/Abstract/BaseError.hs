@@ -35,12 +35,14 @@ instance (NFData1 exc, NFData resume) => NFData (BaseError exc resume) where
 instance (NFData1 exc) => NFData1 (BaseError exc) where
   liftRnf rnf' (BaseError i s e) = rnf i `seq` rnf s `seq` liftRnf rnf' e
 
-throwBaseError :: ( Member (Resumable (BaseError exc)) effects
-                  , Member (Reader M.ModuleInfo) effects
-                  , Member (Reader S.Span) effects
+throwBaseError :: ( Member (Resumable (BaseError exc)) sig
+                  , Member (Reader M.ModuleInfo) sig
+                  , Member (Reader S.Span) sig
+                  , Carrier sig m
+                  , Monad m
                   )
                 => exc resume
-                -> Evaluator term address value effects resume
+                -> m resume
 throwBaseError err = do
   moduleInfo <- currentModule
   span <- currentSpan

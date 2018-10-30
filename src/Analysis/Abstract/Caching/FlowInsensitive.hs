@@ -14,58 +14,59 @@ import Data.Map.Monoidal as Monoidal
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
-consultOracle :: (Member (Reader (Cache term address)) effects, Ord address, Ord term)
+consultOracle :: (Member (Reader (Cache term address)) sig, Carrier sig m, Ord address, Ord term)
               => Configuration term address
-              -> Evaluator term address value effects (Set (ValueRef address))
-consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
+              -> Evaluator term address value m (Set (ValueRef address))
+consultOracle configuration = asks (fromMaybe mempty . cacheLookup configuration)
 
 -- | Run an action with the given in-cache.
-withOracle :: Member (Reader (Cache term address)) effects
+withOracle :: (Member (Reader (Cache term address)) sig, Carrier sig m)
            => Cache term address
-           -> Evaluator term address value effects a
-           -> Evaluator term address value effects a
+           -> Evaluator term address value m a
+           -> Evaluator term address value m a
 withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Member (State (Cache term address)) effects, Ord address, Ord term)
+lookupCache :: (Member (State (Cache term address)) sig, Carrier sig m, Ord address, Ord term)
             => Configuration term address
-            -> Evaluator term address value effects (Maybe (Set (ValueRef address)))
+            -> Evaluator term address value m (Maybe (Set (ValueRef address)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Member (State (Cache term address)) effects, Ord address, Ord term)
+cachingConfiguration :: (Member (State (Cache term address)) sig, Carrier sig m, Ord address, Ord term)
                      => Configuration term address
                      -> Set (ValueRef address)
-                     -> Evaluator term address value effects (ValueRef address)
-                     -> Evaluator term address value effects (ValueRef address)
+                     -> Evaluator term address value m (ValueRef address)
+                     -> Evaluator term address value m (ValueRef address)
 cachingConfiguration configuration values action = do
-  modify' (cacheSet configuration values)
+  modify (cacheSet configuration values)
   result <- action
-  result <$ modify' (cacheInsert configuration result)
+  result <$ modify (cacheInsert configuration result)
 
-putCache :: Member (State (Cache term address)) effects
+putCache :: (Member (State (Cache term address)) sig, Carrier sig m)
          => Cache term address
-         -> Evaluator term address value effects ()
+         -> Evaluator term address value m ()
 putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-isolateCache :: (Member (State (Cache term address)) effects, Member (State (Heap address value)) effects)
-             => Evaluator term address value effects a
-             -> Evaluator term address value effects (Cache term address, Heap address value)
+isolateCache :: (Member (State (Cache term address)) sig, Member (State (Heap address value)) sig, Carrier sig m)
+             => Evaluator term address value m a
+             -> Evaluator term address value m (Cache term address, Heap address value)
 isolateCache action = putCache lowerBound *> action *> ((,) <$> get <*> get)
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
-cachingTerms :: ( Member (Env address) effects
-                , Member NonDet effects
-                , Member (Reader (Cache term address)) effects
-                , Member (Reader (Live address)) effects
-                , Member (State (Cache term address)) effects
+cachingTerms :: ( Member (Env address) sig
+                , Member NonDet sig
+                , Member (Reader (Cache term address)) sig
+                , Member (Reader (Live address)) sig
+                , Member (State (Cache term address)) sig
+                , Carrier sig m
                 , Ord address
                 , Ord term
                 )
-             => Open (Open (term -> Evaluator term address value effects (ValueRef address)))
+             => Open (Open (term -> Evaluator term address value m (ValueRef address)))
 cachingTerms recur0 recur term = do
   c <- getConfiguration term
   cached <- lookupCache c
@@ -75,37 +76,40 @@ cachingTerms recur0 recur term = do
       values <- consultOracle c
       cachingConfiguration c values (recur0 recur term)
 
-convergingModules :: ( AbstractValue term address value effects
-                     , Effects effects
+convergingModules :: ( AbstractValue term address value m
                      , Eq value
-                     , Member (Env address) effects
-                     , Member Fresh effects
-                     , Member NonDet effects
-                     , Member (Reader (Cache term address)) effects
-                     , Member (Reader (Live address)) effects
-                     , Member (Reader ModuleInfo) effects
-                     , Member (Reader Span) effects
-                     , Member (Resumable (BaseError (EnvironmentError address))) effects
-                     , Member (State (Cache term address)) effects
-                     , Member (State (Heap address value)) effects
+                     , Member (Env address) sig
+                     , Member Fresh sig
+                     , Member NonDet sig
+                     , Member (Reader (Cache term address)) sig
+                     , Member (Reader (Live address)) sig
+                     , Member (Reader ModuleInfo) sig
+                     , Member (Reader Span) sig
+                     , Member (Resumable (BaseError (EnvironmentError address))) sig
+                     , Member (State (Cache term address)) sig
+                     , Member (State (Heap address value)) sig
                      , Ord address
                      , Ord term
+                     , Carrier sig m
+                     , Effect sig
                      )
-                  => Open (Module term -> Evaluator term address value effects address)
-convergingModules recur m = do
-  c <- getConfiguration (moduleBody m)
+                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) address)
+                  -> (Module (Either prelude term) -> Evaluator term address value m address)
+convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
+convergingModules recur m@(Module _ (Right term)) = do
+  c <- getConfiguration term
   heap <- getHeap
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   (cache, _) <- converge (lowerBound, heap) (\ (prevCache, _) -> isolateCache $ do
     putEvalContext (configurationContext c)
     -- We need to reset fresh generation so that this invocation converges.
-    resetFresh 0 $
+    resetFresh $
     -- This is subtle: though the calling context supports nondeterminism, we want
     -- to corral all the nondeterminism that happens in this @eval@ invocation, so
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
-      withOracle prevCache (gatherM (const ()) (recur m)))
+      withOracle prevCache (raiseHandler runNonDet (recur m)))
   address =<< maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
@@ -124,21 +128,68 @@ converge seed f = loop seed
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Member NonDet effects) => t (ValueRef address) -> Evaluator term address value effects (ValueRef address)
+scatter :: (Foldable t, Member NonDet sig, Carrier sig m) => t (ValueRef address) -> Evaluator term address value m (ValueRef address)
 scatter = foldMapA pure
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) effects, Member (Env address) effects)
+getConfiguration :: (Member (Reader (Live address)) sig, Member (Env address) sig, Carrier sig m)
                  => term
-                 -> Evaluator term address value effects (Configuration term address)
+                 -> Evaluator term address value m (Configuration term address)
 getConfiguration term = Configuration term <$> askRoots <*> getEvalContext
 
 
-caching :: Effects effects => Evaluator term address value (NonDet ': Reader (Cache term address) ': State (Cache term address) ': effects) a -> Evaluator term address value effects (Cache term address, [a])
+caching :: (Carrier sig m, Effect sig)
+        => Evaluator term address value (AltC B (Eff
+                                        (ReaderC (Cache term address) (Eff
+                                        (StateC (Cache term address) (Eff
+                                        m)))))) a
+        -> Evaluator term address value m (Cache term address, [a])
 caching
-  = runState lowerBound
-  . runReader lowerBound
-  . runNonDet
+  = raiseHandler (runState  lowerBound)
+  . raiseHandler (runReader lowerBound)
+  . fmap toList
+  . raiseHandler runNonDet
+
+data B a = E | L a | B (B a) (B a)
+  deriving (Functor)
+
+instance Foldable B where
+  toList = flip go []
+    where go E       rest = rest
+          go (L a)   rest = a : rest
+          go (B a b) rest = go a (go b rest)
+
+  foldMap f = go
+    where go E       = mempty
+          go (L a)   = f a
+          go (B a b) = go a <> go b
+
+  null E = True
+  null _ = False
+
+instance Traversable B where
+  traverse f = go
+    where go E       = pure E
+          go (L a)   = L <$> f a
+          go (B a b) = B <$> go a <*> go b
+
+instance Applicative B where
+  pure = L
+  E     <*> _ = E
+  L f   <*> a = fmap f a
+  B l r <*> a = B (l <*> a) (r <*> a)
+
+instance Alternative B where
+  empty = E
+  E <|> b = b
+  a <|> E = a
+  a <|> b = B a b
+
+instance Monad B where
+  return = pure
+  E     >>= _ = E
+  L a   >>= f = f a
+  B l r >>= f = B (l >>= f) (r >>= f)
 
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.

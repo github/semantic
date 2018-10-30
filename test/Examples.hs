@@ -2,8 +2,7 @@ module Main (main) where
 
 import           Control.Exception (displayException)
 import           Control.Monad
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception
+import           Control.Effect
 import qualified Data.ByteString as B
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
@@ -100,7 +99,7 @@ languages =
   -- , ("php", ".php") -- TODO: No parse-examples in tree-sitter yet
   ]
 
-parseFilePath :: (Member (Exc SomeException) effs, Member Task effs, Member Files effs) => FilePath -> Eff effs Bool
+parseFilePath :: (Member (Error SomeException) sig, Member Task sig, Member Files sig, Carrier sig m, Monad m) => FilePath -> m Bool
 parseFilePath path = readBlob (file path) >>= runParse' >>= const (pure True)
 
 languagesDir :: FilePath

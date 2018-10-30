@@ -15,10 +15,10 @@ module Data.Project (
   ) where
 
 import Prelude hiding (readFile)
-import Prologue hiding (throwError)
+import Prologue
 
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception
+import           Control.Effect
+import           Control.Effect.Error
 import           Data.Blob
 import           Data.File
 import           Data.Language
@@ -77,10 +77,10 @@ newtype ProjectException
   = FileNotFound FilePath
     deriving (Show, Eq, Typeable, Exception)
 
-readFile :: Member (Exc SomeException) effs
+readFile :: (Member (Error SomeException) sig, Applicative m, Carrier sig m)
          => Project
          -> File
-         -> Eff effs (Maybe Blob)
+         -> m (Maybe Blob)
 readFile Project{..} f =
   let p         = filePath f
       candidate = find (\b -> blobPath b == p) projectBlobs

@@ -41,14 +41,16 @@ library
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Heap
                      , Control.Abstract.Hole
-                     , Control.Abstract.Matching
                      , Control.Abstract.Modules
                      , Control.Abstract.Primitive
                      , Control.Abstract.PythonPackage
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
-                     -- Rewriting
+                     -- Effects
+                     , Control.Effect.Interpose
+                     -- Matching and rewriting DSLs
+                     , Control.Matching
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
@@ -186,6 +188,7 @@ library
                      , Reprinting.Typeset
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.Analysis
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
@@ -230,11 +233,11 @@ library
                      , deepseq
                      , directory
                      , directory-tree
-                     , effects
                      , fastsum
                      , filepath
                      , free
                      , freer-cofreer
+                     , fused-effects
                      , ghc-prim
                      , gitrev
                      , Glob
@@ -359,10 +362,10 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , containers
-                     , effects
                      , fastsum
                      , filepath
                      , free
+                     , fused-effects
                      , Glob
                      , hashable
                      , haskell-tree-sitter
@@ -413,9 +416,9 @@ test-suite parse-examples
   build-depends:       base
                      , bytestring
                      , directory
-                     , effects
                      , fastsum
                      , filepath
+                     , fused-effects
                      , Glob
                      , hspec >= 2.4.1
                      , hspec-core

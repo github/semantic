@@ -8,7 +8,7 @@ import           Analysis.Abstract.Caching.FlowSensitive
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
 import           Control.Exception (displayException)
-import           Control.Monad.Effect.Trace (runPrintingTrace)
+import           Control.Effect.Trace (runTraceByPrinting)
 import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.Evaluatable
@@ -26,7 +26,8 @@ import           Data.Project hiding (readFile)
 import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
 import           Parsing.Parser
-import           Prologue hiding (weaken)
+import           Prologue
+import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
@@ -36,9 +37,10 @@ import           System.FilePath.Posix (takeDirectory)
 
 justEvaluating
   = runM
-  . runPrintingTrace
+  . runEvaluator
+  . raiseHandler runTraceByPrinting
   . runHeap
-  . runFresh 0
+  . raiseHandler runFresh
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -49,10 +51,11 @@ justEvaluating
   . runValueError
 
 checking
-  = runM @_ @IO
-  . runPrintingTrace
-  . runState (lowerBound @(Heap Monovariant Type))
-  . runFresh 0
+  = runM
+  . runEvaluator
+  . raiseHandler runTraceByPrinting
+  . runHeap
+  . raiseHandler runFresh
   . caching
   . providingLiveSet
   . fmap reassociate
@@ -97,12 +100,12 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+       (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
-       (runReader (packageInfo package)
-       (runState (lowerBound @Span)
-       (runReader (lowerBound @Span)
-       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (fmap (Concrete.runBoolean . Concrete.runWhile) . Concrete.runFunction) modules)))))))
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
@@ -110,24 +113,25 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (id @(Evaluator _ Precise (Value _ Precise) _ _)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+       (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
-       (runReader (packageInfo package)
-       (runState (lowerBound @Span)
-       (runReader (lowerBound @Span)
-       (evaluate proxy id withTermSpans (Precise.runAllocator . Precise.runDeref) (fmap (Concrete.runBoolean . Concrete.runWhile) . Concrete.runFunction) modules)))))))
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path (Language.reflect proxy) []
   package <- fmap (quieterm . snd) <$> parsePackage parser project
   modules <- topologicalSort <$> runImportGraphToModules proxy package
-  pure (runReader (packageInfo package)
-       (runState (lowerBound @Span)
-       (runReader (lowerBound @Span)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
+  pure (id @(Evaluator _ Monovariant _ _ _)
+       (raiseHandler (runReader (packageInfo package))
+       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (runReader (lowerBound @Span))
+       (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
-       (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (fmap (Type.runBoolean . Type.runWhile) . Type.runFunction) modules))))))
+       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
 
 parseFile :: Parser term -> FilePath -> IO term
@@ -136,10 +140,10 @@ parseFile parser = runTask . (parse parser <=< readBlob . file)
 blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
 
-mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
-mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weaken sum))) (either (\ (SomeExc exc) -> Left (SomeExc (inject exc))) Right)
+mergeErrors :: Either (SomeError (Sum errs)) (Either (SomeError err) result) -> Either (SomeError (Sum (err ': errs))) result
+mergeErrors = either (\ (SomeError sum) -> Left (SomeError (weaken sum))) (either (\ (SomeError err) -> Left (SomeError (inject err))) Right)
 
-reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) (Either (SomeExc exc4) (Either (SomeExc exc5) (Either (SomeExc exc6) (Either (SomeExc exc7) result)))))) -> Either (SomeExc (Sum '[exc7, exc6, exc5, exc4, exc3, exc2, exc1])) result
-reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . Right
+reassociate :: Either (SomeError err1) (Either (SomeError err2) (Either (SomeError err3) (Either (SomeError err4) (Either (SomeError err5) (Either (SomeError err6) (Either (SomeError err7) result)))))) -> Either (SomeError (Sum '[err7, err6, err5, err4, err3, err2, err1])) result
+reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . Right
 
 {-# ANN module ("HLint: ignore Reduce duplication" :: String) #-}
