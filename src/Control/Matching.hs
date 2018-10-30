@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 
-module Control.Abstract.Matching
+module Control.Matching
   ( Matcher
   , TermMatcher
   , target
@@ -9,6 +9,7 @@ module Control.Abstract.Matching
   , matchM
   , narrow
   , narrow'
+  , purely
   , succeeds
   , fails
   , runMatcher
@@ -70,6 +71,10 @@ target = Target
 -- | 'ensure' succeeds iff the provided predicate function returns true when applied to the matcher's 'target'.
 ensure :: (t -> Bool) -> Matcher t ()
 ensure f = target >>= \c -> guard (f c)
+
+-- | Promote a pure function to a 'Matcher'.
+purely :: (a -> b) -> Matcher a b
+purely f = fmap f target
 
 -- | 'matchm' takes a modification function and a new matcher action the target parameter of which
 --   is the result of the modification function. If the modification function returns 'Just' when
