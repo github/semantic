@@ -41,7 +41,6 @@ library
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Heap
                      , Control.Abstract.Hole
-                     , Control.Abstract.Matching
                      , Control.Abstract.Modules
                      , Control.Abstract.Primitive
                      , Control.Abstract.PythonPackage
@@ -51,7 +50,8 @@ library
                      -- Effects
                      , Control.Effect.Interpose
                      , Control.Effect.REPL
-                     -- Rewriting
+                     -- Matching and rewriting DSLs
+                     , Control.Matching
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
