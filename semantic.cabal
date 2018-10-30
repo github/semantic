@@ -49,6 +49,7 @@ library
                      , Control.Abstract.Value
                      -- Effects
                      , Control.Effect.Interpose
+                     , Control.Effect.REPL
                      -- Matching and rewriting DSLs
                      , Control.Matching
                      , Control.Rewriting
