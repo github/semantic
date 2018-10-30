@@ -12,7 +12,9 @@ module Control.Abstract.ScopeGraph
   , Reference(..)
   , EdgeLabel(..)
   , currentScope
-  , insertEdge
+  , insertExportEdge
+  , insertImportEdge
+  , insertLexicalEdge
   , withScope
   , associatedScope
   , putDeclarationScope
@@ -64,7 +66,24 @@ putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
 reference :: forall address effects value. (Ord address, Member (State (ScopeGraph address)) effects) => Reference -> Declaration -> Evaluator address value effects ()
 reference ref = modify @(ScopeGraph address) . (ScopeGraph.reference ref)
 
--- |
+-- | Combinator to insert an export edge from the current scope to the provided scope address.
+insertExportEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+                 => scopeAddress
+                 -> Evaluator scopeAddress value effects ()
+insertExportEdge = insertEdge ScopeGraph.Export
+
+-- | Combinator to insert an import edge from the current scope to the provided scope address.
+insertImportEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+                 => scopeAddress
+                 -> Evaluator scopeAddress value effects ()
+insertImportEdge = insertEdge ScopeGraph.Import
+
+-- | Combinator to insert a lexical edge from the current scope to the provided scope address.
+insertLexicalEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+                  => scopeAddress
+                  -> Evaluator scopeAddress value effects ()
+insertLexicalEdge = insertEdge ScopeGraph.Lexical
+
 insertEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
            => EdgeLabel
            -> scopeAddress
