@@ -47,7 +47,6 @@ justEvaluating
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runEnvironmentError
   . runEvalError
   . runResolutionError
   . runAddressError
@@ -56,7 +55,7 @@ justEvaluating
 checking
   = runM @_ @IO
   . runPrintingTrace
-  . runState (lowerBound @(Heap Monovariant Type))
+  . runState (lowerBound @(Heap Monovariant Monovariant Type))
   . runFresh 0
   . runTermEvaluator @_ @Monovariant @Type
   . caching
@@ -65,7 +64,6 @@ checking
   . runLoadError
   . runUnspecialized
   . runResolutionError
-  . runEnvironmentError
   . runEvalError
   . runAddressError
   . runTypes
@@ -103,7 +101,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise _))
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise (Value Precise (ConcreteEff Precise _)))))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (runReader (packageInfo package)
        (runState (lowerBound @Span)
@@ -116,7 +114,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   trace $ "evaluating with load order: " <> show (map (modulePath . moduleInfo) modules)
   pure (runTermEvaluator @_ @_ @(Value Precise (ConcreteEff Precise '[Trace]))
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise (Value Precise (ConcreteEff Precise '[Trace])))))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (runReader (packageInfo package)
        (runState (lowerBound @Span)

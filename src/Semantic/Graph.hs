@@ -67,7 +67,20 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
 
-runGraph :: forall effs. (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs, Effects effs)
+runGraph :: forall effs. ( Member Distribute effs
+                         , Member (Exc SomeException) effs
+                         , Member Resolution effs
+                         , Member Task effs
+                         , Member Trace effs
+                         , Member (State Span) effs
+                         , Member (Allocator (Address (Hole (Maybe Name) (Located Monovariant)))) effs
+                         , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) (Located Monovariant))))) effs
+                         , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) (Located Monovariant))))) effs
+                         , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
+                         , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
+                         , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
+                         , Effects effs
+                         )
          => GraphType
          -> Bool
          -> Project
@@ -84,7 +97,7 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: ( HasField fields Span
+runCallGraph :: forall fields syntax term lang effs. ( HasField fields Span
                 , Show (Record fields)
                 , Ord (Record fields)
                 , (VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax)
@@ -98,6 +111,10 @@ runCallGraph :: ( HasField fields Span
                 , HasPrelude lang
                 , HasPostlude lang
                 , Member Trace effs
+                , Member (State Span) effs
+                , Member (Allocator (Address (Hole (Maybe Name) (Located Monovariant)))) effs
+                , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) (Located Monovariant))))) effs
+                , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) (Located Monovariant))))) effs
                 , Effects effs
                 )
              => Proxy lang
@@ -113,7 +130,7 @@ runCallGraph lang includePackages modules package = do
         = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
         . graphing @_ @_ @(Maybe Name) @Monovariant
         . caching
-        . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) Abstract))
+        . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) (Hole (Maybe Name) (Located Monovariant)) Abstract))
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
@@ -126,7 +143,7 @@ runCallGraph lang includePackages modules package = do
         . runState (lowerBound @Span)
         . runReader (lowerBound @ControlFlowVertex)
         . providingLiveSet
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)))))))
+        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)) Abstract)))))
         . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
       runAddressEffects
         = Hole.runAllocator (Located.handleAllocator Monovariant.handleAllocator)
@@ -139,6 +156,9 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , HasPrelude lang
                                , HasPostlude lang
                                , Member Trace effs
+                               , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
+                               , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
+                               , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                                , Recursive term
                                , Effects effs
                                )
@@ -154,6 +174,9 @@ runImportGraphToModules :: ( Declarations term
                            , HasPrelude lang
                            , HasPostlude lang
                            , Member Trace effs
+                           , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
+                           , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
+                           , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                            , Recursive term
                            , Effects effs
                            )
@@ -169,6 +192,9 @@ runImportGraph :: ( Declarations term
                   , HasPrelude lang
                   , HasPostlude lang
                   , Member Trace effs
+                  , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
+                  , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
+                  , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                   , Recursive term
                   , Effects effs
                   )
@@ -205,16 +231,16 @@ type ConcreteEffects address rest
   =  Reader Span
   ': State Span
   ': Reader PackageInfo
-  ': Modules address
-  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))
+  ': Modules address (Value address (ConcreteEff address rest))
+  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address (Value address (ConcreteEff address rest))))))
   ': Resumable (BaseError (ValueError address (ConcreteEff address rest)))
   ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
   ': Resumable (BaseError ResolutionError)
   ': Resumable (BaseError EvalError)
   ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address rest))))
-  ': Resumable (BaseError (LoadError address))
+  ': Resumable (BaseError (LoadError address (Value address (ConcreteEff address rest))))
   ': Fresh
-  ': State (Heap address (Value address (ConcreteEff address rest)))
+  ': State (Heap address address (Value address (ConcreteEff address rest)))
   ': rest
 
 newtype ConcreteEff address outerEffects a = ConcreteEff
@@ -255,6 +281,9 @@ parsePythonPackage :: forall syntax fields effs term.
                    , Member Resolution effs
                    , Member Trace effs
                    , Member Task effs
+                   , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
+                   , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
+                   , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                    , (Show (Record fields))
                    , Effects effs)
                    => Parser term       -- ^ A parser.
@@ -345,17 +374,17 @@ resumingResolutionError = runResolutionErrorWith (\ baseError -> traceError "Res
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: ( Applicative (m address value effects)
-                     , AbstractHole address
+resumingLoadError :: forall m address value effects a. ( Applicative (m address value effects)
+                     , AbstractHole value
                      , Effectful (m address value)
                      , Effects effects
                      , Member Trace effects
                      , Ord address
                      )
-                  => m address value (Resumable (BaseError (LoadError address)) ': effects) a
+                  => m address value (Resumable (BaseError (LoadError address value)) ': effects) a
                   -> m address value effects a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
-  ModuleNotFoundError _ -> pure (lowerBound @ScopeGraph.ScopeGraph, (lowerBound, hole))) -- TODO: Confirm `lowerBound @ScopeGraph.ScopeGraph` is what we want.
+  ModuleNotFoundError _ -> pure (lowerBound @(ScopeGraph.ScopeGraph address), hole :: value)) -- TODO: Confirm `lowerBound @ScopeGraph.ScopeGraph` is what we want.
 
 resumingEvalError :: ( Applicative (m effects)
                      , Effectful m

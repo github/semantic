@@ -36,6 +36,10 @@ data Frame scopeAddress frameAddress value = Frame {
 data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
     deriving (Eq, Ord, Show)
 
+instance Lower (Heap scopeAddress frameAddress value) where
+  lowerBound = Heap lowerBound lowerBound
+
+
 -- | Look up the frame for an 'address' in a 'Heap', if any.
 frameLookup :: Ord address => address -> Heap scope address value -> Maybe (Frame scope address value)
 frameLookup address = Map.lookup address . heap
