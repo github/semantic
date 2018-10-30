@@ -6,6 +6,7 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
+import           Control.Exception as Exc (displayException)
 import           Data.File
 import           Data.Language (ensureLanguage, languageForFilePath)
 import           Data.List (intercalate, uncons)
@@ -24,12 +25,17 @@ import qualified Semantic.Task as Task
 import           Semantic.Task.Files
 import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
+import           System.Exit (die)
 import           System.FilePath
 import           Serializing.Format hiding (Options)
 import           Text.Read
 
 main :: IO ()
-main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
+main = do
+  (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
+  res <- Task.withOptions options $ \ config logger statter ->
+    Task.runTaskWithConfig config { configSHA = Just buildSHA } logger statter task
+  either (die . displayException) pure res
 
 -- | A parser for the application's command-line arguments.
 --
@@ -48,7 +54,7 @@ optionsParser = do
   requestId <- optional (strOption $ long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
   failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
-  pure $ Options logLevel requestId failOnWarning failOnParseError (Just buildSHA)
+  pure $ Options logLevel requestId failOnWarning failOnParseError
 
 argumentsParser :: Parser (Task.TaskEff ())
 argumentsParser = do

@@ -42,6 +42,7 @@ data Config
   , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
+  , configSHA                    :: Maybe String -- ^ Optional SHA to include in log messages.
 
   , configOptions                :: Options      -- ^ Options configurable via command line arguments.
   }
@@ -53,14 +54,13 @@ data Options
   , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
   , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
-  , optionsSHA              :: Maybe String  -- ^ Optional SHA to include in log messages.
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) Nothing False False Nothing
+defaultOptions = Options (Just Warning) Nothing False False
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) Nothing False False Nothing
+debugOptions = Options (Just Debug) Nothing False False
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
@@ -84,6 +84,7 @@ defaultConfig options@Options{..} = do
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
+    , configSHA = Nothing
 
     , configOptions = options
     }
@@ -106,7 +107,7 @@ logOptionsFromConfig Config{..} = LogOptions
                    , ("pid", show configProcessID)
                    , ("hostname", configHostName)
                    ]
-                   <> [("sha", x) | x <- toList (optionsSHA configOptions) ]
+                   <> [("sha", x) | x <- toList configSHA ]
                    <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
           _ -> []
 
