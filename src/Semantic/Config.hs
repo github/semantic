@@ -106,8 +106,8 @@ logOptionsFromConfig Config{..} = LogOptions
           False -> [ ("app", configAppName)
                    , ("pid", show configProcessID)
                    , ("hostname", configHostName)
+                   , ("sha", fromMaybe "development" configSHA)
                    ]
-                   <> [("sha", x) | x <- toList configSHA ]
                    <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
           _ -> []
 
