@@ -66,16 +66,15 @@ newtype FilesC m a = FilesC { runFilesC :: m a }
 
 instance (Member (Error SomeException) sig, MonadIO m, Carrier sig m) => Carrier (Files :+: sig) (FilesC m) where
   ret = FilesC . ret
-  eff = FilesC . (alg \/ eff . handleCoercible)
-    where alg = \case
-            Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-            Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-            Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-            Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-            ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-            FindFiles dir exts excludeDirs k -> (findFilesInDir dir exts excludeDirs `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
-            Write (ToPath path) builder k -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> runFilesC k
-            Write (ToHandle (WriteHandle handle)) builder k -> liftIO (B.hPutBuilder handle builder) >> runFilesC k
+  eff = FilesC . handleSum (eff . handleCoercible) (\case
+    Read (FromPath path) k -> (readBlobFromFile' path `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
+    Read (FromHandle handle) k -> (readBlobsFromHandle handle  `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
+    Read (FromPathPair paths) k -> (runBothWith readFilePair paths `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
+    Read (FromPairHandle handle) k -> (readBlobPairsFromHandle handle `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
+    ReadProject rootDir dir language excludeDirs k -> (readProjectFromPaths rootDir dir language excludeDirs `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
+    FindFiles dir exts excludeDirs k -> (findFilesInDir dir exts excludeDirs `catchIO` (throwError . toException @SomeException)) >>= runFilesC . k
+    Write (ToPath path) builder k -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder)) >> runFilesC k
+    Write (ToHandle (WriteHandle handle)) builder k -> liftIO (B.hPutBuilder handle builder) >> runFilesC k)
 
 
 readBlob :: (Member Files sig, Carrier sig m) => File -> m Blob

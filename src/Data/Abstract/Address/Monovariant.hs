@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Monovariant
 ( Monovariant(..)
 ) where
@@ -20,12 +20,13 @@ instance Show Monovariant where
 
 instance Carrier sig m => Carrier (Allocator Monovariant :+: sig) (AllocatorC Monovariant m) where
   ret = AllocatorC . ret
-  eff = AllocatorC . (alg \/ eff . handleCoercible)
-    where alg (Alloc name k) = runAllocatorC (k (Monovariant name))
+  eff = AllocatorC . handleSum
+    (eff . handleCoercible)
+    (\ (Alloc name k) -> runAllocatorC (k (Monovariant name)))
 
 
 instance (Ord value, Carrier sig m, Alternative m, Monad m) => Carrier (Deref value :+: sig) (DerefC Monovariant value m) where
   ret = DerefC . ret
-  eff = DerefC . (alg \/ eff . handleCoercible)
-    where alg (DerefCell cell k) = traverse (foldMapA pure) (nonEmpty (toList cell)) >>= runDerefC . k
-          alg (AssignCell value cell k) = runDerefC (k (Set.insert value cell))
+  eff = DerefC . handleSum (eff . handleCoercible) (\case
+    DerefCell        cell k -> traverse (foldMapA pure) (nonEmpty (toList cell)) >>= runDerefC . k
+    AssignCell value cell k -> runDerefC (k (Set.insert value cell)))

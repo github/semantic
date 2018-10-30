@@ -27,6 +27,7 @@ import           Data.Quieterm (quieterm)
 import           Data.Sum (weaken)
 import           Parsing.Parser
 import           Prologue
+import           Semantic.Analysis
 import           Semantic.Config
 import           Semantic.Graph
 import           Semantic.Task
@@ -104,7 +105,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
        (raiseHandler (runReader (packageInfo package))
        (raiseHandler (runState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
-       (evaluate proxy id withTermSpans modules)))))))
+       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
 evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions $ do
   project <- readProject Nothing path lang []
@@ -117,7 +118,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
        (raiseHandler (runReader (packageInfo package))
        (raiseHandler (runState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
-       (evaluate proxy id withTermSpans modules)))))))
+       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
 
 evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $ do
@@ -130,7 +131,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
        (raiseHandler (runReader (lowerBound @Span))
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
-       (evaluate proxy id withTermSpans modules)))))))
+       (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
 
 parseFile :: Parser term -> FilePath -> IO term

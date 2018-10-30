@@ -91,10 +91,13 @@ convergingModules :: ( AbstractValue term address value m
                      , Ord address
                      , Ord term
                      , Carrier sig m
+                     , Effect sig
                      )
-                  => Open (Module term -> Evaluator term address value m address)
-convergingModules recur m = do
-  c <- getConfiguration (moduleBody m)
+                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) address)
+                  -> (Module (Either prelude term) -> Evaluator term address value m address)
+convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
+convergingModules recur m@(Module _ (Right term)) = do
+  c <- getConfiguration term
   heap <- getHeap
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   (cache, _) <- converge (lowerBound, heap) (\ (prevCache, _) -> isolateCache $ do
@@ -106,8 +109,7 @@ convergingModules recur m = do
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
-    -- FIXME: do we actually need to gather here after all??
-      withOracle prevCache (recur m))
+      withOracle prevCache (raiseHandler runNonDet (recur m)))
   address =<< maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
