@@ -30,6 +30,7 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
+import Control.Abstract.Heap as Heap
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Located as Located
@@ -72,13 +73,6 @@ runGraph :: forall effs. ( Member Distribute effs
                          , Member Resolution effs
                          , Member Task effs
                          , Member Trace effs
-                         , Member (State Span) effs
-                         , Member (Allocator (Address (Hole (Maybe Name) (Located Monovariant)))) effs
-                         , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) (Located Monovariant))))) effs
-                         , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) (Located Monovariant))))) effs
-                         , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
-                         , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
-                         , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                          , Effects effs
                          )
          => GraphType
@@ -111,10 +105,6 @@ runCallGraph :: forall fields syntax term lang effs. ( HasField fields Span
                 , HasPrelude lang
                 , HasPostlude lang
                 , Member Trace effs
-                , Member (State Span) effs
-                , Member (Allocator (Address (Hole (Maybe Name) (Located Monovariant)))) effs
-                , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) (Located Monovariant))))) effs
-                , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) (Located Monovariant))))) effs
                 , Effects effs
                 )
              => Proxy lang
@@ -135,6 +125,8 @@ runCallGraph lang includePackages modules package = do
         . resumingLoadError
         . resumingUnspecialized
         -- . resumingEnvironmentError -- TODO: Fix me. Replace with resumingScopeGraphError?
+        . resumingScopeError
+        . resumingHeapError
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
@@ -212,6 +204,8 @@ runImportGraph lang (package :: Package term) f =
         . resumingLoadError
         . resumingUnspecialized
         -- . resumingEnvironmentError -- TODO: Fix me. Replace with `resumingScopeGraphError`?
+        . resumingScopeError
+        . resumingHeapError
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
@@ -237,6 +231,8 @@ type ConcreteEffects address rest
   ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
   ': Resumable (BaseError ResolutionError)
   ': Resumable (BaseError EvalError)
+  ': Resumable (BaseError (HeapError address))
+  ': Resumable (BaseError (ScopeError address))
   ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address rest))))
   ': Resumable (BaseError (LoadError address (Value address (ConcreteEff address rest))))
   ': Fresh
@@ -281,9 +277,6 @@ parsePythonPackage :: forall syntax fields effs term.
                    , Member Resolution effs
                    , Member Trace effs
                    , Member Task effs
-                   , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
-                   , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
-                   , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                    , (Show (Record fields))
                    , Effects effs)
                    => Parser term       -- ^ A parser.
@@ -297,6 +290,9 @@ parsePythonPackage parser project = do
         . resumingLoadError
         . resumingUnspecialized
         -- . resumingEnvironmentError -- TODO: Fix me. Replace with `resumineScopeGraphError`?
+        . Hole.runAllocator Precise.handleAllocator
+        . resumingScopeError
+        . resumingHeapError
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
@@ -448,6 +444,50 @@ resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" b
   KeyValueError{}   -> pure (hole, hole)
   ArrayError{}      -> pure lowerBound
   ArithmeticError{} -> pure hole)
+
+resumingHeapError :: forall m address value effects a. ( Applicative (m address value effects)
+  , Effectful (m address value)
+  , Effects effects
+  , Member Trace effects
+  , Show address
+  , Ord address
+  , Member (Reader ModuleInfo) effects
+  , Member (State (Heap address address value)) effects
+  , Member (Allocator address) effects
+  , Member Fresh effects
+  , Member (Resumable (BaseError (ScopeError address))) effects
+  , Member (Reader Span) effects
+  , Member (State (ScopeGraph address)) effects
+  )
+  => m address value (Resumable (BaseError (HeapError address)) ': effects) a
+  -> m address value effects a
+resumingHeapError = runHeapErrorWith (\ baseError -> traceError "HeapError" baseError *> case baseErrorException baseError of
+  EmptyHeapError -> raiseEff . lowerEff $ do
+    currentScope' <- raiseEff (lowerEff currentScope)
+    frame <- newFrame @_ @value currentScope' mempty
+    putCurrentFrame frame
+    pure frame)
+
+resumingScopeError :: forall m address value effects a. ( Applicative (m address value effects)
+    , Effectful (m address value)
+    , Effects effects
+    , Member Trace effects
+    , Show address
+    , Ord address
+    , Member (Reader ModuleInfo) effects
+    , Member (Allocator address) effects
+    , Member Fresh effects
+    , Member (Reader Span) effects
+    , Member (State (ScopeGraph address)) effects
+    )
+    => m address value (Resumable (BaseError (ScopeError address)) ': effects) a
+    -> m address value effects a
+resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
+  _ -> undefined)
+  -- LookupError :: address -> HeapError address address
+  -- LookupLinksError :: address ->  HeapError address (Map EdgeLabel (Map address address))
+  -- LookupPathError :: Path address ->  HeapError address address
+
 
 -- TODO: Fix me.
 -- Replace this with ScopeGraphError?

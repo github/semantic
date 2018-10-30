@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Control.Abstract.Heap
 ( Heap
-, HeapError
+, HeapError(..)
 , Address(..)
 , Position(..)
 , Configuration(..)
@@ -18,6 +18,7 @@ module Control.Abstract.Heap
 , withChildFrame
 , define
 , withFrame
+, putCurrentFrame
 -- * Garbage collection
 , gc
 -- * Effects
@@ -25,6 +26,7 @@ module Control.Abstract.Heap
 , AddressError(..)
 , runAddressError
 , runAddressErrorWith
+, runHeapErrorWith
 ) where
 
 import Control.Abstract.Context (withCurrentCallStack)
@@ -85,12 +87,14 @@ currentFrame :: forall address value effects. ( Member (State (Heap address addr
              => Evaluator address value effects address
 currentFrame = maybeM (throwHeapError EmptyHeapError) =<< (Heap.currentFrame <$> get @(Heap address address value))
 
+putCurrentFrame :: forall address value effects. ( Member (State (Heap address address value)) effects ) => address -> Evaluator address value effects ()
+putCurrentFrame address = modify @(Heap address address value) (\heap -> heap { Heap.currentFrame = Just address })
+
 -- | Inserts a new frame into the heap with the given scope and links.
 newFrame :: forall address value effects. (
             Member (State (Heap address address value)) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
-          , Member (Resumable (BaseError (HeapError address))) effects
           , Ord address
           , Member (Allocator address) effects
           , Member (State (ScopeGraph address)) effects
@@ -332,6 +336,12 @@ runHeapError :: ( Effectful (m address value)
                 => m address value (Resumable (BaseError (HeapError address)) ': effects) a
                 -> m address value effects (Either (SomeExc (BaseError (HeapError address))) a)
 runHeapError = runResumable
+
+runHeapErrorWith :: (Effectful (m address value), Effects effects)
+                  => (forall resume . BaseError (HeapError address) resume -> m address value effects resume)
+                  -> m address value (Resumable (BaseError (HeapError address)) ': effects) a
+                  -> m address value effects a
+runHeapErrorWith = runResumableWith
 
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Set value)

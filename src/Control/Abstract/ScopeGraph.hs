@@ -25,6 +25,7 @@ module Control.Abstract.ScopeGraph
   , Allocator(..)
   , alloc
   , Address(..)
+  , runScopeErrorWith
   ) where
 
 import           Control.Abstract.Evaluator hiding (Local)
@@ -222,3 +223,9 @@ instance PureEffect (Allocator address)
 
 instance Effect (Allocator address) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
+
+runScopeErrorWith :: (Effectful (m address value), Effects effects)
+                  => (forall resume . BaseError (ScopeError address) resume -> m address value effects resume)
+                  -> m address value (Resumable (BaseError (ScopeError address)) ': effects) a
+                  -> m address value effects a
+runScopeErrorWith = runResumableWith
