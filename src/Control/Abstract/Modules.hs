@@ -76,7 +76,7 @@ sendModules :: Member (Modules address value) effects => Modules address value (
 sendModules = send
 
 runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) effects
-              , Member (Resumable (BaseError (LoadError address))) effects
+              , Member (Resumable (BaseError (LoadError address value))) effects
               , PureEffects effects
               )
            => Set ModulePath
@@ -100,29 +100,29 @@ instance Semigroup (Merging address value) where
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError address resume where
-  ModuleNotFoundError :: ModulePath -> LoadError address (ModuleResult address value)
+data LoadError address value resume where
+  ModuleNotFoundError :: ModulePath -> LoadError address value (ModuleResult address value)
 
-deriving instance Eq (LoadError address resume)
-deriving instance Show (LoadError address resume)
-instance Show1 (LoadError address) where
+deriving instance Eq (LoadError address value resume)
+deriving instance Show (LoadError address value resume)
+instance Show1 (LoadError address value) where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError address) where
+instance Eq1 (LoadError address value) where
   liftEq _ (ModuleNotFoundError a) (ModuleNotFoundError b) = a == b
 
 runLoadError :: (Effectful (m address value), Effects effects)
-             => m address value (Resumable (BaseError (LoadError address)) ': effects) a
-             -> m address value effects (Either (SomeExc (BaseError (LoadError address))) a)
+             => m address value (Resumable (BaseError (LoadError address value)) ': effects) a
+             -> m address value effects (Either (SomeExc (BaseError (LoadError address value))) a)
 runLoadError = runResumable
 
 runLoadErrorWith :: (Effectful (m address value), Effects effects)
-                 => (forall resume . (BaseError (LoadError address)) resume -> m address value effects resume)
-                 -> m address value (Resumable (BaseError (LoadError address)) ': effects) a
+                 => (forall resume . (BaseError (LoadError address value)) resume -> m address value effects resume)
+                 -> m address value (Resumable (BaseError (LoadError address value)) ': effects) a
                  -> m address value effects a
 runLoadErrorWith = runResumableWith
 
-throwLoadError :: Member (Resumable (BaseError (LoadError address))) effects
-               => LoadError address resume
+throwLoadError :: Member (Resumable (BaseError (LoadError address value))) effects
+               => LoadError address value resume
                -> Evaluator address value effects resume
 throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name) emptySpan err
 
