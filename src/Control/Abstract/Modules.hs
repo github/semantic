@@ -99,12 +99,11 @@ instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))
          )
       => Carrier (Modules address :+: sig) (ModulesC address m) where
   ret = ModulesC . const . ret
-  eff op = ModulesC (\ paths -> (alg paths \/ eff . handleReader paths runModulesC) op)
-    where alg paths = \case
-            Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
-            Lookup  path  k -> askModuleTable >>= flip runModulesC paths . k . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path
-            Resolve names k -> runModulesC (k (find (`Set.member` paths) names)) paths
-            List    dir   k -> runModulesC (k (filter ((dir ==) . takeDirectory) (toList paths))) paths
+  eff op = ModulesC (\ paths -> handleSum (eff . handleReader paths runModulesC) (\case
+    Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
+    Lookup  path  k -> askModuleTable >>= flip runModulesC paths . k . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup path
+    Resolve names k -> runModulesC (k (find (`Set.member` paths) names)) paths
+    List    dir   k -> runModulesC (k (filter ((dir ==) . takeDirectory) (toList paths))) paths) op)
 
 askModuleTable :: (Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig, Carrier sig m) => m (ModuleTable (NonEmpty (Module (ModuleResult address))))
 askModuleTable = ask

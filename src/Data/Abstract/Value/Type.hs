@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances, LambdaCase #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
@@ -253,26 +253,25 @@ instance ( Member (Allocator address) sig
          )
       => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
   ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
-    where alg eval = \case
-            Abstract.Function _ params body k -> runEvaluator $ do
-              (env, tvars) <- foldr (\ name rest -> do
-                addr <- alloc name
-                tvar <- Var <$> fresh
-                assign addr tvar
-                bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
-              locally (catchReturn (bindAll env *> runFunction (Evaluator . eval) (Evaluator (eval body)))) >>= deref >>= Evaluator . flip runFunctionC eval . k . (zeroOrMoreProduct tvars :->)
-            Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
-            Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval
-            Abstract.Call op _ params k -> runEvaluator $ do
-              tvar <- fresh
-              paramTypes <- traverse deref params
-              let needed = zeroOrMoreProduct paramTypes :-> Var tvar
-              unified <- op `unify` needed
-              boxed <- case unified of
-                _ :-> ret -> box ret
-                actual    -> throwTypeError (UnificationError needed actual) >>= box
-              Evaluator $ runFunctionC (k boxed) eval
+  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
+    Abstract.Function _ params body k -> runEvaluator $ do
+      (env, tvars) <- foldr (\ name rest -> do
+        addr <- alloc name
+        tvar <- Var <$> fresh
+        assign addr tvar
+        bimap (Env.insert name addr) (tvar :) <$> rest) (pure (lowerBound, [])) params
+      locally (catchReturn (bindAll env *> runFunction (Evaluator . eval) (Evaluator (eval body)))) >>= deref >>= Evaluator . flip runFunctionC eval . k . (zeroOrMoreProduct tvars :->)
+    Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
+    Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval
+    Abstract.Call op _ params k -> runEvaluator $ do
+      tvar <- fresh
+      paramTypes <- traverse deref params
+      let needed = zeroOrMoreProduct paramTypes :-> Var tvar
+      unified <- op `unify` needed
+      boxed <- case unified of
+        _ :-> ret -> box ret
+        actual    -> throwTypeError (UnificationError needed actual) >>= box
+      Evaluator $ runFunctionC (k boxed) eval) op)
 
 
 instance ( Member (Reader ModuleInfo) sig
@@ -285,10 +284,9 @@ instance ( Member (Reader ModuleInfo) sig
          )
       => Carrier (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
   ret = BooleanC . ret
-  eff = BooleanC . (alg \/ eff . handleCoercible)
-    where alg (Abstract.Boolean _ k) = runBooleanC (k Bool)
-          alg (Abstract.AsBool t k) = unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False))
-          alg (Abstract.Disjunction t1 t2 k) = (runBooleanC t1 >>= unify Bool) <|> (runBooleanC t2 >>= unify Bool) >>= runBooleanC . k
+  eff = BooleanC . handleSum (eff . handleCoercible) (\case
+    Abstract.Boolean _ k -> runBooleanC (k Bool)
+    Abstract.AsBool  t k -> unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False)))
 
 
 instance ( Member (Abstract.Boolean Type) sig
@@ -298,10 +296,11 @@ instance ( Member (Abstract.Boolean Type) sig
          )
       => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
   ret = WhileC . ret
-  eff = WhileC . (alg \/ eff . handleCoercible)
-    where alg (Abstract.While cond body k) = do
-            cond' <- runWhileC cond
-            ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit))
+  eff = WhileC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.While cond body k) -> do
+      cond' <- runWhileC cond
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
 
 
 instance AbstractHole Type where

@@ -187,19 +187,18 @@ newtype EnvC address m a = EnvC { runEnvC :: Eff (StateC (EvalContext address) (
 
 instance (Carrier sig m, Effect sig) => Carrier (Env address :+: sig) (EnvC address m) where
   ret = EnvC . ret
-  eff = EnvC . (alg \/ eff . R . R . handleCoercible)
-    where alg = \case
-            Lookup name k -> gets (Env.lookupEnv' name . ctxEnvironment) >>= runEnvC . k
-            Bind name addr k -> modify (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment)) >> runEnvC k
-            Close names k -> gets (Env.intersect names . ctxEnvironment) >>= runEnvC . k
-            Locally action k -> do
-              modify (\EvalContext{..} -> EvalContext ctxSelf (Env.push @address ctxEnvironment))
-              a <- runEnvC action
-              modify (\EvalContext{..} -> EvalContext ctxSelf (Env.pop @address ctxEnvironment))
-              runEnvC (k a)
-            GetCtx k -> get >>= runEnvC . k
-            PutCtx e k -> put e >> runEnvC k
-            Export name alias addr k -> modify (Exports.insert name alias addr) >> runEnvC k
+  eff = EnvC . handleSum (eff . R . R . handleCoercible) (\case
+    Lookup name k -> gets (Env.lookupEnv' name . ctxEnvironment) >>= runEnvC . k
+    Bind name addr k -> modify (\EvalContext{..} -> EvalContext ctxSelf (Env.insertEnv name addr ctxEnvironment)) >> runEnvC k
+    Close names k -> gets (Env.intersect names . ctxEnvironment) >>= runEnvC . k
+    Locally action k -> do
+      modify (\EvalContext{..} -> EvalContext ctxSelf (Env.push @address ctxEnvironment))
+      a <- runEnvC action
+      modify (\EvalContext{..} -> EvalContext ctxSelf (Env.pop @address ctxEnvironment))
+      runEnvC (k a)
+    GetCtx k -> get >>= runEnvC . k
+    PutCtx e k -> put e >> runEnvC k
+    Export name alias addr k -> modify (Exports.insert name alias addr) >> runEnvC k)
 
 freeVariableError :: ( Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig

@@ -75,29 +75,28 @@ instance ( FreeVariables term
          )
       => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Eff m)) where
   ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
-    where alg eval = \case
-            Abstract.Function name params body k -> runEvaluator $ do
-              packageInfo <- currentPackage
-              moduleInfo <- currentModule
-              Closure packageInfo moduleInfo name params (Right body) <$> close (foldr Set.delete (freeVariables body) params) >>= Evaluator . flip runFunctionC eval . k
-            Abstract.BuiltIn builtIn k -> do
-              packageInfo <- currentPackage
-              moduleInfo <- currentModule
-              runFunctionC (k (Closure packageInfo moduleInfo Nothing [] (Left builtIn) lowerBound)) eval
-            Abstract.Call op self params k -> runEvaluator $ do
-              boxed <- case op of
-                Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> box Unit
-                Closure _ _ _ _ (Left Show) _ -> deref self >>= box . String . pack . show
-                Closure packageInfo moduleInfo _ names (Right body) env -> do
-                  -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
-                  -- charge them to the closure's origin.
-                  withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-                    bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
-                    let fnCtx = EvalContext (Just self) (Env.push env)
-                    withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction (Evaluator . eval) (Evaluator (eval body))))
-                _ -> throwValueError (CallError op) >>= box
-              Evaluator $ runFunctionC (k boxed) eval
+  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
+    Abstract.Function name params body k -> runEvaluator $ do
+      packageInfo <- currentPackage
+      moduleInfo <- currentModule
+      Closure packageInfo moduleInfo name params (Right body) <$> close (foldr Set.delete (freeVariables body) params) >>= Evaluator . flip runFunctionC eval . k
+    Abstract.BuiltIn builtIn k -> do
+      packageInfo <- currentPackage
+      moduleInfo <- currentModule
+      runFunctionC (k (Closure packageInfo moduleInfo Nothing [] (Left builtIn) lowerBound)) eval
+    Abstract.Call op self params k -> runEvaluator $ do
+      boxed <- case op of
+        Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> box Unit
+        Closure _ _ _ _ (Left Show) _ -> deref self >>= box . String . pack . show
+        Closure packageInfo moduleInfo _ names (Right body) env -> do
+          -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+          -- charge them to the closure's origin.
+          withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
+            bindings <- foldr (\ (name, addr) rest -> Env.insert name addr <$> rest) (pure lowerBound) (zip names params)
+            let fnCtx = EvalContext (Just self) (Env.push env)
+            withEvalContext fnCtx (catchReturn (bindAll bindings *> runFunction (Evaluator . eval) (Evaluator (eval body))))
+        _ -> throwValueError (CallError op) >>= box
+      Evaluator $ runFunctionC (k boxed) eval) op)
 
 
 instance ( Member (Reader ModuleInfo) sig
@@ -108,21 +107,10 @@ instance ( Member (Reader ModuleInfo) sig
          )
       => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Value term address) m) where
   ret = BooleanC . ret
-  eff = BooleanC . (alg \/ eff . handleCoercible)
-    where alg :: Abstract.Boolean (Value term address) (BooleanC (Value term address) m) (BooleanC (Value term address) m a) -> m a
-          alg = \case
-            Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
-            Abstract.AsBool (Boolean b) k -> runBooleanC (k b)
-            Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k
-            Abstract.Disjunction a b    k -> do
-              a' <- runBooleanC a
-              a'' <- case a' of
-                Boolean b -> pure b
-                other     -> throwBaseError (BoolError other)
-              if a'' then
-                runBooleanC (k a')
-              else
-                runBooleanC b >>= runBooleanC . k
+  eff = BooleanC . handleSum (eff . handleCoercible) (\case
+    Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
+    Abstract.AsBool (Boolean b) k -> runBooleanC (k b)
+    Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k)
 
 
 instance ( Carrier sig m
@@ -140,26 +128,25 @@ instance ( Carrier sig m
          )
       => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
   ret = WhileC . ret
-  eff = WhileC . (alg \/ eff . handleCoercible)
-    where alg = \case
-            Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
-              cond' <- Evaluator (runWhileC cond)
+  eff = WhileC . handleSum (eff . handleCoercible) (\case
+    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
+      cond' <- Evaluator (runWhileC cond)
 
-              -- `interpose` is used to handle 'UnspecializedError's and abort out of the
-              -- loop, otherwise under concrete semantics we run the risk of the
-              -- conditional always being true and getting stuck in an infinite loop.
+      -- `interpose` is used to handle 'UnspecializedError's and abort out of the
+      -- loop, otherwise under concrete semantics we run the risk of the
+      -- conditional always being true and getting stuck in an infinite loop.
 
-              ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
-              (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address))
-                >>= runWhileC . k
-            where
-              loop x = catchLoopControl @address (fix x) $ \case
-                Break value -> deref value
-                Abort -> pure unit
-                -- FIXME: Figure out how to deal with this. Ruby treats this as the result
-                -- of the current block iteration, while PHP specifies a breakout level
-                -- and TypeScript appears to take a label.
-                Continue _  -> loop x
+      ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
+      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address))
+        >>= runWhileC . k)
+    where
+      loop x = catchLoopControl @address (fix x) $ \case
+        Break value -> deref value
+        Abort -> pure unit
+        -- FIXME: Figure out how to deal with this. Ruby treats this as the result
+        -- of the current block iteration, while PHP specifies a breakout level
+        -- and TypeScript appears to take a label.
+        Continue _  -> loop x
 
 
 instance AbstractHole (Value term address) where
