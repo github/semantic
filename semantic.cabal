@@ -50,6 +50,7 @@ library
                      , Control.Abstract.Value
                      -- Effects
                      , Control.Effect.Interpose
+                     , Control.Effect.REPL
                      -- Rewriting
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
