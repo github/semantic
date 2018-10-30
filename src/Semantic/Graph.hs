@@ -59,6 +59,7 @@ import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
 import           Prologue hiding (TypeError (..))
+import           Semantic.Analysis
 import           Semantic.Task as Task
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
@@ -90,10 +91,8 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
                 , Functor syntax
                 , Evaluatable syntax
                 , term ~ Term syntax Location
-                , FreeVariables term
-                , Recursive term
+                , FreeVariables1 syntax
                 , HasPrelude lang
-                , HasPostlude lang
                 , Member Trace sig
                 , Carrier sig m
                 , Effect sig
@@ -103,29 +102,30 @@ runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy synta
              -> [Module term]
              -> Package term
              -> Eff m (Graph ControlFlowVertex)
-runCallGraph lang includePackages modules package = do
-  let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
-      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
-      extractGraph (graph, _) = simplify graph
-      runGraphAnalysis
-        = graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
-        . runHeap
-        . caching
-        . raiseHandler runFresh
-        . resumingLoadError
-        . resumingUnspecialized
-        . resumingEnvironmentError
-        . resumingEvalError
-        . resumingResolutionError
-        . resumingAddressError
-        . raiseHandler (runReader (packageInfo package))
-        . raiseHandler (runReader (lowerBound @Span))
-        . raiseHandler (runState (lowerBound @Span))
-        . raiseHandler (runReader (lowerBound @ControlFlowVertex))
-        . providingLiveSet
-        . runModuleTable
-        . runModules (ModuleTable.modulePaths (packageModules package))
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm modules))
+runCallGraph lang includePackages modules package
+  = fmap (simplify . fst)
+  . runEvaluator
+  . graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
+  . runHeap
+  . caching
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingEnvironmentError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . raiseHandler (runReader (packageInfo package))
+  . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @ControlFlowVertex))
+  . providingLiveSet
+  . runModuleTable
+  . runModules (ModuleTable.modulePaths (packageModules package))
+  $ evaluate lang perModule perTerm modules
+  where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
+        perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
+
 
 runModuleTable :: Carrier sig m
                => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address)))) (Eff m)) a
@@ -136,7 +136,6 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
                                , FreeVariables term
                                , HasPrelude lang
-                               , HasPostlude lang
                                , Member Trace sig
                                , Recursive term
                                , Carrier sig m
@@ -153,7 +152,6 @@ runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
                            , FreeVariables term
                            , HasPrelude lang
-                           , HasPostlude lang
                            , Member Trace sig
                            , Recursive term
                            , Carrier sig m
@@ -170,7 +168,6 @@ runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
-                  , HasPostlude lang
                   , Member Trace sig
                   , Recursive term
                   , Carrier sig m
@@ -181,26 +178,25 @@ runImportGraph :: ( Declarations term
                -> Package term
                -> (ModuleInfo -> Graph vertex)
                -> Eff m (Graph vertex)
-runImportGraph lang (package :: Package term) f =
-  let analyzeModule = graphingModuleInfo
-      extractGraph (graph, _) = graph >>= f
-      runImportGraphAnalysis
-        = raiseHandler (runState lowerBound)
-        . runHeap
-        . raiseHandler runFresh
-        . resumingLoadError
-        . resumingUnspecialized
-        . resumingEnvironmentError
-        . resumingEvalError
-        . resumingResolutionError
-        . resumingAddressError
-        . resumingValueError
-        . runModuleTable
-        . runModules (ModuleTable.modulePaths (packageModules package))
-        . raiseHandler (runReader (packageInfo package))
-        . raiseHandler (runState (lowerBound @Span))
-        . raiseHandler (runReader (lowerBound @Span))
-  in extractGraph <$> runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise)) (runImportGraphAnalysis (evaluate lang analyzeModule id (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+runImportGraph lang (package :: Package term) f
+  = fmap (fst >=> f)
+  . runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise))
+  . raiseHandler (runState lowerBound)
+  . runHeap
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingEnvironmentError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . resumingValueError
+  . runModuleTable
+  . runModules (ModuleTable.modulePaths (packageModules package))
+  . raiseHandler (runReader (packageInfo package))
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @Span))
+  $ evaluate lang graphingModuleInfo (evalTerm id) (ModuleTable.toPairs (packageModules package) >>= toList . snd)
 
 
 runHeap :: (Carrier sig m, Effect sig) => Evaluator term address value (StateC (Heap address value) (Eff m)) a -> Evaluator term address value m (Heap address value, a)
@@ -264,8 +260,7 @@ parsePythonPackage parser project = do
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
-      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id [ setupModule ])
-      -- FIXME: what are we gonna do about runPythonPackaging
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id (runPythonPackaging . evalTerm id) [ setupModule ])
     Nothing -> pure PythonPackage.Unknown
   case strat of
     PythonPackage.Unknown -> do

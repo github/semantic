@@ -206,7 +206,9 @@ newtype TraceInTelemetryC m a = TraceInTelemetryC { runTraceInTelemetryC :: m a 
 
 instance (Member Telemetry sig, Carrier sig m, Monad m) => Carrier (Trace :+: sig) (TraceInTelemetryC m) where
   ret = TraceInTelemetryC . ret
-  eff = TraceInTelemetryC . ((\ (Trace str k) -> writeLog Debug str [] >> runTraceInTelemetryC k) \/ eff . handleCoercible)
+  eff = TraceInTelemetryC . handleSum
+    (eff . handleCoercible)
+    (\ (Trace str k) -> writeLog Debug str [] >> runTraceInTelemetryC k)
 
 
 -- | An effect describing high-level tasks to be performed.
@@ -250,16 +252,15 @@ newtype TaskC m a = TaskC { runTaskC :: m a }
 
 instance (Member (Error SomeException) sig, Member (Lift IO) sig, Member (Reader Config) sig, Member Resource sig, Member Telemetry sig, Member Timeout sig, Member Trace sig, Carrier sig m, MonadIO m) => Carrier (Task :+: sig) (TaskC m) where
   ret = TaskC . ret
-  eff = TaskC . (alg \/ eff . handleCoercible)
-    where alg = \case
-            Parse parser blob k -> runParser blob parser >>= runTaskC . k
-            Analyze interpret analysis k -> runTaskC (k (interpret analysis))
-            Decorate algebra term k -> runTaskC (k (decoratorWithAlgebra algebra term))
-            Semantic.Task.Diff terms k -> runTaskC (k (diffTermPair terms))
-            Render renderer input k -> runTaskC (k (renderer input))
-            Serialize format input k -> do
-              formatStyle <- asks (bool Plain Colourful . configIsTerminal)
-              runTaskC (k (runSerialize formatStyle format input))
+  eff = TaskC . handleSum (eff . handleCoercible) (\case
+    Parse parser blob k -> runParser blob parser >>= runTaskC . k
+    Analyze interpret analysis k -> runTaskC (k (interpret analysis))
+    Decorate algebra term k -> runTaskC (k (decoratorWithAlgebra algebra term))
+    Semantic.Task.Diff terms k -> runTaskC (k (diffTermPair terms))
+    Render renderer input k -> runTaskC (k (renderer input))
+    Serialize format input k -> do
+      formatStyle <- asks (bool Plain Colourful . configIsTerminal)
+      runTaskC (k (runSerialize formatStyle format input)))
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.

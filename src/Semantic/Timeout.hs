@@ -47,7 +47,6 @@ runTimeoutC f (TimeoutC m) = m f
 
 instance (Carrier sig m, MonadIO m) => Carrier (Timeout :+: sig) (TimeoutC m) where
   ret a = TimeoutC (const (ret a))
-  eff op = TimeoutC (\ handler ->
-    ((\ (Timeout n task k) -> liftIO (System.timeout (toMicroseconds n) (handler (runTimeoutC handler task))) >>= runTimeoutC handler . k)
-    \/ (eff . handlePure (runTimeoutC handler)))
-      op)
+  eff op = TimeoutC (\ handler -> handleSum
+    (eff . handlePure (runTimeoutC handler))
+    (\ (Timeout n task k) -> liftIO (System.timeout (toMicroseconds n) (handler (runTimeoutC handler task))) >>= runTimeoutC handler . k) op)

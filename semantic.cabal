@@ -48,6 +48,8 @@ library
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
                      , Control.Abstract.Value
+                     -- Effects
+                     , Control.Effect.Interpose
                      -- Rewriting
                      , Control.Rewriting
                      -- Datatypes for abstract interpretation
@@ -186,6 +188,7 @@ library
                      , Reprinting.Typeset
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.Analysis
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
@@ -234,12 +237,12 @@ library
                      , filepath
                      , free
                      , freer-cofreer
+                     , fused-effects
                      , ghc-prim
                      , gitrev
                      , Glob
                      , hashable
                      , haskeline
-                     , higher-order-effects
                      , hscolour
                      , http-client
                      , http-client-tls
@@ -362,10 +365,10 @@ test-suite test
                      , fastsum
                      , filepath
                      , free
+                     , fused-effects
                      , Glob
                      , hashable
                      , haskell-tree-sitter
-                     , higher-order-effects
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
@@ -415,8 +418,8 @@ test-suite parse-examples
                      , directory
                      , fastsum
                      , filepath
+                     , fused-effects
                      , Glob
-                     , higher-order-effects
                      , hspec >= 2.4.1
                      , hspec-core
                      , hspec-expectations-pretty-diff
