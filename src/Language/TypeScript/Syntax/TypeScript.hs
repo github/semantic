@@ -32,13 +32,13 @@ instance Evaluatable Import where
     (scopeGraph, value) <- require modulePath
     bindAll scopeGraph
     if Prologue.null symbols then
-      maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+      maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
     else do
       scopeAddress <- newScope mempty
       scope <- lookupScope scopeAddress
       for_ symbols $ \Alias{..} ->
         insertImportReference (Reference aliasName) (Declaration aliasValue) scopeGraph scopeAddress scope
-      insertEdge ScopeGraph.Import scopeAddress
+      insertImportEdge scopeAddress
     rvalBox unit
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }

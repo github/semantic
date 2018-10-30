@@ -33,7 +33,7 @@ instance Evaluatable JavaScriptRequire where
       Nothing -> do
         -- TODO: Throw a resumable exception if no current scope in imported scope graph.
         -- Or better yet get rid of the Maybe in ScopeGraph { currentScope :: Maybe scope, ... }
-        maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+        maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
     rvalBox unit
 
 data Debugger a = Debugger

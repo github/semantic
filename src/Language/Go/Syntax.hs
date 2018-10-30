@@ -18,7 +18,7 @@ import           Proto3.Suite
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import           System.FilePath.Posix
-import Control.Abstract.ScopeGraph
+import           Control.Abstract.ScopeGraph
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data IsRelative = Unknown | Relative | NonRelative
@@ -97,7 +97,7 @@ instance Evaluatable Import where
       traceResolve (unPath importPath) path
       scopeGraph <- fst <$> require path
       bindAll scopeGraph
-      maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+      maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
     rvalBox unit
 
 

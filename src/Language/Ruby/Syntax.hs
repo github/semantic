@@ -17,7 +17,7 @@ import           Proto3.Suite.Class
 import           Reprinting.Tokenize
 import           System.FilePath.Posix
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Control.Abstract.ScopeGraph (bindAll, insertEdge, ScopeError)
+import Control.Abstract.ScopeGraph (bindAll, insertImportEdge, ScopeError)
 
 
 -- TODO: Fully sort out ruby require/load mechanics
@@ -91,7 +91,7 @@ instance Evaluatable Require where
     traceResolve name path
     (scopeGraph, v) <- doRequire path
     bindAll scopeGraph
-    maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+    maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( Member (Boolean value) effects
@@ -141,7 +141,7 @@ doLoad path shouldWrap = do
   scopeGraph <- fst <$> load path'
   unless shouldWrap $ do
     bindAll scopeGraph
-    maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+    maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
