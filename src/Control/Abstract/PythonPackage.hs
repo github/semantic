@@ -3,7 +3,8 @@ module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
 import           Control.Abstract.Evaluator (LoopControl, Return)
-import           Control.Abstract.Heap (Allocator, Deref, deref)
+import Control.Abstract.ScopeGraph (Allocator)
+import           Control.Abstract.Heap (Deref)
 import           Control.Abstract.Value
 import           Control.Monad.Effect (Effectful (..))
 import qualified Control.Monad.Effect as Eff
@@ -32,9 +33,8 @@ runPythonPackaging :: forall effects address body a. (
                       , Member (State Strategy) effects
                       , Member (Allocator address) effects
                       , Member (Deref (Value address body)) effects
-                      , Member (Env address) effects
-                      , Member (Eff.Exc (LoopControl address)) effects
-                      , Member (Eff.Exc (Return address)) effects
+                      , Member (Eff.Exc (LoopControl (Value address body))) effects
+                      , Member (Eff.Exc (Return (Value address body))) effects
                       , Member (Eff.Reader ModuleInfo) effects
                       , Member (Eff.Reader PackageInfo) effects
                       , Member (Eff.Reader Span) effects
@@ -45,22 +45,20 @@ runPythonPackaging = Eff.interpose @(Function address (Value address body)) $ \c
   Call callName super params -> do
     case callName of
       Closure _ _ name' paramNames _ _ -> do
-        let bindings = foldr (\ (name, addr) rest -> Map.insert name addr rest) lowerBound (zip paramNames params)
-        let asStrings address = (deref >=> asArray) address >>= traverse (deref >=> asString)
+        let bindings = foldr (\ (name, value) rest -> Map.insert name value rest) lowerBound (zip paramNames params)
+        let asStrings address = asArray address >>= traverse asString
 
-        case name' of
-          Just n
-            | name "find_packages" == n -> do
-              as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "exclude") bindings)
-              put (FindPackages as)
-            | name "setup" == n -> do
-              packageState <- get
-              if packageState == Unknown then do
-                as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "packages") bindings)
-                put (Packages as)
-                else
-                  pure ()
-          _ -> pure ()
+        if name "find_packages" == name' then do
+          as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "exclude") bindings)
+          put (FindPackages as)
+        else if name "setup" == name' then do
+          packageState <- get
+          if packageState == Unknown then do
+            as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "packages") bindings)
+            put (Packages as)
+            else
+              pure ()
+        else pure ()
       _ -> pure ()
     call callName super params
   Function name params vars body ->  function name params vars (raiseEff body)

@@ -64,7 +64,6 @@ cachingTerms :: ( Cacheable term address value
                 , Member (Reader (Cache term address value)) effects
                 , Member (Reader (Live address)) effects
                 , Member (State (Cache term address value)) effects
-                , Member (Env address) effects
                 , Member (State (Heap address address value)) effects
                 )
              => SubtermAlgebra (Base term) term (TermEvaluator term address value effects (ValueRef address value))
@@ -87,7 +86,6 @@ convergingModules :: ( AbstractValue address value effects
                      , Member (Reader ModuleInfo) effects
                      , Member (Reader Span) effects
                      , Member (State (Cache term address value)) effects
-                     , Member (Env address) effects
                      , Member (State (Heap address address value)) effects
                      , Effects effects
                      , Member (Deref value) effects
@@ -100,7 +98,6 @@ convergingModules recur m = do
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   cache <- converge lowerBound (\ prevCache -> isolateCache $ do
     TermEvaluator (putHeap        (configurationHeap    c))
-    TermEvaluator (putEvalContext (configurationContext c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want

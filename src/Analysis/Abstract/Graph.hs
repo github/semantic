@@ -64,7 +64,6 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Member (Reader Span) effects
-                 , Member (Env (Hole context (Located address))) effects
                  , Member (State (Graph ControlFlowVertex)) effects
                  , Member (State (Map (Hole context (Located address)) ControlFlowVertex)) effects
                  , Member (Resumable (BaseError (EnvironmentError (Hole context (Located address))))) effects

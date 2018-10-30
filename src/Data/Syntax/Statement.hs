@@ -31,8 +31,7 @@ instance ToJSON1 Statements
 instance Evaluatable Statements where
   eval (Statements xs) = do
     currentScope' <- currentScope
-    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
-    scope <- newScope edges
+    scope <- newScope (Map.singleton Lexical [ currentScope' ])
     withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . subtermRef)) (nonEmpty xs)
 
 instance Tokenize Statements where
@@ -49,7 +48,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
-    Rval <$> ifthenelse bool (subtermAddress if') (subtermAddress else')
+    Rval <$> ifthenelse bool (subtermValue if') (subtermValue else')
 
 instance Tokenize If where
   tokenize If{..} = within' TIf $ do

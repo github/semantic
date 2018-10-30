@@ -18,6 +18,7 @@ import           Proto3.Suite
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import           System.FilePath.Posix
+import Control.Abstract.ScopeGraph
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data IsRelative = Unknown | Relative | NonRelative
@@ -51,7 +52,7 @@ importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathT
                 | otherwise = NonRelative
 
 defaultAlias :: ImportPath -> Name
-defaultAlias = name . T.pack . takeFileName . unPath
+defaultAlias = Data.Abstract.Evaluatable.name . T.pack . takeFileName . unPath
 
 resolveGoImport :: ( Member (Modules address value) effects
                    , Member (Reader ModuleInfo) effects
@@ -90,13 +91,13 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import importPath _) = do
+  eval (Language.Go.Syntax.Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
       scopeGraph <- fst <$> require path
       bindAll scopeGraph
-      insertEdge ScopeGraph.Import (currentScope scopeGraph)
+      maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
     rvalBox unit
 
 
@@ -114,12 +115,15 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
     alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
-    void . withChildFrame alias $ \addr -> do
-      makeNamespace alias addr Nothing . for_ paths $ \p -> do
-        traceResolve (unPath importPath) p
-        importedEnv <- fst . snd <$> require p
-        bindAll importedEnv
     rvalBox unit
+    -- rvalBox . withChildFrame (Declaration alias) $ \addr -> do
+    --   -- TODO: Add edges to these importedScopeGraphs
+    --   for_ paths $ \p -> do
+    --     traceResolve (unPath importPath) p
+    --     importedScopeGraph <- fst <$> require p
+    --     bindAll importedScopeGraph
+    --   slot <- lookupDeclaration (Declaration alias)
+    --   makeNamespace alias slot Nothing
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }

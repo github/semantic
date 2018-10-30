@@ -16,6 +16,8 @@ import           Prologue
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize
 import           System.FilePath.Posix
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import Control.Abstract.ScopeGraph (bindAll, insertEdge, ScopeError)
 
 
 -- TODO: Fully sort out ruby require/load mechanics
@@ -59,13 +61,14 @@ instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
   eval Send{..} = do
-    let sel = case sendSelector of
-          Just sel -> subtermAddress sel
-          Nothing  -> variable (name "call")
-    recv <- maybe (self >>= maybeM (box unit)) subtermAddress sendReceiver
-    func <- deref =<< evaluateInScopedEnv recv sel
-    args <- traverse subtermAddress sendArgs
-    Rval <$> call func recv args -- TODO pass through sendBlock
+    undefined
+    -- let sel = case sendSelector of
+    --       Just sel -> subtermAddress sel
+    --       Nothing  -> variable (name "call")
+    -- recv <- maybe (self >>= maybeM (box unit)) subtermAddress sendReceiver
+    -- func <- deref =<< evaluateInScopedEnv recv sel
+    -- args <- traverse subtermValue sendArgs
+    -- Rval <$> call func recv args -- TODO pass through sendBlock
 
 instance Tokenize Send where
   tokenize Send{..} = within TCall $ do
@@ -86,20 +89,21 @@ instance Evaluatable Require where
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
     traceResolve name path
-    (importedEnv, v) <- doRequire path
-    bindAll importedEnv
+    (scopeGraph, v) <- doRequire path
+    bindAll scopeGraph
+    maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( Member (Boolean value) effects
              , Member (Modules address value) effects
              )
           => M.ModulePath
-          -> Evaluator address value effects (Bindings address, value)
+          -> Evaluator address value effects (ScopeGraph.ScopeGraph address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> (,) . fst . snd <$> load path <*> boolean True
-    Just (_, (env, _)) -> (env,) <$> boolean False
+    Nothing       -> (,) . fst <$> load path <*> boolean True
+    Just (scopeGraph, _) -> (scopeGraph,) <$> boolean False
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
@@ -119,12 +123,14 @@ instance Evaluatable Load where
     rvalBox =<< doLoad path shouldWrap
 
 doLoad :: ( Member (Boolean value) effects
-          , Member (Env address) effects
           , Member (Modules address value) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects
           , Member (Resumable (BaseError ResolutionError)) effects
           , Member Trace effects
+          , Ord address
+          , Member (Resumable (BaseError (ScopeError address))) effects
+          , Member (State (ScopeGraph.ScopeGraph address)) effects
           )
        => Text
        -> Bool
@@ -132,8 +138,10 @@ doLoad :: ( Member (Boolean value) effects
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- fst . snd <$> load path'
-  unless shouldWrap $ bindAll importedEnv
+  scopeGraph <- fst <$> load path'
+  unless shouldWrap $ do
+    bindAll scopeGraph
+    maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
@@ -150,10 +158,12 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    super <- traverse subtermAddress classSuperClass
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
-    rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr super (void (subtermAddress classBody)))
+    -- TODO: Reimplement this
+    undefined
+    -- super <- traverse subtermAddress classSuperClass
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
+    -- rvalBox =<< letrec' name (\addr ->
+    --   makeNamespace name addr super (void (subtermAddress classBody)))
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -164,9 +174,11 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
-    rvalBox =<< letrec' name (\addr ->
-      makeNamespace name addr Nothing (void (eval xs)))
+    -- TODO: Implement this
+    undefined
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName (subterm iden))
+    -- rvalBox =<< letrec' name (\addr ->
+    --   makeNamespace name addr Nothing (void (eval xs)))
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
