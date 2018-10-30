@@ -23,7 +23,6 @@ import           Semantic.Env
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Haystack as Haystack
 import qualified Semantic.Telemetry.Stat as Stat
-import           Semantic.Version
 import           System.Environment
 import           System.IO (hIsTerminalDevice, stdout)
 import           System.Posix.Process
@@ -106,8 +105,8 @@ logOptionsFromConfig Config{..} = LogOptions
           False -> [ ("app", configAppName)
                    , ("pid", show configProcessID)
                    , ("hostname", configHostName)
-                   , ("sha", buildSHA)
                    ]
+                   <> [("sha", x) | x <- toList (optionsSHA configOptions) ]
                    <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
           _ -> []
 
