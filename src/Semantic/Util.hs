@@ -129,7 +129,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
   pure (runReader (packageInfo package)
        (runState (lowerBound @Span)
        (runReader (lowerBound @Span)
-       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant)))))
+       (runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Monovariant Type)))))
        (raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
        (evaluate proxy id withTermSpans (Monovariant.runAllocator . Monovariant.runDeref) (Type.runBoolean . Type.runFunction) modules))))))
 
