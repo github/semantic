@@ -30,6 +30,7 @@ import qualified Data.Time.LocalTime as LocalTime
 import Numeric (readDec)
 import Parsing.Parser (rubyParser)
 import Prologue
+import Semantic.Analysis
 import Semantic.Config (logOptionsFromConfig)
 import Semantic.Distribute
 import Semantic.Graph
@@ -77,10 +78,9 @@ newtype REPLC m a = REPLC { runREPLC :: (Prefs, Settings IO) -> m a }
 
 instance (Carrier sig m, MonadIO m) => Carrier (REPL :+: sig) (REPLC m) where
   ret = REPLC . const . ret
-  eff op = REPLC (\ args -> (alg args \/ eff . handleReader args runREPLC) op)
-    where alg args = \case
-            Prompt   k -> liftIO (uncurry runInputTWithPrefs args (getInputLine (cyan <> "repl: " <> plain))) >>= flip runREPLC args . k
-            Output s k -> liftIO (uncurry runInputTWithPrefs args (outputStrLn s)) *> runREPLC k args
+  eff op = REPLC (\ args -> handleSum (eff . handleReader args runREPLC) (\case
+    Prompt   k -> liftIO (uncurry runInputTWithPrefs args (getInputLine (cyan <> "repl: " <> plain))) >>= flip runREPLC args . k
+    Output s k -> liftIO (uncurry runInputTWithPrefs args (outputStrLn s)) *> runREPLC k args) op)
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
@@ -120,7 +120,7 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . raiseHandler (runReader (packageInfo package))
     . raiseHandler (runState (lowerBound @Span))
     . raiseHandler (runReader (lowerBound @Span))
-    $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) modules
+    $ evaluate proxy id (evalTerm (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package))))) modules
 
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without
@@ -132,13 +132,13 @@ newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnori
 
 instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgnoringStatC m) where
   ret = TelemetryIgnoringStatC . const . ret
-  eff op = TelemetryIgnoringStatC (\ logOptions -> (algT logOptions \/ eff . handleReader logOptions runTelemetryIgnoringStatC) op)
-    where algT logOptions (WriteStat _ k) = runTelemetryIgnoringStatC k logOptions
-          algT logOptions (WriteLog level message pairs k) = do
-            time <- liftIO Time.getCurrentTime
-            zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
-            writeLogMessage logOptions (Message level message pairs zonedTime)
-            runTelemetryIgnoringStatC k logOptions
+  eff op = TelemetryIgnoringStatC (\ logOptions -> handleSum (eff . handleReader logOptions runTelemetryIgnoringStatC) (\case
+    WriteStat _                  k -> runTelemetryIgnoringStatC k logOptions
+    WriteLog level message pairs k -> do
+      time <- liftIO Time.getCurrentTime
+      zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
+      writeLogMessage logOptions (Message level message pairs zonedTime)
+      runTelemetryIgnoringStatC k logOptions) op)
 
 step :: ( Member (Env address) sig
         , Member (Error SomeException) sig

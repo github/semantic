@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Abstract
 ( Abstract (..)
 , runFunction
@@ -31,27 +31,25 @@ instance ( Member (Allocator address) sig
          )
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
   ret = FunctionC . const . ret
-  eff op = FunctionC (\ eval -> (alg eval \/ eff . handleReader eval runFunctionC) op)
-    where alg eval = \case
-            Function _ params body k -> runEvaluator $ do
-              env <- foldr (\ name rest -> do
-                addr <- alloc name
-                assign addr Abstract
-                Env.insert name addr <$> rest) (pure lowerBound) params
-              addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
-              deref addr >>= Evaluator . flip runFunctionC eval . k
-            BuiltIn _ k -> runFunctionC (k Abstract) eval
-            Call _ _ params k -> runEvaluator $ do
-              traverse_ deref params
-              box Abstract >>= Evaluator . flip runFunctionC eval . k
+  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
+    Function _ params body k -> runEvaluator $ do
+      env <- foldr (\ name rest -> do
+        addr <- alloc name
+        assign addr Abstract
+        Env.insert name addr <$> rest) (pure lowerBound) params
+      addr <- locally (bindAll env *> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
+      deref addr >>= Evaluator . flip runFunctionC eval . k
+    BuiltIn _ k -> runFunctionC (k Abstract) eval
+    Call _ _ params k -> runEvaluator $ do
+      traverse_ deref params
+      box Abstract >>= Evaluator . flip runFunctionC eval . k) op)
 
 
-instance (Carrier sig m, Alternative m, Monad m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
+instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
   ret = BooleanC . ret
-  eff = BooleanC . (alg \/ eff . handleCoercible)
-    where alg (Boolean _ k) = runBooleanC (k Abstract)
-          alg (AsBool _ k) = runBooleanC (k True) <|> runBooleanC (k False)
-          alg (Disjunction a b k) = (runBooleanC a <|> runBooleanC b) >>= runBooleanC . k
+  eff = BooleanC . handleSum (eff . handleCoercible) (\case
+    Boolean _ k -> runBooleanC (k Abstract)
+    AsBool  _ k -> runBooleanC (k True) <|> runBooleanC (k False))
 
 
 instance ( Member (Abstract.Boolean Abstract) sig
@@ -61,10 +59,11 @@ instance ( Member (Abstract.Boolean Abstract) sig
          )
       => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
   ret = WhileC . ret
-  eff = WhileC . (alg \/ eff . handleCoercible)
-    where alg (Abstract.While cond body k) = do
-            cond' <- runWhileC cond
-            ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit))
+  eff = WhileC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.While cond body k) -> do
+      cond' <- runWhileC cond
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
 
 
 instance Ord address => ValueRoots address Abstract where

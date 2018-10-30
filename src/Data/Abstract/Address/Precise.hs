@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, GADTs, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Precise
 ( Precise(..)
 ) where
@@ -19,12 +19,13 @@ instance Show Precise where
 
 instance (Member Fresh sig, Carrier sig m, Monad m) => Carrier (Allocator Precise :+: sig) (AllocatorC Precise m) where
   ret = AllocatorC . ret
-  eff = AllocatorC . (alg \/ eff . handleCoercible)
-    where alg (Alloc _ k) = Precise <$> fresh >>= runAllocatorC . k
+  eff = AllocatorC . handleSum
+    (eff . handleCoercible)
+    (\ (Alloc _ k) -> Precise <$> fresh >>= runAllocatorC . k)
 
 
 instance Carrier sig m => Carrier (Deref value :+: sig) (DerefC Precise value m) where
   ret = DerefC . ret
-  eff = DerefC . (alg \/ eff . handleCoercible)
-    where alg (DerefCell cell k) = runDerefC (k (fst <$> Set.minView cell))
-          alg (AssignCell value _ k) = runDerefC (k (Set.singleton value))
+  eff = DerefC . handleSum (eff . handleCoercible) (\case
+    DerefCell        cell k -> runDerefC (k (fst <$> Set.minView cell))
+    AssignCell value _    k -> runDerefC (k (Set.singleton value)))

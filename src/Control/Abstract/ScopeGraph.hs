@@ -98,23 +98,22 @@ newtype ScopeEnvC address m a = ScopeEnvC { runScopeEnvC :: Eff (StateC (ScopeGr
 
 instance (Ord address, Member Fresh sig, Member (Allocator address) sig, Carrier sig m, Effect sig) => Carrier (ScopeEnv address :+: sig) (ScopeEnvC address m) where
   ret = ScopeEnvC . ret
-  eff = ScopeEnvC . (alg \/ eff . R . handleCoercible)
-    where alg = \case
-            Lookup ref                     k -> gets (ScopeGraph.scopeOfRef ref) >>= runScopeEnvC . k
-            Declare decl span scope        k -> modify @(ScopeGraph address) (ScopeGraph.declare decl span scope) *> runScopeEnvC k
-            PutDeclarationScope decl scope k -> modify @(ScopeGraph address) (ScopeGraph.insertDeclarationScope decl scope) *> runScopeEnvC k
-            Reference ref decl             k -> modify @(ScopeGraph address) (ScopeGraph.reference ref decl) *> runScopeEnvC k
-            NewScope edges                 k -> do
-              -- Take the edges and construct a new scope, update the current scope to the new scope
-              name <- gensym
-              address <- runEvaluator (alloc name)
-              modify @(ScopeGraph address) (ScopeGraph.newScope address edges)
-              runScopeEnvC (k address)
-            CurrentScope                   k -> gets ScopeGraph.currentScope >>= runScopeEnvC . k
-            AssociatedScope decl           k -> gets (ScopeGraph.associatedScope decl) >>= runScopeEnvC . k
-            Local scope action             k -> do
-              prevScope <- gets ScopeGraph.currentScope
-              modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = Just scope })
-              value <- runScopeEnvC action
-              modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = prevScope })
-              runScopeEnvC (k value)
+  eff = ScopeEnvC . handleSum (eff . R . handleCoercible) (\case
+    Lookup ref                     k -> gets (ScopeGraph.scopeOfRef ref) >>= runScopeEnvC . k
+    Declare decl span scope        k -> modify @(ScopeGraph address) (ScopeGraph.declare decl span scope) *> runScopeEnvC k
+    PutDeclarationScope decl scope k -> modify @(ScopeGraph address) (ScopeGraph.insertDeclarationScope decl scope) *> runScopeEnvC k
+    Reference ref decl             k -> modify @(ScopeGraph address) (ScopeGraph.reference ref decl) *> runScopeEnvC k
+    NewScope edges                 k -> do
+      -- Take the edges and construct a new scope, update the current scope to the new scope
+      name <- gensym
+      address <- runEvaluator (alloc name)
+      modify @(ScopeGraph address) (ScopeGraph.newScope address edges)
+      runScopeEnvC (k address)
+    CurrentScope                   k -> gets ScopeGraph.currentScope >>= runScopeEnvC . k
+    AssociatedScope decl           k -> gets (ScopeGraph.associatedScope decl) >>= runScopeEnvC . k
+    Local scope action             k -> do
+      prevScope <- gets ScopeGraph.currentScope
+      modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = Just scope })
+      value <- runScopeEnvC action
+      modify @(ScopeGraph address) (\g -> g { ScopeGraph.currentScope = prevScope })
+      runScopeEnvC (k value))

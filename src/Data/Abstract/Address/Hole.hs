@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Hole
 ( Hole(..)
 , toMaybe
@@ -29,8 +29,9 @@ instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
          )
       => Carrier (Allocator (Hole context address) :+: sig) (AllocatorC (Hole context address) m) where
   ret = promoteA . ret
-  eff = alg \/ AllocatorC . eff . handleCoercible
-    where alg (Alloc name k) = Total <$> promoteA (eff (L (Alloc name ret))) >>= k
+  eff = handleSum
+    (AllocatorC . eff . handleCoercible)
+    (\ (Alloc name k) -> Total <$> promoteA (eff (L (Alloc name ret))) >>= k)
 
 
 promoteD :: DerefC address value m a -> DerefC (Hole context address) value m a
@@ -39,6 +40,6 @@ promoteD = DerefC . runDerefC
 instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m, Monad m)
       => Carrier (Deref value :+: sig) (DerefC (Hole context address) value m) where
   ret = promoteD . ret
-  eff = alg \/ DerefC . eff . handleCoercible
-    where alg (DerefCell cell k) = promoteD (eff (L (DerefCell cell ret))) >>= k
-          alg (AssignCell value cell k) = promoteD (eff (L (AssignCell value cell ret))) >>= k
+  eff = handleSum (DerefC . eff . handleCoercible) (\case
+    DerefCell        cell k -> promoteD (eff (L (DerefCell        cell ret))) >>= k
+    AssignCell value cell k -> promoteD (eff (L (AssignCell value cell ret))) >>= k)

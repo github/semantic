@@ -2,14 +2,9 @@
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
-, ModuleC
-, ValueC
-, evaluate
 , traceResolve
 -- * Preludes
 , HasPrelude(..)
--- * Postludes
-, HasPostlude(..)
 -- * Effects
 , EvalError(..)
 , throwEvalError
@@ -28,19 +23,14 @@ import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catc
 import Control.Abstract.Heap as X hiding (runAddressError, runAddressErrorWith)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Boolean(..), Function(..), While(..))
-import Control.Abstract.ScopeGraph
-import Control.Effect.Eavesdrop
-import Control.Effect.Interpose
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.BaseError as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
-import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Name as X
 import Data.Abstract.Ref as X
 import Data.Language
-import Data.Function
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -84,96 +74,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
     traverse_ recur expr
     v <- throwUnspecializedError $ UnspecializedError ("Eval unspecialized for " <> liftShowsPrec (const (const id)) (const id) 0 expr "")
     rvalBox v
-
-
-type ModuleC address value m
-  = EavesdropC (Modules address)                                  (Eff
-  ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
-  ( ErrorC (LoopControl address)                                  (Eff
-  ( ErrorC (Return address)                                       (Eff
-  ( EnvC address                                                  (Eff
-  ( ScopeEnvC address                                             (Eff
-  ( DerefC address value                                          (Eff
-  ( AllocatorC address                                            (Eff
-  ( ReaderC ModuleInfo                                            (Eff
-    m)))))))))))))))))
-
-type ValueC term address value m
-  = FunctionC term address value (Eff
-  ( WhileC value                 (Eff
-  ( BooleanC value               (Eff
-    m)))))
-
-evaluate :: ( AbstractValue term address value valueC
-            , Carrier sig c
-            , allocatorC ~ AllocatorC address (Eff (ReaderC ModuleInfo (Eff c)))
-            , Carrier (Allocator address :+: Reader ModuleInfo :+: sig) allocatorC
-            , Carrier (Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig) (DerefC address value (Eff allocatorC))
-            , booleanC ~ BooleanC value (Eff moduleC)
-            , Carrier (Boolean value :+: moduleSig) booleanC
-            , whileC ~ WhileC value (Eff booleanC)
-            , moduleSig ~ (Eavesdrop (Modules address) :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: Error (LoopControl address) :+: Error (Return address) :+: Env address :+: ScopeEnv address :+: Deref value :+: Allocator address :+: Reader ModuleInfo :+: sig)
-            , Carrier (While value :+: Boolean value :+: moduleSig) whileC
-            , Carrier (Function term address value :+: While value :+: Boolean value :+: moduleSig) valueC
-            , Declarations term
-            , Effect sig
-            , Evaluatable (Base term)
-            , FreeVariables term
-            , HasPostlude lang
-            , HasPrelude lang
-            , Member Fresh sig
-            , Member (Modules address) sig
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) sig
-            , Member (Reader PackageInfo) sig
-            , Member (Reader Span) sig
-            , Member (State Span) sig
-            , Member (Resumable (BaseError (AddressError address value))) sig
-            , Member (Resumable (BaseError (EnvironmentError address))) sig
-            , Member (Resumable (BaseError EvalError)) sig
-            , Member (Resumable (BaseError ResolutionError)) sig
-            , Member (Resumable (BaseError (UnspecializedError value))) sig
-            , Member (State (Heap address value)) sig
-            , Member Trace sig
-            , Ord address
-            , Recursive term
-            , moduleC ~ ModuleC address value c
-            , valueC ~ ValueC term address value moduleC
-            )
-         => proxy lang
-         -> Open (Module term -> Evaluator term address value moduleC address)
-         -> Open (Open (term -> Evaluator term address value valueC (ValueRef address)))
-         -> [Module term]
-         -> Evaluator term address value c (ModuleTable (NonEmpty (Module (ModuleResult address))))
-evaluate lang analyzeModule analyzeTerm modules = do
-  (_, (preludeBinds, _)) <- runInModule lowerBound moduleInfoFromCallStack . runValue $ do
-    definePrelude lang
-    box unit
-  foldr (run preludeBinds) ask modules
-  where run preludeBinds m rest = do
-          evaluated <- runInModule preludeBinds (moduleInfo m)
-            (analyzeModule (evalModuleBody . moduleBody)
-            m)
-          -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
-          local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
-
-        evalModuleBody term = runValue (do
-          result <- evalTerm term
-          result <$ postlude lang)
-
-        evalTerm = fix (analyzeTerm ((. project) . eval)) >=> address
-
-        runValue = runBoolean . runWhile . runFunction evalTerm
-
-        runInModule preludeBinds info
-          = raiseHandler (runReader info)
-          . runAllocator
-          . runDeref
-          . runScopeEnv
-          . runEnv (EvalContext Nothing (X.push (newEnv preludeBinds)))
-          . runReturn
-          . runLoopControl
-          . raiseHandler runInterpose
-          . raiseHandler runEavesdrop
 
 
 traceResolve :: (Show a, Show b, Member Trace sig, Carrier sig m) => a -> b -> Evaluator term address value m ()
@@ -228,36 +128,6 @@ instance HasPrelude 'JavaScript where
   definePrelude _ = do
     defineNamespace (name "console") $ do
       define (name "log") (builtIn Print)
-
--- Postludes
-
-class HasPostlude (language :: Language) where
-  postlude :: ( AbstractValue term address value m
-              , Carrier sig m
-              , HasCallStack
-              , Member (Allocator address) sig
-              , Member (Deref value) sig
-              , Member (Env address) sig
-              , Member Fresh sig
-              , Member (Reader ModuleInfo) sig
-              , Member (Reader Span) sig
-              , Member (Resumable (BaseError (EnvironmentError address))) sig
-              , Member Trace sig
-              )
-           => proxy language
-           -> Evaluator term address value m ()
-  postlude _ = pure ()
-
-instance HasPostlude 'Go
-instance HasPostlude 'Haskell
-instance HasPostlude 'Java
-instance HasPostlude 'PHP
-instance HasPostlude 'Python
-instance HasPostlude 'Ruby
-instance HasPostlude 'TypeScript
-
-instance HasPostlude 'JavaScript where
-  postlude _ = trace "JS postlude"
 
 
 -- Effects
