@@ -53,7 +53,7 @@ data Options
   , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
   , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
   , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
-  , optionsSHA              :: Maybe String
+  , optionsSHA              :: Maybe String  -- ^ Optional SHA to include in log messages.
   }
 
 defaultOptions :: Options
