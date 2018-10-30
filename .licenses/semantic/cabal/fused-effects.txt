@@ -2,7 +2,7 @@
 type: cabal
 name: fused-effects
 version: 0.1.0.0
-summary: A fast, flexible, fused effect system, à la Effect Handlers in Scope, Monad Transformers and Modular Algebraic Effects: What Binds Them Together, and Fusion for Free—Efficient Algebraic Effect Handlers.
+summary: 'A fast, flexible, fused effect system, à la Effect Handlers in Scope, Monad Transformers and Modular Algebraic Effects: What Binds Them Together, and Fusion for Free—Efficient Algebraic Effect Handlers.'
 homepage: https://github.com/robrix/fused-effects
 license: bsd-3-clause
 ---
