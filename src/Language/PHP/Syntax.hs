@@ -38,36 +38,38 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: ( Member (Modules address) effects
-                  , Member (Reader ModuleInfo) effects
-                  , Member (Reader Span) effects
-                  , Member (Resumable (BaseError ResolutionError)) effects
+resolvePHPName :: ( Member (Modules address) sig
+                  , Member (Reader ModuleInfo) sig
+                  , Member (Reader Span) sig
+                  , Member (Resumable (BaseError ResolutionError)) sig
+                  , Carrier sig m
                   )
                => T.Text
-               -> Evaluator term address value effects ModulePath
+               -> Evaluator term address value m ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybeM (throwResolutionError $ NotFoundError name [name] Language.PHP) modulePath
   where name = toName n
         toName = T.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( AbstractValue term address value effects
-           , Member (Deref value) effects
-           , Member (Env address) effects
-           , Member (Modules address) effects
-           , Member (Reader ModuleInfo) effects
-           , Member (Reader Span) effects
-           , Member (Resumable (BaseError (AddressError address value))) effects
-           , Member (Resumable (BaseError ResolutionError)) effects
-           , Member (Resumable (BaseError (EnvironmentError address))) effects
-           , Member (State (Heap address value)) effects
-           , Member Trace effects
+include :: ( AbstractValue term address value m
+           , Carrier sig m
+           , Member (Deref value) sig
+           , Member (Env address) sig
+           , Member (Modules address) sig
+           , Member (Reader ModuleInfo) sig
+           , Member (Reader Span) sig
+           , Member (Resumable (BaseError (AddressError address value))) sig
+           , Member (Resumable (BaseError ResolutionError)) sig
+           , Member (Resumable (BaseError (EnvironmentError address))) sig
+           , Member (State (Heap address value)) sig
+           , Member Trace sig
            , Ord address
            )
-        => (term -> Evaluator term address value effects (ValueRef address))
+        => (term -> Evaluator term address value m (ValueRef address))
         -> term
-        -> (ModulePath -> Evaluator term address value effects (ModuleResult address))
-        -> Evaluator term address value effects (ValueRef address)
+        -> (ModulePath -> Evaluator term address value m (ModuleResult address))
+        -> Evaluator term address value m (ValueRef address)
 include eval pathTerm f = do
   name <- eval pathTerm >>= Abstract.value >>= asString
   path <- resolvePHPName name

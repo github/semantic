@@ -12,6 +12,7 @@ import           Data.Aeson
 import qualified Data.Map as Map
 import           Data.Sum (Apply (..), Sum)
 import qualified Data.Text as Text
+import           GHC.Generics
 import           Prologue
 
 class ToJSONFields a where

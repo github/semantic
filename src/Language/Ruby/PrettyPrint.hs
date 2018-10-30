@@ -2,8 +2,8 @@
 
 module Language.Ruby.PrettyPrint ( printingRuby ) where
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Exception (Exc, throwError)
+import Control.Effect
+import Control.Effect.Error
 import Control.Monad.Trans (lift)
 import Data.Machine
 
@@ -14,10 +14,10 @@ import Data.Reprinting.Splice
 import Data.Reprinting.Token as Token
 
 -- | Print Ruby syntax.
-printingRuby :: (Member (Exc TranslationError) effs) => ProcessT (Eff effs) Fragment Splice
+printingRuby :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => ProcessT m Fragment Splice
 printingRuby = repeatedly (await >>= step)
 
-step :: (Member (Exc TranslationError) effs) => Fragment -> PlanT k Splice (Eff effs) ()
+step :: (Member (Error TranslationError) sig, Carrier sig m, Monad m) => Fragment -> PlanT k Splice m ()
 step (Verbatim txt) = emit txt
 step (New _ _ txt)  = emit txt
 step (Defer el cs)  = case (el, cs) of

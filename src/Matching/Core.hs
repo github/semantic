@@ -8,7 +8,7 @@ module Matching.Core
 
 import Prologue
 
-import           Control.Abstract.Matching
+import           Control.Matching
 import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 

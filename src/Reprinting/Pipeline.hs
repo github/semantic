@@ -103,9 +103,9 @@ module Reprinting.Pipeline
   , runTranslating
   ) where
 
-import           Control.Monad.Effect as Effect
-import qualified Control.Monad.Effect.Exception as Exc
-import           Control.Monad.Effect.State
+import           Control.Effect as Effect
+import           Control.Effect.Error as Effect
+import           Control.Effect.State as Effect
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
 import           Data.Text.Prettyprint.Doc
@@ -132,7 +132,7 @@ runReprinter :: Tokenize a
 runReprinter src translating tree
   = fmap go
   . Effect.run
-  . Exc.runError
+  . Effect.runError
   . fmap snd
   . runState (mempty :: [Scope])
   . foldT $ source (tokenizing src tree)
@@ -156,7 +156,7 @@ runContextualizing :: Tokenize a
   -> Either TranslationError [Fragment]
 runContextualizing src tree
   = Effect.run
-  . Exc.runError
+  . Effect.runError
   . fmap snd
   . runState (mempty :: [Scope])
   . runT $ source (tokenizing src tree)
@@ -169,7 +169,7 @@ runTranslating :: Tokenize a
   -> Either TranslationError [Splice]
 runTranslating src translating tree
   = Effect.run
-  . Exc.runError
+  . Effect.runError
   . fmap snd
   . runState (mempty :: [Scope])
   . runT $ source (tokenizing src tree)

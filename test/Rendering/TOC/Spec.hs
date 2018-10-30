@@ -2,6 +2,7 @@
 module Rendering.TOC.Spec (spec) where
 
 import Analysis.Declaration
+import Control.Effect
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
 import Data.Bifunctor.Join
@@ -16,7 +17,6 @@ import Data.Sum
 import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
-import Data.Union hiding (forAll)
 import Diffing.Algorithm
 import Diffing.Interpreter
 import Prelude
@@ -231,10 +231,12 @@ diffWithParser :: ( Eq1 syntax
                   , Diffable syntax
                   , HasDeclaration syntax
                   , Hashable1 syntax
-                  , Member Distribute effs
-                  , Member Task effs
+                  , Member Distribute sig
+                  , Member Task sig
+                  , Carrier sig m
+                  , Monad m
                   )
                => Parser (Term syntax Location)
                -> BlobPair
-               -> Eff effs (Diff syntax (Maybe Declaration) (Maybe Declaration))
+               -> m (Diff syntax (Maybe Declaration) (Maybe Declaration))
 diffWithParser parser blobs = distributeFor blobs (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) >>= SpecHelpers.diff . runJoin

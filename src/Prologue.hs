@@ -26,7 +26,6 @@ import Data.Set as X (Set)
 import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
 import Data.These as X
-import Data.Union as X
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 
@@ -34,7 +33,6 @@ import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, thr
 import Control.Applicative as X
 import Control.Arrow as X ((&&&), (***))
 import Control.Monad as X hiding (fail, return)
-import Control.Monad.Except as X (MonadError (..))
 import Control.Monad.Fail as X (MonadFail (..))
 import Control.Monad.IO.Class as X (MonadIO (..))
 import Data.Algebra as X
@@ -56,7 +54,7 @@ import Data.Traversable as X
 import Data.Typeable as X (Typeable)
 
 -- Generics
-import GHC.Generics as X hiding (moduleName)
+import GHC.Generics as X (Generic, Generic1)
 import GHC.Stack as X
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
