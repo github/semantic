@@ -9,7 +9,7 @@ import           Control.Category
 import qualified Data.ByteString.Char8 as BC
 import           Text.Show.Pretty (pPrint)
 
-import           Control.Abstract.Matching
+import           Control.Matching
 import           Control.Rewriting hiding (fromMatcher, target)
 import           Data.Blob
 import           Data.File
