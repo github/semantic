@@ -17,7 +17,6 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
-import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.File (File (..), readBlobFromFile)
 import Data.Graph (topologicalSort)
@@ -194,10 +193,3 @@ shouldBreak = do
           | n >= posLine spanStart
           , n <= posLine spanEnd   = True
           | otherwise              = False
-
-
-cyan :: String
-cyan = "\ESC[1;36m\STX"
-
-plain :: String
-plain = "\ESC[0m\STX"
