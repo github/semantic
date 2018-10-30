@@ -35,7 +35,6 @@ import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Effect.Carrier
-import Data.Coerce
 import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Data.Abstract.Module
