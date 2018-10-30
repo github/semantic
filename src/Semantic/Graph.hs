@@ -19,7 +19,7 @@ module Semantic.Graph
 , resumingUnspecialized
 , resumingAddressError
 , resumingValueError
-, resumingEnvironmentError
+-- , resumingEnvironmentError -- TODO: Fix me. Replace with resumingScopeGraphError?
 , resumingTypeError
 ) where
 
@@ -117,7 +117,7 @@ runCallGraph lang includePackages modules package = do
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
-        . resumingEnvironmentError
+        -- . resumingEnvironmentError -- TODO: Fix me. Replace with resumingScopeGraphError?
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
@@ -185,7 +185,7 @@ runImportGraph lang (package :: Package term) f =
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
-        . resumingEnvironmentError
+        -- . resumingEnvironmentError -- TODO: Fix me. Replace with `resumingScopeGraphError`?
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
@@ -211,7 +211,6 @@ type ConcreteEffects address rest
   ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
   ': Resumable (BaseError ResolutionError)
   ': Resumable (BaseError EvalError)
-  ': Resumable (BaseError (EnvironmentError address))
   ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address rest))))
   ': Resumable (BaseError (LoadError address))
   ': Fresh
@@ -237,7 +236,7 @@ parsePackage parser project = do
   pkg <$ trace ("project: " <> prettyShow (() <$ pkg))
 
   where
-    n = name (projectName project)
+    n = Data.Abstract.Evaluatable.name (projectName project) -- TODO: Confirm this is the right `name`.
 
 -- | Parse all files in a project into 'Module's.
 parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module (Blob, term)]
@@ -268,7 +267,7 @@ parsePythonPackage parser project = do
         . runFresh 0
         . resumingLoadError
         . resumingUnspecialized
-        . resumingEnvironmentError
+        -- . resumingEnvironmentError -- TODO: Fix me. Replace with `resumineScopeGraphError`?
         . resumingEvalError
         . resumingResolutionError
         . resumingAddressError
@@ -276,7 +275,7 @@ parsePythonPackage parser project = do
         . runReader lowerBound
         . runModules lowerBound
         . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
-        . runReader (PackageInfo (name "setup") lowerBound)
+        . runReader (PackageInfo (Data.Abstract.Evaluatable.name "setup") lowerBound) -- TODO: Confirm this is the right `name`.
         . runState lowerBound
         . runReader lowerBound
       runAddressEffects
@@ -292,7 +291,7 @@ parsePythonPackage parser project = do
     PythonPackage.Unknown -> do
       modules <- fmap (fmap snd) <$> parseModules parser project
       resMap <- Task.resolutionMap project
-      pure (Package.fromModules (name (projectName project)) modules resMap)
+      pure (Package.fromModules (Data.Abstract.Evaluatable.name (projectName project)) modules resMap) -- TODO: Confirm this is the right `name`.
     PythonPackage.Packages dirs -> do
       filteredBlobs <- for dirs $ \dir -> do
         let packageDir = projectRootDir project </> unpack dir
@@ -312,7 +311,7 @@ parsePythonPackage parser project = do
         let p = project { projectBlobs = catMaybes $ join filteredBlobs }
         modules <- fmap (fmap snd) <$> parseModules parser p
         resMap <- Task.resolutionMap p
-        pure (Package.fromModules (name $ projectName p) modules resMap)
+        pure (Package.fromModules (Data.Abstract.Evaluatable.name $ projectName p) modules resMap) -- TODO: Confirm this is the right `name`.
 
 parseModule :: (Member (Exc SomeException) effs, Member Task effs)
             => Project
@@ -356,7 +355,7 @@ resumingLoadError :: ( Applicative (m address value effects)
                   => m address value (Resumable (BaseError (LoadError address)) ': effects) a
                   -> m address value effects a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
-  ModuleNotFoundError _ -> pure (ScopeGraph.emptyGraph, (lowerBound, hole)))
+  ModuleNotFoundError _ -> pure (lowerBound @ScopeGraph.ScopeGraph, (lowerBound, hole))) -- TODO: Confirm `lowerBound @ScopeGraph.ScopeGraph` is what we want.
 
 resumingEvalError :: ( Applicative (m effects)
                      , Effectful m
@@ -421,14 +420,16 @@ resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" b
   ArrayError{}      -> pure lowerBound
   ArithmeticError{} -> pure hole)
 
-resumingEnvironmentError :: ( Monad (m (Hole (Maybe Name) address) value effects)
-                            , Effectful (m (Hole (Maybe Name) address) value)
-                            , Effects effects
-                            , Member Trace effects
-                            )
-                         => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a
-                         -> m (Hole (Maybe Name) address) value effects a
-resumingEnvironmentError = runResumableWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError))
+-- TODO: Fix me.
+-- Replace this with ScopeGraphError?
+-- resumingEnvironmentError :: ( Monad (m (Hole (Maybe Name) address) value effects)
+--                             , Effectful (m (Hole (Maybe Name) address) value)
+--                             , Effects effects
+--                             , Member Trace effects
+--                             )
+--                          => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a
+--                          -> m (Hole (Maybe Name) address) value effects a
+-- resumingEnvironmentError = runResumableWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError))
 
 resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
                      , Effects effects
