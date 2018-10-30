@@ -25,9 +25,11 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    recv <- box unit -- TODO
-    args <- traverse subtermAddress callParams
-    Rval <$> call op recv args
+    -- TODO: Fix me.
+    -- recv <- box unit
+    -- args <- traverse subtermAddress callParams
+    -- Rval <$> call op recv args
+    rvalBox unit
 
 instance Tokenize Call where
   tokenize Call{..} = within TCall $ do
@@ -293,9 +295,10 @@ instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Delete where
   eval (Delete a) = do
-    valueRef <- subtermRef a
-    addr <- address valueRef
-    dealloc addr
+    -- TODO: Fix me.
+    -- valueRef <- subtermRef a
+    -- addr <- address valueRef
+    -- dealloc addr
     rvalBox unit
 
 -- | A sequence expression such as Javascript or C's comma operator.
@@ -440,14 +443,17 @@ instance Evaluatable MemberAccess where
     reference (Reference name) (Declaration name)
     childScope <- associatedScope (Declaration name)
 
-    ptr <- subtermAddress obj
-    case childScope of
-      Just childScope -> withScope childScope $ reference (Reference propName) (Declaration propName)
-      Nothing ->
-        -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
-        pure ()
+    -- TODO: Fix me.
+    -- ptr <- subtermAddress obj
+    -- case childScope of
+    --   Just childScope -> withScope childScope $ reference (Reference propName) (Declaration propName)
+    --   Nothing ->
+    --     -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
+    --     pure ()
+    --
+    -- pure $! LvalMember ptr propName
+    rvalBox unit
 
-    pure $! LvalMember ptr propName
 
 -- | Subscript (e.g a[1])
 data Subscript a = Subscript { lhs :: a, rhs :: [a] }
@@ -506,8 +512,10 @@ instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ScopeResolution where
-  eval (ScopeResolution xs) = Rval <$> foldl1 f (fmap subtermAddress xs)
-    where f ns id = ns >>= flip evaluateInScopedEnv id
+  eval (ScopeResolution xs) = undefined
+    -- TODO: Fix me.
+    -- Rval <$> foldl1 f (fmap subtermAddress xs)
+      -- where f ns id = ns >>= flip evaluateInScopedEnv id
 
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
@@ -575,7 +583,9 @@ instance Eq1 Super where liftEq = genericLiftEq
 instance Ord1 Super where liftCompare = genericLiftCompare
 instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Super where
-  eval Super = Rval <$> (maybeM (box unit) =<< self)
+  eval Super = undefined
+    -- TODO: Fix me.
+    -- Rval <$> (maybeM (box unit) =<< self)
 
 data This a = This
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1)
@@ -584,4 +594,6 @@ instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
-  eval This = Rval <$> (maybeM (box unit) =<< self)
+  eval This = undefined
+    -- TODO: Fix me.
+    -- Rval <$> (maybeM (box unit) =<< self)

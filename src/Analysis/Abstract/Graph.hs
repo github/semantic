@@ -78,8 +78,8 @@ graphingTerms :: ( Member (Reader ModuleInfo) effects
                  , Functor syntax
                  , term ~ Term syntax (Record fields)
                  )
-              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
-              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address))))
+              => SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address)) value)) -- TODO: Fix me. I added `value` to `(ValueRef (Hole context ...))`
+              -> SubtermAlgebra (Base term) term (TermEvaluator term (Hole context (Located address)) value effects (ValueRef (Hole context (Located address)) value)) -- TODO: Fix me. I added `value` to `(ValueRef (Hole context ...))`
 graphingTerms recur term@(In a syntax) = do
   definedInModule <- currentModule
   case toVertex a definedInModule (subterm <$> syntax) of
@@ -87,12 +87,13 @@ graphingTerms recur term@(In a syntax) = do
     Just (v@Method{}, _) -> recurWithContext v
     Just (v@Variable{..}, name) -> do
       variableDefinition v
-      maybeAddr <- TermEvaluator (lookupEnv name)
-      case maybeAddr of
-        Just a -> do
-          defined <- gets (Map.lookup a)
-          maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
-        _ -> pure ()
+      -- TODO: Fix me.
+      -- maybeAddr <- TermEvaluator (lookupEnv name)
+      -- case maybeAddr of
+      --   Just a -> do
+      --     defined <- gets (Map.lookup a)
+      --     maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
+      --   _ -> pure ()
       recur term
     _ -> recur term
   where
@@ -101,8 +102,9 @@ graphingTerms recur term@(In a syntax) = do
       moduleInclusion v
       local (const v) $ do
         valRef <- recur term
-        addr <- TermEvaluator (Control.Abstract.address valRef)
-        modify' (Map.insert addr v)
+        -- TODO: Fix me.
+        -- addr <- TermEvaluator (Control.Abstract.address valRef)
+        -- modify' (Map.insert addr v)
         pure valRef
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.

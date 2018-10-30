@@ -21,7 +21,7 @@ import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named
 import qualified Proto3.Suite as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import Control.Abstract.ScopeGraph (Allocator, bindAll, insertEdge, declare, Declaration(..))
+import Control.Abstract.ScopeGraph (Allocator, bindAll, insertImportEdge, declare, Declaration(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data QualifiedName
@@ -154,7 +154,7 @@ instance Evaluatable Import where
     scopeGraph <- fst <$> require path
     bindAll scopeGraph
     if Prologue.null xs then
-      maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+      maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
     else
       for_ xs $ \Alias{..} -> do
         -- TODO: Add an Alias Edge to resolve qualified export froms

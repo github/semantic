@@ -118,8 +118,10 @@ instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Let where
   eval Let{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm letVariable))
-    addr <- snd <$> letrec name (subtermValue letValue)
-    Rval <$> locally (bind name addr *> subtermAddress letBody)
+    -- TODO: Fix me.
+    -- addr <- snd <$> letrec name (subtermValue letValue)
+    -- Rval <$> locally (bind name addr *> subtermAddress letBody)
+    rvalBox unit
 
 
 -- Assignment
@@ -137,31 +139,33 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
   eval Assignment{..} = do
-    lhs <- subtermRef assignmentTarget
-    rhs <- subtermAddress assignmentValue
-
-    case lhs of
-      LvalLocal name -> do
-        case declaredName (subterm assignmentValue) of
-          Just rhsName -> do
-            assocScope <- associatedScope (Declaration rhsName)
-            case assocScope of
-              Just assocScope' -> do
-                objectScope <- newScope (Map.singleton Import [ assocScope' ])
-                putDeclarationScope (Declaration name) objectScope
-              Nothing -> pure ()
-          Nothing ->
-            -- The rhs wasn't assigned to a reference/declaration.
-            pure ()
-        bind name rhs
-      LvalMember _ _ ->
-        -- we don't yet support mutable object properties:
-        pure ()
-      Rval _ ->
-        -- the left hand side of the assignment expression is invalid:
-        pure ()
-
-    pure (Rval rhs)
+    undefined
+    -- TODO: Fix me.
+    -- lhs <- subtermRef assignmentTarget
+    -- rhs <- subtermAddress assignmentValue
+    --
+    -- case lhs of
+    --   LvalLocal name -> do
+    --     case declaredName (subterm assignmentValue) of
+    --       Just rhsName -> do
+    --         assocScope <- associatedScope (Declaration rhsName)
+    --         case assocScope of
+    --           Just assocScope' -> do
+    --             objectScope <- newScope (Map.singleton Import [ assocScope' ])
+    --             putDeclarationScope (Declaration name) objectScope
+    --           Nothing -> pure ()
+    --       Nothing ->
+    --         -- The rhs wasn't assigned to a reference/declaration.
+    --         pure ()
+    --     bind name rhs
+    --   LvalMember _ _ ->
+    --     -- we don't yet support mutable object properties:
+    --     pure ()
+    --   Rval _ ->
+    --     -- the left hand side of the assignment expression is invalid:
+    --     pure ()
+    --
+    -- pure (Rval rhs)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement { value :: a }
@@ -220,7 +224,9 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval (Return x) = Rval <$> (subtermAddress x >>= earlyReturn)
+  eval (Return x) = undefined
+    -- TODO: Fix me.
+    -- Rval <$> (subtermAddress x >>= earlyReturn)
 
 instance Tokenize Return where
   tokenize (Return x) = within' TReturn x
@@ -244,7 +250,9 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval (Break x) = Rval <$> (subtermAddress x >>= throwBreak)
+  eval (Break x) = undefined
+    -- TODO: Fix me.
+    -- Rval <$> (subtermAddress x >>= throwBreak)
 
 newtype Continue a = Continue { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
@@ -254,7 +262,9 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval (Continue x) = Rval <$> (subtermAddress x >>= throwContinue)
+  eval (Continue x) = undefined
+    -- TODO: Fix me.
+    -- Rval <$> (subtermAddress x >>= throwContinue)
 
 newtype Retry a = Retry { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)

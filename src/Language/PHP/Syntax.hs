@@ -76,7 +76,7 @@ include pathTerm f = do
   traceResolve name path
   (scopeGraph, v) <- f path
   bindAll scopeGraph
-  maybe (pure ()) (insertEdge ScopeGraph.Import) (ScopeGraph.currentScope scopeGraph)
+  maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
   pure (Rval v)
 
 newtype Require a = Require { value :: a }
