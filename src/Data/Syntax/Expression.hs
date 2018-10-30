@@ -3,13 +3,13 @@
 module Data.Syntax.Expression where
 
 import Prelude hiding (null)
-import Prologue hiding (Member, This, index, null)
+import Prologue hiding (This, index, null)
 
 import Data.Fixed
 import Proto3.Suite.Class
 
 import           Control.Abstract.ScopeGraph as ScopeGraph
-import           Data.Abstract.Evaluatable as Abstract hiding (Member)
+import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope
@@ -249,7 +249,9 @@ instance Ord1 Or where liftCompare = genericLiftCompare
 instance Show1 Or where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Or where
-  eval eval (Or a b) = disjunction (eval a >>= Abstract.value) (eval b >>= Abstract.value) >>= rvalBox
+  eval eval (Or a b) = do
+    a' <- eval a >>= Abstract.value
+    ifthenelse a' (rvalBox a') (eval b)
 
 data And a = And { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)

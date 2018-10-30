@@ -1,11 +1,13 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, TypeOperators #-}
+{-# LANGUAGE GADTs, KindSignatures, LambdaCase, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.REPL
 ( rubyREPL
 ) where
 
 import Control.Abstract hiding (Continue, List, string)
-import Control.Monad.Effect.Resource
+import Control.Effect.Carrier
+import Control.Effect.Resource
+import Control.Effect.Sum
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable hiding (string)
@@ -14,6 +16,7 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Concrete
 import Data.Blob (Blob(..))
+import Data.Coerce
 import Data.Error (showExcerpt)
 import Data.File (File (..), readBlobFromFile)
 import Data.Graph (topologicalSort)
@@ -26,7 +29,8 @@ import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Numeric (readDec)
 import Parsing.Parser (rubyParser)
-import Prologue hiding (throwError)
+import Prologue
+import Semantic.Analysis
 import Semantic.Config (logOptionsFromConfig)
 import Semantic.Distribute
 import Semantic.Graph
@@ -41,15 +45,16 @@ import System.Console.Haskeline
 import System.Directory (createDirectoryIfMissing, getHomeDirectory)
 import System.FilePath
 
-data REPL (m :: * -> *) result where
-  Prompt :: REPL m (Maybe String)
-  Output :: String -> REPL m ()
+data REPL (m :: * -> *) k
+  = Prompt (Maybe String -> k)
+  | Output String k
+  deriving (Functor)
 
-prompt :: (Effectful m, Member REPL effects) => m effects (Maybe String)
-prompt = send Prompt
+prompt :: (Member REPL sig, Carrier sig m) => m (Maybe String)
+prompt = send (Prompt ret)
 
-output :: (Effectful m, Member REPL effects) => String -> m effects ()
-output s = send (Output s)
+output :: (Member REPL sig, Carrier sig m) => String -> m ()
+output s = send (Output s (ret ()))
 
 
 data Quit = Quit
@@ -58,16 +63,24 @@ data Quit = Quit
 instance Exception Quit
 
 
-instance PureEffect REPL
+instance HFunctor REPL where
+  hmap _ = coerce
+
 instance Effect REPL where
-  handleState state handler (Request Prompt k) = Request Prompt (handler . (<$ state) . k)
-  handleState state handler (Request (Output s) k) = Request (Output s) (handler . (<$ state) . k)
+  handle state handler (Prompt k) = Prompt (handler . (<$ state) . k)
+  handle state handler (Output s k) = Output s (handler (k <$ state))
 
 
-runREPL :: (Effectful m, MonadIO (m effects), PureEffects effects) => Prefs -> Settings IO -> m (REPL ': effects) a -> m effects a
-runREPL prefs settings = interpret $ \case
-  Prompt   -> liftIO (runInputTWithPrefs prefs settings (getInputLine (cyan <> "repl: " <> plain)))
-  Output s -> liftIO (runInputTWithPrefs prefs settings (outputStrLn s))
+runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff (REPLC m) a -> m a
+runREPL prefs settings = flip runREPLC (prefs, settings) . interpret
+
+newtype REPLC m a = REPLC { runREPLC :: (Prefs, Settings IO) -> m a }
+
+instance (Carrier sig m, MonadIO m) => Carrier (REPL :+: sig) (REPLC m) where
+  ret = REPLC . const . ret
+  eff op = REPLC (\ args -> handleSum (eff . handleReader args runREPLC) (\case
+    Prompt   k -> liftIO (uncurry runInputTWithPrefs args (getInputLine (cyan <> "repl: " <> plain))) >>= flip runREPLC args . k
+    Output s k -> liftIO (uncurry runInputTWithPrefs args (outputStrLn s)) *> runREPLC k args) op)
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
@@ -89,10 +102,11 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . fmap snd
     . runState ([] @Breakpoint)
     . runReader Step
+    . runEvaluator
     . id @(Evaluator _ Precise (Value _ Precise) _ _)
-    . runPrintingTrace
+    . raiseHandler runTraceByPrinting
     . runHeap
-    . runFresh 0
+    . raiseHandler runFresh
     . fmap reassociate
     . runLoadError
     . runUnspecialized
@@ -101,35 +115,43 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . runResolutionError
     . runAddressError
     . runValueError
-    . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+    . runModuleTable
     . runModules (ModuleTable.modulePaths (packageModules (snd <$> package)))
-    . runReader (packageInfo package)
-    . runState (lowerBound @Span)
-    . runReader (lowerBound @Span)
-    $ evaluate proxy id (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package)))) (Precise.runAllocator . Precise.runDeref) (fmap (Concrete.runBoolean . Concrete.runWhile) . Concrete.runFunction) modules
+    . raiseHandler (runReader (packageInfo package))
+    . raiseHandler (runState (lowerBound @Span))
+    . raiseHandler (runReader (lowerBound @Span))
+    $ evaluate proxy id (evalTerm (withTermSpans . step (fmap (\ (x:|_) -> moduleBody x) <$> ModuleTable.toPairs (packageModules (fst <$> package))))) modules
 
 -- TODO: REPL for typechecking/abstract semantics
 -- TODO: drive the flow from within the REPL instead of from without
 
-runTelemetryIgnoringStat :: (Effectful m, MonadIO (m effects), PureEffects effects) => LogOptions -> m (Telemetry : effects) a -> m effects a
-runTelemetryIgnoringStat logOptions = interpret $ \case
-  WriteStat{} -> pure ()
-  WriteLog level message pairs -> do
-    time <- liftIO Time.getCurrentTime
-    zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
-    writeLogMessage logOptions (Message level message pairs zonedTime)
+runTelemetryIgnoringStat :: (Carrier sig m, MonadIO m) => LogOptions -> Eff (TelemetryIgnoringStatC m) a -> m a
+runTelemetryIgnoringStat logOptions = flip runTelemetryIgnoringStatC logOptions . interpret
 
-step :: ( Member (Env address) effects
-        , Member (Exc SomeException) effects
-        , Member REPL effects
-        , Member (Reader ModuleInfo) effects
-        , Member (Reader Span) effects
-        , Member (Reader Step) effects
-        , Member (State [Breakpoint]) effects
+newtype TelemetryIgnoringStatC m a = TelemetryIgnoringStatC { runTelemetryIgnoringStatC :: LogOptions -> m a }
+
+instance (Carrier sig m, MonadIO m) => Carrier (Telemetry :+: sig) (TelemetryIgnoringStatC m) where
+  ret = TelemetryIgnoringStatC . const . ret
+  eff op = TelemetryIgnoringStatC (\ logOptions -> handleSum (eff . handleReader logOptions runTelemetryIgnoringStatC) (\case
+    WriteStat _                  k -> runTelemetryIgnoringStatC k logOptions
+    WriteLog level message pairs k -> do
+      time <- liftIO Time.getCurrentTime
+      zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
+      writeLogMessage logOptions (Message level message pairs zonedTime)
+      runTelemetryIgnoringStatC k logOptions) op)
+
+step :: ( Member (Env address) sig
+        , Member (Error SomeException) sig
+        , Member REPL sig
+        , Member (Reader ModuleInfo) sig
+        , Member (Reader Span) sig
+        , Member (Reader Step) sig
+        , Member (State [Breakpoint]) sig
         , Show address
+        , Carrier sig m
         )
      => [(ModulePath, Blob)]
-     -> Open (Open (term -> Evaluator term address value effects a))
+     -> Open (Open (term -> Evaluator term address value m a))
 step blobs recur0 recur term = do
   break <- shouldBreak
   if break then do
@@ -157,7 +179,7 @@ step blobs recur0 recur term = do
         runCommand run [":step"]     = local (const Step) run
         runCommand run [":continue"] = local (const Continue) run
         runCommand run [":break", s]
-          | [(i, "")] <- readDec s = modify' (OnLine i :) >> runCommands run
+          | [(i, "")] <- readDec s = modify (OnLine i :) >> runCommands run
         -- TODO: :show breakpoints
         -- TODO: :delete breakpoints
         runCommand run [":list"] = list >> runCommands run
@@ -189,7 +211,7 @@ data Step
 
 -- TODO: StepLocal/StepModule
 
-shouldBreak :: (Member (State [Breakpoint]) effects, Member (Reader Span) effects, Member (Reader Step) effects) => Evaluator term address value effects Bool
+shouldBreak :: (Member (State [Breakpoint]) sig, Member (Reader Span) sig, Member (Reader Step) sig, Carrier sig m) => Evaluator term address value m Bool
 shouldBreak = do
   step <- ask
   case step of

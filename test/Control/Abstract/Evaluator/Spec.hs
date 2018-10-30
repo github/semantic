@@ -27,7 +27,7 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (_, expected) <- evaluate $ do
-      identity <- function Nothing [name "x"] (coerce (variable (name "x")))
+      identity <- function Nothing [name "x"] (SpecEff (variable (name "x")))
       recv <- box unit
       addr <- box (integer 123)
       call identity recv [addr]
@@ -35,48 +35,49 @@ spec = parallel $ do
 
 evaluate
   = runM
-  . runIgnoringTrace
+  . runTraceByIgnoring
   . runState (lowerBound @(Heap Precise Val))
-  . runFresh 0
+  . runFresh
   . runReader (PackageInfo (name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . runReader (lowerBound @Span)
+  . runEvaluator
   . fmap reassociate
   . runValueError
   . runEnvironmentError
   . runAddressError
-  . Precise.runDeref @_ @_ @Val
-  . Precise.runAllocator
+  . runDeref @Val
+  . runAllocator
   . (>>= deref . snd)
   . runEnv lowerBound
   . runReturn
   . runLoopControl
-  . Value.runBoolean
-  . Value.runFunction coerce
+  . runBoolean
+  . runFunction runSpecEff
 
-reassociate :: Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result)) -> Either (SomeExc (Sum '[exc3, exc2, exc1])) result
-reassociate = mergeExcs . mergeExcs . mergeExcs . Right
+reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) result)) -> Either (SomeError (Sum '[exc3, exc2, exc1])) result
+reassociate = mergeErrors . mergeErrors . mergeErrors . Right
 
 type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
-  { runSpecEff :: Eff '[ Function SpecEff Precise Val
-                       , Boolean Val
-                       , Exc (LoopControl Precise)
-                       , Exc (Return Precise)
-                       , Env Precise
-                       , Allocator Precise
-                       , Deref Val
-                       , Resumable (BaseError (AddressError Precise Val))
-                       , Resumable (BaseError (EnvironmentError Precise))
-                       , Resumable (BaseError (ValueError SpecEff Precise))
-                       , Reader Span
-                       , Reader ModuleInfo
-                       , Reader PackageInfo
-                       , Fresh
-                       , State (Heap Precise Val)
-                       , Trace
-                       , Lift IO
-                       ] Precise
+  { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
+                 (Eff (BooleanC Val
+                 (Eff (ErrorC (LoopControl Precise)
+                 (Eff (ErrorC (Return Precise)
+                 (Eff (EnvC Precise
+                 (Eff (AllocatorC Precise
+                 (Eff (DerefC Precise Val
+                 (Eff (ResumableC (BaseError (AddressError Precise Val))
+                 (Eff (ResumableC (BaseError (EnvironmentError Precise))
+                 (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
+                 (Eff (ReaderC Span
+                 (Eff (ReaderC ModuleInfo
+                 (Eff (ReaderC PackageInfo
+                 (Eff (FreshC
+                 (Eff (StateC (Heap Precise Val)
+                 (Eff (TraceByIgnoringC
+                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))
+                 Precise
   }
 
 instance Eq SpecEff where _ == _ = True

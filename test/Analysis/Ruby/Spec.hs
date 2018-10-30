@@ -6,7 +6,7 @@ import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Number as Number
 import Data.Abstract.Value.Concrete as Value
 import Data.AST
-import Control.Monad.Effect (SomeExc(..))
+import Control.Effect.Resumable (SomeError(..))
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Sum
 import qualified Language.Ruby.Assignment as Ruby
@@ -36,7 +36,7 @@ spec config = parallel $ do
 
     it "evaluates load with wrapper" $ do
       (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
-      res `shouldBe` Left (SomeExc (inject @(BaseError (EnvironmentError Precise)) (BaseError (ModuleInfo "load-wrap.rb") emptySpan (FreeVariable "foo"))))
+      res `shouldBe` Left (SomeError (inject @(BaseError (EnvironmentError Precise)) (BaseError (ModuleInfo "load-wrap.rb") emptySpan (FreeVariable "foo"))))
 
     it "evaluates subclass" $ do
       (_, (heap, res)) <- evaluate ["subclass.rb"]
