@@ -6,7 +6,7 @@ summary: 'A fast, flexible, fused effect system, à la Effect Handlers in Scope,
 homepage: https://github.com/robrix/fused-effects
 license: bsd-3-clause
 ---
-Copyright (c) 2018, Rob Rix
+Copyright (c) 2018, Rob Rix and Patrick Thomson
 
 All rights reserved.
 
