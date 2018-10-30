@@ -119,8 +119,7 @@ runTelemetryIgnoringStat logOptions = interpret $ \case
     zonedTime <- liftIO (LocalTime.utcToLocalZonedTime time)
     writeLogMessage logOptions (Message level message pairs zonedTime)
 
-step :: ( Member (Env address) effects
-        , Member (Exc SomeException) effects
+step :: ( Member (Exc SomeException) effects
         , Member REPL effects
         , Member (Reader ModuleInfo) effects
         , Member (Reader Span) effects

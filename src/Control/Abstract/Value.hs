@@ -17,7 +17,6 @@ module Control.Abstract.Value
 , doWhile
 , forLoop
 , makeNamespace
-, evaluateInScopedEnv
 -- , address
 , value
 , rvalBox
@@ -29,7 +28,7 @@ import Control.Abstract.ScopeGraph (Declaration, ScopeGraph, ScopeError)
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap hiding (address)
-import Control.Abstract.ScopeGraph (Allocator)
+import Control.Abstract.ScopeGraph (Allocator, currentScope, newScope, EdgeLabel(..), )
 import qualified Control.Abstract.Heap as Heap
 import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
@@ -40,6 +39,7 @@ import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Span
 import Prologue hiding (TypeError)
+import qualified Data.Map.Strict as Map
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -216,15 +216,29 @@ class AbstractIntro value => AbstractValue address value effects where
 -- | C-style for loops.
 forLoop :: ( AbstractValue address value effects
            , Member (Boolean value) effects
-           , Member (Env address) effects
+           , Member (Reader ModuleInfo) effects
+           , Member (State (Heap address address value)) effects
+           , Ord address
+           , Member (Reader Span) effects
+           , Member (Resumable (BaseError (HeapError address))) effects
+           , Member (Allocator address) effects
+           , Member (Resumable (BaseError (ScopeError address))) effects
+           , Member Fresh effects
+           , Member (State (ScopeGraph address)) effects
            )
         => Evaluator address value effects value -- ^ Initial statement
         -> Evaluator address value effects value -- ^ Condition
         -> Evaluator address value effects value -- ^ Increment/stepper
         -> Evaluator address value effects value -- ^ Body
         -> Evaluator address value effects value
-forLoop initial cond step body =
-  locally (initial *> while cond (body *> step))
+forLoop initial cond step body = initial *> while cond (action *> step)
+  where
+    action = do
+      currentScope' <- currentScope
+      currentFrame' <- currentFrame
+      scopeAddr <- newScope (Map.singleton Lexical [ currentScope' ])
+      frame <- newFrame scopeAddr (Map.singleton Lexical (Map.singleton currentScope' currentFrame'))
+      withScopeAndFrame frame body
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
 while :: (AbstractValue address value effects, Member (Boolean value) effects)
@@ -256,7 +270,6 @@ makeNamespace :: ( AbstractValue address value effects
                  , Member (Allocator address) effects
                  , Member (Allocator (Address address)) effects
                  , Member (Resumable (BaseError (ScopeError address))) effects
-                 , Member (Env address) effects
                  , Member (State (Heap address address value)) effects
                  , Member Fresh effects
                  , Ord address
@@ -274,16 +287,15 @@ makeNamespace declaration addr super body = do
 
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
-evaluateInScopedEnv :: ( AbstractValue address value effects
-                       , Member (Env address) effects
-                       )
-                    => address
-                    -> Evaluator address value effects a
-                    -> Evaluator address value effects a
-evaluateInScopedEnv receiver term = do
-  scopedEnv <- scopedEnvironment receiver
-  env <- maybeM getEnv scopedEnv
-  withEvalContext (EvalContext (Just receiver) env) term
+-- evaluateInScopedEnv :: ( AbstractValue address value effects
+--                        )
+--                     => address
+--                     -> Evaluator address value effects a
+--                     -> Evaluator address value effects a
+-- evaluateInScopedEnv receiver term = do
+--   scopedEnv <- scopedEnvironment receiver
+--   env <- maybeM getEnv scopedEnv
+--   withEvalContext (EvalContext (Just receiver) env) term
 
 
 -- | Evaluates a 'Value' returning the referenced value
