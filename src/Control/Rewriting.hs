@@ -74,7 +74,7 @@ import           Data.Profunctor
 import qualified Data.Sum as Sum hiding (apply)
 import           Data.Text (pack)
 
-import Control.Abstract.Matching (Matcher, stepMatcher)
+import Control.Matching (Matcher, stepMatcher)
 import Data.History as History
 import Data.Term
 
