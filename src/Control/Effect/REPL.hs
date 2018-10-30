@@ -1,4 +1,4 @@
-{-# LANGUAGE KindSignatures, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, TypeOperators, UndecidableInstances #-}
 
 module Control.Effect.REPL
   ( REPL (..)
