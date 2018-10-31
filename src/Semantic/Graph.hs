@@ -74,15 +74,6 @@ runGraph :: forall effs. ( Member Distribute effs
                          , Member Task effs
                          , Member Trace effs
                          , Effects effs
-                         , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
-                         , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
-                         , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
-                         , Member (Allocator (Hole (Maybe Name) (Located Monovariant))) effs
-                         , Member (Reader ModuleInfo) effs
-                         , Member (Reader Span) effs
-                         , Member (Allocator (Address (Hole (Maybe Name) (Located Monovariant)))) effs
-                         , Member (State (ScopeGraph (Hole (Maybe Name) Precise))) effs
-                         , Member (Allocator (Hole (Maybe Name) Precise)) effs
                          )
          => GraphType
          -> Bool
@@ -115,10 +106,6 @@ runCallGraph :: forall fields syntax term lang effs. ( HasField fields Span
                 , HasPostlude lang
                 , Member Trace effs
                 , Effects effs
-                , Member (Allocator (Hole (Maybe Name) (Located Monovariant))) effs
-                , Member (Reader ModuleInfo) effs
-                , Member (Reader Span) effs
-                , Member (Allocator (Address (Hole (Maybe Name) (Located Monovariant)))) effs
                 )
              => Proxy lang
              -> Bool
@@ -167,10 +154,6 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                                , Recursive term
                                , Effects effs
-                               , Member (State (ScopeGraph (Hole (Maybe Name) Precise))) effs
-                               , Member (Allocator (Hole (Maybe Name) Precise)) effs
-                               , Member (Reader Span) effs
-                               , Member (Reader ModuleInfo) effs
                                )
                             => Proxy lang
                             -> Package term
@@ -187,10 +170,6 @@ runImportGraphToModules :: ( Declarations term
                            , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
                            , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
                            , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
-                           , Member (State (ScopeGraph (Hole (Maybe Name) Precise))) effs
-                           , Member (Allocator (Hole (Maybe Name) Precise)) effs
-                           , Member (Reader Span) effs
-                           , Member (Reader ModuleInfo) effs
                            , Recursive term
                            , Effects effs
                            )
@@ -208,11 +187,6 @@ runImportGraph :: ( Declarations term
                   , Member Trace effs
                   , Recursive term
                   , Effects effs
-                  , Member (State (ScopeGraph (Hole (Maybe Name) Precise))) effs
-                  , Member (Allocator (Hole (Maybe Name) Precise)) effs
-                  , Member (Reader Span) effs
-                  , Member (Reader ModuleInfo) effs
-                  , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
                   )
                => Proxy lang
                -> Package term
