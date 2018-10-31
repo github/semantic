@@ -40,13 +40,7 @@ subtractRange range1 range2 = Range (start range1) (end range1 - rangeLength (Ra
 
 -- Instances
 
--- $setup
--- >>> import Test.QuickCheck
--- >>> instance Arbitrary Range where arbitrary = Range <$> arbitrary <*> arbitrary
-
--- $
--- Associativity:
--- prop> \ a b c -> a <> (b <> c) == (a <> b) <> (c :: Range)
+-- | The associativity of this instance is specced in @Data.Range.Spec@.
 instance Semigroup Range where
   Range start1 end1 <> Range start2 end2 = Range (min start1 start2) (max end1 end2)
 

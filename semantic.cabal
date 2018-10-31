@@ -338,6 +338,7 @@ test-suite test
                      , Data.Functor.Listable
                      , Data.Graph.Spec
                      , Data.Mergeable
+                     , Data.Range.Spec
                      , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec

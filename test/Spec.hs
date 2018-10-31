@@ -12,6 +12,7 @@ import qualified Data.Diff.Spec
 import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Graph.Spec
+import qualified Data.Range.Spec
 import qualified Data.Scientific.Spec
 import qualified Data.Source.Spec
 import qualified Data.Term.Spec
@@ -52,6 +53,7 @@ main = do
       describe "Data.Graph" Data.Graph.Spec.spec
       describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
       describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
+      describe "Data.Range" Data.Range.Spec.spec
       describe "Data.Scientific" Data.Scientific.Spec.spec
       describe "Data.Source" Data.Source.Spec.spec
       describe "Data.Term" Data.Term.Spec.spec
