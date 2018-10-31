@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, LambdaCase, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.REPL
 ( rubyREPL
@@ -8,6 +8,7 @@ import Control.Abstract hiding (Continue, List, string)
 import Control.Effect.Carrier
 import Control.Effect.Resource
 import Control.Effect.Sum
+import Control.Effect.REPL
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable hiding (string)
@@ -24,6 +25,7 @@ import Data.List (uncons)
 import Data.Project
 import Data.Quieterm
 import Data.Span
+import qualified Data.Text as T
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Numeric (readDec)
@@ -44,42 +46,10 @@ import System.Console.Haskeline
 import System.Directory (createDirectoryIfMissing, getHomeDirectory)
 import System.FilePath
 
-data REPL (m :: * -> *) k
-  = Prompt (Maybe String -> k)
-  | Output String k
-  deriving (Functor)
-
-prompt :: (Member REPL sig, Carrier sig m) => m (Maybe String)
-prompt = send (Prompt ret)
-
-output :: (Member REPL sig, Carrier sig m) => String -> m ()
-output s = send (Output s (ret ()))
-
-
 data Quit = Quit
   deriving Show
 
 instance Exception Quit
-
-
-instance HFunctor REPL where
-  hmap _ = coerce
-
-instance Effect REPL where
-  handle state handler (Prompt k) = Prompt (handler . (<$ state) . k)
-  handle state handler (Output s k) = Output s (handler (k <$ state))
-
-
-runREPL :: (MonadIO m, Carrier sig m) => Prefs -> Settings IO -> Eff (REPLC m) a -> m a
-runREPL prefs settings = flip runREPLC (prefs, settings) . interpret
-
-newtype REPLC m a = REPLC { runREPLC :: (Prefs, Settings IO) -> m a }
-
-instance (Carrier sig m, MonadIO m) => Carrier (REPL :+: sig) (REPLC m) where
-  ret = REPLC . const . ret
-  eff op = REPLC (\ args -> handleSum (eff . handleReader args runREPLC) (\case
-    Prompt   k -> liftIO (uncurry runInputTWithPrefs args (getInputLine (cyan <> "repl: " <> plain))) >>= flip runREPLC args . k
-    Output s k -> liftIO (uncurry runInputTWithPrefs args (outputStrLn s)) *> runREPLC k args) op)
 
 rubyREPL = repl (Proxy @'Language.Ruby) rubyParser
 
@@ -161,7 +131,7 @@ step blobs recur0 recur term = do
   where list = do
           path <- asks modulePath
           span <- ask
-          maybe (pure ()) (\ blob -> output (showExcerpt True span blob "")) (Prelude.lookup path blobs)
+          maybe (pure ()) (\ blob -> output (T.pack (showExcerpt True span blob ""))) (Prelude.lookup path blobs)
         help = do
           output "Commands available from the prompt:"
           output ""
@@ -173,12 +143,12 @@ step blobs recur0 recur term = do
           output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
         showBindings = do
           bindings <- Env.head <$> getEnv
-          output $ unlines (uncurry showBinding <$> Env.pairs bindings)
+          output . T.pack $ unlines (uncurry showBinding <$> Env.pairs bindings)
         showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"]     = local (const Step) run
         runCommand run [":continue"] = local (const Continue) run
         runCommand run [":break", s]
-          | [(i, "")] <- readDec s = modify (OnLine i :) >> runCommands run
+          | [(i, "")] <- readDec (T.unpack s) = modify (OnLine i :) >> runCommands run
         -- TODO: :show breakpoints
         -- TODO: :delete breakpoints
         runCommand run [":list"] = list >> runCommands run
@@ -189,10 +159,10 @@ step blobs recur0 recur term = do
         runCommand run [":help"] = help >> runCommands run
         runCommand run [":?"] = help >> runCommands run
         runCommand run [] = runCommands run
-        runCommand run other = output ("unknown command '" <> unwords other <> "'") >> output "use :? for help" >> runCommands run
+        runCommand run other = output ("unknown command '" <> T.unwords other <> "'") >> output "use :? for help" >> runCommands run
         runCommands run = do
-          str <- prompt
-          maybe (runCommands run) (runCommand run . words) str
+          str <- prompt "repl: "
+          maybe (runCommands run) (runCommand run . T.words) str
 
 
 newtype Breakpoint
@@ -223,10 +193,3 @@ shouldBreak = do
           | n >= posLine spanStart
           , n <= posLine spanEnd   = True
           | otherwise              = False
-
-
-cyan :: String
-cyan = "\ESC[1;36m\STX"
-
-plain :: String
-plain = "\ESC[0m\STX"
