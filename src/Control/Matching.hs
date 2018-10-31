@@ -55,6 +55,9 @@ instance Alternative (Matcher t) where
 instance Monad (Matcher t) where
   (>>=) = Then
 
+instance MonadFail (Matcher t) where
+  fail _ = Empty
+
 -- | This matcher always succeeds.
 succeeds :: Matcher t ()
 succeeds = guard True
