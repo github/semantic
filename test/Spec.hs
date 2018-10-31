@@ -9,6 +9,7 @@ import qualified Assigning.Assignment.Spec
 import qualified Control.Abstract.Evaluator.Spec
 import qualified Control.Rewriting.Spec
 import qualified Data.Diff.Spec
+import qualified Data.Abstract.Name.Spec
 import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Graph.Spec
@@ -52,6 +53,7 @@ main = do
       describe "Data.Diff" Data.Diff.Spec.spec
       describe "Data.Graph" Data.Graph.Spec.spec
       describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
+      describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
       describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
       describe "Data.Range" Data.Range.Spec.spec
       describe "Data.Scientific" Data.Scientific.Spec.spec

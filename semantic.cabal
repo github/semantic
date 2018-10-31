@@ -333,6 +333,7 @@ test-suite test
                      , Control.Abstract.Evaluator.Spec
                      , Control.Rewriting.Spec
                      , Data.Abstract.Path.Spec
+                     , Data.Abstract.Name.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
