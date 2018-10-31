@@ -23,7 +23,6 @@ import           Semantic.Env
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Haystack as Haystack
 import qualified Semantic.Telemetry.Stat as Stat
-import           Semantic.Version
 import           System.Environment
 import           System.IO (hIsTerminalDevice, stdout)
 import           System.Posix.Process
@@ -43,6 +42,7 @@ data Config
   , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
+  , configSHA                    :: Maybe String -- ^ Optional SHA to include in log messages.
 
   , configOptions                :: Options      -- ^ Options configurable via command line arguments.
   }
@@ -84,6 +84,7 @@ defaultConfig options@Options{..} = do
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
+    , configSHA = Nothing
 
     , configOptions = options
     }
@@ -105,8 +106,9 @@ logOptionsFromConfig Config{..} = LogOptions
           False -> [ ("app", configAppName)
                    , ("pid", show configProcessID)
                    , ("hostname", configHostName)
-                   , ("sha", buildSHA)
-                   ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
+                   , ("sha", fromMaybe "development" configSHA)
+                   ]
+                   <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
           _ -> []
 
 
