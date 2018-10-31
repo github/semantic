@@ -106,11 +106,9 @@ class (Show1 syntax, Traversable syntax, ConstructorName syntax) => Definable sy
   definition r name range t = do
     let cName = constructorName t
     enter cName range
-    -- maybe (pure ()) (enter "docstr" . Just) r
     maybe (pure ()) (emitIden r) name
     sequenceA_ t
     exit cName range
-    -- maybe (pure ()) (exit "docstr" . Just) r
 
   docsMatcher ::
     ( [] :< fs
@@ -150,6 +148,7 @@ defining Blob{..} term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
         state = InternalState blobSource (termAnnotation term)
         go    = foldSubterms descend term
+
 descend :: forall syntax fs.
   ( Definable syntax
   , Declarations (syntax (Term (Sum fs) Location))
@@ -168,18 +167,14 @@ descend t = do
   let r = snippetRange loc (fmap subterm t)
   definition range n r (fmap subtermRef t)
 
-getRangeUntil ::
-     Location
-  -> Rule () (syntax (Term a Location)) (Term a Location)
-  -> syntax (Term a Location)
-  -> Maybe Range
+getRangeUntil :: Location -> Rule () (syntax (Term a Location)) (Term a Location) -> syntax (Term a Location) -> Maybe Range
 getRangeUntil a finder r
   = let start = locationByteRange a
         end   = locationByteRange <$> rewrite (finder >>^ annotation) () r
     in either (const Nothing) (Just . subtractRange start) end
 
-getRange matcher t
-  = locationByteRange <$> runMatcher @Maybe matcher t
+getRange :: (Corecursive t, Recursive t, Foldable (Base t)) => Matcher t Location -> t -> Maybe Range
+getRange matcher t = locationByteRange <$> runMatcher @Maybe matcher t
 
 firstItem :: Rule env [a] a
 firstItem = target >>= maybeM (Prologue.fail "empty list") . listToMaybe
