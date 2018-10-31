@@ -6,6 +6,7 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
+import           Control.Exception as Exc (displayException)
 import           Data.File
 import           Data.Language (ensureLanguage, languageForFilePath)
 import           Data.List (intercalate, uncons)
@@ -24,12 +25,17 @@ import qualified Semantic.Task as Task
 import           Semantic.Task.Files
 import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
+import           System.Exit (die)
 import           System.FilePath
 import           Serializing.Format hiding (Options)
 import           Text.Read
 
 main :: IO ()
-main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
+main = do
+  (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
+  res <- Task.withOptions options $ \ config logger statter ->
+    Task.runTaskWithConfig config { configSHA = Just buildSHA } logger statter task
+  either (die . displayException) pure res
 
 -- | A parser for the application's command-line arguments.
 --
