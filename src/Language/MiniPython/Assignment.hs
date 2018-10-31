@@ -46,6 +46,7 @@ type Syntax =
    , Expression.Times
    , Literal.Integer
    , Literal.Boolean
+   , Literal.TextElement
    , Statement.If
    , Statement.Return
    , Statement.Statements
@@ -77,6 +78,7 @@ expressionChoices =
   , functionDefinition
   , identifier
   , integer
+  , string
   , returnStatement
   , ifStatement
   ]
@@ -110,6 +112,9 @@ identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol D
 
 integer :: Assignment Term
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+
+string :: Assignment Term
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 comment :: Assignment Term
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
