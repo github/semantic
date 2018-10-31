@@ -98,7 +98,9 @@ functionDefinition =
       makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
-    makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
+    makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody)
+      = let fn = makeTerm loc (Declaration.Function [] functionName' functionParameters functionBody)
+        in maybe fn (makeTerm loc . Type.Annotation fn) ty
 
 binaryOperator :: Assignment Term
 binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression (term expression)
