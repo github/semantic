@@ -1,14 +1,9 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Tags.Taggable
-( Definer
-, Definable(..)
-, defining
-, runSymbolizing
-, enter
-, exit
-, getRangeUntil
-, getRange
-, firstItem
+( Tagger
+, Token(..)
+, Taggable(..)
+, tagging
 )
 where
 
@@ -44,6 +39,8 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Type as Type
 import qualified Data.Syntax as Syntax
+import qualified Language.Python.Syntax as Python
+import qualified Language.Ruby.Syntax as Ruby
 
  -- TODO: Move to src/Data
 data Token
@@ -52,24 +49,14 @@ data Token
   | Identifier Text (Maybe Range)
   deriving (Eq, Show)
 
-data Symbol
-  = Symbol
-  { name :: Text
-  , kind :: Text
-  , context :: [Text]
-  , line :: Maybe Text
-  , docs :: Maybe Text
-  }
-  deriving (Eq, Show)
+data Tagger a where
+  Pure :: a -> Tagger a
+  Bind :: Tagger a -> (a -> Tagger b) -> Tagger b
+  Tell :: Token -> Tagger ()
+  Get :: Tagger InternalState
+  Put :: InternalState -> Tagger ()
 
-data Definer a where
-  Pure :: a -> Definer a
-  Bind :: Definer a -> (a -> Definer b) -> Definer b
-  Tell :: Token -> Definer ()
-  Get :: Definer InternalState
-  Put :: InternalState -> Definer ()
-
-compile :: InternalState -> Definer a -> Machine.Plan k Token (InternalState, a)
+compile :: InternalState -> Tagger a -> Machine.Plan k Token (InternalState, a)
 compile p = \case
   Pure a   -> pure (p, a)
   Bind a f -> compile p a >>= (\(new, v) -> compile new (f v))
@@ -77,40 +64,38 @@ compile p = \case
   Get      -> pure (p, p)
   Put p'   -> pure (p', ())
 
-instance Functor Definer where fmap = liftA
-instance Applicative Definer where
+instance Functor Tagger where fmap = liftA
+instance Applicative Tagger where
   pure  = Pure
   (<*>) = ap
-instance Monad Definer where (>>=) = Bind
+instance Monad Tagger where (>>=) = Bind
 
-enter, exit :: String -> Maybe Range -> Definer ()
+enter, exit :: String -> Maybe Range -> Tagger ()
 enter c = Tell . Enter (pack c)
 exit c = Tell . Exit (pack c)
 
-emitIden :: Maybe Range -> Name -> Definer ()
+emitIden :: Maybe Range -> Name -> Tagger ()
 emitIden range name = Tell (Identifier (formatName name) range)
 
-data InternalState = InternalState
-  { _source   :: Source.Source   -- We need to be able to slice
-  , location  :: Location
-  }
+newtype InternalState = InternalState { location  :: Location}
+
  -- InternalState handling
-asks :: (InternalState -> a) -> Definer a
+asks :: (InternalState -> a) -> Tagger a
 asks f = f <$> Get
 
-modify :: (InternalState -> InternalState) -> Definer ()
+modify :: (InternalState -> InternalState) -> Tagger ()
 modify f = Get >>= \x -> Put . f $! x
 
-class (Show1 syntax, Traversable syntax, ConstructorName syntax) => Definable syntax where
-  definition :: Maybe Range -> Maybe Name -> Maybe Range -> FAlgebra syntax (Definer ())
-  definition r name range t = do
+class (Show1 syntax, Traversable syntax, ConstructorName syntax) => Taggable syntax where
+  tag :: Maybe Range -> Maybe Name -> Maybe Range -> FAlgebra syntax (Tagger ())
+  tag r name range t = do
     let cName = constructorName t
     enter cName range
     maybe (pure ()) (emitIden r) name
     sequenceA_ t
     exit cName range
 
-  docsMatcher ::
+  docsLiteral ::
     ( [] :< fs
     , Declaration.Function :< fs
     , Literal.TextElement :< fs
@@ -118,23 +103,23 @@ class (Show1 syntax, Traversable syntax, ConstructorName syntax) => Definable sy
     , Apply Foldable fs
     )
     => Location -> syntax (Term (Sum fs) Location) -> Maybe Range
-  docsMatcher _ _ = Nothing
+  docsLiteral _ _ = Nothing
 
-  snippetRange :: Location -> syntax (Term a Location) -> Maybe Range
-  snippetRange _ _ = Nothing
+  snippet :: Location -> syntax (Term a Location) -> Maybe Range
+  snippet _ _ = Nothing
 
-withLocation :: Annotated t Location => t -> Definer a -> Definer a
+withLocation :: Annotated t Location => t -> Tagger a -> Tagger a
 withLocation t act = do
   old <- asks location
   modify (\x -> x { location = annotation t })
   act <* modify (\x -> x { location = old })
 
-defining ::
+tagging ::
   ( Apply Functor fs
   , Apply Foldable fs
   , Apply Traversable fs
   , Apply Show1 fs
-  , Apply Definable fs
+  , Apply Taggable fs
   , Apply ConstructorName fs
   , Apply Declarations1 fs
   , [] :< fs
@@ -144,13 +129,13 @@ defining ::
   => Blob
   -> Term (Sum fs) Location
   -> Machine.Source Token
-defining Blob{..} term = pipe
+tagging Blob{..} term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
-        state = InternalState blobSource (termAnnotation term)
+        state = InternalState (termAnnotation term)
         go    = foldSubterms descend term
 
 descend :: forall syntax fs.
-  ( Definable syntax
+  ( Taggable syntax
   , Declarations (syntax (Term (Sum fs) Location))
   , Functor syntax
   , Apply Functor fs
@@ -159,13 +144,13 @@ descend :: forall syntax fs.
   , Literal.TextElement :< fs
   , Declaration.Function :< fs
   )
-  => SubtermAlgebra syntax (Term (Sum fs) Location) (Definer ())
+  => SubtermAlgebra syntax (Term (Sum fs) Location) (Tagger ())
 descend t = do
-  (InternalState _ loc) <- asks id
+  (InternalState loc) <- asks id
   let n = declaredName (fmap subterm t)
-  let range = docsMatcher loc (fmap subterm t)
-  let r = snippetRange loc (fmap subterm t)
-  definition range n r (fmap subtermRef t)
+  let range = docsLiteral loc (fmap subterm t)
+  let r = snippet loc (fmap subterm t)
+  tag range n r (fmap subtermRef t)
 
 getRangeUntil :: Location -> Rule () (syntax (Term a Location)) (Term a Location) -> syntax (Term a Location) -> Maybe Range
 getRangeUntil a finder r
@@ -178,62 +163,6 @@ getRange matcher t = locationByteRange <$> runMatcher @Maybe matcher t
 
 firstItem :: Rule env [a] a
 firstItem = target >>= maybeM (Prologue.fail "empty list") . listToMaybe
-
-type ContextToken = (Text, Maybe Range)
-
-type Contextualizer
-  = Eff (StateC [ContextToken]
-  ( Eff (ErrorC TranslationError
-  ( Eff VoidC))))
-
-symbolsToSummarize :: [Text]
-symbolsToSummarize = ["Function", "Method", "Class", "Module"]
-
-contextualizing :: Blob -> Machine.ProcessT Contextualizer Token Symbol
-contextualizing Blob{..} = repeatedly $ await >>= \case
-  Enter x r -> enterScope (x, r)
-  Exit x r  -> exitScope (x, r)
-  Identifier iden rng -> lift State.get >>= \case
-    ((x, r):("Context", cr):xs) | x `elem` symbolsToSummarize
-      -> yield $ Symbol iden x (fmap fst xs) (slice r) (slice cr)
-    ((x, r):xs) | x `elem` symbolsToSummarize
-      -> yield $ Symbol iden x (fmap fst xs) (slice r) (slice rng)
-    _ -> pure ()
-  where
-    slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
-
-enterScope, exitScope :: ContextToken -> Machine.PlanT k Symbol Contextualizer ()
-enterScope c = lift (State.modify (c :))
-exitScope  c = lift State.get >>= \case
-  (x:xs) -> when (x == c) (lift (State.modify (const xs)))
-  cs     -> lift (Error.throwError (UnbalancedPair c cs))
-
-data TranslationError = UnbalancedPair ContextToken [ContextToken]
-  deriving (Eq, Show)
-
-runSymbolizing ::
-  ( Apply Functor fs
-  , Apply Foldable fs
-  , Apply Traversable fs
-  , Apply Show1 fs
-  , Apply Definable fs
-  , Apply ConstructorName fs
-  , Apply Declarations1 fs
-  , [] :< fs
-  , Literal.TextElement :< fs
-  , Declaration.Function :< fs
-  )
-  => Blob
-  -> Term (Sum fs) Location
-  -> Either TranslationError [Symbol]
-runSymbolizing blob tree
-  = Eff.run
-  . Error.runError
-  . fmap snd
-  . State.runState (mempty :: [ContextToken])
-  . runT $ source (defining blob tree)
-      ~> contextualizing blob
-
 
 docstringMatcher ::
   ( [] :< fs
@@ -248,37 +177,149 @@ docstringMatcher = match Declaration.functionBody $ do
   pure (annotation a)
 
 -- Instances
--- | Sums of definable terms are definable.
-instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Definable fs, Apply ConstructorName fs) => Definable (Sum fs) where
-  definition d n r = apply @Definable (definition d n r)
-  docsMatcher a = apply @Definable (docsMatcher a)
-  snippetRange x = apply @Definable (snippetRange x)
 
-instance (Definable a) => Definable (TermF a Location) where
-  definition d n r t = withLocation t (definition d n r (termFOut t))
-  docsMatcher _ t = docsMatcher (termFAnnotation t) (termFOut t)
-  snippetRange _ t = snippetRange (termFAnnotation t) (termFOut t)
+instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Taggable fs, Apply ConstructorName fs) => Taggable (Sum fs) where
+  tag d n r = apply @Taggable (tag d n r)
+  docsLiteral a = apply @Taggable (docsLiteral a)
+  snippet x = apply @Taggable (snippet x)
 
-instance Definable [] where
-  definition _ _ _ = sequenceA_
+instance (Taggable a) => Taggable (TermF a Location) where
+  tag d n r t = withLocation t (tag d n r (termFOut t))
+  docsLiteral _ t = docsLiteral (termFAnnotation t) (termFOut t)
+  snippet _ t = snippet (termFAnnotation t) (termFOut t)
 
-instance Definable Declaration.Function where
-  docsMatcher a = getRange docstringMatcher . injectTerm a
-  snippetRange ann = getRangeUntil ann (arr Declaration.functionBody)
+instance Taggable [] where
+  tag _ _ _ = sequenceA_
 
-instance Definable Comment.Comment
-instance Definable Expression.Times
-instance Definable Expression.Plus
-instance Definable Expression.Minus
-instance Definable Expression.Call
-instance Definable Literal.Boolean
-instance Definable Literal.Integer
-instance Definable Literal.TextElement
-instance Definable Statement.If
-instance Definable Statement.Return
-instance Definable Statement.Statements
-instance Definable Syntax.Context
-instance Definable Syntax.Empty
-instance Definable Syntax.Error
-instance Definable Syntax.Identifier
-instance Definable Type.Annotation
+instance Taggable Declaration.Function where
+  docsLiteral a = getRange docstringMatcher . injectTerm a
+  snippet ann = getRangeUntil ann (arr Declaration.functionBody)
+
+instance Taggable Declaration.Method
+
+
+instance Taggable Comment.Comment
+
+instance Taggable Expression.And
+instance Taggable Expression.Await
+instance Taggable Expression.BAnd
+instance Taggable Expression.BOr
+instance Taggable Expression.BXOr
+instance Taggable Expression.Call
+instance Taggable Expression.Cast
+instance Taggable Expression.Comparison
+instance Taggable Expression.Complement
+instance Taggable Expression.Delete
+instance Taggable Expression.DividedBy
+instance Taggable Expression.Enumeration
+instance Taggable Expression.Equal
+instance Taggable Expression.FloorDivision
+instance Taggable Expression.GreaterThan
+instance Taggable Expression.GreaterThanEqual
+instance Taggable Expression.InstanceOf
+instance Taggable Expression.LessThan
+instance Taggable Expression.LessThanEqual
+instance Taggable Expression.LShift
+instance Taggable Expression.Matches
+instance Taggable Expression.Member
+instance Taggable Expression.MemberAccess
+instance Taggable Expression.Minus
+instance Taggable Expression.Modulo
+instance Taggable Expression.Negate
+instance Taggable Expression.New
+instance Taggable Expression.NonNullExpression
+instance Taggable Expression.Not
+instance Taggable Expression.NotMatches
+instance Taggable Expression.Or
+instance Taggable Expression.Plus
+instance Taggable Expression.Power
+instance Taggable Expression.RShift
+instance Taggable Expression.ScopeResolution
+instance Taggable Expression.SequenceExpression
+instance Taggable Expression.StrictEqual
+instance Taggable Expression.Subscript
+instance Taggable Expression.Super
+instance Taggable Expression.This
+instance Taggable Expression.Times
+instance Taggable Expression.Typeof
+instance Taggable Expression.UnsignedRShift
+instance Taggable Expression.Void
+instance Taggable Expression.XOr
+
+instance Taggable Literal.Boolean
+instance Taggable Literal.Integer
+instance Taggable Literal.Float
+instance Taggable Literal.Rational
+instance Taggable Literal.Complex
+instance Taggable Literal.String
+instance Taggable Literal.Character
+instance Taggable Literal.InterpolationElement
+instance Taggable Literal.TextElement
+instance Taggable Literal.EscapeSequence
+instance Taggable Literal.Symbol
+instance Taggable Literal.SymbolElement
+instance Taggable Literal.Regex
+instance Taggable Literal.Array
+instance Taggable Literal.Hash
+instance Taggable Literal.Tuple
+instance Taggable Literal.Set
+instance Taggable Literal.Pointer
+instance Taggable Literal.Reference
+instance Taggable Literal.Null
+instance Taggable Literal.KeyValue
+
+instance Taggable Statement.Assignment
+instance Taggable Statement.Break
+instance Taggable Statement.Catch
+instance Taggable Statement.Continue
+instance Taggable Statement.DoWhile
+instance Taggable Statement.Else
+instance Taggable Statement.Finally
+instance Taggable Statement.For
+instance Taggable Statement.ForEach
+instance Taggable Statement.Goto
+instance Taggable Statement.If
+instance Taggable Statement.Let
+instance Taggable Statement.Match
+instance Taggable Statement.NoOp
+instance Taggable Statement.Pattern
+instance Taggable Statement.PostDecrement
+instance Taggable Statement.PostIncrement
+instance Taggable Statement.PreDecrement
+instance Taggable Statement.PreIncrement
+instance Taggable Statement.Retry
+instance Taggable Statement.Return
+instance Taggable Statement.ScopeEntry
+instance Taggable Statement.ScopeExit
+instance Taggable Statement.Statements
+instance Taggable Statement.Throw
+instance Taggable Statement.Try
+instance Taggable Statement.While
+instance Taggable Statement.Yield
+
+instance Taggable Syntax.Context
+instance Taggable Syntax.Empty
+instance Taggable Syntax.Error
+instance Taggable Syntax.Identifier
+
+instance Taggable Type.Annotation
+
+instance Taggable Declaration.MethodSignature
+instance Taggable Declaration.InterfaceDeclaration
+instance Taggable Declaration.PublicFieldDefinition
+instance Taggable Declaration.Variable
+instance Taggable Declaration.Class
+instance Taggable Declaration.Decorator
+instance Taggable Declaration.Datatype
+instance Taggable Declaration.Constructor
+instance Taggable Declaration.Comprehension
+instance Taggable Declaration.Type
+instance Taggable Declaration.TypeAlias
+
+
+instance Taggable Python.Ellipsis
+instance Taggable Python.FutureImport
+instance Taggable Python.Import
+instance Taggable Python.QualifiedAliasedImport
+instance Taggable Python.QualifiedImport
+instance Taggable Python.Redirect

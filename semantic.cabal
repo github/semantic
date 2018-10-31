@@ -218,6 +218,7 @@ library
                      , Serializing.Format
                      , Serializing.SExpression
                      , Tags.Taggable
+                     , Tags.Tagging
                      -- Custom Prelude
                      , Prologue
   build-depends:       base >= 4.8 && < 5
