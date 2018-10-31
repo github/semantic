@@ -332,6 +332,7 @@ test-suite test
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
                      , Control.Rewriting.Spec
+                     , Data.Abstract.Environment.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Abstract.Name.Spec
                      , Data.Diff.Spec
@@ -341,6 +342,7 @@ test-suite test
                      , Data.Mergeable
                      , Data.Range.Spec
                      , Data.Scientific.Spec
+                     , Data.Semigroup.App.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
@@ -431,15 +433,6 @@ test-suite parse-examples
                      , semantic
   default-extensions:  RecordWildCards
                      , FlexibleContexts
-
-test-suite doctests
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Doctests.hs
-  default-language:    Haskell2010
-  ghc-options:         -dynamic -threaded -j
-  build-depends:       base
-                     , doctest
 
 benchmark evaluation
   hs-source-dirs:      bench/evaluation
