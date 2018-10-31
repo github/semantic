@@ -7,6 +7,8 @@ import Prelude hiding (id, (.), readFile)
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Control.Abstract
+import Control.Abstract.Heap (runHeapError)
+import Control.Abstract.ScopeGraph (runScopeError)
 import           Control.Category
 import           Control.Exception (displayException)
 import           Control.Monad.Effect.Trace (runPrintingTrace)
@@ -47,6 +49,8 @@ justEvaluating
   . fmap reassociate
   . runLoadError
   . runUnspecialized
+  . runScopeError
+  . runHeapError
   . runEvalError
   . runResolutionError
   . runAddressError
@@ -63,13 +67,15 @@ checking
   . fmap reassociate
   . runLoadError
   . runUnspecialized
+  . runScopeError
+  . runHeapError
   . runResolutionError
   . runEvalError
   . runAddressError
   . runTypes
 
 evalGoProject         = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Go)         goParser
-evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)       rubyParser
+evalRubyProject       = justEvaluating <=< evaluateProject (Proxy @'Language.Ruby)               rubyParser
 evalPHPProject        = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.PHP)        phpParser
 evalPythonProject     = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.Python)     pythonParser
 evalJavaScriptProject = justEvaluating <=< evaluateProject (Proxy :: Proxy 'Language.JavaScript) typescriptParser

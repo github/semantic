@@ -26,7 +26,6 @@ import           Prologue
 
 defineClass :: ( AbstractValue address value effects
                , HasCallStack
-               , Member (Allocator (Address address)) effects
                , Member (Allocator address) effects
                , Member (Deref value) effects
                , Member (Reader ModuleInfo) effects
@@ -49,7 +48,6 @@ defineClass declaration superclasses body = void . define declaration $ do
 
 defineNamespace :: ( AbstractValue address value effects
                    , HasCallStack
-                   , Member (Allocator (Address address)) effects
                    , Member (Allocator address) effects
                    , Member (Resumable (BaseError (HeapError address))) effects
                    , Member Fresh effects

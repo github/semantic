@@ -26,6 +26,7 @@ module Control.Abstract.ScopeGraph
   , alloc
   , Address(..)
   , runScopeErrorWith
+  , runScopeError
   ) where
 
 import           Control.Abstract.Evaluator hiding (Local)
@@ -229,3 +230,8 @@ runScopeErrorWith :: (Effectful (m address value), Effects effects)
                   -> m address value (Resumable (BaseError (ScopeError address)) ': effects) a
                   -> m address value effects a
 runScopeErrorWith = runResumableWith
+
+runScopeError :: (Effectful (m address value), Effects effects)
+              => m address value (Resumable (BaseError (ScopeError address)) ': effects) a
+              -> m address value effects (Either (SomeExc (BaseError (ScopeError address))) a)
+runScopeError = runResumable

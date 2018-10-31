@@ -5,6 +5,8 @@ module Semantic.REPL
 ) where
 
 import Control.Abstract hiding (Continue, List, string)
+import Control.Abstract.ScopeGraph (runScopeError)
+import Control.Abstract.Heap (runHeapError)
 import Control.Monad.IO.Class
 import Data.Abstract.Address.Precise as Precise
 import Data.Abstract.Environment as Env
@@ -96,12 +98,13 @@ repl proxy parser paths = defaultConfig debugOptions >>= \ config -> runM . runD
     . fmap reassociate
     . runLoadError
     . runUnspecialized
-    . runEnvironmentError
+    . runScopeError
+    . runHeapError
     . runEvalError
     . runResolutionError
     . runAddressError
     . runValueError
-    . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise)))))
+    . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult Precise (Value Precise (ConcreteEff Precise _)))))))
     . raiseHandler (runModules (ModuleTable.modulePaths (packageModules (snd <$> package))))
     . runReader (packageInfo package)
     . runState (lowerBound @Span)
@@ -150,10 +153,6 @@ step blobs recur term = do
           output "  :continue                   continue evaluation until the next breakpoint"
           output "  :show bindings              show the current bindings"
           output "  :quit, :q, :abandon         abandon the current evaluation and exit the repl"
-        showBindings = do
-          bindings <- Env.head <$> TermEvaluator getEnv
-          output $ unlines (uncurry showBinding <$> Env.pairs bindings)
-        showBinding name addr = show name <> " = " <> show addr
         runCommand run [":step"]     = local (const Step) run
         runCommand run [":continue"] = local (const Continue) run
         runCommand run [":break", s]
@@ -161,7 +160,8 @@ step blobs recur term = do
         -- TODO: :show breakpoints
         -- TODO: :delete breakpoints
         runCommand run [":list"] = list >> runCommands run
-        runCommand run [":show", "bindings"] = showBindings >> runCommands run
+        -- TODO: Show the scope graph
+        -- runCommand run [":show", "bindings"] = showBindings >> runCommands run
         -- TODO: show the value(s) in the heap
         -- TODO: can we call functions somehow? Maybe parse expressions with the current parser?
         runCommand _   [quit] | quit `elem` [":quit", ":q", ":abandon"] = throwError (SomeException Quit)
