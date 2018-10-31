@@ -24,6 +24,7 @@ module Control.Abstract.Heap
 -- * Effects
 , Deref(..)
 , AddressError(..)
+, runHeapError
 , runAddressError
 , runAddressErrorWith
 , runHeapErrorWith
@@ -142,7 +143,6 @@ withFrame address action = raiseEff $ do
 
 -- | Define a declaration and assign the value of an action in the current frame.
 define :: ( HasCallStack
-          , Member (Allocator (Address address)) effects
           , Member (Deref value) effects
           , Member (Reader ModuleInfo) effects
           , Member (Reader Span) effects

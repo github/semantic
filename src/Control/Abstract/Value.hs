@@ -268,7 +268,6 @@ makeNamespace :: ( AbstractValue address value effects
                  , Member (Resumable (BaseError (HeapError address))) effects
                  , Member (Resumable (BaseError (AddressError address value))) effects
                  , Member (Allocator address) effects
-                 , Member (Allocator (Address address)) effects
                  , Member (Resumable (BaseError (ScopeError address))) effects
                  , Member (State (Heap address address value)) effects
                  , Member Fresh effects

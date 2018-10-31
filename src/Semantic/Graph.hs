@@ -149,9 +149,6 @@ runImportGraphToModuleInfos :: ( Declarations term
                                , HasPrelude lang
                                , HasPostlude lang
                                , Member Trace effs
-                               , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
-                               , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
-                               , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                                , Recursive term
                                , Effects effs
                                )
@@ -167,9 +164,6 @@ runImportGraphToModules :: ( Declarations term
                            , HasPrelude lang
                            , HasPostlude lang
                            , Member Trace effs
-                           , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
-                           , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
-                           , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                            , Recursive term
                            , Effects effs
                            )
@@ -288,7 +282,6 @@ parsePythonPackage parser project = do
         . resumingLoadError
         . resumingUnspecialized
         -- . resumingEnvironmentError -- TODO: Fix me. Replace with `resumineScopeGraphError`?
-        . Hole.runAllocator Precise.handleAllocator
         . resumingScopeError
         . resumingHeapError
         . resumingEvalError
@@ -449,22 +442,13 @@ resumingHeapError :: forall m address value effects a. ( Applicative (m address 
   , Member Trace effects
   , Show address
   , Ord address
-  , Member (Reader ModuleInfo) effects
-  , Member (State (Heap address address value)) effects
-  , Member (Allocator address) effects
   , Member Fresh effects
   , Member (Resumable (BaseError (ScopeError address))) effects
-  , Member (Reader Span) effects
-  , Member (State (ScopeGraph address)) effects
   )
   => m address value (Resumable (BaseError (HeapError address)) ': effects) a
   -> m address value effects a
 resumingHeapError = runHeapErrorWith (\ baseError -> traceError "HeapError" baseError *> case baseErrorException baseError of
-  EmptyHeapError -> raiseEff . lowerEff $ do
-    currentScope' <- raiseEff (lowerEff currentScope)
-    frame <- newFrame @_ @value currentScope' mempty
-    putCurrentFrame frame
-    pure frame)
+  EmptyHeapError -> undefined)
 
 resumingScopeError :: forall m address value effects a. ( Applicative (m address value effects)
     , Effectful (m address value)
@@ -472,8 +456,6 @@ resumingScopeError :: forall m address value effects a. ( Applicative (m address
     , Member Trace effects
     , Show address
     , Ord address
-    , Member (Allocator address) effects
-    , Member (State (ScopeGraph address)) effects
     )
     => m address value (Resumable (BaseError (ScopeError address)) ': effects) a
     -> m address value effects a

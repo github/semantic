@@ -101,7 +101,6 @@ evaluate :: forall address value valueEffects term  moduleEffects effects proxy 
             , HasPostlude lang
             , HasPrelude lang
             , Member Fresh effects
-            , Member (Allocator (Address address)) effects
             , Member (Modules address value) effects
             , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) effects
             , Member (Reader PackageInfo) effects
@@ -143,8 +142,7 @@ evaluate lang analyzeModule analyzeTerm runAllocDeref runValue modules = ((do
       local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
     evalModuleBody term = Subterm term (coerce runValue (do
-      result <- foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . value
-      result <$ TermEvaluator (postlude lang)))
+      foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term >>= TermEvaluator . value))
 
     runInModule :: ModuleInfo -> Evaluator address value moduleEffects value -> Evaluator address value effects (ScopeGraph address, value)
     runInModule info
@@ -164,7 +162,6 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 class HasPrelude (language :: Language) where
   definePrelude :: ( AbstractValue address value effects
                    , HasCallStack
-                   , Member (Allocator (Address address)) effects
                    , Member (Allocator address) effects
                    , Member (State (ScopeGraph address)) effects
                    , Member (Resumable (BaseError (ScopeError address))) effects
@@ -195,7 +192,6 @@ instance HasPrelude 'Python where
 instance HasPrelude 'Ruby where
   definePrelude :: forall address value effects proxy. ( AbstractValue address value effects
                    , HasCallStack
-                   , Member (Allocator (Address address)) effects
                    , Member (Allocator address) effects
                    , Member (State (ScopeGraph address)) effects
                    , Member (Resumable (BaseError (ScopeError address))) effects
@@ -233,7 +229,6 @@ instance HasPrelude 'JavaScript where
 class HasPostlude (language :: Language) where
   postlude :: ( AbstractValue address value effects
               , HasCallStack
-              , Member (Allocator (Address address)) effects
               , Member (Deref value) effects
               , Member Fresh effects
               , Member (Reader ModuleInfo) effects
