@@ -91,7 +91,7 @@ asks f = f <$> Get
 modify :: (InternalState -> InternalState) -> Tagger ()
 modify f = Get >>= \x -> Put . f $! x
 
-class (Show1 syntax, Traversable syntax, ConstructorName syntax) => Taggable syntax where
+class (Show1 syntax, Traversable syntax) => Taggable syntax where
   docsLiteral ::
     ( [] :< fs
     , Declaration.Function :< fs
