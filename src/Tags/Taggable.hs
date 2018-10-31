@@ -22,6 +22,7 @@ import           Control.Rewriting hiding (apply)
 import           Data.Abstract.Declarations
 import           Data.Abstract.Name
 import           Data.Blob
+import           Data.Language
 import           Data.History
 import           Data.List (intersperse)
 import           Data.Location
@@ -77,7 +78,11 @@ exit c = Tell . Exit (pack c)
 emitIden :: Maybe Range -> Name -> Tagger ()
 emitIden range name = Tell (Identifier (formatName name) range)
 
-newtype InternalState = InternalState { location  :: Location}
+data InternalState
+  = InternalState
+  { location  :: Location
+  , language :: Language
+  }
 
  -- InternalState handling
 asks :: (InternalState -> a) -> Tagger a
@@ -94,8 +99,8 @@ class (Show1 syntax, Traversable syntax, ConstructorName syntax) => Taggable syn
     , Apply Functor fs
     , Apply Foldable fs
     )
-    => Location -> syntax (Term (Sum fs) Location) -> Maybe Range
-  docsLiteral _ _ = Nothing
+    => Language -> Location -> syntax (Term (Sum fs) Location) -> Maybe Range
+  docsLiteral _ _ _ = Nothing
 
   snippet :: Location -> syntax (Term a Location) -> Maybe Range
   snippet _ _ = Nothing
@@ -123,11 +128,12 @@ tagging ::
   -> Machine.Source Token
 tagging Blob{..} term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
-        state = InternalState (termAnnotation term)
+        state = InternalState (termAnnotation term) blobLanguage
         go    = foldSubterms descend term
 
 descend :: forall syntax fs.
   ( Taggable syntax
+  , ConstructorName syntax
   , Declarations (syntax (Term (Sum fs) Location))
   , Functor syntax
   , Apply Functor fs
@@ -138,10 +144,10 @@ descend :: forall syntax fs.
   )
   => SubtermAlgebra syntax (Term (Sum fs) Location) (Tagger ())
 descend t = do
-  (InternalState loc) <- asks id
+  (InternalState loc lang) <- asks id
   let term = fmap subterm t
   let snippetRange = snippet loc term
-  let litRange = docsLiteral loc (fmap subterm t)
+  let litRange = docsLiteral lang loc term
 
   enter (constructorName term) snippetRange
   maybe (pure ()) (emitIden litRange) (declaredName term)
@@ -175,18 +181,19 @@ docstringMatcher = match Declaration.functionBody $ do
 -- Instances
 
 instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Taggable fs, Apply ConstructorName fs) => Taggable (Sum fs) where
-  docsLiteral a = apply @Taggable (docsLiteral a)
+  docsLiteral l a = apply @Taggable (docsLiteral l a)
   snippet x = apply @Taggable (snippet x)
 
 instance (Taggable a) => Taggable (TermF a Location) where
-  docsLiteral _ t = docsLiteral (termFAnnotation t) (termFOut t)
+  docsLiteral l _ t = docsLiteral l (termFAnnotation t) (termFOut t)
   snippet _ t = snippet (termFAnnotation t) (termFOut t)
 
 instance Taggable Syntax.Context where
   snippet ann = getRangeUntil ann (arr Syntax.contextSubject)
 
 instance Taggable Declaration.Function where
-  docsLiteral a = getRange docstringMatcher . injectTerm a
+  docsLiteral Python a t = getRange docstringMatcher (injectTerm a t)
+  docsLiteral _ _ _    = Nothing
   snippet ann = getRangeUntil ann (arr Declaration.functionBody)
 
 instance Taggable Declaration.Method
