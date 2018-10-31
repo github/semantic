@@ -87,14 +87,6 @@ modify :: (InternalState -> InternalState) -> Tagger ()
 modify f = Get >>= \x -> Put . f $! x
 
 class (Show1 syntax, Traversable syntax, ConstructorName syntax) => Taggable syntax where
-  tag :: Maybe Range -> Maybe Name -> Maybe Range -> FAlgebra syntax (Tagger ())
-  tag r name range t = do
-    let cName = constructorName t
-    enter cName range
-    maybe (pure ()) (emitIden r) name
-    sequenceA_ t
-    exit cName range
-
   docsLiteral ::
     ( [] :< fs
     , Declaration.Function :< fs
@@ -147,10 +139,14 @@ descend :: forall syntax fs.
   => SubtermAlgebra syntax (Term (Sum fs) Location) (Tagger ())
 descend t = do
   (InternalState loc) <- asks id
-  let n = declaredName (fmap subterm t)
-  let range = docsLiteral loc (fmap subterm t)
-  let r = snippet loc (fmap subterm t)
-  tag range n r (fmap subtermRef t)
+  let term = fmap subterm t
+  let snippetRange = snippet loc term
+  let litRange = docsLiteral loc (fmap subterm t)
+
+  enter (constructorName term) snippetRange
+  maybe (pure ()) (emitIden litRange) (declaredName term)
+  traverse_ subtermRef t
+  exit (constructorName term) snippetRange
 
 getRangeUntil :: Location -> Rule () (syntax (Term a Location)) (Term a Location) -> syntax (Term a Location) -> Maybe Range
 getRangeUntil a finder r
@@ -179,17 +175,15 @@ docstringMatcher = match Declaration.functionBody $ do
 -- Instances
 
 instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Taggable fs, Apply ConstructorName fs) => Taggable (Sum fs) where
-  tag d n r = apply @Taggable (tag d n r)
   docsLiteral a = apply @Taggable (docsLiteral a)
   snippet x = apply @Taggable (snippet x)
 
 instance (Taggable a) => Taggable (TermF a Location) where
-  tag d n r t = withLocation t (tag d n r (termFOut t))
   docsLiteral _ t = docsLiteral (termFAnnotation t) (termFOut t)
   snippet _ t = snippet (termFAnnotation t) (termFOut t)
 
-instance Taggable [] where
-  tag _ _ _ = sequenceA_
+instance Taggable Syntax.Context where
+  snippet ann = getRangeUntil ann (arr Syntax.contextSubject)
 
 instance Taggable Declaration.Function where
   docsLiteral a = getRange docstringMatcher . injectTerm a
@@ -197,9 +191,7 @@ instance Taggable Declaration.Function where
 
 instance Taggable Declaration.Method
 
-instance Taggable Syntax.Context where
-  snippet ann = getRangeUntil ann (arr Syntax.contextSubject)
-
+instance Taggable []
 instance Taggable Comment.Comment
 
 instance Taggable Expression.And
