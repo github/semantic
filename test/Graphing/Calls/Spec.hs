@@ -18,7 +18,7 @@ import           Semantic.Config (defaultOptions)
 import           Semantic.Graph
 import           Semantic.IO
 
-callGraphPythonProject paths = runTaskWithOptions defaultOptions $ do
+callGraphPythonProject paths = runTask $ do
   let proxy = Proxy @'Language.Python
   let lang = Language.Python
   blobs <- catMaybes <$> traverse readBlobFromFile (flip File lang <$> paths)
