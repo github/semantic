@@ -120,6 +120,7 @@ runCallGraph lang includePackages modules package = do
         = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
         . graphing @_ @_ @(Maybe Name) @Monovariant
         . caching
+        . runState (lowerBound @(ScopeGraph (Hole (Maybe Name) (Located Monovariant))))
         . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) (Hole (Maybe Name) (Located Monovariant)) Abstract))
         . runFresh 0
         . resumingLoadError
@@ -184,9 +185,6 @@ runImportGraph :: ( Declarations term
                   , HasPrelude lang
                   , HasPostlude lang
                   , Member Trace effs
-                  , Member (Allocator (Address (Hole (Maybe Name) Precise))) effs
-                  , Member (Resumable (BaseError (HeapError (Hole (Maybe Name) Precise)))) effs
-                  , Member (Resumable (BaseError (ScopeError (Hole (Maybe Name) Precise)))) effs
                   , Recursive term
                   , Effects effs
                   )
@@ -474,10 +472,7 @@ resumingScopeError :: forall m address value effects a. ( Applicative (m address
     , Member Trace effects
     , Show address
     , Ord address
-    , Member (Reader ModuleInfo) effects
     , Member (Allocator address) effects
-    , Member Fresh effects
-    , Member (Reader Span) effects
     , Member (State (ScopeGraph address)) effects
     )
     => m address value (Resumable (BaseError (ScopeError address)) ': effects) a
