@@ -197,6 +197,8 @@ instance Taggable Declaration.Function where
 
 instance Taggable Declaration.Method
 
+instance Taggable Syntax.Context where
+  snippet ann = getRangeUntil ann (arr Syntax.contextSubject)
 
 instance Taggable Comment.Comment
 
@@ -297,7 +299,6 @@ instance Taggable Statement.Try
 instance Taggable Statement.While
 instance Taggable Statement.Yield
 
-instance Taggable Syntax.Context
 instance Taggable Syntax.Empty
 instance Taggable Syntax.Error
 instance Taggable Syntax.Identifier
