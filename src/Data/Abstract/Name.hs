@@ -48,17 +48,13 @@ nameI :: Int -> Name
 nameI = I
 
 -- | Extract a human-readable 'Text' from a 'Name'.
+-- Sample outputs can be found in @Data.Abstract.Name.Spec@.
 formatName :: Name -> Text
 formatName (Name name) = name
 formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
 
--- $
--- >>> I 0
--- "_a"
--- >>> I 26
--- "_aʹ"
 instance Show Name where
   showsPrec _ = prettyShowString . Text.unpack . formatName
     where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'
