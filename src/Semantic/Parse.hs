@@ -7,14 +7,14 @@ import           Analysis.PackageDef (HasPackageDef)
 import           Control.Effect
 import           Control.Effect.Error
 import           Control.Monad.IO.Class
-import           Data.Blob
-import           Data.Either
 import           Data.Abstract.Declarations
+import           Data.Blob
 import           Data.ByteString.Builder (stringUtf8)
+import           Data.Either
 import           Data.Graph.TermVertex
 import           Data.JSON.Fields
-import           Data.Quieterm
 import           Data.Location
+import           Data.Quieterm
 import           Data.Term
 import           Parsing.Parser
 import           Prologue
@@ -24,7 +24,7 @@ import qualified Rendering.JSON as JSON
 import           Rendering.Renderer
 import           Semantic.Task
 import           Serializing.Format
-import Tags.Taggable
+import           Tags.Taggable
 
 -- | Using the specified renderer, parse a list of 'Blob's to produce a 'Builder' output.
 runParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, MonadIO m) => TermRenderer output -> [Blob] -> m Builder

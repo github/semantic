@@ -14,7 +14,6 @@ import qualified Control.Effect.State as State
 import           Control.Monad.Trans
 import           Data.Aeson
 import           Data.Blob
-import           Data.List (intersperse)
 import           Data.Location
 import           Data.Machine as Machine
 import qualified Data.Source as Source
