@@ -48,20 +48,9 @@ data Tag
   }
   deriving (Eq, Show, Generic, ToJSON)
 
-runTagging ::
-  ( Apply Functor fs
-  , Apply Foldable fs
-  , Apply Traversable fs
-  , Apply Show1 fs
-  , Apply Taggable fs
-  , Apply ConstructorName fs
-  , Apply Declarations1 fs
-  , [] :< fs
-  , Literal.TextElement :< fs
-  , Declaration.Function :< fs
-  )
+runTagging :: (IsTaggable syntax)
   => Blob
-  -> Term (Sum fs) Location
+  -> Term syntax Location
   -> Either TranslationError [Tag]
 runTagging blob tree
   = Eff.run

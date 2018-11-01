@@ -9,6 +9,7 @@ import           Control.Effect.Error
 import           Control.Monad.IO.Class
 import           Data.Blob
 import           Data.Either
+import           Data.Abstract.Declarations
 import           Data.ByteString.Builder (stringUtf8)
 import           Data.Graph.TermVertex
 import           Data.JSON.Fields
@@ -23,6 +24,7 @@ import qualified Rendering.JSON as JSON
 import           Rendering.Renderer
 import           Semantic.Task
 import           Serializing.Format
+import Tags.Taggable
 
 -- | Using the specified renderer, parse a list of 'Blob's to produce a 'Builder' output.
 runParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, MonadIO m) => TermRenderer output -> [Blob] -> m Builder
@@ -32,7 +34,8 @@ runParse JSONGraphTermRenderer        = withParsedBlobs' renderJSONError (render
         renderAdjGraph blob term = renderJSONAdjTerm blob (renderTreeGraph term)
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show . quieterm))
-runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
+runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> render (renderSymbolTerms . renderToSymbols' fields blob)) >=> serialize JSON
+-- runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 runParse QuietTermRenderer            = distributeFoldMap $ \blob ->
   showTiming blob <$> time' ((parseSomeBlob blob >>= withSomeTerm (fmap (const (Right ())) . serialize Show . quieterm)) `catchError` \(SomeException e) -> pure (Left (show e)))
@@ -54,6 +57,9 @@ type Render m output
      , Functor syntax
      , Show1 syntax
      , ToJSONFields1 syntax
+     , Declarations1 syntax
+     , Taggable syntax
+     , HasTextElement syntax
      )
   => Blob
   -> Term syntax Location
@@ -69,5 +75,5 @@ withParsedBlobs' onError render = distributeFoldMap $ \blob ->
   (parseSomeBlob blob >>= withSomeTerm (render blob)) `catchError` \(SomeException e) ->
     pure (onError blob (show e))
 
-parseSomeBlob :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1] Location)
+parseSomeBlob :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m) => Blob -> m (SomeTerm '[ConstructorName, Foldable, Functor, HasDeclaration, HasPackageDef, Show1, ToJSONFields1, Taggable, HasTextElement, Declarations1] Location)
 parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (`parse` blob) (someParser blobLanguage)

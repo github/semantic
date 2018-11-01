@@ -28,7 +28,7 @@ renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
     termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f (Maybe Declaration) -> File
     termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
 
-renderToSymbols' :: (IsTaggable fs) => SymbolFields -> Blob -> Term (Sum fs) Location -> [Tag]
+renderToSymbols' :: (IsTaggable f) => SymbolFields -> Blob -> Term f Location -> [Tag]
 renderToSymbols' _ blob term = either mempty id (runTagging blob term)
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
