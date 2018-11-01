@@ -14,25 +14,13 @@ import Prologue hiding (Element, hash, project)
 
 import           Analysis.ConstructorName
 import           Control.Matching hiding (target)
-import           Control.Arrow hiding (first)
-import           Control.Effect as Eff
-import           Control.Effect.Error as Error
-import qualified Control.Effect.State as State
-import           Control.Monad
-import           Control.Monad.Trans
-import           Control.Rewriting hiding (apply)
 import           Data.Abstract.Declarations
 import           Data.Abstract.Name
 import           Data.Blob
 import           Data.Language
-import           Data.History
-import           Data.List (intersperse)
 import           Data.Location
 import           Data.Machine as Machine
 import           Data.Range
-import           Data.Sum
-import qualified Data.Source as Source
-import           Data.Span
 import           Data.Term
 import           Data.Text hiding (empty)
 
@@ -50,12 +38,10 @@ import qualified Language.Haskell.Syntax as Haskell
 import qualified Language.Java.Syntax as Java
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.PHP.Syntax as PHP
-import qualified Language.Python.Assignment as Python
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
 import qualified Language.TypeScript.Syntax as TypeScript
 
-import           Data.Kind
 
 
  -- TODO: Move to src/Data
@@ -95,16 +81,16 @@ emitIden range name = Tell (Identifier (formatName name) range)
 
 data InternalState
   = InternalState
-  { location  :: Location
-  , language :: Language
+  { _location  :: Location
+  , _language :: Language
   }
 
  -- InternalState handling
 asks :: (InternalState -> a) -> Tagger a
 asks f = f <$> Get
 
-modify :: (InternalState -> InternalState) -> Tagger ()
-modify f = Get >>= \x -> Put . f $! x
+-- modify :: (InternalState -> InternalState) -> Tagger ()
+-- modify f = Get >>= \x -> Put . f $! x
 
 class (Show1 constr, Traversable constr) => Taggable constr where
   docsLiteral ::
@@ -118,11 +104,11 @@ class (Show1 constr, Traversable constr) => Taggable constr where
   snippet :: Location -> constr (Term syntax Location) -> Maybe Range
   snippet _ _ = Nothing
 
-withLocation :: Annotated t Location => t -> Tagger a -> Tagger a
-withLocation t act = do
-  old <- asks location
-  modify (\x -> x { location = annotation t })
-  act <* modify (\x -> x { location = old })
+-- withLocation :: Annotated t Location => t -> Tagger a -> Tagger a
+-- withLocation t act = do
+--   old <- asks location
+--   modify (\x -> x { location = annotation t })
+--   act <* modify (\x -> x { location = old })
 
 type IsTaggable syntax =
   ( Functor syntax
@@ -148,7 +134,6 @@ descend :: forall constr syntax.
   ( Taggable constr
   , ConstructorName constr
   , Declarations (constr (Term syntax Location))
-  , Functor constr
   , Functor syntax
   , Foldable syntax
   , HasTextElement syntax
@@ -168,12 +153,9 @@ descend t = do
 subtractLocation :: Location -> Location -> Range
 subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 
-getRange :: (Corecursive t, Recursive t, Foldable (Base t)) => Matcher t Location -> t -> Maybe Range
-getRange matcher t = locationByteRange <$> runMatcher @Maybe matcher t
-
 -- Instances
 
-instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Taggable fs, Apply ConstructorName fs) => Taggable (Sum fs) where
+instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Taggable fs) => Taggable (Sum fs) where
   docsLiteral a = apply @Taggable (docsLiteral a)
   snippet x = apply @Taggable (snippet x)
 
@@ -186,7 +168,7 @@ instance Taggable Syntax.Context where
 
 instance Taggable Declaration.Function where
   docsLiteral Python (Declaration.Function _ _ _ (Term (In _ bodyF)))
-    | ( t@(Term (In exprAnn exprF)):_ ) <- toList bodyF
+    | (Term (In exprAnn exprF):_ ) <- toList bodyF
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise        = Nothing
   docsLiteral _ _ = Nothing
@@ -713,7 +695,7 @@ type family TextElementStrategy syntax where
   TextElementStrategy (Sum fs) = 'Custom
   TextElementStrategy a = 'Default
 
-instance Foldable syntax => HasTextElementWithStrategy 'Default syntax where
+instance HasTextElementWithStrategy 'Default syntax where
   isTextElementWithStrategy _ _ = False
 
 instance CustomHasTextElement syntax => HasTextElementWithStrategy 'Custom syntax where
