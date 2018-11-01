@@ -1,12 +1,14 @@
-{-# LANGUAGE GADTs, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE GADTs, DeriveAnyClass, LambdaCase, RankNTypes, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Tags.Tagging
 ( runTagging
+, Tag(..)
 )
 where
 
 import Prelude hiding (fail, filter, log)
 import Prologue hiding (Element, hash)
 
+import Data.Aeson
 import           Analysis.ConstructorName
 import           Control.Matching hiding (target)
 import           Control.Arrow hiding (first)
@@ -36,15 +38,15 @@ import qualified Data.Syntax.Literal as Literal
 symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module"]
 
-data Symbol
-  = Symbol
+data Tag
+  = Tag
   { name :: Text
   , kind :: Text
   , context :: [Text]
   , line :: Maybe Text
   , docs :: Maybe Text
   }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic, ToJSON)
 
 runTagging ::
   ( Apply Functor fs
@@ -60,7 +62,7 @@ runTagging ::
   )
   => Blob
   -> Term (Sum fs) Location
-  -> Either TranslationError [Symbol]
+  -> Either TranslationError [Tag]
 runTagging blob tree
   = Eff.run
   . Error.runError
@@ -76,20 +78,20 @@ type Contextualizer
   ( Eff (ErrorC TranslationError
   ( Eff VoidC))))
 
-contextualizing :: Blob -> Machine.ProcessT Contextualizer Token Symbol
+contextualizing :: Blob -> Machine.ProcessT Contextualizer Token Tag
 contextualizing Blob{..} = repeatedly $ await >>= \case
   Enter x r -> enterScope (x, r)
   Exit x r  -> exitScope (x, r)
   Identifier iden rng -> lift State.get >>= \case
     ((x, r):("Context", cr):xs) | x `elem` symbolsToSummarize
-      -> yield $ Symbol iden x (fmap fst xs) (slice r) (slice cr)
+      -> yield $ Tag iden x (fmap fst xs) (slice r) (slice cr)
     ((x, r):xs) | x `elem` symbolsToSummarize
-      -> yield $ Symbol iden x (fmap fst xs) (slice r) (slice rng)
+      -> yield $ Tag iden x (fmap fst xs) (slice r) (slice rng)
     _ -> pure ()
   where
     slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
 
-enterScope, exitScope :: ContextToken -> Machine.PlanT k Symbol Contextualizer ()
+enterScope, exitScope :: ContextToken -> Machine.PlanT k Tag Contextualizer ()
 enterScope c = lift (State.modify (c :))
 exitScope  c = lift State.get >>= \case
   (x:xs) -> when (x == c) (lift (State.modify (const xs)))
