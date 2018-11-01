@@ -12,6 +12,7 @@ module Rendering.Renderer
 , renderToCTerm
 , renderSymbolTerms
 , renderToSymbols
+, renderToSymbols'
 , renderTreeGraph
 , renderJSONError
 , Summaries(..)
