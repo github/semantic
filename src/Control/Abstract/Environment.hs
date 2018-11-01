@@ -90,7 +90,6 @@ close fvs = send (Close fvs ret)
 self :: (Member (Env address) sig, Carrier sig m) => Evaluator term address value m (Maybe address)
 self = ctxSelf <$> getEvalContext
 
-<<<<<<< HEAD
 -- | Look up or allocate an address for a 'Name'.
 -- lookupOrAlloc :: ( Member (Allocator address) sig
 --                  , Member (Env address) sig
