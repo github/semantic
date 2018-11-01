@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GADTs #-}
 
 module Data.Abstract.Environment
   ( Environment(..)
@@ -33,14 +33,10 @@ import qualified Data.Map as Map
 import           Prelude hiding (head, lookup)
 import           Prologue
 
--- $setup
--- >>> import Data.Abstract.Address.Precise
--- >>> let bright = push (insertEnv (name "foo") (Precise 0) lowerBound)
--- >>> let shadowed = insertEnv (name "foo") (Precise 1) bright
-
 -- | A map of names to values. Represents a single scope level of an environment chain.
 newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
-  deriving (Eq, Ord)
+  deriving stock (Eq, Ord, Generic)
+  deriving anyclass (NFData)
 
 instance Semigroup (Bindings address) where
   (<>) (Bindings a) (Bindings b) = Bindings (a <> b)
@@ -60,14 +56,21 @@ instance Show address => Show (Bindings address) where
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
 newtype Environment address = Environment { unEnvironment :: NonEmpty (Bindings address) }
-  deriving (Eq, Ord)
+  deriving stock (Eq, Ord, Generic)
+  deriving anyclass (NFData)
 
 data EvalContext address = EvalContext { ctxSelf :: Maybe address, ctxEnvironment :: Environment address }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | Errors involving the environment.
 data EnvironmentError address return where
   FreeVariable :: Name -> EnvironmentError address address
+
+instance NFData1 (EnvironmentError address) where
+  liftRnf _ (FreeVariable n) = rnf n
+
+instance (NFData return) => NFData (EnvironmentError address return) where
+  rnf = liftRnf rnf
 
 deriving instance Eq (EnvironmentError address return)
 deriving instance Show (EnvironmentError address return)
@@ -111,9 +114,6 @@ lookup :: Name -> Bindings address -> Maybe address
 lookup name = Map.lookup name . unBindings
 
 -- | Lookup a 'Name' in the environment.
---
--- >>> lookupEnv' (name "foo") shadowed
--- Just (Precise 1)
 lookupEnv' :: Name -> Environment address -> Maybe address
 lookupEnv' name = foldMapA (lookup name) . unEnvironment
 
@@ -126,9 +126,6 @@ insertEnv :: Name -> address -> Environment address -> Environment address
 insertEnv name addr (Environment (Bindings a :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
 
 -- | Remove a 'Name' from the environment.
---
--- >>> delete (name "foo") shadowed
--- Environment []
 delete :: Name -> Environment address -> Environment address
 delete name = trim . Environment . fmap (Bindings . Map.delete name . unBindings) . unEnvironment
 

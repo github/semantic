@@ -4,6 +4,7 @@ module Language.Go.Syntax where
 
 import Prologue
 
+import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
@@ -11,6 +12,9 @@ import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import           Data.Aeson
 import           Data.JSON.Fields
+import qualified Data.Map as Map
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Proto3.Suite.Class
@@ -22,7 +26,7 @@ import           Control.Abstract.ScopeGraph
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data IsRelative = Unknown | Relative | NonRelative
-  deriving (Bounded, Enum, Finite, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField)
+  deriving (Bounded, Enum, Finite, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField, NFData)
 
 instance Primitive IsRelative where
   primType _ = primType (Proxy @(Enumerated IsRelative))
@@ -35,7 +39,7 @@ instance HasDefault IsRelative where
   def = Unknown
 
 data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message, NFData)
 
 instance MessageField ImportPath where
   encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
@@ -54,15 +58,16 @@ importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathT
 defaultAlias :: ImportPath -> Name
 defaultAlias = Data.Abstract.Evaluatable.name . T.pack . takeFileName . unPath
 
-resolveGoImport :: ( Member (Modules address value) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Package.PackageInfo) effects
-                   , Member (Reader Span) effects
-                   , Member (Resumable (BaseError ResolutionError)) effects
-                   , Member Trace effects
+resolveGoImport :: ( Member (Modules address value) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Package.PackageInfo) sig
+                   , Member (Reader Span) sig
+                   , Member (Resumable (BaseError ResolutionError)) sig
+                   , Member Trace sig
+                   , Carrier sig m
                    )
                 => ImportPath
-                -> Evaluator address value effects [ModulePath]
+                -> Evaluator term address value m [ModulePath]
 resolveGoImport (ImportPath path Unknown) = throwResolutionError $ GoImportError path
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
@@ -84,14 +89,14 @@ resolveGoImport (ImportPath path NonRelative) = do
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: ImportPath, importWildcardToken :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Language.Go.Syntax.Import importPath _) = do
+  eval _ (Language.Go.Syntax.Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
@@ -105,36 +110,34 @@ instance Evaluatable Import where
 --
 -- If the list of symbols is empty copy and qualify everything to the calling environment.
 data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !ImportPath, qualifiedImportAlias :: !a}
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport importPath aliasTerm) = do
+  eval _ (QualifiedImport importPath aliasTerm) = do
     paths <- resolveGoImport importPath
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
-    rvalBox unit
-    -- rvalBox . withChildFrame (Declaration alias) $ \addr -> do
-    --   -- TODO: Add edges to these importedScopeGraphs
-    --   for_ paths $ \p -> do
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
+    undefined
+    -- void . letrec' alias $ \addr -> do
+    --   makeNamespace alias addr Nothing . for_ paths $ \p -> do
     --     traceResolve (unPath importPath) p
-    --     importedScopeGraph <- fst <$> require p
-    --     bindAll importedScopeGraph
-    --   slot <- lookupDeclaration (Declaration alias)
-    --   makeNamespace alias slot Nothing
+    --     importedEnv <- fst . snd <$> require p
+    --     bindAll importedEnv
+    -- rvalBox unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 SideEffectImport where liftEq = genericLiftEq
 instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
-  eval (SideEffectImport importPath _) = do
+  eval _ (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
     for_ paths require
@@ -142,7 +145,7 @@ instance Evaluatable SideEffectImport where
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Composite where liftEq = genericLiftEq
 instance Ord1 Composite where liftCompare = genericLiftCompare
@@ -153,7 +156,7 @@ instance Evaluatable Composite
 
 -- | A default pattern in a Go select or switch statement (e.g. `switch { default: s() }`).
 newtype DefaultPattern a = DefaultPattern { defaultPatternBody :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 DefaultPattern where liftEq = genericLiftEq
 instance Ord1 DefaultPattern where liftCompare = genericLiftCompare
@@ -164,7 +167,7 @@ instance Evaluatable DefaultPattern
 
 -- | A defer statement in Go (e.g. `defer x()`).
 newtype Defer a = Defer { deferBody :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Defer where liftEq = genericLiftEq
 instance Ord1 Defer where liftCompare = genericLiftCompare
@@ -175,7 +178,7 @@ instance Evaluatable Defer
 
 -- | A go statement (i.e. go routine) in Go (e.g. `go x()`).
 newtype Go a = Go { goBody :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Go where liftEq = genericLiftEq
 instance Ord1 Go where liftCompare = genericLiftCompare
@@ -186,7 +189,7 @@ instance Evaluatable Go
 
 -- | A label statement in Go (e.g. `label:continue`).
 data Label a = Label { labelName :: !a, labelStatement :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Label where liftEq = genericLiftEq
 instance Ord1 Label where liftCompare = genericLiftCompare
@@ -197,7 +200,7 @@ instance Evaluatable Label
 
 -- | A rune literal in Go (e.g. `'⌘'`).
 newtype Rune a = Rune { runeLiteral :: Text }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 -- TODO: Implement Eval instance for Rune
 instance Evaluatable Rune
@@ -208,7 +211,7 @@ instance Show1 Rune where liftShowsPrec = genericLiftShowsPrec
 
 -- | A select statement in Go (e.g. `select { case x := <-c: x() }` where each case is a send or receive operation on channels).
 newtype Select a = Select { selectCases :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 -- TODO: Implement Eval instance for Select
 instance Evaluatable Select
@@ -219,7 +222,7 @@ instance Show1 Select where liftShowsPrec = genericLiftShowsPrec
 
 -- | A send statement in Go (e.g. `channel <- value`).
 data Send a = Send { sendReceiver :: !a, sendValue :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Send where liftEq = genericLiftEq
 instance Ord1 Send where liftCompare = genericLiftCompare
@@ -230,7 +233,7 @@ instance Evaluatable Send
 
 -- | A slice expression in Go (e.g. `a[1:4:3]` where a is a list, 1 is the low bound, 4 is the high bound, and 3 is the max capacity).
 data Slice a = Slice { sliceName :: !a, sliceLow :: !a, sliceHigh :: !a, sliceCapacity :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Slice where liftEq = genericLiftEq
 instance Ord1 Slice where liftCompare = genericLiftCompare
@@ -241,7 +244,7 @@ instance Evaluatable Slice
 
 -- | A type switch statement in Go (e.g. `switch x.(type) { // cases }`).
 data TypeSwitch a = TypeSwitch { typeSwitchSubject :: !a, typeSwitchCases :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 TypeSwitch where liftEq = genericLiftEq
 instance Ord1 TypeSwitch where liftCompare = genericLiftCompare
@@ -252,7 +255,7 @@ instance Evaluatable TypeSwitch
 
 -- | A type switch guard statement in a Go type switch statement (e.g. `switch i := x.(type) { // cases}`).
 newtype TypeSwitchGuard a = TypeSwitchGuard { typeSwitchGuardSubject :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 TypeSwitchGuard where liftEq = genericLiftEq
 instance Ord1 TypeSwitchGuard where liftCompare = genericLiftCompare
@@ -263,7 +266,7 @@ instance Evaluatable TypeSwitchGuard
 
 -- | A receive statement in a Go select statement (e.g. `case value := <-channel` )
 data Receive a = Receive { receiveSubject :: !a, receiveExpression :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Receive where liftEq = genericLiftEq
 instance Ord1 Receive where liftCompare = genericLiftCompare
@@ -274,7 +277,7 @@ instance Evaluatable Receive
 
 -- | A receive operator unary expression in Go (e.g. `<-channel` )
 newtype ReceiveOperator a = ReceiveOperator { value :: a}
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 ReceiveOperator where liftEq = genericLiftEq
 instance Ord1 ReceiveOperator where liftCompare = genericLiftCompare
@@ -285,7 +288,7 @@ instance Evaluatable ReceiveOperator
 
 -- | A field declaration in a Go struct type declaration.
 data Field a = Field { fieldContext :: ![a], fieldName :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Field where liftEq = genericLiftEq
 instance Ord1 Field where liftCompare = genericLiftCompare
@@ -296,19 +299,23 @@ instance Evaluatable Field
 
 
 data Package a = Package { packageName :: !a, packageContents :: ![a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Package where liftEq = genericLiftEq
 instance Ord1 Package where liftCompare = genericLiftCompare
 instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
-  eval (Package _ xs) = eval xs
+  eval eval (Package _ xs) = do
+    currentScope' <- currentScope
+    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+    scope <- newScope edges
+    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).
 data TypeAssertion a = TypeAssertion { typeAssertionSubject :: !a, typeAssertionType :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 TypeAssertion where liftEq = genericLiftEq
 instance Ord1 TypeAssertion where liftCompare = genericLiftCompare
@@ -319,7 +326,7 @@ instance Evaluatable TypeAssertion
 
 -- | A type conversion expression in Go (e.g. `T(x)` where `T` is a type and `x` is an expression that can be converted to type `T`).
 data TypeConversion a = TypeConversion { typeConversionType :: !a, typeConversionSubject :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 TypeConversion where liftEq = genericLiftEq
 instance Ord1 TypeConversion where liftCompare = genericLiftCompare
@@ -330,7 +337,7 @@ instance Evaluatable TypeConversion
 
 -- | Variadic arguments and parameters in Go (e.g. parameter: `param ...Type`, argument: `Type...`).
 data Variadic a = Variadic { variadicContext :: [a], variadicIdentifier :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)
 
 instance Eq1 Variadic where liftEq = genericLiftEq
 instance Ord1 Variadic where liftCompare = genericLiftCompare

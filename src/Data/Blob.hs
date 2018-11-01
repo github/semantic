@@ -1,13 +1,17 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Data.Blob
 ( Blob(..)
+, Blobs(..)
+, decodeBlobs
 , nullBlob
 , sourceBlob
+, noLanguageForBlob
 , BlobPair
 , These(..)
 , blobPairDiffing
 , blobPairInserting
 , blobPairDeleting
+, decodeBlobPairs
 , languageForBlobPair
 , languageTagForBlobPair
 , pathForBlobPair
@@ -15,21 +19,29 @@ module Data.Blob
 ) where
 
 import Prologue
-import Proto3.Suite
-import Data.Aeson
+
+import           Control.Effect
+import           Control.Effect.Error
+import           Data.Aeson
+import qualified Data.ByteString.Lazy as BL
+import           Proto3.Suite
+import qualified Proto3.Wire.Decode as Decode
+import qualified Proto3.Wire.Encode as Encode
+
 import Data.JSON.Fields
 import Data.Language
 import Data.Source as Source
-import qualified Proto3.Wire.Encode as Encode
-import qualified Proto3.Wire.Decode as Decode
 
 -- | The source, path, and language of a blob.
 data Blob = Blob
-  { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
-  , blobPath :: FilePath -- ^ The file path to the blob.
+  { blobSource   :: Source   -- ^ The UTF-8 encoded source text of the blob.
+  , blobPath     :: FilePath -- ^ The file path to the blob.
   , blobLanguage :: Language -- ^ The language of this blob.
   }
   deriving (Show, Eq, Generic, Message, Named)
+
+newtype Blobs a = Blobs { blobs :: [a] }
+  deriving (Generic, FromJSON)
 
 instance FromJSON Blob where
   parseJSON = withObject "Blob" $ \b -> inferringLanguage
@@ -48,6 +60,16 @@ inferringLanguage src pth lang
   | knownLanguage lang = Blob src pth lang
   | otherwise = Blob src pth (languageForFilePath pth)
 
+decodeBlobs :: BL.ByteString -> Either String [Blob]
+decodeBlobs = fmap blobs <$> eitherDecode
+
+-- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
+newtype NoLanguageForBlob = NoLanguageForBlob FilePath
+  deriving (Eq, Exception, Ord, Show, Typeable)
+
+noLanguageForBlob :: (Member (Error SomeException) sig, Carrier sig m) => FilePath -> m a
+noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
+
 -- | Represents a blobs suitable for diffing which can be either a blob to
 -- delete, a blob to insert, or a pair of blobs to diff.
 type BlobPair = Join These Blob
@@ -55,8 +77,8 @@ type BlobPair = Join These Blob
 instance Message BlobPair where
   encodeMessage _ pair = case pair of
     (Join (These a b)) -> Encode.embedded 1 (encodeMessage 1 a) <> Encode.embedded 2 (encodeMessage 1 b)
-    (Join (This a)) -> Encode.embedded 1 (encodeMessage 1 a)
-    (Join (That b)) -> Encode.embedded 2 (encodeMessage 1 b)
+    (Join (This a))    -> Encode.embedded 1 (encodeMessage 1 a)
+    (Join (That b))    -> Encode.embedded 2 (encodeMessage 1 b)
   decodeMessage _ = Join <$> (these <|> this <|> that)
     where
       embeddedAt parser = Decode.at (Decode.embedded'' parser)
@@ -100,8 +122,8 @@ languageForBlobPair (Join (These a b))
     = blobLanguage b
 
 pathForBlobPair :: BlobPair -> FilePath
-pathForBlobPair (Join (This Blob{..})) = blobPath
-pathForBlobPair (Join (That Blob{..})) = blobPath
+pathForBlobPair (Join (This Blob{..}))    = blobPath
+pathForBlobPair (Join (That Blob{..}))    = blobPath
 pathForBlobPair (Join (These _ Blob{..})) = blobPath
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
@@ -117,3 +139,6 @@ pathKeyForBlobPair blobs = case bimap blobPath blobPath (runJoin blobs) of
 
 instance ToJSONFields Blob where
   toJSONFields Blob{..} = [ "path" .= blobPath, "language" .= blobLanguage ]
+
+decodeBlobPairs :: BL.ByteString -> Either String [BlobPair]
+decodeBlobPairs = fmap blobs <$> eitherDecode

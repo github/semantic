@@ -16,6 +16,8 @@ import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Parser as TS
 import qualified TreeSitter.Tree as TS
 
+import Data.Blob
+import Data.Handle
 import SpecHelpers hiding (readFile)
 
 
@@ -23,17 +25,19 @@ spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      Just blob <- readFile (File "semantic.cabal" Unknown)
+      Just blob <- readBlobFromFile (File "semantic.cabal" Unknown)
       blobPath blob `shouldBe` "semantic.cabal"
 
     it "throws for absent files" $ do
-      readFile (File "this file should not exist" Unknown) `shouldThrow` anyIOException
+      readBlobFromFile (File "this file should not exist" Unknown) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
     let a = sourceBlob "method.rb" Ruby "def foo; end"
     let b = sourceBlob "method.rb" Ruby "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
+      putStrLn "step 1"
       blobs <- blobsFromFilePath "test/fixtures/cli/diff.json"
+      putStrLn "done"
       blobs `shouldBe` [blobPairDiffing a b]
 
     it "returns blobs when there's no before" $ do
@@ -106,5 +110,7 @@ spec = parallel $ do
 
   where blobsFromFilePath path = do
           h <- openFileForReading path
+          putStrLn "got handle"
           blobs <- readBlobPairsFromHandle h
+          putStrLn "got blobs"
           pure blobs

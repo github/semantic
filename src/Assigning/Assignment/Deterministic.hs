@@ -14,7 +14,7 @@ import Data.Error
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
 import Data.Range
-import Data.Record
+import Data.Location
 import Data.Source as Source
 import Data.Span
 import qualified Data.Syntax as Syntax
@@ -27,15 +27,15 @@ class (Alternative f, Ord symbol, Show symbol) => Assigning symbol f | f -> symb
   branchNode :: symbol -> f a -> f a
 
   toTerm :: (Element syntax syntaxes, Element Syntax.Error syntaxes)
-         => f (syntax (Term (Sum syntaxes) (Record Location)))
-         -> f         (Term (Sum syntaxes) (Record Location))
+         => f (syntax (Term (Sum syntaxes) Location))
+         -> f         (Term (Sum syntaxes) Location)
 
 parseError :: ( Bounded symbol
               , Element Syntax.Error syntaxes
               , HasCallStack
               , Assigning symbol f
               )
-           => f (Term (Sum syntaxes) (Record Location))
+           => f (Term (Sum syntaxes) Location)
 parseError = toTerm (leafNode maxBound $> Syntax.Error (Syntax.ErrorStack (Syntax.errorSite <$> getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
@@ -168,8 +168,8 @@ stateSpan :: State s -> Span
 stateSpan state@(State _ _ [])    = Span (statePos state) (statePos state)
 stateSpan       (State _ _ (s:_)) = astSpan s
 
-stateLocation :: State s -> Record Location
-stateLocation state = stateRange state :. stateSpan state :. Nil
+stateLocation :: State s -> Location
+stateLocation state = Location (stateRange state) (stateSpan state)
 
 advanceState :: State s -> State s
 advanceState state

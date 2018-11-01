@@ -1,34 +1,36 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, RankNTypes, TypeOperators, UndecidableInstances, LambdaCase, ScopedTypeVariables #-}
 module Data.Abstract.Value.Concrete
   ( Value (..)
   , ValueError (..)
-  , ClosureBody (..)
-  , runFunction
-  , runBoolean
   , runValueError
   , runValueErrorWith
   ) where
 
 import Control.Abstract.ScopeGraph (Allocator)
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..))
+import Control.Abstract hiding (Boolean(..), Function(..), While(..))
+import Control.Effect.Carrier
+import Control.Effect.Interpose
+import Control.Effect.Sum
 import Data.Abstract.BaseError
+import Data.Abstract.Evaluatable (UnspecializedError(..))
 import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
+import Data.Abstract.FreeVariables
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
 import Data.Bits
-import Data.Coerce
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific, coefficient, normalize)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
+import Data.Text (pack)
 import Data.Word
 import Prologue
 import qualified Data.Map.Strict as Map
 
-data Value address body
-  = Closure PackageInfo ModuleInfo Name [Name] (ClosureBody (Value address body) body) address
+data Value term address
+  = Closure PackageInfo ModuleInfo Name [Name] (Either BuiltIn term) address
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -41,111 +43,140 @@ data Value address body
   | Array [(Value address body)]
   | Class Declaration [(Value address body)] address
   | Namespace Name (Maybe address) (Bindings address)
-  | KVPair (Value address body) (Value address body)
-  | Hash [Value address body]
+  | KVPair (Value term address) (Value term address)
+  | Hash [Value term address]
   | Null
   | Hole
-  deriving (Eq, Ord, Show)
-
-data ClosureBody value body = ClosureBody { closureBodyId :: Int, closureBody :: body value }
-
-instance Eq   (ClosureBody address body) where
-  (==) = (==) `on` closureBodyId
-
-instance Ord  (ClosureBody address body) where
-  compare = compare `on` closureBodyId
-
-instance Show (ClosureBody address body) where
-  showsPrec d (ClosureBody i _) = showsUnaryWith showsPrec "ClosureBody" d i
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 
-instance Ord address => ValueRoots address (Value address body) where
+instance Ord address => ValueRoots address (Value term address) where
   valueRoots v
     | Closure _ _ _ _ _ env <- v = undefined -- Env.addresses env
-    | otherwise                = mempty
+    | otherwise                  = mempty
 
 
-runFunction :: forall address effects body a. ( Member (Allocator address) effects
-               , Member (Deref (Value address body)) effects
-               , Member (Exc (Return (Value address body))) effects
-               , Member Fresh effects
-               , Member (Reader ModuleInfo) effects
-               , Member (Reader PackageInfo) effects
-               , Member (Reader Span) effects
-               , Member (State Span) effects
-               , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
-               , Member (Resumable (BaseError (ValueError address body))) effects
-               , Member (Resumable (BaseError (ScopeError address))) effects
-               , Member (Resumable (BaseError (HeapError address))) effects
-               , Member (State (Heap address address (Value address body))) effects
-               , Member (State (ScopeGraph address)) effects
-               , Ord address
-               , PureEffects effects
-               )
-            => (body (Value address body) -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) (Value address body))
-            -> (Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) (Value address body) -> body (Value address body))
-            -> Evaluator address (Value address body) (Abstract.Function address (Value address body) ': effects) a
-            -> Evaluator address (Value address body) effects a
-runFunction toEvaluator fromEvaluator = interpret $ \case
-  Abstract.Function name params fvs body -> do
-    packageInfo <- currentPackage
-    moduleInfo <- currentModule
-    i <- fresh
-    -- TODO: Declare all params
-    span <- get @Span
-    declare (Declaration name) span Nothing
+instance ( FreeVariables term
+         , Member (Allocator address) sig
+         , Member (Deref (Value term address)) sig
+         , Member (Env address) sig
+         , Member (Error (Return address)) sig
+         , Member Fresh sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader PackageInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Member (State (Heap address (Value term address))) sig
+         , Member Trace sig
+         , Ord address
+         , Carrier sig m
+         , Show address
+         , Show term
+         )
+      => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Eff m)) where
+  ret = FunctionC . const . ret
+  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
+    Abstract.Function name params body k -> runEvaluator $ do
+      packageInfo <- currentPackage
+      moduleInfo <- currentModule
+      i <- fresh
+      -- TODO: Declare all params
+      span <- get @Span
+      declare (Declaration name) span Nothing
 
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    scope <- newScope lexicalEdges
+      currentScope' <- currentScope
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+      scope <- newScope lexicalEdges
 
-    withScope scope $ do
-      for_ params $ \name -> do
-        span <- get @Span -- TODO: This is definitely wrong
-        declare (Declaration name) span Nothing
+      withScope scope $ do
+        for_ params $ \name -> do
+          span <- get @Span -- TODO: This is definitely wrong
+          declare (Declaration name) span Nothing
 
-    let closure = (Closure packageInfo moduleInfo name params (ClosureBody i (fromEvaluator (Evaluator body))) scope)
-    address <- lookupDeclaration (Declaration name)
-    assign address closure
-    pure closure
-  Abstract.Call op self params -> do
-    case op of
-      Closure packageInfo moduleInfo _ names (ClosureBody _ body) scope -> do
-        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
-        -- charge them to the closure's origin.
-        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-          currentScope' <- currentScope
-          currentFrame' <- currentFrame
-          let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-          frameAddress <- newFrame scope frameEdges
-          withFrame frameAddress $ do
-            for_ (zip names params) $ \(name, param) -> do
-              addr <- lookupDeclaration (Declaration name)
-              assign addr param
-            catchReturn (runFunction toEvaluator fromEvaluator (toEvaluator body))
-      _ -> throwValueError (CallError op)
-
-runBoolean :: ( Member (Reader ModuleInfo) effects
-              , Member (Reader Span) effects
-              , Member (Resumable (BaseError (ValueError address body))) effects
-              , PureEffects effects
-              )
-           => Evaluator address (Value address body) (Abstract.Boolean (Value address body) ': effects) a
-           -> Evaluator address (Value address body) effects a
-runBoolean = interpret $ \case
-  Abstract.Boolean b          -> pure $! Boolean b
-  Abstract.AsBool (Boolean b) -> pure b
-  Abstract.AsBool other       -> throwValueError $! BoolError other
-  Abstract.Disjunction a b    -> do
-    a' <- runBoolean (Evaluator a)
-    a'' <- runBoolean (asBool a')
-    if a'' then pure a' else runBoolean (Evaluator b)
+      let closure = (Closure packageInfo moduleInfo name params (Right body) scope)
+      address <- lookupDeclaration (Declaration name)
+      assign address closure
+      pure closure >>= Evaluator . flip runFunctionC eval . k
+    Abstract.BuiltIn builtIn k -> do
+      packageInfo <- currentPackage
+      moduleInfo <- currentModule
+      runFunctionC (k (Closure packageInfo moduleInfo Nothing [] (Left builtIn) lowerBound)) eval
+    Abstract.Call op self params k -> runEvaluator $ do
+      boxed <- case op of
+        Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> pure Unit
+        Closure _ _ _ _ (Left Show) _ -> deref self >>= pure . String . pack . show
+        Closure packageInfo moduleInfo _ names (Right body) env -> do
+          -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+          -- charge them to the closure's origin.
+          withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
+            currentScope' <- currentScope
+            currentFrame' <- currentFrame
+            let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+            frameAddress <- newFrame scope frameEdges
+            withFrame frameAddress $ do
+              for_ (zip names params) $ \(name, param) -> do
+                addr <- lookupDeclaration (Declaration name)
+                assign addr param
+              catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+        _ -> throwValueError (CallError op)
+      Evaluator $ runFunctionC (k boxed) eval) op)
 
 
-instance AbstractHole (Value address body) where
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Carrier sig m
+         , Monad m
+         )
+      => Carrier (Abstract.Boolean (Value term address) :+: sig) (BooleanC (Value term address) m) where
+  ret = BooleanC . ret
+  eff = BooleanC . handleSum (eff . handleCoercible) (\case
+    Abstract.Boolean b          k -> runBooleanC . k $! Boolean b
+    Abstract.AsBool (Boolean b) k -> runBooleanC (k b)
+    Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k)
+
+
+instance ( Carrier sig m
+         , Member (Deref (Value term address)) sig
+         , Member (Abstract.Boolean (Value term address)) sig
+         , Member (Error (LoopControl address)) sig
+         , Member (Interpose (Resumable (BaseError (UnspecializedError (Value term address))))) sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+         , Member (State (Heap address (Value term address))) sig
+         , Ord address
+         , Show address
+         , Show term
+         )
+      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
+  ret = WhileC . ret
+  eff = WhileC . handleSum (eff . handleCoercible) (\case
+    Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
+      cond' <- Evaluator (runWhileC cond)
+
+      -- `interpose` is used to handle 'UnspecializedError's and abort out of the
+      -- loop, otherwise under concrete semantics we run the risk of the
+      -- conditional always being true and getting stuck in an infinite loop.
+
+      ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
+      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address))
+        >>= runWhileC . k)
+    where
+      loop x = catchLoopControl @address (fix x) $ \case
+        Break value -> deref value
+        Abort -> pure unit
+        -- FIXME: Figure out how to deal with this. Ruby treats this as the result
+        -- of the current block iteration, while PHP specifies a breakout level
+        -- and TypeScript appears to take a label.
+        Continue _  -> loop x
+
+
+instance AbstractHole (Value term address) where
   hole = Hole
 
-instance Show address => AbstractIntro (Value address body) where
+instance (Show address, Show term) => AbstractIntro (Value term address) where
   unit     = Unit
   integer  = Integer . Number.Integer
   string   = String
@@ -159,15 +190,16 @@ instance Show address => AbstractIntro (Value address body) where
 
   null     = Null
 
--- materializeEnvironment :: ( Member (Deref (Value address body)) effects
---                           , Member (Reader ModuleInfo) effects
---                           , Member (Reader Span) effects
---                           , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
---                           , Member (State (Heap address address (Value address body))) effects
+-- materializeEnvironment :: ( Member (Deref (Value term address)) sig
+--                           , Member (Reader ModuleInfo) sig
+--                           , Member (Reader Span) sig
+--                           , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+--                           , Member (State (Heap address (Value term address))) sig
 --                           , Ord address
+--                           , Carrier sig m
 --                           )
---                        => Value address body
---                        -> Evaluator address (Value address body) effects (Maybe (Environment address))
+--                        => Value term address
+--                        -> Evaluator term address (Value term address) m (Maybe (Environment address))
 -- materializeEnvironment val = do
 --   ancestors <- rec val
 --   pure (Env.Environment <$> nonEmpty ancestors)
@@ -175,36 +207,37 @@ instance Show address => AbstractIntro (Value address body) where
 --       rec val = do
 --         supers <- concat <$> traverse (deref >=> rec) (parents val)
 --         pure . maybe [] (: supers) $ bindsFrom val
-
+--
 --       bindsFrom = \case
 --         Class _ _ binds -> Just binds
 --         Namespace _ _ binds -> Just binds
 --         _ -> Nothing
-
+--
 --       parents = \case
 --         Class _ supers _ -> supers
 --         Namespace _ supers _ -> toList supers
 --         _ -> []
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Coercible body (Eff effects)
-         , Member (Allocator address) effects
-         , Member (Abstract.Boolean (Value address body)) effects
-         , Member (Deref (Value address body)) effects
-         , Member (Exc (LoopControl (Value address body))) effects
-         , Member (Exc (Return (Value address body))) effects
-         , Member Fresh effects
-         , Member (Reader ModuleInfo) effects
-         , Member (Reader PackageInfo) effects
-         , Member (Reader Span) effects
-         , Member (Resumable (BaseError (ValueError address body))) effects
-         , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
-         , Member (State (Heap address address (Value address body))) effects
-         , Member Trace effects
+instance ( Member (Allocator address) sig
+         , Member (Abstract.Boolean (Value term address)) sig
+         , Member (Deref (Value term address)) sig
+         , Member (Error (LoopControl address)) sig
+         , Member (Error (Return address)) sig
+         , Member Fresh sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader PackageInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+         , Member (State (Heap address address (Value term address))) sig
+         , Member Trace sig
          , Ord address
          , Show address
+         , Show term
+         , Carrier sig m
          )
-      => AbstractValue address (Value address body) effects where
+      => AbstractValue term address (Value term address) m where
   asPair val
     | KVPair k v <- val = pure (k, v)
     | otherwise = throwValueError $ KeyValueError val
@@ -269,13 +302,9 @@ instance ( Coercible body (Eff effects)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: ( AbstractValue address (Value address body) effects
-                      , Member (Reader ModuleInfo) effects
-                      , Member (Reader Span) effects
-                      , Member (Resumable (BaseError (ValueError address body))) effects
-                      )
+        specialize :: AbstractValue term address (Value term address) m
                    => Either ArithException Number.SomeNumber
-                   -> Evaluator address (Value address body) effects (Value address body)
+                   -> Evaluator term address (Value term address) m (Value term address)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = pure $ integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = pure $ rational r
@@ -294,7 +323,7 @@ instance ( Coercible body (Eff effects)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue address (Value address body) effects, Member (Abstract.Boolean (Value address body)) effects, Ord a) => a -> a -> Evaluator address (Value address body) effects (Value address body)
+        go :: (AbstractValue term address (Value term address) m, Ord a) => a -> a -> Evaluator term address (Value term address) m (Value term address)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> pure $ integer (orderingToInt (compare l r))
@@ -324,36 +353,50 @@ instance ( Coercible body (Eff effects)
         ourShift :: Word64 -> Int -> Integer
         ourShift a b = toInteger (shiftR a b)
 
-  loop x = catchLoopControl (fix x) (\ control -> case control of
-    Break value -> pure value
-    -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
-    Continue _  -> loop x)
-
   castToInteger (Integer (Number.Integer i)) = pure (Integer (Number.Integer i))
   castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
   castToInteger i = throwValueError (NumericError i)
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
-data ValueError address body resume where
-  StringError            :: Value address body                       -> ValueError address body Text
-  BoolError              :: Value address body                       -> ValueError address body Bool
-  IndexError             :: Value address body -> Value address body -> ValueError address body (Value address body)
-  NamespaceError         :: Prelude.String                           -> ValueError address body (Bindings address)
-  CallError              :: Value address body                       -> ValueError address body (Value address body)
-  NumericError           :: Value address body                       -> ValueError address body (Value address body)
-  Numeric2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
-  ComparisonError        :: Value address body -> Value address body -> ValueError address body (Value address body)
-  BitwiseError           :: Value address body                       -> ValueError address body (Value address body)
-  Bitwise2Error          :: Value address body -> Value address body -> ValueError address body (Value address body)
-  KeyValueError          :: Value address body                       -> ValueError address body (Value address body, Value address body)
-  ArrayError             :: Value address body                       -> ValueError address body [(Value address body)]
+data ValueError term address resume where
+  StringError            :: Value term address                       -> ValueError term address Text
+  BoolError              :: Value term address                       -> ValueError term address Bool
+  IndexError             :: Value term address -> Value term address -> ValueError term address (Value term address)
+  NamespaceError         :: Prelude.String                           -> ValueError term address (Bindings address)
+  CallError              :: Value term address                       -> ValueError term address (Value term address)
+  NumericError           :: Value term address                       -> ValueError term address (Value term address)
+  Numeric2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
+  ComparisonError        :: Value term address -> Value term address -> ValueError term address (Value term address)
+  BitwiseError           :: Value term address                       -> ValueError term address (Value term address)
+  Bitwise2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
+  KeyValueError          :: Value term address                       -> ValueError term address (Value term address, Value term address)
+  ArrayError             :: Value term address                       -> ValueError term address [(Value term address)]
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError        :: ArithException                           -> ValueError address body (Value address body)
+  ArithmeticError        :: ArithException                           -> ValueError term address (Value term address)
   -- Out-of-bounds error
-  BoundsError            :: [Value address body]          -> Prelude.Integer    -> ValueError address body (Value address body)
+  BoundsError            :: [Value term address] -> Prelude.Integer  -> ValueError term address (Value term address)
 
+instance (NFData term, NFData address) => NFData1 (ValueError term address) where
+  liftRnf _ x = case x of
+    StringError i       -> rnf i
+    BoolError   i       -> rnf i
+    IndexError  i j     -> rnf i `seq` rnf j
+    NamespaceError i    -> rnf i
+    CallError i         -> rnf i
+    NumericError i      -> rnf i
+    Numeric2Error i j   -> rnf i `seq` rnf j
+    ComparisonError i j -> rnf i `seq` rnf j
+    BitwiseError i      -> rnf i
+    Bitwise2Error i j   -> rnf i `seq` rnf j
+    KeyValueError i     -> rnf i
+    ArrayError i        -> rnf i
+    ArithmeticError i   -> i `seq` ()
+    BoundsError i j     -> rnf i `seq` rnf j
 
-instance Eq address => Eq1 (ValueError address body) where
+instance (NFData term, NFData address, NFData resume) => NFData (ValueError term address resume) where
+  rnf = liftRnf rnf
+
+instance (Eq address, Eq term) => Eq1 (ValueError term address) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
@@ -367,25 +410,26 @@ instance Eq address => Eq1 (ValueError address body) where
   liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
-deriving instance Show address => Show (ValueError address body resume)
-instance Show address => Show1 (ValueError address body) where
+deriving instance (Show address, Show term) => Show (ValueError term address resume)
+instance (Show address, Show term) => Show1 (ValueError term address) where
   liftShowsPrec _ _ = showsPrec
 
-runValueError :: (Effectful (m address (Value address body)), Effects effects)
-              => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
-              -> m address (Value address body) effects (Either (SomeExc (BaseError (ValueError address body))) a)
-runValueError = runResumable
+runValueError :: (Carrier sig m, Effect sig)
+              => Evaluator term address (Value term address) (ResumableC (BaseError (ValueError term address)) (Eff m)) a
+              -> Evaluator term address (Value term address) m (Either (SomeError (BaseError (ValueError term address))) a)
+runValueError = Evaluator . runResumable . runEvaluator
 
-runValueErrorWith :: (Effectful (m address (Value address body)), Effects effects)
-                  => (forall resume . BaseError (ValueError address body) resume -> m address (Value address body) effects resume)
-                  -> m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
-                  -> m address (Value address body) effects a
-runValueErrorWith = runResumableWith
+runValueErrorWith :: Carrier sig m
+                  => (forall resume . BaseError (ValueError term address) resume -> Evaluator term address (Value term address) m resume)
+                  -> Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) (Eff m)) a
+                  -> Evaluator term address (Value term address) m a
+runValueErrorWith f = Evaluator . runResumableWith (runEvaluator . f) . runEvaluator
 
-throwValueError :: ( Member (Resumable (BaseError (ValueError address body))) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Span) effects
+throwValueError :: ( Member (Resumable (BaseError (ValueError term address))) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Carrier sig m
                    )
-                => ValueError address body resume
-                -> Evaluator address (Value address body) effects resume
+                => ValueError term address resume
+                -> Evaluator term address (Value term address) m resume
 throwValueError = throwBaseError

@@ -24,16 +24,16 @@ evaluateProject proxy parser paths = withOptions defaultOptions $ \ config logge
 -- project—coercing the result into a string will suffice, though it throws off the
 -- memory allocation results a bit.
 pyEval :: FilePath -> Benchmarkable
-pyEval p = whnfIO . fmap show . evalPythonProject $ ["bench/bench-fixtures/python/" <> p]
+pyEval p = nfIO . evalPythonProject $ ["bench/bench-fixtures/python/" <> p]
 
 rbEval :: FilePath -> Benchmarkable
-rbEval p = whnfIO . fmap show . evalRubyProject $ ["bench/bench-fixtures/ruby/" <> p]
+rbEval p = nfIO . evalRubyProject $ ["bench/bench-fixtures/ruby/" <> p]
 
 pyCall :: FilePath -> Benchmarkable
-pyCall p = whnfIO $ callGraphProject pythonParser (Proxy @'Language.Python) defaultOptions ["bench/bench-fixtures/python/" <> p]
+pyCall p = nfIO $ callGraphProject pythonParser (Proxy @'Language.Python) defaultOptions ["bench/bench-fixtures/python/" <> p]
 
 rbCall :: FilePath -> Benchmarkable
-rbCall p = whnfIO $ callGraphProject rubyParser (Proxy @'Language.Ruby) defaultOptions ["bench/bench-fixtures/ruby/" <> p]
+rbCall p = nfIO $ callGraphProject rubyParser (Proxy @'Language.Ruby) defaultOptions ["bench/bench-fixtures/ruby/" <> p]
 
 main :: IO ()
 main = defaultMain

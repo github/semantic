@@ -1,13 +1,11 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE LambdaCase, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Address.Located
 ( Located(..)
-, runAllocator
-, handleAllocator
-, runDeref
-, handleDeref
 ) where
 
 import Control.Abstract
+import Control.Effect.Carrier
+import Control.Effect.Sum
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Abstract.Package (PackageInfo)
@@ -22,37 +20,29 @@ data Located address = Located
   deriving (Eq, Ord, Show)
 
 
-relocate :: Evaluator address1 value effects a -> Evaluator address2 value effects a
-relocate = raiseEff . lowerEff
+promoteA :: AllocatorC address m a -> AllocatorC (Located address) m a
+promoteA = AllocatorC . runAllocatorC
+
+instance ( Carrier (Allocator address :+: sig) (AllocatorC address m)
+         , Carrier sig m
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader PackageInfo) sig
+         , Member (Reader Span) sig
+         , Monad m
+         )
+      => Carrier (Allocator (Located address) :+: sig) (AllocatorC (Located address) m) where
+  ret = promoteA . ret
+  eff = handleSum
+    (AllocatorC . eff . handleCoercible)
+    (\ (Alloc name k) -> Located <$> promoteA (eff (L (Alloc name ret))) <*> currentPackage <*> currentModule <*> pure name <*> ask >>= k)
 
 
-runAllocator :: ( Member (Reader ModuleInfo) effects
-                , Member (Reader PackageInfo) effects
-                , Member (Reader Span) effects
-                , PureEffects effects
-                )
-             => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator address value effects x)
-             -> Evaluator (Located address) value (Allocator (Located address) ': effects) a
-             -> Evaluator (Located address) value effects a
-runAllocator handler = interpret (handleAllocator handler)
+promoteD :: DerefC address value m a -> DerefC (Located address) value m a
+promoteD = DerefC . runDerefC
 
-handleAllocator :: ( Member (Reader ModuleInfo) effects
-                   , Member (Reader PackageInfo) effects
-                   , Member (Reader Span) effects
-                   )
-                => (forall x. Allocator address (Eff (Allocator address ': effects)) x -> Evaluator address value effects x)
-                -> Allocator (Located address) (Eff (Allocator (Located address) ': effects)) a
-                -> Evaluator (Located address) value effects a
-handleAllocator handler (Alloc name) = relocate (Located <$> handler (Alloc name) <*> currentPackage <*> currentModule <*> pure name <*> ask)
-
-runDeref :: PureEffects effects
-         => (forall x. Deref value (Eff (Deref value ': effects)) x -> Evaluator address value effects x)
-         -> Evaluator (Located address) value (Deref value ': effects) a
-         -> Evaluator (Located address) value effects a
-runDeref handler = interpret (handleDeref handler)
-
-handleDeref :: (forall x. Deref value (Eff (Deref value ': effects)) x -> Evaluator address value effects x)
-            -> Deref value (Eff (Deref value ': effects)) a
-            -> Evaluator (Located address) value effects a
-handleDeref handler (DerefCell        cell) = relocate (handler (DerefCell        cell))
-handleDeref handler (AssignCell value cell) = relocate (handler (AssignCell value cell))
+instance (Carrier (Deref value :+: sig) (DerefC address value m), Carrier sig m, Monad m)
+      => Carrier (Deref value :+: sig) (DerefC (Located address) value m) where
+  ret = promoteD . ret
+  eff = handleSum (DerefC . eff . handleCoercible) (\case
+    DerefCell        cell k -> promoteD (eff (L (DerefCell        cell ret))) >>= k
+    AssignCell value cell k -> promoteD (eff (L (AssignCell value cell ret))) >>= k)

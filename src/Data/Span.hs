@@ -24,17 +24,20 @@ data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable)
+  deriving (Eq, Ord, Generic, Hashable, NFData)
 
 -- | A Span of position information
 data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable, Named)
+  deriving (Eq, Ord, Generic, Hashable, Named, NFData)
 
 
 -- Instances
+
+instance Show Pos where
+  showsPrec _ Pos{..} = showChar '[' . shows posLine . showString ", " . shows posColumn . showChar ']'
 
 instance Named Pos where nameOf _ = "Position"
 instance Message Pos where
@@ -60,6 +63,9 @@ instance Lower Pos where
 instance HasDefault Pos where
   def = lowerBound @Pos
 
+
+instance Show Span where
+  showsPrec _ Span{..} = shows spanStart . showString " - " . shows spanEnd
 
 instance Message Span where
   encodeMessage _ Span{..} = Encode.embedded 1 (encodeMessage 1 spanStart) <> Encode.embedded 2 (encodeMessage 1 spanEnd)

@@ -1,8 +1,8 @@
 (Statements
   (Class
     (TypeParameter
-    { (Identifier)
-    ->(Identifier) }
+    { (TypeIdentifier)
+    ->(TypeIdentifier) }
       (Empty)
       (Empty))
   { (TypeIdentifier)

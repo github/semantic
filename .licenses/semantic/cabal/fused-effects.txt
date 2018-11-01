@@ -1,12 +1,12 @@
 ---
 type: cabal
-name: vector-th-unbox
-version: 0.2.1.6
-summary: Deriver for Data.Vector.Unboxed using Template Haskell
-homepage: 
+name: fused-effects
+version: 0.1.0.0
+summary: 'A fast, flexible, fused effect system, à la Effect Handlers in Scope, Monad Transformers and Modular Algebraic Effects: What Binds Them Together, and Fusion for Free—Efficient Algebraic Effect Handlers.'
+homepage: https://github.com/robrix/fused-effects
 license: bsd-3-clause
 ---
-Copyright (c) 2012−2015, Liyang HU
+Copyright (c) 2018, Rob Rix and Patrick Thomson
 
 All rights reserved.
 
@@ -21,7 +21,7 @@ modification, are permitted provided that the following conditions are met:
       disclaimer in the documentation and/or other materials provided
       with the distribution.
 
-    * Neither the name of Liyang HU nor the names of other
+    * Neither the name of Rob Rix nor the names of other
       contributors may be used to endorse or promote products derived
       from this software without specific prior written permission.
 

@@ -6,35 +6,38 @@ module Reprinting.Translate
   ) where
 
 import           Control.Monad
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception (Exc)
-import qualified Control.Monad.Effect.Exception as Exc
-import           Control.Monad.Effect.State
+import           Control.Effect
+import           Control.Effect.Error
+import           Control.Effect.State
 import           Control.Monad.Trans
 import           Data.Machine
 
 import           Data.Reprinting.Errors
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
+import           Data.Reprinting.Scope
 import qualified Data.Source as Source
 
-type Translator = Eff '[State [Context], Exc TranslationError]
+type Translator
+  = Eff (StateC [Scope]
+  ( Eff (ErrorC TranslationError
+  ( Eff VoidC))))
 
 contextualizing :: ProcessT Translator Token Fragment
 contextualizing = repeatedly $ await >>= \case
   Chunk source -> yield . Verbatim . Source.toText $ source
-  TElement t -> case t of
+  Element t -> case t of
     Run f -> lift get >>= \c -> yield (New t c f)
     _     -> lift get >>= yield . Defer t
-  TControl ctl -> case ctl of
-    Enter c -> enterContext c
-    Exit c  -> exitContext c
+  Control ctl -> case ctl of
+    Enter c -> enterScope c
+    Exit c  -> exitScope c
     _       -> pure ()
 
-enterContext, exitContext :: Context -> PlanT k Fragment Translator ()
+enterScope, exitScope :: Scope -> PlanT k Fragment Translator ()
 
-enterContext c = lift (modify' (c :))
+enterScope c = lift (modify (c :))
 
-exitContext c = lift get >>= \case
-  (x:xs) -> when (x == c) (lift (modify' (const xs)))
-  cs     -> lift (Exc.throwError (UnbalancedPair c cs))
+exitScope c = lift get >>= \case
+  (x:xs) -> when (x == c) (lift (modify (const xs)))
+  cs     -> lift (throwError (UnbalancedPair c cs))

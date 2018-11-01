@@ -4,7 +4,6 @@ module Semantic.Env
   , envLookupString
   ) where
 
-import Control.Monad.IO.Class
 import Prologue
 import System.Environment
 import Text.Read (readMaybe)

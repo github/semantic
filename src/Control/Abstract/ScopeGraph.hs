@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ExistentialQuantification, GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.ScopeGraph
   ( lookup
   , declare
@@ -33,6 +33,10 @@ import           Control.Abstract.Evaluator hiding (Local)
 import           Data.Abstract.Module
 import           Data.Abstract.BaseError
 import           Data.Abstract.Name hiding (name)
+import           Control.Abstract.Heap
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
+import           Data.Abstract.Name
 import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Address(..), Scope(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Map.Strict as Map

@@ -19,7 +19,8 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.Caching
+                       Analysis.Abstract.Caching.FlowInsensitive
+                     , Analysis.Abstract.Caching.FlowSensitive
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Graph
@@ -35,28 +36,29 @@ library
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
-                     , Control.Abstract.Configuration
                      , Control.Abstract.Context
                      , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Heap
                      , Control.Abstract.Hole
-                     , Control.Abstract.Matching
                      , Control.Abstract.Modules
                      , Control.Abstract.Primitive
                      , Control.Abstract.PythonPackage
                      , Control.Abstract.Roots
                      , Control.Abstract.ScopeGraph
-                     , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
+                     -- Effects
+                     , Control.Effect.Interpose
+                     , Control.Effect.REPL
+                     -- Matching and rewriting DSLs
+                     , Control.Matching
+                     , Control.Rewriting
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address.Hole
                      , Data.Abstract.Address.Located
                      , Data.Abstract.Address.Monovariant
                      , Data.Abstract.Address.Precise
                      , Data.Abstract.BaseError
-                     , Data.Abstract.Cache
-                     , Data.Abstract.Configuration
                      , Data.Abstract.Declarations
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
@@ -82,15 +84,18 @@ library
                      , Data.Diff
                      , Data.Duration
                      , Data.Error
+                     , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
                      , Data.Graph.ControlFlowVertex
                      , Data.Graph.TermVertex
                      , Data.Graph.DiffVertex
+                     , Data.Handle
                      , Data.History
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Location
                      , Data.Map.Monoidal
                      , Data.Proto.DiffTree
                      , Data.Proto.ParseTree
@@ -98,15 +103,16 @@ library
                      , Data.Project
                      , Data.Quieterm
                      , Data.Range
-                     , Data.Record
                      , Data.Reprinting.Errors
-                     , Data.Reprinting.Token
+                     , Data.Reprinting.Fragment
+                     , Data.Reprinting.Operator
+                     , Data.Reprinting.Scope
                      , Data.Reprinting.Splice
+                     , Data.Reprinting.Token
                      , Data.Semigroup.App
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
-                     , Data.SplitDiff
                      -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
@@ -133,6 +139,12 @@ library
                      , Language.Haskell.Grammar
                      , Language.Haskell.Assignment
                      , Language.Haskell.Syntax
+                     , Language.Haskell.Syntax.Constructor
+                     , Language.Haskell.Syntax.Haskell
+                     , Language.Haskell.Syntax.Identifier
+                     , Language.Haskell.Syntax.Pattern
+                     , Language.Haskell.Syntax.QuasiQuote
+                     , Language.Haskell.Syntax.Type
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.JSON.PrettyPrint
@@ -177,6 +189,7 @@ library
                      , Reprinting.Typeset
                      , Reprinting.Pipeline
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.Analysis
                      , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Config
@@ -189,6 +202,7 @@ library
                      , Semantic.REPL
                      , Semantic.Resolution
                      , Semantic.Task
+                     , Semantic.Task.Files
                      , Semantic.Telemetry
                      , Semantic.Telemetry.AsyncQueue
                      , Semantic.Telemetry.Haystack
@@ -196,6 +210,7 @@ library
                      , Semantic.Telemetry.Stat
                      , Semantic.Timeout
                      , Semantic.Util
+                     , Semantic.Util.Pretty
                      , Semantic.Util.Rewriting
                      , Semantic.Version
                      -- Serialization
@@ -216,13 +231,14 @@ library
                      , cmark-gfm
                      , containers
                      , cryptohash
+                     , deepseq
                      , directory
                      , directory-tree
-                     , effects
                      , fastsum
                      , filepath
                      , free
                      , freer-cofreer
+                     , fused-effects
                      , ghc-prim
                      , gitrev
                      , Glob
@@ -243,6 +259,7 @@ library
                      , parsers
                      , prettyprinter
                      , pretty-show
+                     , profunctors
                      , recursion-schemes
                      , reducers
                      , scientific
@@ -276,6 +293,7 @@ library
                      , DeriveTraversable
                      , FlexibleContexts
                      , FlexibleInstances
+                     , MonadFailDesugaring
                      , MultiParamTypeClasses
                      , OverloadedStrings
                      , RecordWildCards
@@ -283,16 +301,16 @@ library
                      , StrictData
                      , TypeApplications
   if flag(release)
-    ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j
+    ghc-options:       -Wall -Werror -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O1 -j -DCOMPUTE_GIT_SHA
   else
-    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j
+    ghc-options:       -Wall -Wmissing-export-lists -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O0 -j +RTS -A128m -n2m -RTS
   ghc-prof-options:    -fprof-auto
 
 executable semantic
   hs-source-dirs:      app
   main-is:             Main.hs
   if flag(release)
-    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O1 -j
+    ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O1 -j -DCOMPUTE_GIT_SHA
   else
     ghc-options:       -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m" -static -j -O0 -j
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
@@ -313,12 +331,18 @@ test-suite test
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
+                     , Control.Rewriting.Spec
+                     , Data.Abstract.Environment.Spec
                      , Data.Abstract.Path.Spec
+                     , Data.Abstract.Name.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
+                     , Data.Graph.Spec
                      , Data.Mergeable
+                     , Data.Range.Spec
                      , Data.Scientific.Spec
+                     , Data.Semigroup.App.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
@@ -344,10 +368,10 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , containers
-                     , effects
                      , fastsum
                      , filepath
                      , free
+                     , fused-effects
                      , Glob
                      , hashable
                      , haskell-tree-sitter
@@ -373,6 +397,7 @@ test-suite test
                      , DeriveGeneric
                      , FlexibleContexts
                      , FlexibleInstances
+                     , MonadFailDesugaring
                      , MultiParamTypeClasses
                      , OverloadedStrings
                      , RecordWildCards
@@ -388,17 +413,29 @@ test-suite lint
   build-depends:       base
                      , hlint
 
-test-suite doctests
+test-suite parse-examples
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  main-is:             Doctests.hs
+  main-is:             Examples.hs
   default-language:    Haskell2010
-  ghc-options:         -dynamic -threaded -j
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j
   build-depends:       base
-                     , doctest
+                     , bytestring
+                     , directory
+                     , fastsum
+                     , filepath
+                     , fused-effects
+                     , Glob
+                     , hspec >= 2.4.1
+                     , hspec-core
+                     , hspec-expectations-pretty-diff
+                     , process
+                     , semantic
+  default-extensions:  RecordWildCards
+                     , FlexibleContexts
 
 benchmark evaluation
-  hs-source-dirs:      bench
+  hs-source-dirs:      bench/evaluation
   type:                exitcode-stdio-1.0
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O1

@@ -103,19 +103,20 @@ module Reprinting.Pipeline
   , runTranslating
   ) where
 
-import           Control.Monad.Effect as Effect
-import qualified Control.Monad.Effect.Exception as Exc
-import           Control.Monad.Effect.State
+import           Control.Effect as Effect
+import           Control.Effect.Error as Effect
+import           Control.Effect.State as Effect
 import           Data.Machine hiding (Source)
 import           Data.Machine.Runner
-import           Data.Record
+import           Data.Text.Prettyprint.Doc
+import           Data.Text.Prettyprint.Doc.Render.Text
+
 import           Data.Reprinting.Errors
+import           Data.Reprinting.Scope
 import           Data.Reprinting.Splice
 import           Data.Reprinting.Token
 import qualified Data.Source as Source
 import           Data.Term
-import           Data.Text.Prettyprint.Doc
-import           Data.Text.Prettyprint.Doc.Render.Text
 import           Reprinting.Tokenize
 import           Reprinting.Translate
 import           Reprinting.Typeset
@@ -123,21 +124,17 @@ import           Reprinting.Typeset
 
 -- | Run the reprinting pipeline given the original 'Source', a language
 -- specific machine (`ProcessT`) and the provided 'Term'.
-runReprinter ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runReprinter :: Tokenize a
   => Source.Source
   -> ProcessT Translator Fragment Splice
-  -> Term a (Record fields)
+  -> Term a History
   -> Either TranslationError Source.Source
 runReprinter src translating tree
   = fmap go
   . Effect.run
-  . Exc.runError
+  . Effect.runError
   . fmap snd
-  . runState (mempty :: [Context])
+  . runState (mempty :: [Scope])
   . foldT $ source (tokenizing src tree)
       ~> contextualizing
       ~> translating
@@ -145,48 +142,36 @@ runReprinter src translating tree
   where go = Source.fromText . renderStrict . layoutPretty defaultLayoutOptions
 
 -- | Run the reprinting pipeline up to tokenizing.
-runTokenizing ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runTokenizing :: Tokenize a
   => Source.Source
-  -> Term a (Record fields)
+  -> Term a History
   -> [Token]
 runTokenizing src tree
   = Data.Machine.run $ source (tokenizing src tree)
 
 -- | Run the reprinting pipeline up to contextualizing.
-runContextualizing ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runContextualizing :: Tokenize a
   => Source.Source
-  -> Term a (Record fields)
+  -> Term a History
   -> Either TranslationError [Fragment]
 runContextualizing src tree
   = Effect.run
-  . Exc.runError
+  . Effect.runError
   . fmap snd
-  . runState (mempty :: [Context])
+  . runState (mempty :: [Scope])
   . runT $ source (tokenizing src tree)
       ~> contextualizing
 
-runTranslating ::
-  ( Show (Record fields)
-  , Tokenize a
-  , HasField fields History
-  )
+runTranslating :: Tokenize a
   => Source.Source
   -> ProcessT Translator Fragment Splice
-  -> Term a (Record fields)
+  -> Term a History
   -> Either TranslationError [Splice]
 runTranslating src translating tree
   = Effect.run
-  . Exc.runError
+  . Effect.runError
   . fmap snd
-  . runState (mempty :: [Context])
+  . runState (mempty :: [Scope])
   . runT $ source (tokenizing src tree)
       ~> contextualizing
       ~> translating

@@ -18,10 +18,10 @@ import           Semantic.Config (defaultOptions)
 import           Semantic.Graph
 import           Semantic.IO
 
-callGraphPythonProject paths = runTaskWithOptions defaultOptions $ do
+callGraphPythonProject paths = runTask $ do
   let proxy = Proxy @'Language.Python
   let lang = Language.Python
-  blobs <- catMaybes <$> traverse readFile (flip File lang <$> paths)
+  blobs <- catMaybes <$> traverse readBlobFromFile (flip File lang <$> paths)
   package <- fmap snd <$> parsePackage pythonParser (Project (takeDirectory (maybe "/" fst (uncons paths))) blobs lang [])
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   runCallGraph proxy False modules package

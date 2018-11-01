@@ -2,15 +2,13 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists -Wno-redundant-constraints -fno-warn-orphans #-} -- For HasCallStack
 module Data.Syntax where
 
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (Empty, Error)
 import Data.Aeson (ToJSON(..), object)
-import Data.AST
 import Data.Char (toLower)
 import Data.JSON.Fields
 import Data.Range
-import Data.Record
+import Data.Location
 import qualified Data.Set as Set
-import Data.Span
 import Data.Sum
 import Data.Term
 import GHC.Types (Constraint)
@@ -18,7 +16,7 @@ import GHC.TypeLits
 import Diffing.Algorithm hiding (Empty)
 import Prelude
 import Prologue
-import Reprinting.Tokenize hiding (Context, Element)
+import Reprinting.Tokenize hiding (Element)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 import Proto3.Suite.Class
@@ -54,16 +52,16 @@ makeTerm1' syntax = case toList syntax of
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
+emptyTerm :: (HasCallStack, Empty :< syntaxes, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
-  where startLocation ann = Range (start (getField ann)) (start (getField ann)) :. Span (spanStart (getField ann)) (spanStart (getField ann)) :. Nil
+  where startLocation Location{..} = Location (Range (start locationByteRange) (start locationByteRange)) (Span (spanStart locationSpan) (spanStart locationSpan))
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location)) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
+handleError :: (HasCallStack, Error :< syntaxes, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location) -> Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
 handleError = flip Assignment.catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) (Record Location))
+parseError :: (HasCallStack, Error :< syntaxes, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable syntaxes) => Assignment.Assignment ast grammar (Term (Sum syntaxes) Location)
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack $ errorSite <$> getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -157,14 +155,14 @@ instance Message1 [] where
 newtype Identifier a = Identifier { name :: Name }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Diffable, Hashable1, Message1, Named1, ToJSONFields1)
+  deriving anyclass (Diffable, Hashable1, Message1, Named1, ToJSONFields1, NFData1)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = pure (LvalLocal name)
+  eval _ (Identifier name) = pure (LvalLocal name)
 
 instance Tokenize Identifier where
   tokenize = yield . Run . formatName . Data.Syntax.name
@@ -179,7 +177,7 @@ instance Declarations1 Identifier where
 newtype AccessibilityModifier a = AccessibilityModifier { contents :: Text }
   deriving newtype (Eq, Ord, Show)
   deriving stock (Foldable, Functor, Generic1, Traversable)
-  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Message1, Named1, ToJSONFields1)
+  deriving anyclass (Declarations1, Diffable, FreeVariables1, Hashable1, Message1, Named1, ToJSONFields1, NFData1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
@@ -192,21 +190,21 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = rvalBox unit
+  eval _ _ = rvalBox unit
 
 instance Tokenize Empty where
   tokenize = ignore
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -235,7 +233,7 @@ unError span Error{..} = Error.Error span errorExpected errorActual stack
   where stack = fromCallSiteList $ unErrorSite <$> unErrorStack errorCallStack
 
 data ErrorSite = ErrorSite { errorMessage :: String, errorLocation :: SrcLoc }
-  deriving (Eq, Show, Generic, Named, Message)
+  deriving (Eq, Show, Generic, Named, Message, NFData)
 
 errorSite :: (String, SrcLoc) -> ErrorSite
 errorSite = uncurry ErrorSite
@@ -245,7 +243,7 @@ unErrorSite ErrorSite{..} = (errorMessage, errorLocation)
 
 newtype ErrorStack = ErrorStack { unErrorStack :: [ErrorSite] }
   deriving stock (Eq, Show, Generic)
-  deriving anyclass (Named, Message)
+  deriving anyclass (Named, Message, NFData)
   deriving newtype (MessageField)
 
 instance HasDefault ErrorStack where
@@ -291,7 +289,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Declarations1, Eq, Foldable, FreeVariables1, Functor, Generic1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Eq, Foldable, FreeVariables1, Functor, Generic1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
@@ -305,7 +303,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval Context{..} = subtermRef contextSubject
+  eval eval Context{..} = eval contextSubject
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject

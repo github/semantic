@@ -3,23 +3,30 @@
     (Send
       (Identifier))
     (Statements
+    {+(Pattern
+      {+(Statements
+        {+(Send
+          {+(Identifier)+})+})+}
+      {+(Statements)+})+}
       (Pattern
         (Statements
           (Send
-          { (Identifier)
-          ->(Identifier) }))
+            (Identifier))
+        {+(Send
+          {+(Identifier)+})+})
         (Statements
-        {+(Pattern
-          {+(Statements
-            {+(Send
-              {+(Identifier)+})+}
-            {+(Send
-              {+(Identifier)+})+})+}
-          {+(Statements
-            {+(Send
-              {+(Identifier)+})+}
-            {+(Statements)+})+})+}
+          (Send
+            (Identifier))))
+    {+(Statements)+}
+    {-(Pattern
+      {-(Statements
         {-(Send
-          {-(Identifier)-})-}
+          {-(Identifier)-})-})-}
+      {-(Statements)-})-}
+    {-(Pattern
+      {-(Statements
         {-(Send
-          {-(Identifier)-})-})))))
+          {-(Identifier)-})-})-}
+      {-(Statements)-})-}
+    {-(Send
+      {-(Identifier)-})-})))

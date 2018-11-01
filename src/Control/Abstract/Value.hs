@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, KindSignatures, LambdaCase, Rank2Types, ScopedTypeVariables, TypeOperators #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractIntro(..)
@@ -6,22 +6,28 @@ module Control.Abstract.Value
 -- * Value effects
 -- $valueEffects
 , function
+, BuiltIn(..)
+, builtIn
 , call
 , Function(..)
+, runFunction
+, FunctionC(..)
 , boolean
 , asBool
 , ifthenelse
-, disjunction
 , Boolean(..)
+, runBoolean
+, BooleanC(..)
 , while
 , doWhile
 , forLoop
+, While(..)
+, runWhile
+, WhileC(..)
 , makeNamespace
 -- , address
 , value
 , rvalBox
-, subtermValue
--- , subtermAddress
 ) where
 
 import Control.Abstract.ScopeGraph (Declaration, ScopeGraph, ScopeError)
@@ -30,8 +36,10 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap hiding (address)
 import Control.Abstract.ScopeGraph (Allocator, currentScope, newScope, EdgeLabel(..), )
 import qualified Control.Abstract.Heap as Heap
-import Data.Abstract.Environment as Env
+import Control.Effect.Carrier
+import Data.Coerce
 import Data.Abstract.BaseError
+import Data.Abstract.Environment as Env
 import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
@@ -65,45 +73,120 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: forall address value effects. Member (Function address value) effects => Name -> [Name] -> Set Name -> Evaluator address value effects value -> Evaluator address value effects value
-function name params fvs (Evaluator body) = send @(Function address value) (Function name params fvs body)
+function :: (Member (Function term address value) sig, Carrier sig m) => Maybe Name -> [Name] -> term -> Evaluator term address value m value
+function name params body = sendFunction (Function name params body ret)
 
-call :: Member (Function address value) effects => value -> address -> [value] -> Evaluator address value effects value
-call fn self args = send (Call fn self args)
+data BuiltIn
+  = Print
+  | Show
+  deriving (Eq, Ord, Show, Generic, NFData)
 
-data Function address value m result where
-  Function :: Name -> [Name] -> Set Name -> m value -> Function address value m value
-  Call     :: value -> address -> [value]   -> Function address value m value
+builtIn :: (Member (Function term address value) sig, Carrier sig m) => BuiltIn -> Evaluator term address value m value
+builtIn = sendFunction . flip BuiltIn ret
 
-instance PureEffect (Function address value) where
-  handle handler (Request (Function name params fvs body) k) = Request (Function name params fvs (handler body)) (handler . k)
-  handle handler (Request (Call fn self addrs)            k) = Request (Call fn self addrs)                      (handler . k)
+call :: (Member (Function term address value) sig, Carrier sig m) => value -> address -> [address] -> Evaluator term address value m address
+call fn self args = sendFunction (Call fn self args ret)
+
+sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
+sendFunction = send
+
+data Function term address value (m :: * -> *) k
+  = Function Name [Name] term (value -> k)
+  | BuiltIn BuiltIn (value -> k)
+  | Call value (Address address) [value] (value -> k)
+  deriving (Functor)
+
+instance HFunctor (Function term address value) where
+  hmap _ = coerce
+
+instance Effect (Function term address value) where
+  handle state handler (Function name params body k) = Function name params body (handler . (<$ state) . k)
+  handle state handler (BuiltIn builtIn           k) = BuiltIn builtIn           (handler . (<$ state) . k)
+  handle state handler (Call fn self addrs        k) = Call fn self addrs        (handler . (<$ state) . k)
+
+
+runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
+            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) address)
+            -> Evaluator term address value (FunctionC term address value (Eff m)) a
+            -> Evaluator term address value m a
+runFunction eval = raiseHandler (flip runFunctionC (runEvaluator . eval) . interpret)
+
+newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) address) -> m a }
+>>>>>>> master
+
 
 -- | Construct a boolean value in the abstract domain.
-boolean :: Member (Boolean value) effects => Bool -> Evaluator address value effects value
-boolean = send . Boolean
+boolean :: (Member (Boolean value) sig, Carrier sig m) => Bool -> m value
+boolean = send . flip Boolean ret
 
 -- | Extract a 'Bool' from a given value.
-asBool :: Member (Boolean value) effects => value -> Evaluator address value effects Bool
-asBool = send . AsBool
+asBool :: (Member (Boolean value) sig, Carrier sig m) => value -> m Bool
+asBool = send . flip AsBool ret
 
 -- | Eliminate boolean values. TODO: s/boolean/truthy
-ifthenelse :: Member (Boolean value) effects => value -> Evaluator address value effects a -> Evaluator address value effects a -> Evaluator address value effects a
+ifthenelse :: (Member (Boolean value) sig, Carrier sig m, Monad m) => value -> m a -> m a -> m a
 ifthenelse v t e = asBool v >>= \ c -> if c then t else e
 
--- | Compute the disjunction (boolean or) of two computed values. This should have short-circuiting semantics where applicable.
-disjunction :: Member (Boolean value) effects => Evaluator address value effects value -> Evaluator address value effects value -> Evaluator address value effects value
-disjunction (Evaluator a) (Evaluator b) = send (Disjunction a b)
+data Boolean value (m :: * -> *) k
+  = Boolean Bool (value -> k)
+  | AsBool value (Bool -> k)
+  deriving (Functor)
 
-data Boolean value m result where
-  Boolean     :: Bool  -> Boolean value m value
-  AsBool      :: value -> Boolean value m Bool
-  Disjunction :: m value -> m value -> Boolean value m value
+instance HFunctor (Boolean value) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
 
-instance PureEffect (Boolean value) where
-  handle handler (Request (Boolean b)        k) = Request (Boolean b) (handler . k)
-  handle handler (Request (AsBool v)         k) = Request (AsBool v)  (handler . k)
-  handle handler (Request (Disjunction a b)  k) = Request (Disjunction (handler a) (handler b))  (handler . k)
+instance Effect (Boolean value) where
+  handle state handler = \case
+    Boolean b k -> Boolean b (handler . (<$ state) . k)
+    AsBool  v k -> AsBool  v (handler . (<$ state) . k)
+
+runBoolean :: Carrier (Boolean value :+: sig) (BooleanC value (Eff m))
+           => Evaluator term address value (BooleanC value (Eff m)) a
+           -> Evaluator term address value m a
+runBoolean = raiseHandler $ runBooleanC . interpret
+
+newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
+
+
+-- | The fundamental looping primitive, built on top of 'ifthenelse'.
+while :: (Member (While value) sig, Carrier sig m)
+      => Evaluator term address value m value -- ^ Condition
+      -> Evaluator term address value m value -- ^ Body
+      -> Evaluator term address value m value
+while cond body = send (While cond body ret)
+
+-- | Do-while loop, built on top of while.
+doWhile :: (Member (While value) sig, Carrier sig m)
+  => Evaluator term address value m value -- ^ Body
+  -> Evaluator term address value m value -- ^ Condition
+  -> Evaluator term address value m value
+doWhile body cond = body *> while cond body
+
+-- | C-style for loops.
+forLoop :: (Member (While value) sig, Member (Env address) sig, Carrier sig m)
+  => Evaluator term address value m value -- ^ Initial statement
+  -> Evaluator term address value m value -- ^ Condition
+  -> Evaluator term address value m value -- ^ Increment/stepper
+  -> Evaluator term address value m value -- ^ Body
+  -> Evaluator term address value m value
+forLoop initial cond step body =
+  locally (initial *> while cond (body *> step))
+
+data While value m k
+  = While (m value) (m value) (value -> k)
+  deriving (Functor)
+
+instance HFunctor (While value) where
+  hmap f (While cond body k) = While (f cond) (f body) k
+
+
+runWhile :: Carrier (While value :+: sig) (WhileC value (Eff m))
+         => Evaluator term address value (WhileC value (Eff m)) a
+         -> Evaluator term address value m a
+runWhile = raiseHandler $ runWhileC . interpret
+
+newtype WhileC value m a = WhileC { runWhileC :: m a }
 
 
 class Show value => AbstractIntro value where
@@ -142,142 +225,95 @@ class Show value => AbstractIntro value where
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class AbstractIntro value => AbstractValue address value effects where
+class AbstractIntro value => AbstractValue term address value carrier where
   -- | Cast numbers to integers
-  castToInteger :: value -> Evaluator address value effects value
+  castToInteger :: value -> Evaluator term address value carrier value
 
 
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
-               -> (value -> Evaluator address value effects value)
+               -> (value -> Evaluator term address value carrier value)
 
   -- | Lift a pair of binary operators to a function on 'value's.
   --   You usually pass the same operator as both arguments, except in the cases where
   --   Haskell provides different functions for integral and fractional operations, such
   --   as division, exponentiation, and modulus.
   liftNumeric2 :: (forall a b. Number a -> Number b -> SomeNumber)
-               -> (value -> value -> Evaluator address value effects value)
+               -> (value -> value -> Evaluator term address value carrier value)
 
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
-  liftComparison :: Comparator -> (value -> value -> Evaluator address value effects value)
+  liftComparison :: Comparator -> (value -> value -> Evaluator term address value carrier value)
 
   -- | Lift a unary bitwise operator to values. This is usually 'complement'.
   liftBitwise :: (forall a . Bits a => a -> a)
-              -> (value -> Evaluator address value effects value)
+              -> (value -> Evaluator term address value carrier value)
 
   -- | Lift a binary bitwise operator to values. The Integral constraint is
   --   necessary to satisfy implementation details of Haskell left/right shift,
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> Evaluator address value effects value)
+               -> (value -> value -> Evaluator term address value carrier value)
 
-  unsignedRShift :: value -> value -> Evaluator address value effects value
+  unsignedRShift :: value -> value -> Evaluator term address value carrier value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  tuple :: [value] -> Evaluator address value effects value
+  tuple :: [value] -> Evaluator term address value carrier value
 
   -- | Construct an array of zero or more values.
-  array :: [value] -> Evaluator address value effects value
+  array :: [value] -> Evaluator term address value carrier value
 
-  asArray :: value -> Evaluator address value effects [value]
+  asArray :: value -> Evaluator term address value carrier [address]
 
   -- | Extract the contents of a key-value pair as a tuple.
-  asPair :: value -> Evaluator address value effects (value, value)
+  asPair :: value -> Evaluator term address value carrier (value, value)
 
   -- | Extract a 'Text' from a given value.
-  asString :: value -> Evaluator address value effects Text
+  asString :: value -> Evaluator term address value carrier Text
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
-  index :: value -> value -> Evaluator address value effects value
+  index :: value -> value -> Evaluator term address value carrier value
 
   -- | Build a class value from a name and environment.
   klass :: Declaration      -- ^ The new class's identifier
         -> [value]          -- ^ A list of superclasses
-        -> address          -- ^ The frame address to capture
-        -> Evaluator address value effects value
+        -> address          -- ^ The environment to capture
+        -> Evaluator term address value carrier value
 
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
-  namespace :: Declaration          -- ^ The namespace's declaration
+  namespace :: Declaration          -- ^ The namespace's identifier
             -> Maybe value          -- The ancestor of the namespace
-            -> address              -- ^ The frame address to capture
-            -> Evaluator address value effects value
+            -> address              -- ^ The environment to mappend
+            -> Evaluator term address value carrier value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: address -> Evaluator address value effects (Maybe (Environment address))
-
-  -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
-  --
-  --   The function argument takes an action which recurs through the loop.
-  loop :: (Evaluator address value effects value -> Evaluator address value effects value) -> Evaluator address value effects value
+  scopedEnvironment :: address -> Evaluator term address value carrier (Maybe (Environment address))
 
 
--- | C-style for loops.
-forLoop :: ( AbstractValue address value effects
-           , Member (Boolean value) effects
-           , Member (Reader ModuleInfo) effects
-           , Member (State (Heap address address value)) effects
-           , Ord address
-           , Member (Reader Span) effects
-           , Member (Resumable (BaseError (HeapError address))) effects
-           , Member (Allocator address) effects
-           , Member (Resumable (BaseError (ScopeError address))) effects
-           , Member Fresh effects
-           , Member (State (ScopeGraph address)) effects
-           )
-        => Evaluator address value effects value -- ^ Initial statement
-        -> Evaluator address value effects value -- ^ Condition
-        -> Evaluator address value effects value -- ^ Increment/stepper
-        -> Evaluator address value effects value -- ^ Body
-        -> Evaluator address value effects value
-forLoop initial cond step body = initial *> while cond (action *> step)
-  where
-    action = do
-      currentScope' <- currentScope
-      currentFrame' <- currentFrame
-      scopeAddr <- newScope (Map.singleton Lexical [ currentScope' ])
-      frame <- newFrame scopeAddr (Map.singleton Lexical (Map.singleton currentScope' currentFrame'))
-      withScopeAndFrame frame body
-
--- | The fundamental looping primitive, built on top of 'ifthenelse'.
-while :: (AbstractValue address value effects, Member (Boolean value) effects)
-      => Evaluator address value effects value
-      -> Evaluator address value effects value
-      -> Evaluator address value effects value
-while cond body = loop $ \ continue -> do
-  this <- cond
-  ifthenelse this (body *> continue) (pure unit)
-
--- | Do-while loop, built on top of while.
-doWhile :: (AbstractValue address value effects, Member (Boolean value) effects)
-        => Evaluator address value effects value
-        -> Evaluator address value effects value
-        -> Evaluator address value effects value
-doWhile body cond = loop $ \ continue -> body *> do
-  this <- cond
-  ifthenelse this continue (pure unit)
+<<<<<<< HEAD
 
 -- TODO rethink whether this function is necessary.
-makeNamespace :: ( AbstractValue address value effects
-                 , Member (Deref value) effects
-                 , Member (Reader ModuleInfo) effects
-                 , Member (State (ScopeGraph address)) effects
-                 , Member (Allocator address) effects
-                 , Member (Reader Span) effects
-                 , Member (Resumable (BaseError (HeapError address))) effects
-                 , Member (Resumable (BaseError (AddressError address value))) effects
-                 , Member (Allocator address) effects
-                 , Member (Resumable (BaseError (ScopeError address))) effects
-                 , Member (State (Heap address address value)) effects
-                 , Member Fresh effects
+makeNamespace :: ( AbstractValue term address value sig
+                 , Member (Deref value) sig
+                 , Member (Reader ModuleInfo) sig
+                 , Member (State (ScopeGraph address)) sig
+                 , Member (Allocator address) sig
+                 , Member (Reader Span) sig
+                 , Member (Resumable (BaseError (HeapError address))) sig
+                 , Member (Resumable (BaseError (AddressError address value))) sig
+                 , Member (Allocator address) sig
+                 , Member (Resumable (BaseError (ScopeError address))) sig
+                 , Member (State (Heap address address value)) sig
+                 , Member Fresh sig
+                 , Carrier sig m
                  , Ord address
                  )
               => Declaration
               -> Address address
               -> Maybe (Address address)
-              -> Evaluator address value effects ()
-              -> Evaluator address value effects value
+              -> Evaluator term address value m ()
+              -> Evaluator term address value m value
 makeNamespace declaration addr super body = do
   super' <- traverse deref super
   define declaration . withChildFrame declaration $ \frame -> do
@@ -286,11 +322,13 @@ makeNamespace declaration addr super body = do
 
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
--- evaluateInScopedEnv :: ( AbstractValue address value effects
+-- evaluateInScopedEnv :: ( AbstractValue term address value m
+--                        , Member (Env address) sig
+--                        , Carrier sig m
 --                        )
 --                     => address
---                     -> Evaluator address value effects a
---                     -> Evaluator address value effects a
+--                     -> Evaluator term address value m a
+--                     -> Evaluator term address value m a
 -- evaluateInScopedEnv receiver term = do
 --   scopedEnv <- scopedEnvironment receiver
 --   env <- maybeM getEnv scopedEnv
@@ -298,64 +336,43 @@ makeNamespace declaration addr super body = do
 
 
 -- | Evaluates a 'Value' returning the referenced value
-value :: ( AbstractValue address value effects
-         , Member (Deref value) effects
-         , Member (Reader ModuleInfo) effects
-         , Member (Reader Span) effects
-         , Member (Resumable (BaseError (AddressError address value))) effects
-         , Member (State (Heap address address value)) effects
+value :: ( AbstractValue term address value sig
+         , Member (Deref value) sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address value))) sig
+         , Member (State (Heap address address value)) sig
+         , Carrier sig m
          , Ord address
          )
       => ValueRef address value
-      -> Evaluator address value effects value
+      -> Evaluator term address value m value
 value (Rval val) = pure val
 value (LvalLocal name) = undefined
 value (LvalMember slot) = undefined
 
--- | Evaluates a 'Subterm' to its rval
-subtermValue :: ( AbstractValue address value effects
-                , Member (Deref value) effects
-                , Member (Reader ModuleInfo) effects
-                , Member (Reader Span) effects
-                , Member (Resumable (BaseError (AddressError address value))) effects
-                , Member (State (Heap address address value)) effects
-                , Ord address
-                )
-             => Subterm term (Evaluator address value effects (ValueRef address value))
-             -> Evaluator address value effects value
-subtermValue = value <=< subtermRef
-
 -- | Returns the address of a value referenced by a 'ValueRef'
--- address :: ( AbstractValue address value effects
---            , Member (Env address) effects
---            , Member (Reader ModuleInfo) effects
---            , Member (Reader Span) effects
---            , Member (Resumable (BaseError (EnvironmentError address))) effects
+-- address :: ( AbstractValue term address value m
+--            , Carrier sig m
+--            , Member (Env address) sig
+--            , Member (Reader ModuleInfo) sig
+--            , Member (Reader Span) sig
+--            , Member (Resumable (BaseError (EnvironmentError address))) sig
 --            )
 --         => ValueRef address
---         -> Evaluator address value effects address
+--         -> Evaluator term address value m address
 -- address (LvalLocal var)       = variable var
 -- address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
 -- address (Rval addr)           = pure addr
 
--- | Evaluates a 'Subterm' to the address of its rval
--- subtermAddress :: ( AbstractValue address value effects
---                   , Member (Env address) effects
---                   , Member (Reader ModuleInfo) effects
---                   , Member (Reader Span) effects
---                   , Member (Resumable (BaseError (EnvironmentError address))) effects
---                   )
---                => Subterm term (Evaluator address value effects (ValueRef address value))
---                -> Evaluator address value effects address
--- subtermAddress = address <=< subtermRef
-
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: ( Member (Allocator address) effects
-           , Member (Deref value) effects
-           , Member Fresh effects
-           , Member (State (Heap address address value)) effects
+rvalBox :: ( Member (Allocator address) sig
+           , Member (Deref value) sig
+           , Member Fresh sig
+           , Member (State (Heap address address value)) sig
+           , Carrier sig m
            , Ord address
            )
         => value
-        -> Evaluator address value effects (ValueRef address value)
+        -> Evaluator term address value m (ValueRef address)
 rvalBox val = pure (Rval val)

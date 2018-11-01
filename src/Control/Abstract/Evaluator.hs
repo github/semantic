@@ -1,6 +1,8 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
+  , raiseHandler
+  , Open
   -- * Effects
   , Return(..)
   , earlyReturn
@@ -9,33 +11,50 @@ module Control.Abstract.Evaluator
   , LoopControl(..)
   , throwBreak
   , throwContinue
+  , throwAbort
   , catchLoopControl
   , runLoopControl
   , module X
   ) where
 
-import Control.Monad.Effect           as X
-import Control.Monad.Effect.Fresh     as X
-import Control.Monad.Effect.Exception as X
-import qualified Control.Monad.Effect.Internal as Eff
-import Control.Monad.Effect.NonDet    as X
-import Control.Monad.Effect.Reader    as X
-import Control.Monad.Effect.Resumable as X
-import Control.Monad.Effect.State     as X
-import Control.Monad.Effect.Trace     as X
+import Control.Effect           as X
+import Control.Effect.Carrier
+import Control.Effect.Error     as X
+import Control.Effect.Fresh     as X
+import Control.Effect.NonDet    as X
+import Control.Effect.Reader    as X
+import Control.Effect.Resumable as X
+import Control.Effect.State     as X
+import Control.Effect.Trace     as X
 import Control.Monad.IO.Class
-import Prologue hiding (MonadError(..))
+import Data.Coerce
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
 --
 --   These parameters enable us to constrain the types of effects using them s.t. we can avoid both ambiguous types when they aren’t mentioned outside of the context, and lengthy, redundant annotations on the use sites of functions employing these effects.
 --
 --   These effects will typically include the environment, heap, module table, etc. effects necessary for evaluation of modules and terms, but may also include any other effects so long as they’re eventually handled.
-newtype Evaluator address value effects a = Evaluator { runEvaluator :: Eff effects a }
-  deriving (Applicative, Effectful, Functor, Monad)
+newtype Evaluator term address value m a = Evaluator { runEvaluator :: Eff m a }
+  deriving (Applicative, Functor, Monad)
 
-deriving instance Member NonDet effects => Alternative (Evaluator address value effects)
-deriving instance Member (Lift IO) effects => MonadIO (Evaluator address value effects)
+deriving instance (Member NonDet sig, Carrier sig m) => Alternative (Evaluator term address value m)
+deriving instance (Member (Lift IO) sig, Carrier sig m) => MonadIO (Evaluator term address value m)
+
+instance Carrier sig m => Carrier sig (Evaluator term address value m) where
+  ret = Evaluator . ret
+  eff = Evaluator . eff . handlePure runEvaluator
+
+
+-- | Raise a handler on 'Eff's into a handler on 'Evaluator's.
+raiseHandler :: (Eff m a -> Eff n b)
+             -> Evaluator term address value m a
+             -> Evaluator term address value n b
+raiseHandler = coerce
+
+
+-- | An open-recursive function.
+type Open a = a -> a
+
 
 -- Effects
 
@@ -43,36 +62,53 @@ deriving instance Member (Lift IO) effects => MonadIO (Evaluator address value e
 newtype Return value = Return { unReturn :: value }
   deriving (Eq, Ord, Show)
 
-earlyReturn :: Member (Exc (Return value)) effects
+earlyReturn :: ( Member (Error (Return value)) sig
+               , Carrier sig m
+               )
             => value
-            -> Evaluator address value effects value
+            -> Evaluator term address value m value
 earlyReturn = throwError . Return
 
-catchReturn :: (Member (Exc (Return value)) effects, Effectful (m address value)) => m address value effects value -> m address value effects value
-catchReturn = Eff.raiseHandler (handleError (\ (Return addr) -> pure addr))
+catchReturn :: (Member (Error (Return value)) sig, Carrier sig m) => Evaluator term address value m value -> Evaluator term address value m value
+catchReturn = flip catchError (\ (Return value) -> pure value)
 
-runReturn :: (Effectful (m address value), Effects effects) => m address value (Exc (Return value) ': effects) value -> m address value effects value
-runReturn = Eff.raiseHandler (fmap (either unReturn id) . runError)
+runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return value) (Eff m)) value -> Evaluator term address value m value
+runReturn = raiseHandler $ fmap (either unReturn id) . runError
 
 
 -- | Effects for control flow around loops (breaking and continuing).
 data LoopControl value
   = Break    { unLoopControl :: value }
   | Continue { unLoopControl :: value }
+  | Abort
   deriving (Eq, Ord, Show)
 
-throwBreak :: Member (Exc (LoopControl value)) effects
+throwBreak :: (Member (Error (LoopControl value)) sig, Carrier sig m)
            => value
-           -> Evaluator address value effects value
+           -> Evaluator term address value m value
 throwBreak = throwError . Break
 
-throwContinue :: Member (Exc (LoopControl value)) effects
+throwContinue :: (Member (Error (LoopControl value)) sig, Carrier sig m)
               => value
-              -> Evaluator address value effects value
+              -> Evaluator term address value m value
 throwContinue = throwError . Continue
 
-catchLoopControl :: (Member (Exc (LoopControl value)) effects, Effectful (m address value)) => m address value effects a -> (LoopControl value -> m address value effects a) -> m address value effects a
+throwAbort :: forall term address sig m value a .
+           ( Member (Error (LoopControl value)) sig
+           , Carrier sig m)
+           => Evaluator term address value m a
+throwAbort = throwError (Abort @address)
+
+catchLoopControl :: (
+                    Member (Error (LoopControl address)) sig
+                  , Carrier sig m
+                  )
+                 => Evaluator term address value m a
+                 -> (LoopControl address -> Evaluator term address value m a)
+                 -> Evaluator term address value m a
 catchLoopControl = catchError
 
-runLoopControl :: (Effectful (m address value), Effects effects) => m address value (Exc (LoopControl value) ': effects) value -> m address value effects value
-runLoopControl = Eff.raiseHandler (fmap (either unLoopControl id) . runError)
+runLoopControl :: (Carrier sig m, Effect sig)
+               => Evaluator term address value (ErrorC (LoopControl address) (Eff m)) value
+               -> Evaluator term address value m value
+runLoopControl = raiseHandler $ fmap (either unLoopControl id) . runError

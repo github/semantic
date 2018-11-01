@@ -6,20 +6,21 @@ module Language.JSON.PrettyPrint
   , minimizingJSON
   ) where
 
-import Prologue hiding (throwError)
+import Prologue
 
-import Control.Monad.Effect
-import Control.Monad.Effect.Exception (Exc, throwError)
+import Control.Effect
+import Control.Effect.Error
 import Control.Monad.Trans (lift)
 import Data.Machine
 
 import Data.Reprinting.Errors
 import Data.Reprinting.Splice
 import Data.Reprinting.Token
+import Data.Reprinting.Scope
 
 -- | Default printing pipeline for JSON.
-defaultJSONPipeline :: (Member (Exc TranslationError) effs)
-  => ProcessT (Eff effs) Fragment Splice
+defaultJSONPipeline :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+  => ProcessT m Fragment Splice
 defaultJSONPipeline
   = printingJSON
   ~> beautifyingJSON defaultBeautyOpts
@@ -34,14 +35,14 @@ printingJSON = repeatedly (await >>= step) where
       (Truth False, _)     -> ins "false"
       (Nullity, _)         -> ins "null"
 
-      (TOpen,  Just TList) -> ins "["
-      (TClose, Just TList) -> ins "]"
-      (TOpen,  Just THash) -> ins "{"
-      (TClose, Just THash) -> ins "}"
+      (Open,  Just List) -> ins "["
+      (Close, Just List) -> ins "]"
+      (Open,  Just Hash) -> ins "{"
+      (Close, Just Hash) -> ins "}"
 
-      (TSep, Just TList)   -> ins ","
-      (TSep, Just TPair)   -> ins ":"
-      (TSep, Just THash)   -> ins ","
+      (Sep, Just List)   -> ins ","
+      (Sep, Just Pair)   -> ins ":"
+      (Sep, Just Hash)   -> ins ","
 
       _                    -> yield s
   step x = yield x
@@ -55,23 +56,26 @@ defaultBeautyOpts :: JSONBeautyOpts
 defaultBeautyOpts = JSONBeautyOpts 2 False
 
 -- | Produce JSON with configurable whitespace and layout.
-beautifyingJSON :: (Member (Exc TranslationError) effs)
-  => JSONBeautyOpts -> ProcessT (Eff effs) Fragment Splice
+beautifyingJSON :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+  => JSONBeautyOpts -> ProcessT m Fragment Splice
 beautifyingJSON _ = repeatedly (await >>= step) where
   step (Defer el cs)   = lift (throwError (NoTranslation el cs))
   step (Verbatim txt)  = emit txt
-  step (New el cs txt) = case (el, listToMaybe cs) of
-    (TOpen,  Just THash) -> emit txt *> layouts [HardWrap, Indent 2 Spaces]
-    (TClose, Just THash) -> layout HardWrap *> emit txt
-    (TSep, Just TList)   -> emit txt *> space
-    (TSep, Just TPair)   -> emit txt *> space
-    (TSep, Just THash)   -> emit txt *> layouts [HardWrap, Indent 2 Spaces]
+  step (New el cs txt) = case (el, cs) of
+    (Open,  Hash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
+    (Close, Hash:rest) -> layout HardWrap *> indent 2 (hashDepth rest) *> emit txt
+    (Sep,   List:_)    -> emit txt *> space
+    (Sep,   Pair:_)    -> emit txt *> space
+    (Sep,   Hash:_)    -> emit txt *> layout HardWrap *> indent 2 (hashDepth cs)
     _                    -> emit txt
 
 -- | Produce whitespace minimal JSON.
-minimizingJSON :: (Member (Exc TranslationError) effs)
-  => ProcessT (Eff effs) Fragment Splice
+minimizingJSON :: (Member (Error TranslationError) sig, Carrier sig m, Monad m)
+  => ProcessT m Fragment Splice
 minimizingJSON = repeatedly (await >>= step) where
   step (Defer el cs)  = lift (throwError (NoTranslation el cs))
   step (Verbatim txt) = emit txt
   step (New _ _ txt)  = emit txt
+
+hashDepth :: [Scope] -> Int
+hashDepth = length . filter (== Hash)
