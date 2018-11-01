@@ -8,32 +8,19 @@ where
 import Prelude hiding (fail, filter, log)
 import Prologue hiding (Element, hash)
 
-import Data.Aeson
-import           Analysis.ConstructorName
-import           Control.Matching hiding (target)
-import           Control.Arrow hiding (first)
 import           Control.Effect as Eff
 import           Control.Effect.Error as Error
 import qualified Control.Effect.State as State
-import           Control.Monad
 import           Control.Monad.Trans
-import           Control.Rewriting hiding (apply)
-import           Data.Abstract.Declarations
-import           Data.Abstract.Name
+import           Data.Aeson
 import           Data.Blob
-import           Data.History
 import           Data.List (intersperse)
 import           Data.Location
 import           Data.Machine as Machine
-import           Data.Range
 import qualified Data.Source as Source
-import           Data.Span
 import           Data.Term
 import           Data.Text hiding (empty)
-
-import Tags.Taggable
-import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Literal as Literal
+import           Tags.Taggable
 
 symbolsToSummarize :: [Text]
 symbolsToSummarize = ["Function", "Method", "Class", "Module"]
