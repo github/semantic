@@ -28,8 +28,23 @@ renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
     termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f (Maybe Declaration) -> File
     termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
 
-renderToSymbols' :: (IsTaggable f) => SymbolFields -> Blob -> Term f Location -> [Tag]
-renderToSymbols' _ blob term = either mempty id (runTagging blob term)
+renderToSymbols' :: (IsTaggable f) => SymbolFields -> Blob -> Term f Location -> [File]
+renderToSymbols' fields blob term = either mempty (pure . tagsToFile fields blob) (runTagging blob term)
+
+tagsToFile :: SymbolFields -> Blob -> [Tag] -> File
+tagsToFile fields blob@Blob{..} tags = File (T.pack blobPath) (T.pack (show blobLanguage)) (fmap (tagToSymbol fields blob) tags)
+
+tagToSymbol :: SymbolFields -> Blob -> Tag -> Symbol
+tagToSymbol SymbolFields{..} Blob{..} Tag{..}
+  = Symbol
+  { symbolName = when symbolFieldsName name
+  , symbolPath = when symbolFieldsPath (T.pack blobPath)
+  , symbolLang = when symbolFieldsLang (T.pack (show blobLanguage))
+  , symbolKind = when symbolFieldsKind kind
+  , symbolLine = join (when symbolFieldsLine line)
+  , symbolSpan = when symbolFieldsSpan span
+  , symbolDocs = join (when symbolFieldsDocs docs)
+  }
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
 symbolSummary :: SymbolFields -> FilePath -> T.Text -> Declaration -> Maybe Symbol
@@ -42,6 +57,7 @@ symbolSummary SymbolFields{..} path _ record = case record of
     , symbolKind = when symbolFieldsKind (toCategoryName declaration)
     , symbolLine = when symbolFieldsLine (declarationText declaration)
     , symbolSpan = when symbolFieldsSpan (declarationSpan declaration)
+    , symbolDocs = Nothing
     }
 
 data File = File
@@ -62,6 +78,7 @@ data Symbol = Symbol
   , symbolKind :: Maybe T.Text
   , symbolLine :: Maybe T.Text
   , symbolSpan :: Maybe Span
+  , symbolDocs :: Maybe T.Text
   } deriving (Generic, Eq, Show)
 
 instance ToJSON Symbol where
@@ -71,7 +88,8 @@ instance ToJSON Symbol where
     , "language" .= symbolLang
     , "kind" .= symbolKind
     , "line" .= symbolLine
-    , "span" .= symbolSpan ]
+    , "span" .= symbolSpan
+    , "docs" .= symbolDocs ]
     where objectWithoutNulls = object . filter (\(_, v) -> v /= Null)
 
 when :: Bool -> a -> Maybe a
@@ -85,11 +103,12 @@ data SymbolFields = SymbolFields
   , symbolFieldsKind :: Bool
   , symbolFieldsLine :: Bool
   , symbolFieldsSpan :: Bool
+  , symbolFieldsDocs :: Bool
   }
   deriving (Eq, Show)
 
 defaultSymbolFields :: SymbolFields
-defaultSymbolFields = SymbolFields True False False True False True
+defaultSymbolFields = SymbolFields True False False True False True True
 
 parseSymbolFields :: String -> SymbolFields
 parseSymbolFields arg =
@@ -101,4 +120,5 @@ parseSymbolFields arg =
     , symbolFieldsKind = "kind" `elem` fields
     , symbolFieldsLine = "line" `elem` fields
     , symbolFieldsSpan = "span" `elem` fields
+    , symbolFieldsDocs = "docs" `elem` fields
     }
