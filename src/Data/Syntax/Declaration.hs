@@ -1,20 +1,21 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TupleSections, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
+import           Control.Abstract.ScopeGraph
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
-import           Control.Abstract.ScopeGraph
 import           Data.JSON.Fields
+import qualified Data.Map.Strict as Map
+import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Set as Set
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
-import qualified Data.Map.Strict as Map
 import           Reprinting.Tokenize
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Diffable Function where
   equivalentBySubterm = Just . functionName
@@ -27,19 +28,18 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval Function{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm functionName))
-    -- TODO: Fix me.
-    -- (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) (freeVariables functionBody) (subtermAddress functionBody))
+  eval _ Function{..} = do
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
+    -- (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) functionBody)
     -- bind name addr
     -- pure (Rval addr)
-    -- where paramNames = foldMap (maybeToList . declaredName . subterm)
-    rvalBox unit
+    -- where paramNames = foldMap (maybeToList . declaredName)
+    undefined
 
 instance Tokenize Function where
-  tokenize Function{..} = within' TFunction $ do
+  tokenize Function{..} = within' Scope.Function $ do
     functionName
-    within' TParams $ sequenceA_ (sep functionParameters)
+    within' Scope.Params $ sequenceA_ (sep functionParameters)
     functionBody
 
 instance Declarations1 Function where
@@ -50,7 +50,7 @@ instance FreeVariables1 Function where
 
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Eq1 Method where liftEq = genericLiftEq
 instance Ord1 Method where liftCompare = genericLiftCompare
@@ -62,19 +62,17 @@ instance Diffable Method where
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
 instance Evaluatable Method where
-  eval Method{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm methodName))
-    -- TODO: Fix me.
-    -- (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) (freeVariables methodBody) (subtermAddress methodBody))
+  eval _ Method{..} = undefined
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
+    -- (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) methodBody)
     -- bind name addr
     -- pure (Rval addr)
-    -- where paramNames = foldMap (maybeToList . declaredName . subterm)
-    rvalBox unit
+    -- where paramNames = foldMap (maybeToList . declaredName)
 
-instance Tokenize Method where
-  tokenize Method{..} = within' TMethod $ do
+instance Tokenize Data.Syntax.Declaration.Method where
+  tokenize Method{..} = within' Scope.Method $ do
     methodName
-    within' TParams $ sequenceA_ (sep methodParameters)
+    within' Scope.Params $ sequenceA_ (sep methodParameters)
     methodBody
 
 instance Declarations1 Method where
@@ -86,7 +84,7 @@ instance FreeVariables1 Method where
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { methodSignatureContext :: ![a], methodSignatureName :: !a, methodSignatureParameters :: ![a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 MethodSignature where liftEq = genericLiftEq
 instance Ord1 MethodSignature where liftCompare = genericLiftCompare
@@ -97,7 +95,7 @@ instance Evaluatable MethodSignature
 
 
 newtype RequiredParameter a = RequiredParameter { requiredParameter :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 RequiredParameter where liftEq = genericLiftEq
 instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
@@ -108,7 +106,7 @@ instance Evaluatable RequiredParameter
 
 
 newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 OptionalParameter where liftEq = genericLiftEq
 instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
@@ -123,19 +121,19 @@ instance Evaluatable OptionalParameter
 -- TODO: It would be really nice to have a more meaningful type contained in here than [a]
 -- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
 newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 VariableDeclaration where liftEq = genericLiftEq
 instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable VariableDeclaration where
-  eval (VariableDeclaration [])   = rvalBox unit
-  eval (VariableDeclaration decs) = do
-    for_ decs $ \declaration -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName (subterm declaration))
+  eval _ (VariableDeclaration [])   = rvalBox unit
+  eval eval (VariableDeclaration decs) = do
+    addresses <- for decs $ \declaration -> do
+      name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
       (span, valueRef) <- do
-        ref <- subtermRef declaration
+        ref <- eval declaration
         subtermSpan <- get @Span
         pure (subtermSpan, ref)
 
@@ -151,7 +149,7 @@ instance Declarations a => Declarations (VariableDeclaration a) where
 -- | A TypeScript/Java style interface declaration to implement.
 
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationSuperInterfaces :: ![a], interfaceDeclarationBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
 instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
@@ -166,7 +164,7 @@ instance Declarations a => Declarations (InterfaceDeclaration a) where
 
 -- | A public field definition such as a field definition in a JavaScript class.
 data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
 instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
@@ -174,16 +172,16 @@ instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition where
-  eval PublicFieldDefinition{..} = do
+  eval _ PublicFieldDefinition{..} = do
     span <- ask @Span
-    propertyName <- maybeM (throwEvalError NoNameError) (declaredName (subterm publicFieldPropertyName))
+    propertyName <- maybeM (throwEvalError NoNameError) (declaredName publicFieldPropertyName)
     declare (Declaration propertyName) span Nothing
     rvalBox unit
 
 
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Variable where liftEq = genericLiftEq
 instance Ord1 Variable where liftCompare = genericLiftCompare
@@ -193,7 +191,7 @@ instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Variable
 
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Declarations a => Declarations (Class a) where
   declaredName (Class _ name _ _) = declaredName name
@@ -206,33 +204,35 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval Class{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm classIdentifier))
+  eval eval Class{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
     span <- ask @Span
     -- Run the action within the class's scope.
     currentScope' <- currentScope
 
     supers <- for classSuperclasses $ \superclass -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
-      associatedScope (Declaration name)
-
-    -- let imports = (Import,) <$> (fmap pure . catMaybes $ supers)
-        -- current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
-        -- edges = Map.fromList (imports <> current)
-    -- childScope <- newScope edges
-    -- declare (Declaration name) span (Just childScope)
-
-    -- withScope childScope $ do
-    --   (_, addr) <- letrec name $ do
-    --     void $ subtermValue classBody
-    --     classBinds <- Env.head <$> getEnv
-    --     klass (Declaration name) (catMaybes supers) classBinds -- TODO: Update klass definition
-    -- pure (Rval addr)
-    rvalBox unit
+      scope <- associatedScope (Declaration name)
+      --   (scope,) <$> (eval superclass >>= address)
+      --
+      -- let imports = (Import,) <$> (fmap pure . catMaybes $ fst <$> supers)
+      --     current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
+      --     edges = Map.fromList (imports <> current)
+      -- childScope <- newScope edges
+      -- declare (Declaration name) span (Just childScope)
+      --
+      -- withScope childScope $ do
+      --   (_, addr) <- letrec name $ do
+      --     void $ eval classBody
+      --     classBinds <- Env.head <$> getEnv
+      --     klass name (snd <$> supers) classBinds
+      --   bind name addr
+      --   pure (Rval addr)
+      undefined
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Decorator where liftEq = genericLiftEq
 instance Ord1 Decorator where liftCompare = genericLiftCompare
@@ -246,7 +246,7 @@ instance Evaluatable Decorator
 
 -- | An ADT, i.e. a disjoint sum of products, like 'data' in Haskell, or 'enum' in Rust or Swift.
 data Datatype a = Datatype { datatypeContext :: a, datatypeName :: a, datatypeConstructors :: [a], datatypeDeriving :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Declaration.Datatype where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Declaration.Datatype where liftCompare = genericLiftCompare
@@ -258,7 +258,7 @@ instance Evaluatable Data.Syntax.Declaration.Datatype
 
 -- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
 data Constructor a = Constructor { constructorContext :: [a], constructorName :: a, constructorFields :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Declaration.Constructor where liftCompare = genericLiftCompare
@@ -270,7 +270,7 @@ instance Evaluatable Data.Syntax.Declaration.Constructor
 
 -- | Comprehension (e.g. ((a for b in c if a()) in Python)
 data Comprehension a = Comprehension { comprehensionValue :: !a, comprehensionBody :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Comprehension where liftEq = genericLiftEq
 instance Ord1 Comprehension where liftCompare = genericLiftCompare
@@ -282,7 +282,7 @@ instance Evaluatable Comprehension
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Type where liftEq = genericLiftEq
 instance Ord1 Type where liftCompare = genericLiftCompare
@@ -294,21 +294,26 @@ instance Evaluatable Type
 
 -- | Type alias declarations in Javascript/Haskell, etc.
 data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: !a, typeAliasKind :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 TypeAlias where liftEq = genericLiftEq
 instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for TypeAlias
 instance Evaluatable TypeAlias where
-  eval TypeAlias{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasIdentifier))
-    kindName <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasKind))
-    span <- ask @Span
-    address <- declare (Declaration name) span Nothing -- TODO: Also need to declare the alias via an Alias edge?
-    kindAddress <- lookupDeclaration (Declaration kindName) -- TODO: Validate the path? Also assumes the type is declared.
-    rvalBox unit -- TODO: Return Address here?
+  eval eval TypeAlias{..} = do
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
+    -- addr <- eval typeAliasKind >>= address
+    -- bind name addr
+    -- pure (Rval addr)
+
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasIdentifier))
+    -- kindName <- maybeM (throwEvalError NoNameError) (declaredName (subterm typeAliasKind))
+    -- span <- ask @Span
+    -- address <- declare (Declaration name) span Nothing -- TODO: Also need to declare the alias via an Alias edge?
+    -- kindAddress <- lookupDeclaration (Declaration kindName) -- TODO: Validate the path? Also assumes the type is declared.
+    -- rvalBox unit -- TODO: Return Address here?
+    undefined
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier

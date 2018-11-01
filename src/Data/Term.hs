@@ -6,18 +6,17 @@ module Data.Term
 , termOut
 , injectTerm
 , projectTerm
+, guardTerm
 , TermF(..)
 , termSize
 , hoistTerm
 , hoistTermF
-, stripTerm
 , Annotated (..)
 ) where
 
 import Prologue
 import Data.Aeson
 import Data.JSON.Fields
-import Data.Record
 import Text.Show
 import qualified Data.Sum as Sum
 import Proto3.Suite.Class
@@ -36,6 +35,11 @@ termOut = termFOut . unTerm
 
 projectTerm :: forall f syntax ann . (f :< syntax) => Term (Sum syntax) ann -> Maybe (f (Term (Sum syntax) ann))
 projectTerm = Sum.project . termOut
+
+guardTerm :: forall m f syntax ann . (f :< syntax, Alternative m)
+          => Term (Sum syntax) ann
+          -> m (f (Term (Sum syntax) ann))
+guardTerm = Sum.projectGuard . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Ord, Foldable, Functor, Show, Traversable)
@@ -70,10 +74,6 @@ hoistTerm f = go where go (Term r) = Term (hoistTermF f (fmap go r))
 
 hoistTermF :: (forall a. f a -> g a) -> TermF f a b -> TermF g a b
 hoistTermF f = go where go (In a r) = In a (f r)
-
--- | Strips the head annotation off a term annotated with non-empty records.
-stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
-stripTerm = fmap rtail
 
 
 type instance Base (Term f a) = TermF f a
@@ -113,6 +113,12 @@ instance Ord1 f => Ord1 (Term f) where
 instance (Ord1 f, Ord a) => Ord (Term f a) where
   compare = compare1
 
+instance NFData1 f => NFData1 (Term f) where
+  liftRnf rnf = go where go x = liftRnf2 rnf go (unTerm x)
+
+instance (NFData1 f, NFData a) => NFData (Term f a) where
+  rnf = liftRnf rnf
+
 
 instance Functor f => Bifunctor (TermF f) where
   bimap f g (In a r) = In (f a) (fmap g r)
@@ -126,6 +132,7 @@ instance Traversable f => Bitraversable (TermF f) where
 
 instance Eq1 f => Eq2 (TermF f) where
   liftEq2 eqA eqB (In a1 f1) (In a2 f2) = eqA a1 a2 && liftEq eqB f1 f2
+
 
 instance (Eq1 f, Eq a) => Eq1 (TermF f a) where
   liftEq = liftEq2 (==)
@@ -141,6 +148,9 @@ instance Ord1 f => Ord2 (TermF f) where
 
 instance (Ord1 f, Ord a) => Ord1 (TermF f a) where
   liftCompare = liftCompare2 compare
+
+instance NFData1 f => NFData2 (TermF f) where
+  liftRnf2 rnf1 rnf2 (In a1 f1) = rnf1 a1 `seq` liftRnf rnf2 f1
 
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
   toJSON = object . toJSONFields

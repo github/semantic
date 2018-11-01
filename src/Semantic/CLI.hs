@@ -6,10 +6,12 @@ module Semantic.CLI
 , Parse.runParse
 ) where
 
-import           Control.Monad.IO.Class
-import           Data.Language (ensureLanguage)
+import           Control.Exception as Exc (displayException)
+import           Data.File
+import           Data.Language (ensureLanguage, languageForFilePath)
 import           Data.List (intercalate, uncons)
 import           Data.List.Split (splitWhen)
+import           Data.Handle
 import           Data.Project
 import           Options.Applicative hiding (style)
 import           Prologue
@@ -18,17 +20,22 @@ import qualified Semantic.AST as AST
 import           Semantic.Config
 import qualified Semantic.Diff as Diff
 import qualified Semantic.Graph as Graph
-import           Semantic.IO as IO
 import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
+import           Semantic.Task.Files
 import qualified Semantic.Telemetry.Log as Log
 import           Semantic.Version
+import           System.Exit (die)
 import           System.FilePath
 import           Serializing.Format hiding (Options)
 import           Text.Read
 
 main :: IO ()
-main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
+main = do
+  (options, task) <- customExecParser (prefs showHelpOnEmpty) arguments
+  res <- Task.withOptions options $ \ config logger statter ->
+    Task.runTaskWithConfig config { configSHA = Just buildSHA } logger statter task
+  either (die . displayException) pure res
 
 -- | A parser for the application's command-line arguments.
 --
@@ -46,7 +53,8 @@ optionsParser = do
                       (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
   requestId <- optional (strOption $ long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id")
   failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
-  pure $ Options logLevel requestId failOnWarning
+  failOnParseError <- switch (long "fail-on-parse-error" <> help "Fail on tree-sitter parse errors.")
+  pure $ Options logLevel requestId failOnWarning failOnParseError
 
 argumentsParser :: Parser (Task.TaskEff ())
 argumentsParser = do
@@ -60,7 +68,7 @@ diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute change
     diffArgumentsParser = do
       renderer <- flag  (Diff.runDiff SExpressionDiffRenderer) (Diff.runDiff SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                        (Diff.runDiff JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
-              <|> flag'                                        (Diff.runDiff JSONGraphDiffRenderer)     (long "json-graph"    <> help "Output JSON diff trees")
+              <|> flag'                                        (Diff.runDiff JSONGraphDiffRenderer)   (long "json-graph"  <> help "Output JSON diff trees")
               <|> flag'                                        (Diff.runDiff ToCDiffRenderer)         (long "toc"         <> help "Output JSON table of contents diff summary")
               <|> flag'                                        (Diff.runDiff DOTDiffRenderer)         (long "dot"         <> help "Output the diff as a DOT graph")
               <|> flag'                                        (Diff.runDiff ShowDiffRenderer)        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
@@ -73,7 +81,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
     parseArgumentsParser = do
       renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
-              <|> flag'                                          (Parse.runParse JSONGraphTermRenderer)     (long "json-graph"    <> help "Output JSON adjacency list")
+              <|> flag'                                          (Parse.runParse JSONGraphTermRenderer)   (long "json-graph"  <> help "Output JSON adjacency list")
               <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
@@ -81,6 +89,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <|> pure defaultSymbolFields)
               <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
               <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
+              <|> flag'                                          (Parse.runParse QuietTermRenderer)        (long "quiet"        <> help "Don't produce output, but show timing stats")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
@@ -116,7 +125,7 @@ graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a g
           <|> flag' Nothing (long "stdin" <> help "Read a list of newline-separated paths to analyze from stdin."))
     makeReadProjectFromPathsTask language maybePaths = do
       paths <- maybeM (liftIO (many getLine)) maybePaths
-      blobs <- traverse IO.readBlob (flip File language <$> paths)
+      blobs <- traverse readBlobFromFile' (flip File language <$> paths)
       pure $! Project (takeDirectory (maybe "/" fst (uncons paths))) blobs language []
     readProjectRecursively = makeReadProjectRecursivelyTask
       <$> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))

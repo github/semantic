@@ -8,8 +8,9 @@ module Semantic.Graph
 , GraphType(..)
 , Graph
 , ControlFlowVertex
-, ConcreteEff(..)
 , style
+, runHeap
+, runModuleTable
 , parsePackage
 , parsePythonPackage
 , withTermSpans
@@ -26,7 +27,7 @@ module Semantic.Graph
 
 import Prelude hiding (readFile)
 
-import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
@@ -41,25 +42,25 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Value.Abstract as Abstract
 import           Data.Abstract.Value.Concrete as Concrete
-    (Value, ValueError (..), runBoolean, runFunction, runValueErrorWith)
+    (Value, ValueError (..), runValueErrorWith)
 import           Data.Abstract.Value.Type as Type
 import           Data.Blob
-import           Data.Coerce
+import           Data.File
 import           Data.Graph
 import           Data.Graph.ControlFlowVertex (VertexDeclarationStrategy, VertexDeclarationWithStrategy)
 import           Data.Language as Language
 import           Data.List (isPrefixOf, isSuffixOf)
 import           Data.Project
-import           Data.Record
+import           Data.Location
 import           Data.Term
 import           Data.Text (pack, unpack)
 import           Language.Haskell.HsColour
 import           Language.Haskell.HsColour.Colourise
 import           Parsing.Parser
-import           Prologue hiding (MonadError (..), TypeError (..))
+import           Prologue hiding (TypeError (..))
+import           Semantic.Analysis
 import           Semantic.Task as Task
 import           System.FilePath.Posix (takeDirectory, (</>))
 import           Text.Show.Pretty (ppShow)
@@ -68,17 +69,18 @@ data GraphType = ImportGraph | CallGraph
 
 type AnalysisClasses = '[ Declarations1, Eq1, Evaluatable, FreeVariables1, Foldable, Functor, Ord1, Show1 ]
 
-runGraph :: forall effs. ( Member Distribute effs
-                         , Member (Exc SomeException) effs
-                         , Member Resolution effs
-                         , Member Task effs
-                         , Member Trace effs
-                         , Effects effs
-                         )
+runGraph :: ( Member Distribute sig
+            , Member (Error SomeException) sig
+            , Member Resolution sig
+            , Member Task sig
+            , Member Trace sig
+            , Carrier sig m
+            , Effect sig
+            )
          => GraphType
          -> Bool
          -> Project
-         -> Eff effs (Graph ControlFlowVertex)
+         -> Eff m (Graph ControlFlowVertex)
 runGraph ImportGraph _ project
   | SomeAnalysisParser parser (lang' :: Proxy lang) <- someAnalysisParser (Proxy :: Proxy AnalysisClasses) (projectLanguage project) = do
     let parse = if projectLanguage project == Language.Python then parsePythonPackage parser else fmap (fmap snd) . parsePackage parser
@@ -91,70 +93,72 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: forall fields syntax term lang effs. ( HasField fields Span
+runCallGraph :: ( HasField fields Span
                 , Show (Record fields)
                 , Ord (Record fields)
-                , (VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax)
+                , VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax
                 , Declarations1 syntax
                 , Ord1 syntax
                 , Functor syntax
                 , Evaluatable syntax
-                , term ~ Term syntax (Record fields)
-                , FreeVariables term
-                , Recursive term
+                , term ~ Term syntax Location
+                , FreeVariables1 syntax
                 , HasPrelude lang
-                , HasPostlude lang
-                , Member Trace effs
-                , Effects effs
+                , Member Trace sig
+                , Carrier sig m
+                , Effect sig
                 )
              => Proxy lang
              -> Bool
              -> [Module term]
              -> Package term
-             -> Eff effs (Graph ControlFlowVertex)
-runCallGraph lang includePackages modules package = do
-  let analyzeTerm = withTermSpans . graphingTerms . cachingTerms
-      analyzeModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
-      extractGraph (graph, _) = simplify graph
-      runGraphAnalysis
-        = runTermEvaluator @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
-        . graphing @_ @_ @(Maybe Name) @Monovariant
-        . caching
-        . runState (lowerBound @(ScopeGraph (Hole (Maybe Name) (Located Monovariant))))
-        . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) (Hole (Maybe Name) (Located Monovariant)) Abstract))
-        . runFresh 0
-        . resumingLoadError
-        . resumingUnspecialized
-        -- . resumingEnvironmentError -- TODO: Fix me. Replace with resumingScopeGraphError?
-        . resumingScopeError
-        . resumingHeapError
-        . resumingEvalError
-        . resumingResolutionError
-        . resumingAddressError
-        . runReader (packageInfo package)
-        . runReader (lowerBound @Span)
-        . runState (lowerBound @Span)
-        . runReader (lowerBound @ControlFlowVertex)
-        . providingLiveSet
-        . runReader (lowerBound @(ModuleTable (NonEmpty (Module (ModuleResult (Hole (Maybe Name) (Located Monovariant)) Abstract)))))
-        . raiseHandler (runModules (ModuleTable.modulePaths (packageModules package)))
-      runAddressEffects
-        = Hole.runAllocator (Located.handleAllocator Monovariant.handleAllocator)
-        . Hole.runDeref (Located.handleDeref Monovariant.handleDeref)
-  extractGraph <$> runEvaluator (runGraphAnalysis (evaluate lang analyzeModule analyzeTerm runAddressEffects (Abstract.runBoolean . Abstract.runFunction) modules))
+             -> Eff m (Graph ControlFlowVertex)
+runCallGraph lang includePackages modules package
+  = fmap (simplify . fst)
+  . runEvaluator
+  . graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
+  . runHeap
+  . caching
+  . runState (lowerBound @(ScopeGraph (Hole (Maybe Name) (Located Monovariant))))
+  . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) (Hole (Maybe Name) (Located Monovariant)) Abstract))
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingScopeError
+  . resumingHeapError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . raiseHandler (runReader (packageInfo package))
+  . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @ControlFlowVertex))
+  . providingLiveSet
+  . runModuleTable
+  . runModules (ModuleTable.modulePaths (packageModules package))
+  $ evaluate lang perModule perTerm modules
+  where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
+        perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
+
+
+runModuleTable :: Carrier sig m
+               => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address)))) (Eff m)) a
+               -> Evaluator term address value m a
+runModuleTable = raiseHandler $ runReader lowerBound
 
 runImportGraphToModuleInfos :: ( Declarations term
                                , Evaluatable (Base term)
                                , FreeVariables term
                                , HasPrelude lang
-                               , HasPostlude lang
-                               , Member Trace effs
+                               , Member Trace sig
                                , Recursive term
-                               , Effects effs
+                               , Carrier sig m
+                               , Show term
+                               , Effect sig
                                )
                             => Proxy lang
                             -> Package term
-                            -> Eff effs (Graph ControlFlowVertex)
+                            -> Eff m (Graph ControlFlowVertex)
 runImportGraphToModuleInfos lang (package :: Package term) = runImportGraph lang package allModuleInfos
   where allModuleInfos info = maybe (vertex (unknownModuleVertex info)) (foldMap (vertex . moduleVertex . moduleInfo)) (ModuleTable.lookup (modulePath info) (packageModules package))
 
@@ -162,14 +166,15 @@ runImportGraphToModules :: ( Declarations term
                            , Evaluatable (Base term)
                            , FreeVariables term
                            , HasPrelude lang
-                           , HasPostlude lang
-                           , Member Trace effs
+                           , Member Trace sig
                            , Recursive term
-                           , Effects effs
+                           , Carrier sig m
+                           , Show term
+                           , Effect sig
                            )
                         => Proxy lang
                         -> Package term
-                        -> Eff effs (Graph (Module term))
+                        -> Eff m (Graph (Module term))
 runImportGraphToModules lang (package :: Package term) = runImportGraph lang package resolveOrLowerBound
   where resolveOrLowerBound info = maybe lowerBound (foldMap vertex) (ModuleTable.lookup (modulePath info) (packageModules package))
 
@@ -177,72 +182,45 @@ runImportGraph :: ( Declarations term
                   , Evaluatable (Base term)
                   , FreeVariables term
                   , HasPrelude lang
-                  , HasPostlude lang
-                  , Member Trace effs
+                  , Member Trace sig
                   , Recursive term
-                  , Effects effs
+                  , Carrier sig m
+                  , Show term
+                  , Effect sig
                   )
                => Proxy lang
                -> Package term
                -> (ModuleInfo -> Graph vertex)
-               -> Eff effs (Graph vertex)
-runImportGraph lang (package :: Package term) f =
-  let analyzeModule = graphingModuleInfo
-      extractGraph (graph, _) = graph >>= f
-      runImportGraphAnalysis
-        = runState lowerBound
-        . runState lowerBound
-        . runFresh 0
-        . resumingLoadError
-        . resumingUnspecialized
-        -- . resumingEnvironmentError -- TODO: Fix me. Replace with `resumingScopeGraphError`?
-        . resumingScopeError
-        . resumingHeapError
-        . resumingEvalError
-        . resumingResolutionError
-        . resumingAddressError
-        . resumingValueError
-        . runReader lowerBound
-        . runModules (ModuleTable.modulePaths (packageModules package))
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
-        . runReader (packageInfo package)
-        . runState lowerBound
-        . runReader lowerBound
-      runAddressEffects
-        = Hole.runAllocator Precise.handleAllocator
-        . Hole.runDeref Precise.handleDeref
-  in extractGraph <$> runEvaluator (runImportGraphAnalysis (evaluate lang analyzeModule id runAddressEffects (Concrete.runBoolean . Concrete.runFunction coerce coerce) (ModuleTable.toPairs (packageModules package) >>= toList . snd)))
+               -> Eff m (Graph vertex)
+runImportGraph lang (package :: Package term) f
+  = fmap (fst >=> f)
+  . runEvaluator @_ @_ @(Value _ (Hole (Maybe Name) Precise))
+  . raiseHandler (runState lowerBound)
+  . runHeap
+  . raiseHandler runFresh
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError
+  . resumingValueError
+  . runModuleTable
+  . runModules (ModuleTable.modulePaths (packageModules package))
+  . raiseHandler (runReader (packageInfo package))
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @Span))
+  $ evaluate lang graphingModuleInfo (evalTerm id) (ModuleTable.toPairs (packageModules package) >>= toList . snd)
 
-type ConcreteEffects address rest
-  =  Reader Span
-  ': State Span
-  ': Reader PackageInfo
-  ': Modules address (Value address (ConcreteEff address rest))
-  ': Reader (ModuleTable (NonEmpty (Module (ModuleResult address (Value address (ConcreteEff address rest))))))
-  ': Resumable (BaseError (ValueError address (ConcreteEff address rest)))
-  ': Resumable (BaseError (AddressError address (Value address (ConcreteEff address rest))))
-  ': Resumable (BaseError ResolutionError)
-  ': Resumable (BaseError EvalError)
-  ': Resumable (BaseError (HeapError address))
-  ': Resumable (BaseError (ScopeError address))
-  ': Resumable (BaseError (UnspecializedError (Value address (ConcreteEff address rest))))
-  ': Resumable (BaseError (LoadError address (Value address (ConcreteEff address rest))))
-  ': Fresh
-  ': State (Heap address address (Value address (ConcreteEff address rest)))
-  ': rest
-
-newtype ConcreteEff address outerEffects a = ConcreteEff
-  { runConcreteEff :: Eff (ValueEffects  address (Value address (ConcreteEff address outerEffects))
-                          (ModuleEffects address (Value address (ConcreteEff address outerEffects))
-                          (ConcreteEffects address outerEffects))) a
-  }
-
+runHeap :: (Carrier sig m, Effect sig)
+        => Evaluator term address value (StateC (Heap address address value) (Eff m)) a
+        -> Evaluator term address value m (Heap address address value, a)
+runHeap = raiseHandler (runState lowerBound)
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: (Member Distribute effs, Member (Exc SomeException) effs, Member Resolution effs, Member Task effs, Member Trace effs)
+parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m)
              => Parser term -- ^ A parser.
              -> Project     -- ^ Project to parse into a package.
-             -> Eff effs (Package (Blob, term))
+             -> m (Package (Blob, term))
 parsePackage parser project = do
   p <- parseModules parser project
   resMap <- Task.resolutionMap project
@@ -253,32 +231,33 @@ parsePackage parser project = do
     n = Data.Abstract.Evaluatable.name (projectName project) -- TODO: Confirm this is the right `name`.
 
 -- | Parse all files in a project into 'Module's.
-parseModules :: (Member Distribute effs, Member (Exc SomeException) effs, Member Task effs) => Parser term -> Project -> Eff effs [Module (Blob, term)]
+parseModules :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => Parser term -> Project -> m [Module (Blob, term)]
 parseModules parser p@Project{..} = distributeFor (projectFiles p) (parseModule p parser)
 
 
 -- | Parse a list of packages from a python project.
-parsePythonPackage :: forall syntax fields effs term.
+parsePythonPackage :: forall syntax sig m term.
                    ( Declarations1 syntax
                    , Evaluatable syntax
                    , FreeVariables1 syntax
                    , Functor syntax
-                   , term ~ Term syntax (Record fields)
-                   , Member (Exc SomeException) effs
-                   , Member Distribute effs
-                   , Member Resolution effs
-                   , Member Trace effs
-                   , Member Task effs
-                   , (Show (Record fields))
-                   , Effects effs)
-                   => Parser term       -- ^ A parser.
-                   -> Project           -- ^ Project to parse into a package.
-                   -> Eff effs (Package term)
+                   , term ~ Term syntax Location
+                   , Member (Error SomeException) sig
+                   , Member Distribute sig
+                   , Member Resolution sig
+                   , Member Trace sig
+                   , Member Task sig
+                   , Carrier sig m
+                   , Effect sig
+                   )
+                   => Parser term      -- ^ A parser.
+                   -> Project          -- ^ Project to parse into a package.
+                   -> Eff m (Package term)
 parsePythonPackage parser project = do
-  let runAnalysis = runEvaluator
-        . runState PythonPackage.Unknown
-        . runState lowerBound
-        . runFresh 0
+  let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
+        . raiseHandler (runState PythonPackage.Unknown)
+        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
+        . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
         -- . resumingEnvironmentError -- TODO: Fix me. Replace with `resumineScopeGraphError`?
@@ -288,20 +267,16 @@ parsePythonPackage parser project = do
         . resumingResolutionError
         . resumingAddressError
         . resumingValueError
-        . runReader lowerBound
+        . runModuleTable
         . runModules lowerBound
-        . runTermEvaluator @_ @_ @(Value (Hole (Maybe Name) Precise) (ConcreteEff (Hole (Maybe Name) Precise) _))
-        . runReader (PackageInfo (Data.Abstract.Evaluatable.name "setup") lowerBound) -- TODO: Confirm this is the right `name`.
-        . runState lowerBound
-        . runReader lowerBound
-      runAddressEffects
-        = Hole.runAllocator Precise.handleAllocator
-        . Hole.runDeref Precise.handleDeref
+        . raiseHandler (runReader (PackageInfo (Data.Abstract.Evaluatable.name "setup") lowerBound))
+        . raiseHandler (runState (lowerBound @Span))
+        . raiseHandler (runReader (lowerBound @Span))
 
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
       setupModule <- fmap snd <$> parseModule project parser setupFile
-      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id id runAddressEffects (Concrete.runBoolean . Concrete.runFunction coerce coerce . runPythonPackaging) [ setupModule ])
+      fst <$> runAnalysis (evaluate (Proxy @'Language.Python) id (runPythonPackaging . evalTerm id) [ setupModule ])
     Nothing -> pure PythonPackage.Unknown
   case strat of
     PythonPackage.Unknown -> do
@@ -329,58 +304,56 @@ parsePythonPackage parser project = do
         resMap <- Task.resolutionMap p
         pure (Package.fromModules (Data.Abstract.Evaluatable.name $ projectName p) modules resMap) -- TODO: Confirm this is the right `name`.
 
-parseModule :: (Member (Exc SomeException) effs, Member Task effs)
+parseModule :: (Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m)
             => Project
             -> Parser term
             -> File
-            -> Eff effs (Module (Blob, term))
+            -> m (Module (Blob, term))
 parseModule proj parser file = do
   mBlob <- readFile proj file
   case mBlob of
     Just blob -> moduleForBlob (Just (projectRootDir proj)) blob . (,) blob <$> parse parser blob
     Nothing   -> throwError (SomeException (FileNotFound (filePath file)))
 
-withTermSpans :: ( HasField fields Span
-                 , Member (Reader Span) effects
-                 , Member (State Span) effects -- last evaluated child's span
+withTermSpans :: ( Member (Reader Span) sig
+                 , Member (State Span) sig -- last evaluated child's span
+                 , Recursive term
+                 , Carrier sig m
+                 , Base term ~ TermF syntax Location
                  )
-              => SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
-              -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term address value effects a)
-withTermSpans recur term = let
-  updatedSpanAlg = withCurrentSpan (getField (termFAnnotation term)) (recur term)
-  in modifyChildSpan (getField (termFAnnotation term)) updatedSpanAlg
+              => Open (Open (term -> Evaluator term address value m a))
+withTermSpans recur0 recur term = let
+  span = locationSpan (termFAnnotation (project term))
+  updatedSpanAlg = withCurrentSpan span (recur0 recur term)
+  in modifyChildSpan span updatedSpanAlg
 
-resumingResolutionError :: ( Applicative (m effects)
-                           , Effectful m
-                           , Member Trace effects
-                           , Effects effects
+resumingResolutionError :: ( Member Trace sig
+                           , Carrier sig m
                            )
-                         => m (Resumable (BaseError ResolutionError) ': effects) a
-                         -> m effects a
+                         => Evaluator term address value (ResumableWithC (BaseError ResolutionError) (Eff
+                                                         m)) a
+                         -> Evaluator term address value m a
 resumingResolutionError = runResolutionErrorWith (\ baseError -> traceError "ResolutionError" baseError *> case baseErrorException baseError of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: forall m address value effects a. ( Applicative (m address value effects)
-                     , AbstractHole value
-                     , Effectful (m address value)
-                     , Effects effects
-                     , Member Trace effects
+resumingLoadError :: ( AbstractHole value
+                     , Carrier sig m
+                     , Member Trace sig
                      , Ord address
                      )
-                  => m address value (Resumable (BaseError (LoadError address value)) ': effects) a
-                  -> m address value effects a
+                  => Evaluator term address value (ResumableWithC (BaseError (LoadError address)) (Eff m)) a
+                  -> Evaluator term address value m a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
-  ModuleNotFoundError _ -> pure (lowerBound @(ScopeGraph.ScopeGraph address), hole :: value)) -- TODO: Confirm `lowerBound @ScopeGraph.ScopeGraph` is what we want.
+  ModuleNotFoundError _ -> pure (lowerBound, hole))
 
-resumingEvalError :: ( Applicative (m effects)
-                     , Effectful m
-                     , Effects effects
-                     , Member Fresh effects
-                     , Member Trace effects
+resumingEvalError :: ( Carrier sig m
+                     , Member Fresh sig
+                     , Member Trace sig
                      )
-                  => m (Resumable (BaseError EvalError) ': effects) a
-                  -> m effects a
+                  => Evaluator term address value (ResumableWithC (BaseError EvalError) (Eff
+                                                  m)) a
+                  -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
   DefaultExportError{}  -> pure ()
   ExportError{}         -> pure ()
@@ -389,37 +362,36 @@ resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" base
   RationalFormatError{} -> pure 0
   NoNameError           -> gensym)
 
-resumingUnspecialized :: ( Applicative (m value effects)
-                         , AbstractHole value
-                         , Effectful (m value)
-                         , Effects effects
-                         , Member Trace effects)
-                      => m value (Resumable (BaseError (UnspecializedError value)) ': effects) a
-                      -> m value effects a
+resumingUnspecialized :: ( AbstractHole value
+                         , Carrier sig m
+                         , Member Trace sig
+                         )
+                      => Evaluator term address value (ResumableWithC (BaseError (UnspecializedError value)) (Eff
+                                                      m)) a
+                      -> Evaluator term address value m a
 resumingUnspecialized = runUnspecializedWith (\ baseError -> traceError "UnspecializedError" baseError *> case baseErrorException baseError of
   UnspecializedError _ -> pure hole)
 
 resumingAddressError :: ( AbstractHole value
-                        , Applicative (m address value effects)
-                        , Effectful (m address value)
-                        , Effects effects
-                        , Member Trace effects
+                        , Carrier sig m
+                        , Member Trace sig
                         , Show address
                         )
-                     => m address value (Resumable (BaseError (AddressError address value)) ': effects) a
-                     -> m address value effects a
+                     => Evaluator term address value (ResumableWithC (BaseError (AddressError address value)) (Eff
+                                                     m)) a
+                     -> Evaluator term address value m a
 resumingAddressError = runAddressErrorWith $ \ baseError -> traceError "AddressError" baseError *> case baseErrorException baseError of
   UnallocatedAddress   _ -> pure lowerBound
   UninitializedAddress _ -> pure hole
 
-resumingValueError :: ( Applicative (m address (Value address body) effects)
-                      , Effectful (m address (Value address body))
-                      , Effects effects
-                      , Member Trace effects
+resumingValueError :: ( Carrier sig m
+                      , Member Trace sig
                       , Show address
+                      , Show term
                       )
-                   => m address (Value address body) (Resumable (BaseError (ValueError address body)) ': effects) a
-                   -> m address (Value address body) effects a
+                   => Evaluator term address (Value term address) (ResumableWithC (BaseError (ValueError term address)) (Eff
+                                                                  m)) a
+                   -> Evaluator term address (Value term address) m a
 resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
   CallError val     -> pure val
   StringError val   -> pure (pack (prettyShow val))
@@ -466,24 +438,15 @@ resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" b
   -- LookupPathError :: Path address ->  HeapError address address
 
 
--- TODO: Fix me.
--- Replace this with ScopeGraphError?
--- resumingEnvironmentError :: ( Monad (m (Hole (Maybe Name) address) value effects)
---                             , Effectful (m (Hole (Maybe Name) address) value)
---                             , Effects effects
---                             , Member Trace effects
---                             )
---                          => m (Hole (Maybe Name) address) value (Resumable (BaseError (EnvironmentError (Hole (Maybe Name) address))) ': effects) a
---                          -> m (Hole (Maybe Name) address) value effects a
--- resumingEnvironmentError = runResumableWith (\ baseError -> traceError "EnvironmentError" baseError >> (\ (FreeVariable name) -> pure (Partial (Just name))) (baseErrorException baseError))
-
-resumingTypeError :: ( Alternative (m address Type (State TypeMap ': effects))
-                     , Effects effects
-                     , Effectful (m address Type)
-                     , Member Trace effects
+resumingTypeError :: ( Carrier sig m
+                     , Member NonDet sig
+                     , Member Trace sig
+                     , Effect sig
                      )
-                  => m address Type (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
-                  -> m address Type effects a
+                  => Evaluator term address Type (ResumableWithC (BaseError TypeError) (Eff
+                                                 (StateC TypeMap (Eff
+                                                 m)))) a
+                  -> Evaluator term address Type m a
 resumingTypeError = runTypesWith (\ baseError -> traceError "TypeError" baseError *> case baseErrorException baseError of
   UnificationError l r -> pure l <|> pure r
   InfiniteType _ r     -> pure r)
@@ -491,5 +454,5 @@ resumingTypeError = runTypesWith (\ baseError -> traceError "TypeError" baseErro
 prettyShow :: Show a => a -> String
 prettyShow = hscolour TTY defaultColourPrefs False False "" False . ppShow
 
-traceError :: (Member Trace effects, Effectful m, Show (exc resume)) => String -> BaseError exc resume -> m effects ()
+traceError :: (Member Trace sig, Show (exc resume), Carrier sig m) => String -> BaseError exc resume -> Evaluator term address value m ()
 traceError prefix baseError = trace $ prefix <> ": " <> prettyShow baseError

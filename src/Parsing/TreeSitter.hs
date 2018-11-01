@@ -8,10 +8,9 @@ import Prologue hiding (bracket)
 
 import           Control.Concurrent.Async
 import qualified Control.Exception as Exc (bracket)
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Exception
-import           Control.Monad.Effect.Trace
-import           Control.Monad.IO.Class
+import           Control.Effect
+import           Control.Effect.Resource
+import           Control.Effect.Trace
 import           Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import           Foreign
 import           Foreign.C.Types (CBool (..))
@@ -20,7 +19,7 @@ import           Foreign.Marshal.Array (allocaArray)
 import Data.AST (AST, Node (Node))
 import Data.Blob
 import Data.Duration
-import Data.Range
+import Data.Location
 import Data.Source
 import Data.Span
 import Data.Term
@@ -57,8 +56,19 @@ runParser parser blobSource  = unsafeUseAsCStringLen (sourceBytes blobSource) $ 
 
 -- | Parse 'Source' with the given 'TS.Language' and return its AST.
 -- Returns Nothing if the operation timed out.
-parseToAST :: (Bounded grammar, Enum grammar, Member (Lift IO) effects, Member Timeout effects, Member Trace effects, PureEffects effects) => Duration -> Ptr TS.Language -> Blob -> Eff effects (Maybe (AST [] grammar))
-parseToAST parseTimeout language Blob{..} = bracket TS.ts_parser_new TS.ts_parser_delete $ \ parser -> do
+parseToAST :: ( Bounded grammar
+              , Carrier sig m
+              , Enum grammar
+              , Member Resource sig
+              , Member Timeout sig
+              , Member Trace sig
+              , MonadIO m
+              )
+           => Duration
+           -> Ptr TS.Language
+           -> Blob
+           -> m (Maybe (AST [] grammar))
+parseToAST parseTimeout language Blob{..} = bracket (liftIO TS.ts_parser_new) (liftIO . TS.ts_parser_delete) $ \ parser -> do
   liftIO $ do
     TS.ts_parser_halt_on_error parser (CBool 1)
     TS.ts_parser_set_language parser language
@@ -82,9 +92,9 @@ toAST :: forall grammar . (Bounded grammar, Enum grammar) => TS.Node -> IO (Base
 toAST node@TS.Node{..} = do
   let count = fromIntegral nodeChildCount
   children <- allocaArray count $ \ childNodesPtr -> do
-    _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nodePtr childNodesPtr (fromIntegral count))
+    _ <- with nodeTSNode (`TS.ts_node_copy_child_nodes` childNodesPtr)
     peekArray count childNodesPtr
-  pure $! In (Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (nodeRange node) (nodeSpan node)) children
+  pure $! In (Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (Location (nodeRange node) (nodeSpan node))) children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g

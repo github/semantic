@@ -31,12 +31,11 @@ module Parsing.Parser
 import           Assigning.Assignment
 import qualified Assigning.Assignment.Deterministic as Deterministic
 import qualified CMarkGFM
-import           Data.Abstract.Evaluatable (HasPostlude, HasPrelude)
+import           Data.Abstract.Evaluatable (HasPrelude)
 import           Data.AST
 import           Data.Graph.ControlFlowVertex (VertexDeclaration')
 import           Data.Kind
 import           Data.Language
-import           Data.Record
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -74,7 +73,6 @@ data SomeAnalysisParser typeclasses ann where
                         , Apply (VertexDeclaration' (Sum fs)) fs
                         , Element Syntax.Identifier fs
                         , HasPrelude lang
-                        , HasPostlude lang
                         )
                      => Parser (Term (Sum fs) ann)
                      -> Proxy lang
@@ -89,9 +87,9 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                       , ApplyAll' typeclasses TypeScript.Syntax
                       , ApplyAll' typeclasses Haskell.Syntax
                       )
-                   => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                                         -- ^ The 'Language' to select.
-                   -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
+                   => proxy typeclasses                       -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                                -- ^ The 'Language' to select.
+                   -> SomeAnalysisParser typeclasses Location -- ^ A 'SomeAnalysisParser' abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser         (Proxy :: Proxy 'Go)
 someAnalysisParser _ Haskell    = SomeAnalysisParser haskellParser    (Proxy :: Proxy 'Haskell)
 someAnalysisParser _ Java       = SomeAnalysisParser javaParser       (Proxy :: Proxy 'Java)
@@ -109,13 +107,13 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar, Show grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))                         -- ^ A parser producing AST.
-                   -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
-                   -> Parser (Term (Sum fs) (Record Location))                 -- ^ A parser producing 'Term's.
+                   => Parser (Term ast (Node grammar))                -- ^ A parser producing AST.
+                   -> Assignment ast grammar (Term (Sum fs) Location) -- ^ An assignment from AST onto 'Term's.
+                   -> Parser (Term (Sum fs) Location)                 -- ^ A parser producing 'Term's.
   DeterministicParser :: (Enum grammar, Ord grammar, Show grammar, Element Syntax.Error syntaxes, Apply Foldable syntaxes, Apply Functor syntaxes)
                       => Parser (AST [] grammar)
-                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) (Record Location))
-                      -> Parser (Term (Sum syntaxes) (Record Location))
+                      -> Deterministic.Assignment grammar (Term (Sum syntaxes) Location)
+                      -> Parser (Term (Sum syntaxes) Location)
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | An abstraction over parsers when we don’t know the details of the term type.
@@ -141,8 +139,8 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum TypeScript.Syntax)
               , ApplyAll typeclasses (Sum PHP.Syntax)
               )
-           => Language                                                -- ^ The 'Language' to select.
-           -> Maybe (Parser (SomeTerm typeclasses (Record Location))) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
+           => Language                                       -- ^ The 'Language' to select.
+           -> Maybe (Parser (SomeTerm typeclasses Location)) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
 someParser Go         = Just (SomeParser goParser)
 someParser Java       = Just (SomeParser javaParser)
 someParser JavaScript = Just (SomeParser typescriptParser)

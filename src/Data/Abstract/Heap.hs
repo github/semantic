@@ -25,7 +25,6 @@ import Data.Semigroup.Reducer
 import Prologue
 import Prelude hiding (lookup)
 
-
 data Frame scopeAddress frameAddress value = Frame {
     scopeAddress :: scopeAddress
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
@@ -33,8 +32,9 @@ data Frame scopeAddress frameAddress value = Frame {
   }
   deriving (Eq, Ord, Show)
 
-data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
-    deriving (Eq, Ord, Show)
+-- | A map of frame addresses onto Frames.
+data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Monoidal.Map frameAddress (Frame scopeAddress frameAddress value) }
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Generic, NFData, Show)
 
 instance Lower (Heap scopeAddress frameAddress value) where
   lowerBound = Heap lowerBound lowerBound

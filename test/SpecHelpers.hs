@@ -10,7 +10,6 @@ module SpecHelpers
 , deNamespace
 , derefQName
 , verbatim
-, TermEvaluator(..)
 , Verbatim(..)
 , toList
 , Config
@@ -20,7 +19,7 @@ module SpecHelpers
 
 import Control.Abstract
 import Control.Arrow ((&&&))
-import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
+import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
 import Data.Abstract.Address.Precise as X
 import Data.Abstract.Environment as Env
@@ -37,12 +36,13 @@ import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Project as X
 import Data.Proxy as X
+import qualified Data.File as F
+import Data.File as X hiding (readFilePair)
 import Data.Foldable (toList)
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Range as X
-import Data.Record as X
 import Data.Semilattice.Lower as X
 import Data.Source as X
 import Data.Span as X
@@ -73,7 +73,6 @@ import qualified Data.ByteString as B
 import qualified Data.Set as Set
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
-import Semantic.Graph (ConcreteEff)
 import Semantic.Telemetry (LogQueue, StatQueue)
 import System.Exit (die)
 import Control.Exception (displayException)
@@ -91,46 +90,47 @@ diffFilePaths (TaskConfig config logger statter) paths = readFilePair paths >>= 
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: TaskConfig -> FilePath -> IO ByteString
-parseFilePath (TaskConfig config logger statter) path = (fromJust <$> IO.readFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
+parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFromFile (file path)) >>= runTaskWithConfig config logger statter . runParse SExpressionTermRenderer . pure >>= either (die . displayException) (pure . runBuilder)
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
-                     runBothWith IO.readFilePair paths'
+                     runBothWith F.readFilePair paths'
 
-type TestEvaluatingEffects = '[ Resumable (BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO])))
-                              , Resumable (BaseError (AddressError Precise Val))
-                              , Resumable (BaseError ResolutionError)
-                              , Resumable (BaseError EvalError)
-                              , Resumable (BaseError (EnvironmentError Precise))
-                              , Resumable (BaseError (UnspecializedError Val))
-                              , Resumable (BaseError (LoadError Precise))
-                              , Fresh
-                              , State (Heap Precise Val)
-                              , Trace
-                              , Lift IO
-                              ]
-type TestEvaluatingErrors = '[ BaseError (ValueError Precise (ConcreteEff Precise '[Trace, Lift IO]))
-                             , BaseError (AddressError Precise Val)
-                             , BaseError ResolutionError
-                             , BaseError EvalError
-                             , BaseError (EnvironmentError Precise)
-                             , BaseError (UnspecializedError Val)
-                             , BaseError (LoadError Precise)
-                             ]
-testEvaluating :: Evaluator Precise Val TestEvaluatingEffects (Span, a)
+type TestEvaluatingC term
+  = ResumableC (BaseError (ValueError term Precise)) (Eff
+  ( ResumableC (BaseError (AddressError Precise (Val term))) (Eff
+  ( ResumableC (BaseError ResolutionError) (Eff
+  ( ResumableC (BaseError EvalError) (Eff
+  ( ResumableC (BaseError (EnvironmentError Precise)) (Eff
+  ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
+  ( ResumableC (BaseError (LoadError Precise)) (Eff
+  ( FreshC (Eff
+  ( StateC (Heap Precise (Val term)) (Eff
+  ( TraceByReturningC (Eff
+  ( LiftC IO))))))))))))))))))))
+type TestEvaluatingErrors term
+  = '[ BaseError (ValueError term Precise)
+     , BaseError (AddressError Precise (Val term))
+     , BaseError ResolutionError
+     , BaseError EvalError
+     , BaseError (EnvironmentError Precise)
+     , BaseError (UnspecializedError (Val term))
+     , BaseError (LoadError Precise)
+     ]
+testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) (Span, a)
                -> IO
                  ( [String]
-                 , ( Heap Precise Val
-                   , Either (SomeExc (Data.Sum.Sum TestEvaluatingErrors))
-                            a
+                 , ( Heap Precise (Val term)
+                   , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
                    )
                  )
 testEvaluating
   = runM
-  . runReturningTrace
+  . runTraceByReturning
   . runState lowerBound
-  . runFresh 0
+  . runFresh
+  . runEvaluator
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -138,36 +138,37 @@ testEvaluating
   . runEvalError
   . runResolutionError
   . runAddressError
-  . runValueError @_ @Precise @(ConcreteEff Precise _)
+  . runValueError @_ @_ @_ @Precise
   . fmap snd
 
-type Val = Value Precise (ConcreteEff Precise '[Trace, Lift IO])
+type Val term = Value term Precise
 
 
-deNamespace :: Heap Precise (Value Precise term)
-            -> Value Precise term
+deNamespace :: Heap Precise (Value term Precise)
+            -> Value term Precise
             -> Maybe (Name, [Name])
 deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
 deNamespace _ _                          = Nothing
 
-namespaceScope :: Heap Precise (Value Precise term)
-               -> Value Precise term
+namespaceScope :: Heap Precise (Value term Precise)
+               -> Value term Precise
                -> Maybe (Environment Precise)
 namespaceScope heap ns@(Namespace _ _ _)
   = either (const Nothing) (snd . snd)
   . run
-  . runFresh 0
+  . runFresh
+  . runEvaluator
   . runAddressError
-  . runState heap
-  . runState (lowerBound @Span)
-  . runReader (lowerBound @Span)
-  . runReader (ModuleInfo "SpecHelper.hs")
+  . raiseHandler (runState heap)
+  . raiseHandler (runState (lowerBound @Span))
+  . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runReader (ModuleInfo "SpecHelper.hs"))
   . runDeref
   $ materializeEnvironment ns
 
 namespaceScope _ _ = Nothing
 
-derefQName :: Heap Precise (Value Precise term) -> NonEmpty Name -> Bindings Precise -> Maybe (Value Precise term)
+derefQName :: Heap Precise (Value term Precise) -> NonEmpty Name -> Bindings Precise -> Maybe (Value term Precise)
 derefQName heap names binds = go names (Env.newEnv binds)
   where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= fmap fst . Set.minView >>= case ns of
           []        -> Just

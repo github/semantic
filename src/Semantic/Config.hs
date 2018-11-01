@@ -23,9 +23,8 @@ import           Semantic.Env
 import           Semantic.Telemetry
 import qualified Semantic.Telemetry.Haystack as Haystack
 import qualified Semantic.Telemetry.Stat as Stat
-import           Semantic.Version
 import           System.Environment
-import           System.IO (hIsTerminalDevice, stderr)
+import           System.IO (hIsTerminalDevice, stdout)
 import           System.Posix.Process
 import           System.Posix.Types
 
@@ -43,6 +42,7 @@ data Config
   , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , configLogFormatter           :: LogFormatter -- ^ Log formatter to use (set automaticaly at runtime).
+  , configSHA                    :: Maybe String -- ^ Optional SHA to include in log messages.
 
   , configOptions                :: Options      -- ^ Options configurable via command line arguments.
   }
@@ -50,22 +50,23 @@ data Config
 -- Options configurable via command line arguments.
 data Options
   = Options
-  { optionsLogLevel      :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disabled logging.
-  , optionsRequestID     :: Maybe String  -- ^ Optional request id for tracing across systems.
-  , optionsFailOnWarning :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
+  { optionsLogLevel         :: Maybe Level   -- ^ What level of messages to log. 'Nothing' disables logging.
+  , optionsRequestID        :: Maybe String  -- ^ Optional request id for tracing across systems.
+  , optionsFailOnWarning    :: Bool          -- ^ Should semantic fail fast on assignment warnings (for testing)
+  , optionsFailOnParseError :: Bool          -- ^ Should semantic fail fast on tree-sitter parser errors (for testing)
   }
 
 defaultOptions :: Options
-defaultOptions = Options (Just Warning) Nothing False
+defaultOptions = Options (Just Warning) Nothing False False
 
 debugOptions :: Options
-debugOptions = Options (Just Debug) Nothing False
+debugOptions = Options (Just Debug) Nothing False False
 
 defaultConfig :: Options -> IO Config
 defaultConfig options@Options{..} = do
   pid <- getProcessID
   hostName <- getHostName
-  isTerminal <- hIsTerminalDevice stderr
+  isTerminal <- hIsTerminalDevice stdout
   haystackURL <- lookupEnv "HAYSTACK_URL"
   (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
@@ -83,6 +84,7 @@ defaultConfig options@Options{..} = do
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal
     , configLogFormatter = if isTerminal then terminalFormatter else logfmtFormatter
+    , configSHA = Nothing
 
     , configOptions = options
     }
@@ -104,8 +106,9 @@ logOptionsFromConfig Config{..} = LogOptions
           False -> [ ("app", configAppName)
                    , ("pid", show configProcessID)
                    , ("hostname", configHostName)
-                   , ("sha", buildSHA)
-                   ] <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
+                   , ("sha", fromMaybe "development" configSHA)
+                   ]
+                   <> [("request_id", x) | x <- toList (optionsRequestID configOptions) ]
           _ -> []
 
 

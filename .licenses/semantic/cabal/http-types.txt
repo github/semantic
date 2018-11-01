@@ -1,7 +1,7 @@
 ---
 type: cabal
 name: http-types
-version: 0.12.1
+version: 0.12.2
 summary: Generic HTTP types for Haskell (for both client and server code).
 homepage: https://github.com/aristidb/http-types
 license: bsd-3-clause

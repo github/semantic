@@ -12,7 +12,6 @@ import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (Name, name)
 import qualified Data.Diff as Diff
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Record
 import           Data.Sum
 import           Data.Syntax
     ( contextualize
@@ -120,7 +119,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 instance Named1 (Sum Syntax) where
@@ -465,9 +464,13 @@ raiseStatement :: Assignment Term
 raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> expressions)
 
 ifStatement :: Assignment Term
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term expression <*> term (makeTerm <$> location <*> manyTermsTill expression (void (symbol ElseClause) <|> void (symbol ElifClause) <|> eof)) <*> (flip (foldr makeElif) <$> many elifClause <*> (symbol ElseClause *> children expressions <|> emptyTerm)))
-  where elifClause = (,) <$> symbol ElifClause <*> children (Statement.If <$> term expression <*> expressions)
-        makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
+ifStatement = makeTerm <$> symbol IfStatement <*> children if'
+  where
+    if' = Statement.If <$> term expression <*> thenClause <*> (elseClause <|> emptyTerm)
+    thenClause = makeTerm <$> location <*> manyTermsTill expression (void (symbol ElseClause) <|> void (symbol ElifClause) <|> eof)
+    elseClause = makeTerm <$> location <*> many (comment <|> elif <|> else')
+    elif = makeTerm <$> symbol ElifClause <*> children if'
+    else' = symbol ElseClause *> children expressions
 
 execStatement :: Assignment Term
 execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call [] <$> term (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> manyTerm (string <|> expression) <*> emptyTerm)

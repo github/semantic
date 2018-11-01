@@ -1,7 +1,9 @@
 {-# LANGUAGE GADTs, LambdaCase, RankNTypes, UndecidableInstances #-}
 
 module Reprinting.Tokenize
-  ( module Data.Reprinting.Token
+  ( module Token
+  , module Scope
+  , module Operator
   , History (..)
   , mark
   , remark
@@ -32,8 +34,10 @@ import           Data.History
 import           Data.List (intersperse)
 import qualified Data.Machine as Machine
 import           Data.Range
-import           Data.Record
-import           Data.Reprinting.Token
+import           Data.Reprinting.Scope (Scope)
+import qualified Data.Reprinting.Scope as Scope
+import           Data.Reprinting.Token as Token
+import           Data.Reprinting.Operator as Operator
 import           Data.Source
 import           Data.Term
 
@@ -95,11 +99,11 @@ data State = State
 yield :: Element -> Tokenizer ()
 yield e = do
   on <- filter <$> Get
-  when (on == AllowAll) . Tell . TElement $ e
+  when (on == AllowAll) . Tell . Element $ e
 
 -- | Yield a 'Control' token.
 control :: Control -> Tokenizer ()
-control = Tell . TControl
+control = Tell . Control
 
 -- | Yield a 'Chunk' of some 'Source'.
 chunk :: Source -> Tokenizer ()
@@ -128,13 +132,13 @@ forbidData = modify (\x -> x { filter = ForbidData })
 move :: Int -> Tokenizer ()
 move c = modify (\x -> x { cursor = c })
 
-withHistory :: (Annotated t (Record fields), HasField fields History)
+withHistory :: Annotated t History
             => t
             -> Tokenizer a
             -> Tokenizer a
 withHistory t act = do
   old <- asks history
-  modify (\x -> x { history = getField (annotation t)})
+  modify (\x -> x { history = annotation t })
   act <* modify (\x -> x { history = old })
 
 withStrategy :: Strategy -> Tokenizer a -> Tokenizer a
@@ -149,7 +153,7 @@ withStrategy s act = do
 -- The reprinting algorithm.
 
 -- | A subterm algebra inspired by the /Scrap Your Reprinter/ algorithm.
-descend :: (Tokenize constr, HasField fields History) => SubtermAlgebra constr (Term a (Record fields)) (Tokenizer ())
+descend :: Tokenize constr => SubtermAlgebra constr (Term a History) (Tokenizer ())
 descend t = do
   (State src hist strat crs _) <- asks id
   let into s = withHistory (subterm s) (subtermRef s)
@@ -179,39 +183,40 @@ log = control . Log
 
 -- | Emit an Enter for the given context, then run the provided
 -- action, then emit a corresponding Exit.
-within :: Context -> Tokenizer () -> Tokenizer ()
+within :: Scope -> Tokenizer () -> Tokenizer ()
 within c r = control (Enter c) *> r <* control (Exit c)
 
--- | Like 'within', but adds 'TOpen' and 'TClose' elements around the action.
-within' :: Context -> Tokenizer () -> Tokenizer ()
-within' c x = within c $ yield TOpen *> x <* yield TClose
+-- | Like 'within', but adds 'Open' and 'Close' elements around the action.
+within' :: Scope -> Tokenizer () -> Tokenizer ()
+within' c x = within c $ yield Token.Open *> x <* yield Token.Close
 
--- | Emit a sequence of tokens interspersed with 'TSep'.
+-- | Emit a sequence of tokens interspersed with 'Sep'.
 sep :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
-sep = intersperse (yield TSep) . toList
+sep = intersperse (yield Token.Sep) . toList
 
--- | Emit a sequence of tokens each with trailing 'TSep'.
+-- | Emit a sequence of tokens each with trailing 'Sep'.
 sepTrailing :: Foldable t => t (Tokenizer ()) -> [Tokenizer ()]
-sepTrailing = foldr (\x acc -> x : yield TSep : acc) mempty
+sepTrailing = foldr (\x acc -> x : yield Token.Sep : acc) mempty
 
--- | Emit a sequence of tokens within a 'TList' Context with appropriate 'TOpen',
+-- | Emit a sequence of tokens within a 'List' Scope with appropriate 'Open',
 -- 'TClose' tokens surrounding.
 list :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-list = within' TList . sequenceA_ . sep
+list = within' Scope.List . sequenceA_ . sep
 
--- | Emit a sequence of tokens within a 'THash' Context with appropriate
--- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
+-- | Emit a sequence of tokens within a 'Hash' Scope with appropriate
+-- 'Open', 'TClose' tokens surrounding and interspersing 'Sep'.
 hash :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-hash = within' THash . sequenceA_ . sep
+hash = within' Scope.Hash . sequenceA_ . sep
 
--- | Emit key value tokens with a 'TSep' within an TPair Context
+-- | Emit key value tokens with a 'Sep' within a scoped 'Pair'.
 pair :: Tokenizer () -> Tokenizer () -> Tokenizer ()
-pair k v = within TPair $ k *> yield TSep <* v
+pair k v = within Scope.Pair $ k *> yield Token.Sep <* v
 
--- | Emit a sequence of tokens within an Imperative Context with appropriate
--- 'TOpen', 'TClose' tokens surrounding and interspersing 'TSep'.
+-- | Emit a sequence of tokens within an 'Imperative' scope with
+-- appropriate 'Open', 'Close' tokens surrounding and interspersing
+-- 'Sep'.
 imperative :: Foldable t => t (Tokenizer ()) -> Tokenizer ()
-imperative = within' Imperative . sequenceA_ . sep
+imperative = within' Scope.Imperative . sequenceA_ . sep
 
 -- | Shortcut for @const (pure ())@, useful for when no action
 -- should be taken.
@@ -224,13 +229,13 @@ class (Show1 constr, Traversable constr) => Tokenize constr where
   -- | Should emit control and data tokens.
   tokenize :: FAlgebra constr (Tokenizer ())
 
-tokenizing :: (Show (Record fields), Tokenize a, HasField fields History)
+tokenizing :: Tokenize a
            => Source
-           -> Term a (Record fields)
+           -> Term a History
            -> Machine.Source Token
 tokenizing src term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
-        state = State src (getField (termAnnotation term)) Reprinting 0 ForbidData
+        state = State src (termAnnotation term) Reprinting 0 ForbidData
         go    = forbidData *> foldSubterms descend term <* finish
 
 -- | Sums of reprintable terms are reprintable.
@@ -238,7 +243,7 @@ instance (Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable
   tokenize = apply @Tokenize tokenize
 
 -- | Annotated terms are reprintable and operate in a context derived from the annotation.
-instance (HasField fields History, Show (Record fields), Tokenize a) => Tokenize (TermF a (Record fields)) where
+instance Tokenize a => Tokenize (TermF a History) where
   tokenize t = withHistory t (tokenize (termFOut t))
 
 instance Tokenize [] where

@@ -14,7 +14,6 @@ import qualified Assigning.Assignment as Assignment
 import           Data.Abstract.Name (name)
 import           Data.List (elem)
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Record
 import           Data.Syntax
     ( contextualize
     , emptyTerm
@@ -130,7 +129,7 @@ type Syntax = '[
   , []
   ]
 
-type Term = Term.Term (Sum Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) Location
 type Assignment = Assignment.Assignment [] Grammar
 
 -- For Protobuf serialization
@@ -163,6 +162,7 @@ expressionChoices =
   , heredoc
   , identifier
   , if'
+  , then'
   , lambda
   , literal
   , method
@@ -270,7 +270,7 @@ literal =
       (children (inject . Literal.String <$> some (interpolation <|> escapeSequence)) <|> inject . Literal.TextElement <$> source)
 
     symbol' :: Assignment Term
-    symbol' = makeTerm' <$> (symbol Symbol <|> symbol Symbol' <|> symbol BareSymbol) <*>
+    symbol' = makeTerm' <$> (symbol Symbol <|> symbol Symbol' <|> symbol Symbol'' <|> symbol BareSymbol) <*>
       (children (inject . Literal.Symbol <$> some interpolation) <|> inject . Literal.SymbolElement <$> source)
 
 interpolation :: Assignment Term
@@ -363,13 +363,16 @@ undef = makeTerm <$> symbol Undef <*> children (Expression.Call [] <$> name' <*>
   where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
 
 if' :: Assignment Term
-if' =   ifElsif If
+if' = ifElsif If
     <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
   where
     ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (elsif' <|> else' <|> emptyTerm))
-    expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
     elsif' = postContextualize comment (ifElsif Elsif)
+    expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
     else' = postContextualize comment (symbol Else *> children expressions)
+
+then' :: Assignment Term
+then' = postContextualize comment (symbol Then *> children expressions)
 
 unless :: Assignment Term
 unless =   makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (else' <|> emptyTerm))
@@ -485,7 +488,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
        <|> lhsIdent
        <|> expression
 
-identWithLocals :: Assignment (Record Location, Text, [Text])
+identWithLocals :: Assignment (Location, Text, [Text])
 identWithLocals = do
   loc <- symbol Identifier
   -- source advances, so it's important we call getLocals first
@@ -505,17 +508,17 @@ unary = symbol Unary >>= \ location ->
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
   <|> makeTerm location <$> children (Expression.Call [] <$> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> source)) <*> some expression <*> emptyTerm)
-  <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
+  <|> makeTerm location . Expression.Negate <$> children ( (symbol AnonMinus <|> symbol AnonMinus' <|> symbol AnonMinus'') *> expression )
   <|> children ( symbol AnonPlus *> expression )
 
 -- TODO: Distinguish `===` from `==` ?
 binary :: Assignment Term
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
   [ (inject .) . Expression.Plus              <$ symbol AnonPlus
-  , (inject .) . Expression.Minus             <$ symbol AnonMinus'
-  , (inject .) . Expression.Times             <$ symbol AnonStar'
+  , (inject .) . Expression.Minus             <$ (symbol AnonMinus <|> symbol AnonMinus' <|> symbol AnonMinus'')
+  , (inject .) . Expression.Times             <$ (symbol AnonStar <|> symbol AnonStar')
   , (inject .) . Expression.Power             <$ symbol AnonStarStar
-  , (inject .) . Expression.DividedBy         <$ symbol AnonSlash
+  , (inject .) . Expression.DividedBy         <$ (symbol AnonSlash <|> symbol AnonSlash' <|> symbol AnonSlash'')
   , (inject .) . Expression.Modulo            <$ symbol AnonPercent
   , (inject .) . Expression.And               <$ symbol AnonAmpersandAmpersand
   , (inject .) . Ruby.Syntax.LowPrecedenceAnd <$ symbol AnonAnd
@@ -530,7 +533,7 @@ binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expressi
   -- for this situation.
   , (inject .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
   , (inject .) . invert Expression.Equal     <$ symbol AnonBangEqual
-  , (inject .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.LShift           <$ (symbol AnonLAngleLAngle <|> symbol AnonLAngleLAngle')
   , (inject .) . Expression.RShift           <$ symbol AnonRAngleRAngle
   , (inject .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
   , (inject .) . Expression.LessThan         <$ symbol AnonLAngle

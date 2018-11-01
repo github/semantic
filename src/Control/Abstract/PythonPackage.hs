@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, LambdaCase, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
@@ -6,59 +6,91 @@ import           Control.Abstract.Evaluator (LoopControl, Return)
 import Control.Abstract.ScopeGraph (Allocator)
 import           Control.Abstract.Heap (Deref)
 import           Control.Abstract.Value
-import           Control.Monad.Effect (Effectful (..))
-import qualified Control.Monad.Effect as Eff
+import           Control.Effect.Carrier
+import           Control.Effect.Sum
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Name (name)
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value.Concrete (Value (..), ValueError (..))
-import           Data.Coerce
 import qualified Data.Map as Map
 import           Prologue
 
 data Strategy = Unknown | Packages [Text] | FindPackages [Text]
   deriving (Show, Eq)
 
-runPythonPackaging :: forall effects address body a. (
-                      Eff.PureEffects effects
+runPythonPackaging :: ( Carrier sig m
                       , Ord address
                       , Show address
-                      , Member Trace effects
-                      , Member (Boolean (Value address body)) effects
-                      , Member (State (Heap address address (Value address body))) effects
-                      , Member (Resumable (BaseError (AddressError address (Value address body)))) effects
-                      , Member (Resumable (BaseError (ValueError address body))) effects
-                      , Member Fresh effects
-                      , Coercible body (Eff.Eff effects)
-                      , Member (State Strategy) effects
-                      , Member (Allocator address) effects
-                      , Member (Deref (Value address body)) effects
-                      , Member (Eff.Exc (LoopControl (Value address body))) effects
-                      , Member (Eff.Exc (Return (Value address body))) effects
-                      , Member (Eff.Reader ModuleInfo) effects
-                      , Member (Eff.Reader PackageInfo) effects
-                      , Member (Eff.Reader Span) effects
-                      , Member (Function address (Value address body)) effects)
-                   => Evaluator address (Value address body) effects a
-                   -> Evaluator address (Value address body) effects a
-runPythonPackaging = Eff.interpose @(Function address (Value address body)) $ \case
-  Call callName super params -> do
-    case callName of
-      Closure _ _ name' paramNames _ _ -> do
-        let bindings = foldr (\ (name, value) rest -> Map.insert name value rest) lowerBound (zip paramNames params)
-        let asStrings address = asArray address >>= traverse asString
+                      , Show term
+                      , Member Trace sig
+                      , Member (Boolean (Value address body)) sig
+                      , Member (State (Heap address address (Value address body))) sig
+                      , Member (Resumable (BaseError (AddressError address (Value address body)))) sig
+                      , Member (Resumable (BaseError (ValueError address body))) sig
+                      , Member Fresh sig
+                      , Coercible body (Eff.Eff sig)
+                      , Member (State Strategy) sig
+                      , Member (Allocator address) sig
+                      , Member (Deref (Value address body)) sig
+                      , Member (Error (LoopControl (Value address body))) sig
+                      , Member (Error (Return (Value address body))) sig
+                      , Member (Reader ModuleInfo) sig
+                      , Member (Reader PackageInfo) sig
+                      , Member (Reader Span) sig
+                      , Member (Function address (Value address body)) sig)
+                   => Evaluator term address (Value address body) (PythonPackagingC term address (Eff m)) a
+                   -> Evaluator term address (Value address body) m a
+runPythonPackaging = raiseHandler (runPythonPackagingC . interpret)
 
-        if name "find_packages" == name' then do
-          as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "exclude") bindings)
-          put (FindPackages as)
-        else if name "setup" == name' then do
-          packageState <- get
-          if packageState == Unknown then do
-            as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "packages") bindings)
-            put (Packages as)
-            else
-              pure ()
-        else pure ()
-      _ -> pure ()
-    call callName super params
-  Function name params vars body ->  function name params vars (raiseEff body)
+
+newtype PythonPackagingC term address m a = PythonPackagingC { runPythonPackagingC :: m a }
+
+wrap :: Evaluator term address (Value term address) m a -> PythonPackagingC term address (Eff m) a
+wrap = PythonPackagingC . runEvaluator
+
+instance ( Carrier sig m
+         , Member (Allocator address) sig
+         , Member (Boolean (Value address body)) sig
+         , Member (Deref (Value address body)) sig
+         , Member (Error (LoopControl address)) sig
+         , Member (Error (Return address)) sig
+         , Member Fresh sig
+         , Member (Function address (Value address body)) sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader PackageInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address (Value address body)))) sig
+         , Member (Resumable (BaseError (ValueError address body))) sig
+         , Member (State (Heap address address (Value address body))) sig
+         , Member (State Strategy) sig
+         , Member Trace sig
+         , Ord address
+         , Show address
+         , Show term
+         )
+      => Carrier sig (PythonPackagingC term address (Eff m)) where
+  ret = PythonPackagingC . ret
+  eff op
+    | Just e <- prj op = wrap $ case handleCoercible e of
+      Call callName super params k -> Evaluator . k =<< do
+        case callName of
+          Closure _ _ name' paramNames _ _ -> do
+            let bindings = foldr (uncurry Map.insert) lowerBound (zip paramNames params)
+            let asStrings = deref >=> asArray >=> traverse (deref >=> asString)
+
+            if name "find_packages" == name' then do
+              as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "exclude") bindings)
+              put (FindPackages as)
+            else if name "setup" == name' then do
+              packageState <- get
+              if packageState == Unknown then do
+                as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "packages") bindings)
+                put (Packages as)
+                else
+                  pure ()
+            else pure ()
+          _ -> pure ()
+        call callName super params
+      Function name params body k -> function name params body >>= Evaluator . k
+      BuiltIn b k -> builtIn b >>= Evaluator . k
+    | otherwise        = PythonPackagingC (eff (handleCoercible op))

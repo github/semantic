@@ -8,8 +8,8 @@ module Data.Abstract.Name
 , formatName
 ) where
 
-import           Control.Monad.Effect
-import           Control.Monad.Effect.Fresh
+import           Control.Effect
+import           Control.Effect.Fresh
 import           Data.Aeson
 import qualified Data.Char as Char
 import           Data.Text (Text)
@@ -24,7 +24,7 @@ import qualified Proto3.Wire.Encode as Encode
 data Name
   = Name Text
   | I Int
-  deriving (Eq, Ord, MessageField)
+  deriving (Eq, Ord, MessageField, Generic, NFData)
 
 instance HasDefault Name where
   def = Name mempty
@@ -36,7 +36,7 @@ instance Primitive Name where
   primType _ = Bytes
 
 -- | Generate a fresh (unused) name for use in synthesized variables/closures/etc.
-gensym :: (Functor (m effs), Member Fresh effs, Effectful m) => m effs Name
+gensym :: (Member Fresh sig, Carrier sig m, Functor m) => m Name
 gensym = I <$> fresh
 
 -- | Construct a 'Name' from a 'Text'.
@@ -48,17 +48,13 @@ nameI :: Int -> Name
 nameI = I
 
 -- | Extract a human-readable 'Text' from a 'Name'.
+-- Sample outputs can be found in @Data.Abstract.Name.Spec@.
 formatName :: Name -> Text
 formatName (Name name) = name
 formatName (I i)       = Text.pack $ '_' : (alphabet !! a) : replicate n 'ʹ'
   where alphabet = ['a'..'z']
         (n, a) = i `divMod` length alphabet
 
--- $
--- >>> I 0
--- "_a"
--- >>> I 26
--- "_aʹ"
 instance Show Name where
   showsPrec _ = prettyShowString . Text.unpack . formatName
     where prettyShowString str = showChar '"' . foldr ((.) . prettyChar) id str . showChar '"'

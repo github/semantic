@@ -4,11 +4,13 @@
     (Statements
       (Identifier)
       (Identifier))
-    (If
-      (Identifier)
-      (Statements
+    (Statements
+      (If
         (Identifier)
-        (Identifier))
+        (Statements
+          (Identifier)
+          (Identifier))
+        (Statements))
       (Statements
         (Identifier)
         (Identifier)))))

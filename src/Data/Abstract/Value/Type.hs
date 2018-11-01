@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances, LambdaCase, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value.Type
   ( Type (..)
   , TypeError (..)
@@ -8,12 +8,15 @@ module Data.Abstract.Value.Type
   , unify
   , runFunction
   , runBoolean
+  , runWhile
   ) where
 
 import Control.Abstract.ScopeGraph
 import qualified Control.Abstract as Abstract
-import Control.Abstract hiding (Boolean(..), Function(..), raiseHandler)
-import Control.Monad.Effect.Internal (raiseHandler)
+import Control.Abstract hiding (Boolean(..), Function(..), While(..))
+import Control.Effect.Carrier
+import Control.Effect.Sum
+import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
@@ -86,40 +89,41 @@ instance Ord1  TypeError where
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
-runTypeError :: (Effectful m, Effects effects) => m (Resumable (BaseError TypeError) ': effects) a -> m effects (Either (SomeExc (BaseError TypeError)) a)
-runTypeError = runResumable
+runTypeError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError TypeError)) a)
+runTypeError = raiseHandler runResumable
 
-runTypeErrorWith :: (Effectful m, Effects effects) => (forall resume . (BaseError TypeError) resume -> m effects resume) -> m (Resumable (BaseError TypeError) ': effects) a -> m effects a
-runTypeErrorWith = runResumableWith
+runTypeErrorWith :: Carrier sig m => (forall resume . (BaseError TypeError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError TypeError) (Eff m)) a -> Evaluator term address value m a
+runTypeErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
-throwTypeError :: ( Member (Resumable (BaseError TypeError)) effects
-                  , Member (Reader ModuleInfo) effects
-                  , Member (Reader Span) effects
+
+throwTypeError :: ( Member (Resumable (BaseError TypeError)) sig
+                  , Member (Reader ModuleInfo) sig
+                  , Member (Reader Span) sig
+                  , Carrier sig m
+                  , Monad m
                   )
                => TypeError resume
-               -> Evaluator address value effects resume
+               -> m resume
 throwTypeError = throwBaseError
 
-runTypeMap :: ( Effectful m
-              , Effects effects
-              )
-           => m (State TypeMap ': effects) a
-           -> m effects a
-runTypeMap = raiseHandler (runState emptyTypeMap >=> pure . snd)
+runTypeMap :: (Carrier sig m, Effect sig)
+           => Evaluator term address Type (StateC TypeMap (Eff m)) a
+           -> Evaluator term address Type m a
+runTypeMap = raiseHandler $ fmap snd . runState emptyTypeMap
 
-runTypes :: ( Effectful m
-            , Effects effects
-            )
-         => m (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
-         -> m effects (Either (SomeExc (BaseError TypeError)) a)
+runTypes :: (Carrier sig m, Effect sig)
+         => Evaluator term address Type (ResumableC (BaseError TypeError) (Eff
+                                        (StateC TypeMap (Eff
+                                        m)))) a
+         -> Evaluator term address Type m (Either (SomeError (BaseError TypeError)) a)
 runTypes = runTypeMap . runTypeError
 
-runTypesWith :: ( Effectful m
-                , Effects effects
-                )
-             => (forall resume . (BaseError TypeError) resume -> m (State TypeMap ': effects) resume)
-             -> m (Resumable (BaseError TypeError) ': State TypeMap ': effects) a
-             -> m effects a
+runTypesWith :: (Carrier sig m, Effect sig)
+             => (forall resume . (BaseError TypeError) resume -> Evaluator term address Type (StateC TypeMap (Eff m)) resume)
+             -> Evaluator term address Type (ResumableWithC (BaseError TypeError) (Eff
+                                            (StateC TypeMap (Eff
+                                            m)))) a
+             -> Evaluator term address Type m a
 runTypesWith with = runTypeMap . runTypeErrorWith with
 
 -- TODO: change my name?
@@ -128,21 +132,22 @@ newtype TypeMap = TypeMap { unTypeMap :: Map.Map TName Type }
 emptyTypeMap :: TypeMap
 emptyTypeMap = TypeMap Map.empty
 
-modifyTypeMap :: ( Effectful m
-                 , Member (State TypeMap) effects
+modifyTypeMap :: ( Member (State TypeMap) sig
+                 , Carrier sig m
+                 , Monad m
                  )
               => (Map.Map TName Type -> Map.Map TName Type)
-              -> m effects ()
+              -> m ()
 modifyTypeMap f = modify (TypeMap . f . unTypeMap)
 
 -- | Prunes substituted type variables
-prune :: ( Effectful m
-         , Monad (m effects)
-         , Member (State TypeMap) effects
+prune :: ( Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
          )
       => Type
-      -> m effects Type
-prune (Var id) = Map.lookup id . unTypeMap <$> get >>= \case
+      -> m Type
+prune (Var id) = gets (Map.lookup id . unTypeMap) >>= \case
                     Just ty -> do
                       pruned <- prune ty
                       modifyTypeMap (Map.insert id pruned)
@@ -152,13 +157,13 @@ prune ty = pure ty
 
 -- | Checks whether a type variable name occurs within another type. This
 --   function is used in 'substitute' to prevent unification of infinite types
-occur :: ( Effectful m
-         , Monad (m effects)
-         , Member (State TypeMap) effects
+occur :: ( Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
          )
       => TName
       -> Type
-      -> m effects Bool
+      -> m Bool
 occur id = prune >=> \case
   Int -> pure False
   Bool -> pure False
@@ -183,14 +188,16 @@ occur id = prune >=> \case
     eitherM f (a, b) = (||) <$> f a <*> f b
 
 -- | Substitutes a type variable name for another type
-substitute :: ( Member (Reader ModuleInfo) effects
-              , Member (Reader Span) effects
-              , Member (Resumable (BaseError TypeError)) effects
-              , Member (State TypeMap) effects
+substitute :: ( Member (Reader ModuleInfo) sig
+              , Member (Reader Span) sig
+              , Member (Resumable (BaseError TypeError)) sig
+              , Member (State TypeMap) sig
+              , Carrier sig m
+              , Monad m
               )
            => TName
            -> Type
-           -> Evaluator address value effects Type
+           -> m Type
 substitute id ty = do
   infiniteType <- occur id ty
   ty <- if infiniteType
@@ -200,14 +207,16 @@ substitute id ty = do
   pure ty
 
 -- | Unify two 'Type's.
-unify :: ( Member (Reader ModuleInfo) effects
-         , Member (Reader Span) effects
-         , Member (Resumable (BaseError TypeError)) effects
-         , Member (State TypeMap) effects
+unify :: ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Monad m
          )
       => Type
       -> Type
-      -> Evaluator address value effects Type
+      -> m Type
 unify a b = do
   a' <- prune a
   b' <- prune b
@@ -229,27 +238,27 @@ instance Ord address => ValueRoots address Type where
   valueRoots _ = mempty
 
 
-runFunction :: ( Member (Allocator address) effects
-               , Member (Deref Type) effects
-               , Member (Exc (Return Type)) effects
-               , Member Fresh effects
-               , Member (Reader ModuleInfo) effects
-               , Member (Reader Span) effects
-               , Member (State Span) effects
-               , Member (Resumable (BaseError TypeError)) effects
-               , Member (Resumable (BaseError (AddressError address Type))) effects
-               , Member (State (Heap address address Type)) effects
-               , Member (State (ScopeGraph address)) effects
-               , Member (Resumable (BaseError (ScopeError address))) effects
-               , Member (Resumable (BaseError (HeapError address))) effects
-               , Member (State TypeMap) effects
-               , Ord address
-               , PureEffects effects
-               )
-            => Evaluator address Type (Abstract.Function address Type ': effects) a
-            -> Evaluator address Type effects a
-runFunction = interpret $ \case
-  Abstract.Function name params _ body -> do
+instance ( Member (Allocator address) sig
+         , Member (Deref Type) sig
+         , Member (Error (Return Type)) sig
+         , Member Fresh sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (State Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (Resumable (BaseError (AddressError address Type))) sig
+         , Member (State (Heap address address Type)) sig
+         , Member (State (ScopeGraph address)) sig
+         , Member (Resumable (BaseError (ScopeError address))) sig
+         , Member (Resumable (BaseError (HeapError address))) sig
+         , Member (State TypeMap) sig
+         , Ord address
+         , Carrier sig m
+         )
+      => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
+  ret = FunctionC . const . ret
+  eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
+    Abstract.Function _ params body k -> runEvaluator $ do
     functionSpan <- ask @Span -- TODO: This might be wrong
     declare (Declaration name) functionSpan Nothing
 
@@ -260,7 +269,7 @@ runFunction = interpret $ \case
     let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
     functionFrame <- newFrame functionScope frameEdges
     -- TODO: Store the frame
-    withScopeAndFrame functionFrame $ do
+    let value = withScopeAndFrame functionFrame $ do
       (_, tvars) <- foldr (\ name rest -> do
         tvar <- Var <$> fresh
         span <- get @Span -- TODO: This span is probably wrong
@@ -270,29 +279,48 @@ runFunction = interpret $ \case
         assign address tvar
         bimap id (tvar :) <$> rest) (pure (undefined, [])) params
       -- TODO: We may still want to represent this as a closure and not a function type
-      (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator body)))
+      (catchReturn (runFunction (Evaluator body)))
+      value >>= Evaluator . flip runFunctionC eval . k . (zeroOrMoreProduct tvars :->)
 
-  Abstract.Call op _ paramTypes -> do
-    tvar <- fresh
-    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
-    unified <- op `unify` needed
-    case unified of
-      _ :-> ret -> pure ret
-      actual    -> throwTypeError (UnificationError needed actual)
+    Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
+    Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval
+    Abstract.Call op _ paramTypes k -> runEvaluator $ do
+      tvar <- fresh
+      let needed = zeroOrMoreProduct paramTypes :-> Var tvar
+      unified <- op `unify` needed
+      boxed <- case unified of
+        _ :-> ret -> pure ret
+        actual    -> throwTypeError (UnificationError needed actual)
+      Evaluator $ runFunctionC (k boxed) eval) op)
 
-runBoolean :: ( Member NonDet effects
-              , Member (Reader ModuleInfo) effects
-              , Member (Reader Span) effects
-              , Member (Resumable (BaseError TypeError)) effects
-              , Member (State TypeMap) effects
-              , PureEffects effects
-              )
-           => Evaluator address Type (Abstract.Boolean Type ': effects) a
-           -> Evaluator address Type effects a
-runBoolean = interpret $ \case
-  Abstract.Boolean _         -> pure Bool
-  Abstract.AsBool  t         -> unify t Bool *> (pure True <|> pure False)
-  Abstract.Disjunction t1 t2 -> (runBoolean (Evaluator t1) >>= unify Bool) <|> (runBoolean (Evaluator t2) >>= unify Bool)
+
+instance ( Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State TypeMap) sig
+         , Carrier sig m
+         , Alternative m
+         , Monad m
+         )
+      => Carrier (Abstract.Boolean Type :+: sig) (BooleanC Type m) where
+  ret = BooleanC . ret
+  eff = BooleanC . handleSum (eff . handleCoercible) (\case
+    Abstract.Boolean _ k -> runBooleanC (k Bool)
+    Abstract.AsBool  t k -> unify t Bool *> (runBooleanC (k True) <|> runBooleanC (k False)))
+
+
+instance ( Member (Abstract.Boolean Type) sig
+         , Carrier sig m
+         , Alternative m
+         , Monad m
+         )
+      => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
+  ret = WhileC . ret
+  eff = WhileC . handleSum
+    (eff . handleCoercible)
+    (\ (Abstract.While cond body k) -> do
+      cond' <- runWhileC cond
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
 
 
 instance AbstractHole Type where
@@ -312,19 +340,19 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address) effects
-         , Member (Deref Type) effects
-         , Member Fresh effects
-         , Member NonDet effects
-         , Member (Reader ModuleInfo) effects
-         , Member (Reader Span) effects
-         , Member (Resumable (BaseError (AddressError address Type))) effects
-         , Member (Resumable (BaseError TypeError)) effects
-         , Member (State (Heap address address Type)) effects
-         , Member (State TypeMap) effects
+instance ( Member (Allocator address) sig
+         , Member (Deref Type) sig
+         , Member Fresh sig
+         , Member (Reader ModuleInfo) sig
+         , Member (Reader Span) sig
+         , Member (Resumable (BaseError (AddressError address Type))) sig
+         , Member (Resumable (BaseError TypeError)) sig
+         , Member (State (Heap address address Type)) sig
+         , Member (State TypeMap) sig
          , Ord address
+         , Carrier sig m
          )
-      => AbstractValue address Type effects where
+      => AbstractValue term address Type m where
   array fieldTypes = do
     var <- fresh
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fieldTypes
@@ -370,7 +398,5 @@ instance ( Member (Allocator address) effects
     (Float, Int) ->                     pure Int
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
-
-  loop f = f empty
 
   castToInteger t = unify t (Int :+ Float :+ Rational) $> Int

@@ -7,6 +7,7 @@ module Semantic.Telemetry.Stat
 , gauge
 , timing
 , withTiming
+, withTiming'
 , histogram
 , set
 , Stat
@@ -26,7 +27,6 @@ module Semantic.Telemetry.Stat
 ) where
 
 
-import           Control.Monad.IO.Class
 import qualified Data.ByteString.Char8 as B
 import           Data.List (intercalate)
 import           Data.List.Split (splitOneOf)
@@ -80,14 +80,20 @@ gauge n v = Stat n (Gauge v)
 timing :: String -> Double -> Tags -> Stat
 timing n v = Stat n (Timer v)
 
--- | Run an IO Action and record timing
+-- | Run an IO Action and record timing in a Stat.
 withTiming :: MonadIO io => String -> Tags -> io a -> io (a, Stat)
 withTiming name tags action = do
+  (res, duration) <- withTiming' action
+  pure (res, timing name duration tags)
+
+-- | Run an IO Action and record timing.
+withTiming' :: MonadIO io => io a -> io (a, Double)
+withTiming' action = do
   start <- liftIO Time.getCurrentTime
   result <- action
   end <- liftIO Time.getCurrentTime
   let duration = realToFrac (Time.diffUTCTime end start * 1000)
-  pure (result, timing name duration tags)
+  pure (result, duration)
 
 -- | Histogram measurement.
 histogram :: String -> Double -> Tags -> Stat

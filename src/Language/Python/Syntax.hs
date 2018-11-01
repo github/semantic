@@ -27,7 +27,7 @@ import qualified Data.Abstract.ScopeGraph as ScopeGraph
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
   | RelativeQualifiedName { path :: FilePath, maybeQualifiedName ::  Maybe QualifiedName }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message)
+  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message, NFData)
 
 instance MessageField QualifiedName where
   encodeMessageField num QualifiedName{..} = Encode.embedded num (encodeMessageField 1 paths)
@@ -67,14 +67,15 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (T.unpack prefix) (Ju
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: ( Member (Modules address value) effects
-                        , Member (Reader ModuleInfo) effects
-                        , Member (Reader Span) effects
-                        , Member (Resumable (BaseError ResolutionError)) effects
-                        , Member Trace effects
+resolvePythonModules :: ( Member (Modules address value) sig
+                        , Member (Reader ModuleInfo) sig
+                        , Member (Reader Span) sig
+                        , Member (Resumable (BaseError ResolutionError)) sig
+                        , Member Trace sig
+                        , Carrier sig m
                         )
                      => QualifiedName
-                     -> Evaluator address value effects (NonEmpty ModulePath)
+                     -> Evaluator term address value m (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -105,14 +106,14 @@ resolvePythonModules q = do
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![Alias] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 newtype FutureImport a = FutureImport { futureImportSymbols :: [Alias] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 FutureImport where liftEq = genericLiftEq
 instance Ord1 FutureImport where liftCompare = genericLiftCompare
@@ -121,7 +122,7 @@ instance Show1 FutureImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable FutureImport where
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
-  deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON)
+  deriving (Eq, Generic, Hashable, Ord, Show, Message, Named, ToJSON, NFData)
 
 toTuple :: Alias -> (Name, Name)
 toTuple Alias{..} = (aliasValue, aliasName)
@@ -131,7 +132,7 @@ toTuple Alias{..} = (aliasValue, aliasName)
 instance Evaluatable Import where
   -- from . import moduleY
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
-  eval (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
+  eval _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
     scopeGraph <- fst <$> require path
     bindAll scopeGraph
@@ -143,7 +144,7 @@ instance Evaluatable Import where
   -- from a import b as c
   -- from a import *
   -- from .moduleY import b
-  eval (Import name xs) = do
+  eval _ (Import name xs) = do
     modulePaths <- resolvePythonModules name
 
     -- Eval parent modules first
@@ -162,10 +163,27 @@ instance Evaluatable Import where
         pure ()
 
     rvalBox unit
+    -- where
+    --   select importedBinds
+    --     | Prologue.null xs = importedBinds
+    --     | otherwise = Env.aliasBindings (toTuple <$> xs) importedBinds
 
+
+-- Evaluate a qualified import
+evalQualifiedImport :: ( AbstractValue term address value m
+                       , Carrier sig m
+                       , Member (Allocator address) sig
+                       , Member (Deref value) sig
+                       , Member (Modules address value) sig
+                       , Member (State (Heap address address value)) sig
+                       , Ord address
+                       )
+                    => Name -> ModulePath -> Evaluator term address value m value
+evalQualifiedImport name path = letrec' name $ \addr -> do
+  unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Message1 QualifiedImport where
   liftEncodeMessage _ _ QualifiedImport{..} = encodeMessageField 1 qualifiedImportFrom
@@ -185,7 +203,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport qualifiedName) = do
+  eval _ (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
     -- rvalBox =<< go (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
     rvalBox unit
@@ -198,7 +216,7 @@ instance Evaluatable QualifiedImport where
       --   makeNamespace name addr Nothing (void (require path >> go (NonEmpty.fromList xs)))
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -206,22 +224,22 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c as e
 instance Evaluatable QualifiedAliasedImport where
-  eval (QualifiedAliasedImport name aliasTerm) = do
+  eval _ (QualifiedAliasedImport name aliasTerm) = do
     modulePaths <- resolvePythonModules name
 
     -- Evaluate each parent module
     for_ (NonEmpty.init modulePaths) require
 
     -- Evaluate and import the last module, aliasing and updating the environment
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
-    rvalBox unit
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     -- rvalBox =<< letrec' alias (\addr -> do
     --   let path = NonEmpty.last modulePaths
     --   unit <$ makeNamespace alias addr Nothing (void (bindAll . fst . snd =<< require path)))
+    undefined
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Ord1 Ellipsis where liftCompare = genericLiftCompare
@@ -232,7 +250,7 @@ instance Evaluatable Ellipsis
 
 
 data Redirect a = Redirect { lhs :: a, rhs :: a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable)
+  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Ord1 Redirect where liftCompare = genericLiftCompare
