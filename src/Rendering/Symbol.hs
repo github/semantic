@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Symbol
 ( renderToSymbols
+, renderToSymbols'
 , SymbolFields(..)
 , defaultSymbolFields
 , parseSymbolFields
@@ -16,6 +17,8 @@ import Data.List.Split (splitWhen)
 import Data.Term
 import qualified Data.Text as T
 import Rendering.TOC
+import Tags.Tagging
+import Tags.Taggable
 
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
@@ -24,6 +27,9 @@ renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
   where
     termToC :: (Foldable f, Functor f) => SymbolFields -> FilePath -> Term f (Maybe Declaration) -> File
     termToC fields path = File (T.pack path) (T.pack (show blobLanguage)) . mapMaybe (symbolSummary fields path "unchanged") . termTableOfContentsBy declaration
+
+renderToSymbols' :: (IsTaggable fs) => SymbolFields -> Blob -> Term (Sum fs) Location -> [Tag]
+renderToSymbols' _ blob term = either mempty id (runTagging blob term)
 
 -- | Construct a 'Symbol' from a node annotation and a change type label.
 symbolSummary :: SymbolFields -> FilePath -> T.Text -> Declaration -> Maybe Symbol
