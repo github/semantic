@@ -139,7 +139,7 @@ descend :: forall constr syntax.
   )
   => Language -> SubtermAlgebra constr (Term syntax Location) (Tagger ())
 descend lang t = do
-  (InternalState loc lang) <- asks id
+  (InternalState loc _) <- asks id
   let term = fmap subterm t
   let snippetRange = snippet loc term
   let litRange = docsLiteral lang term
@@ -167,9 +167,9 @@ instance Taggable Syntax.Context where
 
 instance Taggable Declaration.Function where
   docsLiteral Python (Declaration.Function _ _ _ (Term (In _ bodyF)))
-    | (Term (In exprAnn exprF):_ ) <- toList bodyF
+    | (Term (In exprAnn exprF):_) <- toList bodyF
     , isTextElement exprF = Just (locationByteRange exprAnn)
-    | otherwise        = Nothing
+    | otherwise           = Nothing
   docsLiteral _ _ = Nothing
   snippet ann (Declaration.Function _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
