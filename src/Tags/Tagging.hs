@@ -28,6 +28,7 @@ data Tag
   = Tag
   { name :: Text
   , kind :: Text
+  , span :: Span
   , context :: [Text]
   , line :: Maybe Text
   , docs :: Maybe Text
@@ -56,12 +57,12 @@ type Contextualizer
 contextualizing :: Blob -> Machine.ProcessT Contextualizer Token Tag
 contextualizing Blob{..} = repeatedly $ await >>= \case
   Enter x r -> enterScope (x, r)
-  Exit x r  -> exitScope (x, r)
-  Identifier iden rng -> lift State.get >>= \case
+  Exit  x r -> exitScope (x, r)
+  Iden iden span docsLiteralRange -> lift State.get >>= \case
     ((x, r):("Context", cr):xs) | x `elem` symbolsToSummarize
-      -> yield $ Tag iden x (fmap fst xs) (slice r) (slice cr)
+      -> yield $ Tag iden x span (fmap fst xs) (slice r) (slice cr)
     ((x, r):xs) | x `elem` symbolsToSummarize
-      -> yield $ Tag iden x (fmap fst xs) (slice r) (slice rng)
+      -> yield $ Tag iden x span (fmap fst xs) (slice r) (slice docsLiteralRange)
     _ -> pure ()
   where
     slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)

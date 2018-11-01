@@ -45,9 +45,9 @@ import qualified Language.TypeScript.Syntax as TypeScript
 
  -- TODO: Move to src/Data
 data Token
-  = Enter Text (Maybe Range)
-  | Exit Text (Maybe Range)
-  | Identifier Text (Maybe Range)
+  = Enter { tokenName :: Text, tokenSnippetRange :: Maybe Range }
+  | Exit  { tokenName :: Text, tokenSnippetRange :: Maybe Range}
+  | Iden { identifierName :: Text, tokenSpan :: Span, docsLiteralRange :: Maybe Range }
   deriving (Eq, Show)
 
 data Tagger a where
@@ -75,8 +75,8 @@ enter, exit :: String -> Maybe Range -> Tagger ()
 enter c = Tell . Enter (pack c)
 exit c = Tell . Exit (pack c)
 
-emitIden :: Maybe Range -> Name -> Tagger ()
-emitIden range name = Tell (Identifier (formatName name) range)
+emitIden :: Span -> Maybe Range -> Name -> Tagger ()
+emitIden span docsLiteralRange name = Tell (Iden (formatName name) span docsLiteralRange)
 
 data InternalState
   = InternalState
@@ -127,7 +127,7 @@ tagging :: (IsTaggable syntax)
 tagging Blob{..} term = pipe
   where pipe  = Machine.construct . fmap snd $ compile state go
         state = InternalState (termAnnotation term) blobLanguage
-        go    = foldSubterms descend term
+        go    = foldSubterms (descend blobLanguage) term
 
 descend :: forall constr syntax.
   ( Taggable constr
@@ -137,15 +137,15 @@ descend :: forall constr syntax.
   , Foldable syntax
   , HasTextElement syntax
   )
-  => SubtermAlgebra constr (Term syntax Location) (Tagger ())
-descend t = do
+  => Language -> SubtermAlgebra constr (Term syntax Location) (Tagger ())
+descend lang t = do
   (InternalState loc lang) <- asks id
   let term = fmap subterm t
   let snippetRange = snippet loc term
   let litRange = docsLiteral lang term
 
   enter (constructorName term) snippetRange
-  maybe (pure ()) (emitIden litRange) (declaredName term)
+  maybe (pure ()) (emitIden (locationSpan loc) litRange) (declaredName term)
   traverse_ subtermRef t
   exit (constructorName term) snippetRange
 
@@ -163,7 +163,7 @@ instance (Taggable a) => Taggable (TermF a Location) where
   snippet _ t = snippet (termFAnnotation t) (termFOut t)
 
 instance Taggable Syntax.Context where
-  snippet ann (Syntax.Context _ (Term (In sub _))) = Just $ subtractLocation ann sub
+  snippet ann t@(Syntax.Context _ (Term (In sub _))) = Just $ subtractLocation ann sub
 
 instance Taggable Declaration.Function where
   docsLiteral Python (Declaration.Function _ _ _ (Term (In _ bodyF)))
