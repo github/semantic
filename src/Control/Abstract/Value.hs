@@ -291,8 +291,6 @@ class AbstractIntro value => AbstractValue term address value carrier where
   scopedEnvironment :: address -> Evaluator term address value carrier (Maybe (Environment address))
 
 
-<<<<<<< HEAD
-
 -- TODO rethink whether this function is necessary.
 makeNamespace :: ( AbstractValue term address value sig
                  , Member (Deref value) sig
