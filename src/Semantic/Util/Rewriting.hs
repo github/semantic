@@ -59,6 +59,12 @@ testPythonDefs path = do
   -- pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
   pure $! runTagging blob tree
 
+testGoDefs path = do
+  blob <- readBlobFromFile' (File path Language.Go)
+  tree <- parseFile' goParser path
+  -- pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
+  pure $! runTagging blob tree
+
 
 testRubyFile = do
   let path = "test/fixtures/ruby/reprinting/infix.rb"

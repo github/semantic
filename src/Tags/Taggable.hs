@@ -302,7 +302,22 @@ instance Taggable Syntax.Empty
 instance Taggable Syntax.Error
 instance Taggable Syntax.Identifier
 
+instance Taggable Type.Array
 instance Taggable Type.Annotation
+instance Taggable Type.Function
+instance Taggable Type.Map
+instance Taggable Type.Readonly
+instance Taggable Type.Void
+instance Taggable Type.Int
+instance Taggable Type.Float
+instance Taggable Type.Double
+instance Taggable Type.Bool
+instance Taggable Type.Interface
+instance Taggable Type.Parenthesized
+instance Taggable Type.Pointer
+instance Taggable Type.Product
+instance Taggable Type.Slice
+instance Taggable Type.TypeParameters
 
 instance Taggable Declaration.MethodSignature
 instance Taggable Declaration.InterfaceDeclaration
@@ -323,3 +338,28 @@ instance Taggable Python.Import
 instance Taggable Python.QualifiedAliasedImport
 instance Taggable Python.QualifiedImport
 instance Taggable Python.Redirect
+
+instance Taggable Go.BidirectionalChannel
+instance Taggable Go.ReceiveChannel
+instance Taggable Go.SendChannel
+instance Taggable Go.Import
+instance Taggable Go.QualifiedImport
+instance Taggable Go.SideEffectImport
+instance Taggable Go.Composite
+instance Taggable Go.Label
+instance Taggable Go.Send
+instance Taggable Go.Slice
+instance Taggable Go.TypeSwitch
+instance Taggable Go.Receive
+instance Taggable Go.Field
+instance Taggable Go.Package
+instance Taggable Go.TypeAssertion
+instance Taggable Go.TypeConversion
+instance Taggable Go.Variadic
+instance Taggable Go.DefaultPattern
+instance Taggable Go.Defer
+instance Taggable Go.Go
+instance Taggable Go.Rune
+instance Taggable Go.Select
+instance Taggable Go.TypeSwitchGuard
+instance Taggable Go.ReceiveOperator
