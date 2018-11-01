@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, KindSignatures, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
 , Token(..)
@@ -9,20 +9,19 @@ module Tags.Taggable
 )
 where
 
-import Prelude hiding (fail, filter, log)
-import Prologue hiding (Element, hash, project)
+import Prologue
 
-import           Analysis.ConstructorName
-import           Control.Matching hiding (target)
-import           Data.Abstract.Declarations
-import           Data.Abstract.Name
-import           Data.Blob
-import           Data.Language
-import           Data.Location
-import           Data.Machine as Machine
-import           Data.Range
-import           Data.Term
-import           Data.Text hiding (empty)
+import Analysis.ConstructorName
+import Analysis.HasTextElement
+import Data.Abstract.Declarations
+import Data.Abstract.Name
+import Data.Blob
+import Data.Language
+import Data.Location
+import Data.Machine as Machine
+import Data.Range
+import Data.Term
+import Data.Text hiding (empty)
 
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -667,36 +666,3 @@ instance Taggable TypeScript.ThisType
 instance Taggable TypeScript.ExistentialType
 instance Taggable TypeScript.LiteralType
 instance Taggable TypeScript.Update
-
-
-
-class HasTextElement syntax where
-  isTextElement :: syntax a -> Bool
-
-instance (TextElementStrategy syntax ~ strategy, HasTextElementWithStrategy strategy syntax) => HasTextElement syntax where
-  isTextElement = isTextElementWithStrategy (Proxy :: Proxy strategy)
-
-class CustomHasTextElement syntax where
-  customIsTextElement :: syntax a -> Bool
-
-instance CustomHasTextElement Literal.TextElement where
-  customIsTextElement _ = True
-
-instance Apply HasTextElement fs => CustomHasTextElement (Sum fs) where
-  customIsTextElement = apply @HasTextElement isTextElement
-
-data Strategy = Default | Custom
-
-class HasTextElementWithStrategy (strategy :: Strategy) syntax where
-  isTextElementWithStrategy :: proxy strategy -> syntax a -> Bool
-
-type family TextElementStrategy syntax where
-  TextElementStrategy Literal.TextElement = 'Custom
-  TextElementStrategy (Sum fs) = 'Custom
-  TextElementStrategy a = 'Default
-
-instance HasTextElementWithStrategy 'Default syntax where
-  isTextElementWithStrategy _ _ = False
-
-instance CustomHasTextElement syntax => HasTextElementWithStrategy 'Custom syntax where
-  isTextElementWithStrategy _ = customIsTextElement

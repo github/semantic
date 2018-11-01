@@ -27,8 +27,9 @@ library
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
-                     , Analysis.Decorator
                      , Analysis.Declaration
+                     , Analysis.Decorator
+                     , Analysis.HasTextElement
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
