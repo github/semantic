@@ -33,11 +33,6 @@ import qualified Data.Map as Map
 import           Prelude hiding (head, lookup)
 import           Prologue
 
--- $setup
--- >>> import Data.Abstract.Address.Precise
--- >>> let bright = push (insertEnv (name "foo") (Precise 0) lowerBound)
--- >>> let shadowed = insertEnv (name "foo") (Precise 1) bright
-
 -- | A map of names to values. Represents a single scope level of an environment chain.
 newtype Bindings address = Bindings { unBindings :: Map.Map Name address }
   deriving stock (Eq, Ord, Generic)
@@ -119,9 +114,6 @@ lookup :: Name -> Bindings address -> Maybe address
 lookup name = Map.lookup name . unBindings
 
 -- | Lookup a 'Name' in the environment.
---
--- >>> lookupEnv' (name "foo") shadowed
--- Just (Precise 1)
 lookupEnv' :: Name -> Environment address -> Maybe address
 lookupEnv' name = foldMapA (lookup name) . unEnvironment
 
@@ -134,9 +126,6 @@ insertEnv :: Name -> address -> Environment address -> Environment address
 insertEnv name addr (Environment (Bindings a :| as)) = Environment (Bindings (Map.insert name addr a) :| as)
 
 -- | Remove a 'Name' from the environment.
---
--- >>> delete (name "foo") shadowed
--- Environment []
 delete :: Name -> Environment address -> Environment address
 delete name = trim . Environment . fmap (Bindings . Map.delete name . unBindings) . unEnvironment
 
