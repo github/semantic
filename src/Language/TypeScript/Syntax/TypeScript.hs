@@ -53,7 +53,7 @@ instance Evaluatable QualifiedAliasedImport where
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     -- rvalBox =<< evalRequire modulePath alias
-    alias <- maybeM (throwEvalError NoNameError) (declaredName (subterm aliasTerm))
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     span <- get @Span
     (scopeGraph, value) <- require modulePath
     bindAll scopeGraph
@@ -87,10 +87,10 @@ instance Evaluatable QualifiedExport where
   --   -- Insert the aliases with no addresses.
   --   for_ exportSymbols $ \Alias{..} ->
   --     export aliasValue aliasName Nothing
-  eval (QualifiedExport exportSymbols) = do
+  eval _ (QualifiedExport exportSymbols) = do
     -- Create a Lexical edge from the qualifed export's scope to the current scope.
     currentScopeAddress <- currentScope
-    let edges = Map.singleton Lexical [ currentScopeAddress ]
+    let edges = maybe mempty (Map.singleton Lexical . pure) currentScopeAddress
     scopeAddress <- newScope edges
     putCurrentScope scopeAddress
 
