@@ -1,38 +1,28 @@
 (Statements
-  (Annotation
-    (Function
+  (Function
+    (Identifier)
+    (Identifier))
+  (Function
+    (Identifier)
+    (Identifier)
+    (Identifier))
+  (Function
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    (Identifier))
+  (Function
+    (Identifier)
+    (Assignment
       (Identifier)
       (Identifier))
-    (Empty))
-  (Annotation
-    (Function
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (Empty))
-  (Annotation
-    (Function
-      (Identifier)
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (Empty))
-  (Annotation
-    (Function
-      (Identifier)
+    (Identifier))
+  (Function
+    (Identifier)
+    (Annotation
       (Assignment
         (Identifier)
-        (Identifier))
+        (TextElement))
       (Identifier))
-    (Empty))
-  (Annotation
-    (Function
-      (Identifier)
-      (Annotation
-        (Assignment
-          (Identifier)
-          (TextElement))
-        (Identifier))
-      (Identifier)
-      (Identifier))
-    (Empty)))
+    (Identifier)
+    (Identifier)))
