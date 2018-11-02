@@ -24,37 +24,37 @@ instance ( Member (Allocator address) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (State Span) effects
-         , Member (State (ScopeGraph address)) effects
-         , Member (Resumable (BaseError (ScopeError address))) effects
-         , Member (Resumable (BaseError (HeapError address))) effects
+         , Member (State Span) sig
+         , Member (State (ScopeGraph address)) sig
+         , Member (Resumable (BaseError (ScopeError address))) sig
+         , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (AddressError address Abstract))) sig
          , Member (State (Heap address address Abstract)) sig
+         , Member (Error (Return Abstract)) sig
          , Ord address
          , Carrier sig m
          )
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Function _ params body k -> runEvaluator $ do
-
-    functionSpan <- ask @Span -- TODO: This might be wrong
-    declare (Declaration name) functionSpan Nothing
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    functionScope <- newScope lexicalEdges
-    currentFrame' <- currentFrame
-    let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-    functionFrame <- newFrame functionScope frameEdges
-    Evaluator . flip runFunctionC eval . k =<< withScopeAndFrame functionFrame $ do
-    -- TODO: Use scope graph and heap graph
-      for_ params $ \name -> do
-        span <- get @Span -- TODO: This span is probably wrong
-        declare (Declaration name) span Nothing
-        address <- lookupDeclaration (Declaration name)
-        -- assign tvar values to names in the frame of the function?
-        assign address Abstract
-      catchReturn (runFunction (Evaluator body))
+    Function name params body k -> runEvaluator $ do
+      functionSpan <- ask @Span -- TODO: This might be wrong
+      declare (Declaration name) functionSpan Nothing
+      currentScope' <- currentScope
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+      functionScope <- newScope lexicalEdges
+      currentFrame' <- currentFrame
+      let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+      functionFrame <- newFrame functionScope frameEdges
+      (Evaluator . flip runFunctionC eval . k =<<) . withScopeAndFrame functionFrame $ do
+        -- TODO: Use scope graph and heap graph
+        for_ params $ \name -> do
+          span <- get @Span -- TODO: This span is probably wrong
+          declare (Declaration name) span Nothing
+          address <- lookupDeclaration (Declaration name)
+          -- assign tvar values to names in the frame of the function?
+          assign address Abstract
+        catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
     BuiltIn _ k -> runFunctionC (k Abstract) eval
     Call _ _ params k -> runEvaluator $ do
       pure Abstract >>= Evaluator . flip runFunctionC eval . k) op)
