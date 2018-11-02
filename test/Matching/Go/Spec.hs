@@ -14,7 +14,7 @@ import           SpecHelpers
 
 -- This gets the Text contents of all integers
 integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) Text
-integerMatcher = match Lit.integerContent target
+integerMatcher = need Lit.integerContent
 
 -- This matches all for-loops with its index variable new variable bound to 0,
 -- e.g. `for i := 0; i < 10; i++`
@@ -23,19 +23,20 @@ loopMatcher :: ( Stmt.For :< fs
                , Lit.Integer :< fs)
             => TermMatcher fs ann
 loopMatcher = target <* go where
-  go = match Stmt.forBefore $
-         match Stmt.assignmentValue $
-            match Lit.integerContent $
-               ensure (== "0")
+  go = Stmt.forBefore
+       >>: Stmt.assignmentValue
+       >>: need Lit.integerContent
+       >>> ensure (== "0")
+
 
 spec :: Spec
 spec = describe "matching/go" $ do
   it "extracts integers" $ do
     parsed <- parseFile goParser "test/fixtures/go/matching/integers.go"
-    let matched = runMatcher integerMatcher parsed
+    let matched = matchRecursively integerMatcher parsed
     sort matched `shouldBe` ["1", "2", "3"]
 
   it "counts for loops" $ do
     parsed <- parseFile goParser "test/fixtures/go/matching/for.go"
-    let matched = runMatcher @[] loopMatcher parsed
+    let matched = matchRecursively @[] loopMatcher parsed
     length matched `shouldBe` 2
