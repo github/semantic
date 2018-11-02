@@ -14,7 +14,6 @@ import Data.Abstract.Package
 import Data.Abstract.Value.Concrete as Value
 import Data.Algebra
 import Data.Bifunctor (first)
-import Data.Coerce
 import Data.Functor.Const
 import Data.Sum
 import SpecHelpers hiding (reassociate)
