@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveAnyClass #-}
 module Data.Abstract.Heap
   ( Heap
   , frameLookup
