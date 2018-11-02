@@ -45,8 +45,8 @@ defineClass :: ( AbstractValue term address value m
                )
             => Declaration
             -> [value]
-            -> Evaluator address value m a
-            -> Evaluator address value m ()
+            -> Evaluator term address value m a
+            -> Evaluator term address value m ()
 defineClass declaration superclasses body = void . define declaration $ do
   withChildFrame declaration $ \frame -> do
     _ <- body
@@ -60,7 +60,7 @@ defineNamespace :: ( AbstractValue term address value m
                    , Member (Env address) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
-                   , Member (State (Heap address value)) sig
+                   , Member (State (Heap address address value)) sig
                    , Member (Resumable (BaseError (HeapError address))) sig
                    , Member Fresh sig
                    , Member (Resumable (BaseError (ScopeError address))) sig
@@ -69,8 +69,8 @@ defineNamespace :: ( AbstractValue term address value m
                    , Ord address
                    )
                 => Declaration
-                -> Evaluator address value m a
-                -> Evaluator address value m ()
+                -> Evaluator term address value m a
+                -> Evaluator term address value m ()
 defineNamespace declaration body = void . define declaration $ do
   withChildFrame declaration $ \frame -> do
     _ <- body
