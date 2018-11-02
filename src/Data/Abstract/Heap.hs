@@ -30,7 +30,7 @@ data Frame scopeAddress frameAddress value = Frame {
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
   , slots        :: IntMap (Set value)
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | A map of frame addresses onto Frames.
 data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Monoidal.Map frameAddress (Frame scopeAddress frameAddress value) }
