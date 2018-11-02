@@ -163,14 +163,24 @@ doWhile :: (Member (While value) sig, Carrier sig m)
 doWhile body cond = body *> while cond body
 
 -- | C-style for loops.
-forLoop :: (Member (While value) sig, Member (Env address) sig, Carrier sig m)
+forLoop :: ( Carrier sig m
+           , Member (Allocator address) sig
+           , Member (Reader ModuleInfo) sig
+           , Member (Reader Span) sig
+           , Member (Resumable (BaseError (HeapError address))) sig
+           , Member (Resumable (BaseError (ScopeError address))) sig
+           , Member (State (Heap address address value)) sig
+           , Member (State (ScopeGraph address)) sig
+           , Member (While value) sig
+           , Member Fresh sig
+           , Ord address
+           )
   => Evaluator term address value m value -- ^ Initial statement
   -> Evaluator term address value m value -- ^ Condition
   -> Evaluator term address value m value -- ^ Increment/stepper
   -> Evaluator term address value m value -- ^ Body
   -> Evaluator term address value m value
-forLoop initial cond step body =
-  locally (initial *> while cond (body *> step))
+forLoop initial cond step body = initial *> while cond ((withLexicalScopeAndFrame body) *> step)
 
 data While value m k
   = While (m value) (m value) (value -> k)
