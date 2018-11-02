@@ -14,6 +14,7 @@ module Control.Abstract.Heap
 , newFrame
 , currentFrame
 , withScopeAndFrame
+, withLexicalScopeAndFrame
 , withChildFrame
 , define
 , withFrame
@@ -67,6 +68,31 @@ withScopeAndFrame :: forall term address value m a sig. (
 withScopeAndFrame address action = do
   scope <- scopeLookup @address @value address
   withScope scope (withFrame address action)
+
+-- | Evaluates an action locally the scope and frame of the given frame address.
+withLexicalScopeAndFrame :: forall term address value m a sig. (
+                      Ord address
+                    , Member (Reader ModuleInfo) sig
+                    , Member (Reader Span) sig
+                    , Member (Resumable (BaseError (HeapError address))) sig
+                    , Member (Resumable (BaseError (ScopeError address))) sig
+                    , Member (State (Heap address address value)) sig
+                    , Member (State (ScopeGraph address)) sig
+                    , Member (Allocator address) sig
+                    , Member Fresh sig
+                    , Carrier sig m
+                    )
+                  => Evaluator term address value m a
+                  -> Evaluator term address value m a
+withLexicalScopeAndFrame action = do
+  currentScope' <- currentScope
+  currentFrame' <- currentFrame
+  let (scopeEdges, frameEdges) = case currentScope' of
+        Just currentScope' -> (Map.singleton Lexical [ currentScope' ], Map.singleton Lexical (Map.singleton currentScope' currentFrame'))
+        Nothing -> mempty
+  scope <- newScope scopeEdges
+  frame <- newFrame scope frameEdges
+  withScopeAndFrame frame action
 
 scopeLookup :: forall address value sig m term. (
                 Ord address
