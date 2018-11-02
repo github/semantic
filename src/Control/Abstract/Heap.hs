@@ -55,8 +55,7 @@ import Prologue
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
 withScopeAndFrame :: forall address value m a sig. (
-                    , Ord address
-                    -- , Effectful (m address value) -- Don't think we need Effectful now.
+                      Ord address
                     , Member (Reader ModuleInfo) sig
                     , Member (Reader Span) sig
                     , Member (Resumable (BaseError (HeapError address))) sig
@@ -131,11 +130,10 @@ newFrame scope links = do
   pure address
 
 -- | Evaluates the action within the frame of the given frame address.
-withFrame :: forall address effects m value a. (
+withFrame :: forall address sig m value a. (
              Member (Resumable (BaseError (HeapError address))) sig
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
-           , Effectful (m address value)
            , Member (State (Heap address address value)) sig
            , Carrier sig m
            )
@@ -156,7 +154,7 @@ withFrame address action = raiseEff $ do
 --        , Ord address
 --        )
 --     => value
---     -> Evaluator address value effects address
+--     -> Evaluator term address value m address
 -- box val = do
 --   name <- gensym
 --   addr <- alloc name
@@ -371,7 +369,7 @@ throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) effects
                    , Member (Reader Span) effects
                    )
                 => HeapError address resume
-                -> Evaluator address value effects resume
+                -> Evaluator term address value m resume
 throwHeapError = throwBaseError
 
 runHeapError :: ( Effectful (m address value)
