@@ -153,7 +153,6 @@ instance Taggable Declaration.Function where
 instance Taggable Declaration.Method where
   snippet ann (Declaration.Method _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
--- TODO: Fill these out
 instance Taggable Declaration.Class where
   snippet ann (Declaration.Class _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
