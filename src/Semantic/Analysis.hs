@@ -104,7 +104,6 @@ evalTerm :: ( Carrier sig m
             , Member (Allocator address) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
-            , Member (Env address) sig
             , Member (Error (LoopControl address)) sig
             , Member (Error (Return address)) sig
             , Member Fresh sig

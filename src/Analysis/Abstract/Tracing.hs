@@ -12,8 +12,7 @@ import Data.Semigroup.Reducer as Reducer
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-tracingTerms :: ( Member (Env address) sig
-                , Member (State (Heap address address value)) sig
+tracingTerms :: ( Member (State (Heap address address value)) sig
                 , Member (Writer (trace (Configuration term address value))) sig
                 , Carrier sig m
                 , Reducer (Configuration term address value) (trace (Configuration term address value))
@@ -30,7 +29,7 @@ tracing = runWriter . runEvaluator
 
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Env address) sig, Member (State (Heap address value)) sig, Carrier sig m)
+getConfiguration :: (Member (State (Heap address value)) sig, Carrier sig m)
                  => term
                  -> Evaluator term address value m (Configuration term address value)
 getConfiguration term = Configuration term <$> getEvalContext <*> getHeap

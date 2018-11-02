@@ -62,7 +62,6 @@ cachingTerms :: ( Cacheable term address value
                 , Member (Reader (Cache term address value)) sig
                 , Member (Reader (Live address)) sig
                 , Member (State (Cache term address value)) sig
-                , Member (Env address) sig
                 , Member (State (Heap address value)) sig
                 , Carrier sig m
                 )
@@ -86,7 +85,6 @@ convergingModules :: ( AbstractValue term address value m
                      , Member (Reader Span) sig
                      , Member (Resumable (BaseError (EnvironmentError address))) sig
                      , Member (State (Cache term address value)) sig
-                     , Member (Env address) sig
                      , Member (State (Heap address value)) sig
                      , Carrier sig m
                      , Effect sig
@@ -130,7 +128,7 @@ scatter :: (Foldable t, Member NonDet sig, Member (State (Heap address value)) s
 scatter = foldMapA (\ (Cached value heap') -> putHeap heap' $> value)
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) sig, Member (Env address) sig, Member (State (Heap address value)) sig, Carrier sig m)
+getConfiguration :: (Member (Reader (Live address)) sig, Member (State (Heap address value)) sig, Carrier sig m)
                  => term
                  -> Evaluator term address value m (Configuration term address value)
 getConfiguration term = Configuration term <$> askRoots <*> getEvalContext <*> getHeap

@@ -59,7 +59,6 @@ instance Ord address => ValueRoots address (Value term address) where
 instance ( FreeVariables term
          , Member (Allocator address) sig
          , Member (Deref (Value term address)) sig
-         , Member (Env address) sig
          , Member (Error (Return address)) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
