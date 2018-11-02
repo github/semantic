@@ -40,13 +40,7 @@ instance ( Member (Allocator address) sig
     Function name params body k -> runEvaluator $ do
       functionSpan <- ask @Span -- TODO: This might be wrong
       declare (Declaration name) functionSpan Nothing
-      currentScope' <- currentScope
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-      functionScope <- newScope lexicalEdges
-      currentFrame' <- currentFrame
-      let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-      functionFrame <- newFrame functionScope frameEdges
-      (Evaluator . flip runFunctionC eval . k =<<) . withScopeAndFrame functionFrame $ do
+      (Evaluator . flip runFunctionC eval . k =<<) . withLexicalScopeAndFrame $ do
         -- TODO: Use scope graph and heap graph
         for_ params $ \name -> do
           span <- get @Span -- TODO: This span is probably wrong

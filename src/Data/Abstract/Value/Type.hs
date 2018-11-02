@@ -262,14 +262,8 @@ instance ( Member (Allocator address) sig
       functionSpan <- ask @Span -- TODO: This might be wrong
       declare (Declaration name) functionSpan Nothing
 
-      currentScope' <- currentScope
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-      functionScope <- newScope lexicalEdges
-      currentFrame' <- currentFrame
-      let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-      functionFrame <- newFrame functionScope frameEdges
       -- TODO: Store the frame
-      let value = withScopeAndFrame functionFrame $ do
+      let value = withLexicalScopeAndFrame $ do
             (_, tvars) <- foldr (\ name rest -> do
               tvar <- Var <$> fresh
               span <- get @Span -- TODO: This span is probably wrong
