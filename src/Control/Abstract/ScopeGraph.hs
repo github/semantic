@@ -1,4 +1,4 @@
-{-# LANGUAGE ExistentialQuantification, GADTs, KindSignatures, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.ScopeGraph
   ( lookup
   , declare
@@ -32,10 +32,9 @@ module Control.Abstract.ScopeGraph
 import           Control.Abstract.Evaluator hiding (Local)
 import           Data.Abstract.Module
 import           Data.Abstract.BaseError
-import           Data.Abstract.Name hiding (name)
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
-import           Data.Abstract.Name
+import           Data.Abstract.Name hiding (name)
 import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Address(..), Scope(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Map.Strict as Map
@@ -43,19 +42,20 @@ import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
 
-lookup :: (Ord address, Member (State (ScopeGraph address)) effects) => Reference -> Evaluator address value effects (Maybe address)
+lookup :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Reference -> Evaluator term address value m (Maybe address)
 lookup ref = ScopeGraph.scopeOfRef ref <$> get
 
 declare :: ( Ord address
-           , Member (Resumable (BaseError (ScopeError address))) effects
-           , Member (Reader ModuleInfo) effects
-           , Member (Reader Span) effects
-           , Member (State (ScopeGraph address)) effects
+           , Member (Resumable (BaseError (ScopeError address))) sig
+           , Member (Reader ModuleInfo) sig
+           , Member (Reader Span) sig
+           , Member (State (ScopeGraph address)) sig
+           , Carrier sig m
            )
         => Declaration
         -> Span
         -> Maybe address
-        -> Evaluator address value effects (Address address)
+        -> Evaluator term address value m (Address address)
 declare decl span scope = do
   graph <- get
   let (graph', position) = ScopeGraph.declare decl span scope graph
@@ -65,79 +65,91 @@ declare decl span scope = do
     (Just scope, Just position) -> pure (Address scope position)
     _ -> throwScopeError (ScopeError decl span)
 
-putDeclarationScope :: (Ord address, Member (State (ScopeGraph address)) effects) => Declaration -> address -> Evaluator address value effects ()
+putDeclarationScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
 putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
 
-reference :: forall address effects value. (Ord address, Member (State (ScopeGraph address)) effects) => Reference -> Declaration -> Evaluator address value effects ()
+reference :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Reference -> Declaration -> Evaluator term address value m ()
 reference ref = modify @(ScopeGraph address) . (ScopeGraph.reference ref)
 
 -- | Combinator to insert an export edge from the current scope to the provided scope address.
-insertExportEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+insertExportEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                  => scopeAddress
-                 -> Evaluator scopeAddress value effects ()
+                 -> Evaluator term scopeAddress value m ()
 insertExportEdge = insertEdge ScopeGraph.Export
 
 -- | Combinator to insert an import edge from the current scope to the provided scope address.
-insertImportEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+insertImportEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                  => scopeAddress
-                 -> Evaluator scopeAddress value effects ()
+                 -> Evaluator term scopeAddress value m ()
 insertImportEdge = insertEdge ScopeGraph.Import
 
 -- | Combinator to insert a lexical edge from the current scope to the provided scope address.
-insertLexicalEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+insertLexicalEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                   => scopeAddress
-                  -> Evaluator scopeAddress value effects ()
+                  -> Evaluator term scopeAddress value m ()
 insertLexicalEdge = insertEdge ScopeGraph.Lexical
 
-insertEdge :: (Member (State (ScopeGraph scopeAddress)) effects, Ord scopeAddress)
+insertEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
            => EdgeLabel
            -> scopeAddress
-           -> Evaluator scopeAddress value effects ()
+           -> Evaluator term scopeAddress value m ()
 insertEdge label target = modify (ScopeGraph.insertEdge label target)
 
 -- | Bind all of the scopes from a 'ScopeGraph'.
-bindAll :: ( Ord address, Member (Reader ModuleInfo) effects, Member (Reader Span) effects, Member (Resumable (BaseError (ScopeError address))) effects, Member (State (ScopeGraph address)) effects ) => ScopeGraph address -> Evaluator address value effects ()
+bindAll :: ( Ord address
+           , Member (Reader ModuleInfo) sig
+           , Member (Reader Span) sig
+           , Member (Resumable (BaseError (ScopeError address))) sig
+           , Member (State (ScopeGraph address)) sig
+           , Carrier sig m
+           )
+        => ScopeGraph address
+        -> Evaluator term address value m ()
 bindAll oldGraph = do
   currentGraph <- get
   let newGraph = ScopeGraph.graph oldGraph <> ScopeGraph.graph currentGraph
   put (currentGraph { ScopeGraph.graph = newGraph })
 
 -- | Inserts a new scope into the scope graph with the given edges.
-newScope :: ( Member (Allocator address) effects
-            , Member (State (ScopeGraph address)) effects
+newScope :: ( Member (Allocator address) sig
+            , Member (State (ScopeGraph address)) sig
+            , Member Fresh sig
+            , Carrier sig m
             , Ord address
-            , Member Fresh effects
             )
          => Map EdgeLabel [address]
-         -> Evaluator address value effects address
+         -> Evaluator term address value m address
 newScope edges = do
   -- Take the edges and construct a new scope
   name <- gensym
   address <- alloc name
   address <$ modify (ScopeGraph.newScope address edges)
 
-currentScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
-                , Member (Reader ModuleInfo) effects
-                , Member (Reader Span) effects
-                , Member (State (ScopeGraph address)) effects
+currentScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                , Member (Reader ModuleInfo) sig
+                , Member (Reader Span) sig
+                , Member (State (ScopeGraph address)) sig
+                , Carrier sig m
                 )
-             => Evaluator address value effects address
+             => Evaluator term address value m address
 currentScope = maybeM (throwScopeError CurrentScopeError) . ScopeGraph.currentScope =<< get
 
-lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
-                , Member (Reader ModuleInfo) effects
-                , Member (Reader Span) effects
-                , Member (State (ScopeGraph address)) effects
+lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                , Member (Reader ModuleInfo) sig
+                , Member (Reader Span) sig
+                , Member (State (ScopeGraph address)) sig
+                , Carrier sig m
                 , Ord address
                 )
              => address
-             -> Evaluator address value effects (Scope address)
+             -> Evaluator term address value m (Scope address)
 lookupScope address = maybeM (throwScopeError LookupError) . ScopeGraph.lookupScope address =<< get
 
-insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) effects
-                        , Member (Reader ModuleInfo) effects
-                        , Member (Reader Span) effects
-                        , Member (State (ScopeGraph address)) effects
+insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                        , Member (Reader ModuleInfo) sig
+                        , Member (Reader Span) sig
+                        , Member (State (ScopeGraph address)) sig
+                        , Carrier sig m
                         , Ord address
                         )
                       => Reference
@@ -145,60 +157,63 @@ insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) e
                       -> ScopeGraph address
                       -> address
                       -> Scope address
-                      -> Evaluator address value effects ()
+                      -> Evaluator term address value m ()
 insertImportReference ref decl g scopeAddress scope = do
   newScope <- maybeM (throwScopeError LookupError) (ScopeGraph.insertImportReference ref decl g scopeAddress scope)
   insertScope scopeAddress newScope
 
-insertScope :: ( Member (Resumable (BaseError (ScopeError address))) effects
-               , Member (Reader ModuleInfo) effects
-               , Member (Reader Span) effects
-               , Member (State (ScopeGraph address)) effects
+insertScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
+               , Member (Reader ModuleInfo) sig
+               , Member (Reader Span) sig
+               , Member (State (ScopeGraph address)) sig
+               , Carrier sig m
                , Ord address
                )
             => address
             -> Scope address
-            -> Evaluator address value effects ()
+            -> Evaluator term address value m ()
 insertScope scopeAddress scope = modify (ScopeGraph.insertScope scopeAddress scope)
 
-lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) effects
-                , Member (Reader ModuleInfo) effects
-                , Member (Reader Span) effects
-                , Member (State (ScopeGraph address)) effects
+lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                , Member (Reader ModuleInfo) sig
+                , Member (Reader Span) sig
+                , Member (State (ScopeGraph address)) sig
+                , Carrier sig m
                 , Ord address
                 )
              => Declaration
-             -> Evaluator address value effects (ScopeGraph.Path address)
+             -> Evaluator term address value m (ScopeGraph.Path address)
 lookupScopePath declaration = maybeM (throwScopeError LookupPathError) . ScopeGraph.lookupScopePath declaration =<< get
 
-associatedScope :: (Ord address, Member (State (ScopeGraph address)) effects) => Declaration -> Evaluator address value effects (Maybe address)
+associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
-withScope :: forall m address value effects a. (
-              Member (Resumable (BaseError (ScopeError address))) effects
-            , Member (Reader ModuleInfo) effects
-            , Member (Reader Span) effects
-            , Member (State (ScopeGraph address)) effects
+withScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
+            , Member (Reader ModuleInfo) sig
+            , Member (Reader Span) sig
+            , Member (State (ScopeGraph address)) sig
+            , Carrier sig m
             )
           => address
-          -> m address value effects a
-          -> m address value effects a
-withScope scope action = raiseEff $ do
-    prevScope <- (lowerEff (currentScope @address))
+          -> Evaluator term address value m a
+          -> Evaluator term address value m a
+withScope scope action = do
+    prevScope <- currentScope
     modify (\g -> g { ScopeGraph.currentScope = Just scope })
-    value <- (lowerEff action)
+    value <- action
     modify (\g -> g { ScopeGraph.currentScope = Just prevScope })
     pure value
 
-putCurrentScope :: (Ord address, Member (State (ScopeGraph address)) effects) => address -> Evaluator address value effects ()
+putCurrentScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => address -> Evaluator term address value m ()
 putCurrentScope scope = modify (\g -> g { ScopeGraph.currentScope = Just scope })
 
-throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Span) effects
+throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Carrier sig m
                    )
             => ScopeError address resume
-            -> Evaluator address value effects resume
+            -> Evaluator term address value m resume
 throwScopeError = throwBaseError
 
 data ScopeError address return where
@@ -217,22 +232,35 @@ instance Eq address => Eq1 (ScopeError address) where
   liftEq _ LookupPathError LookupPathError = True
   liftEq _ _ _ = False
 
-alloc :: Member (Allocator address) effects => Name -> Evaluator address value effects address
-alloc = send . Alloc
+alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator term address value m address
+alloc = send . flip Alloc ret
 
-data Allocator address (m :: * -> *) return where
-  Alloc :: Name -> Allocator address m address
+data Allocator address (m :: * -> *) k
+  = Alloc Name (address -> k)
+  deriving (Functor)
+
+instance HFunctor (Allocator address) where
+  hmap _ (Alloc name k) = Alloc name k
 
 instance Effect (Allocator address) where
-  handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
+  handle state handler (Alloc name k) = Alloc name (handler . (<$ state) . k)
 
-runScopeErrorWith :: (Effectful (m address value), Effects effects)
-                  => (forall resume . BaseError (ScopeError address) resume -> m address value effects resume)
-                  -> m address value (Resumable (BaseError (ScopeError address)) ': effects) a
-                  -> m address value effects a
-runScopeErrorWith = runResumableWith
+runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC address (Eff m))
+             => Evaluator term address value (AllocatorC address (Eff m)) a
+             -> Evaluator term address value m a
+runAllocator = raiseHandler $ runAllocatorC . interpret
 
-runScopeError :: (Effectful (m address value), Effects effects)
-              => m address value (Resumable (BaseError (ScopeError address)) ': effects) a
-              -> m address value effects (Either (SomeExc (BaseError (ScopeError address))) a)
-runScopeError = runResumable
+newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
+  deriving (Alternative, Applicative, Functor, Monad)
+
+
+runScopeErrorWith :: Carrier sig m
+                  => (forall resume . BaseError (ScopeError address) resume -> Evaluator term address value m resume)
+                  -> Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a
+                  -> Evaluator term address value m a
+runScopeErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
+
+runScopeError :: (Carrier sig m, Effect sig)
+              => Evaluator term address value (ResumableC (BaseError (ScopeError address)) (Eff m)) a
+              -> Evaluator term address value m (Either (SomeError (BaseError (ScopeError address))) a)
+runScopeError = raiseHandler runResumable
