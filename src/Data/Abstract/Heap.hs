@@ -33,8 +33,8 @@ data Frame scopeAddress frameAddress value = Frame {
   deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | A map of frame addresses onto Frames.
-data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Monoidal.Map frameAddress (Frame scopeAddress frameAddress value) }
-  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Generic, NFData, Show)
+data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
+  deriving (Eq, Ord, Generic, NFData, Show)
 
 instance Lower (Heap scopeAddress frameAddress value) where
   lowerBound = Heap lowerBound lowerBound
