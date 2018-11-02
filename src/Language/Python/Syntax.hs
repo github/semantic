@@ -169,18 +169,18 @@ instance Evaluatable Import where
     --     | otherwise = Env.aliasBindings (toTuple <$> xs) importedBinds
 
 
--- Evaluate a qualified import
-evalQualifiedImport :: ( AbstractValue term address value m
-                       , Carrier sig m
-                       , Member (Allocator address) sig
-                       , Member (Deref value) sig
-                       , Member (Modules address value) sig
-                       , Member (State (Heap address address value)) sig
-                       , Ord address
-                       )
-                    => Name -> ModulePath -> Evaluator term address value m value
-evalQualifiedImport name path = letrec' name $ \addr -> do
-  unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
+-- -- Evaluate a qualified import
+-- evalQualifiedImport :: ( AbstractValue term address value m
+--                        , Carrier sig m
+--                        , Member (Allocator address) sig
+--                        , Member (Deref value) sig
+--                        , Member (Modules address value) sig
+--                        , Member (State (Heap address address value)) sig
+--                        , Ord address
+--                        )
+--                     => Name -> ModulePath -> Evaluator term address value m value
+-- evalQualifiedImport name path = letrec' name $ \addr -> do
+--   unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
