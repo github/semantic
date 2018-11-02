@@ -131,8 +131,8 @@ currentScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (State (ScopeGraph address)) sig
                 , Carrier sig m
                 )
-             => Evaluator term address value m address
-currentScope = maybeM (throwScopeError CurrentScopeError) . ScopeGraph.currentScope =<< get
+             => Evaluator term address value m (Maybe address)
+currentScope = ScopeGraph.currentScope <$> get
 
 lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader ModuleInfo) sig
@@ -201,7 +201,7 @@ withScope scope action = do
     prevScope <- currentScope
     modify (\g -> g { ScopeGraph.currentScope = Just scope })
     value <- action
-    modify (\g -> g { ScopeGraph.currentScope = Just prevScope })
+    modify (\g -> g { ScopeGraph.currentScope = prevScope })
     pure value
 
 putCurrentScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => address -> Evaluator term address value m ()
