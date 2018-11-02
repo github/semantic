@@ -258,29 +258,29 @@ instance ( Member (Allocator address) sig
       => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Abstract.Function _ params body k -> runEvaluator $ do
-    functionSpan <- ask @Span -- TODO: This might be wrong
-    declare (Declaration name) functionSpan Nothing
+    Abstract.Function name params body k -> runEvaluator $ do
+      functionSpan <- ask @Span -- TODO: This might be wrong
+      declare (Declaration name) functionSpan Nothing
 
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    functionScope <- newScope lexicalEdges
-    currentFrame' <- currentFrame
-    let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
-    functionFrame <- newFrame functionScope frameEdges
-    -- TODO: Store the frame
-    let value = withScopeAndFrame functionFrame $ do
-      (_, tvars) <- foldr (\ name rest -> do
-        tvar <- Var <$> fresh
-        span <- get @Span -- TODO: This span is probably wrong
-        declare (Declaration name) span Nothing
-        address <- lookupDeclaration (Declaration name)
-        -- assign tvar values to names in the frame of the function?
-        assign address tvar
-        bimap id (tvar :) <$> rest) (pure (undefined, [])) params
-      -- TODO: We may still want to represent this as a closure and not a function type
-      (catchReturn (runFunction (Evaluator body)))
-      value >>= Evaluator . flip runFunctionC eval . k . (zeroOrMoreProduct tvars :->)
+      currentScope' <- currentScope
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+      functionScope <- newScope lexicalEdges
+      currentFrame' <- currentFrame
+      let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+      functionFrame <- newFrame functionScope frameEdges
+      -- TODO: Store the frame
+      let value = withScopeAndFrame functionFrame $ do
+            (_, tvars) <- foldr (\ name rest -> do
+              tvar <- Var <$> fresh
+              span <- get @Span -- TODO: This span is probably wrong
+              declare (Declaration name) span Nothing
+              address <- lookupDeclaration (Declaration name)
+              -- assign tvar values to names in the frame of the function?
+              assign address tvar
+              bimap id (tvar :) <$> rest) (pure (undefined, [])) params
+            -- TODO: We may still want to represent this as a closure and not a function type
+            (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
+      value >>= Evaluator . flip runFunctionC eval . k
 
     Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
     Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval
