@@ -362,6 +362,7 @@ test-suite test
                      , Semantic.CLI.Spec
                      , Semantic.IO.Spec
                      , Semantic.Stat.Spec
+                     , Tags.Spec
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
