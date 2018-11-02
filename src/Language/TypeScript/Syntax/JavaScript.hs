@@ -28,7 +28,7 @@ instance Evaluatable JavaScriptRequire where
     bindAll scopeGraph
     -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     -- rvalBox =<< evalRequire modulePath alias
-    case declaredName (subterm aliasTerm) of
+    case declaredName aliasTerm of
       Just alias -> do
         span <- get @Span
         void $ declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph) -- TODO: declare shouldn't return a fake (Address address)
