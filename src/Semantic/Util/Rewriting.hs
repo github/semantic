@@ -65,6 +65,12 @@ testGoDefs path = do
   -- pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
   pure $! runTagging blob tree
 
+testRubyDefs path = do
+  blob <- readBlobFromFile' (File path Language.Ruby)
+  tree <- parseFile' rubyParser path
+  -- pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
+  pure $! runTagging blob tree
+
 
 testRubyFile = do
   let path = "test/fixtures/ruby/reprinting/infix.rb"
