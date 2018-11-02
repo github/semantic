@@ -42,8 +42,7 @@ runTagging :: (IsTaggable syntax)
 runTagging blob tree
   = Eff.run
   . Error.runError
-  . fmap snd
-  . State.runState (mempty :: [ContextToken])
+  . State.evalState mempty
   . runT $ source (tagging blob tree)
       ~> contextualizing blob
 
