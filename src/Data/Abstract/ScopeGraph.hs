@@ -42,7 +42,7 @@ data Scope scopeAddress = Scope {
   } deriving (Eq, Show, Ord, Generic, NFData)
 
 newtype Position = Position { unPosition :: Int }
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Show, Ord, Generic, NFData)
 
 data ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope), currentScope :: Maybe scope }
 
