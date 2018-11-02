@@ -149,9 +149,10 @@ f >>: a = need f >>> a
 narrow :: (f :< fs) => Matcher (Term (Sum fs) ann) (f (Term (Sum fs) ann))
 narrow = purely projectTerm >>= foldMapA pure
 
--- | Like 'narrow', but it returns the result of the projection
--- in a 'TermF'. Useful for returning a matched node after ensuring
--- its contents are valid, e.g @narrowF <* a >:: b >>> ensure f@
+-- | Like 'narrow', but it returns the result of the projection in a
+-- 'TermF'. Useful for returning a matched node after ensuring its
+-- contents are projectable and valid, e.g @narrowF <* a >:: b >>>
+-- ensure f@, without losing valuable annotation info.
 narrowF :: (f :< fs, term ~ Term (Sum fs) ann)
         => Matcher term (TermF f ann term)
 narrowF = do
