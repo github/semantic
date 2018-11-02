@@ -113,24 +113,6 @@ instance HasPrelude 'Python where
     define (Declaration (X.name "print")) (builtIn Print)
 
 instance HasPrelude 'Ruby where
-  definePrelude :: forall address value effects proxy. ( AbstractValue address value effects
-                   , HasCallStack
-                   , Member (Allocator address) effects
-                   , Member (State (ScopeGraph address)) effects
-                   , Member (Resumable (BaseError (ScopeError address))) effects
-                   , Member (Resumable (BaseError (HeapError address))) effects
-                   , Member (Deref value) effects
-                   , Member Fresh effects
-                   , Member (Function term address value) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Span) effects
-                   , Member (Resumable (BaseError (AddressError address value))) effects
-                   , Member (State (Heap address address value)) effects
-                   , Member Trace effects
-                   , Ord address
-                   )
-                => proxy 'Ruby
-                -> Evaluator term address value m ()
   definePrelude _ = do
     define (Declaration (X.name "puts")) (builtIn Print)
 
