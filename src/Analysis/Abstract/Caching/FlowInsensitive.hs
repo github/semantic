@@ -57,8 +57,7 @@ isolateCache action = putCache lowerBound *> action *> ((,) <$> get <*> get)
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
-cachingTerms :: ( Member (Env address) sig
-                , Member NonDet sig
+cachingTerms :: ( Member NonDet sig
                 , Member (Reader (Cache term address)) sig
                 , Member (Reader (Live address)) sig
                 , Member (State (Cache term address)) sig
@@ -78,7 +77,6 @@ cachingTerms recur0 recur term = do
 
 convergingModules :: ( AbstractValue term address value m
                      , Eq value
-                     , Member (Env address) sig
                      , Member Fresh sig
                      , Member NonDet sig
                      , Member (Reader (Cache term address)) sig
@@ -132,7 +130,7 @@ scatter :: (Foldable t, Member NonDet sig, Carrier sig m) => t (ValueRef address
 scatter = foldMapA pure
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live address)) sig, Member (Env address) sig, Carrier sig m)
+getConfiguration :: (Member (Reader (Live address)) sig, Carrier sig m)
                  => term
                  -> Evaluator term address value m (Configuration term address)
 getConfiguration term = Configuration term <$> askRoots <*> getEvalContext

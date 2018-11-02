@@ -189,14 +189,14 @@ associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrie
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
 withScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
-            , Member (Reader ModuleInfo) sig
-            , Member (Reader Span) sig
-            , Member (State (ScopeGraph address)) sig
-            , Carrier sig m
-            )
-          => address
-          -> Evaluator term address value m a
-          -> Evaluator term address value m a
+        , Member (Reader ModuleInfo) sig
+        , Member (Reader Span) sig
+        , Member (State (ScopeGraph address)) sig
+        , Carrier sig m
+        )
+      => address
+      -> Evaluator term address value m a
+      -> Evaluator term address value m a
 withScope scope action = do
     prevScope <- currentScope
     modify (\g -> g { ScopeGraph.currentScope = Just scope })

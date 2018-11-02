@@ -57,7 +57,6 @@ defineNamespace :: ( AbstractValue term address value m
                    , HasCallStack
                    , Member (Allocator address) sig
                    , Member (Deref value) sig
-                   , Member (Env address) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
                    , Member (State (Heap address address value)) sig
