@@ -73,7 +73,7 @@ defaultConfig options@Options{..} = do
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
   -- Defaults for these values are commensurate with the Dockerfile
   parseTimeout <- envLookupNum 6000 "TREE_SITTER_PARSE_TIMEOUT"
-  assignTimeout <- envLookupNum 4000 "TREE_SITTER_ASSIGNMENT_TIMEOUT"
+  assignTimeout <- envLookupNum 4000 "SEMANTIC_ASSIGNMENT_TIMEOUT"
   pure Config
     { configAppName = "semantic"
     , configHostName = hostName
