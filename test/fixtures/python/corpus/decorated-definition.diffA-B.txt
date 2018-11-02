@@ -46,13 +46,9 @@
                       {-(Boolean)-})-}
                     {-(Identifier)-}
                     {-(Identifier)-})-}
-                  {-(Annotation
-                    {-(Function
-                      {-(Identifier)-}
-                      {-(Identifier)-})-}
-                    {-(Empty)-})-})-})-})
-            ->(Annotation
-              {+(Function
-                {+(Identifier)+}
-                {+(Identifier)+})+}
-              {+(Empty)+}) })))))))
+                  {-(Function
+                    {-(Identifier)-}
+                    {-(Identifier)-})-})-})-})
+            ->(Function
+              {+(Identifier)+}
+              {+(Identifier)+}) })))))))
