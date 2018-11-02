@@ -130,7 +130,7 @@ instance HasPrelude 'Ruby where
                    , Ord address
                    )
                 => proxy 'Ruby
-                -> Evaluator address value effects ()
+                -> Evaluator term address value m ()
   definePrelude _ = do
     define (Declaration (X.name "puts")) (builtIn Print)
 
