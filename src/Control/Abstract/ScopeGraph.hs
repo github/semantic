@@ -33,7 +33,6 @@ import           Control.Abstract.Evaluator hiding (Local)
 import           Data.Abstract.Module
 import           Data.Abstract.BaseError
 import           Data.Abstract.Name hiding (name)
-import           Control.Abstract.Heap
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
 import           Data.Abstract.Name
