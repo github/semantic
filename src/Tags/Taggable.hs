@@ -147,17 +147,26 @@ instance Taggable Declaration.Function where
     | (Term (In exprAnn exprF):_) <- toList bodyF
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise           = Nothing
-  docsLiteral _ _ = Nothing
+  docsLiteral _ _         = Nothing
   snippet ann (Declaration.Function _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
 instance Taggable Declaration.Method where
-  docsLiteral _ _ = Nothing
   snippet ann (Declaration.Method _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
 -- TODO: Fill these out
-instance Taggable Ruby.Class
-instance Taggable Ruby.Module
+instance Taggable Declaration.Class where
+  snippet ann (Declaration.Class _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
+instance Taggable Ruby.Class where
+  snippet ann (Ruby.Class _ _ (Term (In body _))) = Just $ subtractLocation ann body
+
+instance Taggable Ruby.Module where
+  snippet ann (Ruby.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
+  snippet ann (Ruby.Module _ _) = Just (locationByteRange ann)
+
+instance Taggable TypeScript.Module where
+  snippet ann (TypeScript.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
+  snippet ann (TypeScript.Module _ _) = Just (locationByteRange ann)
 
 instance Taggable []
 instance Taggable Comment.Comment
@@ -282,7 +291,6 @@ instance Taggable Type.Slice
 instance Taggable Type.TypeParameters
 instance Taggable Type.Void
 
-instance Taggable Declaration.Class
 instance Taggable Declaration.Comprehension
 instance Taggable Declaration.Constructor
 instance Taggable Declaration.Datatype
@@ -612,7 +620,6 @@ instance Taggable TypeScript.IndexSignature
 instance Taggable TypeScript.AbstractMethodSignature
 instance Taggable TypeScript.ForOf
 instance Taggable TypeScript.LabeledStatement
-instance Taggable TypeScript.Module
 instance Taggable TypeScript.InternalModule
 instance Taggable TypeScript.ImportAlias
 instance Taggable TypeScript.ClassHeritage
