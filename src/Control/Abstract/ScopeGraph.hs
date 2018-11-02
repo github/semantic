@@ -223,8 +223,6 @@ alloc = send . Alloc
 data Allocator address (m :: * -> *) return where
   Alloc :: Name -> Allocator address m address
 
-instance PureEffect (Allocator address)
-
 instance Effect (Allocator address) where
   handleState c dist (Request (Alloc name) k) = Request (Alloc name) (dist . (<$ c) . k)
 
