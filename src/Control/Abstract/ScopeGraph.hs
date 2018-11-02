@@ -174,8 +174,8 @@ lookupScopePath declaration = maybeM (throwScopeError LookupPathError) . ScopeGr
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) effects) => Declaration -> Evaluator address value effects (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
-withScope :: forall m address value effects a. (Effectful (m address value)
-            , Member (Resumable (BaseError (ScopeError address))) effects
+withScope :: forall m address value effects a. (
+              Member (Resumable (BaseError (ScopeError address))) effects
             , Member (Reader ModuleInfo) effects
             , Member (Reader Span) effects
             , Member (State (ScopeGraph address)) effects
