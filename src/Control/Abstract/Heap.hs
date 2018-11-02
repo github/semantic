@@ -328,25 +328,6 @@ reachable roots heap = go mempty roots
 
 -- Effects
 
-data Allocator address (m :: * -> *) k
-  = Alloc Name (address -> k)
-  deriving (Functor)
-
-instance HFunctor (Allocator address) where
-  hmap _ (Alloc name k) = Alloc name k
-
-instance Effect (Allocator address) where
-  handle state handler (Alloc name k) = Alloc name (handler . (<$ state) . k)
-
-runAllocator :: Carrier (Allocator address :+: sig) (AllocatorC address (Eff m))
-             => Evaluator term address value (AllocatorC address (Eff m)) a
-             -> Evaluator term address value m a
-runAllocator = raiseHandler $ runAllocatorC . interpret
-
-newtype AllocatorC address m a = AllocatorC { runAllocatorC :: m a }
-  deriving (Alternative, Applicative, Functor, Monad)
-
-
 data Deref value (m :: * -> *) k
   = DerefCell        (Set value) (Maybe value -> k)
   | AssignCell value (Set value) (Set value   -> k)
