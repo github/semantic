@@ -46,7 +46,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Boolean value) sig
           , Member (While value) sig
           , Member (Deref value) sig
-          , Member (ScopeEnv address) sig
           , Member (State (ScopeGraph address)) sig
           , Member (Error (LoopControl address)) sig
           , Member (Error (Return address)) sig
