@@ -34,28 +34,7 @@ simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
 
 
--- | Sort a graph’s vertices topologically.
---
--- >>> topologicalSort (Class.path "ab")
--- "ba"
---
--- >>> topologicalSort (Class.path "abc")
--- "cba"
---
--- >>> topologicalSort ((vertex 'a' `connect` vertex 'b') `connect` vertex 'c')
--- "cba"
---
--- >>> topologicalSort (vertex 'a' `connect` (vertex 'b' `connect` vertex 'c'))
--- "cba"
---
--- >>> topologicalSort ((vertex 'a' `connect` vertex 'b') <> (vertex 'a' `connect` vertex 'c'))
--- "cba"
---
--- >>> topologicalSort (Class.path "abd" <> Class.path "acd")
--- "dcba"
---
--- >>> topologicalSort (Class.path "aba")
--- "ab"
+-- | Sort a graph’s vertices topologically. Specced in @Data.Graph.Spec@.
 topologicalSort :: forall v . Ord v => Graph v -> [v]
 topologicalSort = go . Class.toAdjacencyMap . G.transpose . unGraph
   where go :: A.AdjacencyMap v -> [v]

@@ -31,6 +31,7 @@ import Data.Patch
 import Data.Range
 import Data.Location
 import Data.Semigroup (Semigroup(..))
+import Data.Semigroup.App
 import Data.Source
 import Data.Blob
 import Data.Span
@@ -526,6 +527,12 @@ instance Listable Language.Language where
     \/ cons0 Language.Python
     \/ cons0 Language.Ruby
     \/ cons0 Language.TypeScript
+
+instance Listable (f a) => Listable (App f a) where
+  tiers = cons1 App
+
+instance Listable (f a) => Listable (AppMerge f a) where
+  tiers = cons1 AppMerge
 
 instance Listable Location where
   tiers = cons2 Location
