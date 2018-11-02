@@ -97,18 +97,18 @@ throwAbort :: forall term address sig m value a .
            ( Member (Error (LoopControl value)) sig
            , Carrier sig m)
            => Evaluator term address value m a
-throwAbort = throwError (Abort @address)
+throwAbort = throwError (Abort @value)
 
 catchLoopControl :: (
-                    Member (Error (LoopControl address)) sig
+                    Member (Error (LoopControl value)) sig
                   , Carrier sig m
                   )
                  => Evaluator term address value m a
-                 -> (LoopControl address -> Evaluator term address value m a)
+                 -> (LoopControl value -> Evaluator term address value m a)
                  -> Evaluator term address value m a
 catchLoopControl = catchError
 
 runLoopControl :: (Carrier sig m, Effect sig)
-               => Evaluator term address value (ErrorC (LoopControl address) (Eff m)) value
+               => Evaluator term address value (ErrorC (LoopControl value) (Eff m)) value
                -> Evaluator term address value m value
 runLoopControl = raiseHandler $ fmap (either unLoopControl id) . runError
