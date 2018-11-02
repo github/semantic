@@ -13,7 +13,6 @@ import Prologue
 import Control.Effect
 import Control.Effect.Carrier
 import Control.Effect.Sum
-import Data.Coerce
 import System.Console.Haskeline
 import qualified Data.Text as T
 

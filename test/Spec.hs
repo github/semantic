@@ -9,9 +9,14 @@ import qualified Assigning.Assignment.Spec
 import qualified Control.Abstract.Evaluator.Spec
 import qualified Control.Rewriting.Spec
 import qualified Data.Diff.Spec
+import qualified Data.Abstract.Environment.Spec
+import qualified Data.Abstract.Name.Spec
 import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
+import qualified Data.Graph.Spec
+import qualified Data.Range.Spec
 import qualified Data.Scientific.Spec
+import qualified Data.Semigroup.App.Spec
 import qualified Data.Source.Spec
 import qualified Data.Term.Spec
 import qualified Diffing.Algorithm.RWS.Spec
@@ -48,9 +53,14 @@ main = do
       describe "Control.Abstract.Evaluator" Control.Abstract.Evaluator.Spec.spec
       describe "Control.Rewriting.Spec" Control.Rewriting.Spec.spec
       describe "Data.Diff" Data.Diff.Spec.spec
+      describe "Data.Graph" Data.Graph.Spec.spec
+      describe "Data.Abstract.Environment.Spec" Data.Abstract.Environment.Spec.spec
       describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
+      describe "Data.Abstract.Name" Data.Abstract.Name.Spec.spec
       describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
+      describe "Data.Range" Data.Range.Spec.spec
       describe "Data.Scientific" Data.Scientific.Spec.spec
+      describe "Data.Semigroup.App" Data.Semigroup.App.Spec.spec
       describe "Data.Source" Data.Source.Spec.spec
       describe "Data.Term" Data.Term.Spec.spec
       describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
