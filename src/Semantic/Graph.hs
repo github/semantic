@@ -342,7 +342,7 @@ resumingLoadError :: ( AbstractHole value
                      , Member Trace sig
                      , Ord address
                      )
-                  => Evaluator term address value (ResumableWithC (BaseError (LoadError address)) (Eff m)) a
+                  => Evaluator term address value (ResumableWithC (BaseError (LoadError address value)) (Eff m)) a
                   -> Evaluator term address value m a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
   ModuleNotFoundError _ -> pure (lowerBound, hole))
