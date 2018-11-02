@@ -79,29 +79,29 @@ instance Effect (Modules address value) where
   handle state handler (List    path  k) = List    path  (handler . (<$ state) . k)
 
 
-sendModules :: ( Member (Modules address) sig
+sendModules :: ( Member (Modules address value) sig
                , Carrier sig m)
-            => Modules address (Evaluator term address value m) (Evaluator term address value m return)
+            => Modules address value (Evaluator term address value m) (Evaluator term address value m return)
             -> Evaluator term address value m return
 sendModules = send
 
 runModules :: ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) sig
-              , Member (Resumable (BaseError (LoadError address))) sig
+              , Member (Resumable (BaseError (LoadError address value))) sig
               , Carrier sig m
               )
            => Set ModulePath
-           -> Evaluator term address value (ModulesC address (Eff m)) a
+           -> Evaluator term address value (ModulesC address value (Eff m)) a
            -> Evaluator term address value m a
 runModules paths = raiseHandler $ flip runModulesC paths . interpret
 
-newtype ModulesC address m a = ModulesC { runModulesC :: Set ModulePath -> m a }
+newtype ModulesC address value m a = ModulesC { runModulesC :: Set ModulePath -> m a }
 
 instance ( Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) sig
-         , Member (Resumable (BaseError (LoadError address))) sig
+         , Member (Resumable (BaseError (LoadError address value))) sig
          , Carrier sig m
          , Monad m
          )
-      => Carrier (Modules address :+: sig) (ModulesC address m) where
+      => Carrier (Modules address value :+: sig) (ModulesC address value m) where
   ret = ModulesC . const . ret
   eff op = ModulesC (\ paths -> handleSum (eff . handleReader paths runModulesC) (\case
     Load    name  k -> askModuleTable >>= maybeM (throwLoadError (ModuleNotFoundError name)) . fmap (runMerging . foldMap1 (Merging . moduleBody)) . ModuleTable.lookup name >>= flip runModulesC paths . k
@@ -131,22 +131,22 @@ instance Show1 (LoadError address value) where
 instance Eq1 (LoadError address value) where
   liftEq _ (ModuleNotFoundError a) (ModuleNotFoundError b) = a == b
 
-instance NFData1 (LoadError address) where
+instance NFData1 (LoadError address value) where
   liftRnf _ (ModuleNotFoundError p) = rnf p
 
 runLoadError :: (Carrier sig m, Effect sig)
-             => Evaluator term address value (ResumableC (BaseError (LoadError address)) (Eff m)) a
-             -> Evaluator term address value m (Either (SomeError (BaseError (LoadError address))) a)
+             => Evaluator term address value (ResumableC (BaseError (LoadError address value)) (Eff m)) a
+             -> Evaluator term address value m (Either (SomeError (BaseError (LoadError address value))) a)
 runLoadError = raiseHandler runResumable
 
 runLoadErrorWith :: Carrier sig m
-                 => (forall resume . (BaseError (LoadError address)) resume -> Evaluator term address value m resume)
-                 -> Evaluator term address value (ResumableWithC (BaseError (LoadError address)) (Eff m)) a
+                 => (forall resume . (BaseError (LoadError address value)) resume -> Evaluator term address value m resume)
+                 -> Evaluator term address value (ResumableWithC (BaseError (LoadError address value)) (Eff m)) a
                  -> Evaluator term address value m a
 runLoadErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
-throwLoadError :: (Member (Resumable (BaseError (LoadError address))) sig, Carrier sig m)
-               => LoadError address resume
+throwLoadError :: (Member (Resumable (BaseError (LoadError address value))) sig, Carrier sig m)
+               => LoadError address value resume
                -> m resume
 throwLoadError err@(ModuleNotFoundError name) = throwResumable $ BaseError (ModuleInfo name) emptySpan err
 
