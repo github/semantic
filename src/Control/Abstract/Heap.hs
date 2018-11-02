@@ -4,7 +4,6 @@ module Control.Abstract.Heap
 , HeapError(..)
 , Address(..)
 , Position(..)
-, Configuration(..)
 , Live
 , getHeap
 , putHeap
@@ -23,8 +22,6 @@ module Control.Abstract.Heap
 , gc
 -- * Effects
 , Allocator(..)
-, runAllocator
-, AllocatorC(..)
 , Deref(..)
 , runDeref
 , DerefC(..)
@@ -54,7 +51,7 @@ import qualified Data.Map.Strict as Map
 import Prologue
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
-withScopeAndFrame :: forall address value m a sig. (
+withScopeAndFrame :: forall term address value m a sig. (
                       Ord address
                     , Member (Reader ModuleInfo) sig
                     , Member (Reader Span) sig
@@ -65,11 +62,11 @@ withScopeAndFrame :: forall address value m a sig. (
                     , Carrier sig m
                     )
                   => address
-                  -> m address value m a -- Not sure about this one.
-                  -> m address value m a
-withScopeAndFrame address action = raiseEff $ do
-  scope <- lowerEff (scopeLookup @address @value address)
-  lowerEff $ withScope scope (withFrame address action)
+                  -> Evaluator term address value m a -- Not sure about this one.
+                  -> Evaluator term address value m a
+withScopeAndFrame address action = do
+  scope <- scopeLookup @address @value address
+  withScope scope (withFrame address action)
 
 scopeLookup :: forall address value sig m term. (
                 Ord address
@@ -130,7 +127,7 @@ newFrame scope links = do
   pure address
 
 -- | Evaluates the action within the frame of the given frame address.
-withFrame :: forall address sig m value a. (
+withFrame :: forall term address value sig m a. (
              Member (Resumable (BaseError (HeapError address))) sig
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
@@ -138,12 +135,12 @@ withFrame :: forall address sig m value a. (
            , Carrier sig m
            )
           => address
-          -> m address value sig a -- Not sure about this `sig` here (substituting `sig` for `effects`)
-          -> m address value sig a
-withFrame address action = raiseEff $ do
-    prevFrame <- (lowerEff (currentFrame @address @value))
+          -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
+          -> Evaluator term address value m a
+withFrame address action = do
+    prevFrame <- (currentFrame @address @value)
     modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
-    value <- (lowerEff action)
+    value <- action
     modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just prevFrame })
     pure value
 
@@ -213,7 +210,7 @@ deref :: ( Member (Deref value) sig
          , Carrier sig m
          )
       => Address address
-      -> Evaluator address value m value
+      -> Evaluator term address value m value
 -- TODO: THIS IS WRONG we need to call Heap.lookup
 deref addr@Address{..} = gets (Heap.getSlot addr) >>= maybeM (throwAddressError (UnallocatedAddress address)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError (UninitializedAddress address))
 
@@ -364,26 +361,25 @@ instance Eq address => Eq1 (HeapError address) where
   liftEq _ (LookupError a) (LookupError b) = a == b
   liftEq _ (LookupLinksError a) (LookupLinksError b) = a == b
 
-throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) effects
-                   , Member (Reader ModuleInfo) effects
-                   , Member (Reader Span) effects
+throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Carrier sig m
                    )
                 => HeapError address resume
                 -> Evaluator term address value m resume
 throwHeapError = throwBaseError
 
-runHeapError :: ( Effectful (m address value)
-                   , Effects effects
-                   )
-                => m address value (Resumable (BaseError (HeapError address)) ': effects) a
-                -> m address value effects (Either (SomeExc (BaseError (HeapError address))) a)
-runHeapError = runResumable
+runHeapError :: (Carrier sig m, Effect sig)
+                => Evaluator term address value (ResumableC (BaseError (HeapError address)) (Eff m)) a
+                -> Evaluator term address value m (Either (SomeError (BaseError (HeapError address))) a)
+runHeapError = raiseHandler runResumable
 
-runHeapErrorWith :: (Effectful (m address value), Effects effects)
-                  => (forall resume . BaseError (HeapError address) resume -> m address value effects resume)
-                  -> m address value (Resumable (BaseError (HeapError address)) ': effects) a
-                  -> m address value effects a
-runHeapErrorWith = runResumableWith
+runHeapErrorWith :: (Carrier sig m, Effect sig)
+                 => (forall resume. (BaseError (HeapError address)) resume -> Evaluator term address value m resume)
+                 -> Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
+                 -> Evaluator term address value m a
+runHeapErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 data AddressError address value resume where
   UnallocatedAddress   :: address -> AddressError address value (Set value)

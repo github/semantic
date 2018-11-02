@@ -73,7 +73,7 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: (Member (Function term address value) sig, Carrier sig m) => Maybe Name -> [Name] -> term -> Evaluator term address value m value
+function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> Evaluator term address value m value
 function name params body = sendFunction (Function name params body ret)
 
 data BuiltIn
@@ -84,7 +84,7 @@ data BuiltIn
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => BuiltIn -> Evaluator term address value m value
 builtIn = sendFunction . flip BuiltIn ret
 
-call :: (Member (Function term address value) sig, Carrier sig m) => value -> address -> [address] -> Evaluator term address value m address
+call :: (Member (Function term address value) sig, Carrier sig m) => value -> Address address -> [value] -> Evaluator term address value m value
 call fn self args = sendFunction (Call fn self args ret)
 
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
@@ -112,7 +112,6 @@ runFunction :: Carrier (Function term address value :+: sig) (FunctionC term add
 runFunction eval = raiseHandler (flip runFunctionC (runEvaluator . eval) . interpret)
 
 newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) address) -> m a }
->>>>>>> master
 
 
 -- | Construct a boolean value in the abstract domain.
@@ -292,7 +291,7 @@ class AbstractIntro value => AbstractValue term address value carrier where
 
 
 -- TODO rethink whether this function is necessary.
-makeNamespace :: ( AbstractValue term address value sig
+makeNamespace :: ( AbstractValue term address value m
                  , Member (Deref value) sig
                  , Member (Reader ModuleInfo) sig
                  , Member (State (ScopeGraph address)) sig
@@ -334,7 +333,7 @@ makeNamespace declaration addr super body = do
 
 
 -- | Evaluates a 'Value' returning the referenced value
-value :: ( AbstractValue term address value sig
+value :: ( AbstractValue term address value m
          , Member (Deref value) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -372,5 +371,5 @@ rvalBox :: ( Member (Allocator address) sig
            , Ord address
            )
         => value
-        -> Evaluator term address value m (ValueRef address)
+        -> Evaluator term address value m (ValueRef address value)
 rvalBox val = pure (Rval val)
