@@ -70,7 +70,7 @@ enterScope, exitScope :: ContextToken -> Machine.PlanT k Tag Contextualizer ()
 enterScope c = lift (State.modify (c :))
 exitScope  c = lift State.get >>= \case
   (x:xs) -> when (x == c) (lift (State.modify (const xs)))
-  cs     -> lift (Error.throwError (UnbalancedPair c cs))
+  cs     -> lift (State.modify (const cs)) -- Just continue on if it's unbalanced
 
 data TranslationError = UnbalancedPair ContextToken [ContextToken]
   deriving (Eq, Show)
