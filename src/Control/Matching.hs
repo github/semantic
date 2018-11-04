@@ -34,7 +34,6 @@ import Prologue hiding (project)
 
 import Control.Category
 
-import Data.Algebra
 import Data.Sum
 import Data.Term
 
