@@ -17,7 +17,7 @@ module Control.Matching
   , narrow
   , narrowF
   , need
-  , (>>:)
+  , (.>>)
   -- | Useful matchers
   , mhead
   , mjust
@@ -111,7 +111,7 @@ purely f = fmap f target
 -- the action fails.
 --
 -- This is the lowest-level combinator for applying a predicate function
--- to a matcher. In practice, you'll generally use the 'need' and '>>:'
+-- to a matcher. In practice, you'll generally use the 'need' and '.>>'
 -- combinators to iterate on recursive 'Term' values.
 match :: (t -> Maybe u) -> Matcher u a -> Matcher t a
 match = Match
@@ -134,14 +134,14 @@ need f = Match (fmap f . projectTerm) target
 
 -- | An alias for @need f >>>@. Allows you to avoid repeated
 -- calls to 'need' in long chains of projection and composition.
--- Similar to '>>^' from Control.Arrow, except the call to 'projectTerm'
+-- Similar to '^>>' from Control.Arrow, except the call to 'projectTerm'
 -- is implicit.
-infixr 0 >>:
-(>>:) :: (f :< fs, term ~ Term (Sum fs) ann)
+infixr 0 .>>
+(.>>) :: (f :< fs, term ~ Term (Sum fs) ann)
       => (f term -> b)
       -> Matcher b c
       -> Matcher term c
-f >>: a = need f >>> a
+f .>> a = need f >>> a
 
 -- | 'narrow' projects the given 'Term' of 'Sum's into a constituent member
 -- of that 'Sum', failing if the target cannot be thus projected.

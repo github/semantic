@@ -21,7 +21,7 @@ docstringMatcher :: ( Decl.Function :< fs
                     ) => Matcher term (TermF Decl.Function ann term)
 docstringMatcher =
   narrowF <* (Decl.functionBody
-              >>: narrow @[]
+              .>> narrow @[]
               >>> mhead
               >>> narrow @Lit.TextElement
               >>> ensure Lit.isTripleQuoted)

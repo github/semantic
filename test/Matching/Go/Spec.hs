@@ -24,8 +24,8 @@ loopMatcher :: ( Stmt.For :< fs
             => TermMatcher fs ann
 loopMatcher = target <* go where
   go = Stmt.forBefore
-       >>: Stmt.assignmentValue
-       >>: need Lit.integerContent
+       .>> Stmt.assignmentValue
+       .>> need Lit.integerContent
        >>> ensure (== "0")
 
 
