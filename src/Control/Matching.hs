@@ -30,9 +30,10 @@ module Control.Matching
   ) where
 
 import Prelude hiding (id, (.))
-import Prologue hiding (project)
+import Prologue hiding (First, project)
 
 import Control.Category
+import Control.Arrow
 
 import Data.Sum
 import Data.Term
@@ -54,6 +55,7 @@ data Matcher t a where
   Target :: Matcher t t
   Empty  :: Matcher t a
   Comp   :: Matcher b c -> Matcher a b -> Matcher a c
+  Split  :: Matcher b c -> Matcher b' c' -> Matcher (b, b') (c, c')
   -- We could have implemented this by changing the semantics of how Then is interpreted, but that would make Then and Sequence inconsistent.
   Match  :: (t -> Maybe u) -> Matcher u a -> Matcher t a
   Pure   :: a -> Matcher t a
@@ -81,6 +83,10 @@ instance Monad (Matcher t) where
 instance Category Matcher where
   id  = Target
   (.) = Comp
+
+instance Arrow Matcher where
+  (***) = Split
+  arr = purely
 
 -- | This matcher always succeeds.
 succeeds :: Matcher t ()
@@ -196,3 +202,4 @@ matchOne t (Comp g f)   = matchOne t f >>= \x -> matchOne x g
 matchOne _ (Pure a)     = pure a
 matchOne _ Empty        = empty
 matchOne t (Then m f)   = matchOne t m >>= matchOne t . f
+  matchOne t (Split f g)  = matchOne t id >>= \(a, b) -> (,) <$> matchOne a f <*> matchOne b g
