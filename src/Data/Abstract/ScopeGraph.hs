@@ -31,7 +31,7 @@ import           Prelude hiding (lookup)
 import           Prologue
 import qualified Data.Sequence as Seq
 
-data Address address = Address { address :: address, position :: Position }
+data Address address = Address { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
 -- Offsets and frame addresses in the heap should be addresses?
@@ -93,6 +93,7 @@ lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
 lookupScope scope = Map.lookup scope . graph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
+-- TODO: Return the whole value in Maybe or Either.
 declare :: Ord scope => Declaration -> Span -> Maybe scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
 declare declaration ddata assocScope g@ScopeGraph{..} = fromMaybe (g, Nothing) $ do
   scopeKey <- currentScope
