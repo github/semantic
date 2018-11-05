@@ -226,8 +226,9 @@ instance Evaluatable QualifiedName where
     case childScope of
       Just childScope -> do
         currentScopeAddress <- currentScope
+        scopeAddress' <- maybeM (newScope mempty) currentScopeAddress
         currentFrameAddress <- currentFrame
-        frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
+        frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton scopeAddress' currentFrameAddress))
         withScopeAndFrame frameAddress $ do
           reference (Reference propName) (Declaration propName)
           address <- lookupDeclaration (Declaration propName)
