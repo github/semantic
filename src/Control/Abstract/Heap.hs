@@ -240,7 +240,7 @@ deref :: ( Member (Deref value) sig
       => Address address
       -> Evaluator term address value m value
 -- TODO: THIS IS WRONG we need to call Heap.lookup
-deref addr@Address{..} = gets (Heap.getSlot addr) >>= maybeM (throwAddressError (UnallocatedAddress address)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError (UninitializedAddress address))
+deref slot@Address{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError (UninitializedAddress frameAddress))
 
 
 lookupDeclaration :: ( Member (State (Heap address address value)) sig
