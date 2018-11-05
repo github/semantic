@@ -216,5 +216,3 @@ identWithLocals = do
   locals <- getLocals
   ident <- source
   pure (loc, ident, locals)
-
-{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}
