@@ -55,15 +55,8 @@ declare :: ( Carrier sig m
         => Declaration
         -> Span
         -> Maybe address
-        -> Evaluator term address value m (Address address)
-declare decl span scope = do
-  graph <- get
-  let (graph', position) = ScopeGraph.declare decl span scope graph
-  put graph'
-  currentScope <- ScopeGraph.currentScope <$> get
-  case (currentScope, position) of
-    (Just scope, Just position) -> pure (Address scope position)
-    _ -> throwScopeError (ScopeError decl span)
+        -> Evaluator term address value m ()
+declare decl span scope = modify (fst . ScopeGraph.declare decl span scope)
 
 putDeclarationScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
 putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
