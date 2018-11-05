@@ -16,7 +16,7 @@
 --
 --   5. Via the 'Alternative' instance, 'empty' assignments always fail. This can be used (in combination with the 'Monad' instance) to (for example) fail if a 'source' assignment produces an ill-formatted ByteString. However, see below re: committed choice.
 --
---   6. Via the 'Applicative' instance, 'pure' (or via the 'Monad' instance, 'return') assignments always succeed, producing the passed value. They do not advance past the current node. In combination with the 'Alternative' instance, 'pure' can provide default values when optional syntax is not present in the AST.
+--   6. Via the 'Applicative' instance, 'pure' (or via the 'Monad' instance, 'pure') assignments always succeed, producing the passed value. They do not advance past the current node. In combination with the 'Alternative' instance, 'pure' can provide default values when optional syntax is not present in the AST.
 --
 --   Assignments can further be combined in a few different ways:
 --
@@ -161,27 +161,27 @@ tracing f = case getCallStack callStack of
 --
 --   If assigning at the end of input or at the end of a list of children, the location will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
 location :: Assignment ast grammar L.Location
-location = tracing Location `Then` return
+location = tracing Location `Then` pure
 
 getLocals :: HasCallStack => Assignment ast grammar [Text]
-getLocals = tracing GetLocals `Then` return
+getLocals = tracing GetLocals `Then` pure
 
 putLocals :: (HasCallStack, Enum grammar, Eq1 ast, Ix grammar) => [Text] -> Assignment ast grammar ()
-putLocals l = (tracing (PutLocals l) `Then` return)
-          <|> (tracing End `Then` return)
+putLocals l = (tracing (PutLocals l) `Then` pure)
+          <|> (tracing End `Then` pure)
 
 -- | Zero-width production of the current node.
 currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) ())
-currentNode = tracing CurrentNode `Then` return
+currentNode = tracing CurrentNode `Then` pure
 
 -- | Zero-width match of a node with the given symbol, producing the current node’s location.
 symbol :: (Enum grammar, Ix grammar, HasCallStack) => grammar -> Assignment ast grammar L.Location
-symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` return
+symbol s = tracing (Choose (Table.singleton s location) Nothing Nothing) `Then` pure
 
 -- | A rule to produce a node’s source as a ByteString.
 -- You probably want to use 'source', unless you're throwing away the result.
 rawSource :: HasCallStack => Assignment ast grammar ByteString
-rawSource = tracing Source `Then` return
+rawSource = tracing Source `Then` pure
 
 -- | A rule to produce a node's source as Text. Fails if the node's source can't be parsed as UTF-8.
 source :: HasCallStack => Assignment ast grammar Text
@@ -189,7 +189,7 @@ source = fmap decodeUtf8' rawSource >>= either (\e -> fail ("UTF-8 decoding fail
 
 -- | Match a node by applying an assignment to its children.
 children :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar a
-children child = tracing (Children child) `Then` return
+children child = tracing (Children child) `Then` pure
 
 -- | Advance past the current node.
 advance :: HasCallStack => Assignment ast grammar ()
@@ -200,7 +200,7 @@ choice :: (Enum grammar, Eq1 ast, Ix grammar, HasCallStack) => [Assignment ast g
 choice [] = empty
 choice alternatives
   | null choices = asum alternatives
-  | otherwise    = tracing (Choose (Table.fromListWith (<|>) choices) (wrap . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` return
+  | otherwise    = tracing (Choose (Table.fromListWith (<|>) choices) (wrap . tracing . Alt . toList <$> nonEmpty atEnd) (mergeHandlers handlers)) `Then` pure
   where (choices, atEnd, handlers) = foldMap toChoices alternatives
         toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([(grammar, Assignment ast grammar a)], [Assignment ast grammar a], [Error (Either String grammar) -> Assignment ast grammar a])
         toChoices rule = case rule of
@@ -286,7 +286,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                 state@State{..} = case (runTracing t, initialState) of
                   (Choose table _ _, State { stateNodes = Term (In node _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
                   _ -> initialState
-                expectedSymbols = firstSet (t `Then` return)
+                expectedSymbols = firstSet (t `Then` pure)
                 assignmentStack = maybe emptyCallStack (fromCallSiteList . pure) (tracingCallSite t)
                 makeError' = maybe
                              (Error (Span statePos statePos) (fmap Right expectedSymbols) Nothing assignmentStack)
@@ -329,7 +329,7 @@ makeState ns = State 0 (Pos 1 1) [] ns []
 
 instance (Enum grammar, Eq1 ast, Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a
-  empty = tracing (Alt []) `Then` return
+  empty = tracing (Alt []) `Then` pure
 
   (<|>) :: forall a. HasCallStack => Assignment ast grammar a -> Assignment ast grammar a -> Assignment ast grammar a
   Return a <|> _ = Return a
@@ -350,23 +350,23 @@ instance (Enum grammar, Eq1 ast, Ix grammar) => Alternative (Assignment ast gram
                   rebuild a c = Tracing (callSiteL <|> callSiteR) a `Then` c
 
   many :: HasCallStack => Assignment ast grammar a -> Assignment ast grammar [a]
-  many a = tracing (Many a) `Then` return
+  many a = tracing (Many a) `Then` pure
 
 instance MonadFail (Assignment ast grammar) where
   fail :: HasCallStack => String -> Assignment ast grammar a
-  fail s = tracing (Fail s) `Then` return
+  fail s = tracing (Fail s) `Then` pure
 
 instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar, Show1 ast) => Parsing (Assignment ast grammar) where
   try = id
 
   (<?>) :: HasCallStack => Assignment ast grammar a -> String -> Assignment ast grammar a
-  a <?> s = tracing (Label a s) `Then` return
+  a <?> s = tracing (Label a s) `Then` pure
 
   unexpected :: HasCallStack => String -> Assignment ast grammar a
   unexpected = fail
 
   eof :: HasCallStack => Assignment ast grammar ()
-  eof = tracing End `Then` return
+  eof = tracing End `Then` pure
 
   notFollowedBy :: (HasCallStack, Show a) => Assignment ast grammar a -> Assignment ast grammar ()
   notFollowedBy a = a *> unexpected (show a) <|> pure ()
@@ -377,8 +377,8 @@ instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error 
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
   catchError rule handler = iterFreer (\ continue (Tracing cs assignment) -> case assignment of
-    Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` return
-    Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` return
+    Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` pure
+    Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` pure
     _ -> Tracing cs assignment `Then` ((`catchError` handler) . continue)) (fmap pure rule)
 
 instance Show1 f => Show1 (Tracing f) where
@@ -400,5 +400,3 @@ instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (Assignmen
     PutLocals locals -> showsUnaryWith showsPrec "PutLocals" d locals
     where showChild = liftShowsPrec sp sl
           showChildren = liftShowList sp sl
-
-{-# ANN module ("HLint: ignore Avoid return" :: String) #-}
