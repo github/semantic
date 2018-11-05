@@ -116,8 +116,8 @@ runCallGraph lang includePackages modules package
   . graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
   . runHeap
   . caching
-  . runState (lowerBound @(ScopeGraph (Hole (Maybe Name) (Located Monovariant))))
-  . runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) (Hole (Maybe Name) (Located Monovariant)) Abstract))
+  . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) (Located Monovariant)))))
+  . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) (Hole (Maybe Name) (Located Monovariant)) Abstract)))
   . raiseHandler runFresh
   . resumingLoadError
   . resumingUnspecialized
