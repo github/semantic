@@ -85,7 +85,7 @@ instance ( FreeVariables term
       declare (Declaration name) span Nothing
 
       currentScope' <- currentScope
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+      let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
       scope <- newScope lexicalEdges
 
       withScope scope $ do
