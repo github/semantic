@@ -34,6 +34,17 @@
 # Change the severity of hints we don’t want to fail CI for
 - suggest: {name: Eta reduce}
 
+# Ignore eta reduce in the assignment modules
+- ignore:
+  name: Eta reduce
+  within:
+  - Language.Go.Assignment
+  - Language.MiniPython.Assignment
+  - Language.MiniRuby.Assignment
+  - Language.PHP.Assignment
+  - Language.Python.Assignment
+  - Language.Ruby.Assignment
+
 # Our customized warnings
 
 # AMP fallout
