@@ -68,8 +68,8 @@ testGoDefs path = do
 testRubyDefs path = do
   blob <- readBlobFromFile' (File path Language.Ruby)
   tree <- parseFile' rubyParser path
-  -- pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
-  pure $! runTagging blob tree
+  pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
+  -- pure $! runTagging blob tree
 
 
 testRubyFile = do
