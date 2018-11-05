@@ -8,22 +8,19 @@ module Control.Matching
   , target
   , purely
   , ensure
-  , succeeds
-  , fails
   -- | Predicate filtering
-  , match
+  , refine
   , only
   -- | Projecting terms and sums
   , narrow
   , narrowF
-  , need
-  , (.>>)
+  , enter
   -- | Useful matchers
   , mhead
   , mjust
   -- | Running matchers
   , matchRecursively
-  , matchOne
+  , match
   -- | Reexports from Control.Category
   , (>>>)
   , (<<<)
@@ -86,15 +83,7 @@ instance Category Matcher where
 
 instance Arrow Matcher where
   (***) = Split
-  arr = purely
-
--- | This matcher always succeeds.
-succeeds :: Matcher t ()
-succeeds = guard True
-
--- | This matcher always fails.
-fails :: Matcher t ()
-fails = guard False
+  arr f = fmap f target
 
 -- | 'target' extracts the 't' that a given 'Matcher' is operating upon.
 --   Similar to a reader monad's 'ask' function. This is an alias for 'id'
@@ -102,14 +91,15 @@ target :: Matcher t t
 target = id
 
 -- | 'ensure' succeeds iff the provided predicate function returns true when applied to the matcher's 'target'.
-ensure :: (t -> Bool) -> Matcher t ()
-ensure f = target >>= \c -> guard (f c)
+-- If it succeeds, it returns the matcher's 'target'.
+ensure :: (t -> Bool) -> Matcher t t
+ensure f = target >>= \c -> c <$ guard (f c)
 
--- | Promote a pure function to a 'Matcher'.
+-- | Promote a pure function to a 'Matcher'. An alias for 'arr'.
 purely :: (a -> b) -> Matcher a b
-purely f = fmap f target
+purely = arr
 
--- | 'match' takes a modification function and a new matcher action
+-- | 'refine' takes a modification function and a new matcher action
 -- the target parameter of which is the result of the modification
 -- function. If the modification function returns 'Just' when applied
 -- to the current 'target', the given matcher is executed with the
@@ -117,37 +107,26 @@ purely f = fmap f target
 -- the action fails.
 --
 -- This is the lowest-level combinator for applying a predicate function
--- to a matcher. In practice, you'll generally use the 'need' and '.>>'
+-- to a matcher. In practice, you'll generally use the 'enter' and 'narrow'
 -- combinators to iterate on recursive 'Term' values.
-match :: (t -> Maybe u) -> Matcher u a -> Matcher t a
-match = Match
+refine :: (t -> Maybe u) -> Matcher u a -> Matcher t a
+refine = Match
 
 -- | An alias for the common pattern of @match f id@.
 only :: (t -> Maybe u) -> Matcher t u
 only f = Match f Target
 
--- | The 'need' combinator is the primary interface for creating
+-- | The 'enter' combinator is the primary interface for creating
 -- matchers that 'project' their internal 'Term' values into some
 -- constituent type. Given a function from a constituent type @f@
 -- @need p@ succeeds if the provided term can be projected into
 -- an @f@, then applies the @p@ function.
-need :: ( f :< fs
-        , term ~ Term (Sum fs) ann
-        )
+enter :: ( f :< fs
+         , term ~ Term (Sum fs) ann
+         )
      => (f term -> b)
      -> Matcher term b
-need f = Match (fmap f . projectTerm) target
-
--- | An alias for @need f >>>@. Allows you to avoid repeated
--- calls to 'need' in long chains of projection and composition.
--- Similar to '^>>' from Control.Arrow, except the call to 'projectTerm'
--- is implicit.
-infixr 0 .>>
-(.>>) :: (f :< fs, term ~ Term (Sum fs) ann)
-      => (f term -> b)
-      -> Matcher b c
-      -> Matcher term c
-f .>> a = need f >>> a
+enter f = Match (fmap f . projectTerm) target
 
 -- | 'narrow' projects the given 'Term' of 'Sum's into a constituent member
 -- of that 'Sum', failing if the target cannot be thus projected.
@@ -190,16 +169,16 @@ matchRecursively :: (Alternative m, Monad m, Corecursive t, Recursive t, Foldabl
 matchRecursively m = para (paraMatcher m)
 
 paraMatcher :: (Alternative m, Monad m, Corecursive t, Foldable (Base t)) => Matcher t a -> RAlgebra (Base t) t (m a)
-paraMatcher m t = matchOne (embedTerm t) m <|> foldMapA snd t
+paraMatcher m t = match (embedTerm t) m <|> foldMapA snd t
 
 -- | Run one step of a 'Matcher' computation. Look at 'matchRecursively' if you want something
 -- that folds over subterms.
-matchOne :: (Alternative m, Monad m) => t -> Matcher t a -> m a
-matchOne t (Choice a b) = matchOne t a <|> matchOne t b
-matchOne t Target       = pure t
-matchOne t (Match f m)  = foldMapA (`matchOne` m) (f t)
-matchOne t (Comp g f)   = matchOne t f >>= \x -> matchOne x g
-matchOne _ (Pure a)     = pure a
-matchOne _ Empty        = empty
-matchOne t (Then m f)   = matchOne t m >>= matchOne t . f
-matchOne t (Split f g)  = matchOne t id >>= \(a, b) -> (,) <$> matchOne a f <*> matchOne b g
+match :: (Alternative m, Monad m) => t -> Matcher t a -> m a
+match t (Choice a b) = match t a <|> match t b
+match t Target       = pure t
+match t (Match f m)  = foldMapA (`match` m) (f t)
+match t (Comp g f)   = match t f >>= \x -> match x g
+match _ (Pure a)     = pure a
+match _ Empty        = empty
+match t (Then m f)   = match t m >>= match t . f
+match t (Split f g)  = match t id >>= \(a, b) -> (,) <$> match a f <*> match b g

@@ -14,7 +14,7 @@ import           SpecHelpers
 
 -- This gets the Text contents of all integers
 integerMatcher :: (Lit.Integer :< fs) => Matcher (Term (Sum fs) ann) Text
-integerMatcher = need Lit.integerContent
+integerMatcher = enter Lit.integerContent
 
 -- This matches all for-loops with its index variable new variable bound to 0,
 -- e.g. `for i := 0; i < 10; i++`
@@ -23,9 +23,9 @@ loopMatcher :: ( Stmt.For :< fs
                , Lit.Integer :< fs)
             => TermMatcher fs ann
 loopMatcher = target <* go where
-  go = Stmt.forBefore
-       .>> Stmt.assignmentValue
-       .>> need Lit.integerContent
+  go = enter Stmt.forBefore
+       >>> enter Stmt.assignmentValue
+       >>> enter Lit.integerContent
        >>> ensure (== "0")
 
 

@@ -133,8 +133,8 @@ kvMatcher :: forall fs term .
   ) =>
   Text -> Matcher term (Literal.KeyValue term)
 kvMatcher name = narrow <* matchKey where
-  matchKey = Literal.key
-             .>> need Literal.textElementContent
+  matchKey = enter Literal.key
+             >>> enter Literal.textElementContent
              >>> ensure (== name)
 
 changeKV :: ( Apply Functor syntax
