@@ -39,9 +39,9 @@ data Value term address
   | String Text
   | Symbol Text
   | Regex Text
-  | Tuple [(Value address body)]
-  | Array [(Value address body)]
-  | Class Declaration [(Value address body)] address
+  | Tuple [(Value term address)]
+  | Array [(Value term address)]
+  | Class Declaration [(Value term address)] address
   | Namespace Name (Maybe address) (Bindings address)
   | KVPair (Value term address) (Value term address)
   | Hash [Value term address]
@@ -66,7 +66,7 @@ instance ( FreeVariables term
          , Member (Reader Span) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
-         , Member (State (Heap address (Value term address))) sig
+         , Member (State (Heap address address (Value term address))) sig
          , Member Trace sig
          , Ord address
          , Carrier sig m
@@ -144,7 +144,7 @@ instance ( Carrier sig m
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (State (Heap address (Value term address))) sig
+         , Member (State (Heap address address (Value term address))) sig
          , Ord address
          , Show address
          , Show term
@@ -193,7 +193,7 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
 --                           , Member (Reader ModuleInfo) sig
 --                           , Member (Reader Span) sig
 --                           , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
---                           , Member (State (Heap address (Value term address))) sig
+--                           , Member (State (Heap address address (Value term address))) sig
 --                           , Ord address
 --                           , Carrier sig m
 --                           )
