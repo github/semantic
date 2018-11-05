@@ -211,8 +211,10 @@ instance Evaluatable Class where
     currentScope' <- currentScope
 
     supers <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
+      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
       scope <- associatedScope (Declaration name)
+      undefined
+    undefined
       --   (scope,) <$> (eval superclass >>= address)
       --
       -- let imports = (Import,) <$> (fmap pure . catMaybes $ fst <$> supers)
@@ -228,7 +230,6 @@ instance Evaluatable Class where
       --     klass name (snd <$> supers) classBinds
       --   bind name addr
       --   pure (Rval addr)
-      undefined
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
