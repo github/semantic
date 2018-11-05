@@ -64,9 +64,14 @@ instance ( FreeVariables term
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
          , Member (Reader Span) sig
+         , Member (State Span) sig
+         , Member (State (ScopeGraph address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
+         , Member (Resumable (BaseError (HeapError address))) sig
+         , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (State (Heap address address (Value term address))) sig
+         , Member (Error (Return (Value term address))) sig
          , Member Trace sig
          , Ord address
          , Carrier sig m

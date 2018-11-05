@@ -23,23 +23,22 @@ runPythonPackaging :: ( Carrier sig m
                       , Show address
                       , Show term
                       , Member Trace sig
-                      , Member (Boolean (Value address body)) sig
-                      , Member (State (Heap address address (Value address body))) sig
-                      , Member (Resumable (BaseError (AddressError address (Value address body)))) sig
-                      , Member (Resumable (BaseError (ValueError address body))) sig
+                      , Member (Boolean (Value term address)) sig
+                      , Member (State (Heap address address (Value term address))) sig
+                      , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+                      , Member (Resumable (BaseError (ValueError term address))) sig
                       , Member Fresh sig
-                      , Coercible body (Eff.Eff sig)
                       , Member (State Strategy) sig
                       , Member (Allocator address) sig
-                      , Member (Deref (Value address body)) sig
-                      , Member (Error (LoopControl (Value address body))) sig
-                      , Member (Error (Return (Value address body))) sig
+                      , Member (Deref (Value term address)) sig
+                      , Member (Error (LoopControl (Value term address))) sig
+                      , Member (Error (Return (Value term address))) sig
                       , Member (Reader ModuleInfo) sig
                       , Member (Reader PackageInfo) sig
                       , Member (Reader Span) sig
-                      , Member (Function address (Value address body)) sig)
-                   => Evaluator term address (Value address body) (PythonPackagingC term address (Eff m)) a
-                   -> Evaluator term address (Value address body) m a
+                      , Member (Function term address (Value term address)) sig)
+                   => Evaluator term address (Value term address) (PythonPackagingC term address (Eff m)) a
+                   -> Evaluator term address (Value term address) m a
 runPythonPackaging = raiseHandler (runPythonPackagingC . interpret)
 
 
@@ -50,18 +49,18 @@ wrap = PythonPackagingC . runEvaluator
 
 instance ( Carrier sig m
          , Member (Allocator address) sig
-         , Member (Boolean (Value address body)) sig
-         , Member (Deref (Value address body)) sig
-         , Member (Error (LoopControl address)) sig
-         , Member (Error (Return address)) sig
+         , Member (Boolean (Value term address)) sig
+         , Member (Deref (Value term address)) sig
+         , Member (Error (LoopControl (Value term address))) sig
+         , Member (Error (Return (Value term address))) sig
          , Member Fresh sig
-         , Member (Function address (Value address body)) sig
+         , Member (Function term address (Value term address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (AddressError address (Value address body)))) sig
-         , Member (Resumable (BaseError (ValueError address body))) sig
-         , Member (State (Heap address address (Value address body))) sig
+         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+         , Member (Resumable (BaseError (ValueError term address))) sig
+         , Member (State (Heap address address (Value term address))) sig
          , Member (State Strategy) sig
          , Member Trace sig
          , Ord address

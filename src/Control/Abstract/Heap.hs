@@ -192,6 +192,7 @@ define :: ( HasCallStack
           , Member (State (Heap address address value)) sig
           , Member (State (ScopeGraph address)) sig
           , Member (Resumable (BaseError (ScopeError address))) sig
+          , Member (Resumable (BaseError (HeapError address))) sig
           , Ord address
           , Carrier sig m
           )
