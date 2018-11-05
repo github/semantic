@@ -201,9 +201,10 @@ define :: ( HasCallStack
        -> Evaluator term address value m value
 define declaration def = withCurrentCallStack callStack $ do
   span <- ask @Span -- TODO: This Span is most definitely wrong
-  addr <- declare declaration span Nothing
+  declare declaration span Nothing
+  slot <- lookupDeclaration declaration
   value <- def
-  value <$ assign addr value -- TODO: Stop passing in an Address of scopes.
+  value <$ assign slot value -- TODO: Stop passing in an Address of scopes.
 
 -- | Associate an empty child scope with a declaration and then locally evaluate the body within an associated frame.
 withChildFrame :: ( Member (Allocator address) sig
