@@ -572,5 +572,3 @@ infixTerm :: Assignment Term
           -> [Assignment (Term -> Term -> Sum Syntax Term)]
           -> Assignment (Sum Syntax Term)
 infixTerm = infixContext comment
-
-{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

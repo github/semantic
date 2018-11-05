@@ -139,8 +139,6 @@ graphingModules recur m = do
     includeModule path = let path' = if Prologue.null path then "unknown, concrete semantics required" else path
       in moduleInclusion (moduleVertex (ModuleInfo path'))
 
-{-# ANN graphingModules ("HLint: ignore Use ." :: String) #-}
-
 -- | Add vertices to the graph for imported modules.
 graphingModuleInfo :: ( Member (Modules address) sig
                       , Member (Reader ModuleInfo) sig
