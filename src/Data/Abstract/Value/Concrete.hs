@@ -151,10 +151,10 @@ instance ( Member (Reader ModuleInfo) sig
     Abstract.AsBool other       k -> throwBaseError (BoolError other) >>= runBooleanC . k)
 
 
-instance ( Carrier sig m
+instance forall sig m term address. ( Carrier sig m
          , Member (Deref (Value term address)) sig
          , Member (Abstract.Boolean (Value term address)) sig
-         , Member (Error (LoopControl address)) sig
+         , Member (Error (LoopControl (Value term address))) sig
          , Member (Interpose (Resumable (BaseError (UnspecializedError (Value term address))))) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -175,11 +175,11 @@ instance ( Carrier sig m
       -- conditional always being true and getting stuck in an infinite loop.
 
       ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
-      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address))
+      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @(Value term address)))
         >>= runWhileC . k)
     where
-      loop x = catchLoopControl @address (fix x) $ \case
-        Break value -> deref value
+      loop x = catchLoopControl @(Value term address) (fix x) $ \case
+        Break value -> pure value
         Abort -> pure unit
         -- FIXME: Figure out how to deal with this. Ruby treats this as the result
         -- of the current block iteration, while PHP specifies a breakout level
@@ -236,8 +236,8 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
 instance ( Member (Allocator address) sig
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Deref (Value term address)) sig
-         , Member (Error (LoopControl address)) sig
-         , Member (Error (Return address)) sig
+         , Member (Error (LoopControl (Value term address))) sig
+         , Member (Error (Return (Value term address))) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
