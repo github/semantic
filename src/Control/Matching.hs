@@ -38,8 +38,8 @@ import Control.Arrow
 import Data.Sum
 import Data.Term
 
--- | A @Matcher t a@ is a tree automaton that matches some 'Recursive'
---   and 'Corecursive' type @t@, yielding values of type @a@.
+-- | A @Matcher t a@ is a parser over some 'Recursive' and
+--   'Corecursive' type @t@, yielding values of type @a@.
 --
 -- Matching operations are implicitly recursive: when you run a
 -- 'Matcher', it is applied bottom-up. If a matching operation
@@ -202,4 +202,4 @@ matchOne t (Comp g f)   = matchOne t f >>= \x -> matchOne x g
 matchOne _ (Pure a)     = pure a
 matchOne _ Empty        = empty
 matchOne t (Then m f)   = matchOne t m >>= matchOne t . f
-  matchOne t (Split f g)  = matchOne t id >>= \(a, b) -> (,) <$> matchOne a f <*> matchOne b g
+matchOne t (Split f g)  = matchOne t id >>= \(a, b) -> (,) <$> matchOne a f <*> matchOne b g
