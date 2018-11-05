@@ -272,7 +272,7 @@ class AbstractIntro value => AbstractValue term address value carrier where
   -- | Construct an array of zero or more values.
   array :: [value] -> Evaluator term address value carrier value
 
-  asArray :: value -> Evaluator term address value carrier [address]
+  asArray :: value -> Evaluator term address value carrier [value]
 
   -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> Evaluator term address value carrier (value, value)
