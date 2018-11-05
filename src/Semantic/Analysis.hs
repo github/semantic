@@ -69,9 +69,9 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Ord address
             )
          => proxy lang
-         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner value)
-            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
-         -> (term -> Evaluator term address value (ValueC term address value inner) value)
+         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner (ValueRef address value))
+            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) (ValueRef address value)))
+         -> (term -> Evaluator term address value (ValueC term address value inner) (ValueRef address value))
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
