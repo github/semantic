@@ -100,7 +100,7 @@ instance ( FreeVariables term
     Abstract.BuiltIn builtIn k -> do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
-      runFunctionC (k (Closure packageInfo moduleInfo Nothing [] (Left builtIn) lowerBound)) eval
+      runFunctionC (k (Closure packageInfo moduleInfo (Data.Abstract.Name.name . pack $ show builtIn) [] (Left builtIn) lowerBound)) eval
     Abstract.Call op self params k -> runEvaluator $ do
       boxed <- case op of
         Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> pure Unit
