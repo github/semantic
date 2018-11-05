@@ -5,6 +5,7 @@ module Semantic.Analysis
 ) where
 
 import Control.Abstract
+import Control.Abstract.ScopeGraph (runAllocator)
 import Control.Effect.Interpose
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
@@ -14,13 +15,13 @@ import Data.Function
 import Prologue
 
 type ModuleC address value m
-  = ErrorC (LoopControl address) (Eff
-  ( ErrorC (Return address)      (Eff
-  ( EnvC address                 (Eff
-  ( ScopeEnvC address            (Eff
-  ( DerefC address value         (Eff
-  ( AllocatorC address           (Eff
-  ( ReaderC ModuleInfo           (Eff
+  = ErrorC (LoopControl value)          (Eff
+  ( ErrorC (Return value)               (Eff
+  ( StateC (Heap address address value) (Eff
+  ( StateC (ScopeGraph address)         (Eff
+  ( DerefC address value                (Eff
+  ( AllocatorC address                  (Eff
+  ( ReaderC ModuleInfo                  (Eff
     m)))))))))))))
 
 type ValueC term address value m
@@ -68,15 +69,15 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Ord address
             )
          => proxy lang
-         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner address)
-            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) address))
-         -> (term -> Evaluator term address value (ValueC term address value inner) address)
+         -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner value)
+            -> (Module (Either (proxy lang) term) -> Evaluator term address value (ModuleC address value outer) value))
+         -> (term -> Evaluator term address value (ValueC term address value inner) value)
          -> [Module term]
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
-  (_, (preludeBinds, _)) <- evalModule lowerBound prelude
-  foldr (run preludeBinds . fmap Right) ask modules
+  (preludeScopeGraph, _) <- evalModule lowerBound prelude
+  foldr (run preludeScopeGraph . fmap Right) ask modules
   where run prelude m rest = do
           evaluated <- evalModule prelude m
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
@@ -87,16 +88,17 @@ evaluate lang perModule runTerm modules = do
                   = raiseHandler (runReader (moduleInfo m))
                   . runAllocator
                   . runDeref
-                  . runScopeEnv
-                  . runEnv (EvalContext Nothing (Env.push (newEnv prelude)))
+                  . raiseHandler (runState lowerBound) -- ScopeGraph
+                  . raiseHandler (evalState lowerBound) -- Heap
                   . runReturn
                   . runLoopControl
 
-        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> box unit) . definePrelude) runTerm
+        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> pure unit) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
 --   This calls out to the 'Evaluatable' instances, will be passed to 'runValueEffects', and can have other functions composed after it to e.g. intercept effects arising in the evaluation of the term.
+--   TODO: evalTerm should return a ValueRef like eval and runFunction
 evalTerm :: ( Carrier sig m
             , Declarations term
             , Evaluatable (Base term)
@@ -128,6 +130,6 @@ evalTerm :: ( Carrier sig m
             , Ord address
             , Recursive term
             )
-         => Open (Open (term -> Evaluator term address value m (ValueRef address)))
-         -> term -> Evaluator term address value m address
-evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project)) >=> address
+         => Open (Open (term -> Evaluator term address value m (ValueRef address value)))
+         -> term -> Evaluator term address value m value
+evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project)) >=> value
