@@ -274,7 +274,7 @@ instance ( Member (Allocator address) sig
               bimap id (tvar :) <$> rest) (pure (undefined, [])) params
             -- TODO: We may still want to represent this as a closure and not a function type
             (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
-      value >>= Evaluator . flip runFunctionC eval . k
+      value >>= rvalBox >>= Evaluator . flip runFunctionC eval . k
 
     Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
     Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval

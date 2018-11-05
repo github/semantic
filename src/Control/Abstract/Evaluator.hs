@@ -66,11 +66,11 @@ earlyReturn :: ( Member (Error (Return value)) sig
                , Carrier sig m
                )
             => value
-            -> Evaluator term address value m value
+            -> Evaluator term address value m (ValueRef address value)
 earlyReturn = throwError . Return
 
-catchReturn :: (Member (Error (Return value)) sig, Carrier sig m) => Evaluator term address value m value -> Evaluator term address value m value
-catchReturn = flip catchError (\ (Return value) -> pure value)
+catchReturn :: (Member (Error (Return value)) sig, Carrier sig m) => Evaluator term address value m (ValueRef address value) -> Evaluator term address value m (ValueRef address value)
+catchReturn = flip catchError (\ (Return value) -> rvalBox value)
 
 runReturn :: (Carrier sig m, Effect sig) => Evaluator term address value (ErrorC (Return value) (Eff m)) value -> Evaluator term address value m value
 runReturn = raiseHandler $ fmap (either unReturn id) . runError

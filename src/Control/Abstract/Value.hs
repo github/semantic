@@ -73,7 +73,7 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> Evaluator term address value m value
+function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> Evaluator term address value m (ValueRef address value)
 function name params body = sendFunction (Function name params body ret)
 
 data BuiltIn
@@ -81,19 +81,19 @@ data BuiltIn
   | Show
   deriving (Eq, Ord, Show, Generic, NFData)
 
-builtIn :: (Member (Function term address value) sig, Carrier sig m) => BuiltIn -> Evaluator term address value m value
+builtIn :: (Member (Function term address value) sig, Carrier sig m) => BuiltIn -> Evaluator term address value m (ValueRef address value)
 builtIn = sendFunction . flip BuiltIn ret
 
-call :: (Member (Function term address value) sig, Carrier sig m) => value -> Address address -> [value] -> Evaluator term address value m value
+call :: (Member (Function term address value) sig, Carrier sig m) => value -> Address address -> [value] -> Evaluator term address value m (ValueRef address value)
 call fn self args = sendFunction (Call fn self args ret)
 
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
 sendFunction = send
 
 data Function term address value (m :: * -> *) k
-  = Function Name [Name] term (value -> k)
-  | BuiltIn BuiltIn (value -> k)
-  | Call value (Address address) [value] (value -> k)
+  = Function Name [Name] term (ValueRef address value -> k)
+  | BuiltIn BuiltIn (ValueRef address value -> k)
+  | Call value (Address address) [value] (ValueRef address value -> k)
   deriving (Functor)
 
 instance HFunctor (Function term address value) where
@@ -107,12 +107,12 @@ instance Effect (Function term address value) where
 
 -- TODO: eval and runFunction should return a ValueRef instead of a value
 runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
-            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) value)
+            => (term -> Evaluator term address value (FunctionC term address value (Eff m)) (ValueRef address value))
             -> Evaluator term address value (FunctionC term address value (Eff m)) a
             -> Evaluator term address value m a
 runFunction eval = raiseHandler (flip runFunctionC (runEvaluator . eval) . interpret)
 
-newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) value) -> m a }
+newtype FunctionC term address value m a = FunctionC { runFunctionC :: (term -> Eff (FunctionC term address value m) (ValueRef address value)) -> m a }
 
 
 -- | Construct a boolean value in the abstract domain.
