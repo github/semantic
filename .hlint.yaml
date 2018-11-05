@@ -5,7 +5,7 @@
 
 # Blacklist some functions by default.
 - functions:
-  - {name: unsafePerformIO, within: []}
+  - {name: unsafePerformIO, within: [Data.Scientific.Exts.attemptUnsafeArithmetic]}
   - {name: unsafeCoerce, within: []}
   - {name: head, within: []}
   - {name: tail, within: []}
