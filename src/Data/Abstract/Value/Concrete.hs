@@ -86,12 +86,11 @@ instance ( FreeVariables term
       moduleInfo <- currentModule
       i <- fresh
       -- TODO: Declare all params
-      span <- get @Span
-      declare (Declaration name) span Nothing
-
+      span <- ask @Span -- TODO: This is probably wrong.
       currentScope' <- currentScope
       let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
       scope <- newScope lexicalEdges
+      declare (Declaration name) span (Just scope)
 
       withScope scope $ do
         for_ params $ \name -> do
