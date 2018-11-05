@@ -126,11 +126,6 @@ descend lang t@(In loc _) = do
   traverse_ subtermRef t
   exit (constructorName term) snippetRange
 
-getRangeOfDecl :: Foldable t => Location -> Term t Location -> Maybe Range
-getRangeOfDecl ann (Term (In body bodyF))
-  | (Term (In firstEl _):_) <- toList bodyF = Just $ subtractLocation ann firstEl
-  | otherwise = Just $ subtractLocation ann body
-
 subtractLocation :: Location -> Location -> Range
 subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 
@@ -153,7 +148,7 @@ instance Taggable Declaration.Function where
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
-  snippet ann (Declaration.Function _ _ _ body) = getRangeOfDecl ann body
+  snippet ann (Declaration.Function _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
 instance Taggable Declaration.Method where
   docsLiteral Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)))
@@ -161,7 +156,7 @@ instance Taggable Declaration.Method where
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
-  snippet ann (Declaration.Method _ _ _ _ body) = getRangeOfDecl ann body
+  snippet ann (Declaration.Method _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
 instance Taggable Declaration.Class where
   docsLiteral Python (Declaration.Class _ _ _ (Term (In _ bodyF)))
@@ -169,17 +164,17 @@ instance Taggable Declaration.Class where
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
-  snippet ann (Declaration.Class _ _ _ body) = getRangeOfDecl ann body
+  snippet ann (Declaration.Class _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
 instance Taggable Ruby.Class where
-  snippet ann (Ruby.Class _ _ body) = getRangeOfDecl ann body
+  snippet ann (Ruby.Class _ _ (Term (In body _))) = Just $ subtractLocation ann body
 
 instance Taggable Ruby.Module where
-  snippet ann (Ruby.Module _ (body:_)) = getRangeOfDecl ann body
+  snippet ann (Ruby.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
   snippet ann (Ruby.Module _ _) = Just (locationByteRange ann)
 
 instance Taggable TypeScript.Module where
-  snippet ann (TypeScript.Module _ (body:_)) = getRangeOfDecl ann body
+  snippet ann (TypeScript.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
   snippet ann (TypeScript.Module _ _) = Just (locationByteRange ann)
 
 instance Taggable []
