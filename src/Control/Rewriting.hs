@@ -376,9 +376,6 @@ paraM f = liftM snd . cataM run
           a <- f t
           pure (embed $ fmap fst t, a)
 
-eitherA :: Applicative f => (b -> f (Either a c)) -> Either a b -> f (Either a c)
-eitherA = either (pure . Left)
-
 -- | As 'rewriteM', but with some parameters reversed.
 runE :: forall m env from to . Monad m
      => env
