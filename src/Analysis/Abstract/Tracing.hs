@@ -29,15 +29,14 @@ tracing = runWriter . runEvaluator
 
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (State (Heap address value)) sig, Carrier sig m)
+getConfiguration :: (Member (State (Heap address address value)) sig, Carrier sig m)
                  => term
                  -> Evaluator term address value m (Configuration term address value)
-getConfiguration term = Configuration term <$> getEvalContext <*> getHeap
+getConfiguration term = Configuration term <$>  getHeap
 
 -- | A single point in a program’s execution.
 data Configuration term address value = Configuration
   { configurationTerm    :: term                -- ^ The “instruction,” i.e. the current term to evaluate.
-  , configurationContext :: EvalContext address -- ^ The evaluation context in 'configurationTerm'.
-  , configurationHeap    :: Heap address value  -- ^ The heap of values.
+  , configurationHeap    :: Heap address address value  -- ^ The heap of values.
   }
   deriving (Eq, Ord, Show)
