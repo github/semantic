@@ -32,10 +32,8 @@ instance Show1 Statements where liftShowsPrec = genericLiftShowsPrec
 instance ToJSON1 Statements
 
 instance Evaluatable Statements where
-  eval eval (Statements xs) = do
-    currentScope' <- currentScope -- TODO: currentScope should return a Maybe
-    scope <- newScope (Map.singleton Lexical [ currentScope' ])
-    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+  eval eval (Statements xs) =
+    withLexicalScopeAndFrame $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
