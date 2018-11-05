@@ -102,7 +102,7 @@ self = ctxSelf <$> getEvalContext
 -- letrec :: ( Member (Allocator address) sig
 --           , Member (Deref value) sig
 --           , Member (Env address) sig
---           , Member (State (Heap address value)) sig
+--           , Member (State (Heap address address value)) sig
 --           , Ord address
 --           , Carrier sig m
 --           )

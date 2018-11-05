@@ -54,15 +54,16 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member Fresh outerSig
             , Member (Allocator address) innerSig
             , Member (Deref value) innerSig
-            , Member (Env address) innerSig
             , Member Fresh innerSig
             , Member (Reader ModuleInfo) innerSig
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address))))) outerSig
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
             , Member (Reader Span) innerSig
             , Member (Resumable (BaseError (AddressError address value))) innerSig
-            , Member (Resumable (BaseError (EnvironmentError address))) innerSig
             , Member (Resumable (BaseError (UnspecializedError value))) innerSig
-            , Member (State (Heap address value)) innerSig
+            , Member (State (Heap address address value)) innerSig
+            , Member (State (ScopeGraph address)) innerSig
+            , Member (Resumable (BaseError (HeapError address))) innerSig
+            , Member (Resumable (BaseError (ScopeError address))) innerSig
             , Member Trace innerSig
             , Ord address
             )
@@ -104,11 +105,11 @@ evalTerm :: ( Carrier sig m
             , Member (Allocator address) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
-            , Member (Error (LoopControl address)) sig
-            , Member (Error (Return address)) sig
+            , Member (Error (LoopControl value)) sig
+            , Member (Error (Return value)) sig
             , Member Fresh sig
             , Member (Function term address value) sig
-            , Member (Modules address) sig
+            , Member (Modules address value) sig
             , Member (Reader ModuleInfo) sig
             , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
@@ -117,8 +118,10 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError EvalError)) sig
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (Resumable (BaseError (UnspecializedError value))) sig
-            , Member (ScopeEnv address) sig
-            , Member (State (Heap address value)) sig
+            , Member (State (ScopeGraph address)) sig
+            , Member (State (Heap address address value)) sig
+            , Member (Resumable (BaseError (HeapError address))) sig
+            , Member (Resumable (BaseError (ScopeError address))) sig
             , Member (State Span) sig
             , Member Trace sig
             , Member (While value) sig

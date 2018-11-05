@@ -45,12 +45,10 @@ import           Prologue
 lookup :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Reference -> Evaluator term address value m (Maybe address)
 lookup ref = ScopeGraph.scopeOfRef ref <$> get
 
-declare :: ( Ord address
-           , Member (Resumable (BaseError (ScopeError address))) sig
-           , Member (Reader ModuleInfo) sig
-           , Member (Reader Span) sig
+-- TODO: Don't return an address.
+declare :: ( Carrier sig m
            , Member (State (ScopeGraph address)) sig
-           , Carrier sig m
+           , Ord address
            )
         => Declaration
         -> Span
@@ -125,10 +123,7 @@ newScope edges = do
   address <- alloc name
   address <$ modify (ScopeGraph.newScope address edges)
 
-currentScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
-                , Member (Reader ModuleInfo) sig
-                , Member (Reader Span) sig
-                , Member (State (ScopeGraph address)) sig
+currentScope :: ( Member (State (ScopeGraph address)) sig
                 , Carrier sig m
                 )
              => Evaluator term address value m (Maybe address)
@@ -188,15 +183,12 @@ lookupScopePath declaration = maybeM (throwScopeError LookupPathError) . ScopeGr
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
-withScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
-        , Member (Reader ModuleInfo) sig
-        , Member (Reader Span) sig
-        , Member (State (ScopeGraph address)) sig
-        , Carrier sig m
-        )
-      => address
-      -> Evaluator term address value m a
-      -> Evaluator term address value m a
+withScope :: ( Carrier sig m
+             , Member (State (ScopeGraph address)) sig
+             )
+          => address
+          -> Evaluator term address value m a
+          -> Evaluator term address value m a
 withScope scope action = do
     prevScope <- currentScope
     modify (\g -> g { ScopeGraph.currentScope = Just scope })
