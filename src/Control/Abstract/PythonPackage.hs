@@ -76,7 +76,7 @@ instance ( Carrier sig m
         case callName of
           Closure _ _ name' paramNames _ _ -> do
             let bindings = foldr (uncurry Map.insert) lowerBound (zip paramNames params)
-            let asStrings = deref >=> asArray >=> traverse (deref >=> asString)
+            let asStrings = asArray >=> traverse asString
 
             if name "find_packages" == name' then do
               as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "exclude") bindings)
