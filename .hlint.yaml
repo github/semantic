@@ -45,6 +45,8 @@
   - Language.Python.Assignment
   - Language.Ruby.Assignment
 
+- ignore: {name: Use ., within: [Analysis.Abstract.Graph.graphingModules]}
+
 # Our customized warnings
 
 # AMP fallout
