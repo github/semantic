@@ -37,9 +37,8 @@ onTrees = do
 -- Matches only "hi" string literals.
 isHi :: ( Literal.TextElement :< fs
         ) => Matcher (Term (Sum fs) History) Text
-isHi = need Literal.textElementContent
+isHi = enter Literal.textElementContent
        >>> ensure (== "\"hi\"")
-       *>  id
 
 spec :: Spec
 spec = describe "rewriting" $ do

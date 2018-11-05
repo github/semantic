@@ -74,7 +74,7 @@ import           Data.Profunctor
 import qualified Data.Sum as Sum hiding (apply)
 import           Data.Text (pack)
 
-import Control.Matching (Matcher, matchOne)
+import Control.Matching (Matcher, match)
 import Data.History as History
 import Data.Term
 
@@ -212,7 +212,7 @@ promote = Promote
 
 -- | Promote a 'Matcher' to a 'Rule'.
 fromMatcher :: Matcher from to -> Rule env from to
-fromMatcher m = target >>= \t -> maybeM (fail "fromMatcher") (matchOne t m)
+fromMatcher m = target >>= \t -> maybeM (fail "fromMatcher") (match t m)
 
 -- | Promote a Rule from a recursive functor to one over terms, operating
 -- leaf-to-root in the style of 'Data.Functor.Foldable.para'.

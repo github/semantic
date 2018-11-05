@@ -20,8 +20,8 @@ docstringMatcher :: ( Decl.Function :< fs
                     , term ~ Term (Sum fs) ann
                     ) => Matcher term (TermF Decl.Function ann term)
 docstringMatcher =
-  narrowF <* (Decl.functionBody
-              .>> narrow @[]
+  narrowF <* (enter Decl.functionBody
+              >>> narrow @[]
               >>> mhead
               >>> narrow @Lit.TextElement
               >>> ensure Lit.isTripleQuoted)
