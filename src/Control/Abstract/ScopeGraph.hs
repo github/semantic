@@ -23,6 +23,8 @@ module Control.Abstract.ScopeGraph
   , lookupScopePath
   , lookupScope
   , Allocator(..)
+  , AllocatorC(..)
+  , runAllocator
   , alloc
   , Address(..)
   , runScopeErrorWith
