@@ -102,7 +102,7 @@ doRequire :: ( Member (Boolean value) sig
              , Carrier sig m
              )
           => M.ModulePath
-          -> Evaluator term address value m (Bindings address, value)
+          -> Evaluator term address value m (ScopeGraph.ScopeGraph address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
