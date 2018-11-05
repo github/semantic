@@ -101,10 +101,21 @@ instance ( FreeVariables term
       address <- lookupDeclaration (Declaration name)
       assign address closure
       pure closure >>= Evaluator . flip runFunctionC eval . k
-    Abstract.BuiltIn builtIn k -> do
+    Abstract.BuiltIn builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
-      runFunctionC (k (Closure packageInfo moduleInfo (Data.Abstract.Name.name . pack $ show builtIn) [] (Left builtIn) lowerBound)) eval
+
+      span <- ask @Span -- TODO: This is probably wrong.
+      currentScope' <- currentScope
+      let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+          name = Data.Abstract.Name.name . pack $ show builtIn
+      scope <- newScope lexicalEdges
+      declare (Declaration name) span (Just scope)
+      -- TODO: Store the name of the BuiltIn in Abstract.BuiltIn, showing the builtIn name is wrong.
+      let closure = (Closure packageInfo moduleInfo name [] (Left builtIn) scope)
+      address <- lookupDeclaration (Declaration name)
+      assign address closure
+      pure closure >>= Evaluator . flip runFunctionC eval . k
     Abstract.Call op self params k -> runEvaluator $ do
       boxed <- case op of
         Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> pure Unit
