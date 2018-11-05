@@ -51,7 +51,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval eval (If cond if' else') = do
     bool <- eval cond >>= Abstract.value
-    Rval <$> ifthenelse bool (eval if' >>= address) (eval else' >>= address)
+    ifthenelse bool (eval if') (eval else')
 
 instance Tokenize If where
   tokenize If{..} = within' Scope.If $ do
