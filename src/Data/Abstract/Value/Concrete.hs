@@ -118,15 +118,15 @@ instance ( FreeVariables term
       pure closure >>= Evaluator . flip runFunctionC eval . k
     Abstract.Call op self params k -> runEvaluator $ do
       boxed <- case op of
-        Closure _ _ _ _ (Left Print) _ -> traverse (deref >=> trace . show) params *> pure Unit
+        Closure _ _ _ _ (Left Print) _ -> traverse (trace . show) params *> pure Unit
         Closure _ _ _ _ (Left Show) _ -> deref self >>= pure . String . pack . show
-        Closure packageInfo moduleInfo _ names (Right body) env -> do
+        Closure packageInfo moduleInfo _ names (Right body) scope -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
             currentScope' <- currentScope
             currentFrame' <- currentFrame
-            let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+            let frameEdges = maybe mempty (Map.singleton Lexical . flip Map.singleton currentFrame') currentScope'
             frameAddress <- newFrame scope frameEdges
             withFrame frameAddress $ do
               for_ (zip names params) $ \(name, param) -> do
