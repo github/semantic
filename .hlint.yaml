@@ -47,6 +47,8 @@
 
 - ignore: {name: Use ., within: [Analysis.Abstract.Graph.graphingModules]}
 
+- ignore: {name: Reduce duplication, within: [Semantic.Util]}
+
 # Our customized warnings
 
 # AMP fallout
