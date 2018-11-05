@@ -408,29 +408,25 @@ resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" b
   ArrayError{}      -> pure lowerBound
   ArithmeticError{} -> pure hole)
 
-resumingHeapError :: forall m address value effects a. ( Applicative (m address value effects)
-  , Effectful (m address value)
-  , Effects effects
-  , Member Trace effects
-  , Show address
-  , Ord address
-  , Member Fresh effects
-  , Member (Resumable (BaseError (ScopeError address))) effects
-  )
-  => m address value (Resumable (BaseError (HeapError address)) ': effects) a
-  -> m address value effects a
+resumingHeapError :: ( Carrier sig m
+                     , Member Trace sig
+                     , Show address
+                     , Ord address
+                     , Member Fresh sig
+                     , Member (Resumable (BaseError (ScopeError address))) sig
+                     )
+                  => Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
+                  -> Evaluator term address value m a
 resumingHeapError = runHeapErrorWith (\ baseError -> traceError "HeapError" baseError *> case baseErrorException baseError of
   EmptyHeapError -> undefined)
 
-resumingScopeError :: forall m address value effects a. ( Applicative (m address value effects)
-    , Effectful (m address value)
-    , Effects effects
-    , Member Trace effects
-    , Show address
-    , Ord address
-    )
-    => m address value (Resumable (BaseError (ScopeError address)) ': effects) a
-    -> m address value effects a
+resumingScopeError :: ( Carrier sig m
+                     , Member Trace sig
+                     , Show address
+                     , Ord address
+                     )
+                    => Evaluator term address value (Resumable (BaseError (ScopeError address)) (Eff m)) a
+                    -> Evaluator term address value m a
 resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
   _ -> undefined)
   -- LookupError :: address -> HeapError address address
