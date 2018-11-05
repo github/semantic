@@ -302,5 +302,3 @@ instance Diffable f => GDiffable (Rec1 f) where
   galgorithmFor a1 a2 = Rec1 <$> algorithmFor (unRec1 a1) (unRec1 a2)
 
   gtryAlignWith f (Rec1 a) (Rec1 b) = Rec1 <$> tryAlignWith f a b
-
-{-# ANN module ("HLint: ignore Avoid return" :: String) #-}
