@@ -1,22 +1,26 @@
 (Statements
   (Function
     (Identifier)
-    (Identifier))
+    (Statements
+      (Identifier)))
   (Function
     (Identifier)
     (Identifier)
-    (Identifier))
+    (Statements
+      (Identifier)))
   (Function
     (Identifier)
     (Identifier)
     (Identifier)
-    (Identifier))
+    (Statements
+      (Identifier)))
   (Function
     (Identifier)
     (Assignment
       (Identifier)
       (Identifier))
-    (Identifier))
+    (Statements
+      (Identifier)))
   (Function
     (Identifier)
     (Annotation
@@ -25,4 +29,5 @@
         (TextElement))
       (Identifier))
     (Identifier)
-    (Identifier)))
+    (Statements
+      (Identifier))))
