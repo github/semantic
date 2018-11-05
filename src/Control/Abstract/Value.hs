@@ -25,7 +25,7 @@ module Control.Abstract.Value
 , runWhile
 , WhileC(..)
 , makeNamespace
--- , address
+, address
 , value
 , rvalBox
 ) where
@@ -105,6 +105,7 @@ instance Effect (Function term address value) where
   handle state handler (Call fn self addrs        k) = Call fn self addrs        (handler . (<$ state) . k)
 
 
+-- TODO: eval and runFunction should return a ValueRef instead of a value
 runFunction :: Carrier (Function term address value :+: sig) (FunctionC term address value (Eff m))
             => (term -> Evaluator term address value (FunctionC term address value (Eff m)) value)
             -> Evaluator term address value (FunctionC term address value (Eff m)) a
@@ -359,18 +360,20 @@ value (LvalLocal name) = undefined
 value (LvalMember slot) = undefined
 
 -- | Returns the address of a value referenced by a 'ValueRef'
--- address :: ( AbstractValue term address value m
---            , Carrier sig m
---            , Member (Env address) sig
---            , Member (Reader ModuleInfo) sig
---            , Member (Reader Span) sig
---            , Member (Resumable (BaseError (EnvironmentError address))) sig
---            )
---         => ValueRef address
---         -> Evaluator term address value m address
--- address (LvalLocal var)       = variable var
--- address (LvalMember ptr prop) = evaluateInScopedEnv ptr (variable prop)
--- address (Rval addr)           = pure addr
+address :: ( AbstractValue term address value m
+           , Carrier sig m
+           , Member (State (Heap address address value)) sig
+           , Member (State (ScopeGraph address)) sig
+           , Member (Resumable (BaseError (ScopeError address))) sig
+           , Member (Resumable (BaseError (HeapError address))) sig
+           , Member (Reader ModuleInfo) sig
+           , Member (Reader Span) sig
+           )
+        => ValueRef address value
+        -> Evaluator term address value m (Address address)
+address (LvalLocal name)  = undefined
+address (LvalMember slot) = pure slot
+address (Rval value)      = undefined
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: ( Member (Allocator address) sig
