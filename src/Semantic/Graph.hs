@@ -93,10 +93,7 @@ runGraph CallGraph includePackages project
     modules <- topologicalSort <$> runImportGraphToModules lang package
     runCallGraph lang includePackages modules package
 
-runCallGraph :: ( HasField fields Span
-                , Show (Record fields)
-                , Ord (Record fields)
-                , VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax
+runCallGraph :: ( VertexDeclarationWithStrategy (VertexDeclarationStrategy syntax) syntax syntax
                 , Declarations1 syntax
                 , Ord1 syntax
                 , Functor syntax
