@@ -36,14 +36,14 @@
 
 # Ignore eta reduce in the assignment modules
 - ignore:
-  name: Eta reduce
-  within:
-  - Language.Go.Assignment
-  - Language.MiniPython.Assignment
-  - Language.MiniRuby.Assignment
-  - Language.PHP.Assignment
-  - Language.Python.Assignment
-  - Language.Ruby.Assignment
+    name: Eta reduce
+    within:
+    - Language.Go.Assignment
+    - Language.MiniPython.Assignment
+    - Language.MiniRuby.Assignment
+    - Language.PHP.Assignment
+    - Language.Python.Assignment
+    - Language.Ruby.Assignment
 
 - ignore: {name: Use ., within: [Analysis.Abstract.Graph.graphingModules]}
 
