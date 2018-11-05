@@ -85,7 +85,7 @@ class (Show1 constr, Traversable constr) => Taggable constr where
     => Language -> constr (Term syntax Location) -> Maybe Range
   docsLiteral _ _ = Nothing
 
-  snippet :: Location -> constr (Term syntax Location) -> Maybe Range
+  snippet :: (Foldable syntax) => Location -> constr (Term syntax Location) -> Maybe Range
   snippet _ _ = Nothing
 
 type IsTaggable syntax =
@@ -126,6 +126,11 @@ descend lang t@(In loc _) = do
   traverse_ subtermRef t
   exit (constructorName term) snippetRange
 
+getRangeOfDecl :: Foldable t => Location -> Term t Location -> Maybe Range
+getRangeOfDecl ann (Term (In body bodyF))
+  | (Term (In firstEl _):_) <- toList bodyF = Just $ subtractLocation ann firstEl
+  | otherwise = Just $ subtractLocation ann body
+
 subtractLocation :: Location -> Location -> Range
 subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 
@@ -140,7 +145,7 @@ instance (Taggable a) => Taggable (TermF a Location) where
   snippet ann t = snippet ann (termFOut t)
 
 instance Taggable Syntax.Context where
-  snippet ann (Syntax.Context _ (Term (In sub _))) = Just $ subtractLocation ann sub
+  snippet ann (Syntax.Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
 
 instance Taggable Declaration.Function where
   docsLiteral Python (Declaration.Function _ _ _ (Term (In _ bodyF)))
@@ -148,23 +153,33 @@ instance Taggable Declaration.Function where
     , isTextElement exprF = Just (locationByteRange exprAnn)
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
-  snippet ann (Declaration.Function _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  snippet ann (Declaration.Function _ _ _ body) = getRangeOfDecl ann body
 
 instance Taggable Declaration.Method where
-  snippet ann (Declaration.Method _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  docsLiteral Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)))
+    | (Term (In exprAnn exprF):_) <- toList bodyF
+    , isTextElement exprF = Just (locationByteRange exprAnn)
+    | otherwise           = Nothing
+  docsLiteral _ _         = Nothing
+  snippet ann (Declaration.Method _ _ _ _ body) = getRangeOfDecl ann body
 
 instance Taggable Declaration.Class where
-  snippet ann (Declaration.Class _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  docsLiteral Python (Declaration.Class _ _ _ (Term (In _ bodyF)))
+    | (Term (In exprAnn exprF):_) <- toList bodyF
+    , isTextElement exprF = Just (locationByteRange exprAnn)
+    | otherwise           = Nothing
+  docsLiteral _ _         = Nothing
+  snippet ann (Declaration.Class _ _ _ body) = getRangeOfDecl ann body
 
 instance Taggable Ruby.Class where
-  snippet ann (Ruby.Class _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  snippet ann (Ruby.Class _ _ body) = getRangeOfDecl ann body
 
 instance Taggable Ruby.Module where
-  snippet ann (Ruby.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
+  snippet ann (Ruby.Module _ (body:_)) = getRangeOfDecl ann body
   snippet ann (Ruby.Module _ _) = Just (locationByteRange ann)
 
 instance Taggable TypeScript.Module where
-  snippet ann (TypeScript.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
+  snippet ann (TypeScript.Module _ (body:_)) = getRangeOfDecl ann body
   snippet ann (TypeScript.Module _ _) = Just (locationByteRange ann)
 
 instance Taggable []
