@@ -78,7 +78,7 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , term ~ Term syntax Location
                  , Carrier sig m
                  )
-              => Open (Open (term -> Evaluator term (Hole context (Located address)) value m (ValueRef (Hole context (Located address)))))
+              => Open (Open (term -> Evaluator term (Hole context (Located address)) value m (ValueRef (Hole context (Located address)) value)))
 graphingTerms recur0 recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of
@@ -122,7 +122,7 @@ graphingModules :: ( Member (Modules address value) sig
                    , Member (Reader ControlFlowVertex) sig
                    , Carrier sig m
                    )
-                => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
+                => (Module body -> Evaluator term address value (EavesdropC address value (Eff m)) a)
                 -> (Module body -> Evaluator term address value m a)
 graphingModules recur m = do
   let v = moduleVertex (moduleInfo m)
@@ -145,7 +145,7 @@ graphingModuleInfo :: ( Member (Modules address value) sig
                       , Member (State (Graph ModuleInfo)) sig
                       , Carrier sig m
                       )
-                   => (Module body -> Evaluator term address value (EavesdropC address (Eff m)) a)
+                   => (Module body -> Evaluator term address value (EavesdropC address value (Eff m)) a)
                    -> (Module body -> Evaluator term address value m a)
 graphingModuleInfo recur m = do
   appendGraph (vertex (moduleInfo m))
@@ -154,18 +154,18 @@ graphingModuleInfo recur m = do
     Lookup path _ -> currentModule >>= appendGraph . (`connect` vertex (ModuleInfo path)) . vertex
     _             -> pure ()
 
-eavesdrop :: (Carrier sig m, Member (Modules address) sig)
-          => Evaluator term address value (EavesdropC address (Eff m)) a
-          -> (forall x . Modules address (Eff m) (Eff m x) -> Evaluator term address value m ())
+eavesdrop :: (Carrier sig m, Member (Modules address value) sig)
+          => Evaluator term address value (EavesdropC address value (Eff m)) a
+          -> (forall x . Modules address value (Eff m) (Eff m x) -> Evaluator term address value m ())
           -> Evaluator term address value m a
 eavesdrop m f = raiseHandler (runEavesdropC (runEvaluator . f) . interpret) m
 
-newtype EavesdropC address m a = EavesdropC ((forall x . Modules address m (m x) -> m ()) -> m a)
+newtype EavesdropC address value m a = EavesdropC ((forall x . Modules address value m (m x) -> m ()) -> m a)
 
-runEavesdropC :: (forall x . Modules address m (m x) -> m ()) -> EavesdropC address m a -> m a
+runEavesdropC :: (forall x . Modules address value m (m x) -> m ()) -> EavesdropC address value m a -> m a
 runEavesdropC f (EavesdropC m) = m f
 
-instance (Carrier sig m, Member (Modules address) sig, Applicative m) => Carrier sig (EavesdropC address m) where
+instance (Carrier sig m, Member (Modules address value) sig, Applicative m) => Carrier sig (EavesdropC address value m) where
   ret a = EavesdropC (const (ret a))
   eff op
     | Just eff <- prj op = EavesdropC (\ handler -> let eff' = handlePure (runEavesdropC handler) eff in handler eff' *> send eff')
