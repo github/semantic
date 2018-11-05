@@ -142,7 +142,7 @@ runCallGraph lang includePackages modules package
 
 
 runModuleTable :: Carrier sig m
-               => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address)))) (Eff m)) a
+               => Evaluator term address value (ReaderC (ModuleTable (NonEmpty (Module (ModuleResult address value)))) (Eff m)) a
                -> Evaluator term address value m a
 runModuleTable = raiseHandler $ runReader lowerBound
 
