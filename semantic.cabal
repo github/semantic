@@ -354,6 +354,7 @@ test-suite test
                      , Graphing.Calls.Spec
                      , Integration.Spec
                      , Matching.Go.Spec
+                     , Matching.Python.Spec
                      , Numeric.Spec
                      , Proto3.Roundtrip
                      , Reprinting.Spec

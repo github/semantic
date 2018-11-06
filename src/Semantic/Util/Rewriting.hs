@@ -157,11 +157,10 @@ kvMatcher :: forall fs term .
   , term ~ Term (Sum fs) History
   ) =>
   Text -> Matcher term (Literal.KeyValue term)
-kvMatcher name = matchM projectTerm target <* matchKey where
-  matchKey
-    = match Literal.key .
-        match Literal.textElementContent $
-          ensure (== name)
+kvMatcher name = narrow <* matchKey where
+  matchKey = enter Literal.key
+             >>> enter Literal.textElementContent
+             >>> ensure (== name)
 
 changeKV :: ( Apply Functor syntax
             , Literal.Array :< syntax

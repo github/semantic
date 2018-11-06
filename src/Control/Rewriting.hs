@@ -74,7 +74,7 @@ import           Data.Profunctor
 import qualified Data.Sum as Sum hiding (apply)
 import           Data.Text (pack)
 
-import Control.Matching (Matcher, stepMatcher)
+import Control.Matching (Matcher, match)
 import Data.History as History
 import Data.Term
 
@@ -212,7 +212,7 @@ promote = Promote
 
 -- | Promote a 'Matcher' to a 'Rule'.
 fromMatcher :: Matcher from to -> Rule env from to
-fromMatcher m = target >>= \t -> maybeM (fail "fromMatcher") (stepMatcher t m)
+fromMatcher m = target >>= \t -> maybeM (fail "fromMatcher") (match t m)
 
 -- | Promote a Rule from a recursive functor to one over terms, operating
 -- leaf-to-root in the style of 'Data.Functor.Foldable.para'.
@@ -375,9 +375,6 @@ paraM f = liftM snd . cataM run
   where run t = do
           a <- f t
           pure (embed $ fmap fst t, a)
-
-eitherA :: Applicative f => (b -> f (Either a c)) -> Either a b -> f (Either a c)
-eitherA = either (pure . Left)
 
 -- | As 'rewriteM', but with some parameters reversed.
 runE :: forall m env from to . Monad m
