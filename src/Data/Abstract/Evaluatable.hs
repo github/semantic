@@ -119,8 +119,8 @@ instance HasPrelude 'Ruby where
       void $ builtIn (X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
-  definePrelude _ =
-    defineNamespace (Declaration (X.name "console")) (builtIn (X.name "log") Print)
+  definePrelude _ = pure ()
+    -- defineNamespace (Declaration (X.name "console")) (builtIn (X.name "log") Print)
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
