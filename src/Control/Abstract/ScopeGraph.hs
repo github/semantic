@@ -173,7 +173,7 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 )
              => Declaration
              -> Evaluator term address value m (ScopeGraph.Path address)
-lookupScopePath declaration = maybeM (throwScopeError LookupPathError) . ScopeGraph.lookupScopePath declaration =<< get
+lookupScopePath declaration = maybeM (throwScopeError $ LookupPathError declaration) . ScopeGraph.lookupScopePath declaration =<< get
 
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
@@ -206,7 +206,7 @@ throwScopeError = throwBaseError
 data ScopeError address return where
   ScopeError :: Declaration -> Span -> ScopeError address (Address address)
   LookupError :: ScopeError address (Scope address)
-  LookupPathError :: ScopeError address (ScopeGraph.Path address)
+  LookupPathError :: Declaration -> ScopeError address (ScopeGraph.Path address)
   CurrentScopeError :: ScopeError address address
 
 deriving instance Eq (ScopeError address return)
@@ -216,7 +216,7 @@ instance Eq address => Eq1 (ScopeError address) where
   liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
   liftEq _ CurrentScopeError CurrentScopeError = True
   liftEq _ LookupError LookupError = True
-  liftEq _ LookupPathError LookupPathError = True
+  liftEq _ (LookupPathError decl1) (LookupPathError decl2) = decl1 == decl2
   liftEq _ _ _ = False
 
 alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator term address value m address
