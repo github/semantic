@@ -25,6 +25,7 @@ import qualified Diffing.Interpreter.Spec
 import qualified Graphing.Calls.Spec
 import qualified Integration.Spec
 import qualified Matching.Go.Spec
+import qualified Matching.Python.Spec
 import qualified Numeric.Spec
 import qualified Rendering.TOC.Spec
 import qualified Reprinting.Spec
@@ -67,7 +68,8 @@ main = do
       describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
       describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
       describe "Graphing.Calls" Graphing.Calls.Spec.spec
-      describe "Matching" Matching.Go.Spec.spec
+      describe "Matching.Go" Matching.Go.Spec.spec
+      describe "Matching.Python" Matching.Python.Spec.spec
       describe "Numeric" Numeric.Spec.spec
       describe "Rendering.TOC" Rendering.TOC.Spec.spec
       describe "Reprinting.Spec" Reprinting.Spec.spec
