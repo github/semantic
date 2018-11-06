@@ -280,7 +280,9 @@ functionDefinition =
       makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
-    makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
+    makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody)
+      = let fn = makeTerm loc (Declaration.Function [] functionName' functionParameters functionBody)
+        in maybe fn (makeTerm loc . Type.Annotation fn) ty
 
 classDefinition :: Assignment Term
 classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class [] <$> term expression <*> argumentList <*> expressions)
@@ -551,5 +553,3 @@ infixTerm :: Assignment Term
           -> [Assignment (Term -> Term -> Sum Syntax Term)]
           -> Assignment (Sum Syntax Term)
 infixTerm = infixContext comment
-
-{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

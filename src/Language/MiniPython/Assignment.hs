@@ -46,6 +46,7 @@ type Syntax =
    , Expression.Times
    , Literal.Integer
    , Literal.Boolean
+   , Literal.TextElement
    , Statement.If
    , Statement.Return
    , Statement.Statements
@@ -77,6 +78,7 @@ expressionChoices =
   , functionDefinition
   , identifier
   , integer
+  , string
   , returnStatement
   , ifStatement
   ]
@@ -96,7 +98,9 @@ functionDefinition =
       makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
-    makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
+    makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody)
+      = let fn = makeTerm loc (Declaration.Function [] functionName' functionParameters functionBody)
+        in maybe fn (makeTerm loc . Type.Annotation fn) ty
 
 binaryOperator :: Assignment Term
 binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression (term expression)
@@ -110,6 +114,9 @@ identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol D
 
 integer :: Assignment Term
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+
+string :: Assignment Term
+string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
 
 comment :: Assignment Term
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -151,5 +158,3 @@ infixTerm :: Assignment Term
           -> [Assignment (Term -> Term -> Sum Syntax Term)]
           -> Assignment (Sum Syntax Term)
 infixTerm = infixContext comment
-
-{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

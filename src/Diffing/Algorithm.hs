@@ -1,7 +1,7 @@
-{-# LANGUAGE DefaultSignatures, GADTs, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
 module Diffing.Algorithm
-  ( AlgorithmF (..)
-  , Algorithm
+  ( Diff (..)
+  , Algorithm(..)
   , Diffable (..)
   , Equivalence (..)
   , diff
@@ -14,104 +14,100 @@ module Diffing.Algorithm
   , algorithmForTerms
   ) where
 
-import Control.Monad.Free.Freer
-import Data.Diff
+import Control.Effect hiding ((:+:))
+import Control.Effect.Carrier
+import Data.Coerce (coerce)
+import qualified Data.Diff as Diff
 import Data.Sum
 import Data.Term
 import GHC.Generics
 import Prologue
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
-data AlgorithmF term1 term2 result partial where
+data Diff term1 term2 diff (m :: * -> *) k
   -- | Diff two terms with the choice of algorithm left to the interpreter’s discretion.
-  Diff :: term1 -> term2 -> AlgorithmF term1 term2 result result
+  = Diff term1 term2 (diff -> k)
   -- | Diff two terms recursively in O(n) time, resulting in a single diff node.
-  Linear :: term1 -> term2 -> AlgorithmF term1 term2 result result
+  | Linear term1 term2 (diff -> k)
   -- | Diff two lists of terms by each element’s similarity in O(n³ log n), resulting in a list of diffs.
-  RWS :: [term1] -> [term2] -> AlgorithmF term1 term2 result [result]
+  | RWS [term1] [term2] ([diff] -> k)
   -- | Delete a term.
-  Delete :: term1 -> AlgorithmF term1 term2 result result
+  | Delete term1 (diff -> k)
   -- | Insert a term.
-  Insert :: term2 -> AlgorithmF term1 term2 result result
+  | Insert term2 (diff -> k)
   -- | Replace one term with another.
-  Replace :: term1 -> term2 -> AlgorithmF term1 term2 result result
-  -- | An 'Algorithm' that always fails.
-  Empty :: AlgorithmF term1 term2 result a
-  -- | An 'Algorithm' to try one of two alternatives.
-  Alt :: a -> a -> AlgorithmF term1 term2 result a
+  | Replace term1 term2 (diff -> k)
+  deriving (Functor)
 
--- | The free(r) monad for 'AlgorithmF'. This enables us to construct algorithms to diff using '<$>', '<*>', '>>=', and do-notation.
-type Algorithm term1 term2 result = Freer (AlgorithmF term1 term2 result)
+instance HFunctor (Diff term1 term2 diff) where
+  hmap _ = coerce
+  {-# INLINE hmap #-}
+
+instance Effect (Diff term1 term2 diff) where
+  handle state handler = coerce . fmap (handler . (<$ state))
+
+
+newtype Algorithm term1 term2 diff m a = Algorithm { runAlgorithm :: Eff m a }
+  deriving (Applicative, Functor, Monad)
+
+deriving instance (Carrier sig m, Member NonDet sig) => Alternative (Algorithm term1 term2 diff m)
+
+instance Carrier sig m => Carrier sig (Algorithm term1 term2 diff m) where
+  ret = Algorithm . ret
+  eff = Algorithm . eff . handleCoercible
 
 
 -- DSL
 
 -- | Diff two terms without specifying the algorithm to be used.
-diff :: term1 -> term2 -> Algorithm term1 term2 result result
-diff a1 a2 = Diffing.Algorithm.Diff a1 a2 `Then` return
+diff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> m diff
+diff a1 a2 = send (Diff a1 a2 ret)
 
 -- | Diff a These of terms without specifying the algorithm to be used.
-diffThese :: These term1 term2 -> Algorithm term1 term2 result result
+diffThese :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => These term1 term2 -> Algorithm term1 term2 diff m diff
 diffThese = these byDeleting byInserting diff
 
 -- | Diff a pair of optional terms without specifying the algorithm to be used.
-diffMaybe :: Maybe term1 -> Maybe term2 -> Algorithm term1 term2 result (Maybe result)
+diffMaybe :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Maybe term1 -> Maybe term2 -> Algorithm term1 term2 diff m (Maybe diff)
 diffMaybe (Just a1) (Just a2) = Just <$> diff a1 a2
 diffMaybe (Just a1) _         = Just <$> byDeleting a1
 diffMaybe _         (Just a2) = Just <$> byInserting a2
 diffMaybe _         _         = pure Nothing
 
 -- | Diff two terms linearly.
-linearly :: term1 -> term2 -> Algorithm term1 term2 result result
-linearly f1 f2 = Linear f1 f2 `Then` return
+linearly :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> Algorithm term1 term2 diff m diff
+linearly f1 f2 = send (Linear f1 f2 ret)
 
 -- | Diff two terms using RWS.
-byRWS :: [term1] -> [term2] -> Algorithm term1 term2 result [result]
-byRWS as1 as2 = RWS as1 as2 `Then` return
+byRWS :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => [term1] -> [term2] -> Algorithm term1 term2 diff m [diff]
+byRWS as1 as2 = send (RWS as1 as2 ret)
 
 -- | Delete a term.
-byDeleting :: term1 -> Algorithm term1 term2 result result
-byDeleting a1 = Delete a1 `Then` return
+byDeleting :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> Algorithm term1 term2 diff m diff
+byDeleting a1 = sendDiff (Delete a1 ret)
 
 -- | Insert a term.
-byInserting :: term2 -> Algorithm term1 term2 result result
-byInserting a2 = Insert a2 `Then` return
+byInserting :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term2 -> Algorithm term1 term2 diff m diff
+byInserting a2 = sendDiff (Insert a2 ret)
 
 -- | Replace one term with another.
-byReplacing :: term1 -> term2 -> Algorithm term1 term2 result result
-byReplacing a1 a2 = Replace a1 a2 `Then` return
+byReplacing :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => term1 -> term2 -> Algorithm term1 term2 diff m diff
+byReplacing a1 a2 = send (Replace a1 a2 ret)
 
-
-instance (Show term1, Show term2) => Show1 (AlgorithmF term1 term2 result) where
-  liftShowsPrec sp _ d algorithm = case algorithm of
-    Diffing.Algorithm.Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
-    Linear t1 t2 -> showsBinaryWith showsPrec showsPrec "Linear" d t1 t2
-    RWS as bs -> showsBinaryWith (liftShowsPrec showsPrec showList) (liftShowsPrec showsPrec showList) "RWS" d as bs
-    Delete t1 -> showsUnaryWith showsPrec "Delete" d t1
-    Insert t2 -> showsUnaryWith showsPrec "Insert" d t2
-    Replace t1 t2 -> showsBinaryWith showsPrec showsPrec "Replace" d t1 t2
-    Empty -> showString "Empty"
-    Alt a b -> showsBinaryWith sp sp "Alt" d a b
-
-
-instance Alternative (Algorithm term1 term2 result) where
-  empty = Empty `Then` return
-
-  (Empty `Then` _) <|> a2               = a2
-  a1               <|> (Empty `Then` _) = a1
-  a1               <|> a2               = Alt a1 a2 `Then` id
+sendDiff :: (Carrier sig m, Member (Diff term1 term2 diff) sig) => Diff term1 term2 diff (Eff m) (Eff m a) -> Algorithm term1 term2 diff m a
+sendDiff = Algorithm . send
 
 
 -- | Diff two terms based on their 'Diffable' instances, performing substructural comparisons iff the initial comparison fails.
-algorithmForTerms :: Diffable syntax
+algorithmForTerms :: (Carrier sig m, Diffable syntax, Member (Diff (Term syntax ann1) (Term syntax ann2) (Diff.Diff syntax ann1 ann2)) sig, Member NonDet sig)
                   => Term syntax ann1
                   -> Term syntax ann2
-                  -> Algorithm (Term syntax ann1) (Term syntax ann2) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2)
+                  -> Algorithm (Term syntax ann1) (Term syntax ann2) (Diff.Diff syntax ann1 ann2) m (Diff.Diff syntax ann1 ann2)
 algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
   =   mergeFor t1 t2
-  <|> deleteF . In ann1      <$> subalgorithmFor byDeleting  (`mergeFor` t2) f1
-  <|> insertF . In      ann2 <$> subalgorithmFor byInserting (mergeFor t1) f2
-  where mergeFor (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
+  <|> Diff.deleteF . In ann1      <$> subalgorithmFor byDeleting  (`mergeFor` t2) f1
+  <|> Diff.insertF . In      ann2 <$> subalgorithmFor byInserting (mergeFor t1) f2
+  where mergeFor (Term (In ann1 f1)) (Term (In ann2 f2)) = Diff.merge (ann1, ann2) <$> algorithmFor f1 f2
 
 -- | An O(1) relation on terms indicating their non-recursive comparability (i.e. are they of the same “kind” in a way that warrants comparison), defined in terms of the comparability of their respective syntax.
 comparableTerms :: Diffable syntax
@@ -146,14 +142,15 @@ instance Alternative Equivalence where
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   -- | Construct an algorithm to diff a pair of @f@s populated with disjoint terms.
-  algorithmFor :: f term1
+  algorithmFor :: (Carrier sig m, Member (Diff term1 term2 diff) sig, Member NonDet sig)
+               => f term1
                -> f term2
-               -> Algorithm term1 term2 result (f result)
+               -> Algorithm term1 term2 diff m (f diff)
   default
-    algorithmFor :: (Generic1 f, GDiffable (Rep1 f))
+    algorithmFor :: (Carrier sig m, Generic1 f, GDiffable (Rep1 f), Member (Diff term1 term2 diff) sig, Member NonDet sig)
                  => f term1
                  -> f term2
-                 -> Algorithm term1 term2 result (f result)
+                 -> Algorithm term1 term2 diff m (f diff)
   algorithmFor = genericAlgorithmFor
 
   tryAlignWith :: Alternative g => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
@@ -170,7 +167,7 @@ class Diffable f where
   --   These two functions allow us to say e.g. that comparisons against 'Data.Syntax.Context' should also be made against its subject, but not against any of the comments, resulting in the insertion of both comments and context when documenting an existing function.
   --
   --   By default, 'subalgorithmFor' produces 'empty', rejecting substructural comparisons. This is important for performance, as alternations with 'empty' are eliminated at construction time.
-  -- ^ The 'Alternative' instance will in general be 'Algorithm', but left opaque to make it harder to shoot oneself in the foot.
+  -- ^ The 'Alternative' instance will in general be 'Diff', but left opaque to make it harder to shoot oneself in the foot.
   subalgorithmFor :: Alternative g
                   => (a -> g b)    -- ^ A “blur” function to traverse positions which should not be diffed against.
                   -> (a -> g b)    -- ^ A “focus” function to traverse positions which should be diffed against.
@@ -193,10 +190,10 @@ class Diffable f where
   default comparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
   comparableTo = genericComparableTo
 
-genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
+genericAlgorithmFor :: (Carrier sig m, Generic1 f, GDiffable (Rep1 f), Member (Diff term1 term2 diff) sig, Member NonDet sig)
                     => f term1
                     -> f term2
-                    -> Algorithm term1 term2 result (f result)
+                    -> Algorithm term1 term2 diff m (f diff)
 genericAlgorithmFor a1 a2 = to1 <$> galgorithmFor (from1 a1) (from1 a2)
 
 genericComparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
@@ -241,7 +238,7 @@ instance Diffable NonEmpty where
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class GDiffable f where
-  galgorithmFor :: f term1 -> f term2 -> Algorithm term1 term2 result (f result)
+  galgorithmFor :: (Carrier sig m, Member (Diff term1 term2 diff) sig, Member NonDet sig) => f term1 -> f term2 -> Algorithm term1 term2 diff m (f diff)
 
   gtryAlignWith :: Alternative g => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
 
@@ -305,5 +302,3 @@ instance Diffable f => GDiffable (Rec1 f) where
   galgorithmFor a1 a2 = Rec1 <$> algorithmFor (unRec1 a1) (unRec1 a2)
 
   gtryAlignWith f (Rec1 a) (Rec1 b) = Rec1 <$> tryAlignWith f a b
-
-{-# ANN module ("HLint: ignore Avoid return" :: String) #-}

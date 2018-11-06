@@ -663,5 +663,3 @@ manyTerm = many . term
 -- | Match a term and contextualize any comments preceeding or proceeding the term.
 term :: Assignment Term -> Assignment Term
 term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
-
-{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

@@ -1,10 +1,8 @@
 (Statements
-  (Annotation
-    (Function
-      (Empty)
-    {-(Identifier)-}
-      (Plus
-      { (Identifier)
-      ->(Integer) }
-        (Integer)))
-    (Empty)))
+  (Function
+    (Empty)
+  {-(Identifier)-}
+    (Plus
+    { (Identifier)
+    ->(Integer) }
+      (Integer))))
