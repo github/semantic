@@ -197,6 +197,8 @@ runImportGraph lang (package :: Package term) f
   . raiseHandler runFresh
   . resumingLoadError
   . resumingUnspecialized
+  . resumingScopeError
+  . resumingHeapError
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError
@@ -253,7 +255,7 @@ parsePythonPackage :: forall syntax sig m term.
 parsePythonPackage parser project = do
   let runAnalysis = runEvaluator @_ @_ @(Value term (Hole (Maybe Name) Precise))
         . raiseHandler (runState PythonPackage.Unknown)
-        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
+        . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) Precise) (Hole (Maybe Name) Precise) (Value term (Hole (Maybe Name) Precise)))))
         . raiseHandler runFresh
         . resumingLoadError
         . resumingUnspecialized
@@ -334,15 +336,14 @@ resumingResolutionError = runResolutionErrorWith (\ baseError -> traceError "Res
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
-resumingLoadError :: ( AbstractHole value
-                     , Carrier sig m
+resumingLoadError :: ( Carrier sig m
                      , Member Trace sig
                      , Ord address
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (LoadError address value)) (Eff m)) a
                   -> Evaluator term address value m a
-resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
-  ModuleNotFoundError _ -> pure (lowerBound, hole))
+resumingLoadError= runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
+  ModuleNotFoundError _ -> pure (lowerBound, undefined))
 
 resumingEvalError :: ( Carrier sig m
                      , Member Fresh sig
@@ -390,7 +391,7 @@ resumingValueError :: ( Carrier sig m
                                                                   m)) a
                    -> Evaluator term address (Value term address) m a
 resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" baseError *> case baseErrorException baseError of
-  CallError val     -> pure val
+  CallError val     -> rvalBox val
   StringError val   -> pure (pack (prettyShow val))
   BoolError{}       -> pure True
   BoundsError{}     -> pure hole
@@ -411,6 +412,7 @@ resumingHeapError :: ( Carrier sig m
                      , Ord address
                      , Member Fresh sig
                      , Member (Resumable (BaseError (ScopeError address))) sig
+                     , Effect sig
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
                   -> Evaluator term address value m a
@@ -422,7 +424,7 @@ resumingScopeError :: ( Carrier sig m
                      , Show address
                      , Ord address
                      )
-                    => Evaluator term address value (Resumable (BaseError (ScopeError address)) (Eff m)) a
+                    => Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a
                     -> Evaluator term address value m a
 resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
   _ -> undefined)

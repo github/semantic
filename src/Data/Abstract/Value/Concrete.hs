@@ -13,7 +13,7 @@ import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Evaluatable (UnspecializedError(..))
+import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..))
 import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
@@ -59,7 +59,6 @@ instance Ord address => ValueRoots address (Value term address) where
 instance ( FreeVariables term
          , Member (Allocator address) sig
          , Member (Deref (Value term address)) sig
-         , Member (Error (Return address)) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
@@ -71,7 +70,7 @@ instance ( FreeVariables term
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (State (Heap address address (Value term address))) sig
-         , Member (Error (Return (Value term address))) sig
+         , Member (Error (Return address (Value term address))) sig
          , Member Trace sig
          , Ord address
          , Carrier sig m
@@ -97,29 +96,26 @@ instance ( FreeVariables term
           span <- get @Span -- TODO: This is definitely wrong
           declare (Declaration name) span Nothing
 
-      let closure = (Closure packageInfo moduleInfo name params (Right body) scope)
-      address <- lookupDeclaration (Declaration name)
-      assign address closure
-      pure closure >>= Evaluator . flip runFunctionC eval . k
-    Abstract.BuiltIn builtIn k -> runEvaluator $ do
+      address <- lookupDeclaration @(Value term address) (Declaration name)
+      assign address (Closure packageInfo moduleInfo name params (Right body) scope)
+      Evaluator $ runFunctionC (k (LvalMember address)) eval
+    Abstract.BuiltIn name builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
 
       span <- ask @Span -- TODO: This is probably wrong.
       currentScope' <- currentScope
       let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
-          name = Data.Abstract.Name.name . pack $ show builtIn
       scope <- newScope lexicalEdges
       declare (Declaration name) span (Just scope)
       -- TODO: Store the name of the BuiltIn in Abstract.BuiltIn, showing the builtIn name is wrong.
-      let closure = (Closure packageInfo moduleInfo name [] (Left builtIn) scope)
-      address <- lookupDeclaration (Declaration name)
-      assign address closure
-      pure closure >>= Evaluator . flip runFunctionC eval . k
+      address <- lookupDeclaration @(Value term address) (Declaration name)
+      assign address (Closure packageInfo moduleInfo name [] (Left builtIn) scope)
+      Evaluator $ runFunctionC (k (LvalMember address)) eval
     Abstract.Call op self params k -> runEvaluator $ do
       boxed <- case op of
-        Closure _ _ _ _ (Left Print) _ -> traverse (trace . show) params *> pure Unit
-        Closure _ _ _ _ (Left Show) _ -> deref self >>= pure . String . pack . show
+        Closure _ _ _ _ (Left Print) _ -> traverse (trace . show) params *> rvalBox Unit
+        Closure _ _ _ _ (Left Show) _ -> deref self >>= rvalBox . String . pack . show
         Closure packageInfo moduleInfo _ names (Right body) scope -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
@@ -154,7 +150,7 @@ instance ( Member (Reader ModuleInfo) sig
 instance forall sig m term address. ( Carrier sig m
          , Member (Deref (Value term address)) sig
          , Member (Abstract.Boolean (Value term address)) sig
-         , Member (Error (LoopControl (Value term address))) sig
+         , Member (Error (LoopControl address (Value term address))) sig
          , Member (Interpose (Resumable (BaseError (UnspecializedError (Value term address))))) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -164,7 +160,7 @@ instance forall sig m term address. ( Carrier sig m
          , Show address
          , Show term
          )
-      => Carrier (Abstract.While (Value term address) :+: sig) (WhileC (Value term address) (Eff m)) where
+      => Carrier (Abstract.While address (Value term address) :+: sig) (WhileC address (Value term address) (Eff m)) where
   ret = WhileC . ret
   eff = WhileC . handleSum (eff . handleCoercible) (\case
     Abstract.While cond body k -> interpose @(Resumable (BaseError (UnspecializedError (Value term address)))) (runEvaluator (loop (\continue -> do
@@ -174,13 +170,13 @@ instance forall sig m term address. ( Carrier sig m
       -- loop, otherwise under concrete semantics we run the risk of the
       -- conditional always being true and getting stuck in an infinite loop.
 
-      ifthenelse cond' (Evaluator (runWhileC body) *> continue) (pure Unit))))
-      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @(Value term address)))
+      ifthenelse cond' (Evaluator (runWhileC body) *> continue) (rvalBox Unit))))
+      (\(Resumable (BaseError _ _ (UnspecializedError _)) _) -> throwError (Abort @address @(Value term address)))
         >>= runWhileC . k)
     where
-      loop x = catchLoopControl @(Value term address) (fix x) $ \case
-        Break value -> pure value
-        Abort -> pure unit
+      loop x = catchLoopControl (fix x) $ \case
+        Break valueRef -> pure valueRef
+        Abort -> rvalBox unit
         -- FIXME: Figure out how to deal with this. Ruby treats this as the result
         -- of the current block iteration, while PHP specifies a breakout level
         -- and TypeScript appears to take a label.
@@ -236,8 +232,8 @@ instance (Show address, Show term) => AbstractIntro (Value term address) where
 instance ( Member (Allocator address) sig
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Deref (Value term address)) sig
-         , Member (Error (LoopControl (Value term address))) sig
-         , Member (Error (Return (Value term address))) sig
+         , Member (Error (LoopControl address (Value term address))) sig
+         , Member (Error (Return address (Value term address))) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
@@ -377,7 +373,7 @@ data ValueError term address resume where
   BoolError              :: Value term address                       -> ValueError term address Bool
   IndexError             :: Value term address -> Value term address -> ValueError term address (Value term address)
   NamespaceError         :: Prelude.String                           -> ValueError term address (Bindings address)
-  CallError              :: Value term address                       -> ValueError term address (Value term address)
+  CallError              :: Value term address                       -> ValueError term address (ValueRef address (Value term address))
   NumericError           :: Value term address                       -> ValueError term address (Value term address)
   Numeric2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
   ComparisonError        :: Value term address -> Value term address -> ValueError term address (Value term address)

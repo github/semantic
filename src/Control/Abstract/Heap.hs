@@ -50,6 +50,7 @@ import Data.Span (Span)
 import qualified Data.Set as Set
 import qualified Data.Map.Strict as Map
 import Prologue
+import Data.Abstract.Ref
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
 withScopeAndFrame :: forall term address value m a sig. (
@@ -198,13 +199,13 @@ define :: ( HasCallStack
           )
        => Declaration
        -> Evaluator term address value m value
-       -> Evaluator term address value m value
+       -> Evaluator term address value m (ValueRef address value)
 define declaration def = withCurrentCallStack callStack $ do
   span <- ask @Span -- TODO: This Span is most definitely wrong
   declare declaration span Nothing
   slot <- lookupDeclaration declaration
   value <- def
-  value <$ assign slot value -- TODO: Stop passing in an Address of scopes.
+  LvalMember slot <$ assign slot value
 
 -- | Associate an empty child scope with a declaration and then locally evaluate the body within an associated frame.
 withChildFrame :: ( Member (Allocator address) sig
@@ -243,7 +244,7 @@ deref :: ( Member (Deref value) sig
 deref slot@Address{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError (UninitializedAddress frameAddress))
 
 
-lookupDeclaration :: ( Member (State (Heap address address value)) sig
+lookupDeclaration :: forall value address term sig m. ( Member (State (Heap address address value)) sig
                      , Member (State (ScopeGraph address)) sig
                      , Member (Resumable (BaseError (ScopeError address))) sig
                      , Member (Resumable (BaseError (HeapError address))) sig

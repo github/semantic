@@ -290,7 +290,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval eval (fmap (eval >=> Abstract.value) -> For before cond step body) = rvalBox =<< forLoop before cond step body
+  eval eval (fmap (eval >=> Abstract.value) -> For before cond step body) = forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -312,7 +312,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval eval While{..} = rvalBox =<< while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
+  eval eval While{..} = while (eval whileCondition >>= Abstract.value) (eval whileBody >>= Abstract.value)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -322,7 +322,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval eval DoWhile{..} = rvalBox =<< doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
+  eval eval DoWhile{..} = doWhile (eval doWhileBody >>= Abstract.value) (eval doWhileCondition >>= Abstract.value)
 
 -- Exception handling
 

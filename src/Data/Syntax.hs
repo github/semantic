@@ -24,6 +24,9 @@ import Proto3.Wire.Types
 import qualified Proto3.Suite.DotProto as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
+import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
+import Control.Abstract.Heap (lookupDeclaration)
+import Data.Abstract.Ref
 
 -- Combinators
 
@@ -162,7 +165,9 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval _ (Identifier name) = pure (LvalLocal name)
+  eval _ (Identifier name) = do
+    reference (Reference name) (Declaration name)
+    LvalMember <$> lookupDeclaration (Declaration name)
 
 instance Tokenize Identifier where
   tokenize = yield . Run . formatName . Data.Syntax.name

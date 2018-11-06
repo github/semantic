@@ -44,11 +44,11 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , FreeVariables term
           , Member (Allocator address) sig
           , Member (Boolean value) sig
-          , Member (While value) sig
+          , Member (While address value) sig
           , Member (Deref value) sig
           , Member (State (ScopeGraph address)) sig
-          , Member (Error (LoopControl value)) sig
-          , Member (Error (Return value)) sig
+          , Member (Error (LoopControl address value)) sig
+          , Member (Error (Return address value)) sig
           , Member Fresh sig
           , Member (Function term address value) sig
           , Member (Modules address value) sig
@@ -109,24 +109,22 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    void $ define (Declaration (X.name "print")) (builtIn Print)
+    void $ builtIn (X.name "print") Print
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    void $ define (Declaration (X.name "puts")) (builtIn Print)
+    void $ builtIn (X.name "puts") Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
-      void $ define (Declaration (X.name "inspect")) (builtIn Show)
+      void $ builtIn (X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
   definePrelude _ =
-    defineNamespace (Declaration (X.name "console")) $ do
-      define (Declaration (X.name "log")) (builtIn Print)
+    defineNamespace (Declaration (X.name "console")) (builtIn (X.name "log") Print)
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    defineNamespace (Declaration (X.name "console")) $ do
-      define (Declaration (X.name "log")) (builtIn Print)
+    defineNamespace (Declaration (X.name "console")) $ builtIn (X.name "log") Print
 
 
 -- Effects

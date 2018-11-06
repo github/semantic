@@ -81,8 +81,8 @@ data BuiltIn
   | Show
   deriving (Eq, Ord, Show, Generic, NFData)
 
-builtIn :: (Member (Function term address value) sig, Carrier sig m) => BuiltIn -> Evaluator term address value m (ValueRef address value)
-builtIn = sendFunction . flip BuiltIn ret
+builtIn :: (Member (Function term address value) sig, Carrier sig m) => Name -> BuiltIn -> Evaluator term address value m (ValueRef address value)
+builtIn name = sendFunction . flip (BuiltIn name) ret
 
 call :: (Member (Function term address value) sig, Carrier sig m) => value -> Address address -> [value] -> Evaluator term address value m (ValueRef address value)
 call fn self args = sendFunction (Call fn self args ret)
@@ -92,7 +92,7 @@ sendFunction = send
 
 data Function term address value (m :: * -> *) k
   = Function Name [Name] term (ValueRef address value -> k)
-  | BuiltIn BuiltIn (ValueRef address value -> k)
+  | BuiltIn Name BuiltIn (ValueRef address value -> k)
   | Call value (Address address) [value] (ValueRef address value -> k)
   deriving (Functor)
 
@@ -101,7 +101,7 @@ instance HFunctor (Function term address value) where
 
 instance Effect (Function term address value) where
   handle state handler (Function name params body k) = Function name params body (handler . (<$ state) . k)
-  handle state handler (BuiltIn builtIn           k) = BuiltIn builtIn           (handler . (<$ state) . k)
+  handle state handler (BuiltIn name builtIn      k) = BuiltIn name builtIn      (handler . (<$ state) . k)
   handle state handler (Call fn self addrs        k) = Call fn self addrs        (handler . (<$ state) . k)
 
 
@@ -150,17 +150,17 @@ newtype BooleanC value m a = BooleanC { runBooleanC :: m a }
 
 
 -- | The fundamental looping primitive, built on top of 'ifthenelse'.
-while :: (Member (While value) sig, Carrier sig m)
+while :: (Member (While address value) sig, Carrier sig m)
       => Evaluator term address value m value -- ^ Condition
       -> Evaluator term address value m value -- ^ Body
-      -> Evaluator term address value m value
+      -> Evaluator term address value m (ValueRef address value)
 while cond body = send (While cond body ret)
 
 -- | Do-while loop, built on top of while.
-doWhile :: (Member (While value) sig, Carrier sig m)
+doWhile :: (Member (While address value) sig, Carrier sig m)
   => Evaluator term address value m value -- ^ Body
   -> Evaluator term address value m value -- ^ Condition
-  -> Evaluator term address value m value
+  -> Evaluator term address value m (ValueRef address value)
 doWhile body cond = body *> while cond body
 
 -- | C-style for loops.
@@ -172,7 +172,7 @@ forLoop :: ( Carrier sig m
            , Member (Resumable (BaseError (ScopeError address))) sig
            , Member (State (Heap address address value)) sig
            , Member (State (ScopeGraph address)) sig
-           , Member (While value) sig
+           , Member (While address value) sig
            , Member Fresh sig
            , Ord address
            )
@@ -180,23 +180,23 @@ forLoop :: ( Carrier sig m
   -> Evaluator term address value m value -- ^ Condition
   -> Evaluator term address value m value -- ^ Increment/stepper
   -> Evaluator term address value m value -- ^ Body
-  -> Evaluator term address value m value
+  -> Evaluator term address value m (ValueRef address value)
 forLoop initial cond step body = initial *> while cond ((withLexicalScopeAndFrame body) *> step)
 
-data While value m k
-  = While (m value) (m value) (value -> k)
+data While address value m k
+  = While (m value) (m value) (ValueRef address value -> k)
   deriving (Functor)
 
-instance HFunctor (While value) where
+instance HFunctor (While address value) where
   hmap f (While cond body k) = While (f cond) (f body) k
 
 
-runWhile :: Carrier (While value :+: sig) (WhileC value (Eff m))
-         => Evaluator term address value (WhileC value (Eff m)) a
+runWhile :: Carrier (While address value :+: sig) (WhileC address value (Eff m))
+         => Evaluator term address value (WhileC address value (Eff m)) a
          -> Evaluator term address value m a
 runWhile = raiseHandler $ runWhileC . interpret
 
-newtype WhileC value m a = WhileC { runWhileC :: m a }
+newtype WhileC address value m a = WhileC { runWhileC :: m a }
 
 
 class Show value => AbstractIntro value where
@@ -321,7 +321,7 @@ makeNamespace :: ( AbstractValue term address value m
               -> Address address
               -> Maybe (Address address)
               -> Evaluator term address value m ()
-              -> Evaluator term address value m value
+              -> Evaluator term address value m (ValueRef address value)
 makeNamespace declaration addr super body = do
   super' <- traverse deref super
   define declaration . withChildFrame declaration $ \frame -> do
@@ -356,8 +356,7 @@ value :: ( AbstractValue term address value m
       => ValueRef address value
       -> Evaluator term address value m value
 value (Rval val) = pure val
-value (LvalLocal name) = undefined
-value (LvalMember slot) = undefined
+value (LvalMember slot) = deref slot
 
 -- | Returns the address of a value referenced by a 'ValueRef'
 address :: ( AbstractValue term address value m
@@ -371,18 +370,9 @@ address :: ( AbstractValue term address value m
            )
         => ValueRef address value
         -> Evaluator term address value m (Address address)
-address (LvalLocal name)  = undefined
 address (LvalMember slot) = pure slot
 address (Rval value)      = undefined
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
-rvalBox :: ( Member (Allocator address) sig
-           , Member (Deref value) sig
-           , Member Fresh sig
-           , Member (State (Heap address address value)) sig
-           , Carrier sig m
-           , Ord address
-           )
-        => value
-        -> Evaluator term address value m (ValueRef address value)
+rvalBox :: value -> Evaluator term address value m (ValueRef address value)
 rvalBox val = pure (Rval val)

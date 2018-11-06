@@ -13,6 +13,7 @@ import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Prologue
 import qualified Data.Map.Strict as Map
+import Data.Abstract.Ref
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
@@ -20,7 +21,7 @@ data Abstract = Abstract
 
 instance ( Member (Allocator address) sig
          , Member (Deref Abstract) sig
-         , Member (Error (Return address)) sig
+         , Member (Error (Return address Abstract)) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -30,7 +31,6 @@ instance ( Member (Allocator address) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (AddressError address Abstract))) sig
          , Member (State (Heap address address Abstract)) sig
-         , Member (Error (Return Abstract)) sig
          , Ord address
          , Carrier sig m
          )
@@ -49,9 +49,9 @@ instance ( Member (Allocator address) sig
           -- assign tvar values to names in the frame of the function?
           assign address Abstract
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
-    BuiltIn _ k -> runFunctionC (k Abstract) eval
+    BuiltIn _ _ k -> runFunctionC (k (Rval Abstract)) eval
     Call _ _ params k -> runEvaluator $ do
-      pure Abstract >>= Evaluator . flip runFunctionC eval . k) op)
+      rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)
 
 
 instance (Carrier sig m, Alternative m) => Carrier (Boolean Abstract :+: sig) (BooleanC Abstract m) where
@@ -66,13 +66,13 @@ instance ( Member (Abstract.Boolean Abstract) sig
          , Alternative m
          , Monad m
          )
-      => Carrier (While Abstract :+: sig) (WhileC Abstract m) where
+      => Carrier (While address Abstract :+: sig) (WhileC address Abstract m) where
   ret = WhileC . ret
   eff = WhileC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k $ Rval unit)))
 
 
 instance Ord address => ValueRoots address Abstract where
