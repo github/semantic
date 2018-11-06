@@ -13,10 +13,10 @@ import qualified Data.Syntax.Literal as Literal
 import           Data.Term
 
 matchHash :: (Literal.Hash :< fs, term ~ Term (Sum fs) ann) => Matcher term (Literal.Hash term)
-matchHash = matchM projectTerm target
+matchHash = narrow
 
 matchArray :: (Literal.Array :< fs, term ~ Term (Sum fs) ann) => Matcher term (Literal.Array term)
-matchArray = matchM projectTerm target
+matchArray = narrow
 
 matchFloat :: (Literal.Float :< fs, term ~ Term (Sum fs) ann) => Matcher term (Literal.Float term)
-matchFloat = matchM projectTerm target
+matchFloat = narrow
