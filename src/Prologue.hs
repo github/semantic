@@ -1,6 +1,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Prologue
   ( module X
+  , eitherA
   , foldMapA
   , maybeM
   , maybeLast
@@ -72,3 +73,7 @@ fromMaybeLast b = fromMaybe b . getLast . foldMap (Last . Just)
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
+
+-- Promote a function to either-applicatives.
+eitherA :: Applicative f => (b -> f (Either a c)) -> Either a b -> f (Either a c)
+eitherA = either (pure . Left)
