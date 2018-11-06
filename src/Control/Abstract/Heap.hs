@@ -31,6 +31,7 @@ module Control.Abstract.Heap
 , runAddressError
 , runAddressErrorWith
 , runHeapErrorWith
+, throwHeapError
 ) where
 
 import Control.Abstract.Context (withCurrentCallStack)
@@ -42,7 +43,8 @@ import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
 import Data.Abstract.ScopeGraph (Path(..))
 import Data.Abstract.Heap (Heap, Position(..))
-import Control.Abstract.ScopeGraph
+import Control.Abstract.ScopeGraph hiding (ScopeError(..))
+import Control.Abstract.ScopeGraph (ScopeError)
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
@@ -88,9 +90,10 @@ withLexicalScopeAndFrame :: forall term address value m a sig. (
 withLexicalScopeAndFrame action = do
   currentScope' <- currentScope
   currentFrame' <- currentFrame
-  let (scopeEdges, frameEdges) = case currentScope' of
-        Just currentScope' -> (Map.singleton Lexical [ currentScope' ], Map.singleton Lexical (Map.singleton currentScope' currentFrame'))
-        Nothing -> mempty
+  let (scopeEdges, frameEdges) = case (currentScope', currentFrame') of
+        (Just currentScope', Just currentFrame') ->
+          (Map.singleton Lexical [ currentScope' ], Map.singleton Lexical (Map.singleton currentScope' currentFrame'))
+        _ -> mempty
   scope <- newScope scopeEdges
   frame <- newFrame scope frameEdges
   withScopeAndFrame frame action
@@ -122,13 +125,10 @@ modifyHeap = modify
 -- | Retrieve the heap.
 currentFrame :: forall address value sig term m. (
                   Member (State (Heap address address value)) sig
-                , Member (Reader ModuleInfo) sig
-                , Member (Reader Span) sig
-                , Member (Resumable (BaseError (HeapError address))) sig
                 , Carrier sig m
                 )
-             => Evaluator term address value m address
-currentFrame = maybeM (throwHeapError EmptyHeapError) =<< (Heap.currentFrame <$> get @(Heap address address value))
+             => Evaluator term address value m (Maybe address)
+currentFrame = Heap.currentFrame <$> get @(Heap address address value)
 
 putCurrentFrame :: forall address value sig m term. ( Member (State (Heap address address value)) sig, Carrier sig m ) => address -> Evaluator term address value m ()
 putCurrentFrame address = modify @(Heap address address value) (\heap -> heap { Heap.currentFrame = Just address })
@@ -165,10 +165,10 @@ withFrame :: forall term address value sig m a. (
           -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
           -> Evaluator term address value m a
 withFrame address action = do
-    prevFrame <- (currentFrame @address @value)
+    prevFrame <- currentFrame @address @value
     modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
     value <- action
-    modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just prevFrame })
+    modify @(Heap address address value) (\h -> h { Heap.currentFrame = prevFrame })
     pure value
 
 -- box :: ( Member (Allocator address) effects
@@ -272,7 +272,7 @@ lookupFrameAddress :: ( Member (State (Heap address address value)) sig
                   => Path address
                   -> Evaluator term address value m address
 lookupFrameAddress path = do
-  frameAddress <- currentFrame
+  frameAddress <- maybeM (throwHeapError CurrentFrameError) =<< currentFrame
   go path frameAddress
   where
     go path address = case path of
@@ -376,7 +376,7 @@ newtype DerefC address value m a = DerefC { runDerefC :: m a }
 
 
 data HeapError address resume where
-  EmptyHeapError :: HeapError address address
+  CurrentFrameError :: HeapError address address
   LookupError :: address -> HeapError address address
   LookupLinksError :: address ->  HeapError address (Map EdgeLabel (Map address address))
   LookupPathError :: Path address ->  HeapError address address
@@ -386,7 +386,7 @@ deriving instance Show address => Show (HeapError address resume)
 instance Show address => Show1 (HeapError address) where
   liftShowsPrec _ _ = showsPrec
 instance Eq address => Eq1 (HeapError address) where
-  liftEq _ EmptyHeapError EmptyHeapError = True
+  liftEq _ CurrentFrameError CurrentFrameError = True
   liftEq _ (LookupError a) (LookupError b) = a == b
   liftEq _ (LookupLinksError a) (LookupLinksError b) = a == b
 

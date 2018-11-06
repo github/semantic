@@ -7,7 +7,7 @@ module Control.Abstract.ScopeGraph
   , bindAll
   , Declaration(..)
   , ScopeGraph
-  , ScopeError
+  , ScopeError(..)
   , name
   , Reference(..)
   , EdgeLabel(..)
@@ -29,6 +29,7 @@ module Control.Abstract.ScopeGraph
   , Address(..)
   , runScopeErrorWith
   , runScopeError
+  , throwScopeError
   ) where
 
 import           Control.Abstract.Evaluator hiding (Local)

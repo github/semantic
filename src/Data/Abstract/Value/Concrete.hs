@@ -6,7 +6,7 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Control.Abstract.ScopeGraph (Allocator)
+import Control.Abstract.ScopeGraph (Allocator, ScopeError( CurrentScopeError ))
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
@@ -120,9 +120,9 @@ instance ( FreeVariables term
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-            currentScope' <- currentScope
-            currentFrame' <- currentFrame
-            let frameEdges = maybe mempty (Map.singleton Lexical . flip Map.singleton currentFrame') currentScope'
+            currentScope' <- maybeM (throwScopeError CurrentScopeError) =<< currentScope
+            currentFrame' <- maybeM (throwHeapError CurrentFrameError) =<< currentFrame
+            let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
             frameAddress <- newFrame scope frameEdges
             withFrame frameAddress $ do
               for_ (zip names params) $ \(name, param) -> do
