@@ -280,7 +280,7 @@ functionDefinition =
       makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> term expression <* symbol Parameters <*> children (manyTerm expression) <*> optional (symbol Type *> children (term expression)) <*> expressions')
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions')
   where
-    expressions' = makeTerm <$> location <*> many expression
+    expressions' = makeTerm <$> location <*> manyTerm expression
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody)
       = let fn = makeTerm loc (Declaration.Function [] functionName' functionParameters functionBody)
         in maybe fn (makeTerm loc . Type.Annotation fn) ty
@@ -288,7 +288,7 @@ functionDefinition =
 classDefinition :: Assignment Term
 classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class [] <$> term expression <*> argumentList <*> expressions')
   where
-    expressions' = makeTerm <$> location <*> many expression
+    expressions' = makeTerm <$> location <*> manyTerm expression
     argumentList = symbol ArgumentList *> children (manyTerm expression)
                     <|> pure []
 
