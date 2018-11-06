@@ -407,6 +407,7 @@ resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" b
   ArithmeticError{} -> pure hole)
 
 resumingHeapError :: ( Carrier sig m
+                     , AbstractHole address
                      , Member Trace sig
                      , Show address
                      , Ord address
@@ -416,8 +417,8 @@ resumingHeapError :: ( Carrier sig m
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
                   -> Evaluator term address value m a
-resumingHeapError = runHeapErrorWith (\ baseError -> traceError "HeapError" baseError *> case baseErrorException baseError of
-  EmptyHeapError -> undefined)
+resumingHeapError = runHeapErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
+    CurrentFrameError -> pure hole)
 
 resumingScopeError :: ( Carrier sig m
                      , Member Trace sig
@@ -427,7 +428,7 @@ resumingScopeError :: ( Carrier sig m
                     => Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a
                     -> Evaluator term address value m a
 resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
-  _ -> undefined)
+  ex -> undefined)
   -- LookupError :: address -> HeapError address address
   -- LookupLinksError :: address ->  HeapError address (Map EdgeLabel (Map address address))
   -- LookupPathError :: Path address ->  HeapError address address
