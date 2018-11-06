@@ -80,7 +80,7 @@ include eval pathTerm f = do
   (scopeGraph, v) <- f path
   bindAll scopeGraph
   maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
-  pure (Rval v)
+  pure v
 
 newtype Require a = Require { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)

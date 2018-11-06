@@ -5,17 +5,19 @@ module Data.Abstract.Ref
   ) where
 
 import Data.Abstract.Name
-import Data.Abstract.ScopeGraph (Address)
+import Data.Abstract.ScopeGraph (Address(..))
+import Data.Bifunctor
 
 -- | 'ValueRef' is the type subterms evaluate to and can represent either values directly ('Rval'), or references to values (lvals - such as local variables or object members)
 data ValueRef address value where
   -- | A value.
   Rval       :: value -> ValueRef address value
-  -- | A local variable. No environment is attached—it’s assumed that 'LvalLocal' will be evaluated in the same scope it was constructed in.
-  LvalLocal  :: Name -> ValueRef address value
   -- | An object member.
   LvalMember :: Address address -> ValueRef address value
 
+instance Bifunctor ValueRef where
+  bimap f g (Rval v) = Rval (g v)
+  bimap f g (LvalMember slot@Address{..}) = LvalMember (slot { frameAddress = f frameAddress })
 
 deriving instance (Eq value, Eq address) => Eq (ValueRef address value)
 deriving instance (Ord value, Ord address) => Ord (ValueRef address value)

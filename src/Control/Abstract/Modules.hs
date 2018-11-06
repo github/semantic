@@ -34,8 +34,9 @@ import Data.Span
 import Prologue
 import System.FilePath.Posix (takeDirectory)
 import Data.Abstract.ScopeGraph
+import Data.Abstract.Ref
 
-type ModuleResult address value = (ScopeGraph address, value)
+type ModuleResult address value = (ScopeGraph address, ValueRef address value)
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address value))

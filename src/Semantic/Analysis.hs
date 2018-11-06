@@ -15,8 +15,8 @@ import Data.Function
 import Prologue
 
 type ModuleC address value m
-  = ErrorC (LoopControl value)          (Eff
-  ( ErrorC (Return value)               (Eff
+  = ErrorC (LoopControl address value)          (Eff
+  ( ErrorC (Return address value)               (Eff
   ( StateC (Heap address address value) (Eff
   ( StateC (ScopeGraph address)         (Eff
   ( DerefC address value                (Eff
@@ -26,7 +26,7 @@ type ModuleC address value m
 
 type ValueC term address value m
   = FunctionC term address value                                  (Eff
-  ( WhileC value                                                  (Eff
+  ( WhileC address value                                          (Eff
   ( BooleanC value                                                (Eff
   ( InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff
     m)))))))
@@ -44,8 +44,8 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))
             , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
             , Carrier booleanSig booleanC
-            , whileC ~ WhileC value (Eff booleanC)
-            , whileSig ~ (While value :+: booleanSig)
+            , whileC ~ WhileC address value (Eff booleanC)
+            , whileSig ~ (While address value :+: booleanSig)
             , Carrier whileSig whileC
             , functionC ~ FunctionC term address value (Eff whileC)
             , functionSig ~ (Function term address value :+: whileSig)
@@ -93,7 +93,7 @@ evaluate lang perModule runTerm modules = do
                   . runReturn
                   . runLoopControl
 
-        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> pure unit) . definePrelude) runTerm
+        runValueEffects = raiseHandler runInterpose . runBoolean . runWhile . runFunction runTerm . either ((*> rvalBox unit) . definePrelude) runTerm
 
 -- | Evaluate a term recursively, applying the passed function at every recursive position.
 --
@@ -107,29 +107,28 @@ evalTerm :: ( Carrier sig m
             , Member (Allocator address) sig
             , Member (Boolean value) sig
             , Member (Deref value) sig
-            , Member (Error (LoopControl value)) sig
-            , Member (Error (Return value)) sig
-            , Member Fresh sig
+            , Member (Error (LoopControl address value)) sig
+            , Member (Error (Return address value)) sig
             , Member (Function term address value) sig
             , Member (Modules address value) sig
             , Member (Reader ModuleInfo) sig
             , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
             , Member (Resumable (BaseError (AddressError address value))) sig
-            , Member (Resumable (BaseError (EnvironmentError address))) sig
-            , Member (Resumable (BaseError EvalError)) sig
-            , Member (Resumable (BaseError ResolutionError)) sig
-            , Member (Resumable (BaseError (UnspecializedError value))) sig
-            , Member (State (ScopeGraph address)) sig
-            , Member (State (Heap address address value)) sig
             , Member (Resumable (BaseError (HeapError address))) sig
             , Member (Resumable (BaseError (ScopeError address))) sig
+            , Member (Resumable (BaseError (UnspecializedError value))) sig
+            , Member (Resumable (BaseError EvalError)) sig
+            , Member (Resumable (BaseError ResolutionError)) sig
+            , Member (State (Heap address address value)) sig
+            , Member (State (ScopeGraph address)) sig
             , Member (State Span) sig
+            , Member (While address value) sig
+            , Member Fresh sig
             , Member Trace sig
-            , Member (While value) sig
             , Ord address
             , Recursive term
             )
          => Open (Open (term -> Evaluator term address value m (ValueRef address value)))
-         -> term -> Evaluator term address value m value
-evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project)) >=> value
+         -> term -> Evaluator term address value m (ValueRef address value)
+evalTerm perTerm = fix (perTerm (\ ev -> eval ev . project))

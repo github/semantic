@@ -21,6 +21,7 @@ import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
 import Prologue hiding (TypeError)
+import Data.Abstract.Ref
 
 type TName = Int
 
@@ -240,7 +241,7 @@ instance Ord address => ValueRoots address Type where
 
 instance ( Member (Allocator address) sig
          , Member (Deref Type) sig
-         , Member (Error (Return Type)) sig
+         , Member (Error (Return address Type)) sig
          , Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
@@ -273,11 +274,11 @@ instance ( Member (Allocator address) sig
               assign address tvar
               bimap id (tvar :) <$> rest) (pure (undefined, [])) params
             -- TODO: We may still want to represent this as a closure and not a function type
-            (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
-      value >>= rvalBox >>= Evaluator . flip runFunctionC eval . k
+            bimap id (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
+      value >>= Evaluator . flip runFunctionC eval . k
 
-    Abstract.BuiltIn Print k -> runFunctionC (k (String :-> Unit)) eval
-    Abstract.BuiltIn Show  k -> runFunctionC (k (Object :-> String)) eval
+    Abstract.BuiltIn _ Print k -> runFunctionC (k (Rval $ String :-> Unit)) eval
+    Abstract.BuiltIn _ Show  k -> runFunctionC (k (Rval $ Object :-> String)) eval
     Abstract.Call op _ paramTypes k -> runEvaluator $ do
       tvar <- fresh
       let needed = zeroOrMoreProduct paramTypes :-> Var tvar
@@ -285,7 +286,7 @@ instance ( Member (Allocator address) sig
       boxed <- case unified of
         _ :-> ret -> pure ret
         actual    -> throwTypeError (UnificationError needed actual)
-      Evaluator $ runFunctionC (k boxed) eval) op)
+      Evaluator $ runFunctionC (k (Rval boxed)) eval) op)
 
 
 instance ( Member (Reader ModuleInfo) sig
@@ -308,13 +309,13 @@ instance ( Member (Abstract.Boolean Type) sig
          , Alternative m
          , Monad m
          )
-      => Carrier (Abstract.While Type :+: sig) (WhileC Type m) where
+      => Carrier (Abstract.While address Type :+: sig) (WhileC address Type m) where
   ret = WhileC . ret
   eff = WhileC . handleSum
     (eff . handleCoercible)
     (\ (Abstract.While cond body k) -> do
       cond' <- runWhileC cond
-      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k unit)))
+      ifthenelse cond' (runWhileC body *> empty) (runWhileC (k (Rval unit))))
 
 
 instance AbstractHole Type where

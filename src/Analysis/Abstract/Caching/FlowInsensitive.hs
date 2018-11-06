@@ -84,7 +84,6 @@ convergingModules :: ( AbstractValue term address value m
                      , Member (Reader (Live address)) sig
                      , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
-                     , Member (Resumable (BaseError (EnvironmentError address))) sig
                      , Member (State (Cache term address value)) sig
                      , Member (State (Heap address address value)) sig
                      , Member (State (ScopeGraph address)) sig
