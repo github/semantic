@@ -26,7 +26,6 @@ import Data.Abstract.Environment
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
-import Data.Coerce
 import Data.Language
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Set as Set

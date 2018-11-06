@@ -37,7 +37,6 @@ import Control.Abstract.Heap hiding (address)
 import Control.Abstract.ScopeGraph (Allocator, currentScope, newScope, EdgeLabel(..), )
 import qualified Control.Abstract.Heap as Heap
 import Control.Effect.Carrier
-import Data.Coerce
 import Data.Abstract.BaseError
 import Data.Abstract.Environment as Env
 import Data.Abstract.Module

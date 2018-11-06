@@ -13,7 +13,7 @@ import Data.Sum
 import Data.Term
 import GHC.Types (Constraint)
 import GHC.TypeLits
-import Diffing.Algorithm hiding (Empty)
+import Diffing.Algorithm
 import Prelude
 import Prologue
 import Reprinting.Tokenize hiding (Element)

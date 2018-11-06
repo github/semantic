@@ -71,5 +71,3 @@ parser = signed (choice [hex, oct, bin, dec]) where
 attemptUnsafeArithmetic :: a -> Either ArithException a
 attemptUnsafeArithmetic = unsafePerformIO . Exc.try . evaluate
 {-# NOINLINE attemptUnsafeArithmetic #-}
-
-{-# ANN attemptUnsafeArithmetic ("HLint: ignore Avoid restricted function" :: String) #-}
