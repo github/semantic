@@ -31,11 +31,9 @@
                 {-(Boolean)-})-}
               {-(Identifier)-}
               {-(Identifier)-})-}
-            { (Annotation
-              {-(Function
-                {-(Identifier)-}
-                {-(Identifier)-})-}
-              {-(Empty)-})
+            { (Function
+              {-(Identifier)-}
+              {-(Identifier)-})
             ->(Decorator
               {+(Identifier)+}
               {+(Identifier)+}
@@ -51,8 +49,6 @@
                       {+(Boolean)+})+}
                     {+(Identifier)+}
                     {+(Identifier)+})+}
-                  {+(Annotation
-                    {+(Function
-                      {+(Identifier)+}
-                      {+(Identifier)+})+}
-                    {+(Empty)+})+})+})+}) })))))))
+                  {+(Function
+                    {+(Identifier)+}
+                    {+(Identifier)+})+})+})+}) })))))))

@@ -144,6 +144,11 @@ instance Evaluatable TextElement where
 instance Tokenize TextElement where
   tokenize = yield . Run . textElementContent
 
+isTripleQuoted :: TextElement a -> Bool
+isTripleQuoted (TextElement t) =
+  let trip = "\"\"\""
+  in  T.take 3 t == trip && T.takeEnd 3 t == trip
+
 -- | A sequence of textual contents within a string literal.
 newtype EscapeSequence a = EscapeSequence { value :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
