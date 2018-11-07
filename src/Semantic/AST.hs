@@ -7,14 +7,18 @@ module Semantic.AST
   , runASTParse
   ) where
 
-import Control.Effect
-import Control.Monad
-import Data.AST
-import Data.Blob
-import Parsing.Parser
 import Prologue
-import Rendering.JSON (renderJSONAST)
-import Semantic.Task
+
+import Data.ByteString.Builder
+import Data.List (intersperse)
+
+import           Control.Effect
+import           Control.Effect.Error
+import           Data.AST
+import           Data.Blob
+import           Parsing.Parser
+import           Rendering.JSON (renderJSONAST)
+import           Semantic.Task
 import qualified Serializing.Format as F
 
 data SomeAST where
@@ -29,10 +33,17 @@ astParseBlob blob@Blob{..}
   | otherwise = noLanguageForBlob blobPath
 
 
-data ASTFormat = SExpression | JSON | Show
+data ASTFormat = SExpression | JSON | Show | Quiet
   deriving (Show)
 
-runASTParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, Monad m) => ASTFormat -> [Blob] -> m F.Builder
+runASTParse :: (Member Distribute sig, Member (Error SomeException) sig, Member Task sig, Carrier sig m, MonadIO m) => ASTFormat -> [Blob] -> m F.Builder
 runASTParse SExpression = distributeFoldMap (astParseBlob >=> withSomeAST (serialize (F.SExpression F.ByShow)))
 runASTParse Show        = distributeFoldMap (astParseBlob >=> withSomeAST (serialize F.Show . fmap nodeSymbol))
 runASTParse JSON        = distributeFoldMap (\ blob -> astParseBlob blob >>= withSomeAST (render (renderJSONAST blob))) >=> serialize F.JSON
+runASTParse Quiet       = distributeFoldMap $ \blob -> do
+  result <- time' ((Right <$> astParseBlob blob) `catchError` (pure . Left @SomeException))
+  pure . mconcat . intersperse "\t" $ [ either (const "ERR") (const "OK") (fst result)
+                                      , stringUtf8 (show (blobLanguage blob))
+                                      , stringUtf8 (blobPath blob)
+                                      , doubleDec (snd result) <> " ms\n"
+                                      ]

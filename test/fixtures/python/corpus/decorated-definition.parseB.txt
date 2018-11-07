@@ -21,8 +21,6 @@
                   (Boolean))
                 (Identifier)
                 (Identifier))
-              (Annotation
-                (Function
-                  (Identifier)
-                  (Identifier))
-                (Empty)))))))))
+              (Function
+                (Identifier)
+                (Identifier)))))))))

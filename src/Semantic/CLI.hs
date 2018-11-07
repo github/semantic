@@ -89,7 +89,7 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
                   <|> pure defaultSymbolFields)
               <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
               <|> flag'                                          (Parse.runParse ShowTermRenderer)        (long "show"         <> help "Output using the Show instance (debug only, format subject to change without notice)")
-              <|> flag'                                          (Parse.runParse QuietTermRenderer)        (long "quiet"        <> help "Don't produce output, but show timing stats")
+              <|> flag'                                          (Parse.runParse QuietTermRenderer)       (long "quiet"        <> help "Don't produce output, but show timing stats")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= renderer
 
@@ -97,11 +97,12 @@ parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate pa
     symbolFieldsReader = eitherReader (Right . parseSymbolFields)
 
 tsParseCommand :: Mod CommandFields (Task.TaskEff Builder)
-tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
+tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Don't produce output, but show timing stats"))
   where
     tsParseArgumentsParser = do
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
+            <|> flag'                 AST.Quiet       (long "quiet"       <> help "Don't produce output, but show timing stats")
             <|> flag'                 AST.Show        (long "show"        <> help "Output using the Show instance (debug only, format subject to change without notice)")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format

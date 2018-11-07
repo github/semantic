@@ -1,13 +1,11 @@
 (Statements
   (Class
     (Identifier)
-    (Annotation
-      (Function
-        (Identifier)
-        (Identifier)
-        (Return
-          (Identifier)))
-      (Empty)))
+    (Function
+      (Identifier)
+      (Identifier)
+      (Return
+        (Identifier))))
   (Class
     (Identifier)
     (NoOp
@@ -15,10 +13,8 @@
   (Class
     (Identifier)
     (Identifier)
-    (Annotation
-      (Function
-        (Identifier)
-        (Identifier)
-        (Return
-          (Empty)))
-      (Empty))))
+    (Function
+      (Identifier)
+      (Identifier)
+      (Return
+        (Empty)))))

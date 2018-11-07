@@ -1,8 +1,6 @@
 (Statements
-  (Annotation
-    (Function
-      (Empty)
-      (Plus
-        (Integer)
-        (Integer)))
-    (Empty)))
+  (Function
+    (Empty)
+    (Plus
+      (Integer)
+      (Integer))))
