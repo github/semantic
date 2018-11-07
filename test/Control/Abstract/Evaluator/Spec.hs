@@ -43,7 +43,6 @@ evaluate
   . runEvaluator
   . fmap reassociate
   . runValueError
-  . runEnvironmentError
   . runAddressError
   . runDeref @Val
   . runAllocator
@@ -67,7 +66,6 @@ newtype SpecEff = SpecEff
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val
                  (Eff (ResumableC (BaseError (AddressError Precise Val))
-                 (Eff (ResumableC (BaseError (EnvironmentError Precise))
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
                  (Eff (ReaderC Span
                  (Eff (ReaderC ModuleInfo
@@ -75,7 +73,7 @@ newtype SpecEff = SpecEff
                  (Eff (FreshC
                  (Eff (StateC (Heap Precise Val)
                  (Eff (TraceByIgnoringC
-                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))
+                 (Eff (LiftC IO)))))))))))))))))))))))))))))))
                  Precise
   }
 
