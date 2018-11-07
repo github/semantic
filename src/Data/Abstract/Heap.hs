@@ -72,6 +72,20 @@ lookup address (EPath label scope path) declaration heap = do
     nextAddress <- Map.lookup scope scopeMap
     lookup nextAddress path declaration heap
 
+lookupFrameAddress :: (Ord address, Ord scope) => Path scope -> Heap scope address value -> Maybe address
+lookupFrameAddress path h@Heap{..} = do
+  frameAddress <- currentFrame
+  go path frameAddress
+  where
+    go path address = case path of
+      DPath decl position -> pure address
+      EPath edge nextScopeAddress path' -> do
+        linkMap <- frameLinks address h
+        frameAddress <- do
+          scopeMap <- Map.lookup edge linkMap
+          Map.lookup nextScopeAddress scopeMap
+        go path' frameAddress
+
 newFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Heap scope address value -> Heap scope address value
 newFrame scope address links = insertFrame address (Frame scope links mempty)
 
