@@ -32,6 +32,7 @@ instance ( Member (Allocator address) sig
          , Member (Resumable (BaseError (AddressError address Abstract))) sig
          , Member (State (Heap address address Abstract)) sig
          , Ord address
+         , Show address
          , Carrier sig m
          )
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where

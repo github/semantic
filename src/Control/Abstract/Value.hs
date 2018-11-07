@@ -174,6 +174,8 @@ forLoop :: ( Carrier sig m
            , Member (While address value) sig
            , Member Fresh sig
            , Ord address
+           , Show address
+           , Show value
            )
   => Evaluator term address value m value -- ^ Initial statement
   -> Evaluator term address value m value -- ^ Condition
@@ -315,6 +317,8 @@ makeNamespace :: ( AbstractValue term address value m
                  , Member Fresh sig
                  , Carrier sig m
                  , Ord address
+                 , Show address
+                 , Show value
                  )
               => Declaration
               -> Address address
