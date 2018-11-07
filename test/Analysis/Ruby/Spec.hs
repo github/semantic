@@ -19,11 +19,11 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      (_, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
+      res <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 1)]
-          Env.names env `shouldContain` [ "foo" ]
+        Right (Just (Module _ (scopeGraph, (_, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Just (Rval $ Value.Integer (Number.Integer 1))
+          lookupDeclaration "foo" scopeGraph `shouldBe` Just _
         other -> expectationFailure (show other)
 
     it "evaluates load" $ do
@@ -45,7 +45,7 @@ spec config = parallel $ do
           heapLookupAll addr heap `shouldBe` Just [String "\"<bar>\""]
           Env.names env `shouldContain` [ "Bar", "Foo" ]
 
-          (derefQName heap ("Bar" :| []) env >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
+          (lookupDeclaration "Bar" heap >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
         other -> expectationFailure (show other)
 
     it "evaluates modules" $ do

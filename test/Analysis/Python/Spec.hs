@@ -19,9 +19,10 @@ spec config = parallel $ do
         Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldContain` [ "a", "b" ]
 
-          (derefQName heap ("a" :| [])    env >>= deNamespace heap) `shouldBe` Just ("a", ["foo"])
-          (derefQName heap ("b" :| [])    env >>= deNamespace heap) `shouldBe` Just ("b", ["c"])
-          (derefQName heap ("b" :| ["c"]) env >>= deNamespace heap) `shouldBe` Just ("c", ["baz"])
+          (lookupDeclaration "a" heap >>= deNamespace heap) `shouldBe` Just ("a", ["foo"])
+          (lookupDeclaration "b" heap >>= deNamespace heap) `shouldBe` Just ("b", ["c"])
+          undefined
+          -- (derefQName heap ("b" :| ["c"]) env >>= deNamespace heap) `shouldBe` Just ("c", ["baz"])
         other -> expectationFailure (show other)
 
     it "imports with aliases" $ do
@@ -41,7 +42,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "main3.py" <$> res of
         Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldContain` [ "utils" ]
-          (derefQName heap ("utils" :| []) env >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
+          (lookupDeclaration "utils" heap >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
         other -> expectationFailure (show other)
 
     it "subclasses" $ do
