@@ -77,7 +77,7 @@ include eval pathTerm f = do
   name <- eval pathTerm >>= Abstract.value >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (scopeGraph, v) <- f path
+  (scopeGraph, (_, v)) <- f path
   bindAll scopeGraph
   maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
   pure v

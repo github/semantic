@@ -29,7 +29,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (scopeGraph, value) <- require modulePath
+    (scopeGraph, (_, value)) <- require modulePath
     bindAll scopeGraph
     if Prologue.null symbols then
       maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
@@ -55,7 +55,7 @@ instance Evaluatable QualifiedAliasedImport where
     -- rvalBox =<< evalRequire modulePath alias
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     span <- get @Span
-    (scopeGraph, value) <- require modulePath
+    (scopeGraph, (_, value)) <- require modulePath
     bindAll scopeGraph
     declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph)
     rvalBox unit
