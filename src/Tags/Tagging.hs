@@ -59,12 +59,13 @@ contextualizing Blob{..} = repeatedly $ await >>= \case
   Exit  x r -> exitScope (x, r)
   Iden iden span docsLiteralRange -> lift State.get >>= \case
     ((x, r):("Context", cr):xs) | x `elem` symbolsToSummarize
-      -> yield $ Tag iden x span (fmap fst xs) (slice r) (slice cr)
+      -> yield $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice cr)
     ((x, r):xs) | x `elem` symbolsToSummarize
-      -> yield $ Tag iden x span (fmap fst xs) (slice r) (slice docsLiteralRange)
+      -> yield $ Tag iden x span (fmap fst xs) (firstLine (slice r)) (slice docsLiteralRange)
     _ -> pure ()
   where
     slice = fmap (stripEnd . Source.toText . flip Source.slice blobSource)
+    firstLine = fmap (fst . breakOn "\n")
 
 enterScope, exitScope :: ContextToken -> Machine.PlanT k Tag Contextualizer ()
 enterScope c = lift (State.modify (c :))

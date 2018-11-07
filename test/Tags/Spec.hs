@@ -55,6 +55,11 @@ spec = parallel $ do
         , Tag "f" "Function" (Span (Pos 3 5) (Pos 5 17)) ["Statements", "Class", "Statements"] (Just "def f(self)") (Just "\"\"\"The f method\"\"\"")
         ]
 
+    it "produces tags for multi-line functions" $ do
+      (blob, tree) <- parseTestFile pythonParser "test/fixtures/python/tags/multiline.py"
+      runTagging blob tree `shouldBe` Right
+        [ Tag "Foo" "Function" (Span (Pos 1 1) (Pos 3 13)) ["Statements"] (Just "def Foo(x,") Nothing ]
+
   describe "ruby" $ do
     it "produces tags for methods" $ do
       (blob, tree) <- parseTestFile rubyParser "test/fixtures/ruby/tags/simple_method.rb"
