@@ -29,7 +29,7 @@ import Data.Abstract.Heap as X
 import Data.Abstract.Module as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Name as X
-import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError, materializeEnvironment)
+import Data.Abstract.Value.Concrete (Value(..), ValueError, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.ByteString.Builder (toLazyByteString)
@@ -82,7 +82,7 @@ runBuilder = toStrict . toLazyByteString
 -- | This orphan instance is so we don't have to insert @name@ calls
 -- in dozens and dozens of environment specs.
 instance IsString Name where
-  fromString = name . fromString
+  fromString = X.name . fromString
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: TaskConfig -> Both FilePath -> IO ByteString
@@ -98,59 +98,65 @@ readFilePair paths = let paths' = fmap file paths in
                      runBothWith F.readFilePair paths'
 
 type TestEvaluatingC term
-  = ResumableC (BaseError (ValueError term Precise)) (Eff
-  ( ResumableC (BaseError (AddressError Precise (Val term))) (Eff
+  = ResumableC (BaseError (AddressError Precise (Val term))) (Eff
+  ( ResumableC (BaseError (ValueError term Precise)) (Eff
   ( ResumableC (BaseError ResolutionError) (Eff
   ( ResumableC (BaseError EvalError) (Eff
-  ( ResumableC (BaseError (EnvironmentError Precise)) (Eff
+  ( ResumableC (BaseError (HeapError Precise)) (Eff
+  ( ResumableC (BaseError (ScopeError Precise)) (Eff
   ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
-  ( ResumableC (BaseError (LoadError Precise)) (Eff
+  ( ResumableC (BaseError (LoadError Precise (Val term))) (Eff
   ( FreshC (Eff
-  ( StateC (Heap Precise (Val term)) (Eff
+  ( StateC (Heap Precise Precise (Val term)) (Eff
+  ( StateC (ScopeGraph Precise) (Eff
   ( TraceByReturningC (Eff
-  ( LiftC IO))))))))))))))))))))
+  ( LiftC IO))))))))))))))))))))))))
 type TestEvaluatingErrors term
-  = '[ BaseError (ValueError term Precise)
-     , BaseError (AddressError Precise (Val term))
+  = '[ BaseError (AddressError Precise (Val term))
+     , BaseError (ValueError term Precise)
      , BaseError ResolutionError
      , BaseError EvalError
-     , BaseError (EnvironmentError Precise)
+     , BaseError (HeapError Precise)
+     , BaseError (ScopeError Precise)
      , BaseError (UnspecializedError (Val term))
-     , BaseError (LoadError Precise)
+     , BaseError (LoadError Precise (Val term))
      ]
 testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) (Span, a)
                -> IO
                  ( [String]
-                 , ( Heap Precise (Val term)
-                   , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
-                   )
+                 , (ScopeGraph Precise,
+                     ( Heap Precise Precise (Val term)
+                     , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
+                   ))
                  )
 testEvaluating
   = runM
   . runTraceByReturning
-  . runState lowerBound
+  . runState lowerBound -- ScopeGraph
+  . runState lowerBound -- Heap
   . runFresh
   . runEvaluator
   . fmap reassociate
   . runLoadError
   . runUnspecialized
-  . runEnvironmentError
+  . runScopeError
+  . runHeapError
   . runEvalError
   . runResolutionError
+  . runValueError
   . runAddressError
-  . runValueError @_ @_ @_ @Precise
   . fmap snd
 
 type Val term = Value term Precise
 
 
-deNamespace :: Heap Precise (Value term Precise)
+deNamespace :: Heap Precise Precise (Value term Precise)
             -> Value term Precise
             -> Maybe (Name, [Name])
 deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
 deNamespace _ _                          = Nothing
 
-namespaceScope :: Heap Precise (Value term Precise)
+namespaceScope :: Heap Precise Precise (Value term Precise)
                -> Value term Precise
                -> Maybe (Environment Precise)
 namespaceScope heap ns@(Namespace _ _ _)
@@ -168,7 +174,7 @@ namespaceScope heap ns@(Namespace _ _ _)
 
 namespaceScope _ _ = Nothing
 
-derefQName :: Heap Precise (Value term Precise) -> NonEmpty Name -> Bindings Precise -> Maybe (Value term Precise)
+derefQName :: Heap Precise Precise (Value term Precise) -> NonEmpty Name -> Bindings Precise -> Maybe (Value term Precise)
 derefQName heap names binds = go names (Env.newEnv binds)
   where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= fmap fst . Set.minView >>= case ns of
           []        -> Just
