@@ -32,10 +32,11 @@ import qualified Data.Set as Set
 import Data.Span
 import Prologue
 import System.FilePath.Posix (takeDirectory)
+import Data.Abstract.Heap
 import Data.Abstract.ScopeGraph
 import Data.Abstract.Ref
 
-type ModuleResult address value = (ScopeGraph address, ValueRef address value)
+type ModuleResult address value = (ScopeGraph address, (Heap address address value, ValueRef address value))
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address value))
@@ -117,7 +118,7 @@ newtype Merging address value = Merging { runMerging :: ModuleResult address val
 
 instance Semigroup (Merging address value) where
   -- TODO: We may need to combine graphs
-  Merging (_, _) <> Merging (graph2, addr) = Merging (graph2, addr)
+  Merging (_, (_, _)) <> Merging (graph2, (heap2, addr)) = Merging (graph2, (heap2, addr))
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
