@@ -91,7 +91,7 @@ evaluate lang perModule runTerm modules = do
                   . runAllocator
                   . runDeref
                   . raiseHandler (runState lowerBound) -- ScopeGraph
-                  . raiseHandler (evalState lowerBound) -- Heap
+                  . raiseHandler (runState lowerBound) -- Heap
                   . runReturn
                   . runLoopControl
 
