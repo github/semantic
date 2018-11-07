@@ -7,8 +7,6 @@ module SpecHelpers
 , parseFilePath
 , readFilePair
 , testEvaluating
-, deNamespace
-, derefQName
 , verbatim
 , Verbatim(..)
 , toList
@@ -18,6 +16,8 @@ module SpecHelpers
 ) where
 
 import Control.Abstract
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Abstract.Heap as Heap
 import Control.Arrow ((&&&))
 import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
@@ -107,10 +107,8 @@ type TestEvaluatingC term
   ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
   ( ResumableC (BaseError (LoadError Precise (Val term))) (Eff
   ( FreshC (Eff
-  ( StateC (Heap Precise Precise (Val term)) (Eff
-  ( StateC (ScopeGraph Precise) (Eff
   ( TraceByReturningC (Eff
-  ( LiftC IO))))))))))))))))))))))))
+  ( LiftC IO))))))))))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (AddressError Precise (Val term))
      , BaseError (ValueError term Precise)
@@ -124,16 +122,11 @@ type TestEvaluatingErrors term
 testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) (Span, a)
                -> IO
                  ( [String]
-                 , (ScopeGraph Precise,
-                     ( Heap Precise Precise (Val term)
-                     , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
-                   ))
+                 , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
                  )
 testEvaluating
   = runM
   . runTraceByReturning
-  . runState lowerBound -- ScopeGraph
-  . runState lowerBound -- Heap
   . runFresh
   . runEvaluator
   . fmap reassociate
@@ -150,35 +143,36 @@ testEvaluating
 type Val term = Value term Precise
 
 
-deNamespace :: Heap Precise Precise (Value term Precise)
-            -> Value term Precise
-            -> Maybe (Name, [Name])
-deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
-deNamespace _ _                          = Nothing
+-- deNamespace :: Heap Precise Precise (Value term Precise)
+--             -> Value term Precise
+--             -> Maybe (Name, [Name])
+-- deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
+-- deNamespace _ _                          = Nothing
 
-namespaceScope :: Heap Precise Precise (Value term Precise)
-               -> Value term Precise
-               -> Maybe (Environment Precise)
-namespaceScope heap ns@(Namespace _ _ _)
-  = either (const Nothing) (snd . snd)
-  . run
-  . runFresh
-  . runEvaluator
-  . runAddressError
-  . raiseHandler (runState heap)
-  . raiseHandler (runState (lowerBound @Span))
-  . raiseHandler (runReader (lowerBound @Span))
-  . raiseHandler (runReader (ModuleInfo "SpecHelper.hs"))
-  . runDeref
-  $ materializeEnvironment ns
+-- namespaceScope :: Heap Precise Precise (Value term Precise)
+--                -> Value term Precise
+--                -> Maybe (Environment Precise)
+-- namespaceScope heap ns@(Namespace _ _ _)
+--   = either (const Nothing) (snd . snd)
+--   . run
+--   . runFresh
+--   . runEvaluator
+--   . runAddressError
+--   . raiseHandler (runState heap)
+--   . raiseHandler (runState (lowerBound @Span))
+--   . raiseHandler (runReader (lowerBound @Span))
+--   . raiseHandler (runReader (ModuleInfo "SpecHelper.hs"))
+--   . runDeref
+--   $ undefined
 
-namespaceScope _ _ = Nothing
+-- namespaceScope _ _ = Nothing
 
-derefQName :: Heap Precise Precise (Value term Precise) -> NonEmpty Name -> Bindings Precise -> Maybe (Value term Precise)
-derefQName heap names binds = go names (Env.newEnv binds)
-  where go (n1 :| ns) env = Env.lookupEnv' n1 env >>= flip heapLookup heap >>= fmap fst . Set.minView >>= case ns of
-          []        -> Just
-          (n2 : ns) -> namespaceScope heap >=> go (n2 :| ns)
+lookupDeclaration :: Name -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe (Value term Precise)
+lookupDeclaration name heap scopeGraph = do
+  path <- ScopeGraph.lookupScopePath name scopeGraph
+  frameAddress <- Heap.lookupFrameAddress path heap
+  set <- Heap.getSlot (Address frameAddress (Heap.pathPosition path)) heap
+  fst <$> Set.minView set
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

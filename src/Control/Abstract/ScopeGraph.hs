@@ -174,7 +174,7 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 )
              => Declaration
              -> Evaluator term address value m (ScopeGraph.Path address)
-lookupScopePath declaration = maybeM (throwScopeError $ LookupPathError declaration) . ScopeGraph.lookupScopePath declaration =<< get
+lookupScopePath decl@Declaration{..} = maybeM (throwScopeError $ LookupPathError decl) . ScopeGraph.lookupScopePath name =<< get
 
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get

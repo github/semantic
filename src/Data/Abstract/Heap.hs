@@ -14,6 +14,7 @@ module Data.Abstract.Heap
   , Position(..)
   , pathPosition
   , pathDeclaration
+  , lookupFrameAddress
   ) where
 
 import Data.Abstract.Live

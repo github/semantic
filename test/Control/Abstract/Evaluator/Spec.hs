@@ -17,64 +17,73 @@ import Data.Bifunctor (first)
 import Data.Functor.Const
 import Data.Sum
 import SpecHelpers hiding (reassociate)
+import Data.Abstract.Ref
+import qualified Control.Abstract.Heap as Heap
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (_, expected) <- evaluate (box (integer 123))
-    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+    (_, (_, expected)) <- evaluate (rvalBox (integer 123))
+    expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
 
   it "calls functions" $ do
-    (_, expected) <- evaluate $ do
-      identity <- function Nothing [name "x"] (SpecEff (variable (name "x")))
-      recv <- box unit
-      addr <- box (integer 123)
-      call identity recv [addr]
-    expected `shouldBe` Right (Value.Integer (Number.Integer 123))
+    (_, (_, expected)) <- evaluate $ do
+      identity <- value =<< function "identity" [SpecHelpers.name "x"]
+        (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x"))))
+      val <- pure (integer 123)
+      -- TODO Pass a unit slot to call at the self position
+      call identity undefined [val]
+    expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
 
 evaluate
   = runM
   . runTraceByIgnoring
-  . runState (lowerBound @(Heap Precise Val))
+  . runState (lowerBound @(ScopeGraph Precise))
+  . runState (lowerBound @(Heap Precise Precise Val))
   . runFresh
-  . runReader (PackageInfo (name "test") mempty)
+  . runReader (PackageInfo (SpecHelpers.name "test") mempty)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . evalState (lowerBound @Span)
   . runReader (lowerBound @Span)
   . runEvaluator
   . fmap reassociate
+  . runScopeError
+  . runHeapError
   . runValueError
   . runAddressError
   . runDeref @Val
   . runAllocator
-  . (>>= deref . snd)
-  . runEnv lowerBound
   . runReturn
   . runLoopControl
   . runBoolean
   . runFunction runSpecEff
 
-reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) result)) -> Either (SomeError (Sum '[exc3, exc2, exc1])) result
-reassociate = mergeErrors . mergeErrors . mergeErrors . Right
+reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) (Either (SomeError exc4) result))) -> Either (SomeError (Sum '[exc4, exc3, exc2, exc1])) result
+reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . Right
 
 type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
   { runSpecEff :: Evaluator SpecEff Precise Val (FunctionC SpecEff Precise Val
                  (Eff (BooleanC Val
-                 (Eff (ErrorC (LoopControl Precise)
-                 (Eff (ErrorC (Return Precise)
-                 (Eff (EnvC Precise
+                 (Eff (ErrorC (LoopControl Precise Val)
+                 (Eff (ErrorC (Return Precise Val)
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val
                  (Eff (ResumableC (BaseError (AddressError Precise Val))
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
+                 (Eff (ResumableC (BaseError (HeapError Precise))
+                 (Eff (ResumableC (BaseError (ScopeError Precise))
                  (Eff (ReaderC Span
+                 (Eff (StateC Span
                  (Eff (ReaderC ModuleInfo
                  (Eff (ReaderC PackageInfo
                  (Eff (FreshC
-                 (Eff (StateC (Heap Precise Val)
+                 (Eff (StateC (Heap Precise Precise Val)
+                 (Eff (StateC (ScopeGraph Precise)
                  (Eff (TraceByIgnoringC
-                 (Eff (LiftC IO)))))))))))))))))))))))))))))))
-                 Precise
+                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))
+                 (ValueRef Precise Val)
   }
 
 instance Eq SpecEff where _ == _ = True

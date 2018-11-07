@@ -16,7 +16,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "main.go" <$> res of
         Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
-          (derefQName heap ("foo" :| []) env >>= deNamespace heap) `shouldBe` Just ("foo",  ["New"])
+          (lookupDeclaration "foo" heap >>= deNamespace heap) `shouldBe` Just ("foo",  ["New"])
         other -> expectationFailure (show other)
 
     it "imports with aliases (and side effects only)" $ do
@@ -24,7 +24,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "main1.go" <$> res of
         Right (Just (Module _ (_, (env, addr)) :| [])) -> do
           Env.names env `shouldBe` [ "f", "main" ]
-          (derefQName heap ("f" :| []) env >>= deNamespace heap) `shouldBe` Just ("f",  ["New"])
+          (lookupDeclaration "f" heap >>= deNamespace heap) `shouldBe` Just ("f",  ["New"])
         other -> expectationFailure (show other)
 
   where
