@@ -42,6 +42,8 @@ defineClass :: ( AbstractValue term address value m
                , Member (State (Heap address address value)) sig
                , Member (State (ScopeGraph address)) sig
                , Ord address
+               , Show address
+               , Show value
                )
             => Declaration
             -> [value]
@@ -66,6 +68,8 @@ defineNamespace :: ( AbstractValue term address value m
                    , Member (State (Heap address address value)) sig
                    , Member (State (ScopeGraph address)) sig
                    , Ord address
+                   , Show address
+                   , Show value
                    )
                 => Declaration
                 -> Evaluator term address value m a

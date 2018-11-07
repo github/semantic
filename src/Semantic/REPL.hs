@@ -12,7 +12,6 @@ import Control.Effect.Resource
 import Control.Effect.Sum
 import Control.Effect.REPL
 import Data.Abstract.Address.Precise as Precise
-import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable hiding (string)
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
@@ -119,7 +118,6 @@ step :: ( Member (Error SomeException) sig
         , Member (Reader Span) sig
         , Member (Reader Step) sig
         , Member (State [Breakpoint]) sig
-        , Show address
         , Carrier sig m
         )
      => [(ModulePath, Blob)]

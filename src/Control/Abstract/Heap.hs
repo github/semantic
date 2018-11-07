@@ -54,6 +54,7 @@ import qualified Data.Map.Strict as Map
 import Prologue
 import Data.Abstract.Ref
 
+
 -- | Evaluates an action locally the scope and frame of the given frame address.
 withScopeAndFrame :: forall term address value m a sig. (
                       Ord address
@@ -64,9 +65,11 @@ withScopeAndFrame :: forall term address value m a sig. (
                     , Member (State (Heap address address value)) sig
                     , Member (State (ScopeGraph address)) sig
                     , Carrier sig m
+                    , Show address
+                    , Show value
                     )
                   => address
-                  -> Evaluator term address value m a -- Not sure about this one.
+                  -> Evaluator term address value m a
                   -> Evaluator term address value m a
 withScopeAndFrame address action = do
   scope <- scopeLookup @address @value address
@@ -84,6 +87,8 @@ withLexicalScopeAndFrame :: forall term address value m a sig. (
                     , Member (Allocator address) sig
                     , Member Fresh sig
                     , Carrier sig m
+                    , Show address
+                    , Show value
                     )
                   => Evaluator term address value m a
                   -> Evaluator term address value m a
@@ -143,6 +148,8 @@ newFrame :: forall address value sig m term. (
           , Member (State (ScopeGraph address)) sig
           , Member Fresh sig
           , Carrier sig m
+          , Show address
+          , Show value
           )
          => address
          -> Map EdgeLabel (Map address address)
@@ -160,6 +167,8 @@ withFrame :: forall term address value sig m a. (
            , Member (Reader Span) sig
            , Member (State (Heap address address value)) sig
            , Carrier sig m
+           , Show value
+           , Show address
            )
           => address
           -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
@@ -219,6 +228,8 @@ withChildFrame :: ( Member (Allocator address) sig
                   , Member (Deref value) sig
                   , Ord address
                   , Carrier sig m
+                  , Show address
+                  , Show value
                   )
                 => Declaration
                 -> (address -> Evaluator term address value m a)

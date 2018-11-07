@@ -254,6 +254,7 @@ instance ( Member (Allocator address) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (State TypeMap) sig
          , Ord address
+         , Show address
          , Carrier sig m
          )
       => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
