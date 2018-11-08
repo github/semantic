@@ -8,7 +8,6 @@ module Control.Abstract.ScopeGraph
   , Declaration(..)
   , ScopeGraph
   , ScopeError(..)
-  , name
   , Reference(..)
   , EdgeLabel(..)
   , currentScope
@@ -134,7 +133,7 @@ lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 )
              => address
              -> Evaluator term address value m (Scope address)
-lookupScope address = maybeM (throwScopeError LookupError) . ScopeGraph.lookupScope address =<< get
+lookupScope address = maybeM (throwScopeError LookupScopeError) . ScopeGraph.lookupScope address =<< get
 
 insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) sig
                         , Member (Reader ModuleInfo) sig
@@ -150,7 +149,7 @@ insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) s
                       -> Scope address
                       -> Evaluator term address value m ()
 insertImportReference ref decl g scopeAddress scope = do
-  newScope <- maybeM (throwScopeError LookupError) (ScopeGraph.insertImportReference ref decl g scopeAddress scope)
+  newScope <- maybeM (throwScopeError LookupScopeError) (ScopeGraph.insertImportReference ref decl g scopeAddress scope)
   insertScope scopeAddress newScope
 
 insertScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
@@ -174,7 +173,7 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 )
              => Declaration
              -> Evaluator term address value m (ScopeGraph.Path address)
-lookupScopePath decl@Declaration{..} = maybeM (throwScopeError $ LookupPathError decl) . ScopeGraph.lookupScopePath name =<< get
+lookupScopePath decl@Declaration{..} = maybeM (throwScopeError $ LookupPathError decl) . ScopeGraph.lookupScopePath unDeclaration =<< get
 
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
@@ -206,7 +205,7 @@ throwScopeError = throwBaseError
 
 data ScopeError address return where
   ScopeError :: Declaration -> Span -> ScopeError address (Address address)
-  LookupError :: ScopeError address (Scope address)
+  LookupScopeError :: ScopeError address (Scope address)
   LookupPathError :: Declaration -> ScopeError address (ScopeGraph.Path address)
   CurrentScopeError :: ScopeError address address
 
@@ -216,7 +215,7 @@ instance Show address => Show1 (ScopeError address) where liftShowsPrec _ _ = sh
 instance Eq address => Eq1 (ScopeError address) where
   liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
   liftEq _ CurrentScopeError CurrentScopeError = True
-  liftEq _ LookupError LookupError = True
+  liftEq _ LookupScopeError LookupScopeError = True
   liftEq _ (LookupPathError decl1) (LookupPathError decl2) = decl1 == decl2
   liftEq _ _ _ = False
 
