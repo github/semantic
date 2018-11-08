@@ -5,7 +5,7 @@ module Language.Python.Syntax where
 
 import           Data.Abstract.BaseError
 import           Data.Abstract.Environment as Env
-import           Data.Abstract.Evaluatable
+import           Data.Abstract.Evaluatable hiding (Import)
 import           Data.Abstract.Module
 import           Data.Aeson
 import           Data.Functor.Classes.Generic

@@ -12,19 +12,23 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "Go" $ do
     it "imports and wildcard imports" $ do
-      (_, (heap, res)) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      (_, res) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main.go" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          Env.names env `shouldBe` [ "Bar", "Rab", "foo", "main" ]
-          (lookupDeclaration "foo" heap >>= deNamespace heap) `shouldBe` Just ("foo",  ["New"])
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "Bar" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "Rab" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "main" heap scopeGraph `shouldBe` Just ()
+          -- (lookupDeclaration "foo" heap >>= deNamespace heap) `shouldBe` Just ("foo",  ["New"])
         other -> expectationFailure (show other)
 
     it "imports with aliases (and side effects only)" $ do
-      (_, (heap, res)) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
+      (_, res) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main1.go" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          Env.names env `shouldBe` [ "f", "main" ]
-          (lookupDeclaration "f" heap >>= deNamespace heap) `shouldBe` Just ("f",  ["New"])
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "f" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "main" heap scopeGraph `shouldBe` Just ()
+          -- (lookupDeclaration "f" heap >>= deNamespace heap) `shouldBe` Just ("f",  ["New"])
         other -> expectationFailure (show other)
 
   where

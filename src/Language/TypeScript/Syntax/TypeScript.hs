@@ -8,8 +8,8 @@ import           Data.Aeson
 import qualified Data.Text as T
 import           Proto3.Suite
 
+import Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
-import           Control.Abstract.ScopeGraph hiding (Import)
 import           qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.JSON.Fields
 import           Diffing.Algorithm

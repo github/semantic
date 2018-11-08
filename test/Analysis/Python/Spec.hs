@@ -17,44 +17,51 @@ spec config = parallel $ do
       (_, res) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main.py" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, value)) :| [])) -> do
-          Env.names env `shouldContain` [ "a", "b" ]
+          const () <$> SpecHelpers.lookupDeclaration "a" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "b" heap scopeGraph `shouldBe` Just ()
 
-          (lookupDeclaration "a" heap >>= deNamespace heap) `shouldBe` Just ("a", ["foo"])
-          (lookupDeclaration "b" heap >>= deNamespace heap) `shouldBe` Just ("b", ["c"])
+          -- (lookupDeclaration "a" heap >>= deNamespace heap) `shouldBe` Just ("a", ["foo"])
+          -- (lookupDeclaration "b" heap >>= deNamespace heap) `shouldBe` Just ("b", ["c"])
           undefined
           -- (derefQName heap ("b" :| ["c"]) env >>= deNamespace heap) `shouldBe` Just ("c", ["baz"])
         other -> expectationFailure (show other)
 
     it "imports with aliases" $ do
-      (_, (_, res)) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
+      (_, res) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main1.py" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> Env.names env `shouldContain` [ "b", "e" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "b" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "e" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "imports using 'from' syntax" $ do
-      (_, (_, res)) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
+      (_, res) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main2.py" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> Env.names env `shouldContain` [ "bar", "foo" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "imports with relative syntax" $ do
-      (_, (heap, res)) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
+      (_, res) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
       case ModuleTable.lookup "main3.py" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          Env.names env `shouldContain` [ "utils" ]
-          (lookupDeclaration "utils" heap >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "utils" heap scopeGraph `shouldBe` Just ()
+          -- (lookupDeclaration "utils" heap >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
         other -> expectationFailure (show other)
 
     it "subclasses" $ do
-      (_, (heap, res)) <- evaluate ["subclass.py"]
+      (_, res) <- evaluate ["subclass.py"]
       case ModuleTable.lookup "subclass.py" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"bar\""]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          SpecHelpers.lookupDeclaration undefined heap scopeGraph `shouldBe` Just [String "\"bar\""]
         other -> expectationFailure (show other)
 
     it "handles multiple inheritance left-to-right" $ do
-      (_, (heap, res)) <- evaluate ["multiple_inheritance.py"]
+      (_, res) <- evaluate ["multiple_inheritance.py"]
       case ModuleTable.lookup "multiple_inheritance.py" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"foo!\""]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          SpecHelpers.lookupDeclaration undefined heap scopeGraph `shouldBe` Just [String "\"foo!\""]
         other -> expectationFailure (show other)
 
   where

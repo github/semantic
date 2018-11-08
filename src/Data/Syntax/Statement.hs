@@ -10,8 +10,8 @@ import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Proto3.Suite.Class
 
+import Control.Abstract hiding (Return, Break, Continue, While)
 import Data.Abstract.Evaluatable as Abstract
-import Control.Abstract.ScopeGraph
 import Data.JSON.Fields
 import Diffing.Algorithm
 import Reprinting.Tokenize
