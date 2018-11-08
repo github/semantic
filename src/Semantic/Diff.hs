@@ -5,7 +5,7 @@ module Semantic.Diff
   ) where
 
 import Analysis.ConstructorName (ConstructorName)
-import Analysis.Declaration (HasDeclaration, declarationAlgebra)
+import Analysis.TOCSummary (HasDeclaration, declarationAlgebra)
 import Control.Effect
 import Control.Monad.IO.Class
 import Data.Blob

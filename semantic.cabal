@@ -27,7 +27,7 @@ library
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
-                     , Analysis.Declaration
+                     , Analysis.TOCSummary
                      , Analysis.Decorator
                      , Analysis.HasTextElement
                      , Analysis.PackageDef

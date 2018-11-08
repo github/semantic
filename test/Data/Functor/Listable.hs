@@ -18,7 +18,7 @@ module Data.Functor.Listable
 ) where
 
 import Analysis.CyclomaticComplexity
-import Analysis.Declaration
+import Analysis.TOCSummary
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
