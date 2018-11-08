@@ -38,6 +38,7 @@ data Config
   , configStatsPort              :: Stat.Port    -- ^ Port of statsd/datadog (default: "28125")
 
   , configTreeSitterParseTimeout :: Duration     -- ^ Timeout in milliseconds before canceling tree-sitter parsing (default: 10000).
+  , configAssignmentTimeout      :: Duration     -- ^ Millisecond timeout for assignment (default: 10000)
   , configMaxTelemetyQueueSize   :: Int          -- ^ Max size of telemetry queues before messages are dropped (default: 1000).
   , configIsTerminal             :: Bool         -- ^ Whether a terminal is attached (set automaticaly at runtime).
   , configLogPrintSource         :: Bool         -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
@@ -70,7 +71,9 @@ defaultConfig options@Options{..} = do
   haystackURL <- lookupEnv "HAYSTACK_URL"
   (statsHost, statsPort) <- lookupStatsAddr
   size <- envLookupNum 1000 "MAX_TELEMETRY_QUEUE_SIZE"
-  parseTimeout <- envLookupNum 10000 "TREE_SITTER_PARSE_TIMEOUT" -- Default is 10 seconds
+  -- Defaults for these values are commensurate with the Dockerfile
+  parseTimeout <- envLookupNum 6000 "TREE_SITTER_PARSE_TIMEOUT"
+  assignTimeout <- envLookupNum 4000 "SEMANTIC_ASSIGNMENT_TIMEOUT"
   pure Config
     { configAppName = "semantic"
     , configHostName = hostName
@@ -80,6 +83,7 @@ defaultConfig options@Options{..} = do
     , configStatsPort = statsPort
 
     , configTreeSitterParseTimeout = fromMilliseconds parseTimeout
+    , configAssignmentTimeout = fromMilliseconds assignTimeout
     , configMaxTelemetyQueueSize = size
     , configIsTerminal = isTerminal
     , configLogPrintSource = isTerminal
