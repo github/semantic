@@ -488,7 +488,8 @@ parenthesizedExpression :: Assignment Term
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment Term
-selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> (identifier' <|> fieldIdentifier'))
+selectorExpression = makeWithContext <$> symbol SelectorExpression <*> children ((,,) <$> expression <*> optional comment <*> (identifier' <|> fieldIdentifier'))
+  where makeWithContext loc (lhs, comment, rhs) = maybe (makeTerm loc (Expression.MemberAccess lhs rhs)) (\c -> makeTerm loc (Syntax.Context (c :| []) (makeTerm loc (Expression.MemberAccess lhs rhs)))) comment
 
 sliceExpression :: Assignment Term
 sliceExpression = makeTerm <$> symbol SliceExpression <*> children (Go.Syntax.Slice <$> expression <* token AnonLBracket <*> (emptyTerm <|> expression) <* token AnonColon <*> (expression <|> emptyTerm) <* optional (token AnonColon) <*> (expression <|> emptyTerm))

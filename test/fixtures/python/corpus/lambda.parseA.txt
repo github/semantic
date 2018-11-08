@@ -1,6 +1,7 @@
 (Statements
   (Function
     (Empty)
-    (Plus
-      (Integer)
-      (Integer))))
+    (Statements
+      (Plus
+        (Integer)
+        (Integer)))))
