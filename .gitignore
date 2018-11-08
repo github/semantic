@@ -4,7 +4,7 @@
 .stack-work
 .stack-work-profiling
 profiles
-tags
+/tags
 
 cabal.project.local
 dist

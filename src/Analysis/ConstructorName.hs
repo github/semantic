@@ -4,6 +4,7 @@ module Analysis.ConstructorName
 ) where
 
 import Data.Sum
+import Data.Term
 import GHC.Generics
 import Prologue
 
@@ -22,12 +23,16 @@ instance Apply ConstructorName fs => ConstructorNameWithStrategy 'Custom (Sum fs
 instance ConstructorNameWithStrategy 'Custom [] where
   constructorNameWithStrategy _ _ = "Statements"
 
+instance (ConstructorName syntax) => ConstructorNameWithStrategy 'Custom (TermF syntax ann) where
+  constructorNameWithStrategy _ = constructorName . termFOut
+
 data Strategy = Default | Custom
 
 type family ConstructorNameStrategy syntax where
-  ConstructorNameStrategy (Sum _) = 'Custom
-  ConstructorNameStrategy []      = 'Custom
-  ConstructorNameStrategy syntax  = 'Default
+  ConstructorNameStrategy (Sum _)     = 'Custom
+  ConstructorNameStrategy []          = 'Custom
+  ConstructorNameStrategy (TermF _ _) = 'Custom
+  ConstructorNameStrategy syntax      = 'Default
 
 class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
   constructorNameWithStrategy :: proxy strategy -> syntax a -> String
