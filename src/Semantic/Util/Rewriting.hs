@@ -25,6 +25,11 @@ import           Parsing.Parser
 import           Reprinting.Pipeline
 import           Semantic.Task
 
+import Tags.Tagging
+import Tags.Taggable
+import Data.Machine
+import Data.Machine.Source
+
 testPythonFile = do
   let path = "test/fixtures/python/reprinting/function.py"
   src  <- blobSource <$> readBlobFromFile' (File path Language.Python)
@@ -46,6 +51,26 @@ testPythonPipeline'' = do
 testPythonPipeline''' = do
   (src, tree) <- testPythonFile
   pure $ runTranslating src printingPython (mark Refactored tree)
+
+
+testPythonDefs path = do
+  blob <- readBlobFromFile' (File path Language.Python)
+  tree <- parseFile' pythonParser path
+  -- pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
+  pure $! runTagging blob tree
+
+testGoDefs path = do
+  blob <- readBlobFromFile' (File path Language.Go)
+  tree <- parseFile' goParser path
+  -- pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
+  pure $! runTagging blob tree
+
+testRubyDefs path = do
+  blob <- readBlobFromFile' (File path Language.Ruby)
+  tree <- parseFile' rubyParser path
+  pure . Data.Machine.run $ Data.Machine.Source.source (tagging blob tree)
+  -- pure $! runTagging blob tree
+
 
 testRubyFile = do
   let path = "test/fixtures/ruby/reprinting/infix.rb"

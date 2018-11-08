@@ -42,7 +42,7 @@ guardTerm :: forall m f syntax ann . (f :< syntax, Alternative m)
 guardTerm = Sum.projectGuard . termOut
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
-  deriving (Eq, Ord, Foldable, Functor, Show, Traversable)
+  deriving (Eq, Ord, Foldable, Functor, Show, Traversable, Generic1)
 
 -- | A convenience typeclass to get the annotation out of a 'Term' or 'TermF'.
 -- Useful in term-rewriting algebras.
