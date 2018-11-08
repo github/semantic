@@ -32,8 +32,8 @@ spec config = parallel $ do
           (fmap (const ()) <$> ScopeGraph.lookupScopePath "b" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "b") (Position 1))
           (fmap (const ()) <$> ScopeGraph.lookupScopePath "quz" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "z") (Position 2))
 
-          -- (lookupDeclaration "b" heap  >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
-          -- (lookupDeclaration "z" heap >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
+          -- (Heap.lookupDeclaration "b" heap  >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
+          -- (Heap.lookupDeclaration "z" heap >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
           (fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Position 1) )))
           (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Position 1) ))
         other -> expectationFailure (show other)
@@ -59,9 +59,9 @@ spec config = parallel $ do
       (_, res) <- evaluate ["sequence-expression.ts"]
       case ModuleTable.lookup "sequence-expression.ts" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, _)) :| [])) -> do
-          -- (lookupDeclaration "x" heap) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
-          frameAddress <- Heap.lookupDeclaration "x" scopeGraph heap
-          getSlot frameAddress heap `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+          -- (Heap.lookupDeclaration "x" heap) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+          let value = SpecHelpers.lookupDeclaration "x" heap scopeGraph
+          value `shouldBe` Just [ Value.Float (Number.Decimal 3.0) ]
 
           -- Env.names env `shouldBe` [ "x" ]
           (fmap (const ()) <$> ScopeGraph.lookupScopePath "x" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "x") (Position 1))
@@ -70,60 +70,60 @@ spec config = parallel $ do
     it "evaluates void expressions" $ do
       (_, res) <- evaluate ["void.ts"]
       case ModuleTable.lookup "void.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Null]
+        Right (Just (Module _ (_, (_, value)) :| [])) -> value `shouldBe` Rval Null
         other -> expectationFailure (show other)
 
     it "evaluates delete" $ do
       (_, res) <- evaluate ["delete.ts"]
       case ModuleTable.lookup "delete.ts" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [Unit]
-          (lookupDeclaration "x" heap) `shouldBe` Nothing
-          Env.names env `shouldBe` [ "x" ]
+        Right (Just (Module _ (scopeGraph, (heap, value)) :| [])) -> do
+          value `shouldBe` Rval Unit
+          SpecHelpers.lookupDeclaration "x" heap scopeGraph `shouldBe` Just []
         other -> expectationFailure (show other)
 
     it "evaluates await" $ do
       (_, res) <- evaluate ["await.ts"]
       case ModuleTable.lookup "await.ts" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          Env.names env `shouldBe` [ "f2" ]
-          (lookupDeclaration "y" heap) `shouldBe` Nothing
+        Right (Just (Module _ (scopeGraph, (heap, value)) :| [])) -> do
+          SpecHelpers.lookupDeclaration "f2" heap scopeGraph `shouldBe` Just []
+          SpecHelpers.lookupDeclaration "y" heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
 
     it "evaluates BOr statements" $ do
       (_, res) <- evaluate ["bor.ts"]
       case ModuleTable.lookup "bor.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
+        Right (Just (Module _ (scopeGraph, (heap, value)) :| [])) ->
+          value `shouldBe` Rval (Value.Integer (Number.Integer 3))
         other -> expectationFailure (show other)
 
     it "evaluates BAnd statements" $ do
       (_, res) <- evaluate ["band.ts"]
       case ModuleTable.lookup "band.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 0)]
+        Right (Just (Module _ (_, (_, value)) :| [])) -> value `shouldBe` Rval (Value.Integer (Number.Integer 0))
         other -> expectationFailure (show other)
 
     it "evaluates BXOr statements" $ do
       (_, res) <- evaluate ["bxor.ts"]
       case ModuleTable.lookup "bxor.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
+        Right (Just (Module _ (_, (_, value)) :| [])) -> value `shouldBe` Rval (Value.Integer (Number.Integer 3))
         other -> expectationFailure (show other)
 
     it "evaluates LShift statements" $ do
       (_, res) <- evaluate ["lshift.ts"]
       case ModuleTable.lookup "lshift.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 4)]
+        Right (Just (Module _ (_, (_, value)) :| [])) -> value `shouldBe` Rval (Value.Integer (Number.Integer 4))
         other -> expectationFailure (show other)
 
     it "evaluates RShift statements" $ do
       (_, res) <- evaluate ["rshift.ts"]
       case ModuleTable.lookup "rshift.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 0)]
+        Right (Just (Module _ (_, (_, value)) :| [])) -> value `shouldBe` Rval (Value.Integer (Number.Integer 0))
         other -> expectationFailure (show other)
 
     it "evaluates Complement statements" $ do
       (_, res) <- evaluate ["complement.ts"]
       case ModuleTable.lookup "complement.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer (-2))]
+        Right (Just (Module _ (_, (_, value)) :| [])) -> value `shouldBe` Rval (Value.Integer (Number.Integer (-2)))
         other -> expectationFailure (show other)
 
 
