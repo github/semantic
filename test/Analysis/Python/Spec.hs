@@ -14,9 +14,9 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "Python" $ do
     it "imports" $ do
-      (_, (heap, res)) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
+      (_, res) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main.py" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
+        Right (Just (Module _ (scopeGraph, (heap, value)) :| [])) -> do
           Env.names env `shouldContain` [ "a", "b" ]
 
           (lookupDeclaration "a" heap >>= deNamespace heap) `shouldBe` Just ("a", ["foo"])
