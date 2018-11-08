@@ -11,6 +11,7 @@ import qualified Data.List.NonEmpty as NonEmpty
 import Data.Sum
 import SpecHelpers
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Abstract.Heap       as Heap
 
 spec :: TaskConfig -> Spec
 spec config = parallel $ do
@@ -26,12 +27,15 @@ spec config = parallel $ do
     it "imports with qualified names" $ do
       (_, res) <- evaluate ["main1.ts", "foo.ts", "a.ts"]
       case ModuleTable.lookup "main1.ts" <$> res of
-        Right (Just (Module _ (_, (env, _)) :| [])) -> do
-          Env.names env `shouldBe` [ "b", "z" ]
+        Right (Just (Module _ (scopeGraph, _) :| [])) -> do
+          -- Env.names env `shouldBe` [ "b", "z" ]
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "b" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "b") (Position 1))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "quz" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "z") (Position 2))
 
-          undefined
           -- (lookupDeclaration "b" heap  >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
           -- (lookupDeclaration "z" heap >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Position 1) )))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Position 1) ))
         other -> expectationFailure (show other)
 
     it "side effect only imports" $ do
@@ -47,15 +51,20 @@ spec config = parallel $ do
     it "evaluates early return statements" $ do
       (_, res) <- evaluate ["early-return.ts"]
       case ModuleTable.lookup "early-return.ts" <$> res of
-        Right (Just (Module _ (_, (_, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 123.0)]
+        Right (Just (Module _ (scopeGraph, _) :| [])) -> (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Position 1))
+        -- heapLookupAll addr heap `shouldBe` Just [Value.Float (Number.Decimal 123.0)]
         other -> expectationFailure (show other)
 
     it "evaluates sequence expressions" $ do
       (_, res) <- evaluate ["sequence-expression.ts"]
       case ModuleTable.lookup "sequence-expression.ts" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          Env.names env `shouldBe` [ "x" ]
-          (lookupDeclaration "x" heap) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+        Right (Just (Module _ (scopeGraph, (heap, _)) :| [])) -> do
+          -- (lookupDeclaration "x" heap) `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+          frameAddress <- Heap.lookupDeclaration "x" scopeGraph heap
+          getSlot frameAddress heap `shouldBe` Just (Value.Float (Number.Decimal 3.0))
+
+          -- Env.names env `shouldBe` [ "x" ]
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "x" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "x") (Position 1))
         other -> expectationFailure (show other)
 
     it "evaluates void expressions" $ do
