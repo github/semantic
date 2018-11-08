@@ -2,7 +2,7 @@ module Analysis.PHP.Spec (spec) where
 
 import Control.Abstract
 import Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable (EvalError(..))
+import Data.Abstract.Evaluatable (EvalError(..), ValueRef(..))
 import qualified Data.Language as Language
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Language.PHP.Assignment as PHP
@@ -13,26 +13,29 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "PHP" $ do
     it "evaluates include and require" $ do
-      (_, (heap, res)) <- evaluate ["main.php", "foo.php", "bar.php"]
+      (_, res) <- evaluate ["main.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main.php" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [unit]
-          Env.names env `shouldBe` [ "bar", "foo" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Rval unit
+          const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates include_once and require_once" $ do
-      (_, (heap, res)) <- evaluate ["main_once.php", "foo.php", "bar.php"]
+      (_, res) <- evaluate ["main_once.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main_once.php" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [unit]
-          Env.names env `shouldBe` [ "bar", "foo" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Rval unit
+          const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates namespaces" $ do
-      (_, (heap, res)) <- evaluate ["namespaces.php"]
+      (_, res) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          Env.names env `shouldBe` [ "Foo", "NS1" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "Foo" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "NS1" heap scopeGraph `shouldBe` Just ()
 
           undefined
           -- (derefQName heap ("NS1" :| [])               env >>= deNamespace heap) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])

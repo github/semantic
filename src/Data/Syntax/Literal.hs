@@ -5,7 +5,7 @@ module Data.Syntax.Literal where
 import Prelude hiding (Float, null)
 import Prologue hiding (Set, hash, null)
 
-import           Data.Abstract.Evaluatable as Eval
+import           Data.Abstract.Evaluatable as Eval hiding (Reference)
 import           Data.JSON.Fields
 import           Data.Scientific.Exts
 import qualified Data.Text as T

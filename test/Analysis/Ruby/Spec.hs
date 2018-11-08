@@ -1,6 +1,5 @@
 module Analysis.Ruby.Spec (spec) where
 
-import Data.Abstract.Environment as Env
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Number as Number
 import Data.Abstract.Value.Concrete as Value
@@ -11,6 +10,7 @@ import Data.Sum
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Data.Language as Language
 import Data.Abstract.Evaluatable
+import Control.Abstract (ScopeError(..), Declaration(..))
 
 import SpecHelpers
 
@@ -19,84 +19,85 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      res <- evaluate ["main.rb", "foo.rb"]
+      (_, res) <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
-        Right (Just (Module _ (scopeGraph, (_, valueRef)) :| [])) -> do
-          valueRef `shouldBe` Just (Rval $ Value.Integer (Number.Integer 1))
-          lookupDeclaration "foo" scopeGraph `shouldBe` Just _
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
+          const () <$> lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates load" $ do
-      (_, (heap, res)) <- evaluate ["load.rb", "foo.rb"]
+      (_, res) <- evaluate ["load.rb", "foo.rb"]
       case ModuleTable.lookup "load.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 1)]
-          Env.names env `shouldContain` [ "foo" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
+          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates load with wrapper" $ do
-      (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
-      res `shouldBe` Left (SomeError (inject @(BaseError (EnvironmentError Precise)) (BaseError (ModuleInfo "load-wrap.rb") emptySpan (FreeVariable "foo"))))
+      (_, res) <- evaluate ["load-wrap.rb", "foo.rb"]
+      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "load-wrap.rb") emptySpan (ScopeError (Declaration "foo") emptySpan))))
 
     it "evaluates subclass" $ do
-      (_, (heap, res)) <- evaluate ["subclass.rb"]
+      (_, res) <- evaluate ["subclass.rb"]
       case ModuleTable.lookup "subclass.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [String "\"<bar>\""]
-          Env.names env `shouldContain` [ "Bar", "Foo" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Rval (String "\"<bar>\"")
+          const () <$> SpecHelpers.lookupDeclaration "Bar" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "Foo" heap scopeGraph `shouldBe` Just ()
 
-          (lookupDeclaration "Bar" heap >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
+          -- (lookupDeclaration "Bar" heap >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
         other -> expectationFailure (show other)
 
     it "evaluates modules" $ do
-      (_, (heap, res)) <- evaluate ["modules.rb"]
+      (_, res) <- evaluate ["modules.rb"]
       case ModuleTable.lookup "modules.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [String "\"<hello>\""]
-          Env.names env `shouldContain` [ "Bar" ]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Rval (String "\"<hello>\"")
+          const () <$> SpecHelpers.lookupDeclaration "Bar" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "handles break correctly" $ do
-      (_, (heap, res)) <- evaluate ["break.rb"]
+      (_, res) <- evaluate ["break.rb"]
       case ModuleTable.lookup "break.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 3)]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 3))
         other -> expectationFailure (show other)
 
     it "handles next correctly" $ do
-      (_, (heap, res)) <- evaluate ["next.rb"]
+      (_, res) <- evaluate ["next.rb"]
       case ModuleTable.lookup "next.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 8)]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 8))
         other -> expectationFailure (show other)
 
     it "calls functions with arguments" $ do
-      (_, (heap, res)) <- evaluate ["call.rb"]
+      (_, res) <- evaluate ["call.rb"]
       case ModuleTable.lookup "call.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 579)]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 579))
         other -> expectationFailure (show other)
 
     it "evaluates early return statements" $ do
-      (_, (heap, res)) <- evaluate ["early-return.rb"]
+      (_, res) <- evaluate ["early-return.rb"]
       case ModuleTable.lookup "early-return.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 123)]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 123))
         other -> expectationFailure (show other)
 
     it "has prelude" $ do
-      (_, (heap, res)) <- evaluate ["preluded.rb"]
+      (_, res) <- evaluate ["preluded.rb"]
       case ModuleTable.lookup "preluded.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [String "\"<foo>\""]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> valueRef `shouldBe` Rval (String "\"<foo>\"")
         other -> expectationFailure (show other)
 
     it "evaluates __LINE__" $ do
-      (_, (heap, res)) <- evaluate ["line.rb"]
+      (_, res) <- evaluate ["line.rb"]
       case ModuleTable.lookup "line.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> heapLookupAll addr heap `shouldBe` Just [Value.Integer (Number.Integer 4)]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 4))
         other -> expectationFailure (show other)
 
     it "resolves builtins used in the prelude" $ do
-      (traces, (heap, res)) <- evaluate ["puts.rb"]
+      (traces, res) <- evaluate ["puts.rb"]
       case ModuleTable.lookup "puts.rb" <$> res of
-        Right (Just (Module _ (_, (env, addr)) :| [])) -> do
-          heapLookupAll addr heap `shouldBe` Just [Unit]
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          valueRef `shouldBe` Rval Unit
           traces `shouldContain` ["String \"\\\"hello\\\"\""]
         other -> expectationFailure (show other)
 
