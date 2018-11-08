@@ -113,7 +113,7 @@ reference ref decl@Declaration{..} g@ScopeGraph{..} = fromMaybe g $ do
   go currentAddress currentScope' currentAddress id
   where
     go currentAddress currentScope address path =
-      case lookupDeclaration name address g of
+      case lookupDeclaration unDeclaration address g of
           Just (_, index) ->
             let newScope = currentScope { references = Map.insert ref (path (DPath decl index)) (references currentScope) }
             in Just (g { graph = Map.insert currentAddress newScope graph })
@@ -132,7 +132,7 @@ insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} scopeAddress sco
   go currentAddress (EPath Import scopeAddress)
   where
     go address path =
-      case lookupDeclaration name address g of
+      case lookupDeclaration unDeclaration address g of
         Just (_, index) ->
           Just $ scope { references = Map.insert ref (path (DPath decl index)) (references scope) }
         Nothing -> traverseEdges Import <|> traverseEdges Lexical
@@ -177,7 +177,7 @@ insertEdge label target g@ScopeGraph{..} = fromMaybe g $ do
 insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertDeclarationScope decl@Declaration{..} address g@ScopeGraph{..} = fromMaybe g $ do
   declScope <- scopeOfDeclaration decl g
-  (span, position) <- (fst . snd . fst &&& unPosition . snd) <$> lookupDeclaration name declScope g
+  (span, position) <- (fst . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
   scope <- lookupScope declScope g
   pure $ g { graph = Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, Just address))) position (declarations scope) }) graph }
 
@@ -209,20 +209,20 @@ pathOfRef ref graph = do
 scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 scopeOfDeclaration Declaration{..} g@ScopeGraph{..} = go (Map.keys graph)
   where
-    go (scope : scopes') = fromMaybe (go scopes') $ lookupDeclaration name scope g >> pure (Just scope)
+    go (scope : scopes') = fromMaybe (go scopes') $ lookupDeclaration unDeclaration scope g >> pure (Just scope)
     go [] = Nothing
 
 -- | Returns the scope associated with a declaration (the child scope if any exists).
 associatedScope :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 associatedScope Declaration{..} g@ScopeGraph{..} = go (Map.keys graph)
   where
-    go (scope : scopes') = fromMaybe (go scopes') $ snd . snd . fst <$> lookupDeclaration name scope g
+    go (scope : scopes') = fromMaybe (go scopes') $ snd . snd . fst <$> lookupDeclaration unDeclaration scope g
     go [] = Nothing
 
-newtype Reference = Reference { name :: Name }
+newtype Reference = Reference { unReference :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
 
-newtype Declaration = Declaration { name :: Name }
+newtype Declaration = Declaration { unDeclaration :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | The type of edge from a scope to its parent scopes.

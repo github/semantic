@@ -76,7 +76,7 @@ lookup address (EPath label scope path) declaration heap = do
 
 lookupDeclaration :: Ord address => Declaration -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
 lookupDeclaration Declaration{..} scopeGraph heap = do
-  path <- lookupScopePath name scopeGraph
+  path <- lookupScopePath unDeclaration scopeGraph
   frameAddress <- lookupFrameAddress path heap
   pure (Address frameAddress (pathPosition path))
 

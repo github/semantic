@@ -2,10 +2,7 @@
 module Control.Abstract.PythonPackage
 ( runPythonPackaging, Strategy(..) ) where
 
-import           Control.Abstract.Evaluator (LoopControl, Return)
-import Control.Abstract.ScopeGraph (Allocator)
-import           Control.Abstract.Heap (Deref)
-import           Control.Abstract.Value
+import Control.Abstract
 import           Control.Effect.Carrier
 import           Control.Effect.Sum
 import           Data.Abstract.Evaluatable
