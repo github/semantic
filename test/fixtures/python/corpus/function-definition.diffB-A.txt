@@ -4,27 +4,31 @@
   ->(Identifier) }
   {-(Identifier)-}
   {-(Identifier)-}
-  { (Identifier)
-  ->(Identifier) })
+    (Statements
+    { (Identifier)
+    ->(Identifier) }))
   (Function
     (Identifier)
   {+(Identifier)+}
-  { (Identifier)
-  ->(Identifier) })
+    (Statements
+    { (Identifier)
+    ->(Identifier) }))
   (Function
   { (Identifier)
   ->(Identifier) }
   { (Identifier)
   ->(Identifier) }
   {+(Identifier)+}
-  { (Identifier)
-  ->(Identifier) })
+    (Statements
+    { (Identifier)
+    ->(Identifier) }))
 {+(Function
   {+(Identifier)+}
   {+(Assignment
     {+(Identifier)+}
     {+(Identifier)+})+}
-  {+(Identifier)+})+}
+  {+(Statements
+    {+(Identifier)+})+})+}
   (Function
     (Identifier)
     (Annotation
@@ -36,4 +40,5 @@
     ->(Identifier) })
   { (Identifier)
   ->(Identifier) }
-    (Identifier)))
+    (Statements
+      (Identifier))))
