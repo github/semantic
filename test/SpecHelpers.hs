@@ -72,6 +72,7 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Data.Set as Set
+import Data.Set (Set)
 import qualified Semantic.IO as IO
 import Semantic.Config (Config)
 import Semantic.Telemetry (LogQueue, StatQueue)
@@ -168,12 +169,11 @@ type Val term = Value term Precise
 
 -- namespaceScope _ _ = Nothing
 
-lookupDeclaration :: Name -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe (Value term Precise)
+lookupDeclaration :: Name -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Value term Precise ]
 lookupDeclaration name heap scopeGraph = do
   path <- ScopeGraph.lookupScopePath name scopeGraph
   frameAddress <- Heap.lookupFrameAddress path heap
-  set <- Heap.getSlot (Address frameAddress (Heap.pathPosition path)) heap
-  fst <$> Set.minView set
+  toList <$> Heap.getSlot (Address frameAddress (Heap.pathPosition path)) heap
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)
