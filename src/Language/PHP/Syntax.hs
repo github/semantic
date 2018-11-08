@@ -12,7 +12,7 @@ import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Prologue hiding (Text)
 import           Proto3.Suite.Class
-import Control.Abstract.ScopeGraph
+import Control.Abstract
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Map.Strict as Map
 

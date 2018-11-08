@@ -13,9 +13,10 @@ module SpecHelpers
 , Config
 , LogQueue
 , StatQueue
+, lookupDeclaration
 ) where
 
-import Control.Abstract
+import Control.Abstract hiding (lookupDeclaration)
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap as Heap
 import Control.Arrow ((&&&))
