@@ -114,7 +114,7 @@ scopeLookup :: forall address value sig m term. (
               )
             => address
             -> Evaluator term address value m address
-scopeLookup address = maybeM (throwHeapError (LookupError address)) =<< Heap.scopeLookup address <$> get @(Heap address address value)
+scopeLookup address = maybeM (throwHeapError (LookupAddressError address)) =<< Heap.scopeLookup address <$> get @(Heap address address value)
 
 getHeap :: (Member (State (Heap address address value)) sig, Carrier sig m) => Evaluator term address value m (Heap address address value)
 getHeap = get
@@ -277,6 +277,7 @@ lookupFrameAddress :: ( Member (State (Heap address address value)) sig
                      , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
                      , Member (Resumable (BaseError (HeapError address))) sig
+                     , Member (Resumable (BaseError (ScopeError address))) sig
                      , Ord address
                      , Carrier sig m
                      )
@@ -288,12 +289,12 @@ lookupFrameAddress path = do
   where
     go path address = case path of
       DPath decl position -> pure address
-      EPath edge nextScopeAddress path' -> do
+      p@(EPath edge nextScopeAddress path') -> do
         linkMap <- frameLinks address
         let frameAddress = do
               scopeMap <- Map.lookup edge linkMap
               Map.lookup nextScopeAddress scopeMap
-        maybe (throwHeapError $ LookupPathError path') (go path') frameAddress
+        maybe (throwHeapError $ LookupLinkError p) (go path') frameAddress
 
 frameLinks :: forall address value sig m term. (
                 Member (State (Heap address address value)) sig
@@ -388,9 +389,9 @@ newtype DerefC address value m a = DerefC { runDerefC :: m a }
 
 data HeapError address resume where
   CurrentFrameError :: HeapError address address
-  LookupError :: address -> HeapError address address
+  LookupAddressError :: address -> HeapError address address
   LookupLinksError :: address ->  HeapError address (Map EdgeLabel (Map address address))
-  LookupPathError :: Path address ->  HeapError address address
+  LookupLinkError :: Path address ->  HeapError address address
 
 deriving instance Eq address => Eq (HeapError address resume)
 deriving instance Show address => Show (HeapError address resume)
@@ -398,8 +399,9 @@ instance Show address => Show1 (HeapError address) where
   liftShowsPrec _ _ = showsPrec
 instance Eq address => Eq1 (HeapError address) where
   liftEq _ CurrentFrameError CurrentFrameError = True
-  liftEq _ (LookupError a) (LookupError b) = a == b
+  liftEq _ (LookupAddressError a) (LookupAddressError b) = a == b
   liftEq _ (LookupLinksError a) (LookupLinksError b) = a == b
+  liftEq _ (LookupLinkError a) (LookupLinkError b) = a == b
 
 throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Reader ModuleInfo) sig
