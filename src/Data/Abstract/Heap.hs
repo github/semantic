@@ -18,7 +18,7 @@ module Data.Abstract.Heap
   ) where
 
 import Data.Abstract.Live
-import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Address(..), pathPosition, pathDeclaration)
+import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Address(..), ScopeGraph, pathPosition, pathDeclaration, lookupScopePath)
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
@@ -72,6 +72,12 @@ lookup address (EPath label scope path) declaration heap = do
     scopeMap <- Map.lookup label (links frame)
     nextAddress <- Map.lookup scope scopeMap
     lookup nextAddress path declaration heap
+
+lookupDeclaration :: Ord address => Declaration -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
+lookupDeclaration Declaration{..} scopeGraph heap = do
+  path <- lookupScopePath name scopeGraph
+  frameAddress <- lookupFrameAddress path heap
+  pure (Address frameAddress (pathPosition path))
 
 lookupFrameAddress :: (Ord address, Ord scope) => Path scope -> Heap scope address value -> Maybe address
 lookupFrameAddress path h@Heap{..} = do
