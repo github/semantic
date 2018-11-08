@@ -192,7 +192,7 @@ instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Variable
 
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Declarations a => Declarations (Class a) where
   declaredName (Class _ name _ _) = declaredName name
@@ -230,7 +230,8 @@ instance Evaluatable Class where
       bind name addr
       pure (Rval addr)
 
-
+instance Declarations1 Class where
+  liftDeclaredName declaredName = declaredName . classIdentifier
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }

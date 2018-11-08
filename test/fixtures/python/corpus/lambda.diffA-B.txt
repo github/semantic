@@ -2,7 +2,8 @@
   (Function
     (Empty)
   {+(Identifier)+}
-    (Plus
-    { (Integer)
-    ->(Identifier) }
-      (Integer))))
+    (Statements
+      (Plus
+      { (Integer)
+      ->(Identifier) }
+        (Integer)))))

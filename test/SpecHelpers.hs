@@ -5,6 +5,7 @@ module SpecHelpers
 , runBuilder
 , diffFilePaths
 , parseFilePath
+, parseTestFile
 , readFilePair
 , testEvaluating
 , deNamespace
@@ -96,6 +97,12 @@ parseFilePath (TaskConfig config logger statter) path = (fromJust <$> readBlobFr
 readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith F.readFilePair paths'
+
+parseTestFile :: Parser term -> FilePath -> IO (Blob, term)
+parseTestFile parser path = runTask $ do
+  blob <- readBlob (file path)
+  term <- parse parser blob
+  pure (blob, term)
 
 type TestEvaluatingC term
   = ResumableC (BaseError (ValueError term Precise)) (Eff

@@ -3,37 +3,39 @@
     (Identifier)
     (Class
       (Identifier)
-      (Decorator
-        (Identifier)
-        (Statements)
+      (Statements
         (Decorator
           (Identifier)
-          (Integer)
+          (Statements)
           (Decorator
             (Identifier)
-            (Statements
-              (Integer)
-              (Integer))
+            (Integer)
             (Decorator
               (Identifier)
-              (Assignment
-                (Identifier)
-                (Boolean))
+              (Statements
+                (Integer)
+                (Integer))
               (Decorator
                 (Identifier)
-                (Identifier)
+                (Assignment
+                  (Identifier)
+                  (Boolean))
                 (Decorator
                   (Identifier)
                   (Identifier)
                   (Decorator
                     (Identifier)
-                    (Statements
-                      (Integer)
-                      (Assignment
+                    (Identifier)
+                    (Decorator
+                      (Identifier)
+                      (Statements
+                        (Integer)
+                        (Assignment
+                          (Identifier)
+                          (Boolean))
                         (Identifier)
-                        (Boolean))
-                      (Identifier)
-                      (Identifier))
-                    (Function
-                      (Identifier)
-                      (Identifier))))))))))))
+                        (Identifier))
+                      (Function
+                        (Identifier)
+                        (Statements
+                          (Identifier))))))))))))))
