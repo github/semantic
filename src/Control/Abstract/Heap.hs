@@ -204,6 +204,7 @@ define :: ( HasCallStack
           , Member (Resumable (BaseError (ScopeError address))) sig
           , Member (Resumable (BaseError (HeapError address))) sig
           , Ord address
+          , Show address
           , Carrier sig m
           )
        => Declaration
@@ -262,6 +263,7 @@ lookupDeclaration :: forall value address term sig m. ( Member (State (Heap addr
                      , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
                      , Ord address
+                     , Show address
                      , Carrier sig m
                      )
                   => Declaration

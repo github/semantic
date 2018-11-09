@@ -172,6 +172,7 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (State (ScopeGraph address)) sig
                 , Carrier sig m
                 , Ord address
+                , Show address
                 )
              => Declaration
              -> Evaluator term address value m (ScopeGraph.Path address)
