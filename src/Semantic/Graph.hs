@@ -418,7 +418,10 @@ resumingHeapError :: ( Carrier sig m
                   => Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
                   -> Evaluator term address value m a
 resumingHeapError = runHeapErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
-    CurrentFrameError -> pure hole)
+    CurrentFrameError -> pure hole
+    LookupAddressError _ -> pure hole
+    LookupLinksError _ -> pure mempty
+    LookupLinkError _ -> pure hole)
 
 resumingScopeError :: ( Carrier sig m
                      , Member Trace sig
