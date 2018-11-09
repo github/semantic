@@ -30,7 +30,13 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval eval Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
-    _ <- eval functionName
+    -- TODO: We need a way to get the Span of the functionName that doesn't require
+    -- us to evaluate the term. If we evaluate the functionName here, we throw a
+    -- lookupPathError because we haven't declared it yet, but we can't declare
+    -- it without the Span of the term representing the functionName.
+    -- _ <- eval functionName
+    span <- ask @Span
+    declare (Declaration name) span Nothing
     function name functionParameters functionBody
 
 instance Tokenize Function where
