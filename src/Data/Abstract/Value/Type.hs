@@ -16,12 +16,12 @@ import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
-import Data.Abstract.Environment as Env
 import Data.Abstract.BaseError
 import Data.Semigroup.Foldable (foldMap1)
 import qualified Data.Map as Map
 import Prologue hiding (TypeError)
 import Data.Abstract.Ref
+import Data.Abstract.Evaluatable
 
 type TName = Int
 
@@ -246,6 +246,7 @@ instance ( Member (Allocator address) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
+         , Member (Resumable (BaseError EvalError)) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (Resumable (BaseError (AddressError address Type))) sig
          , Member (State (Heap address address Type)) sig
@@ -253,6 +254,7 @@ instance ( Member (Allocator address) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (State TypeMap) sig
+         , Declarations term
          , Ord address
          , Show address
          , Carrier sig m
@@ -266,9 +268,12 @@ instance ( Member (Allocator address) sig
 
       -- TODO: Store the frame
       let value = withLexicalScopeAndFrame $ do
-            (_, tvars) <- foldr (\ name rest -> do
+            (_, tvars) <- foldr (\ param rest -> do
               tvar <- Var <$> fresh
-              span <- get @Span -- TODO: This span is probably wrong
+              name <- maybeM (throwEvalError NoNameError) (declaredName param)
+
+              -- Eval param in order to set the Span state correctly
+              span <- (runFunction (Evaluator . eval) (Evaluator (eval param))) >> get @Span
               declare (Declaration name) span Nothing
               address <- lookupDeclaration (Declaration name)
               -- assign tvar values to names in the frame of the function?

@@ -18,8 +18,10 @@ import Data.Functor.Const
 import Data.Sum
 import SpecHelpers hiding (reassociate)
 import Data.Abstract.Ref
+import Data.Abstract.Evaluatable
 import qualified Control.Abstract.Heap as Heap
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import Data.Text (pack)
 
 spec :: Spec
 spec = parallel $ do
@@ -29,8 +31,9 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (_, (_, expected)) <- evaluate $ do
-      identity <- value =<< function "identity" [SpecHelpers.name "x"]
+      valueRef <- function "identity" [ SpecEff (pure $ Rval (Value.Symbol (pack "x"))) ]
         (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x"))))
+      identity <- value valueRef
       val <- pure (integer 123)
       -- TODO Pass a unit slot to call at the self position
       call identity undefined [val]
@@ -52,6 +55,7 @@ evaluate
   . runHeapError
   . runValueError
   . runAddressError
+  . runEvalError
   . runDeref @Val
   . runAllocator
   . runReturn
@@ -59,8 +63,8 @@ evaluate
   . runBoolean
   . runFunction runSpecEff
 
-reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) (Either (SomeError exc4) result))) -> Either (SomeError (Sum '[exc4, exc3, exc2, exc1])) result
-reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . Right
+reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) (Either (SomeError exc4) (Either (SomeError exc5) result)))) -> Either (SomeError (Sum '[exc5, exc4, exc3, exc2, exc1])) result
+reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . Right
 
 type Val = Value SpecEff Precise
 newtype SpecEff = SpecEff
@@ -70,6 +74,7 @@ newtype SpecEff = SpecEff
                  (Eff (ErrorC (Return Precise Val)
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val
+                 (Eff (ResumableC (BaseError EvalError)
                  (Eff (ResumableC (BaseError (AddressError Precise Val))
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
                  (Eff (ResumableC (BaseError (HeapError Precise))
@@ -82,10 +87,12 @@ newtype SpecEff = SpecEff
                  (Eff (StateC (Heap Precise Precise Val)
                  (Eff (StateC (ScopeGraph Precise)
                  (Eff (TraceByIgnoringC
-                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))
+                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))
                  (ValueRef Precise Val)
   }
 
 instance Eq SpecEff where _ == _ = True
 instance Show SpecEff where show _ = "_"
 instance FreeVariables SpecEff where freeVariables _ = lowerBound
+
+instance Declarations SpecEff where declaredName specEff = lowerBound

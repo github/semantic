@@ -14,6 +14,8 @@ import Data.Abstract.Environment as Env
 import Prologue
 import qualified Data.Map.Strict as Map
 import Data.Abstract.Ref
+import Data.Abstract.Evaluatable
+import Data.Abstract.Declarations
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
@@ -27,10 +29,12 @@ instance ( Member (Allocator address) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
+         , Member (Resumable (BaseError EvalError)) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (AddressError address Abstract))) sig
          , Member (State (Heap address address Abstract)) sig
+         , Declarations term
          , Ord address
          , Show address
          , Carrier sig m
@@ -40,16 +44,26 @@ instance ( Member (Allocator address) sig
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
     Function name params body k -> runEvaluator $ do
       functionSpan <- ask @Span -- TODO: This might be wrong
-      declare (Declaration name) functionSpan Nothing
-      (Evaluator . flip runFunctionC eval . k =<<) . withLexicalScopeAndFrame $ do
-        -- TODO: Use scope graph and heap graph
-        for_ params $ \name -> do
-          span <- get @Span -- TODO: This span is probably wrong
+      currentScope' <- currentScope
+      let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+      scope <- newScope lexicalEdges
+      declare (Declaration name) functionSpan (Just scope)
+
+      withScope scope $ do
+        for_ params $ \param -> do
+          name <- maybeM (throwEvalError NoNameError) (declaredName param)
+
+          -- Eval param in order to update (State Span) to the Span of the param.
+          span <- (runFunction (Evaluator . eval) (Evaluator (eval param))) >> get @Span
           declare (Declaration name) span Nothing
-          address <- lookupDeclaration (Declaration name)
-          -- assign tvar values to names in the frame of the function?
-          assign address Abstract
+        -- TODO: Ask @robrix if we should evaluate the body under Abstract semantics
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+
+
+      address <- lookupDeclaration @Abstract (Declaration name)
+      assign address Abstract
+      Evaluator $ runFunctionC (k (LvalMember address)) eval
+
     BuiltIn _ _ k -> runFunctionC (k (Rval Abstract)) eval
     Call _ _ params k -> runEvaluator $ do
       rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)

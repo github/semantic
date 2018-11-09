@@ -13,7 +13,7 @@ import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..))
+import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), declaredName, throwEvalError, EvalError(..), Declarations)
 import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
@@ -66,11 +66,13 @@ instance ( FreeVariables term
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
+         , Member (Resumable (BaseError EvalError)) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (State (Heap address address (Value term address))) sig
          , Member (Error (Return address (Value term address))) sig
+         , Declarations term
          , Member Trace sig
          , Ord address
          , Carrier sig m
@@ -91,13 +93,16 @@ instance ( FreeVariables term
       scope <- newScope lexicalEdges
       declare (Declaration name) span (Just scope)
 
-      withScope scope $ do
-        for_ params $ \name -> do
-          span <- get @Span -- TODO: This is definitely wrong
-          declare (Declaration name) span Nothing
+      names <- withScope scope . for params $ \param -> do
+        name <- maybeM (throwEvalError NoNameError) (declaredName param)
+
+        -- Eval param in order to update (State Span) to the Span of the param.
+        span <- (runFunction (Evaluator . eval) (Evaluator (eval param))) >> get @Span
+
+        name <$ declare (Declaration name) span Nothing
 
       address <- lookupDeclaration @(Value term address) (Declaration name)
-      assign address (Closure packageInfo moduleInfo name params (Right body) scope)
+      assign address (Closure packageInfo moduleInfo name names (Right body) scope)
       Evaluator $ runFunctionC (k (LvalMember address)) eval
     Abstract.BuiltIn name builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
