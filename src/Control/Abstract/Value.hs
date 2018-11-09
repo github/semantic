@@ -84,8 +84,8 @@ data BuiltIn
 builtIn :: (Member (Function term address value) sig, Carrier sig m) => Name -> BuiltIn -> Evaluator term address value m (ValueRef address value)
 builtIn name = sendFunction . flip (BuiltIn name) ret
 
-call :: (Member (Function term address value) sig, Carrier sig m) => value -> Address address -> [value] -> Evaluator term address value m (ValueRef address value)
-call fn self args = sendFunction (Call fn self args ret)
+call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m (ValueRef address value)
+call fn args = sendFunction (Call fn args ret)
 
 sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Function term address value (Evaluator term address value m) (Evaluator term address value m a) -> Evaluator term address value m a
 sendFunction = send
@@ -93,7 +93,7 @@ sendFunction = send
 data Function term address value (m :: * -> *) k
   = Function Name [term] term (ValueRef address value -> k)
   | BuiltIn Name BuiltIn (ValueRef address value -> k)
-  | Call value (Address address) [value] (ValueRef address value -> k)
+  | Call value [value] (ValueRef address value -> k)
   deriving (Functor)
 
 instance HFunctor (Function term address value) where
@@ -102,7 +102,7 @@ instance HFunctor (Function term address value) where
 instance Effect (Function term address value) where
   handle state handler (Function name params body k) = Function name params body (handler . (<$ state) . k)
   handle state handler (BuiltIn name builtIn      k) = BuiltIn name builtIn      (handler . (<$ state) . k)
-  handle state handler (Call fn self addrs        k) = Call fn self addrs        (handler . (<$ state) . k)
+  handle state handler (Call fn addrs        k) = Call fn addrs        (handler . (<$ state) . k)
 
 
 -- TODO: eval and runFunction should return a ValueRef instead of a value

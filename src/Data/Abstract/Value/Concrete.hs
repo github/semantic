@@ -117,10 +117,10 @@ instance ( FreeVariables term
       address <- lookupDeclaration @(Value term address) (Declaration name)
       assign address (Closure packageInfo moduleInfo name [] (Left builtIn) scope)
       Evaluator $ runFunctionC (k (LvalMember address)) eval
-    Abstract.Call op self params k -> runEvaluator $ do
+    Abstract.Call op params k -> runEvaluator $ do
       boxed <- case op of
         Closure _ _ _ _ (Left Print) _ -> traverse (trace . show) params *> rvalBox Unit
-        Closure _ _ _ _ (Left Show) _ -> deref self >>= rvalBox . String . pack . show
+        Closure _ _ name _ (Left Show) _ -> pure name >>= rvalBox . String . pack . show
         Closure packageInfo moduleInfo _ names (Right body) scope -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.

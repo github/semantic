@@ -65,7 +65,7 @@ instance ( Member (Allocator address) sig
       Evaluator $ runFunctionC (k (LvalMember address)) eval
 
     BuiltIn _ _ k -> runFunctionC (k (Rval Abstract)) eval
-    Call _ _ params k -> runEvaluator $ do
+    Call _ params k -> runEvaluator $ do
       rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)
 
 
