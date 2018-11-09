@@ -4,6 +4,8 @@ import Control.Arrow ((&&&))
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.Number as Number
+import Data.Abstract.Package (PackageInfo(..))
+import Data.Abstract.Module (ModuleInfo(..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
@@ -39,11 +41,13 @@ spec config = parallel $ do
         other -> expectationFailure (show other)
 
     it "imports functions" $ do
-      (_, res) <- evaluate ["main3.ts", "a.ts"]
-      case ModuleTable.lookup "main3.ts" <$> res of
+      (_, res) <- evaluate ["a.ts"]
+      case ModuleTable.lookup "a.ts" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
-          fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Heap.Position 1)))
-          valueRef `shouldBe` Rval (Value.String "this is the baz function")
+          fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Heap.Position 0))
+          let closure' (Rval (Closure packageInfo moduleInfo name params _ _)) = Right (Closure packageInfo moduleInfo name params (Right ()) ())
+              closure' _                                                       = Left ()
+          closure' valueRef `shouldBe` Right (Closure (PackageInfo { packageName = "analysis", packageResolutions = mempty }) (ModuleInfo "a.ts") "baz" [] (Right ()) ())
         other -> expectationFailure (show other)
 
     it "side effect only imports" $ do
