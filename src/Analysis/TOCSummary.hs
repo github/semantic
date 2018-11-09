@@ -1,15 +1,13 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Analysis.Declaration
+module Analysis.TOCSummary
 ( Declaration(..)
 , HasDeclaration
 , declarationAlgebra
 ) where
 
-import Prologue hiding (first, project)
+import Prologue hiding (project)
 
-import           Control.Arrow hiding (first)
-import qualified Data.Text as T
-
+import           Control.Arrow
 import           Control.Rewriting hiding (apply)
 import           Data.Blob
 import           Data.Error (Error (..), showExpectation)
@@ -20,15 +18,12 @@ import           Data.Source as Source
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import           Data.Term
+import qualified Data.Text as T
 import qualified Language.Markdown.Syntax as Markdown
-import qualified Language.Ruby.Syntax as Ruby.Syntax
-import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 
 -- | A declaration’s identifier and type.
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language, declarationReceiver :: Maybe Text }
-  | ClassDeclaration    { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
-  | ModuleDeclaration   { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
   | FunctionDeclaration { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
   | HeadingDeclaration  { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: Text, declarationText :: Text, declarationSpan :: Span, declarationLanguage :: Language }
@@ -117,27 +112,6 @@ instance CustomHasDeclaration whole Declaration.Method where
       isEmpty = (== 0) . rangeLength . locationByteRange
       methodSource = getIdentifier (arr Declaration.methodBody) blob (In ann decl)
 
--- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
-instance CustomHasDeclaration whole Declaration.Class where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
-    = Just $ ClassDeclaration (getSource blobSource identifierAnn) classSource (locationSpan ann) blobLanguage
-      where classSource = getIdentifier (arr Declaration.classBody) blob (In ann decl)
-
-instance CustomHasDeclaration whole Ruby.Syntax.Class where
-  customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Class (Term (In identifierAnn _), _) _ _)
-    = Just $ ClassDeclaration (getSource blobSource identifierAnn) rubyClassSource (locationSpan ann) blobLanguage
-      where rubyClassSource = getIdentifier (arr Ruby.Syntax.classBody) blob (In ann decl)
-
-instance CustomHasDeclaration whole Ruby.Syntax.Module where
-  customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Module (Term (In identifierAnn _), _) _)
-    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) rubyModuleSource (locationSpan ann) blobLanguage
-      where rubyModuleSource = getIdentifier (arr Ruby.Syntax.moduleStatements >>> first) blob (In ann decl)
-
-instance CustomHasDeclaration whole TypeScript.Syntax.Module where
-  customToDeclaration blob@Blob{..} ann decl@(TypeScript.Syntax.Module (Term (In identifierAnn _), _) _)
-    = Just $ ModuleDeclaration (getSource blobSource identifierAnn) tsModuleSource (locationSpan ann) blobLanguage
-      where tsModuleSource = getIdentifier (arr TypeScript.Syntax.moduleStatements >>> first) blob (In ann decl)
-
 -- When encountering a Declaration-annotated term, we need to extract a Text
 -- for the resulting Declaration's 'declarationIdentifier' field. This text
 -- is constructed by slicing out text from the original blob corresponding
@@ -153,9 +127,6 @@ getIdentifier finder Blob{..} (In a r)
         -- Text-based gyrations to slice the identifier out of the provided blob source
         sliceFrom = T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange
     in either (const mempty) sliceFrom bodyRange
-
-first :: Rule env [a] a
-first = target >>= maybeM (Prologue.fail "empty list") . listToMaybe
 
 getSource :: Source -> Location -> Text
 getSource blobSource = toText . flip Source.slice blobSource . locationByteRange
@@ -181,10 +152,6 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 --
 --   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
-  DeclarationStrategy Declaration.Class = 'Custom
-  DeclarationStrategy Ruby.Syntax.Class = 'Custom
-  DeclarationStrategy Ruby.Syntax.Module = 'Custom
-  DeclarationStrategy TypeScript.Syntax.Module = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom

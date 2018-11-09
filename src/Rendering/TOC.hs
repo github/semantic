@@ -17,7 +17,7 @@ module Rendering.TOC
 ) where
 
 import Prologue
-import Analysis.Declaration
+import Analysis.TOCSummary
 import Data.Align (bicrosswalk)
 import Data.Aeson
 import Data.Blob
@@ -151,13 +151,7 @@ renderRPCToCDiff :: (Foldable f, Functor f) => BlobPair -> Diff f (Maybe Declara
 renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
 diffTOC :: (Foldable f, Functor f) => Diff f (Maybe Declaration) (Maybe Declaration) -> [TOCSummary]
-diffTOC = fmap entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration
-  where
-    extraDeclarations :: Entry Declaration -> Bool
-    extraDeclarations entry = case entryPayload entry of
-      ClassDeclaration{..} -> False
-      ModuleDeclaration{..} -> False
-      _ -> True
+diffTOC = fmap entrySummary . dedupe . tableOfContentsBy declaration
 
 renderToCTerm :: (Foldable f, Functor f) => Blob -> Term f (Maybe Declaration) -> Summaries
 renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
@@ -171,8 +165,6 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
-  ClassDeclaration{} -> "Class"
-  ModuleDeclaration{} -> "Module"
   FunctionDeclaration{} -> "Function"
   MethodDeclaration{} -> "Method"
   HeadingDeclaration _ _ _ _ l -> "Heading " <> T.pack (show l)
