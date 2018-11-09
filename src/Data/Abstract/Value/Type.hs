@@ -285,7 +285,7 @@ instance ( Member (Allocator address) sig
 
     Abstract.BuiltIn _ Print k -> runFunctionC (k (Rval $ String :-> Unit)) eval
     Abstract.BuiltIn _ Show  k -> runFunctionC (k (Rval $ Object :-> String)) eval
-    Abstract.Call op _ paramTypes k -> runEvaluator $ do
+    Abstract.Call op paramTypes k -> runEvaluator $ do
       tvar <- fresh
       let needed = zeroOrMoreProduct paramTypes :-> Var tvar
       unified <- op `unify` needed

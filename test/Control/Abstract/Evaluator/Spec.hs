@@ -36,7 +36,7 @@ spec = parallel $ do
       identity <- value valueRef
       val <- pure (integer 123)
       -- TODO Pass a unit slot to call at the self position
-      call identity undefined [val]
+      call identity [val]
     expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
 
 evaluate
