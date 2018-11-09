@@ -29,6 +29,8 @@ module Control.Abstract.ScopeGraph
   , runScopeErrorWith
   , runScopeError
   , throwScopeError
+  , Scope
+  , ScopeGraph.Path
   ) where
 
 import           Control.Abstract.Evaluator hiding (Local)
