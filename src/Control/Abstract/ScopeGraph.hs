@@ -191,7 +191,9 @@ withScope scope action = do
     prevScope <- currentScope
     modify (\g -> g { ScopeGraph.currentScope = Just scope })
     value <- action
-    modify (\g -> g { ScopeGraph.currentScope = prevScope })
+    case prevScope of
+      Nothing -> modify (\g -> g { ScopeGraph.currentScope = Just scope })
+      _ -> modify (\g -> g { ScopeGraph.currentScope = prevScope })
     pure value
 
 putCurrentScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => address -> Evaluator term address value m ()

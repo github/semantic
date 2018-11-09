@@ -177,7 +177,9 @@ withFrame address action = do
     prevFrame <- currentFrame @address @value
     modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
     value <- action
-    modify @(Heap address address value) (\h -> h { Heap.currentFrame = prevFrame })
+    case prevFrame of
+      Nothing -> modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
+      _ -> modify @(Heap address address value) (\h -> h { Heap.currentFrame = prevFrame })
     pure value
 
 -- box :: ( Member (Allocator address) effects
