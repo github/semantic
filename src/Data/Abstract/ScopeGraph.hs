@@ -24,6 +24,7 @@ module Data.Abstract.ScopeGraph
   , scopeOfRef
   ) where
 
+import Control.Abstract.Hole
 import           Data.Abstract.Name
 import qualified Data.Map.Strict as Map
 import           Data.Span
@@ -41,6 +42,15 @@ data Scope scopeAddress = Scope {
   , declarations :: Seq (Declaration, (Span, Maybe scopeAddress))
   } deriving (Eq, Show, Ord, Generic, NFData)
 
+instance Lower (Scope scopeAddress) where
+  lowerBound = Scope mempty mempty mempty
+
+instance AbstractHole (Scope scopeAddress) where
+  hole = lowerBound
+
+instance AbstractHole address => AbstractHole (Address address) where
+  hole = Address hole (Position 0)
+
 newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)
 
@@ -57,9 +67,13 @@ deriving instance NFData scope => NFData (ScopeGraph scope)
 
 data Path scope where
   -- | Construct a direct path to a declaration.
+  Hole :: Path scope
   DPath :: Declaration -> Position -> Path scope
   -- | Construct an edge from a scope to another declaration path.
   EPath :: EdgeLabel -> scope -> Path scope -> Path scope
+
+instance AbstractHole (Path scope) where
+  hole = Hole
 
 deriving instance Eq scope => Eq (Path scope)
 deriving instance Show scope => Show (Path scope)
