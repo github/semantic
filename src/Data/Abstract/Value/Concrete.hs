@@ -104,8 +104,9 @@ instance ( FreeVariables term
         name <$ declare (Declaration name) span Nothing
 
       address <- lookupDeclaration @(Value term address) (Declaration name)
-      assign address (Closure packageInfo moduleInfo name names (Right body) scope)
-      Evaluator $ runFunctionC (k (LvalMember address)) eval
+      let closure = Closure packageInfo moduleInfo name names (Right body) scope
+      assign address closure
+      Evaluator $ runFunctionC (k (Rval closure)) eval
     Abstract.BuiltIn name builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
