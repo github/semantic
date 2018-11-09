@@ -27,11 +27,13 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Call where
   eval eval Call{..} = do
+    op <- eval callFunction >>= Abstract.value
+    args <- traverse (eval >=> Abstract.value) callParams
+    call op args
     -- op <- eval callFunction >>= Abstract.value
     -- recv <- box unit -- TODO
     -- args <- traverse (eval >=> address) callParams
     -- Rval <$> call op recv args
-    undefined
 
 instance Tokenize Call where
   tokenize Call{..} = within Scope.Call $ do
