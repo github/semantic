@@ -28,13 +28,10 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval _ Function{..} = do
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
-    -- (_, addr) <- letrec name (function (Just name) (paramNames functionParameters) functionBody)
-    -- bind name addr
-    -- pure (Rval addr)
-    -- where paramNames = foldMap (maybeToList . declaredName)
-    undefined
+  eval eval Function{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
+    _ <- eval functionName
+    function name functionParameters functionBody
 
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
