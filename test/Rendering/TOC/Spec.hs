@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
-import Analysis.Declaration
+import Analysis.TOCSummary
 import Control.Effect
 import Data.Aeson hiding (defaultOptions)
 import Data.Bifunctor
