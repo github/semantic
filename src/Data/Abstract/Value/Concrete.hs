@@ -91,7 +91,9 @@ instance ( FreeVariables term
       currentScope' <- currentScope
       let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
       scope <- newScope lexicalEdges
-      declare (Declaration name) span (Just scope)
+      -- TODO: Fix this if we find a solution to declaring names of functions without throwing a lookupPathError.
+      -- declare (Declaration name) span (Just scope)
+      putDeclarationScope (Declaration name) scope
 
       names <- withScope scope . for params $ \param -> do
         name <- maybeM (throwEvalError NoNameError) (declaredName param)
