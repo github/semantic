@@ -87,7 +87,9 @@ pathDeclaration :: Path scope -> Declaration
 pathDeclaration (DPath d _)     = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
 
+-- TODO: Possibly return in Maybe since we can have Hole paths
 pathPosition :: Path scope -> Position
+pathPosition Hole    = Position 0
 pathPosition (DPath _ p)   = p
 pathPosition (EPath _ _ p) = pathPosition p
 
