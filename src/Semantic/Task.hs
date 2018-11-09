@@ -334,13 +334,13 @@ runParser blob@Blob{..} parser = case parser of
                 logError config Error blob err (("task", "assign") : blobFields)
                 throwError (toException err)
               Right term -> do
-                for_ (errors term) $ \ err -> case Error.errorActual err of
+                for_ (zip (errors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
                   Just "ParseError" -> do
-                    writeStat (increment "parse.parse_errors" languageTag)
+                    when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
                     logError config Warning blob err (("task", "parse") : blobFields)
                     when (optionsFailOnParseError (configOptions config)) $ throwError (toException err)
                   _ -> do
-                    writeStat (increment "parse.assign_warnings" languageTag)
+                    when (i == 0) $ writeStat (increment "parse.assign_warnings" languageTag)
                     logError config Warning blob err (("task", "assign") : blobFields)
                     when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
