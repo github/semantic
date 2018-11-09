@@ -38,10 +38,18 @@ spec config = parallel $ do
           (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 1) ))
         other -> expectationFailure (show other)
 
+    it "imports functions" $ do
+      (_, res) <- evaluate ["main3.ts", "a.ts"]
+      case ModuleTable.lookup "main3.ts" <$> res of
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Heap.Position 1)))
+          valueRef `shouldBe` Rval (Value.String "this is the baz function")
+        other -> expectationFailure (show other)
+
     it "side effect only imports" $ do
       (_, res) <- evaluate ["main2.ts", "a.ts", "foo.ts"]
       case ModuleTable.lookup "main2.ts" <$> res of
-        Right (Just (Module _ (_, (env, _)) :| [])) -> env `shouldBe` lowerBound
+        Right (Just (Module _ (_, (heap, _)) :| [])) -> heap `shouldBe` lowerBound
         other -> expectationFailure (show other)
 
     it "fails exporting symbols not defined in the module" $ do
