@@ -70,7 +70,8 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable SideEffectImport where
   eval _ (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    void $ require modulePath
+    (scopeGraph, _) <- require modulePath
+    bindAll scopeGraph
     rvalBox unit
 
 
