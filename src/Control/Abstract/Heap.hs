@@ -288,6 +288,7 @@ lookupFrameAddress path = do
   go path frameAddress
   where
     go path address = case path of
+      Hole -> throwHeapError (LookupLinkError path)
       DPath decl position -> pure address
       p@(EPath edge nextScopeAddress path') -> do
         linkMap <- frameLinks address
