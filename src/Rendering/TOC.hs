@@ -3,6 +3,7 @@ module Rendering.TOC
 ( renderToCDiff
 , renderRPCToCDiff
 , renderToCTerm
+, renderJSONSummaryError
 , diffTOC
 , Summaries(..)
 , TOCSummary(..)
@@ -30,6 +31,10 @@ import Data.Patch
 import Data.Location
 import Data.Term
 import qualified Data.Text as T
+
+renderJSONSummaryError :: BlobPair -> String -> Summaries
+renderJSONSummaryError pair e = Summaries mempty (Map.singleton "msg" [toJSON e]) -- JSON [ SomeJSON (object [ "error" .= err ]) ]
+  -- where err = object ["message" .= e, "info" .= toJSON (JSONStat pair)]
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
