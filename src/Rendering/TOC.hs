@@ -33,8 +33,8 @@ import Data.Term
 import qualified Data.Text as T
 
 renderJSONSummaryError :: BlobPair -> String -> Summaries
-renderJSONSummaryError pair e = Summaries mempty (Map.singleton "msg" [toJSON e]) -- JSON [ SomeJSON (object [ "error" .= err ]) ]
-  -- where err = object ["message" .= e, "info" .= toJSON (JSONStat pair)]
+renderJSONSummaryError pair e = Summaries mempty (Map.singleton path [object ["error" .= e]])
+  where path = T.pack (pathKeyForBlobPair pair)
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
