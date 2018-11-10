@@ -102,7 +102,7 @@ renderJSONError Blob{..} e = JSON [ SomeJSON (object [ "error" .= err ]) ]
 
 renderJSONDiffError :: BlobPair -> String -> JSON "diffs" SomeJSON
 renderJSONDiffError pair e = JSON [ SomeJSON (object [ "error" .= err ]) ]
-  where err = object ["message" .= e, "info" .= toJSON (JSONStat pair)]
+  where err = object ["message" .= e, "stat" .= toJSON (JSONStat pair)]
 
 data SomeJSON where
   SomeJSON :: ToJSON a => a -> SomeJSON
