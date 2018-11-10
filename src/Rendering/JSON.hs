@@ -8,6 +8,7 @@ module Rendering.JSON
 , renderJSONAST
 , renderSymbolTerms
 , renderJSONError
+, renderJSONDiffError
 , SomeJSON(..)
 ) where
 
@@ -98,6 +99,10 @@ renderJSONError Blob{..} e = JSON [ SomeJSON (object [ "error" .= err ]) ]
   where err = object [ "message" .= e
                      , "path" .= blobPath
                      , "language" .= blobLanguage ]
+
+renderJSONDiffError :: BlobPair -> String -> JSON "diffs" SomeJSON
+renderJSONDiffError pair e = JSON [ SomeJSON (object [ "error" .= err ]) ]
+  where err = object ["message" .= e, "info" .= toJSON (JSONStat pair)]
 
 data SomeJSON where
   SomeJSON :: ToJSON a => a -> SomeJSON
