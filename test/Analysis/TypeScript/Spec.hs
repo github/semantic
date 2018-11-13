@@ -56,6 +56,8 @@ spec config = parallel $ do
         Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
           fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph `shouldBe` Nothing
           valueRef `shouldBe` Rval Unit
+          const () <$> Heap.currentFrame heap `shouldBe` Just ()
+          Heap.heapSize heap `shouldBe` 1
         other -> expectationFailure (show other)
 
     it "side effect only imports" $ do
