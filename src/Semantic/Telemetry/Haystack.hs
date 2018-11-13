@@ -10,8 +10,10 @@ import           Control.Exception
 import           Crypto.Hash
 import           Data.Aeson hiding (Error)
 import qualified Data.ByteString.Char8 as BC
+import           Data.List (intercalate)
 import qualified Data.Text as Text
 import qualified Data.Text.Encoding as Text
+import           GHC.Exts (currentCallStack)
 import           Network.HTTP.Client
 import           Network.HTTP.Types.Status (statusCode)
 import           Prologue hiding (hash)
@@ -51,14 +53,15 @@ haystackClient maybeURL managerSettings appName
 reportError :: ErrorLogger -> HaystackClient -> ErrorReport -> IO ()
 reportError logger NullHaystackClient ErrorReport{..} = let msg = takeWhile (/= '\n') (displayException errorReportException) in logger msg errorReportContext
 reportError logger HaystackClient{..} ErrorReport{..} = do
+  bt <- fmap (intercalate "\n") currentCallStack
   let fullMsg = displayException errorReportException
   let summary = takeWhile (/= '\n') fullMsg
   logger summary errorReportContext
   let payload = object $
         [ "app"       .= haystackClientAppName
-        , "message"   .= summary
+        , "message"   .= fullMsg
         , "class"     .= summary
-        , "backtrace" .= fullMsg
+        , "backtrace" .= bt
         , "rollup"    .= rollup fullMsg
         ] <> foldr (\(k, v) acc -> Text.pack k .= v : acc) [] errorReportContext
   let request = haystackClientRequest { requestBody = RequestBodyLBS (encode payload) }
