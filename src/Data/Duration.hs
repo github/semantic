@@ -5,6 +5,7 @@ module Data.Duration
 , fromMicroseconds
 , fromNanoseconds
 , toMicroseconds
+, toSeconds
 ) where
 
 -- A duration suitable for timeouts stored as an int of milliseconds.
@@ -32,3 +33,6 @@ fromNanoseconds n = fromMicroseconds (n `div` 1000)
 
 toMicroseconds :: Duration -> Int
 toMicroseconds (Milliseconds n) = n * 1000
+
+toSeconds :: Duration -> Int
+toSeconds (Milliseconds n) = n * 1000 * 1000
