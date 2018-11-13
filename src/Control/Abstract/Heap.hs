@@ -314,6 +314,20 @@ frameLinks :: forall address value sig m term. (
 frameLinks address = maybeM (throwHeapError $ LookupLinksError address) . Heap.frameLinks address =<< get @(Heap address address value)
 
 
+bindFrames :: ( Ord address
+           , Member (Reader ModuleInfo) sig
+           , Member (Reader Span) sig
+           , Member (Resumable (BaseError (ScopeError address))) sig
+           , Member (State (Heap address address value)) sig
+           , Carrier sig m
+           )
+        => Heap address address value
+        -> Evaluator term address value m ()
+bindFrames oldHeap = do
+  currentHeap <- get
+  let newHeap = Heap.heap oldHeap <> Heap.heap currentHeap
+  put (currentHeap { Heap.heap = newHeap })
+
 
 -- lookupDeclaration :: Declaration -> address -> ScopeGraph address -> Maybe (Address address)
 -- lookupDeclaration decl address g = do
