@@ -8,6 +8,7 @@ module Rendering.JSON
 , renderJSONAST
 , renderSymbolTerms
 , renderJSONError
+, renderJSONSymbolError
 , renderJSONDiffError
 , SomeJSON(..)
 ) where
@@ -94,12 +95,22 @@ instance ToJSON a => ToJSON (JSONAST a) where
 renderSymbolTerms :: ToJSON a => [a] -> JSON "files" SomeJSON
 renderSymbolTerms = JSON . map SomeJSON
 
-renderJSONError :: Blob -> String -> JSON "trees" SomeJSON
-renderJSONError Blob{..} e = JSON [ SomeJSON (object [ "error" .= err ]) ]
-  where err = object [ "message" .= e
-                     , "path" .= blobPath
-                     , "language" .= blobLanguage ]
+-- | Render an error for symbols.
+renderJSONSymbolError :: Blob -> String -> JSON "files" SomeJSON
+renderJSONSymbolError blob e = JSON [ renderError blob e ]
 
+-- | Render an error for terms.
+renderJSONError :: Blob -> String -> JSON "trees" SomeJSON
+renderJSONError blob e = JSON [ renderError blob e ]
+
+-- | Render an error for a particular blob.
+renderError :: ToJSON a => Blob -> a -> SomeJSON
+renderError Blob{..} e = SomeJSON $ object
+  [ "error" .= e
+  , "path" .= blobPath
+  , "language" .= blobLanguage ]
+
+-- | Render an error for diffs.
 renderJSONDiffError :: BlobPair -> String -> JSON "diffs" SomeJSON
 renderJSONDiffError pair e = JSON [ SomeJSON (object [ "error" .= err ]) ]
   where err = object ["message" .= e, "stat" .= toJSON (JSONStat pair)]

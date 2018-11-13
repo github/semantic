@@ -33,7 +33,7 @@ runParse JSONGraphTermRenderer        = withParsedBlobs' renderJSONError (render
         renderAdjGraph blob term = renderJSONAdjTerm blob (renderTreeGraph term)
 runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
 runParse ShowTermRenderer             = withParsedBlobs (const (serialize Show . quieterm))
-runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
+runParse (SymbolsTermRenderer fields) = withParsedBlobs' renderJSONSymbolError (\ blob -> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
 runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 runParse QuietTermRenderer            = distributeFoldMap $ \blob ->
   showTiming blob <$> time' ((parseSomeBlob blob >>= withSomeTerm (fmap (const (Right ())) . serialize Show . quieterm)) `catchError` \(SomeException e) -> pure (Left (show e)))
