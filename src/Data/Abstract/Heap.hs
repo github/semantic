@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, DeriveAnyClass #-}
 module Data.Abstract.Heap
-  ( Heap
+  ( Heap(..)
+  , Frame(..)
   , frameLookup
   , scopeLookup
   , frameSlots
