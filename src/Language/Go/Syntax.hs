@@ -140,7 +140,9 @@ instance Evaluatable SideEffectImport where
   eval _ (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
-    for_ paths require
+    for_ paths $ \path -> do
+      (scopeGraph, _) <- require path
+      bindAll scopeGraph
     rvalBox unit
 
 -- A composite literal in Go
