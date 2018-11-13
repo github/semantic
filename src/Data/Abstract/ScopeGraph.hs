@@ -145,7 +145,7 @@ reference ref decl@Declaration{..} g@ScopeGraph{..} = fromMaybe g $ do
 insertImportReference :: Ord address => Reference -> Declaration -> ScopeGraph address -> address -> Scope address -> Maybe (Scope address)
 insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} scopeAddress scope = do
   currentAddress <- currentScope
-  go currentAddress (EPath Import scopeAddress)
+  go currentAddress (EPath Import currentAddress)
   where
     go address path =
       case lookupDeclaration unDeclaration address g of
