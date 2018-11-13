@@ -11,6 +11,7 @@ import           Proto3.Suite
 import Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
 import           qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           qualified Data.Abstract.Heap as Heap
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
@@ -29,16 +30,24 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (scopeGraph, (_, value)) <- require modulePath
+    (scopeGraph, (heap, value)) <- require modulePath
     bindAll scopeGraph
+    bindFrames heap
     if Prologue.null symbols then
       maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
     else do
-      scopeAddress <- newScope mempty
+      let scopeEdges = maybe mempty (Map.singleton ScopeGraph.Import . pure) (ScopeGraph.currentScope scopeGraph)
+      scopeAddress <- newScope scopeEdges
       scope <- lookupScope scopeAddress
       for_ symbols $ \Alias{..} ->
         insertImportReference (Reference aliasName) (Declaration aliasValue) scopeGraph scopeAddress scope
+      let frameLinks = case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+            (Just importScope, Just importFrame) -> Map.singleton importScope importFrame
+            _ -> mempty
+
+      frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
       insertImportEdge scopeAddress
+      insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
     rvalBox unit
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
