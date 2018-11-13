@@ -32,6 +32,8 @@ module Control.Abstract.Heap
 , runAddressErrorWith
 , runHeapErrorWith
 , throwHeapError
+, bindFrames
+, insertFrameLink
 ) where
 
 import Control.Abstract.Context (withCurrentCallStack)
@@ -329,11 +331,22 @@ bindFrames oldHeap = do
   put (currentHeap { Heap.heap = newHeap })
 
 
--- lookupDeclaration :: Declaration -> address -> ScopeGraph address -> Maybe (Address address)
--- lookupDeclaration decl address g = do
---   dataMap <- ddataOfScope address g
---   (_, position) <- lookupDeclaration decl dataMap
---   pure (Address address position)
+insertFrameLink :: forall address value sig m term. ( Member (State (Heap address address value)) sig
+                   , Member (Resumable (BaseError (HeapError address))) sig
+                   , Member (Reader ModuleInfo) sig
+                   , Member (Reader Span) sig
+                   , Ord address
+                   , Carrier sig m
+                   )
+                => EdgeLabel -> Map address address -> Evaluator term address value m ()
+insertFrameLink label linkMap = do
+  frameAddress <- maybeM (throwHeapError CurrentFrameError) =<< currentFrame
+  heap <- get @(Heap address address value)
+  currentFrame <- maybeM (throwHeapError $ LookupFrameError frameAddress) (Heap.frameLookup frameAddress heap)
+  let newCurrentFrame = currentFrame {
+        Heap.links = Map.alter (\val -> val <> Just linkMap) label (Heap.links currentFrame)
+      }
+  modify (\h -> h { Heap.heap = Map.insert frameAddress newCurrentFrame (Heap.heap h)})
 
 
 -- | Write a value to the given frame address in the 'Heap'.
@@ -409,6 +422,7 @@ newtype DerefC address value m a = DerefC { runDerefC :: m a }
 data HeapError address resume where
   CurrentFrameError :: HeapError address address
   LookupAddressError :: address -> HeapError address address
+  LookupFrameError :: address -> HeapError address (Heap.Frame address address value)
   LookupLinksError :: address ->  HeapError address (Map EdgeLabel (Map address address))
   LookupLinkError :: Path address ->  HeapError address address
 
@@ -421,6 +435,7 @@ instance Eq address => Eq1 (HeapError address) where
   liftEq _ (LookupAddressError a) (LookupAddressError b) = a == b
   liftEq _ (LookupLinksError a) (LookupLinksError b) = a == b
   liftEq _ (LookupLinkError a) (LookupLinkError b) = a == b
+  liftEq _ (LookupFrameError a) (LookupFrameError b) = a == b
 
 throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Reader ModuleInfo) sig
