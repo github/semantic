@@ -188,7 +188,7 @@ insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> ScopeGraph scopeA
 insertEdge label target g@ScopeGraph{..} = fromMaybe g $ do
   scopeAddress <- currentScope
   currentScope' <- lookupScope scopeAddress g
-  scopes <- Map.lookup label (edges currentScope')
+  scopes <- maybe (Just mempty) pure (Map.lookup label (edges currentScope'))
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (g { graph = Map.insert scopeAddress newScope graph })
 
