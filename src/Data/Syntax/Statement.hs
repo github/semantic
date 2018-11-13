@@ -223,7 +223,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval eval (Return x) = undefined -- Rval <$> (eval x >>= address >>= earlyReturn)
+  eval eval (Return x) = eval x >>= earlyReturn
 
 instance Tokenize Return where
   tokenize (Return x) = within' Scope.Return x
