@@ -14,6 +14,7 @@ module Rendering.Renderer
 , renderToSymbols
 , renderTreeGraph
 , renderJSONError
+, renderJSONSymbolError
 , renderJSONDiffError
 , renderJSONSummaryError
 , Summaries(..)
