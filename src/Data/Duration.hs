@@ -35,4 +35,4 @@ toMicroseconds :: Duration -> Int
 toMicroseconds (Milliseconds n) = n * 1000
 
 toSeconds :: Duration -> Int
-toSeconds (Milliseconds n) = n * 1000 * 1000
+toSeconds (Milliseconds n) = n `div` 1000
