@@ -92,20 +92,14 @@ instance Evaluatable QualifiedExport where
     -- Create a Lexical edge from the qualifed export's scope to the current scope.
     currentScopeAddress <- currentScope
     let edges = maybe mempty (Map.singleton Lexical . pure) currentScopeAddress
-    scopeAddress <- newScope edges
-    putCurrentScope scopeAddress
+    exportScope <- newScope edges
+    insertExportEdge exportScope -- Create an export edge from the current scope to the export scope
+    putCurrentScope exportScope -- Set the export scope as the new current scope
 
     for_ exportSymbols $ \Alias{..} -> do
       reference (Reference aliasName) (Declaration aliasValue)
 
-      associatedScope' <- associatedScope (Declaration aliasValue)
-      span <- ask @Span -- TODO: This is wrong. We should store the span of the aliasName not the span of the qualifed export.
-      declare (Declaration aliasName) span associatedScope'
-
     -- Create an export edge from a new scope to the qualifed export's scope.
-    let edges = Map.singleton Export [ scopeAddress ]
-    nextScope <- newScope edges
-    putCurrentScope nextScope
     rvalBox unit
 
 data Alias = Alias { aliasValue :: Name, aliasName :: Name }
