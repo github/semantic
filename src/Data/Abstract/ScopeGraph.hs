@@ -167,7 +167,8 @@ lookupScopePath declaration g@ScopeGraph{..} = do
     go address path =
       case lookupDeclaration declaration address g of
         Just (_, index) -> Just $ path (DPath (Declaration declaration) index)
-        Nothing -> traverseEdges Import <|> traverseEdges Lexical
+        Nothing -> maybe Nothing (Just . path) (lookupReference declaration address g)
+          <|> traverseEdges Import <|> traverseEdges Lexical
           where
             traverseEdges edge = do
               linkMap <- linksOfScope address g
@@ -179,6 +180,9 @@ lookupDeclaration declaration scope g = do
   dataSeq <- ddataOfScope scope g
   index <- Seq.findIndexR (((Declaration declaration) ==) . fst) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
+
+lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+lookupReference  name scope g = Map.lookup (Reference name) =<< pathsOfScope scope g
 
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertEdge label target g@ScopeGraph{..} = fromMaybe g $ do
