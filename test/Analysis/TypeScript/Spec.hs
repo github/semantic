@@ -50,6 +50,14 @@ spec config = parallel $ do
           closure' valueRef `shouldBe` Right (Closure (PackageInfo { packageName = "analysis", packageResolutions = mempty }) (ModuleInfo "a.ts") "baz" [] (Right ()) ())
         other -> expectationFailure (show other)
 
+    it "side effect only imports dont expose exports" $ do
+      (_, res) <- evaluate ["main3.ts", "a.ts"]
+      case ModuleTable.lookup "main3.ts" <$> res of
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph `shouldBe` Nothing
+          valueRef `shouldBe` Rval Unit
+        other -> expectationFailure (show other)
+
     it "side effect only imports" $ do
       (_, res) <- evaluate ["main2.ts", "a.ts", "foo.ts"]
       case ModuleTable.lookup "main2.ts" <$> res of
