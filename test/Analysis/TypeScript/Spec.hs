@@ -14,6 +14,7 @@ import Data.Sum
 import SpecHelpers
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap       as Heap
+import Data.Text (pack)
 
 spec :: TaskConfig -> Spec
 spec config = parallel $ do
@@ -40,7 +41,7 @@ spec config = parallel $ do
           (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 1) ))
         other -> expectationFailure (show other)
 
-    it "imports functions" $ do
+    it "stores function declaration in scope graph" $ do
       (_, res) <- evaluate ["a.ts"]
       case ModuleTable.lookup "a.ts" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
@@ -48,6 +49,14 @@ spec config = parallel $ do
           let closure' (Rval (Closure packageInfo moduleInfo name params _ _)) = Right (Closure packageInfo moduleInfo name params (Right ()) ())
               closure' _                                                       = Left ()
           closure' valueRef `shouldBe` Right (Closure (PackageInfo { packageName = "analysis", packageResolutions = mempty }) (ModuleInfo "a.ts") "baz" [] (Right ()) ())
+        other -> expectationFailure (show other)
+
+    it "imports functions" $ do
+      (_, res) <- evaluate ["main4.ts", "foo.ts"]
+      case ModuleTable.lookup "main4.ts" <$> res of
+        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+          fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () $ ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 0))
+          valueRef `shouldBe` Rval (String $ pack "this is the foo function")
         other -> expectationFailure (show other)
 
     it "side effect only imports dont expose exports" $ do
