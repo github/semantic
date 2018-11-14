@@ -22,6 +22,7 @@ module Data.Abstract.ScopeGraph
   , lookupScopePath
   , Scope(..)
   , scopeOfRef
+  , pathDeclarationScope
   ) where
 
 import Control.Abstract.Hole
@@ -86,6 +87,11 @@ deriving instance Functor Path
 pathDeclaration :: Path scope -> Declaration
 pathDeclaration (DPath d _)     = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
+
+pathDeclarationScope :: Path scope -> Maybe scope
+pathDeclarationScope (EPath _ scope (DPath d _)) = Just scope
+pathDeclarationScope (EPath _ _ p) = pathDeclarationScope p
+pathDeclarationScope _ = Nothing
 
 -- TODO: Possibly return in Maybe since we can have Hole paths
 pathPosition :: Path scope -> Position
