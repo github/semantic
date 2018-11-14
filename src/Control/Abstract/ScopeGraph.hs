@@ -20,6 +20,7 @@ module Control.Abstract.ScopeGraph
   , putCurrentScope
   , insertImportReference
   , lookupScopePath
+  , lookupDeclarationScope
   , lookupScope
   , Allocator(..)
   , AllocatorC(..)
@@ -178,6 +179,16 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
              -> Evaluator term address value m (ScopeGraph.Path address)
 lookupScopePath decl@Declaration{..} = maybeM (throwScopeError $ LookupPathError decl) . ScopeGraph.lookupScopePath unDeclaration =<< get
 
+lookupDeclarationScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                , Member (Reader ModuleInfo) sig
+                , Member (Reader Span) sig
+                , Member (State (ScopeGraph address)) sig
+                , Carrier sig m
+                , Ord address
+                , Show address
+                ) => Declaration -> Evaluator term address value m address
+lookupDeclarationScope decl = maybeM (throwScopeError $ LookupDeclarationScopeError decl) . ScopeGraph.pathDeclarationScope =<< lookupScopePath decl
+
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
@@ -212,6 +223,7 @@ data ScopeError address return where
   ScopeError :: Declaration -> Span -> ScopeError address (Address address)
   LookupScopeError :: ScopeError address (Scope address)
   LookupPathError :: Declaration -> ScopeError address (ScopeGraph.Path address)
+  LookupDeclarationScopeError :: Declaration -> ScopeError address address
   CurrentScopeError :: ScopeError address address
 
 deriving instance Eq (ScopeError address return)
