@@ -9,6 +9,7 @@ module Control.Abstract.Heap
 , putHeap
 , alloc
 , lookupDeclaration
+, lookupDeclarationFrame
 , deref
 , assign
 , newFrame
@@ -276,6 +277,22 @@ lookupDeclaration decl = do
   path <- lookupScopePath decl
   frameAddress <- lookupFrameAddress path
   pure (Address frameAddress (Heap.pathPosition path))
+
+lookupDeclarationFrame :: ( Member (State (Heap address address value)) sig
+                          , Member (State (ScopeGraph address)) sig
+                          , Member (Resumable (BaseError (ScopeError address))) sig
+                          , Member (Resumable (BaseError (HeapError address))) sig
+                          , Member (Reader ModuleInfo) sig
+                          , Member (Reader Span) sig
+                          , Ord address
+                          , Show address
+                          , Carrier sig m
+                          )
+                       => Declaration
+                       -> Evaluator term address value m address
+lookupDeclarationFrame decl = do
+  path <- lookupScopePath decl
+  lookupFrameAddress path
 
 -- | Follow a path through the heap and return the frame address associated with the declaration.
 lookupFrameAddress :: ( Member (State (Heap address address value)) sig
