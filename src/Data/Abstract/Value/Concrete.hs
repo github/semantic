@@ -6,7 +6,7 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Control.Abstract.ScopeGraph (Allocator, ScopeError( CurrentScopeError ))
+import Control.Abstract.ScopeGraph (Allocator, ScopeError( CurrentScopeError ), lookupDeclarationScope)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
@@ -124,13 +124,13 @@ instance ( FreeVariables term
       boxed <- case op of
         Closure _ _ _ _ (Left Print) _ -> traverse (trace . show) params *> rvalBox Unit
         Closure _ _ name _ (Left Show) _ -> pure name >>= rvalBox . String . pack . show
-        Closure packageInfo moduleInfo _ names (Right body) scope -> do
+        Closure packageInfo moduleInfo name names (Right body) scope -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-            currentScope' <- maybeM (throwScopeError CurrentScopeError) =<< currentScope
-            currentFrame' <- maybeM (throwHeapError CurrentFrameError) =<< currentFrame
-            let frameEdges = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+            declarationScope <- lookupDeclarationScope (Declaration name)
+            declarationFrame <- lookupDeclarationFrame (Declaration name)
+            let frameEdges = Map.singleton Lexical (Map.singleton declarationScope declarationFrame)
             frameAddress <- newFrame scope frameEdges
             withFrame frameAddress $ do
               for_ (zip names params) $ \(name, param) -> do
