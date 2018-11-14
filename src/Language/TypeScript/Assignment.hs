@@ -816,7 +816,7 @@ requiredParameter = makeRequiredParameter
                              <*> (term typeAnnotation' <|> emptyTerm)
                              <*> (term expression <|> emptyTerm))
   where
-    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
+    makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] identifier initializer)
 
 restParameter :: Assignment Term
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> term identifier <*> (term typeAnnotation' <|> emptyTerm))
