@@ -16,8 +16,6 @@ import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import qualified Data.Map.Strict as Map
-import Data.Semigroup.App
-import Data.Semigroup.Foldable (foldMap1)
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -30,7 +28,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (scopeGraph, (heap, value)) <- require modulePath
+    (scopeGraph, (heap, _)) <- require modulePath
     bindAll scopeGraph
     bindFrames heap
     if Prologue.null symbols then
@@ -64,7 +62,7 @@ instance Evaluatable QualifiedAliasedImport where
     -- rvalBox =<< evalRequire modulePath alias
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     span <- get @Span
-    (scopeGraph, (_, value)) <- require modulePath
+    (scopeGraph, (_, _)) <- require modulePath
     bindAll scopeGraph
     declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph)
     rvalBox unit
@@ -128,7 +126,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval _ (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    scopeGraph <- fst <$> require modulePath
+    -- scopeGraph <- fst <$> require modulePath
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \Alias{..} -> do
       -- TODO: Add an Alias Edge to resolve qualified export froms
@@ -146,9 +144,9 @@ instance Ord1 DefaultExport where liftCompare = genericLiftCompare
 instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultExport where
-  eval eval (DefaultExport term) = do
+  eval _ (DefaultExport term) = do
     case declaredName term of
-      Just name -> undefined -- do
+      Just _ -> undefined -- do
         -- addr <- eval term >>= address
         -- export name name Nothing
         -- bind name addr
@@ -544,7 +542,7 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval eval (Module iden xs) = undefined -- do
+  eval _ (Module _ _) = undefined -- do
     -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     -- rvalBox =<< letrec' name (\addr ->
     --   makeNamespace name addr Nothing (traverse_ eval xs))
@@ -560,7 +558,7 @@ instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
-  eval eval (InternalModule iden xs) = undefined -- do
+  eval _ (InternalModule _ _) = undefined -- do
     -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     -- rvalBox =<< letrec' name (\addr ->
     --   makeNamespace name addr Nothing (traverse_ eval xs))
@@ -595,7 +593,7 @@ instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 instance Evaluatable AbstractClass where
-  eval eval AbstractClass{..} = undefined -- do
+  eval _ AbstractClass{..} = undefined -- do
     -- name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
     -- supers <- traverse (eval >=> address) classHeritage
     -- (v, addr) <- letrec name $ do

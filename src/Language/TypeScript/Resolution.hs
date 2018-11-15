@@ -24,7 +24,6 @@ import           System.FilePath.Posix
 
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
-import Control.Abstract.ScopeGraph (Allocator)
 import qualified Data.Abstract.Module as M
 import           Data.Abstract.Package
 import           Data.Abstract.Path

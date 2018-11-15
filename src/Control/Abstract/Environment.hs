@@ -27,7 +27,6 @@ module Control.Abstract.Environment
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Abstract.ScopeGraph (Declaration(..))
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
@@ -129,13 +128,15 @@ self = ctxSelf <$> getEvalContext
 --   v <$ bind name addr
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Reader ModuleInfo) sig
-            , Member (Reader Span) sig
-            , Carrier sig m
-            )
-         => Name
+-- variable :: ( Member (Reader ModuleInfo) sig
+--             , Member (Reader Span) sig
+--             , Carrier sig m
+--             )
+--          => Name
+--          -> Evaluator term address value m (Address address)
+variable :: Name
          -> Evaluator term address value m (Address address)
-variable name = undefined -- lookupEnv name >>= maybeM (freeVariableError name)
+variable _ = undefined -- lookupEnv name >>= maybeM (freeVariableError name)
 
 -- Effects
 

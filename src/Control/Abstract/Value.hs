@@ -33,13 +33,11 @@ module Control.Abstract.Value
 import Control.Abstract.ScopeGraph (Declaration, ScopeGraph, ScopeError)
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Control.Abstract.Heap hiding (address)
-import Control.Abstract.ScopeGraph (Allocator, currentScope, newScope, EdgeLabel(..), )
-import qualified Control.Abstract.Heap as Heap
+import Control.Abstract.Heap
+import Control.Abstract.ScopeGraph (Allocator)
 import Control.Effect.Carrier
 import Data.Abstract.Declarations
 import Data.Abstract.BaseError
-import Data.Abstract.Environment as Env
 import Data.Abstract.Module
 import Data.Abstract.Name
 import Data.Abstract.Number as Number
@@ -47,7 +45,6 @@ import Data.Abstract.Ref
 import Data.Scientific (Scientific)
 import Data.Span
 import Prologue hiding (TypeError)
-import qualified Data.Map.Strict as Map
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -73,7 +70,7 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: (Declarations term, Member (Function term address value) sig, Carrier sig m) => Name -> [term] -> term -> Evaluator term address value m (ValueRef address value)
+function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [term] -> term -> Evaluator term address value m (ValueRef address value)
 function name params body = sendFunction (Function name params body ret)
 
 data BuiltIn
@@ -312,21 +309,19 @@ makeNamespace :: ( AbstractValue term address value m
                  , Member (Reader Span) sig
                  , Member (Resumable (BaseError (HeapError address))) sig
                  , Member (Resumable (BaseError (AddressError address value))) sig
-                 , Member (Allocator address) sig
                  , Member (Resumable (BaseError (ScopeError address))) sig
                  , Member (State (Heap address address value)) sig
                  , Member Fresh sig
                  , Carrier sig m
                  , Ord address
                  , Show address
-                 , Show value
                  )
               => Declaration
               -> Address address
               -> Maybe (Address address)
               -> Evaluator term address value m ()
               -> Evaluator term address value m (ValueRef address value)
-makeNamespace declaration addr super body = do
+makeNamespace declaration _ super body = do
   super' <- traverse deref super
   define declaration . withChildFrame declaration $ \frame -> do
       _ <- body
@@ -348,8 +343,7 @@ makeNamespace declaration addr super body = do
 
 
 -- | Evaluates a 'Value' returning the referenced value
-value :: ( AbstractValue term address value m
-         , Member (Deref value) sig
+value :: ( Member (Deref value) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError (AddressError address value))) sig
@@ -363,19 +357,21 @@ value (Rval val) = pure val
 value (LvalMember slot) = deref slot
 
 -- | Returns the address of a value referenced by a 'ValueRef'
-address :: ( AbstractValue term address value m
-           , Carrier sig m
-           , Member (State (Heap address address value)) sig
-           , Member (State (ScopeGraph address)) sig
-           , Member (Resumable (BaseError (ScopeError address))) sig
-           , Member (Resumable (BaseError (HeapError address))) sig
-           , Member (Reader ModuleInfo) sig
-           , Member (Reader Span) sig
-           )
-        => ValueRef address value
+-- address :: ( AbstractValue term address value m
+--            , Carrier sig m
+--            , Member (State (Heap address address value)) sig
+--            , Member (State (ScopeGraph address)) sig
+--            , Member (Resumable (BaseError (ScopeError address))) sig
+--            , Member (Resumable (BaseError (HeapError address))) sig
+--            , Member (Reader ModuleInfo) sig
+--            , Member (Reader Span) sig
+--            )
+--         => ValueRef address value
+--         -> Evaluator term address value m (Address address)
+address :: ValueRef address value
         -> Evaluator term address value m (Address address)
 address (LvalMember slot) = pure slot
-address (Rval value)      = undefined
+address (Rval _)      = undefined
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: value -> Evaluator term address value m (ValueRef address value)

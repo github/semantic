@@ -7,7 +7,6 @@ module Analysis.Abstract.Caching.FlowInsensitive
 
 import Control.Abstract
 import Data.Abstract.BaseError
-import Data.Abstract.Environment
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Data.Map.Monoidal as Monoidal
@@ -28,7 +27,7 @@ withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Member (State (Cache term address value)) sig, Carrier sig m, Ord address, Ord term, Ord value)
+lookupCache :: (Member (State (Cache term address value)) sig, Carrier sig m, Ord address, Ord term)
             => Configuration term address
             -> Evaluator term address value m (Maybe (Set (ValueRef address value)))
 lookupCache configuration = cacheLookup configuration <$> get

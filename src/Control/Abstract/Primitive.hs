@@ -5,28 +5,12 @@ module Control.Abstract.Primitive
   ) where
 
 import           Control.Abstract.Context
-import           Control.Abstract.Environment
 import           Control.Abstract.Evaluator
 import           Control.Abstract.Heap
-import           Control.Abstract.ScopeGraph (Declaration (..), EdgeLabel (..), ScopeError, ScopeGraph, currentScope, declare, newScope, withScope, Allocator)
+import           Control.Abstract.ScopeGraph (Declaration (..), ScopeError, ScopeGraph, Allocator)
 import           Control.Abstract.Value
 import           Data.Abstract.BaseError
-import           Data.Abstract.Environment
-import qualified Data.Abstract.Environment as Env
-import           Data.Abstract.Name (Name)
-import qualified Data.Abstract.Name as Name
-import qualified Data.Map.Strict as Map
-import           Data.Text (unpack)
 import           Prologue
-
-import Control.Abstract.Context
-import Control.Abstract.Environment
-import Control.Abstract.Evaluator
-import Control.Abstract.Heap
-import Control.Abstract.Value
-import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Name
-import Prologue
 
 defineClass :: ( AbstractValue term address value m
                , Carrier sig m
@@ -35,7 +19,6 @@ defineClass :: ( AbstractValue term address value m
                , Member (Deref value) sig
                , Member (Reader ModuleInfo) sig
                , Member (Reader Span) sig
-               , Member (State (Heap address address value)) sig
                , Member Fresh sig
                , Member (Resumable (BaseError (HeapError address))) sig
                , Member (Resumable (BaseError (ScopeError address))) sig
@@ -43,7 +26,6 @@ defineClass :: ( AbstractValue term address value m
                , Member (State (ScopeGraph address)) sig
                , Ord address
                , Show address
-               , Show value
                )
             => Declaration
             -> [value]
@@ -61,7 +43,6 @@ defineNamespace :: ( AbstractValue term address value m
                    , Member (Deref value) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
-                   , Member (State (Heap address address value)) sig
                    , Member (Resumable (BaseError (HeapError address))) sig
                    , Member Fresh sig
                    , Member (Resumable (BaseError (ScopeError address))) sig
@@ -69,7 +50,6 @@ defineNamespace :: ( AbstractValue term address value m
                    , Member (State (ScopeGraph address)) sig
                    , Ord address
                    , Show address
-                   , Show value
                    )
                 => Declaration
                 -> Evaluator term address value m a

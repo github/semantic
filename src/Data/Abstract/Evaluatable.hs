@@ -65,7 +65,6 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member Trace sig
           , Ord address
           , Show address
-          , Show value
           )
        => (term -> Evaluator term address value m (ValueRef address value))
        -> (constr term -> Evaluator term address value m (ValueRef address value))
@@ -99,7 +98,6 @@ class HasPrelude (language :: Language) where
                    , Member Trace sig
                    , Ord address
                    , Show address
-                   , Show value
                    )
                 => proxy language
                 -> Evaluator term address value m ()

@@ -300,7 +300,7 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Delete where
-  eval eval (Delete a) = do
+  eval _ (Delete _) = do
     -- valueRef <- eval a
     -- addr <- address valueRef
     -- dealloc addr
@@ -444,18 +444,17 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval eval (MemberAccess obj propName) = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName obj)
-    reference (Reference name) (Declaration name)
-    childScope <- associatedScope (Declaration name)
-
+  eval _ (MemberAccess _ _) = do
+    undefined
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName obj)
+    -- reference (Reference name) (Declaration name)
+    -- childScope <- associatedScope (Declaration name)
     -- ptr <- eval obj >>= address
     -- case childScope of
     --   Just childScope -> withScope childScope $ reference (Reference propName) (Declaration propName)
     --   Nothing ->
     --     -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
     --     pure ()
-    undefined
 
 
 -- | Subscript (e.g a[1])
@@ -515,7 +514,7 @@ instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable ScopeResolution where
-  eval eval (ScopeResolution xs) = undefined -- Rval <$> foldl1 f (fmap (eval >=> address) xs)
+  eval _ (ScopeResolution _) = undefined -- Rval <$> foldl1 f (fmap (eval >=> address) xs)
     -- where f ns id = ns >>= flip evaluateInScopedEnv id
 
 

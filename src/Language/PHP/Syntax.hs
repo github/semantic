@@ -217,7 +217,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval eval (QualifiedName obj iden) = do
+  eval _ (QualifiedName obj iden) = do
     name <- maybeM (throwEvalError NoNameError) (declaredName obj)
     reference (Reference name) (Declaration name)
     childScope <- associatedScope (Declaration name)
@@ -245,7 +245,7 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval eval (NamespaceName xs) = undefined -- Rval <$> foldl1 f (fmap (eval >=> address) xs)
+  eval _ (NamespaceName _) = undefined -- Rval <$> foldl1 f (fmap (eval >=> address) xs)
     -- where f ns id = ns >>= flip evaluateInScopedEnv id
 
 newtype ConstDeclaration a = ConstDeclaration { values :: [a] }
@@ -401,7 +401,7 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval eval Namespace{..} = undefined -- Rval <$> go (declaredName <$> namespaceName)
+  eval _ Namespace{..} = undefined -- Rval <$> go (declaredName <$> namespaceName)
     -- where
     --   -- Each namespace name creates a closure over the subsequent namespace closures
     --   go (n:x:xs) = do

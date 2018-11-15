@@ -341,14 +341,10 @@ instance AbstractIntro Type where
   null        = Null
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Member (Allocator address) sig
-         , Member (Deref Type) sig
-         , Member Fresh sig
+instance ( Member Fresh sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
-         , Member (Resumable (BaseError (AddressError address Type))) sig
          , Member (Resumable (BaseError TypeError)) sig
-         , Member (State (Heap address address Type)) sig
          , Member (State TypeMap) sig
          , Ord address
          , Carrier sig m
