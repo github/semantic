@@ -40,13 +40,13 @@
       (Empty)
       (Empty)
       (Empty)
-      (Statements)))
+      (StatementBlock)))
   (DefaultExport
     (Function
       (Empty)
       (Empty)
       (Identifier)
-      (Statements)))
+      (StatementBlock)))
   (QualifiedExport)
   (DefaultExport
     (TextElement))
