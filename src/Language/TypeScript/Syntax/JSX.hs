@@ -10,6 +10,8 @@ import           Proto3.Suite
 import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
 import           Diffing.Algorithm
+import qualified Data.Map.Strict as Map
+import Control.Abstract as Abstract
 
 data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], jsxClosingElement :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -83,13 +85,40 @@ instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
 instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable OptionalParameter
 
-data RequiredParameter a = RequiredParameter { requiredParameterContext :: ![a], requiredParameterSubject :: !a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+data RequiredParameter a = RequiredParameter { requiredParameterContext :: ![a], requiredParameterSubject :: !a, requiredParameterValue :: !a }
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Declarations1 RequiredParameter where
+  liftDeclaredName declaredName RequiredParameter{..} = declaredName requiredParameterSubject
 
 instance Eq1 RequiredParameter where liftEq = genericLiftEq
 instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
 instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable RequiredParameter
+instance Evaluatable RequiredParameter where
+  eval eval RequiredParameter{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName requiredParameterSubject)
+    span <- ask @Span
+    declare (Declaration name) span Nothing
+
+    lhs <- eval requiredParameterSubject
+    rhs <- eval requiredParameterValue
+
+    case lhs of
+      Rval val -> throwEvalError (AssignmentRvalError val)
+      LvalMember lhsSlot -> do
+        case declaredName requiredParameterValue of
+          Just rhsName -> do
+            assocScope <- associatedScope (Declaration rhsName)
+            case assocScope of
+              Just assocScope' -> do
+                objectScope <- newScope (Map.singleton Import [ assocScope' ])
+                putSlotDeclarationScope lhsSlot (Just objectScope) -- TODO: not sure if this is right
+              Nothing ->
+                pure ()
+          Nothing ->
+            pure ()
+        assign lhsSlot =<< Abstract.value rhs
+        pure (LvalMember lhsSlot)
 
 data RestParameter a = RestParameter { restParameterContext :: ![a], restParameterSubject :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
