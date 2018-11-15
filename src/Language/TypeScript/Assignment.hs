@@ -204,6 +204,7 @@ type Syntax = '[
   , TypeScript.Syntax.QualifiedExportFrom
   , TypeScript.Syntax.JavaScriptRequire
   , []
+  , Statement.StatementBlock
   ]
 
 type Term = Term.Term (Sum Syntax) Location

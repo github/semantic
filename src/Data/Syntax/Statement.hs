@@ -17,6 +17,7 @@ import Diffing.Algorithm
 import Reprinting.Tokenize
 import qualified Data.Reprinting.Token as Token
 import qualified Data.Reprinting.Scope as Scope
+import Data.Abstract.Ref
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
@@ -36,6 +37,21 @@ instance Evaluatable Statements where
     withLexicalScopeAndFrame $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
+  tokenize = imperative
+
+newtype StatementBlock a = StatementBlock { statements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
+
+instance Eq1 StatementBlock where liftEq = genericLiftEq
+instance Ord1 StatementBlock where liftCompare = genericLiftCompare
+instance Show1 StatementBlock where liftShowsPrec = genericLiftShowsPrec
+instance ToJSON1 StatementBlock
+
+instance Evaluatable StatementBlock where
+  eval eval (StatementBlock xs) =
+    maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+
+instance Tokenize StatementBlock where
   tokenize = imperative
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
@@ -139,32 +155,25 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
   eval eval Assignment{..} = do
-    undefined
-    -- lhs <- eval assignmentTarget
-    -- rhs <- eval assignmentValue >>= address
-    --
-    -- case lhs of
-    --   LvalLocal name -> do
-    --     case declaredName assignmentValue of
-    --       Just rhsName -> do
-    --         assocScope <- associatedScope (Declaration rhsName)
-    --         case assocScope of
-    --           Just assocScope' -> do
-    --             objectScope <- newScope (Map.singleton Import [ assocScope' ])
-    --             putDeclarationScope (Declaration name) objectScope
-    --           Nothing -> pure ()
-    --       Nothing ->
-    --         -- The rhs wasn't assigned to a reference/declaration.
-    --         pure ()
-    --     bind name rhs
-    --   LvalMember _ _ ->
-    --     -- we don't yet support mutable object properties:
-    --     pure ()
-    --   Rval _ ->
-    --     -- the left hand side of the assignment expression is invalid:
-    --     pure ()
-    --
-    -- pure (Rval rhs)
+    lhs <- eval assignmentTarget
+    rhs <- eval assignmentValue
+
+    case lhs of
+      Rval val -> throwEvalError (AssignmentRvalError val)
+      LvalMember lhsSlot -> do
+        case declaredName assignmentValue of
+          Just rhsName -> do
+            assocScope <- associatedScope (Declaration rhsName)
+            case assocScope of
+              Just assocScope' -> do
+                objectScope <- newScope (Map.singleton Import [ assocScope' ])
+                putSlotDeclarationScope lhsSlot (Just objectScope) -- TODO: not sure if this is right
+              Nothing ->
+                pure ()
+          Nothing ->
+            pure ()
+        assign lhsSlot =<< Abstract.value rhs
+        pure (LvalMember lhsSlot)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement { value :: a }
