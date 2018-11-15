@@ -272,6 +272,7 @@ instance Taggable Statement.Retry
 instance Taggable Statement.Return
 instance Taggable Statement.ScopeEntry
 instance Taggable Statement.ScopeExit
+instance Taggable Statement.StatementBlock
 instance Taggable Statement.Statements
 instance Taggable Statement.Throw
 instance Taggable Statement.Try
