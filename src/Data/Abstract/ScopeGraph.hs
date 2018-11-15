@@ -151,8 +151,8 @@ reference ref decl@Declaration{..} g@ScopeGraph{..} = fromMaybe g $ do
             in traverseEdges Import <|> traverseEdges Lexical
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
-insertImportReference :: Ord address => Reference -> Declaration -> ScopeGraph address -> address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} scopeAddress scope = do
+insertImportReference :: Ord address => Reference -> Declaration -> ScopeGraph address -> Scope address -> Maybe (Scope address)
+insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} scope = do
   currentAddress <- currentScope
   go currentAddress (EPath Import currentAddress)
   where
