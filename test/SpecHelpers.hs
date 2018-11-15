@@ -102,7 +102,7 @@ type TestEvaluatingC term
   = ResumableC (BaseError (AddressError Precise (Val term))) (Eff
   ( ResumableC (BaseError (ValueError term Precise)) (Eff
   ( ResumableC (BaseError ResolutionError) (Eff
-  ( ResumableC (BaseError EvalError) (Eff
+  ( ResumableC (BaseError (EvalError Precise (Val term))) (Eff
   ( ResumableC (BaseError (HeapError Precise)) (Eff
   ( ResumableC (BaseError (ScopeError Precise)) (Eff
   ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
