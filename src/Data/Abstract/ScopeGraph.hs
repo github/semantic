@@ -23,6 +23,7 @@ module Data.Abstract.ScopeGraph
   , Scope(..)
   , scopeOfRef
   , pathDeclarationScope
+  , putDeclarationScopeAtPosition
   ) where
 
 import Control.Abstract.Hole
@@ -186,6 +187,12 @@ lookupDeclaration declaration scope g = do
   dataSeq <- ddataOfScope scope g
   index <- Seq.findIndexR (((Declaration declaration) ==) . fst) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
+
+putDeclarationScopeAtPosition :: Ord scopeAddress => scopeAddress -> Position -> Maybe scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+putDeclarationScopeAtPosition scope position assocScope g = fromMaybe g $ do
+  dataSeq <- ddataOfScope scope g
+  let seq = Seq.adjust' (\(d, (span, _)) -> (d, (span, assocScope))) (unPosition position) dataSeq
+  pure $ g { graph = Map.adjust (\s -> s { declarations = seq }) scope (graph g) }
 
 lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupReference  name scope g = Map.lookup (Reference name) =<< pathsOfScope scope g
