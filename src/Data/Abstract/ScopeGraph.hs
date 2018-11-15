@@ -92,9 +92,9 @@ pathDeclaration Hole          = undefined
 
 -- TODO: Store the current scope closer _in_ the DPath?
 pathDeclarationScope :: Maybe scope -> Path scope -> Maybe scope
-pathDeclarationScope _ (EPath _ scope (DPath d _)) = Just scope
+pathDeclarationScope _ (EPath _ scope (DPath _ _)) = Just scope
 pathDeclarationScope currentScope (EPath _ _ p) = pathDeclarationScope currentScope p
-pathDeclarationScope currentScope (DPath d _) = currentScope
+pathDeclarationScope currentScope (DPath _ _) = currentScope
 
 -- TODO: Possibly return in Maybe since we can have Hole paths
 pathPosition :: Path scope -> Position
