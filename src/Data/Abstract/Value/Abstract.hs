@@ -10,12 +10,10 @@ import Control.Abstract as Abstract
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Environment as Env
 import Prologue
 import qualified Data.Map.Strict as Map
 import Data.Abstract.Ref
 import Data.Abstract.Evaluatable
-import Data.Abstract.Declarations
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
@@ -49,7 +47,7 @@ instance ( Member (Allocator address) sig
       scope <- newScope lexicalEdges
       declare (Declaration name) functionSpan (Just scope)
 
-      withScope scope $ do
+      _ <- withScope scope $ do
         for_ params $ \param -> do
           name <- maybeM (throwEvalError NoNameError) (declaredName param)
 
@@ -65,7 +63,7 @@ instance ( Member (Allocator address) sig
       Evaluator $ runFunctionC (k (LvalMember address)) eval
 
     BuiltIn _ _ k -> runFunctionC (k (Rval Abstract)) eval
-    Call _ params k -> runEvaluator $ do
+    Call _ _ k -> runEvaluator $ do
       rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)
 
 
@@ -108,15 +106,7 @@ instance AbstractIntro Abstract where
   kvPair _ _ = Abstract
   null       = Abstract
 
-instance ( Member (Allocator address) sig
-         , Member (Deref Abstract) sig
-         , Member Fresh sig
-         , Member NonDet sig
-         , Member (State (Heap address address Abstract)) sig
-         , Ord address
-         , Carrier sig m
-         )
-      => AbstractValue term address Abstract m where
+instance AbstractValue term address Abstract m where
   array _ = pure Abstract
 
   tuple _ = pure Abstract

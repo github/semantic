@@ -22,7 +22,6 @@ import           Proto3.Suite
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import           System.FilePath.Posix
-import           Control.Abstract.ScopeGraph
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 
 data IsRelative = Unknown | Relative | NonRelative
@@ -118,9 +117,9 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval _ (QualifiedImport importPath aliasTerm) = do
-    paths <- resolveGoImport importPath
-    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     undefined
+    -- paths <- resolveGoImport importPath
+    -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     -- void . letrec' alias $ \addr -> do
     --   makeNamespace alias addr Nothing . for_ paths $ \p -> do
     --     traceResolve (unPath importPath) p

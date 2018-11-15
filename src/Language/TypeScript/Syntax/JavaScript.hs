@@ -12,7 +12,6 @@ import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import           Control.Abstract.ScopeGraph hiding (Import)
 import           qualified Data.Abstract.ScopeGraph as ScopeGraph
-import qualified Data.Map.Strict as Map
 
 data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -24,7 +23,7 @@ instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JavaScriptRequire where
   eval _ (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
-    (scopeGraph, (_, value)) <- require modulePath
+    (scopeGraph, _) <- require modulePath
     bindAll scopeGraph
     -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     -- rvalBox =<< evalRequire modulePath alias

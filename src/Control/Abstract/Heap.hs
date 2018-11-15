@@ -159,7 +159,7 @@ newFrame scope links = do
 
 -- | Evaluates the action within the frame of the given frame address.
 withFrame :: forall term address value sig m a. (
-           , Member (State (Heap address address value)) sig
+             Member (State (Heap address address value)) sig
            , Carrier sig m
            )
           => address

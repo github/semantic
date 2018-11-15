@@ -26,7 +26,6 @@ import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import Control.Abstract.ScopeGraph (reference, Reference(..), Declaration(..))
 import Control.Abstract.Heap (lookupDeclaration)
-import Data.Abstract.Ref
 
 -- Combinators
 

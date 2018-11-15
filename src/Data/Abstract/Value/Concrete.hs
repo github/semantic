@@ -6,7 +6,7 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Control.Abstract.ScopeGraph (Allocator, ScopeError( CurrentScopeError ), lookupDeclarationScope)
+import Control.Abstract.ScopeGraph (Allocator, ScopeError, lookupDeclarationScope)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
@@ -14,8 +14,7 @@ import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), declaredName, throwEvalError, EvalError(..), Declarations)
-import Data.Abstract.Environment (Environment, Bindings, EvalContext(..))
-import qualified Data.Abstract.Environment as Env
+import Data.Abstract.Environment (Bindings)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -23,7 +22,6 @@ import Data.Bits
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific, coefficient, normalize)
 import Data.Scientific.Exts
-import qualified Data.Set as Set
 import Data.Text (pack)
 import Data.Word
 import Prologue
@@ -52,8 +50,8 @@ data Value term address
 
 instance Ord address => ValueRoots address (Value term address) where
   valueRoots v
-    | Closure _ _ _ _ _ env <- v = undefined -- Env.addresses env
-    | otherwise                  = mempty
+    | Closure _ _ _ _ _ _ <- v = undefined -- Env.addresses env
+    | otherwise                = mempty
 
 
 instance ( FreeVariables term
@@ -85,9 +83,8 @@ instance ( FreeVariables term
     Abstract.Function name params body k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
-      i <- fresh
+      _ <- fresh
       -- TODO: Declare all params
-      span <- ask @Span -- TODO: This is probably wrong.
       currentScope' <- currentScope
       let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
       scope <- newScope lexicalEdges
@@ -97,7 +94,7 @@ instance ( FreeVariables term
 
       names <- withScope scope . for params $ \param -> do
         -- Leave it up to the Evaluatable instance of param to declare the name
-        (runFunction (Evaluator . eval) (Evaluator (eval param)))
+        _ <- runFunction (Evaluator . eval) (Evaluator (eval param))
         maybeM (throwEvalError NoNameError) (declaredName param)
 
       address <- lookupDeclaration @(Value term address) (Declaration name)
@@ -153,15 +150,9 @@ instance ( Member (Reader ModuleInfo) sig
 
 
 instance forall sig m term address. ( Carrier sig m
-         , Member (Deref (Value term address)) sig
          , Member (Abstract.Boolean (Value term address)) sig
          , Member (Error (LoopControl address (Value term address))) sig
          , Member (Interpose (Resumable (BaseError (UnspecializedError (Value term address))))) sig
-         , Member (Reader ModuleInfo) sig
-         , Member (Reader Span) sig
-         , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (State (Heap address address (Value term address))) sig
-         , Ord address
          , Show address
          , Show term
          )
@@ -267,7 +258,8 @@ instance ( Member (Allocator address) sig
   klass n supers binds = do
     pure $ Class n supers binds
 
-  namespace name super binds = undefined -- do
+  namespace _ _ _ = undefined -- do
+  -- namespace name super binds = undefined -- do
     -- maybeNs <- lookupEnv name >>= traverse deref
     -- binds' <- maybe (pure lowerBound) asNamespaceBinds maybeNs
     -- let super' = (maybeNs >>= asNamespaceSuper) <|> super

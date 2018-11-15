@@ -3,10 +3,8 @@
 module Data.Syntax.Declaration where
 
 import           Control.Abstract.ScopeGraph
-import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
-import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Set as Set
 import           Diffing.Algorithm
@@ -28,7 +26,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: How should we represent function types, where applicable?
 
 instance Evaluatable Function where
-  eval eval Function{..} = do
+  eval _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
     -- TODO: We need a way to get the Span of the functionName that doesn't require
     -- us to evaluate the term. If we evaluate the functionName here, we throw a
@@ -134,14 +132,14 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable VariableDeclaration where
   eval _ (VariableDeclaration [])   = rvalBox unit
   eval eval (VariableDeclaration decs) = do
-    addresses <- for decs $ \declaration -> do
+    _ <- for decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
-      (span, valueRef) <- do
+      (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
         pure (subtermSpan, ref)
 
-      declare (Declaration name) span Nothing -- TODO is it true that variable declarations never have an associated scope?
+      declare (Declaration name) span Nothing
     rvalBox unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
@@ -208,17 +206,16 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval eval Class{..} = do
-    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
-    span <- ask @Span
-    -- Run the action within the class's scope.
-    currentScope' <- currentScope
-
-    supers <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
-      scope <- associatedScope (Declaration name)
-      undefined
+  eval _ Class{..} = do
     undefined
+     -- <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
+    -- span <- ask @Span
+    -- Run the action within the class's scope.
+    -- currentScope' <- currentScope
+    --
+    -- supers <- for classSuperclasses $ \superclass -> do
+    --   name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+    --   scope <- associatedScope (Declaration name)
       --   (scope,) <$> (eval superclass >>= address)
       --
       -- let imports = (Import,) <$> (fmap pure . catMaybes $ fst <$> supers)
@@ -309,7 +306,7 @@ instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TypeAlias where
-  eval eval TypeAlias{..} = do
+  eval _ TypeAlias{..} = do
     -- name <- maybeM (throwEvalError NoNameError) (declaredName typeAliasIdentifier)
     -- addr <- eval typeAliasKind >>= address
     -- bind name addr

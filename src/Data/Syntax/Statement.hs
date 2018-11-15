@@ -17,7 +17,6 @@ import Diffing.Algorithm
 import Reprinting.Tokenize
 import qualified Data.Reprinting.Token as Token
 import qualified Data.Reprinting.Scope as Scope
-import Data.Abstract.Ref
 
 -- | Imperative sequence of statements/declarations s.t.:
 --
@@ -133,7 +132,7 @@ instance Ord1 Let where liftCompare = genericLiftCompare
 instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Let where
-  eval eval Let{..} = do
+  eval _ Let{..} = do
     undefined
     -- name <- maybeM (throwEvalError NoNameError) (declaredName letVariable)
     -- addr <- snd <$> letrec name (eval letValue >>= Abstract.value)
@@ -256,7 +255,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval eval (Break x) = undefined -- Rval <$> (eval x >>= address >>= throwBreak)
+  eval _ (Break _) = undefined -- Rval <$> (eval x >>= address >>= throwBreak)
 
 newtype Continue a = Continue { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -266,7 +265,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval eval (Continue x) = undefined -- Rval <$> (eval x >>= address >>= throwContinue)
+  eval _ (Continue _) = undefined -- Rval <$> (eval x >>= address >>= throwContinue)
 
 newtype Retry a = Retry { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)

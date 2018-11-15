@@ -18,7 +18,6 @@ import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize
-import           System.FilePath.Posix
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Control.Abstract.ScopeGraph (bindAll, insertImportEdge, ScopeError)
 
@@ -64,7 +63,7 @@ instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
-  eval eval Send{..} = undefined -- do
+  eval _ Send{..} = undefined -- do
     -- let sel = case sendSelector of
     --       Just sel -> eval sel >>= address
     --       Nothing  -> variable (name "call")
@@ -162,7 +161,7 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval eval Class{..} = undefined -- do
+  eval _ Class{..} = undefined -- do
     -- super <- traverse (eval >=> address) classSuperClass
     -- name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
     -- rvalBox =<< letrec' name (\addr ->
@@ -179,7 +178,7 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval eval (Module iden xs) = undefined -- do
+  eval _ (Module _ _) = undefined -- do
     -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     -- rvalBox =<< letrec' name (\addr ->
     --   makeNamespace name addr Nothing (traverse_ eval xs))
