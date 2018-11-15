@@ -49,9 +49,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "a.ts" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
           fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Heap.Position 0))
-          let closure' (Rval (Closure packageInfo moduleInfo name params _ _)) = Right (Closure packageInfo moduleInfo name params (Right ()) ())
-              closure' _                                                       = Left ()
-          closure' valueRef `shouldBe` Right (Closure (PackageInfo { packageName = "analysis", packageResolutions = mempty }) (ModuleInfo "a.ts") "baz" [] (Right ()) ())
+          valueRef `shouldBe` Rval Unit
         other -> expectationFailure (show other)
 
     it "imports functions" $ do
