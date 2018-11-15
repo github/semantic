@@ -7,17 +7,15 @@
       (Empty)
       (Empty)
       (Empty)
-      (Assignment
-        (Identifier)
-        (Empty)))
+      (Identifier)
+      (Empty))
     (RequiredParameter
       (Empty)
       (Empty)
       (Empty)
-      (Assignment
-        (Identifier)
-        (Empty)))
-    (Statements
+      (Identifier)
+      (Empty))
+    (StatementBlock
       (Function
         (Empty)
         (Empty)
@@ -26,17 +24,15 @@
           (Empty)
           (Empty)
           (Empty)
-          (Assignment
-            (Identifier)
-            (Empty)))
+          (Identifier)
+          (Empty))
         (RequiredParameter
           (Empty)
           (Empty)
           (Empty)
-          (Assignment
-            (Identifier)
-            (Empty)))
-        (Statements
+          (Identifier)
+          (Empty))
+        (StatementBlock
           (Call
             (MemberAccess
               (Identifier))

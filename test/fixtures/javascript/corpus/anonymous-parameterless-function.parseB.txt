@@ -3,6 +3,6 @@
     (Empty)
     (Empty)
     (Empty)
-    (Statements
+    (StatementBlock
       (Return
         (TextElement)))))
