@@ -1,20 +1,25 @@
 (Statements
   (Class
     (Identifier)
-    (Function
-      (Identifier)
-      (Identifier)
-      (Return
-        (Identifier))))
+    (Statements
+      (Function
+        (Identifier)
+        (Identifier)
+        (Statements
+          (Return
+            (Identifier))))))
   (Class
     (Identifier)
-    (NoOp
-      (Empty)))
+    (Statements
+      (NoOp
+        (Empty))))
   (Class
     (Identifier)
     (Identifier)
-    (Function
-      (Identifier)
-      (Identifier)
-      (Return
-        (Empty)))))
+    (Statements
+      (Function
+        (Identifier)
+        (Identifier)
+        (Statements
+          (Return
+            (Empty)))))))

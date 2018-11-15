@@ -3,11 +3,14 @@
     (Identifier)
     (Identifier)
     (Identifier)
-    (Identifier))
+    (Statements
+      (Identifier)))
   (Function
     (Identifier)
-    (Identifier))
+    (Statements
+      (Identifier)))
   (Function
     (Identifier)
     (Identifier)
-    (Identifier)))
+    (Statements
+      (Identifier))))

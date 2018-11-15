@@ -2,6 +2,7 @@
   (Function
     (Empty)
     (Identifier)
-    (Plus
-      (Identifier)
-      (Integer))))
+    (Statements
+      (Plus
+        (Identifier)
+        (Integer)))))

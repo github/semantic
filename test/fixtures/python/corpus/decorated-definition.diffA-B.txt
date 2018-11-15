@@ -4,51 +4,54 @@
     (Class
     { (Identifier)
     ->(Identifier) }
-      (Decorator
-        (Identifier)
-        (Statements)
+      (Statements
         (Decorator
-        { (Identifier)
-        ->(Identifier) }
-        {+(Identifier)+}
-        {-(Integer)-}
+          (Identifier)
+          (Statements)
           (Decorator
           { (Identifier)
           ->(Identifier) }
           {+(Identifier)+}
-          {-(Statements
-            {-(Integer)-}
-            {-(Integer)-})-}
+          {-(Integer)-}
             (Decorator
-              (Identifier)
-            {+(Statements
-              {+(Integer)+}
-              {+(Assignment
+            { (Identifier)
+            ->(Identifier) }
+            {+(Identifier)+}
+            {-(Statements
+              {-(Integer)-}
+              {-(Integer)-})-}
+              (Decorator
+                (Identifier)
+              {+(Statements
+                {+(Integer)+}
+                {+(Assignment
+                  {+(Identifier)+}
+                  {+(Boolean)+})+}
                 {+(Identifier)+}
-                {+(Boolean)+})+}
-              {+(Identifier)+}
-              {+(Identifier)+})+}
-            {-(Assignment
-              {-(Identifier)-}
-              {-(Boolean)-})-}
-            { (Decorator
-              {-(Identifier)-}
-              {-(Identifier)-}
-              {-(Decorator
+                {+(Identifier)+})+}
+              {-(Assignment
+                {-(Identifier)-}
+                {-(Boolean)-})-}
+              { (Decorator
                 {-(Identifier)-}
                 {-(Identifier)-}
                 {-(Decorator
                   {-(Identifier)-}
-                  {-(Statements
-                    {-(Integer)-}
-                    {-(Assignment
+                  {-(Identifier)-}
+                  {-(Decorator
+                    {-(Identifier)-}
+                    {-(Statements
+                      {-(Integer)-}
+                      {-(Assignment
+                        {-(Identifier)-}
+                        {-(Boolean)-})-}
                       {-(Identifier)-}
-                      {-(Boolean)-})-}
-                    {-(Identifier)-}
-                    {-(Identifier)-})-}
-                  {-(Function
-                    {-(Identifier)-}
-                    {-(Identifier)-})-})-})-})
-            ->(Function
-              {+(Identifier)+}
-              {+(Identifier)+}) })))))))
+                      {-(Identifier)-})-}
+                    {-(Function
+                      {-(Identifier)-}
+                      {-(Statements
+                        {-(Identifier)-})-})-})-})-})
+              ->(Function
+                {+(Identifier)+}
+                {+(Statements
+                  {+(Identifier)+})+}) }))))))))

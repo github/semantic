@@ -152,7 +152,7 @@ doLoad path shouldWrap = do
 -- TODO: autoload
 
 data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
-  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
+  deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, FreeVariables1, ToJSONFields1, Named1, Message1, NFData1)
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
@@ -168,8 +168,11 @@ instance Evaluatable Class where
     -- rvalBox =<< letrec' name (\addr ->
     --   makeNamespace name addr super (void (eval classBody)))
 
+instance Declarations1 Class where
+  liftDeclaredName declaredName = declaredName . classIdentifier
+
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
@@ -180,6 +183,9 @@ instance Evaluatable Module where
     -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
     -- rvalBox =<< letrec' name (\addr ->
     --   makeNamespace name addr Nothing (traverse_ eval xs))
+
+instance Declarations1 Module where
+  liftDeclaredName declaredName = declaredName . moduleIdentifier
 
 data LowPrecedenceAnd a = LowPrecedenceAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
