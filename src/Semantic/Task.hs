@@ -72,9 +72,7 @@ import           Data.Bool
 import           Data.ByteString.Builder
 import           Data.Coerce
 import           Data.Diff
-import           Data.Duration
 import qualified Data.Error as Error
-import           Data.Language (Language)
 import           Data.Location
 import           Data.Source (Source)
 import           Data.Sum
@@ -273,7 +271,7 @@ logError :: (Member Telemetry sig, Carrier sig m)
          -> m ()
 logError Config{..} level blob err = writeLog level (Error.formatError configLogPrintSource configIsTerminal blob err)
 
-data ParserCancelled = ParserTimedOut FilePath Language | AssignmentTimedOut FilePath Language
+data ParserCancelled = ParserTimedOut | AssignmentTimedOut
   deriving (Show, Typeable)
 
 instance Exception ParserCancelled
@@ -288,7 +286,7 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.tree_sitter_ast_parse" languageTag $ do
       config <- ask
       parseToAST (configTreeSitterParseTimeout config) language blob
-        >>= maybeM (throwError (SomeException (ParserTimedOut blobPath blobLanguage)))
+        >>= maybeM (throwError (SomeException ParserTimedOut))
 
   AssignmentParser    parser assignment -> runAssignment Assignment.assign    parser assignment
   DeterministicParser parser assignment -> runAssignment Deterministic.assign parser assignment
@@ -328,21 +326,20 @@ runParser blob@Blob{..} parser = case parser of
             writeLog Error "failed parsing" (("task", "parse") : blobFields)
             throwError (toException err)
 
-          -- TODO: Could give assignment a dedicated config for it's timeout.
-          res <- timeout (fromSeconds 3) . time "parse.assign" languageTag $
+          res <- timeout (configAssignmentTimeout config) . time "parse.assign" languageTag $
             case assign blobSource assignment ast of
               Left err -> do
                 writeStat (increment "parse.assign_errors" languageTag)
                 logError config Error blob err (("task", "assign") : blobFields)
                 throwError (toException err)
               Right term -> do
-                for_ (errors term) $ \ err -> case Error.errorActual err of
+                for_ (zip (errors term) [(0::Integer)..]) $ \ (err, i) -> case Error.errorActual err of
                   Just "ParseError" -> do
-                    writeStat (increment "parse.parse_errors" languageTag)
+                    when (i == 0) $ writeStat (increment "parse.parse_errors" languageTag)
                     logError config Warning blob err (("task", "parse") : blobFields)
                     when (optionsFailOnParseError (configOptions config)) $ throwError (toException err)
                   _ -> do
-                    writeStat (increment "parse.assign_warnings" languageTag)
+                    when (i == 0) $ writeStat (increment "parse.assign_warnings" languageTag)
                     logError config Warning blob err (("task", "assign") : blobFields)
                     when (optionsFailOnWarning (configOptions config)) $ throwError (toException err)
                 term <$ writeStat (count "parse.nodes" (length term) languageTag)
@@ -351,4 +348,4 @@ runParser blob@Blob{..} parser = case parser of
             Nothing -> do
               writeStat (increment "assign.assign_timeouts" languageTag)
               writeLog Error "assignment timeout" (("task", "assign") : blobFields)
-              throwError (SomeException (AssignmentTimedOut blobPath blobLanguage))
+              throwError (SomeException AssignmentTimedOut)

@@ -27,8 +27,9 @@ library
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
+                     , Analysis.TOCSummary
                      , Analysis.Decorator
-                     , Analysis.Declaration
+                     , Analysis.HasTextElement
                      , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
@@ -217,6 +218,8 @@ library
                      , Serializing.DOT
                      , Serializing.Format
                      , Serializing.SExpression
+                     , Tags.Taggable
+                     , Tags.Tagging
                      -- Custom Prelude
                      , Prologue
   build-depends:       base >= 4.8 && < 5
@@ -360,6 +363,7 @@ test-suite test
                      , Semantic.CLI.Spec
                      , Semantic.IO.Spec
                      , Semantic.Stat.Spec
+                     , Tags.Spec
                      , SpecHelpers
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
