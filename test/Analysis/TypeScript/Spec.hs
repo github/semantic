@@ -58,8 +58,8 @@ spec config = parallel $ do
       (_, res) <- evaluate ["main4.ts", "foo.ts"]
       case ModuleTable.lookup "main4.ts" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
-          fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () $ ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 0))
-          valueRef `shouldBe` Rval (String $ pack "this is the foo function")
+          fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import ()  . ScopeGraph.EPath ScopeGraph.Import () $ ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 0))
+          valueRef `shouldBe` Rval (String $ pack "\"this is the foo function\"")
         other -> expectationFailure (show other)
 
     it "side effect only imports dont expose exports" $ do
