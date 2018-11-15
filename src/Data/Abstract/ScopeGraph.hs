@@ -89,10 +89,11 @@ pathDeclaration :: Path scope -> Declaration
 pathDeclaration (DPath d _)     = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
 
-pathDeclarationScope :: Path scope -> Maybe scope
-pathDeclarationScope (EPath _ scope (DPath d _)) = Just scope
-pathDeclarationScope (EPath _ _ p) = pathDeclarationScope p
-pathDeclarationScope _ = Nothing
+-- TODO: Store the current scope closer _in_ the DPath?
+pathDeclarationScope :: Maybe scope -> Path scope -> Maybe scope
+pathDeclarationScope _ (EPath _ scope (DPath d _)) = Just scope
+pathDeclarationScope currentScope (EPath _ _ p) = pathDeclarationScope currentScope p
+pathDeclarationScope currentScope (DPath d _) = currentScope
 
 -- TODO: Possibly return in Maybe since we can have Hole paths
 pathPosition :: Path scope -> Position

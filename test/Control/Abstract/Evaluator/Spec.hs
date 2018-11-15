@@ -22,6 +22,7 @@ import Data.Abstract.Evaluatable
 import qualified Control.Abstract.Heap as Heap
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.Text (pack)
+import System.IO.Unsafe (unsafePerformIO)
 
 spec :: Spec
 spec = parallel $ do
@@ -31,13 +32,24 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (_, (_, expected)) <- evaluate $ do
-      valueRef <- function "identity" [ SpecEff (pure $ Rval (Value.Symbol (pack "x"))) ]
-        (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x"))))
-      identity <- value valueRef
-      val <- pure (integer 123)
-      -- TODO Pass a unit slot to call at the self position
-      call identity [val]
-    expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
+      withLexicalScopeAndFrame $ do
+        declare (ScopeGraph.Declaration "identity") emptySpan Nothing
+        valueRef <- function "identity" [ SpecEff (do
+            declare (ScopeGraph.Declaration "x") emptySpan Nothing
+            pure $ Rval (Value.Symbol $ pack "x"))
+            , SpecEff (do
+            declare (ScopeGraph.Declaration "y") emptySpan Nothing
+            pure $ Rval (Value.Symbol $ pack "y"))
+          ]
+          (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "y"))))
+        identity <- value valueRef
+        val <- pure (integer 123)
+        -- TODO Pass a unit slot to call at the self position
+        call identity [val, val]
+    slotPosition expected `shouldBe` Just 1
+    where
+      slotPosition (Right (LvalMember (Address _ Position{..}))) = Just unPosition
+      slotPosition _ = Nothing
 
 evaluate
   = runM
@@ -95,4 +107,8 @@ instance Eq SpecEff where _ == _ = True
 instance Show SpecEff where show _ = "_"
 instance FreeVariables SpecEff where freeVariables _ = lowerBound
 
-instance Declarations SpecEff where declaredName specEff = lowerBound
+instance Declarations SpecEff where
+  declaredName eff =
+    case unsafePerformIO (evaluate $ runSpecEff eff) of
+      (_, (_, Right (Rval (Value.Symbol text)))) -> Just (SpecHelpers.name text)
+      _ -> error "declaredName for SpecEff should return an RVal"

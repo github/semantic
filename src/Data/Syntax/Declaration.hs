@@ -35,6 +35,7 @@ instance Evaluatable Function where
     -- lookupPathError because we haven't declared it yet, but we can't declare
     -- it without the Span of the term representing the functionName.
     -- _ <- eval functionName
+    -- TODO: Should we declare the name of the function within `function`?
     span <- ask @Span
     declare (Declaration name) span Nothing
     function name functionParameters functionBody
