@@ -16,6 +16,7 @@ module Data.Abstract.Heap
   , pathDeclaration
   , lookupFrameAddress
   , lookupDeclaration
+  , isHeapEmpty
   ) where
 
 import Data.Abstract.Live
@@ -103,6 +104,13 @@ fillFrame address slots heap =
 -- | The number of frames in the `Heap`.
 heapSize :: Heap scope address value -> Int
 heapSize = Map.size . heap
+
+isHeapEmpty :: (Eq address, Eq value) => Heap scope address value -> Bool
+isHeapEmpty h@Heap{..} = isJust currentFrame &&
+                         (heapSize h) == 1 &&
+                         (toEmptyFrame <$> Map.elems heap) == [ Frame () mempty mempty ]
+  where
+    toEmptyFrame Frame{..} = Frame () (Map.mapKeysMonotonic (const ()) <$> links) slots
 
 -- -- | A map of addresses onto cells holding their values.
 -- newtype Heap address address value = Heap { unHeap :: Monoidal.Map address (Set value) }
