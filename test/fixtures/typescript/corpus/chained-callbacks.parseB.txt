@@ -10,10 +10,9 @@
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (Statements
+        (Identifier)
+        (Empty))
+      (StatementBlock
         (Return
           (MemberAccess
             (Identifier)))))

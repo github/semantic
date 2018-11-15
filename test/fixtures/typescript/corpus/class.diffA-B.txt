@@ -22,10 +22,9 @@
         {+(Empty)+}
         {+(Empty)+}
         {+(Empty)+}
-        {+(Assignment
-          {+(Identifier)+}
-          {+(Empty)+})+})+}
-      {+(Statements
+        {+(Identifier)+}
+        {+(Empty)+})+}
+      {+(StatementBlock
         {+(Return
           {+(Identifier)+})+})+})+}
     {+(Method
@@ -39,10 +38,9 @@
         {+(Empty)+}
         {+(Empty)+}
         {+(Empty)+}
-        {+(Assignment
-          {+(Identifier)+}
-          {+(Empty)+})+})+}
-      {+(Statements
+        {+(Identifier)+}
+        {+(Empty)+})+}
+      {+(StatementBlock
         {+(Return
           {+(Identifier)+})+})+})+}
     {+(Method
@@ -56,10 +54,9 @@
         {+(Empty)+}
         {+(Empty)+}
         {+(Empty)+}
-        {+(Assignment
-          {+(Identifier)+}
-          {+(Empty)+})+})+}
-      {+(Statements
+        {+(Identifier)+}
+        {+(Empty)+})+}
+      {+(StatementBlock
         {+(Return
           {+(Identifier)+})+})+})+}
     {-(PublicFieldDefinition
@@ -79,10 +76,9 @@
         {-(Empty)-}
         {-(Empty)-}
         {-(Empty)-}
-        {-(Assignment
-          {-(Identifier)-}
-          {-(Empty)-})-})-}
-      {-(Statements
+        {-(Identifier)-}
+        {-(Empty)-})-}
+      {-(StatementBlock
         {-(Return
           {-(Identifier)-})-})-})-}
     {-(Method
@@ -96,10 +92,9 @@
         {-(Empty)-}
         {-(Empty)-}
         {-(Empty)-}
-        {-(Assignment
-          {-(Identifier)-}
-          {-(Empty)-})-})-}
-      {-(Statements
+        {-(Identifier)-}
+        {-(Empty)-})-}
+      {-(StatementBlock
         {-(Return
           {-(Identifier)-})-})-})-}
     {-(Method
@@ -113,9 +108,8 @@
         {-(Empty)-}
         {-(Empty)-}
         {-(Empty)-}
-        {-(Assignment
-          {-(Identifier)-}
-          {-(Empty)-})-})-}
-      {-(Statements
+        {-(Identifier)-}
+        {-(Empty)-})-}
+      {-(StatementBlock
         {-(Return
           {-(Identifier)-})-})-})-})))

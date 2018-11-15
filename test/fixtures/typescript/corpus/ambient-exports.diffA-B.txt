@@ -12,18 +12,16 @@
       {+(Empty)+}
       {+(Annotation
         {+(PredefinedType)+})+}
-      {+(Assignment
-        {+(Identifier)+}
-        {+(Empty)+})+})+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
     {+(RequiredParameter
       {+(Empty)+}
       {+(Empty)+}
       {+(Annotation
         {+(PredefinedType)+})+}
-      {+(Assignment
-        {+(Identifier)+}
-        {+(Empty)+})+})+}
-    {+(Statements
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(StatementBlock
       {+(Return
         {+(Hash
           {+(ShorthandPropertyIdentifier)+}
