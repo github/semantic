@@ -59,7 +59,7 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Resumable (BaseError (HeapError address))) sig
           , Member (Resumable (BaseError (AddressError address value))) sig
           , Member (Resumable (BaseError (UnspecializedError value))) sig
-          , Member (Resumable (BaseError EvalError)) sig
+          , Member (Resumable (BaseError (EvalError address value))) sig
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (Heap address address value)) sig
           , Member Trace sig
@@ -133,19 +133,20 @@ instance HasPrelude 'JavaScript where
 -- Effects
 
 -- | The type of error thrown when failing to evaluate a term.
-data EvalError return where
-  NoNameError :: EvalError Name
+data EvalError address value return where
+  NoNameError :: EvalError address value Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: Text -> EvalError Integer
-  FloatFormatError    :: Text -> EvalError Scientific
-  RationalFormatError :: Text -> EvalError Rational
-  DefaultExportError  :: EvalError ()
-  ExportError         :: ModulePath -> Name -> EvalError ()
+  IntegerFormatError  :: Text -> EvalError address value Integer
+  FloatFormatError    :: Text -> EvalError address value Scientific
+  RationalFormatError :: Text -> EvalError address value Rational
+  DefaultExportError  :: EvalError address value ()
+  ExportError         :: ModulePath -> Name -> EvalError address value ()
+  AssignmentRvalError :: value -> EvalError address value (ValueRef address value)
 
-deriving instance Eq (EvalError return)
-deriving instance Show (EvalError return)
+deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
+deriving instance (Show address, Show value) => Show (EvalError address value return)
 
-instance NFData1 EvalError where
+instance NFData1 (EvalError address value) where
   liftRnf _ x = case x of
     NoNameError -> ()
     IntegerFormatError i -> rnf i
@@ -154,10 +155,10 @@ instance NFData1 EvalError where
     DefaultExportError -> ()
     ExportError p n -> rnf p `seq` rnf n
 
-instance NFData return => NFData (EvalError return) where
+instance (NFData address, NFData value, NFData return) => NFData (EvalError address value return) where
   rnf = liftRnf rnf
 
-instance Eq1 EvalError where
+instance Eq1 (EvalError address value) where
   liftEq _ NoNameError        NoNameError                  = True
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
@@ -166,21 +167,21 @@ instance Eq1 EvalError where
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
   liftEq _ _ _                                             = False
 
-instance Show1 EvalError where
+instance (Show address, Show value) => Show1 (EvalError address value) where
   liftShowsPrec _ _ = showsPrec
 
-runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError EvalError)) a)
+runEvalError :: (Carrier sig m, Effect sig) => Evaluator term address value (ResumableC (BaseError (EvalError address value)) (Eff m)) a -> Evaluator term address value m (Either (SomeError (BaseError (EvalError address value))) a)
 runEvalError = raiseHandler runResumable
 
-runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError EvalError) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError EvalError) (Eff m)) a -> Evaluator term address value m a
+runEvalErrorWith :: Carrier sig m => (forall resume . (BaseError (EvalError address value)) resume -> Evaluator term address value m resume) -> Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff m)) a -> Evaluator term address value m a
 runEvalErrorWith f = raiseHandler $ runResumableWith (runEvaluator . f)
 
 throwEvalError :: ( Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
-                  , Member (Resumable (BaseError EvalError)) sig
+                  , Member (Resumable (BaseError (EvalError address value))) sig
                   , Carrier sig m
                   )
-               => EvalError resume
+               => EvalError address value resume
                -> Evaluator term address value m resume
 throwEvalError = throwBaseError
 
