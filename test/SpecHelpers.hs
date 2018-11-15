@@ -114,7 +114,7 @@ type TestEvaluatingErrors term
   = '[ BaseError (AddressError Precise (Val term))
      , BaseError (ValueError term Precise)
      , BaseError ResolutionError
-     , BaseError EvalError
+     , BaseError (EvalError Precise (Val term))
      , BaseError (HeapError Precise)
      , BaseError (ScopeError Precise)
      , BaseError (UnspecializedError (Val term))
