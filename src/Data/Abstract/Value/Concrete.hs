@@ -96,12 +96,9 @@ instance ( FreeVariables term
       putDeclarationScope (Declaration name) scope
 
       names <- withScope scope . for params $ \param -> do
-        name <- maybeM (throwEvalError NoNameError) (declaredName param)
-
-        -- Eval param in order to update (State Span) to the Span of the param.
-        span <- (runFunction (Evaluator . eval) (Evaluator (eval param))) >> get @Span
-
-        name <$ declare (Declaration name) span Nothing
+        -- Leave it up to the Evaluatable instance of param to declare the name
+        (runFunction (Evaluator . eval) (Evaluator (eval param)))
+        maybeM (throwEvalError NoNameError) (declaredName param)
 
       address <- lookupDeclaration @(Value term address) (Declaration name)
       let closure = Closure packageInfo moduleInfo name names (Right body) scope
@@ -132,7 +129,7 @@ instance ( FreeVariables term
             declarationFrame <- lookupDeclarationFrame (Declaration name)
             let frameEdges = Map.singleton Lexical (Map.singleton declarationScope declarationFrame)
             frameAddress <- newFrame scope frameEdges
-            withFrame frameAddress $ do
+            withScopeAndFrame frameAddress $ do
               for_ (zip names params) $ \(name, param) -> do
                 addr <- lookupDeclaration (Declaration name)
                 assign addr param
