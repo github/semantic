@@ -29,7 +29,7 @@ instance ( Member (Allocator address) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
-         , Member (Resumable (BaseError EvalError)) sig
+         , Member (Resumable (BaseError (EvalError address Abstract))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (AddressError address Abstract))) sig

@@ -66,7 +66,7 @@ instance ( FreeVariables term
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
-         , Member (Resumable (BaseError EvalError)) sig
+         , Member (Resumable (BaseError (EvalError address (Value term address)))) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
          , Member (Resumable (BaseError (HeapError address))) sig
          , Member (Resumable (BaseError (ScopeError address))) sig

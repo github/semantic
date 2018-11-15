@@ -120,7 +120,7 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError (HeapError address))) sig
             , Member (Resumable (BaseError (ScopeError address))) sig
             , Member (Resumable (BaseError (UnspecializedError value))) sig
-            , Member (Resumable (BaseError EvalError)) sig
+            , Member (Resumable (BaseError (EvalError address value))) sig
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig
             , Member (State (ScopeGraph address)) sig

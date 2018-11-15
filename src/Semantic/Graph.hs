@@ -348,8 +348,10 @@ resumingLoadError= runLoadErrorWith (\ baseError -> traceError "LoadError" baseE
 resumingEvalError :: ( Carrier sig m
                      , Member Fresh sig
                      , Member Trace sig
+                     , Show value
+                     , Show address
                      )
-                  => Evaluator term address value (ResumableWithC (BaseError EvalError) (Eff
+                  => Evaluator term address value (ResumableWithC (BaseError (EvalError address value)) (Eff
                                                   m)) a
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
