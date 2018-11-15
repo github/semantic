@@ -22,7 +22,6 @@ module Control.Abstract.Modules
 import Control.Abstract.Evaluator
 import Control.Effect.Carrier
 import Control.Effect.Sum
-import Data.Abstract.Environment
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable

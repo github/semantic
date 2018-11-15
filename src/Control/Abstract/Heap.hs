@@ -53,7 +53,6 @@ import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
 import Data.Span (Span)
-import qualified Data.Set as Set
 import qualified Data.Map.Strict as Map
 import Prologue
 import Data.Abstract.Ref
@@ -65,7 +64,6 @@ withScopeAndFrame :: forall term address value m a sig. (
                     , Member (Reader ModuleInfo) sig
                     , Member (Reader Span) sig
                     , Member (Resumable (BaseError (HeapError address))) sig
-                    , Member (Resumable (BaseError (ScopeError address))) sig
                     , Member (State (Heap address address value)) sig
                     , Member (State (ScopeGraph address)) sig
                     , Carrier sig m
@@ -114,7 +112,6 @@ scopeLookup :: forall address value sig m term. (
               , Member (Reader Span) sig
               , Member (Resumable (BaseError (HeapError address))) sig
               , Member (State (Heap address address value)) sig
-              , Member (State (ScopeGraph address)) sig
               , Carrier sig m
               )
             => address
@@ -146,15 +143,10 @@ putCurrentFrame address = modify @(Heap address address value) (\heap -> heap { 
 -- | Inserts a new frame into the heap with the given scope and links.
 newFrame :: forall address value sig m term. (
             Member (State (Heap address address value)) sig
-          , Member (Reader ModuleInfo) sig
-          , Member (Reader Span) sig
           , Ord address
           , Member (Allocator address) sig
-          , Member (State (ScopeGraph address)) sig
           , Member Fresh sig
           , Carrier sig m
-          , Show address
-          , Show value
           )
          => address
          -> Map EdgeLabel (Map address address)
@@ -167,13 +159,8 @@ newFrame scope links = do
 
 -- | Evaluates the action within the frame of the given frame address.
 withFrame :: forall term address value sig m a. (
-             Member (Resumable (BaseError (HeapError address))) sig
-           , Member (Reader ModuleInfo) sig
-           , Member (Reader Span) sig
            , Member (State (Heap address address value)) sig
            , Carrier sig m
-           , Show value
-           , Show address
            )
           => address
           -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
@@ -233,7 +220,6 @@ withChildFrame :: ( Member (Allocator address) sig
                   , Member (Reader Span) sig
                   , Member (Resumable (BaseError (HeapError address))) sig
                   , Member (Resumable (BaseError (ScopeError address))) sig
-                  , Member (Deref value) sig
                   , Ord address
                   , Carrier sig m
                   , Show address
@@ -264,12 +250,10 @@ deref slot@Address{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError 
 
 putSlotDeclarationScope :: forall address value sig m term. ( Member (State (Heap address address value)) sig
                            , Member (State (ScopeGraph address)) sig
-                           , Member (Resumable (BaseError (ScopeError address))) sig
                            , Member (Resumable (BaseError (HeapError address))) sig
                            , Member (Reader ModuleInfo) sig
                            , Member (Reader Span) sig
                            , Ord address
-                           , Show address
                            , Carrier sig m
                            )
                         => Address address
@@ -315,11 +299,9 @@ lookupDeclarationFrame decl = do
 
 -- | Follow a path through the heap and return the frame address associated with the declaration.
 lookupFrameAddress :: ( Member (State (Heap address address value)) sig
-                     , Member (State (ScopeGraph address)) sig
                      , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
                      , Member (Resumable (BaseError (HeapError address))) sig
-                     , Member (Resumable (BaseError (ScopeError address))) sig
                      , Ord address
                      , Carrier sig m
                      )
@@ -331,7 +313,7 @@ lookupFrameAddress path = do
   where
     go path address = case path of
       Hole -> throwHeapError (LookupLinkError path)
-      DPath decl position -> pure address
+      DPath _ _ -> pure address
       p@(EPath edge nextScopeAddress path') -> do
         linkMap <- frameLinks address
         let frameAddress = do
@@ -353,14 +335,11 @@ frameLinks address = maybeM (throwHeapError $ LookupLinksError address) . Heap.f
 
 
 bindFrames :: ( Ord address
-           , Member (Reader ModuleInfo) sig
-           , Member (Reader Span) sig
-           , Member (Resumable (BaseError (ScopeError address))) sig
-           , Member (State (Heap address address value)) sig
-           , Carrier sig m
-           )
-        => Heap address address value
-        -> Evaluator term address value m ()
+              , Member (State (Heap address address value)) sig
+              , Carrier sig m
+              )
+           => Heap address address value
+           -> Evaluator term address value m ()
 bindFrames oldHeap = do
   currentHeap <- get
   let newHeap = Heap.heap oldHeap <> Heap.heap currentHeap
@@ -403,29 +382,30 @@ assign addr value = do
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: ( Member (State (Heap address address value)) sig
-      , Ord address
-      , ValueRoots address value
-      , Carrier sig m
-      )
-   => Live address                       -- ^ The set of addresses to consider rooted.
+-- gc :: ( Member (State (Heap address address value)) sig
+--       , Ord address
+--       , ValueRoots address value
+--       , Carrier sig m
+--       )
+--    => Live address                       -- ^ The set of addresses to consider rooted.
+--    -> Evaluator term address value m ()
+gc :: Live address                       -- ^ The set of addresses to consider rooted.
    -> Evaluator term address value m ()
-gc roots =
+-- gc roots =
+gc _ =
   -- TODO: Implement frame garbage collection
   undefined
   -- modifyHeap (heapRestrict <*> reachable roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
-reachable :: ( Ord address
-             , ValueRoots address value
-             )
+reachable :: Ord address
           => Live address       -- ^ The set of root addresses.
           -> Heap address address value -- ^ The heap to trace addresses through.
           -> Live address       -- ^ The set of addresses reachable from the root set.
-reachable roots heap = go mempty roots
+reachable roots _ = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
-          Just (a, as) -> undefined -- go (liveInsert a seen) $ case heapLookupAll a heap of
+          Just (_, _) -> undefined -- go (liveInsert a seen) $ case heapLookupAll a heap of
             -- Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
             -- _           -> seen
 
@@ -472,6 +452,7 @@ instance Eq address => Eq1 (HeapError address) where
   liftEq _ (LookupLinksError a) (LookupLinksError b) = a == b
   liftEq _ (LookupLinkError a) (LookupLinkError b) = a == b
   liftEq _ (LookupFrameError a) (LookupFrameError b) = a == b
+  liftEq _ _ _ = False
 
 throwHeapError  :: ( Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Reader ModuleInfo) sig
@@ -487,7 +468,7 @@ runHeapError :: (Carrier sig m, Effect sig)
                 -> Evaluator term address value m (Either (SomeError (BaseError (HeapError address))) a)
 runHeapError = raiseHandler runResumable
 
-runHeapErrorWith :: (Carrier sig m, Effect sig)
+runHeapErrorWith :: Carrier sig m
                  => (forall resume. (BaseError (HeapError address)) resume -> Evaluator term address value m resume)
                  -> Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
                  -> Evaluator term address value m a
