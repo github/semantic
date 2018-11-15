@@ -73,7 +73,7 @@ spec config = parallel $ do
     it "side effect only imports" $ do
       (_, res) <- evaluate ["main2.ts", "a.ts", "foo.ts"]
       case ModuleTable.lookup "main2.ts" <$> res of
-        Right (Just (Module _ (_, (heap, _)) :| [])) -> heap `shouldBe` lowerBound
+        Right (Just (Module _ (_, (heap, _)) :| [])) -> heap `shouldSatisfy` Heap.isHeapEmpty
         other -> expectationFailure (show other)
 
     it "fails exporting symbols not defined in the module" $ do
