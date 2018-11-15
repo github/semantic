@@ -86,8 +86,9 @@ deriving instance Functor Path
 
 -- Returns the declaration of a path.
 pathDeclaration :: Path scope -> Declaration
-pathDeclaration (DPath d _)     = d
+pathDeclaration (DPath d _)   = d
 pathDeclaration (EPath _ _ p) = pathDeclaration p
+pathDeclaration Hole          = undefined
 
 -- TODO: Store the current scope closer _in_ the DPath?
 pathDeclarationScope :: Maybe scope -> Path scope -> Maybe scope
