@@ -7,6 +7,7 @@ module Control.Abstract.Heap
 , Live
 , getHeap
 , putHeap
+, putSlotDeclarationScope
 , alloc
 , lookupDeclaration
 , lookupDeclarationFrame
@@ -44,7 +45,7 @@ import Control.Applicative (Alternative)
 import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
-import Data.Abstract.ScopeGraph (Path(..))
+import Data.Abstract.ScopeGraph (Path(..), putDeclarationScopeAtPosition)
 import Data.Abstract.Heap (Heap, Position(..))
 import Control.Abstract.ScopeGraph hiding (ScopeError(..))
 import Control.Abstract.ScopeGraph (ScopeError)
@@ -106,6 +107,7 @@ withLexicalScopeAndFrame action = do
   frame <- newFrame scope frameEdges
   withScopeAndFrame frame action
 
+-- | Lookup a scope address for a given frame address.
 scopeLookup :: forall address value sig m term. (
                 Ord address
               , Member (Reader ModuleInfo) sig
@@ -259,6 +261,23 @@ deref :: ( Member (Deref value) sig
       -> Evaluator term address value m value
 -- TODO: THIS IS WRONG we need to call Heap.lookup
 deref slot@Address{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError (UninitializedAddress frameAddress))
+
+putSlotDeclarationScope :: forall address value sig m term. ( Member (State (Heap address address value)) sig
+                           , Member (State (ScopeGraph address)) sig
+                           , Member (Resumable (BaseError (ScopeError address))) sig
+                           , Member (Resumable (BaseError (HeapError address))) sig
+                           , Member (Reader ModuleInfo) sig
+                           , Member (Reader Span) sig
+                           , Ord address
+                           , Show address
+                           , Carrier sig m
+                           )
+                        => Address address
+                        -> Maybe address
+                        -> Evaluator term address value m ()
+putSlotDeclarationScope Address{..} assocScope = do
+  scopeAddress <- scopeLookup frameAddress
+  modify @(ScopeGraph address) (putDeclarationScopeAtPosition scopeAddress position assocScope)
 
 
 lookupDeclaration :: forall value address term sig m. ( Member (State (Heap address address value)) sig
