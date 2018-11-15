@@ -74,7 +74,7 @@ newtype SpecEff = SpecEff
                  (Eff (ErrorC (Return Precise Val)
                  (Eff (AllocatorC Precise
                  (Eff (DerefC Precise Val
-                 (Eff (ResumableC (BaseError EvalError)
+                 (Eff (ResumableC (BaseError (EvalError Precise Val))
                  (Eff (ResumableC (BaseError (AddressError Precise Val))
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
                  (Eff (ResumableC (BaseError (HeapError Precise))

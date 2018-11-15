@@ -15,6 +15,9 @@ import SpecHelpers
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap       as Heap
 import Data.Text (pack)
+import qualified Language.TypeScript.Assignment as TypeScript
+import Data.Quieterm
+import Data.Location
 
 spec :: TaskConfig -> Spec
 spec config = parallel $ do
@@ -77,7 +80,7 @@ spec config = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       (_, res) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
-      res `shouldBe` Left (SomeError (inject @(BaseError EvalError) (BaseError (ModuleInfo "foo.ts") emptySpan (ExportError "foo.ts" (name "pip")))))
+      res `shouldBe` Left (SomeError (inject @(BaseError (EvalError Precise (Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "foo.ts") emptySpan (ExportError "foo.ts" (name "pip")))))
 
     it "evaluates early return statements" $ do
       (_, res) <- evaluate ["early-return.ts"]
