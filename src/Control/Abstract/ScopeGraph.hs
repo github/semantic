@@ -38,11 +38,9 @@ import           Control.Abstract.Evaluator hiding (Local)
 import           Data.Abstract.Module
 import           Data.Abstract.BaseError
 import           Control.Effect.Carrier
-import           Control.Effect.Sum
 import           Data.Abstract.Name hiding (name)
 import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Address(..), Scope(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import qualified Data.Map.Strict as Map
 import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
@@ -93,9 +91,6 @@ insertEdge label target = modify (ScopeGraph.insertEdge label target)
 
 -- | Bind all of the scopes from a 'ScopeGraph'.
 bindAll :: ( Ord address
-           , Member (Reader ModuleInfo) sig
-           , Member (Reader Span) sig
-           , Member (Resumable (BaseError (ScopeError address))) sig
            , Member (State (ScopeGraph address)) sig
            , Carrier sig m
            )
@@ -152,13 +147,10 @@ insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) s
                       -> Scope address
                       -> Evaluator term address value m ()
 insertImportReference ref decl g scopeAddress scope = do
-  newScope <- maybeM (throwScopeError LookupScopeError) (ScopeGraph.insertImportReference ref decl g scopeAddress scope)
+  newScope <- maybeM (throwScopeError LookupScopeError) (ScopeGraph.insertImportReference ref decl g scope)
   insertScope scopeAddress newScope
 
-insertScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
-               , Member (Reader ModuleInfo) sig
-               , Member (Reader Span) sig
-               , Member (State (ScopeGraph address)) sig
+insertScope :: ( Member (State (ScopeGraph address)) sig
                , Carrier sig m
                , Ord address
                )
@@ -210,7 +202,7 @@ withScope scope action = do
       _ -> modify (\g -> g { ScopeGraph.currentScope = prevScope })
     pure value
 
-putCurrentScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => address -> Evaluator term address value m ()
+putCurrentScope :: (Member (State (ScopeGraph address)) sig, Carrier sig m) => address -> Evaluator term address value m ()
 putCurrentScope scope = modify (\g -> g { ScopeGraph.currentScope = Just scope })
 
 throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) sig
@@ -232,7 +224,7 @@ data ScopeError address return where
 deriving instance Eq (ScopeError address return)
 deriving instance Show (ScopeError address return)
 instance Show address => Show1 (ScopeError address) where liftShowsPrec _ _ = showsPrec
-instance Eq address => Eq1 (ScopeError address) where
+instance Eq1 (ScopeError address) where
   liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
   liftEq _ CurrentScopeError CurrentScopeError = True
   liftEq _ LookupScopeError LookupScopeError = True

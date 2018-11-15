@@ -11,7 +11,6 @@ module Data.Abstract.Heap
   , initFrame
   , newFrame
   , heapSize
-  , currentFrame
   , Position(..)
   , pathPosition
   , pathDeclaration
@@ -23,8 +22,6 @@ import Data.Abstract.Live
 import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Address(..), ScopeGraph, pathPosition, pathDeclaration, lookupScopePath)
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap as IntMap
-import qualified Data.Map.Monoidal as Monoidal
-import Data.Semigroup.Reducer
 import Prologue
 import Prelude hiding (lookup)
 
@@ -67,14 +64,6 @@ setSlot Address{..} value h@Heap{} =
         h { heap = Map.insert frameAddress (frame { slots = IntMap.insert (unPosition position) value slotMap }) (heap h) }
       Nothing -> h
 
-lookup :: (Ord address, Ord scope) => address -> Path scope -> Declaration -> Heap scope address value -> Maybe scope
-lookup address (DPath d _) declaration heap = guard (d == declaration) >> scopeLookup address heap
-lookup address (EPath label scope path) declaration heap = do
-    frame <- frameLookup address heap
-    scopeMap <- Map.lookup label (links frame)
-    nextAddress <- Map.lookup scope scopeMap
-    lookup nextAddress path declaration heap
-
 lookupDeclaration :: (Ord address, Show address) => Declaration -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
 lookupDeclaration Declaration{..} scopeGraph heap = do
   path <- lookupScopePath unDeclaration scopeGraph
@@ -87,13 +76,14 @@ lookupFrameAddress path h@Heap{..} = do
   go path frameAddress
   where
     go path address = case path of
-      DPath decl position -> pure address
+      DPath _ _ -> pure address
       EPath edge nextScopeAddress path' -> do
         linkMap <- frameLinks address h
         frameAddress <- do
           scopeMap <- Map.lookup edge linkMap
           Map.lookup nextScopeAddress scopeMap
         go path' frameAddress
+      Hole -> Nothing
 
 newFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope address) -> Heap scope address value -> Heap scope address value
 newFrame scope address links = insertFrame address (Frame scope links mempty)
@@ -109,9 +99,6 @@ fillFrame address slots heap =
   case frameLookup address heap of
     Just frame -> insertFrame address (frame { slots = slots }) heap
     Nothing    -> heap
-
-deleteFrame :: Ord address => address -> Heap scope address value -> Heap scope address value
-deleteFrame address h@Heap{..} = h { heap = Map.delete address heap }
 
 -- | The number of frames in the `Heap`.
 heapSize :: Heap scope address value -> Int

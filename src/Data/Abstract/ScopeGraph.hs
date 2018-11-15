@@ -168,7 +168,7 @@ insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} scope = do
               -- Return the first path to the declaration through the scopes.
               getFirst (foldMap (First . (\scope -> go scope (path . EPath edge scope))) scopes)
 
-lookupScopePath :: (Ord scopeAddress, Show scopeAddress) => Name -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+lookupScopePath :: Ord scopeAddress => Name -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupScopePath declaration g@ScopeGraph{..} = do
   currentAddress <- currentScope
   go currentAddress id

@@ -4,7 +4,6 @@ module Data.Abstract.Ref
   , Ref (..)
   ) where
 
-import Data.Abstract.Name
 import Data.Abstract.ScopeGraph (Address(..))
 import Data.Bifunctor
 
@@ -16,8 +15,8 @@ data ValueRef address value where
   LvalMember :: Address address -> ValueRef address value
 
 instance Bifunctor ValueRef where
-  bimap f g (Rval v) = Rval (g v)
-  bimap f g (LvalMember slot@Address{..}) = LvalMember (slot { frameAddress = f frameAddress })
+  bimap _ g (Rval v) = Rval (g v)
+  bimap f _ (LvalMember slot@Address{..}) = LvalMember (slot { frameAddress = f frameAddress })
 
 deriving instance (Eq value, Eq address) => Eq (ValueRef address value)
 deriving instance (Ord value, Ord address) => Ord (ValueRef address value)
