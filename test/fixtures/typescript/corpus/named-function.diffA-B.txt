@@ -8,17 +8,15 @@
     {-(Empty)-}
     {-(Empty)-}
     {-(Empty)-}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Empty)-})-})-}
+    {-(Identifier)-}
+    {-(Empty)-})-}
   {-(RequiredParameter
     {-(Empty)-}
     {-(Empty)-}
     {-(Empty)-}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Empty)-})-})-}
-    (Statements
+    {-(Identifier)-}
+    {-(Empty)-})-}
+    (StatementBlock
     {+(Return
       {+(Boolean)+})+}
     {-(Identifier)-}))
