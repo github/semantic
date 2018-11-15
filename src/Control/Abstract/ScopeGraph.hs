@@ -187,7 +187,10 @@ lookupDeclarationScope :: ( Member (Resumable (BaseError (ScopeError address))) 
                 , Ord address
                 , Show address
                 ) => Declaration -> Evaluator term address value m address
-lookupDeclarationScope decl = maybeM (throwScopeError $ LookupDeclarationScopeError decl) . ScopeGraph.pathDeclarationScope =<< lookupScopePath decl
+lookupDeclarationScope decl = do
+  path <- lookupScopePath decl
+  currentScope' <- currentScope
+  maybeM (throwScopeError $ LookupDeclarationScopeError decl) (ScopeGraph.pathDeclarationScope currentScope' path)
 
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
