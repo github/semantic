@@ -79,7 +79,11 @@ spec config = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       (_, res) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
-      res `shouldBe` Left (SomeError (inject @(BaseError (EvalError Precise (Value (Quieterm (Sum TypeScript.Syntax) Location) Precise))) (BaseError (ModuleInfo "foo.ts") emptySpan (ExportError "foo.ts" (name "pip")))))
+      case ModuleTable.lookup "bad-export.ts" <$> res of
+        Right (Just (Module _ (scopeGraph, (_, valueRef)) :| [])) -> do
+          ScopeGraph.lookupScopePath "pip" scopeGraph `shouldBe` Nothing
+          valueRef `shouldBe` Rval Unit
+        other -> expectationFailure (show other)
 
     it "evaluates early return statements" $ do
       (_, res) <- evaluate ["early-return.ts"]
@@ -98,7 +102,7 @@ spec config = parallel $ do
           value `shouldBe` Just [ Value.Float (Number.Decimal 3.0) ]
 
           -- Env.names env `shouldBe` [ "x" ]
-          (fmap (const ()) <$> ScopeGraph.lookupScopePath "x" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "x") (Heap.Position 1))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "x" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "x") (Heap.Position 0))
         other -> expectationFailure (show other)
 
     it "evaluates void expressions" $ do
