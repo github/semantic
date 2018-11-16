@@ -117,7 +117,9 @@ spec config = parallel $ do
       (_, res) <- evaluate ["await.ts"]
       case ModuleTable.lookup "await.ts" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, value)) :| [])) -> do
-          SpecHelpers.lookupDeclaration "f2" heap scopeGraph `shouldBe` Just []
+          -- Test that f2 is in the scopegraph and heap.
+          fmap (const ()) <$> SpecHelpers.lookupDeclaration "f2" heap scopeGraph `shouldBe` Just [ () ]
+          -- Test we can't reference y from outside the function
           SpecHelpers.lookupDeclaration "y" heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
 
