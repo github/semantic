@@ -34,6 +34,7 @@ import Data.Semigroup.Foldable
 import Data.Sum hiding (project)
 import Data.Term
 import Prologue
+import Data.ImportPath (ImportPath)
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
@@ -132,14 +133,15 @@ instance HasPrelude 'JavaScript where
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError address value return where
-  NoNameError :: EvalError address value Name
-  -- Indicates that our evaluator wasn't able to make sense of these literals.
-  IntegerFormatError  :: Text -> EvalError address value Integer
-  FloatFormatError    :: Text -> EvalError address value Scientific
-  RationalFormatError :: Text -> EvalError address value Rational
+  QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
+  AssignmentRvalError :: value -> EvalError address value (ValueRef address value)
   DefaultExportError  :: EvalError address value ()
   ExportError         :: ModulePath -> Name -> EvalError address value ()
-  AssignmentRvalError :: value -> EvalError address value (ValueRef address value)
+  -- Indicates that our evaluator wasn't able to make sense of these literals.
+  FloatFormatError    :: Text -> EvalError address value Scientific
+  IntegerFormatError  :: Text -> EvalError address value Integer
+  NoNameError :: EvalError address value Name
+  RationalFormatError :: Text -> EvalError address value Rational
   ReferenceError      :: value -> Name -> EvalError address value (ValueRef address value)
 
 deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
@@ -155,8 +157,9 @@ instance NFData value => NFData1 (EvalError address value) where
     NoNameError -> ()
     RationalFormatError i -> rnf i
     ReferenceError v n -> rnf v `seq` rnf n
+    QualifiedImportError i -> rnf i
 
-instance (NFData address, NFData value, NFData return) => NFData (EvalError address value return) where
+instance (NFData value, NFData return) => NFData (EvalError address value return) where
   rnf = liftRnf rnf
 
 instance Eq value => Eq1 (EvalError address value) where
