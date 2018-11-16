@@ -11,6 +11,7 @@ import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize
+import Data.Span (emptySpan)
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
@@ -134,12 +135,13 @@ instance Evaluatable VariableDeclaration where
   eval eval (VariableDeclaration decs) = do
     _ <- for decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
+      declare (Declaration name) emptySpan Nothing
       (span, _) <- do
         ref <- eval declaration
         subtermSpan <- get @Span
         pure (subtermSpan, ref)
 
-      declare (Declaration name) span Nothing
+      putDeclarationSpan (Declaration name) span
     rvalBox unit
 
 instance Declarations a => Declarations (VariableDeclaration a) where
