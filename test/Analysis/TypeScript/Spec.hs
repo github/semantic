@@ -36,13 +36,13 @@ spec config = parallel $ do
       case ModuleTable.lookup "main1.ts" <$> res of
         Right (Just (Module _ (scopeGraph, _) :| [])) -> do
           -- Env.names env `shouldBe` [ "b", "z" ]
-          (fmap (const ()) <$> ScopeGraph.lookupScopePath "b" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "b") (Heap.Position 1))
-          (fmap (const ()) <$> ScopeGraph.lookupScopePath "quz" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "z") (Heap.Position 2))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "b" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "b") (Heap.Position 0))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "z" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "z") (Heap.Position 1))
 
           -- (Heap.lookupDeclaration "b" heap  >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
           -- (Heap.lookupDeclaration "z" heap >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
-          (fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Heap.Position 1) )))
-          (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 1) ))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "baz" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Heap.Position 1) ))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 0) ))
         other -> expectationFailure (show other)
 
     it "stores function declaration in scope graph" $ do
