@@ -26,8 +26,9 @@ spec config = parallel $ do
       (_, res) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
       case ModuleTable.lookup "main.ts" <$> res of
         Right (Just (Module _ (scopeGraph, _) :| [])) -> do
-          (fmap (const ()) <$> ScopeGraph.lookupScopePath "bar" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "bar") (Heap.Position 1) )))
-          (fmap (const ()) <$> ScopeGraph.lookupScopePath "quz" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "quz") (Heap.Position 1) ))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "bar" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "baz") (Heap.Position 1) )))
+          (fmap (const ()) <$> ScopeGraph.lookupScopePath "quz" scopeGraph) `shouldBe` Just (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.EPath ScopeGraph.Import () (ScopeGraph.DPath (ScopeGraph.Declaration "quz") (Heap.Position 0) )))
+
         other -> expectationFailure (show other)
 
     it "imports with qualified names" $ do
