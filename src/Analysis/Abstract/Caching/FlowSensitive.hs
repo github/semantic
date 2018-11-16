@@ -91,8 +91,8 @@ convergingModules :: ( AbstractValue term address value m
                      , Carrier sig m
                      , Effect sig
                      )
-                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) (Address address))
-                  -> (Module (Either prelude term) -> Evaluator term address value m (Address address))
+                  => (Module (Either prelude term) -> Evaluator term address value (AltC Maybe (Eff m)) (ValueRef address value))
+                  -> (Module (Either prelude term) -> Evaluator term address value m (ValueRef address value))
 convergingModules recur m@(Module _ (Left _)) = raiseHandler runNonDet (recur m) >>= maybeM empty
 convergingModules recur m@(Module _ (Right term)) = do
   c <- getConfiguration term
@@ -107,7 +107,7 @@ convergingModules recur m@(Module _ (Right term)) = do
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
       withOracle prevCache (raiseHandler runNonDet (recur m)))
-  address =<< maybe empty scatter (cacheLookup c cache)
+  maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
