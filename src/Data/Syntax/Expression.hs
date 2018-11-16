@@ -8,6 +8,7 @@ import Prologue hiding (This, index, null)
 import Data.Fixed
 import Proto3.Suite.Class
 
+import Control.Abstract hiding (Member, Void, Call)
 import           Control.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
@@ -444,17 +445,19 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval _ (MemberAccess _ _) = do
-    undefined
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName obj)
-    -- reference (Reference name) (Declaration name)
-    -- childScope <- associatedScope (Declaration name)
-    -- ptr <- eval obj >>= address
-    -- case childScope of
-    --   Just childScope -> withScope childScope $ reference (Reference propName) (Declaration propName)
-    --   Nothing ->
-    --     -- TODO: Throw an ReferenceError because we can't find the associated child scope for `obj`.
-    --     pure ()
+  eval eval MemberAccess{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName lhs)
+    reference (Reference name) (Declaration name)
+    lhsValue <- Abstract.value =<< eval lhs
+    lhsFrame <- Abstract.scopedEnvironment lhsValue
+    case lhsFrame of
+      Just lhsFrame ->
+        withScopeAndFrame lhsFrame $ do
+          reference (Reference rhs) (Declaration rhs)
+          LvalMember <$> lookupDeclaration (Declaration rhs)
+      Nothing -> do
+        -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
+        throwEvalError (ReferenceError lhsValue rhs)
 
 
 -- | Subscript (e.g a[1])
