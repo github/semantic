@@ -4,7 +4,7 @@ module Language.TypeScript.Syntax.TypeScript where
 
 import Prologue
 
-import           Data.Aeson
+import           Data.Aeson (ToJSON)
 import qualified Data.Text as T
 import           Proto3.Suite
 
@@ -62,10 +62,17 @@ instance Evaluatable QualifiedAliasedImport where
     -- rvalBox =<< evalRequire modulePath alias
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     span <- get @Span
-    (scopeGraph, (_, _)) <- require modulePath
+    (scopeGraph, (heap, _)) <- require modulePath
     bindAll scopeGraph
+    bindFrames heap
     declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph)
-    rvalBox unit
+    aliasSlot <- lookupDeclaration (Declaration alias)
+    case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+      (Just scope, Just frame) -> do
+        aliasFrame <- newFrame scope (Map.singleton ScopeGraph.Import (Map.singleton scope frame))
+        assign aliasSlot =<< object aliasFrame
+        pure (LvalMember aliasSlot)
+      _ -> throwEvalError (QualifiedImportError importPath)
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
