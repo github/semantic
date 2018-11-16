@@ -104,7 +104,7 @@ instance Evaluatable RequiredParameter where
     rhs <- eval requiredParameterValue
 
     case lhs of
-      Rval val -> throwEvalError (AssignmentRvalError val)
+      Rval val -> throwEvalError (DerefError val)
       LvalMember lhsSlot -> do
         case declaredName requiredParameterValue of
           Just rhsName -> do

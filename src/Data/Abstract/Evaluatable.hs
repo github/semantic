@@ -134,7 +134,7 @@ instance HasPrelude 'JavaScript where
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError address value return where
   QualifiedImportError :: ImportPath -> EvalError address value (ValueRef address value)
-  AssignmentRvalError :: value -> EvalError address value (ValueRef address value)
+  DerefError :: value -> EvalError address value (ValueRef address value)
   DefaultExportError  :: EvalError address value ()
   ExportError         :: ModulePath -> Name -> EvalError address value ()
   -- Indicates that our evaluator wasn't able to make sense of these literals.
@@ -149,7 +149,7 @@ deriving instance (Show address, Show value) => Show (EvalError address value re
 
 instance NFData value => NFData1 (EvalError address value) where
   liftRnf _ x = case x of
-    AssignmentRvalError v -> rnf v
+    DerefError v -> rnf v
     DefaultExportError -> ()
     ExportError p n -> rnf p `seq` rnf n
     FloatFormatError i -> rnf i
@@ -163,7 +163,7 @@ instance (NFData value, NFData return) => NFData (EvalError address value return
   rnf = liftRnf rnf
 
 instance Eq value => Eq1 (EvalError address value) where
-  liftEq _ (AssignmentRvalError v) (AssignmentRvalError v2) = v == v2
+  liftEq _ (DerefError v) (DerefError v2) = v == v2
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
