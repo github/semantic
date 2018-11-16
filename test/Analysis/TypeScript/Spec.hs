@@ -83,7 +83,8 @@ spec config = parallel $ do
     it "evaluates early return statements" $ do
       (_, res) <- evaluate ["early-return.ts"]
       case ModuleTable.lookup "early-return.ts" <$> res of
-        Right (Just (Module _ (scopeGraph, _) :| [])) -> (fmap (const ()) <$> ScopeGraph.lookupScopePath "foo" scopeGraph) `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 1))
+        Right (Just (Module _ (scopeGraph, _) :| [])) ->
+          ScopeGraph.lookupScopePath "foo" scopeGraph `shouldBe` Just (ScopeGraph.DPath (ScopeGraph.Declaration "foo") (Heap.Position 0))
         -- SpecHelpers.lookupDeclaration undefined heap scopeGraph `shouldBe` Just [Value.Float (Number.Decimal 123.0)]
         other -> expectationFailure (show other)
 
