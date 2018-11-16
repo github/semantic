@@ -6,6 +6,7 @@ module Data.Abstract.Ref
 
 import Data.Abstract.ScopeGraph (Address(..))
 import Data.Bifunctor
+import Control.Abstract.Hole
 
 -- | 'ValueRef' is the type subterms evaluate to and can represent either values directly ('Rval'), or references to values (lvals - such as local variables or object members)
 data ValueRef address value where
@@ -13,6 +14,9 @@ data ValueRef address value where
   Rval       :: value -> ValueRef address value
   -- | An object member.
   LvalMember :: Address address -> ValueRef address value
+
+instance AbstractHole value => AbstractHole (ValueRef address value) where
+  hole = Rval hole
 
 instance Bifunctor ValueRef where
   bimap _ g (Rval v) = Rval (g v)
