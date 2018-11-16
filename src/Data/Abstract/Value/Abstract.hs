@@ -133,3 +133,4 @@ instance AbstractValue term address Abstract m where
   liftComparison _ _ _ = pure Abstract
 
   castToInteger _ = pure Abstract
+  object _ = pure Abstract
