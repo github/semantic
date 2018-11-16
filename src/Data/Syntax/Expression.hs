@@ -304,7 +304,7 @@ instance Evaluatable Delete where
   eval eval (Delete a) = do
     valueRef <- eval a
     case valueRef of
-      LvalMember addr -> valueRef <$ dealloc addr
+      LvalMember addr -> dealloc addr >> rvalBox unit
       Rval val -> throwEvalError (DerefError val)
 
 -- | A sequence expression such as Javascript or C's comma operator.
