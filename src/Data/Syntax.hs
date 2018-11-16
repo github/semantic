@@ -3,7 +3,7 @@
 module Data.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Empty, Error)
-import Data.Aeson (ToJSON(..), object)
+import Data.Aeson as Aeson (ToJSON(..), object)
 import Data.Char (toLower)
 import Data.JSON.Fields
 import Data.Range
@@ -266,7 +266,7 @@ instance HasDefault SrcLoc where
 
 instance ToJSON ErrorStack where
   toJSON (ErrorStack es) = toJSON (jSite <$> es) where
-    jSite (ErrorSite site SrcLoc{..}) = object
+    jSite (ErrorSite site SrcLoc{..}) = Aeson.object
       [ "site" .= site
       , "package" .= srcLocPackage
       , "module" .= srcLocModule
