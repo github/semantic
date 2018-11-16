@@ -67,10 +67,14 @@ instance Evaluatable QualifiedAliasedImport where
     bindFrames heap
     declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph)
     aliasSlot <- lookupDeclaration (Declaration alias)
+
     case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
       (Just scope, Just frame) -> do
-        importScope <- newScope (Map.singleton ScopeGraph.Import scope)
-        aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import (Map.singleton scope frame))
+        insertImportEdge scope
+        let scopeMap = (Map.singleton scope frame)
+        insertFrameLink ScopeGraph.Import scopeMap
+        importScope <- newScope (Map.singleton ScopeGraph.Import [ scope ])
+        aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
         assign aliasSlot =<< object aliasFrame
         pure (LvalMember aliasSlot)
       _ -> throwEvalError (QualifiedImportError importPath)
