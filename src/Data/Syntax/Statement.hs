@@ -158,7 +158,7 @@ instance Evaluatable Assignment where
     rhs <- eval assignmentValue
 
     case lhs of
-      Rval val -> throwEvalError (AssignmentRvalError val)
+      Rval val -> throwEvalError (DerefError val)
       LvalMember lhsSlot -> do
         case declaredName assignmentValue of
           Just rhsName -> do

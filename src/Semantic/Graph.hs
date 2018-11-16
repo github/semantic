@@ -358,7 +358,7 @@ resumingEvalError :: ( Carrier sig m
                   -> Evaluator term address value m a
 resumingEvalError = runEvalErrorWith (\ baseError -> traceError "EvalError" baseError *> case baseErrorException baseError of
   QualifiedImportError{} -> pure hole
-  AssignmentRvalError{} -> pure hole
+  DerefError{} -> pure hole
   ReferenceError{} -> pure hole
   DefaultExportError{}  -> pure ()
   ExportError{}         -> pure ()
