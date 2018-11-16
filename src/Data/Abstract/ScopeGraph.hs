@@ -96,6 +96,7 @@ pathDeclarationScope :: Maybe scope -> Path scope -> Maybe scope
 pathDeclarationScope _ (EPath _ scope (DPath _ _)) = Just scope
 pathDeclarationScope currentScope (EPath _ _ p) = pathDeclarationScope currentScope p
 pathDeclarationScope currentScope (DPath _ _) = currentScope
+pathDeclarationScope _ Hole = Nothing
 
 -- TODO: Possibly return in Maybe since we can have Hole paths
 pathPosition :: Path scope -> Position
