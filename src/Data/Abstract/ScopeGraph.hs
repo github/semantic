@@ -6,6 +6,7 @@ module Data.Abstract.ScopeGraph
   , declare
   , EdgeLabel(..)
   , insertDeclarationScope
+  , insertDeclarationSpan
   , insertImportReference
   , newScope
   , insertScope
@@ -215,6 +216,14 @@ insertDeclarationScope decl@Declaration{..} address g@ScopeGraph{..} = fromMaybe
   (span, position) <- (fst . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
   scope <- lookupScope declScope g
   pure $ g { graph = Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, Just address))) position (declarations scope) }) graph }
+
+-- | Insert a declaration span into the declaration in the scope graph.
+insertDeclarationSpan :: Ord scopeAddress => Declaration -> Span -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+insertDeclarationSpan decl@Declaration{..} span g@ScopeGraph{..} = fromMaybe g $ do
+  declScope <- scopeOfDeclaration decl g
+  (associatedScope, position) <- (snd . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
+  scope <- lookupScope declScope g
+  pure $ g { graph = Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, associatedScope))) position (declarations scope) }) graph }
 
 -- | Insert a new scope with the given address and edges into the scope graph.
 newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph address -> ScopeGraph address
