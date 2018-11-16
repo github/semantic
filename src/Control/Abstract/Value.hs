@@ -25,7 +25,6 @@ module Control.Abstract.Value
 , runWhile
 , WhileC(..)
 , makeNamespace
-, address
 , value
 , rvalBox
 ) where
