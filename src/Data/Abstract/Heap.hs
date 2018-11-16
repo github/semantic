@@ -8,6 +8,7 @@ module Data.Abstract.Heap
   , frameLinks
   , getSlot
   , setSlot
+  , deleteSlot
   , initFrame
   , newFrame
   , heapSize
@@ -63,6 +64,13 @@ setSlot Address{..} value h@Heap{} =
     case frameLookup frameAddress h of
       Just frame -> let slotMap = slots frame in
         h { heap = Map.insert frameAddress (frame { slots = IntMap.insert (unPosition position) value slotMap }) (heap h) }
+      Nothing -> h
+
+deleteSlot :: Ord address => Address address -> Heap scope address value -> Heap scope address value
+deleteSlot Address{..} h@Heap{} =
+    case frameLookup frameAddress h of
+      Just frame -> let slotMap = slots frame in
+        h { heap = Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) (heap h) }
       Nothing -> h
 
 lookupDeclaration :: (Ord address, Show address) => Declaration -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
