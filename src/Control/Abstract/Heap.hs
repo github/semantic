@@ -9,6 +9,7 @@ module Control.Abstract.Heap
 , putHeap
 , putSlotDeclarationScope
 , alloc
+, dealloc
 , lookupDeclaration
 , lookupDeclarationFrame
 , deref
@@ -377,6 +378,15 @@ assign addr value = do
   heap <- getHeap
   cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlot addr heap)) ret)
   putHeap (Heap.setSlot addr cell heap)
+
+dealloc :: forall address value sig m term. ( Member (Deref value) sig
+          , Member (State (Heap address address value)) sig
+          , Ord address
+          , Carrier sig m
+          )
+       => Address address
+       -> Evaluator term address value m ()
+dealloc addr = modify @(Heap address address value) (Heap.deleteSlot addr)
 
 
 -- Garbage collection
