@@ -17,6 +17,7 @@ module Control.Abstract.ScopeGraph
   , withScope
   , associatedScope
   , putDeclarationScope
+  , putDeclarationSpan
   , putCurrentScope
   , insertImportReference
   , lookupScopePath
@@ -61,6 +62,9 @@ declare decl span scope = modify (fst . ScopeGraph.declare decl span scope)
 
 putDeclarationScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
 putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
+
+putDeclarationSpan :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Span -> Evaluator term address value m ()
+putDeclarationSpan decl = modify @(ScopeGraph address) . (ScopeGraph.insertDeclarationSpan decl)
 
 reference :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Reference -> Declaration -> Evaluator term address value m ()
 reference ref = modify @(ScopeGraph address) . (ScopeGraph.reference ref)
