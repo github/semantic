@@ -28,7 +28,7 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 data Value term address
-  = Closure PackageInfo ModuleInfo Name [Name] (Either BuiltIn term) address
+  = Closure PackageInfo ModuleInfo Name [Name] (Either BuiltIn term) address -- TODO: Remove this address since it's a scope address
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -40,6 +40,7 @@ data Value term address
   | Tuple [(Value term address)]
   | Array [(Value term address)]
   | Class Declaration [(Value term address)] address
+  | Object address
   | Namespace Name (Maybe address) (Bindings address)
   | KVPair (Value term address) (Value term address)
   | Hash [Value term address]
