@@ -114,7 +114,7 @@ instance AbstractValue term address Abstract m where
   klass _ _ _ = pure Abstract
   namespace _ _ _ = pure Abstract
 
-  scopedEnvironment _ = pure lowerBound
+  scopedEnvironment _ = pure Nothing
 
   asString _ = pure ""
   asPair _ = pure (Abstract, Abstract)

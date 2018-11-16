@@ -297,7 +297,7 @@ class AbstractIntro value => AbstractValue term address value carrier where
             -> Evaluator term address value carrier value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: address -> Evaluator term address value carrier (Maybe (Environment address))
+  scopedEnvironment :: value -> Evaluator term address value carrier (Maybe address)
 
 
 -- TODO rethink whether this function is necessary.

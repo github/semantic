@@ -359,7 +359,7 @@ instance ( Member Fresh sig
   klass _ _ _     = pure Object
   namespace _ _ _ = pure Unit
 
-  scopedEnvironment _ = pure (Just lowerBound)
+  scopedEnvironment _ = pure Nothing
 
   asString t = unify t String $> ""
   asPair t   = do

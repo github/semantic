@@ -272,7 +272,9 @@ instance ( Member (Allocator address) sig
     --     | Namespace _ _ binds' <- v = pure binds'
     --     | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
-  -- scopedEnvironment = deref >=> materializeEnvironment
+  scopedEnvironment v
+    | Object address <- v = pure (Just address)
+    | otherwise = pure Nothing
 
   asString v
     | String n <- v = pure n
