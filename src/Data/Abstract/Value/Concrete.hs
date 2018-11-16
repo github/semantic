@@ -367,6 +367,8 @@ instance ( Member (Allocator address) sig
   castToInteger (Float (Number.Decimal i)) = pure (Integer (Number.Integer (coefficient (normalize i))))
   castToInteger i = throwValueError (NumericError i)
 
+  object frameAddress = pure (Object frameAddress)
+
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError term address resume where
   StringError            :: Value term address                       -> ValueError term address Text
