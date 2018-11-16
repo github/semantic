@@ -140,29 +140,34 @@ data EvalError address value return where
   DefaultExportError  :: EvalError address value ()
   ExportError         :: ModulePath -> Name -> EvalError address value ()
   AssignmentRvalError :: value -> EvalError address value (ValueRef address value)
+  ReferenceError      :: value -> Name -> EvalError address value (ValueRef address value)
 
 deriving instance (Eq address, Eq value) => Eq (EvalError address value return)
 deriving instance (Show address, Show value) => Show (EvalError address value return)
 
-instance NFData1 (EvalError address value) where
+instance NFData value => NFData1 (EvalError address value) where
   liftRnf _ x = case x of
-    NoNameError -> ()
-    IntegerFormatError i -> rnf i
-    FloatFormatError i -> rnf i
-    RationalFormatError i -> rnf i
+    AssignmentRvalError v -> rnf v
     DefaultExportError -> ()
     ExportError p n -> rnf p `seq` rnf n
+    FloatFormatError i -> rnf i
+    IntegerFormatError i -> rnf i
+    NoNameError -> ()
+    RationalFormatError i -> rnf i
+    ReferenceError v n -> rnf v `seq` rnf n
 
 instance (NFData address, NFData value, NFData return) => NFData (EvalError address value return) where
   rnf = liftRnf rnf
 
-instance Eq1 (EvalError address value) where
-  liftEq _ NoNameError        NoNameError                  = True
+instance Eq value => Eq1 (EvalError address value) where
+  liftEq _ (AssignmentRvalError v) (AssignmentRvalError v2) = v == v2
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
-  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
+  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
+  liftEq _ NoNameError        NoNameError                  = True
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
+  liftEq _ (ReferenceError v n) (ReferenceError v2 n2)     = (v == v2) && (n == n2)
   liftEq _ _ _                                             = False
 
 instance (Show address, Show value) => Show1 (EvalError address value) where
