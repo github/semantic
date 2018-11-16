@@ -2,4 +2,8 @@ function foo() {
   return "this is the foo function";
 }
 
-export { foo, bar }
+function baz() {
+  return "this is the baz function";
+}
+
+export { foo, baz }
