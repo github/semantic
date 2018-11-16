@@ -94,6 +94,7 @@ library
                      , Data.Graph.DiffVertex
                      , Data.Handle
                      , Data.History
+                     , Data.ImportPath
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Location
