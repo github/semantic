@@ -2,14 +2,18 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Directive where
 
-import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module (ModuleInfo (..))
-import           Data.JSON.Fields
-import           Data.Span
+import Prologue
+
 import qualified Data.Text as T
-import           Diffing.Algorithm
-import           Prologue
 import           Proto3.Suite.Class
+
+import Data.Abstract.Evaluatable
+import Data.Abstract.Module (ModuleInfo (..))
+import Data.JSON.Fields
+import Data.Span
+import Diffing.Algorithm
+import Reprinting.Tokenize
+import Data.Reprinting.Token
 
 -- A file directive like the Ruby constant `__FILE__`.
 data File a = File
@@ -22,6 +26,10 @@ instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable File where
   eval _ File = rvalBox =<< (string . T.pack . modulePath <$> currentModule)
 
+-- PT TODO: proper token for this
+instance Tokenize File where
+  tokenize _ = yield . Run $ "__FILE__"
+
 
 -- A line directive like the Ruby constant `__LINE__`.
 data Line a = Line
@@ -33,3 +41,7 @@ instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Line where
   eval _ Line = rvalBox =<< (integer . fromIntegral . posLine . spanStart <$> currentSpan)
+
+-- PT TODO: proper token for this
+instance Tokenize Line where
+  tokenize _ = yield . Run $ "__FILE__"
