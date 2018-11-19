@@ -14,7 +14,7 @@ import Data.Abstract.Evaluatable as Abstract
 import Control.Abstract.ScopeGraph
 import Data.JSON.Fields
 import Diffing.Algorithm
-import Reprinting.Tokenize
+import Reprinting.Tokenize (Tokenize (..), imperative, within', yield)
 import qualified Data.Reprinting.Token as Token
 import qualified Data.Reprinting.Scope as Scope
 
@@ -57,9 +57,9 @@ instance Evaluatable If where
 instance Tokenize If where
   tokenize If{..} = within' Scope.If $ do
     ifCondition
-    yield Token.Then
+    yield (Token.Flow Token.Then)
     ifThenBody
-    yield Token.Else
+    yield (Token.Flow Token.Else)
     ifElseBody
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.

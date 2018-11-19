@@ -4,6 +4,7 @@ module Data.Reprinting.Token
   , isControl
   , Element (..)
   , Control (..)
+  , Flow (..)
   ) where
 
 import Data.Text (Text)
@@ -31,15 +32,38 @@ isControl _ = False
 -- and are interpreted into language-specific representations at a
 -- later point in the reprinting pipeline.
 data Element
-  = Run Text   -- ^ A literal chunk of text.
-  | Truth Bool -- ^ A boolean value.
-  | Nullity    -- ^ @null@ or @nil@ or some other zero value.
-  | Sep        -- ^ Some sort of delimiter, interpreted in some 'Context'.
-  | Sym        -- ^ Some sort of symbol, interpreted in some 'Context'.
-  | Then
+  = Run Text         -- ^ A literal chunk of text.
+  | Truth Bool       -- ^ A boolean value.
+  | Nullity          -- ^ @null@ or @nil@ or some other zero value.
+  | Sep              -- ^ Some sort of delimiter, interpreted in some 'Context'.
+  | Sym              -- ^ Some sort of symbol, interpreted in some 'Context'.
+  | Open             -- ^ The beginning of some 'Context', such as an @[@ or @{@.
+  | Close            -- ^ The opposite of 'Open'.
+  | Access           -- ^ Member/method access
+  | Resolve          -- ^ Namespace/package resolution
+  | Assign           -- ^ Variable binding
+  | Self             -- ^ @self@ or @this@
+  | Superclass       -- ^ @super@
+  | Flow Flow        -- ^ Control-flow token (@if@, @else@, @for@...)
+  | Extends          -- ^ Subclassing indicator (syntax varies)
+    deriving (Eq, Show)
+
+-- | Helper datum to corral control-flow entities like @while@, @for@,
+-- etc. Usually corresponds to a keyword in a given language.
+data Flow
+  = Break
+  | Continue
   | Else
-  | Open       -- ^ The beginning of some 'Context', such as an @[@ or @{@.
-  | Close      -- ^ The opposite of 'TOpen'.
+  | For
+  | Foreach
+  | In     -- ^ Usually associated with 'Foreach' loops
+  | Rescue -- ^ AKA @catch@ in most languages
+  | Retry
+  | Switch -- ^ AKA @case@
+  | Then   -- ^ The true-branch of @if@-statements
+  | Try
+  | While
+  | Yield
     deriving (Eq, Show)
 
 -- | 'Control' tokens describe information about some AST's context.
