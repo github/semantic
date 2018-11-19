@@ -6,6 +6,7 @@ import Prelude hiding (null)
 import Prologue hiding (This, index, null)
 
 import Data.Fixed
+import Data.List (intersperse)
 import Proto3.Suite.Class
 
 import           Control.Abstract.ScopeGraph as ScopeGraph
@@ -15,6 +16,7 @@ import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope
 import           Diffing.Algorithm hiding (Delete)
 import           Reprinting.Tokenize
+import           Data.Reprinting.Token (Element (..))
 import qualified Data.Reprinting.Token as Token
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -51,6 +53,9 @@ instance Evaluatable LessThan where
     go x = case x of
       (LessThan a b)         -> liftComparison (Concrete (<)) a b
 
+instance Tokenize LessThan where
+  tokenize LessThan{..} = within' (Scope.InfixL (Compare Less) 4) $ lhs *> yield Token.Sym <* rhs
+
 data LessThanEqual a = LessThanEqual { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -62,6 +67,9 @@ instance Evaluatable LessThanEqual where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go x = case x of
       (LessThanEqual a b)         -> liftComparison (Concrete (<=)) a b
+
+instance Tokenize LessThanEqual where
+  tokenize LessThanEqual{..} = within' (Scope.InfixL (CompareEql Less) 4) $ lhs *> yield Token.Sym <* rhs
 
 data GreaterThan a = GreaterThan { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -75,6 +83,9 @@ instance Evaluatable GreaterThan where
     go x = case x of
       (GreaterThan a b)         -> liftComparison (Concrete (>)) a b
 
+instance Tokenize GreaterThan where
+  tokenize GreaterThan{..} = within' (Scope.InfixL (Compare Greater) 4) $ lhs *> yield Token.Sym <* rhs
+
 data GreaterThanEqual a = GreaterThanEqual { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -86,6 +97,9 @@ instance Evaluatable GreaterThanEqual where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go x = case x of
       (GreaterThanEqual a b)         -> liftComparison (Concrete (>=)) a b
+
+instance Tokenize GreaterThanEqual where
+  tokenize GreaterThanEqual{..} = within' (Scope.InfixL (CompareEql Greater) 4) $ lhs *> yield Token.Sym <* rhs
 
 data Equal a = Equal { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -101,6 +115,9 @@ instance Evaluatable Equal where
       -- We need some mechanism to customize this behavior per-language.
       (Equal a b)         -> liftComparison (Concrete (==)) a b
 
+instance Tokenize Equal where
+  tokenize Equal{..} = within' (Scope.InfixL Eql 4) $ lhs *> yield Token.Sym <* rhs
+
 data StrictEqual a = StrictEqual { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -115,6 +132,9 @@ instance Evaluatable StrictEqual where
       -- We need some mechanism to customize this behavior per-language.
       (StrictEqual a b)         -> liftComparison (Concrete (==)) a b
 
+instance Tokenize StrictEqual where
+  tokenize StrictEqual{..} = within' (Scope.InfixL StrictEql 4) $ lhs *> yield Token.Sym <* rhs
+
 data Comparison a = Comparison { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -126,6 +146,9 @@ instance Evaluatable Comparison where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go x = case x of
       (Comparison a b)         -> liftComparison (Concrete (==)) a b
+
+instance Tokenize Comparison where
+  tokenize Comparison{..} = within' (Scope.InfixL Spaceship 4) $ lhs *> yield Token.Sym <* rhs
 
 data Plus a = Plus { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -180,6 +203,9 @@ instance Evaluatable DividedBy where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go (DividedBy a b)     = liftNumeric2 div' a b where div'   = liftIntegralFrac div (/)
 
+instance Tokenize DividedBy where
+  tokenize DividedBy{..} = within' (Scope.InfixL Divide 7) $ lhs *> yield Token.Sym <* rhs
+
 data Modulo a = Modulo { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -190,6 +216,9 @@ instance Show1 Modulo where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Modulo where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go (Modulo a b)        = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
+
+instance Tokenize Modulo where
+  tokenize Modulo{..} = within' (Scope.InfixL Modulus 7) $ lhs *> yield Token.Sym <* rhs
 
 data Power a = Power { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -202,6 +231,9 @@ instance Evaluatable Power where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go (Power a b)         = liftNumeric2 liftedExponent a b
 
+instance Tokenize Power where
+  tokenize Power{..} = within' (Scope.InfixL Raise 9) $ lhs *> yield Token.Sym <* rhs
+
 newtype Negate a = Negate { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -212,6 +244,9 @@ instance Show1 Negate where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Negate where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go (Negate a)          = liftNumeric negate a
+
+instance Tokenize Negate where
+  tokenize Negate{..} = within' (Scope.Prefix NumericNegate) $ yield Token.Sym <* value
 
 data FloorDivision a = FloorDivision { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -224,6 +259,9 @@ instance Evaluatable FloorDivision where
   eval eval t = rvalBox =<< (traverse (eval >=> Abstract.value) t >>= go) where
     go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
+instance Tokenize FloorDivision where
+  tokenize FloorDivision{..} = within' (Scope.InfixL FloorDivide 7) $ lhs *> yield Token.Sym <* rhs
+
 -- | Regex matching operators (Ruby's =~ and ~!)
 data Matches a = Matches { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -233,6 +271,9 @@ instance Ord1 Matches where liftCompare = genericLiftCompare
 instance Show1 Matches where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Matches
 
+instance Tokenize Matches where
+  tokenize Matches{..} = within' (Scope.InfixL RegexMatch 1) $ lhs *> yield Token.Sym <* rhs
+
 data NotMatches a = NotMatches { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -240,6 +281,9 @@ instance Eq1 NotMatches where liftEq = genericLiftEq
 instance Ord1 NotMatches where liftCompare = genericLiftCompare
 instance Show1 NotMatches where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NotMatches
+
+instance Tokenize NotMatches where
+  tokenize NotMatches{..} = within' (Scope.InfixL RegexNotMatch 1) $ lhs *> yield Token.Sym <* rhs
 
 data Or a = Or { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -253,6 +297,9 @@ instance Evaluatable Or where
     a' <- eval a >>= Abstract.value
     ifthenelse a' (rvalBox a') (eval b)
 
+instance Tokenize Or where
+  tokenize Or{..} = within' (Scope.InfixL LogicalOr 2) $ lhs *> yield Token.Sym <* rhs
+
 data And a = And { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -265,6 +312,9 @@ instance Evaluatable And where
       cond <- a
       ifthenelse cond b (pure cond)
 
+instance Tokenize And where
+  tokenize And{..} = within' (Scope.InfixL LogicalAnd 2) $ lhs *> yield Token.Sym <* rhs
+
 newtype Not a = Not { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -275,6 +325,9 @@ instance Show1 Not where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Not where
   eval eval t = rvalBox =<< go (fmap (eval >=> Abstract.value) t) where
     go (Not a) = a >>= asBool >>= boolean . not
+
+instance Tokenize Not where
+  tokenize Not{..} = within' (Scope.Prefix LogicalNot) $ yield Token.Sym <* value
 
 data XOr a = XOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -287,6 +340,9 @@ instance Evaluatable XOr where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
   eval eval t = rvalBox =<< go (fmap (eval >=> Abstract.value) t) where
     go (XOr a b) = liftA2 (/=) (a >>= asBool) (b >>= asBool) >>= boolean
+
+instance Tokenize XOr where
+  tokenize XOr{..} = within' (Scope.InfixL LogicalXor 2) $ lhs *> yield Token.Sym <* rhs
 
 -- | Javascript delete operator
 newtype Delete a = Delete { value :: a }
@@ -339,7 +395,7 @@ instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Typeof
 
 -- | Bitwise operators.
-data BOr a = BOr { left :: a, right :: a }
+data BOr a = BOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 BOr where liftEq = genericLiftEq
@@ -351,7 +407,10 @@ instance Evaluatable BOr where
     b' <- eval b >>= Abstract.value >>= castToInteger
     liftBitwise2 (.|.) a' b' >>= rvalBox
 
-data BAnd a = BAnd { left :: a, right :: a }
+instance Tokenize BOr where
+  tokenize BOr{..} = within' (Scope.InfixL BinaryOr 4) $ lhs *> yield Token.Sym <* rhs
+
+data BAnd a = BAnd { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 BAnd where liftEq = genericLiftEq
@@ -363,8 +422,10 @@ instance Evaluatable BAnd where
     b' <- eval b >>= Abstract.value >>= castToInteger
     liftBitwise2 (.&.) a' b' >>= rvalBox
 
+instance Tokenize BAnd where
+  tokenize BAnd{..} = within' (Scope.InfixL BinaryAnd 5) $ lhs *> yield Token.Sym <* rhs
 
-data BXOr a = BXOr { left :: a, right :: a }
+data BXOr a = BXOr { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 BXOr where liftEq = genericLiftEq
@@ -376,7 +437,10 @@ instance Evaluatable BXOr where
     b' <- eval b >>= Abstract.value >>= castToInteger
     liftBitwise2 xor a' b' >>= rvalBox
 
-data LShift a = LShift { left :: a, right :: a }
+instance Tokenize BXOr where
+  tokenize BXOr{..} = within' (Scope.InfixL BinaryXor 5) $ lhs *> yield Token.Sym <* rhs
+
+data LShift a = LShift { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 LShift where liftEq = genericLiftEq
@@ -390,7 +454,10 @@ instance Evaluatable LShift where
     where
       shiftL' a b = shiftL a (fromIntegral (toInteger b))
 
-data RShift a = RShift { left :: a, right :: a }
+instance Tokenize LShift where
+  tokenize LShift{..} = within' (Scope.InfixL LeftShift 4) $ lhs *> yield Token.Sym <* rhs
+
+data RShift a = RShift { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 RShift where liftEq = genericLiftEq
@@ -404,7 +471,10 @@ instance Evaluatable RShift where
     where
       shiftR' a b = shiftR a (fromIntegral (toInteger b))
 
-data UnsignedRShift a = UnsignedRShift { left :: a, right :: a }
+instance Tokenize RShift where
+  tokenize RShift{..} = within' (Scope.InfixL RightShift 4) $ lhs *> yield Token.Sym <* rhs
+
+data UnsignedRShift a = UnsignedRShift { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Eq1 UnsignedRShift where liftEq = genericLiftEq
@@ -427,6 +497,9 @@ instance Evaluatable Complement where
   eval eval (Complement a) = do
     a' <- eval a >>= Abstract.value >>= castToInteger
     liftBitwise complement a' >>= rvalBox
+
+instance Tokenize Complement where
+  tokenize Complement{..} = within' (Scope.Prefix BinaryComplement) $ yield Token.Sym <* value
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a = MemberAccess { lhs :: a, rhs :: Name }
@@ -454,6 +527,9 @@ instance Evaluatable MemberAccess where
 
     pure $! LvalMember ptr propName
 
+instance Tokenize MemberAccess where
+  tokenize MemberAccess{..} = lhs *> yield Access *> yield (Run (formatName rhs))
+
 -- | Subscript (e.g a[1])
 data Subscript a = Subscript { lhs :: a, rhs :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -468,6 +544,9 @@ instance Evaluatable Subscript where
   eval eval (Subscript l [r]) = Rval <$> join (index <$> (eval l >>= Abstract.value) <*> (eval r >>= Abstract.value))
   eval _ (Subscript _ _)   = rvalBox =<< throwUnspecializedError (UnspecializedError "Eval unspecialized for subscript with slices")
 
+instance Tokenize Subscript where
+  tokenize Subscript{..} = lhs *> within' Scope.Indexing (sequenceA_ (intersperse (yield Token.Sep) rhs))
+
 data Member a = Member { lhs :: a, rhs :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -476,6 +555,9 @@ instance Ord1 Member where liftCompare = genericLiftCompare
 instance Show1 Member where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Member where
+
+instance Tokenize Member where
+  tokenize Member{..} = lhs *> yield Token.Access <* rhs
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
 data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a, enumerationStep :: !a }
@@ -488,6 +570,8 @@ instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Enumeration
 instance Evaluatable Enumeration
 
+instance Tokenize Enumeration where
+  tokenize Enumeration{..} = within Scope.Slice $ enumerationStart *> enumerationEnd *> enumerationStep
 
 -- | InstanceOf (e.g. a instanceof b in JavaScript
 data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a }
@@ -514,6 +598,10 @@ instance Evaluatable ScopeResolution where
   eval eval (ScopeResolution xs) = Rval <$> foldl1 f (fmap (eval >=> address) xs)
     where f ns id = ns >>= flip evaluateInScopedEnv id
 
+instance Tokenize ScopeResolution where
+  tokenize (ScopeResolution (a :| rest)) = do
+    a
+    forM_ rest $ \item -> yield Token.Resolve *> item
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
 newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
@@ -582,8 +670,14 @@ instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Super where
   eval _ Super = Rval <$> (maybeM (box unit) =<< self)
 
+instance Tokenize Super where
+  tokenize _ = yield Superclass
+
 data This a = This
   deriving (Diffable, Eq, Foldable, Functor,  Generic1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Hashable1, Named1, Message1, NFData1)
+
+instance Tokenize This where
+  tokenize _ = yield Self
 
 instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
