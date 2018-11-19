@@ -35,10 +35,10 @@ step (Defer el cs)  = case (el, cs) of
   (Close, Imperative:Return:_) -> pure () -- Don't hardwarp or indent for return statements
 
   -- If statements
-  (Open,  If:_)                -> emit "if" *> space
-  (Then,  If:_)                -> emit ":"
-  (Else,  If:xs)               -> endContext (imperativeDepth xs) *> emit "else:"
-  (Close, If:_)                -> pure ()
+  (Open,       If:_)           -> emit "if" *> space
+  (Flow Then,  If:_)           -> emit ":"
+  (Flow Else,  If:xs)          -> endContext (imperativeDepth xs) *> emit "else:"
+  (Close,      If:_)           -> pure ()
 
   -- Booleans
   (Truth True,  _)               -> emit "True"
