@@ -13,7 +13,6 @@ import Data.JSON.Fields
 import Data.Span
 import Diffing.Algorithm
 import Reprinting.Tokenize
-import Data.Reprinting.Token
 
 -- A file directive like the Ruby constant `__FILE__`.
 data File a = File
@@ -26,7 +25,7 @@ instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable File where
   eval _ File = rvalBox =<< (string . T.pack . modulePath <$> currentModule)
 
--- PT TODO: proper token for this
+-- We may need a separate token class for these given additional languages
 instance Tokenize File where
   tokenize _ = yield . Run $ "__FILE__"
 
