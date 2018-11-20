@@ -601,7 +601,7 @@ instance Evaluatable ScopeResolution where
 instance Tokenize ScopeResolution where
   tokenize (ScopeResolution (a :| rest)) = do
     a
-    forM_ rest $ \item -> yield Token.Resolve *> item
+    for_ rest $ \item -> yield Token.Resolve *> item
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
 newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
