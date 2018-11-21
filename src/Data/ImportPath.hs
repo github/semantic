@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveAnyClass #-}
-module Data.ImportPath (IsRelative(..), ImportPath(..), importPath, toName) where
+module Data.ImportPath (IsRelative(..), ImportPath(..), importPath, toName, defaultAlias) where
 
 import Prologue
 import           Data.Aeson
@@ -9,6 +9,7 @@ import           Proto3.Suite
 import qualified Proto3.Wire.Decode as Decode
 import qualified Proto3.Wire.Encode as Encode
 import           Data.Abstract.Path (stripQuotes)
+import           System.FilePath.Posix
 
 data IsRelative = Unknown | Relative | NonRelative
   deriving (Bounded, Enum, Finite, MessageField, Named, Eq, Generic, Hashable, Ord, Show, ToJSON, NFData)
@@ -30,14 +31,17 @@ instance MessageField ImportPath where
   protoType _ = messageField (Prim $ Named (Single (nameOf (Proxy @ImportPath)))) Nothing
 
 instance HasDefault ImportPath where
-  def = ImportPath mempty Relative
+  def = ImportPath mempty Unknown
 
 -- TODO: fix the duplication present in this and Python
 importPath :: Text -> ImportPath
 importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
   where
-    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- TODO: fix partiality
+    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- head call here is safe
                 | otherwise = NonRelative
+
+defaultAlias :: ImportPath -> Name
+defaultAlias = name . T.pack . takeFileName . unPath
 
 toName :: ImportPath -> Name
 toName = name . T.pack . unPath

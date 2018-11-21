@@ -23,39 +23,8 @@ import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
 import           System.FilePath.Posix
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-
-data IsRelative = Unknown | Relative | NonRelative
-  deriving (Bounded, Enum, Finite, Eq, Generic, Hashable, Ord, Show, ToJSON, Named, MessageField, NFData)
-
-instance Primitive IsRelative where
-  primType _ = primType (Proxy @(Enumerated IsRelative))
-  encodePrimitive f = encodePrimitive f . Enumerated . Right
-  decodePrimitive   = decodePrimitive >>= \case
-    (Enumerated (Right r)) -> pure r
-    other                  -> Prelude.fail ("IsRelative decodeMessageField: unexpected value" <> show other)
-
-instance HasDefault IsRelative where
-  def = Unknown
-
-data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: IsRelative }
-  deriving (Eq, Generic, Hashable, Ord, Show, ToJSON, Named, Message, NFData)
-
-instance MessageField ImportPath where
-  encodeMessageField num = Encode.embedded num . encodeMessage (fieldNumber 1)
-  decodeMessageField = fromMaybe def <$> Decode.embedded (decodeMessage (fieldNumber 1))
-  protoType _ = messageField (Prim $ Named (Single (nameOf (Proxy @ImportPath)))) Nothing
-
-instance HasDefault ImportPath where
-  def = ImportPath mempty Unknown
-
-importPath :: Text -> ImportPath
-importPath str = let path = stripQuotes str in ImportPath (T.unpack path) (pathType path)
-  where
-    pathType xs | not (T.null xs), T.head xs == '.' = Relative -- head call here is safe
-                | otherwise = NonRelative
-
-defaultAlias :: ImportPath -> Name
-defaultAlias = Data.Abstract.Evaluatable.name . T.pack . takeFileName . unPath
+import Data.ImportPath
+import           System.FilePath.Posix
 
 resolveGoImport :: ( Member (Modules address value) sig
                    , Member (Reader ModuleInfo) sig
