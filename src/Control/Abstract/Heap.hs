@@ -33,6 +33,7 @@ module Control.Abstract.Heap
 , runHeapError
 , runAddressError
 , runAddressErrorWith
+, throwAddressError
 , runHeapErrorWith
 , throwHeapError
 , bindFrames
@@ -245,9 +246,9 @@ deref :: ( Member (Deref value) sig
          , Carrier sig m
          )
       => Address address
-      -> Evaluator term address value m value
+      -> Evaluator term address value m (Maybe value)
 -- TODO: THIS IS WRONG we need to call Heap.lookup
-deref slot@Address{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError (UninitializedAddress frameAddress))
+deref slot@Address{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret
 
 putSlotDeclarationScope :: forall address value sig m term. ( Member (State (Heap address address value)) sig
                            , Member (State (ScopeGraph address)) sig
