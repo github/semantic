@@ -58,10 +58,8 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedAliasedImport where
   eval _ (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    -- rvalBox =<< evalRequire modulePath alias
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    span <- get @Span
+    span <- ask @Span
     (scopeGraph, (heap, _)) <- require modulePath
     bindAll scopeGraph
     bindFrames heap
