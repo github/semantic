@@ -4,13 +4,15 @@ module Language.Go.Syntax where
 
 import Prologue
 
+import Control.Abstract
+import qualified Data.Abstract.Heap as Heap
 import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
-import           Data.Aeson
+import           Data.Aeson hiding (object)
 import           Data.JSON.Fields
 import qualified Data.Map as Map
 import           Data.Semigroup.App
@@ -21,7 +23,6 @@ import           Proto3.Suite.Class
 import           Proto3.Suite
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import           System.FilePath.Posix
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.ImportPath
 import           System.FilePath.Posix
@@ -86,15 +87,33 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval _ (QualifiedImport importPath aliasTerm) = do
-    undefined
-    -- paths <- resolveGoImport importPath
-    -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    -- void . letrec' alias $ \addr -> do
-    --   makeNamespace alias addr Nothing . for_ paths $ \p -> do
-    --     traceResolve (unPath importPath) p
-    --     importedEnv <- fst . snd <$> require p
-    --     bindAll importedEnv
-    -- rvalBox unit
+    paths <- resolveGoImport importPath
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
+    span <- ask @Span
+    scopeAddress <- newScope mempty
+    importScope <- lookupScope scopeAddress
+    declare (Declaration alias) span (Just scopeAddress)
+    aliasSlot <- lookupDeclaration (Declaration alias)
+
+    withScope scopeAddress $ do
+      for_ paths $ \modulePath -> do
+        (scopeGraph, (heap, _)) <- require modulePath
+        bindAll scopeGraph
+        bindFrames heap
+
+        case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+          (Just scope, Just frame) -> do
+            insertImportEdge scope
+            let scopeMap = (Map.singleton scope frame)
+            insertFrameLink ScopeGraph.Import scopeMap
+
+            maybeObj <- deref aliasSlot
+            importScope <- newScope (Map.singleton ScopeGraph.Import [ scope ])
+            aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
+            assign aliasSlot =<< object aliasFrame
+            pure (LvalMember aliasSlot)
+          _ -> throwEvalError (QualifiedImportError importPath)
+    pure (LvalMember aliasSlot)
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
