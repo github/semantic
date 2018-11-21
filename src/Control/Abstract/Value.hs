@@ -24,7 +24,7 @@ module Control.Abstract.Value
 , While(..)
 , runWhile
 , WhileC(..)
-, makeNamespace
+-- , makeNamespace
 , value
 , rvalBox
 ) where
@@ -302,31 +302,31 @@ class AbstractIntro value => AbstractValue term address value carrier where
 
 
 -- TODO rethink whether this function is necessary.
-makeNamespace :: ( AbstractValue term address value m
-                 , Member (Deref value) sig
-                 , Member (Reader ModuleInfo) sig
-                 , Member (State (ScopeGraph address)) sig
-                 , Member (Allocator address) sig
-                 , Member (Reader Span) sig
-                 , Member (Resumable (BaseError (HeapError address))) sig
-                 , Member (Resumable (BaseError (AddressError address value))) sig
-                 , Member (Resumable (BaseError (ScopeError address))) sig
-                 , Member (State (Heap address address value)) sig
-                 , Member Fresh sig
-                 , Carrier sig m
-                 , Ord address
-                 , Show address
-                 )
-              => Declaration
-              -> Address address
-              -> Maybe (Address address)
-              -> Evaluator term address value m ()
-              -> Evaluator term address value m (ValueRef address value)
-makeNamespace declaration _ super body = do
-  super' <- traverse deref super
-  define declaration . withChildFrame declaration $ \frame -> do
-      _ <- body
-      namespace declaration super' frame
+-- makeNamespace :: ( AbstractValue term address value m
+--                  , Member (Deref value) sig
+--                  , Member (Reader ModuleInfo) sig
+--                  , Member (State (ScopeGraph address)) sig
+--                  , Member (Allocator address) sig
+--                  , Member (Reader Span) sig
+--                  , Member (Resumable (BaseError (HeapError address))) sig
+--                  , Member (Resumable (BaseError (AddressError address value))) sig
+--                  , Member (Resumable (BaseError (ScopeError address))) sig
+--                  , Member (State (Heap address address value)) sig
+--                  , Member Fresh sig
+--                  , Carrier sig m
+--                  , Ord address
+--                  , Show address
+--                  )
+--               => Declaration
+--               -> Address address
+--               -> Maybe (Address address)
+--               -> Evaluator term address value m ()
+--               -> Evaluator term address value m (ValueRef address value)
+-- makeNamespace declaration _ super body = do
+--   super' <- traverse deref super
+--   define declaration . withChildFrame declaration $ \frame -> do
+--       _ <- body
+--       namespace declaration super' frame
 
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
