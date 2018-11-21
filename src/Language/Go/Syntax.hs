@@ -105,13 +105,22 @@ instance Evaluatable QualifiedImport where
           (Just scope, Just frame) -> do
             insertImportEdge scope
             let scopeMap = (Map.singleton scope frame)
-            insertFrameLink ScopeGraph.Import scopeMap
 
             maybeObj <- deref aliasSlot
-            importScope <- newScope (Map.singleton ScopeGraph.Import [ scope ])
-            aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
-            assign aliasSlot =<< object aliasFrame
-            pure (LvalMember aliasSlot)
+            case maybeObj of
+              Nothing -> do
+                objFrame <- newFrame scope (Map.singleton ScopeGraph.Import scopeMap)
+                val <- object objFrame
+                assign aliasSlot val
+                pure (LvalMember aliasSlot)
+              Just obj -> do
+                maybeFrame <- scopedEnvironment obj
+                case maybeFrame of
+                  Just frame ->
+                    withFrame frame $ do
+                      insertFrameLink ScopeGraph.Import scopeMap
+                      pure (LvalMember aliasSlot)
+                  Nothing -> throwEvalError (QualifiedImportError importPath) -- Maybe a DerefError?
           _ -> throwEvalError (QualifiedImportError importPath)
     pure (LvalMember aliasSlot)
 
