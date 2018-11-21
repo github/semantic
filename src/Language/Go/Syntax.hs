@@ -91,7 +91,6 @@ instance Evaluatable QualifiedImport where
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     span <- ask @Span
     scopeAddress <- newScope mempty
-    importScope <- lookupScope scopeAddress
     declare (Declaration alias) span (Just scopeAddress)
     aliasSlot <- lookupDeclaration (Declaration alias)
 
@@ -109,7 +108,7 @@ instance Evaluatable QualifiedImport where
             maybeObj <- deref aliasSlot
             case maybeObj of
               Nothing -> do
-                objFrame <- newFrame scope (Map.singleton ScopeGraph.Import scopeMap)
+                objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
                 val <- object objFrame
                 assign aliasSlot val
                 pure (LvalMember aliasSlot)
