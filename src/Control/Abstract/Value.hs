@@ -355,7 +355,7 @@ value :: ( Member (Deref value) sig
       => ValueRef address value
       -> Evaluator term address value m value
 value (Rval val) = pure val
-value (LvalMember slot) = maybeM (throwAddressError $ UninitializedAddress (frameAddress slot)) =<< deref slot
+value (LvalMember slot) = deref slot
 
 -- | Returns the address of a value referenced by a 'ValueRef'
 -- address :: ( AbstractValue term address value m
