@@ -95,10 +95,9 @@ instance Evaluatable QualifiedImport where
     aliasSlot <- lookupDeclaration (Declaration alias)
 
     withScope scopeAddress $ do
-      go paths
-      where
+      let
         go [] = pure ()
-        go (modulePath : xs) = do
+        go (modulePath : paths) = do
           (scopeGraph, (heap, _)) <- require modulePath
           bindAll scopeGraph
           bindFrames heap
@@ -121,12 +120,13 @@ instance Evaluatable QualifiedImport where
                     insertImportEdge scope
                     let scopeMap = (Map.singleton scope frame)
 
-                    maybeFrame <- scopedEnvironment obj
+                    maybeFrame <- scopedEnvironment val
                     case maybeFrame of
                       Just frame -> withFrame frame (insertFrameLink ScopeGraph.Import scopeMap)
                       Nothing -> pure ()
-                  Nothing -> pure ()
-            Nothing -> pure ()
+                  _ -> pure ()
+            _ -> pure ()
+      go paths
     rvalBox unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).
