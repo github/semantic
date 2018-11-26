@@ -69,9 +69,14 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      scopeGraph <- fst <$> require path
+      (scopeGraph, (heap, _)) <- require path
       bindAll scopeGraph
-      maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
+      bindFrames heap
+      case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+        (Just scopeAddress, Just frame) -> do
+          insertImportEdge scopeAddress
+          insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frame)
+        _ -> pure ()
     rvalBox unit
 
 
