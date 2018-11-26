@@ -1,3 +1,15 @@
+{- |
+
+Taggable allows projecting syntax terms to a list of named symbols. In order to
+identify a new syntax as Taggable, you need to:
+
+1. Give that syntax a non-derived Taggable instance and implement as least the
+'symbolName' method.
+
+2. Make sure that 'symbolsToSummarize' in Tagging.hs includes the string
+constructor name of this syntax.
+
+-}
 {-# LANGUAGE AllowAmbiguousTypes, GADTs, ConstraintKinds, LambdaCase, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Tags.Taggable
 ( Tagger
@@ -88,6 +100,9 @@ class (Show1 constr, Traversable constr) => Taggable constr where
   snippet :: (Foldable syntax) => Location -> constr (Term syntax Location) -> Maybe Range
   snippet _ _ = Nothing
 
+  symbolName :: Declarations1 syntax => constr (Term syntax Location) -> Maybe Name
+  symbolName _ = Nothing
+
 type IsTaggable syntax =
   ( Functor syntax
   , Foldable syntax
@@ -110,10 +125,10 @@ tagging Blob{..} term = pipe
 descend ::
   ( Taggable (TermF syntax Location)
   , ConstructorName (TermF syntax Location)
-  , Declarations ((TermF syntax Location) (Term syntax Location))
   , Functor syntax
   , Foldable syntax
   , HasTextElement syntax
+  , Declarations1 syntax
   )
   => Language -> SubtermAlgebra (TermF syntax Location) (Term syntax Location) (Tagger ())
 descend lang t@(In loc _) = do
@@ -122,7 +137,7 @@ descend lang t@(In loc _) = do
   let litRange = docsLiteral lang term
 
   enter (constructorName term) snippetRange
-  maybe (pure ()) (emitIden (locationSpan loc) litRange) (declaredName term)
+  maybe (pure ()) (emitIden (locationSpan loc) litRange) (symbolName term)
   traverse_ subtermRef t
   exit (constructorName term) snippetRange
 
@@ -134,10 +149,12 @@ subtractLocation a b = subtractRange (locationByteRange a) (locationByteRange b)
 instance ( Apply Show1 fs, Apply Functor fs, Apply Foldable fs, Apply Traversable fs, Apply Taggable fs) => Taggable (Sum fs) where
   docsLiteral a = apply @Taggable (docsLiteral a)
   snippet x = apply @Taggable (snippet x)
+  symbolName = apply @Taggable symbolName
 
 instance (Taggable a) => Taggable (TermF a Location) where
   docsLiteral l t = docsLiteral l (termFOut t)
   snippet ann t = snippet ann (termFOut t)
+  symbolName t = symbolName (termFOut t)
 
 instance Taggable Syntax.Context where
   snippet ann (Syntax.Context _ (Term (In subj _))) = Just (subtractLocation ann subj)
@@ -149,6 +166,7 @@ instance Taggable Declaration.Function where
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
   snippet ann (Declaration.Function _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName = declaredName . Declaration.functionName
 
 instance Taggable Declaration.Method where
   docsLiteral Python (Declaration.Method _ _ _ _ (Term (In _ bodyF)))
@@ -157,6 +175,7 @@ instance Taggable Declaration.Method where
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
   snippet ann (Declaration.Method _ _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName = declaredName . Declaration.methodName
 
 instance Taggable Declaration.Class where
   docsLiteral Python (Declaration.Class _ _ _ (Term (In _ bodyF)))
@@ -165,17 +184,21 @@ instance Taggable Declaration.Class where
     | otherwise           = Nothing
   docsLiteral _ _         = Nothing
   snippet ann (Declaration.Class _ _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName = declaredName . Declaration.classIdentifier
 
 instance Taggable Ruby.Class where
   snippet ann (Ruby.Class _ _ (Term (In body _))) = Just $ subtractLocation ann body
+  symbolName = declaredName . Ruby.classIdentifier
 
 instance Taggable Ruby.Module where
   snippet ann (Ruby.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
-  snippet ann (Ruby.Module _ _) = Just (locationByteRange ann)
+  snippet ann (Ruby.Module _ _)                    = Just $ locationByteRange ann
+  symbolName = declaredName . Ruby.moduleIdentifier
 
 instance Taggable TypeScript.Module where
   snippet ann (TypeScript.Module _ (Term (In body _):_)) = Just $ subtractLocation ann body
-  snippet ann (TypeScript.Module _ _) = Just (locationByteRange ann)
+  snippet ann (TypeScript.Module _ _                   ) = Just $ locationByteRange ann
+  symbolName = declaredName . TypeScript.moduleIdentifier
 
 instance Taggable []
 instance Taggable Comment.Comment
