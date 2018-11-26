@@ -95,33 +95,67 @@ instance Evaluatable QualifiedImport where
     aliasSlot <- lookupDeclaration (Declaration alias)
 
     withScope scopeAddress $ do
-      for_ paths $ \modulePath -> do
-        (scopeGraph, (heap, _)) <- require modulePath
-        bindAll scopeGraph
-        bindFrames heap
+      go paths
+      where
+        go [] = pure ()
+        go (modulePath : xs) = do
+          (scopeGraph, (heap, _)) <- require modulePath
+          bindAll scopeGraph
+          bindFrames heap
 
-        case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-          (Just scope, Just frame) -> do
-            insertImportEdge scope
-            let scopeMap = (Map.singleton scope frame)
+          case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+            (Just scope, Just frame) -> do
+              insertImportEdge scope
+              let scopeMap = (Map.singleton scope frame)
 
-            maybeObj <- deref aliasSlot
-            case maybeObj of
-              Nothing -> do
-                objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
-                val <- object objFrame
-                assign aliasSlot val
-                pure (LvalMember aliasSlot)
-              Just obj -> do
-                maybeFrame <- scopedEnvironment obj
-                case maybeFrame of
-                  Just frame ->
-                    withFrame frame $ do
-                      insertFrameLink ScopeGraph.Import scopeMap
-                      pure (LvalMember aliasSlot)
-                  Nothing -> throwEvalError (QualifiedImportError importPath) -- Maybe a DerefError?
-          _ -> throwEvalError (QualifiedImportError importPath)
-    pure (LvalMember aliasSlot)
+              objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
+              val <- object objFrame
+              assign aliasSlot val
+              for_ paths $ \modulePath -> do
+                (scopeGraph, (heap, _)) <- require modulePath
+                bindAll scopeGraph
+                bindFrames heap
+
+                case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+                  (Just scope, Just frame) -> do
+                    insertImportEdge scope
+                    let scopeMap = (Map.singleton scope frame)
+
+                    maybeFrame <- scopedEnvironment obj
+                    case maybeFrame of
+                      Just frame -> withFrame frame (insertFrameLink ScopeGraph.Import scopeMap)
+                      Nothing -> pure ()
+                  Nothing -> pure ()
+            Nothing -> pure ()
+    rvalBox unit
+
+    --   for_ paths $ \modulePath -> do
+    --     (scopeGraph, (heap, _)) <- require modulePath
+    --     bindAll scopeGraph
+    --     bindFrames heap
+
+    --     case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+    --       (Just scope, Just frame) -> do
+    --         insertImportEdge scope
+    --         let scopeMap = (Map.singleton scope frame)
+
+    --         maybeObj <- deref aliasSlot
+    --         case maybeObj of
+    --           Nothing -> do
+    --             objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
+    --             val <- object objFrame
+    --             assign aliasSlot val
+    --             pure (LvalMember aliasSlot)
+    --           Just obj -> do
+    --             maybeFrame <- scopedEnvironment obj
+    --             case maybeFrame of
+    --               Just frame ->
+    --                 withFrame frame $ do
+    --                   insertFrameLink ScopeGraph.Import scopeMap
+    --                   pure (LvalMember aliasSlot)
+    --               Nothing -> throwEvalError (QualifiedImportError importPath) -- Maybe a DerefError?
+    --       _ -> throwEvalError (QualifiedImportError importPath)
+    -- pure (LvalMember aliasSlot)
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
