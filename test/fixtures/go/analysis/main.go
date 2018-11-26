@@ -1,10 +1,9 @@
 package main
 
 import "./foo"
-// import . "./bar"
+import . "./bar"
 
 func main() {
 	foo.New()
-	// Bar()
-	// Rab()
+	Bar()
 }
