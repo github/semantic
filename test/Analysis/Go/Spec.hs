@@ -18,6 +18,7 @@ spec config = parallel $ do
           (SpecHelpers.lookupDeclaration "foo" heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["New"]
           () <$ SpecHelpers.lookupDeclaration "main" heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "Bar" heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Rab" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "imports with aliases (and side effects only)" $ do
