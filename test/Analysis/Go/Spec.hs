@@ -1,6 +1,5 @@
 module Analysis.Go.Spec (spec) where
 
-import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.Language as Language
@@ -15,11 +14,10 @@ spec config = parallel $ do
       (_, res) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main.go" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "Bar" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "Rab" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "main" heap scopeGraph `shouldBe` Just ()
-          -- (lookupDeclaration "foo" heap >>= deNamespace heap) `shouldBe` Just ("foo",  ["New"])
+          () <$ SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+          (SpecHelpers.lookupDeclaration "foo" heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["New"]
+          () <$ SpecHelpers.lookupDeclaration "main" heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Bar" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "imports with aliases (and side effects only)" $ do
