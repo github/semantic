@@ -50,6 +50,8 @@ import Data.Span as X
 import Data.String
 import Data.Sum
 import Data.Term as X
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import Parsing.Parser as X
 import Rendering.Renderer as X hiding (error)
 import Semantic.Diff as X
@@ -185,7 +187,7 @@ newtype Verbatim = Verbatim ByteString
   deriving (Eq)
 
 instance Show Verbatim where
-  show (Verbatim x) = show x
+  showsPrec _ (Verbatim byteString) = (T.unpack (T.decodeUtf8 byteString) ++)
 
 verbatim :: ByteString -> Verbatim
 verbatim = Verbatim . stripWhitespace
