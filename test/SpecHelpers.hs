@@ -15,6 +15,7 @@ module SpecHelpers
 , LogQueue
 , StatQueue
 , lookupDeclaration
+, objectMembers
 ) where
 
 import Control.Abstract hiding (lookupDeclaration)
@@ -151,16 +152,22 @@ testEvaluating
 type Val term = Value term Precise
 
 
--- deNamespace :: Heap Precise Precise (Value term Precise)
---             -> Value term Precise
---             -> Maybe (Name, [Name])
--- deNamespace heap ns@(Namespace name _ _) = (,) name . Env.allNames <$> namespaceScope heap ns
--- deNamespace _ _                          = Nothing
+objectMembers :: Heap Precise Precise (Value term Precise)
+            -> ScopeGraph Precise
+            -> Value term Precise
+            -> Maybe [Name]
+objectMembers heap scopeGraph (Object frame) = frameNames heap scopeGraph frame
+objectMembers _ _ _                          = Nothing
 
--- namespaceScope :: Heap Precise Precise (Value term Precise)
---                -> Value term Precise
---                -> Maybe (Environment Precise)
--- namespaceScope heap ns@(Namespace _ _ _)
+frameNames :: Heap Precise Precise (Value term Precise)
+           -> ScopeGraph Precise
+           -> Precise
+           -> Maybe [ Name ]
+frameNames heap scopeGraph frame = do
+  scopeAddress <- Heap.scopeLookup frame heap
+  scope <- ScopeGraph.lookupScope scopeAddress scopeGraph
+  pure (unDeclaration <$> ScopeGraph.declarationNames scope scopeGraph)
+
 --   = either (const Nothing) (snd . snd)
 --   . run
 --   . runFresh
