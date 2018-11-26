@@ -25,6 +25,7 @@ module Data.Abstract.ScopeGraph
   , scopeOfRef
   , pathDeclarationScope
   , putDeclarationScopeAtPosition
+  , declarationNames
   ) where
 
 import Control.Abstract.Hole
@@ -191,6 +192,13 @@ lookupDeclaration declaration scope g = do
   dataSeq <- ddataOfScope scope g
   index <- Seq.findIndexR (((Declaration declaration) ==) . fst) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
+
+declarationNames :: Ord address => Scope address -> ScopeGraph address -> [Declaration]
+declarationNames scope scopeGraph = localDeclarations <> edgeNames
+  where addresses = join (Map.elems (edges scope))
+        edgeNames = addresses >>= toList . flip lookupScope scopeGraph >>= flip declarationNames scopeGraph
+        localDeclarations = toList . fmap fst $ declarations scope
+
 
 putDeclarationScopeAtPosition :: Ord scopeAddress => scopeAddress -> Position -> Maybe scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 putDeclarationScopeAtPosition scope position assocScope g = fromMaybe g $ do
