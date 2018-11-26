@@ -129,34 +129,6 @@ instance Evaluatable QualifiedImport where
             Nothing -> pure ()
     rvalBox unit
 
-    --   for_ paths $ \modulePath -> do
-    --     (scopeGraph, (heap, _)) <- require modulePath
-    --     bindAll scopeGraph
-    --     bindFrames heap
-
-    --     case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-    --       (Just scope, Just frame) -> do
-    --         insertImportEdge scope
-    --         let scopeMap = (Map.singleton scope frame)
-
-    --         maybeObj <- deref aliasSlot
-    --         case maybeObj of
-    --           Nothing -> do
-    --             objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
-    --             val <- object objFrame
-    --             assign aliasSlot val
-    --             pure (LvalMember aliasSlot)
-    --           Just obj -> do
-    --             maybeFrame <- scopedEnvironment obj
-    --             case maybeFrame of
-    --               Just frame ->
-    --                 withFrame frame $ do
-    --                   insertFrameLink ScopeGraph.Import scopeMap
-    --                   pure (LvalMember aliasSlot)
-    --               Nothing -> throwEvalError (QualifiedImportError importPath) -- Maybe a DerefError?
-    --       _ -> throwEvalError (QualifiedImportError importPath)
-    -- pure (LvalMember aliasSlot)
-
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Named1, Message1, NFData1, Traversable)

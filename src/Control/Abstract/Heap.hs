@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
@@ -47,7 +47,7 @@ import Control.Applicative (Alternative)
 import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import qualified Data.Abstract.Heap as Heap
-import Data.Abstract.ScopeGraph (Path(..), putDeclarationScopeAtPosition, Scope(..))
+import Data.Abstract.ScopeGraph (Path(..), putDeclarationScopeAtPosition)
 import Data.Abstract.Heap (Heap, Position(..))
 import Control.Abstract.ScopeGraph hiding (ScopeError(..))
 import Control.Abstract.ScopeGraph (ScopeError)
@@ -58,7 +58,6 @@ import Data.Span (Span)
 import qualified Data.Map.Strict as Map
 import Prologue
 import Data.Abstract.Ref
-import qualified Data.IntMap as IntMap
 
 
 -- | Evaluates an action locally the scope and frame of the given frame address.
@@ -146,10 +145,6 @@ putCurrentFrame address = modify @(Heap address address value) (\heap -> heap { 
 -- | Inserts a new frame into the heap with the given scope and links.
 newFrame :: forall address value sig m term. (
             Member (State (Heap address address value)) sig
-          , Member (State (ScopeGraph address)) sig
-          , Member (Resumable (BaseError (ScopeError address))) sig
-          , Member (Reader Span) sig
-          , Member (Reader ModuleInfo) sig
           , Ord address
           , Member (Allocator address) sig
           , Member Fresh sig
@@ -158,12 +153,10 @@ newFrame :: forall address value sig m term. (
          => address
          -> Map EdgeLabel (Map address address)
          -> Evaluator term address value m address
-newFrame scopeAddress links = do
+newFrame scope links = do
   name <- gensym
   address <- alloc name
-  scope <- lookupScope scopeAddress
-  let slots = IntMap.fromDistinctAscList (take (length (declarations scope)) ((,mempty) <$> [1..]))
-  modify @(Heap address address value) (Heap.initFrame scopeAddress address links slots)
+  modify @(Heap address address value) (Heap.newFrame scope address links)
   pure address
 
 -- | Evaluates the action within the frame of the given frame address.
