@@ -222,7 +222,9 @@ instance Eq1 LowPrecedenceAnd where liftEq = genericLiftEq
 instance Ord1 LowPrecedenceAnd where liftCompare = genericLiftCompare
 instance Show1 LowPrecedenceAnd where liftShowsPrec = genericLiftShowsPrec
 
--- PT TODO: This isn't right
+-- TODO: These should probably be expressed with a new context/token,
+-- rather than a literal run, and need to take surrounding precedence
+-- into account.
 instance Tokenize LowPrecedenceAnd where
   tokenize LowPrecedenceAnd{..} = lhs *> yield (Token.Run "and") <* rhs
 
@@ -241,6 +243,5 @@ instance Eq1 LowPrecedenceOr where liftEq = genericLiftEq
 instance Ord1 LowPrecedenceOr where liftCompare = genericLiftCompare
 instance Show1 LowPrecedenceOr where liftShowsPrec = genericLiftShowsPrec
 
--- PT TODO: This isn't right
 instance Tokenize LowPrecedenceOr where
   tokenize LowPrecedenceOr{..} = lhs *> yield (Token.Run "or") <* rhs
