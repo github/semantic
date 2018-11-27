@@ -62,12 +62,14 @@ instance Diffable Method where
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
 instance Evaluatable Method where
-  eval _ Method{..} = undefined
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
-    -- (_, addr) <- letrec name (function (Just name) (paramNames methodParameters) methodBody)
-    -- bind name addr
-    -- pure (Rval addr)
-    -- where paramNames = foldMap (maybeToList . declaredName)
+  eval _ Method{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
+    -- TODO: Should we declare the name of the function within `function`?
+    span <- ask @Span
+    declare (Declaration name) span Nothing
+    params <- for methodParameters $ \param -> do
+      maybeM (throwEvalError NoNameError) (declaredName param)
+    function name params methodBody
 
 instance Tokenize Data.Syntax.Declaration.Method where
   tokenize Method{..} = within' Scope.Method $ do
