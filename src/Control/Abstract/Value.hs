@@ -168,6 +168,7 @@ forLoop :: ( Carrier sig m
            , Member (Resumable (BaseError (ScopeError address))) sig
            , Member (State (Heap address address value)) sig
            , Member (State (ScopeGraph address)) sig
+           , Member (Reader (address, address)) sig
            , Member (While address value) sig
            , Member Fresh sig
            , Ord address

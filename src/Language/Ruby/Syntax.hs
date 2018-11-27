@@ -92,7 +92,6 @@ instance Evaluatable Require where
     path <- resolveRubyName name
     traceResolve name path
     (scopeGraph, v) <- doRequire path
-    bindAll scopeGraph
     maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
@@ -144,7 +143,6 @@ doLoad path shouldWrap = do
   traceResolve path path'
   scopeGraph <- fst <$> load path'
   unless shouldWrap $ do
-    bindAll scopeGraph
     maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 

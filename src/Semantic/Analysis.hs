@@ -17,12 +17,11 @@ import Prologue
 type ModuleC address value m
   = ErrorC (LoopControl address value)          (Eff
   ( ErrorC (Return address value)               (Eff
-  ( StateC (Heap address address value) (Eff
-  ( StateC (ScopeGraph address)         (Eff
+  ( ReaderC (address, address)          (Eff
   ( DerefC address value                (Eff
   ( AllocatorC address                  (Eff
   ( ReaderC ModuleInfo                  (Eff
-    m)))))))))))))
+    m)))))))))))
 
 type ValueC term address value m
   = FunctionC term address value                                  (Eff
@@ -78,20 +77,24 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
-  (preludeScopeGraph, (heap, _)) <- evalModule lowerBound lowerBound prelude
-  foldr (run preludeScopeGraph heap . fmap Right) ask modules
-  where run preludeScopeGraph preludeHeap m rest = do
-          evaluated <- evalModule preludeScopeGraph preludeHeap m
+  (preludeScopeAddress, (preludeFrameAddress, _)) <- evalModule lowerBound lowerBound prelude
+  foldr (run preludeScopeAddress heap . fmap Right) ask modules
+  where run preludeScopeAddress preludeFrameAddress m rest = do
+          evaluated <- evalModule preludeScopeAddress preludeFrameAddress m
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModule scopeGraph heap m = runInModule (perModule (runValueEffects . moduleBody) m)
-          where runInModule
+        evalModule parentScopeAddress parentFrameAddress m = do
+          let (scopeEdges, frameLinks) = (Map.singleton Lexical [ parentScopeAddress ], Map.singleton Lexical (Map.singleton parentScopeAddress parentFrameAddress))
+          scopeAddress <- newScope scopeEdges
+          frameAddress <- newFrame scopeAddress frameLinks
+          val <- runInModule scopeAddress frameAddress (perModule (runValueEffects . moduleBody) m)
+          pure (scopeAddress, (frameAddress, val))
+          where runInModule scopeAddress frameAddress
                   = raiseHandler (runReader (moduleInfo m))
                   . runAllocator
                   . runDeref
-                  . raiseHandler (runState lowerBound) -- ScopeGraph
-                  . raiseHandler (runState lowerBound) -- Heap
+                  . raiseHandler (runReader (scopeAddress, frameAddress))
                   . runReturn
                   . runLoopControl
 
