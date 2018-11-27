@@ -78,14 +78,14 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
-  (preludeScopeGraph, _) <- evalModule lowerBound prelude
-  foldr (run preludeScopeGraph . fmap Right) ask modules
-  where run prelude m rest = do
-          evaluated <- evalModule prelude m
+  (preludeScopeGraph, (heap, _)) <- evalModule lowerBound lowerBound prelude
+  foldr (run preludeScopeGraph heap . fmap Right) ask modules
+  where run preludeScopeGraph preludeHeap m rest = do
+          evaluated <- evalModule preludeScopeGraph preludeHeap m
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModule prelude m = runInModule (perModule (runValueEffects . moduleBody) m)
+        evalModule scopeGraph heap m = runInModule (perModule (runValueEffects . moduleBody) m)
           where runInModule
                   = raiseHandler (runReader (moduleInfo m))
                   . runAllocator
