@@ -69,7 +69,7 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [term] -> term -> Evaluator term address value m (ValueRef address value)
+function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> Evaluator term address value m (ValueRef address value)
 function name params body = sendFunction (Function name params body ret)
 
 data BuiltIn
@@ -77,7 +77,7 @@ data BuiltIn
   | Show
   deriving (Eq, Ord, Show, Generic, NFData)
 
-builtIn :: (Member (Function term address value) sig, Carrier sig m) => Name -> BuiltIn -> Evaluator term address value m (ValueRef address value)
+builtIn :: (Member (Function term address value) sig, Carrier sig m) => Name -> BuiltIn -> Evaluator term address value m value
 builtIn name = sendFunction . flip (BuiltIn name) ret
 
 call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m (ValueRef address value)
@@ -87,8 +87,8 @@ sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Fun
 sendFunction = send
 
 data Function term address value (m :: * -> *) k
-  = Function Name [term] term (ValueRef address value -> k)
-  | BuiltIn Name BuiltIn (ValueRef address value -> k)
+  = Function Name [Name] term (ValueRef address value -> k)
+  | BuiltIn Name BuiltIn (value -> k)
   | Call value [value] (ValueRef address value -> k)
   deriving (Functor)
 

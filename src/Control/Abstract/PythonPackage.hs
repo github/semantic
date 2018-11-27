@@ -72,14 +72,14 @@ instance ( Carrier sig m
     | Just e <- prj op = wrap $ case handleCoercible e of
       Call callName params k -> Evaluator . k =<< do
         case callName of
-          Closure _ _ name' paramNames _ _ -> do
+          Closure _ _ name' paramNames _ scope parentFrame -> do
             let bindings = foldr (uncurry Map.insert) lowerBound (zip paramNames params)
             let asStrings = asArray >=> traverse asString
 
-            if name "find_packages" == name' then do
+            if Just (name "find_packages") == name' then do
               as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "exclude") bindings)
               put (FindPackages as)
-            else if name "setup" == name' then do
+            else if Just (name "setup") == name' then do
               packageState <- get
               if packageState == Unknown then do
                 as <- maybe (pure mempty) (fmap (fmap stripQuotes) . asStrings) (Map.lookup (name "packages") bindings)
