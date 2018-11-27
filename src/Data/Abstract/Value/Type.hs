@@ -270,12 +270,10 @@ instance ( Member (Allocator address) sig
       let value = withLexicalScopeAndFrame $ do
             (_, tvars) <- foldr (\ param rest -> do
               tvar <- Var <$> fresh
-              name <- maybeM (throwEvalError NoNameError) (declaredName param)
 
-              -- Eval param in order to set the Span state correctly
-              span <- (runFunction (Evaluator . eval) (Evaluator (eval param))) >> get @Span
-              declare (Declaration name) span Nothing
-              address <- lookupDeclaration (Declaration name)
+              functionSpan <- ask @Span
+              declare (Declaration param) functionSpan Nothing
+              address <- lookupDeclaration (Declaration param)
               -- assign tvar values to names in the frame of the function?
               assign address tvar
               bimap id (tvar :) <$> rest) (pure (undefined, [])) params
@@ -283,8 +281,8 @@ instance ( Member (Allocator address) sig
             bimap id (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
       value >>= Evaluator . flip runFunctionC eval . k
 
-    Abstract.BuiltIn _ Print k -> runFunctionC (k (Rval $ String :-> Unit)) eval
-    Abstract.BuiltIn _ Show  k -> runFunctionC (k (Rval $ Object :-> String)) eval
+    Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval
+    Abstract.BuiltIn _ Show  k -> runFunctionC (k (Object :-> String)) eval
     Abstract.Call op paramTypes k -> runEvaluator $ do
       tvar <- fresh
       let needed = zeroOrMoreProduct paramTypes :-> Var tvar

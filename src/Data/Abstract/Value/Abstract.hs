@@ -49,11 +49,8 @@ instance ( Member (Allocator address) sig
 
       _ <- withScope scope $ do
         for_ params $ \param -> do
-          name <- maybeM (throwEvalError NoNameError) (declaredName param)
-
-          -- Eval param in order to update (State Span) to the Span of the param.
-          span <- (runFunction (Evaluator . eval) (Evaluator (eval param))) >> get @Span
-          declare (Declaration name) span Nothing
+          functionSpan <- ask @Span
+          declare (Declaration param) functionSpan Nothing
         -- TODO: Ask @robrix if we should evaluate the body under Abstract semantics
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
 
@@ -62,7 +59,7 @@ instance ( Member (Allocator address) sig
       assign address Abstract
       Evaluator $ runFunctionC (k (LvalMember address)) eval
 
-    BuiltIn _ _ k -> runFunctionC (k (Rval Abstract)) eval
+    BuiltIn _ _ k -> runFunctionC (k Abstract) eval
     Call _ _ k -> runEvaluator $ do
       rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)
 

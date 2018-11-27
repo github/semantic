@@ -28,7 +28,7 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 data Value term address
-  = Closure PackageInfo ModuleInfo Name [Name] (Either BuiltIn term) address -- TODO: Remove this address since it's a scope address
+  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) address (Maybe address)
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -51,7 +51,7 @@ data Value term address
 
 instance Ord address => ValueRoots address (Value term address) where
   valueRoots v
-    | Closure _ _ _ _ _ _ <- v = undefined -- Env.addresses env
+    | Closure _ _ _ _ _ _ _ <- v = undefined -- Env.addresses env
     | otherwise                = mempty
 
 
@@ -88,45 +88,43 @@ instance ( FreeVariables term
       -- TODO: Declare all params
       currentScope' <- currentScope
       let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
-      scope <- newScope lexicalEdges
+      associatedScope <- newScope lexicalEdges
       -- TODO: Fix this if we find a solution to declaring names of functions without throwing a lookupPathError.
       -- declare (Declaration name) span (Just scope)
-      putDeclarationScope (Declaration name) scope
+      putDeclarationScope (Declaration name) associatedScope
 
-      names <- withScope scope . for params $ \param -> do
-        -- Leave it up to the Evaluatable instance of param to declare the name
-        _ <- runFunction (Evaluator . eval) (Evaluator (eval param))
-        maybeM (throwEvalError NoNameError) (declaredName param)
+      functionSpan <- ask @Span
+      names <- withScope associatedScope . for params $ \param ->
+        param <$ declare (Declaration param) functionSpan Nothing
 
       address <- lookupDeclaration @(Value term address) (Declaration name)
-      let closure = Closure packageInfo moduleInfo name names (Right body) scope
+      currentFrame' <- currentFrame
+      let closure = Closure packageInfo moduleInfo (Just name) names (Right body) associatedScope currentFrame'
       assign address closure
       Evaluator $ runFunctionC (k (Rval closure)) eval
     Abstract.BuiltIn name builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
 
-      span <- ask @Span -- TODO: This is probably wrong.
       currentScope' <- currentScope
+      currentFrame' <- currentFrame @(Value term address)
       let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
-      scope <- newScope lexicalEdges
-      declare (Declaration name) span (Just scope)
-      -- TODO: Store the name of the BuiltIn in Abstract.BuiltIn, showing the builtIn name is wrong.
-      address <- lookupDeclaration @(Value term address) (Declaration name)
-      assign address (Closure packageInfo moduleInfo name [] (Left builtIn) scope)
-      Evaluator $ runFunctionC (k (LvalMember address)) eval
+      associatedScope <- newScope lexicalEdges
+      let closure = Closure packageInfo moduleInfo Nothing [] (Left builtIn) associatedScope currentFrame'
+      Evaluator $ runFunctionC (k closure) eval
     Abstract.Call op params k -> runEvaluator $ do
       boxed <- case op of
-        Closure _ _ _ _ (Left Print) _ -> traverse (trace . show) params *> rvalBox Unit
-        Closure _ _ name _ (Left Show) _ -> pure name >>= rvalBox . String . pack . show
-        Closure packageInfo moduleInfo name names (Right body) scope -> do
+        Closure _ _ _ _ (Left Print) _ _ -> traverse (trace . show) params *> rvalBox Unit
+        Closure _ _ _ _ (Left Show) _ _ -> rvalBox . String . pack $ show params
+        Closure packageInfo moduleInfo _ names (Right body) associatedScope parentFrame -> do
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-            declarationScope <- lookupDeclarationScope (Declaration name)
-            declarationFrame <- lookupDeclarationFrame (Declaration name)
-            let frameEdges = Map.singleton Lexical (Map.singleton declarationScope declarationFrame)
-            frameAddress <- newFrame scope frameEdges
+            parentScope <- traverse scopeLookup parentFrame
+            let frameEdges = case (parentScope, parentFrame) of
+                  (Just scope, Just frame) -> Map.singleton Lexical (Map.singleton scope frame)
+                  _ -> mempty
+            frameAddress <- newFrame associatedScope frameEdges
             withScopeAndFrame frameAddress $ do
               for_ (zip names params) $ \(name, param) -> do
                 addr <- lookupDeclaration (Declaration name)
