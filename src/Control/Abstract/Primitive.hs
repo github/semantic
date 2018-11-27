@@ -24,6 +24,7 @@ defineClass :: ( AbstractValue term address value m
                , Member (Resumable (BaseError (ScopeError address))) sig
                , Member (State (Heap address address value)) sig
                , Member (State (ScopeGraph address)) sig
+               , Member (Reader (address, address)) sig
                , Ord address
                , Show address
                )
@@ -48,6 +49,7 @@ defineNamespace :: ( AbstractValue term address value m
                    , Member (Resumable (BaseError (ScopeError address))) sig
                    , Member (State (Heap address address value)) sig
                    , Member (State (ScopeGraph address)) sig
+                   , Member (Reader (address, address)) sig
                    , Ord address
                    , Show address
                    )

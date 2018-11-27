@@ -137,8 +137,7 @@ instance Evaluatable Import where
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
-    scopeGraph <- fst <$> require path
-    bindAll scopeGraph
+    (scopeGraph, (heap, _)) <- require path
     span <- ask @Span
     declare (Declaration aliasValue) span (ScopeGraph.currentScope scopeGraph)
     rvalBox unit
@@ -155,15 +154,26 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    scopeGraph <- fst <$> require path
-    bindAll scopeGraph
-    if Prologue.null xs then
-      maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
-    else
-      for_ xs $ \Alias{..} -> do
-        -- TODO: Add an Alias Edge to resolve qualified export froms
-        -- Scope 1 -> alias (bar, foo) -> Export 3 -> Export -> Scope 4
-        pure ()
+    (scopeGraph, (heap, _)) <- require path
+    if Prologue.null xs then do
+      case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+        (Just scope, Just frame) -> do
+          insertImportEdge scope
+          insertFrameLink ScopeGraph.Import (Map.singleton scope frame)
+        _ -> pure ()
+    else do
+      let scopeEdges = maybe mempty (Map.singleton ScopeGraph.Import . pure) (ScopeGraph.currentScope scopeGraph)
+      scopeAddress <- newScope scopeEdges
+      scope <- lookupScope scopeAddress
+      for_ xs $ \Alias{..} ->
+        insertImportReference (Reference aliasName) (Declaration aliasValue) scopeGraph scopeAddress scope
+      let frameLinks = case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+            (Just importScope, Just importFrame) -> Map.singleton importScope importFrame
+            _ -> mempty
+
+      frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
+      insertImportEdge scopeAddress
+      insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
 
     rvalBox unit
     -- where
@@ -235,8 +245,6 @@ instance Evaluatable QualifiedImport where
                 go rest)
       mkScopeMap modulePath fun = do
         (scopeGraph, (heap, _)) <- require modulePath
-        bindAll scopeGraph
-        bindFrames heap
         case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
           (Just scope, Just frame) -> do
             insertImportEdge scope

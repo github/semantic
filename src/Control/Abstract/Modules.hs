@@ -35,7 +35,8 @@ import Data.Abstract.Heap
 import Data.Abstract.ScopeGraph
 import Data.Abstract.Ref
 
-type ModuleResult address value = (ScopeGraph address, (Heap address address value, ValueRef address value))
+-- A scope address, frame address, and value ref.
+type ModuleResult address value = (address, (address, ValueRef address value))
 
 -- | Retrieve an evaluated module, if any. @Nothing@ means we’ve never tried to load it, and @Just (env, value)@ indicates the result of a completed load.
 lookupModule :: (Member (Modules address value) sig, Carrier sig m) => ModulePath -> Evaluator term address value m (Maybe (ModuleResult address value))

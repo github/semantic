@@ -93,10 +93,10 @@ pathDeclaration (EPath _ _ p) = pathDeclaration p
 pathDeclaration Hole          = undefined
 
 -- TODO: Store the current scope closer _in_ the DPath?
-pathDeclarationScope :: Maybe scope -> Path scope -> Maybe scope
+pathDeclarationScope :: scope -> Path scope -> Maybe scope
 pathDeclarationScope _ (EPath _ scope (DPath _ _)) = Just scope
 pathDeclarationScope currentScope (EPath _ _ p) = pathDeclarationScope currentScope p
-pathDeclarationScope currentScope (DPath _ _) = currentScope
+pathDeclarationScope currentScope (DPath _ _) = Just currentScope
 pathDeclarationScope _ Hole = Nothing
 
 -- TODO: Possibly return in Maybe since we can have Hole paths
@@ -154,9 +154,8 @@ reference ref decl@Declaration{..} g@ScopeGraph{..} = fromMaybe g $ do
             in traverseEdges Import <|> traverseEdges Lexical
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
-insertImportReference :: Ord address => Reference -> Declaration -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} scope = do
-  currentAddress <- currentScope
+insertImportReference :: Ord address => Reference -> Declaration -> ScopeGraph address -> address -> Scope address -> Maybe (Scope address)
+insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} currentAddress scope = do
   go currentAddress (EPath Import currentAddress)
   where
     go address path =
