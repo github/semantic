@@ -13,7 +13,7 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Function
 import Prologue
-import qualified Data.Map as Map
+import qualified Data.Map.Strict as Map
 
 type ModuleC address value m
   = ErrorC (LoopControl address value)          (Eff
