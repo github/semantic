@@ -11,7 +11,9 @@ import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import           Control.Abstract.ScopeGraph hiding (Import)
+import           Control.Abstract.Heap
 import           qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           qualified Data.Map.Strict as Map
 
 data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -23,17 +25,20 @@ instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JavaScriptRequire where
   eval _ (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
-    (scopeGraph, _) <- require modulePath
-    -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    -- rvalBox =<< evalRequire modulePath alias
+    (moduleScope, (moduleFrame, _)) <- require modulePath
+
     case declaredName aliasTerm of
       Just alias -> do
-        span <- get @Span
-        void $ declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph) -- TODO: declare shouldn't return a fake (Address address)
+        span <- ask @Span
+        importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+        declare (Declaration alias) span (Just importScope)
+        let scopeMap = Map.singleton moduleScope moduleFrame
+        aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
+        aliasSlot <- lookupDeclaration (Declaration alias)
+        assign aliasSlot =<< object aliasFrame
       Nothing -> do
-        -- TODO: Throw a resumable exception if no current scope in imported scope graph.
-        -- Or better yet get rid of the Maybe in ScopeGraph { currentScope :: Maybe scope, ... }
-        maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
+        insertImportEdge moduleScope
+        insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     rvalBox unit
 
 data Debugger a = Debugger

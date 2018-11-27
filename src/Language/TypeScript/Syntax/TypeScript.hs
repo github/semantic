@@ -57,19 +57,20 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedAliasedImport where
   eval _ (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    span <- ask @Span
     (moduleScope, (moduleFrame, _)) <- require modulePath
-    declare (Declaration alias) span (Just moduleScope)
-    aliasSlot <- lookupDeclaration (Declaration alias)
+    span <- ask @Span
 
-    insertImportEdge moduleScope
-    let scopeMap = Map.singleton moduleScope moduleFrame
-    insertFrameLink ScopeGraph.Import scopeMap
     importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+    let scopeMap = Map.singleton moduleScope moduleFrame
     aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
+
+    alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
+    declare (Declaration alias) span (Just importScope)
+    aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot =<< object aliasFrame
-    pure (LvalMember aliasSlot)
+
+    rvalBox unit
+
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
