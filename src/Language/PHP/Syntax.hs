@@ -59,10 +59,11 @@ include :: ( AbstractValue term address value m
            , Carrier sig m
            , Member (Deref value) sig
            , Member (Modules address value) sig
+           , Member (Reader (address, address)) sig
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
            , Member (Resumable (BaseError (AddressError address value))) sig
-           , Member (Resumable (BaseError (ScopeError address))) sig
+           , Member (Resumable (BaseError (HeapError address))) sig
            , Member (State (ScopeGraph address)) sig
            , Member (Resumable (BaseError ResolutionError)) sig
            , Member (State (Heap address address value)) sig
@@ -77,8 +78,9 @@ include eval pathTerm f = do
   name <- eval pathTerm >>= Abstract.value >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (scopeGraph, (_, v)) <- f path
-  maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
+  (moduleScope, (moduleFrame, v)) <- f path
+  insertImportEdge moduleScope
+  insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
   pure v
 
 newtype Require a = Require { value :: a }
@@ -224,8 +226,8 @@ instance Evaluatable QualifiedName where
     propName <- maybeM (throwEvalError NoNameError) (declaredName iden)
     case childScope of
       Just childScope -> do
-        currentScopeAddress <- maybeM (throwScopeError CurrentScopeError) =<< currentScope
-        currentFrameAddress <- maybeM (throwHeapError CurrentFrameError) =<< currentFrame
+        currentScopeAddress <- currentScope
+        currentFrameAddress <- currentFrame
         frameAddress <- newFrame childScope (Map.singleton Lexical (Map.singleton currentScopeAddress currentFrameAddress))
         withScopeAndFrame frameAddress $ do
           reference (Reference propName) (Declaration propName)
