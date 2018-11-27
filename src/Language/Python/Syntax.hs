@@ -6,7 +6,7 @@ module Language.Python.Syntax where
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
-import           Data.Aeson
+import           Data.Aeson hiding (object)
 import           Data.Functor.Classes.Generic
 import           Data.JSON.Fields
 import qualified Data.Language as Language
@@ -20,8 +20,12 @@ import Proto3.Suite (Primitive(..), Message(..), Message1(..), Named1(..), Named
 import qualified Proto3.Suite as Proto
 import qualified Proto3.Wire.Encode as Encode
 import qualified Proto3.Wire.Decode as Decode
-import Control.Abstract.ScopeGraph (Allocator, bindAll, insertImportEdge, declare, Declaration(..))
+import Control.Abstract.ScopeGraph hiding (Import)
+import Control.Abstract.Heap
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Abstract.Heap as Heap
+import qualified Data.Map.Strict as Map
+import qualified Data.List as List
 
 data QualifiedName
   = QualifiedName { paths :: NonEmpty FilePath }
@@ -204,9 +208,56 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval _ (QualifiedImport qualifiedName) = do
     modulePaths <- resolvePythonModules (QualifiedName qualifiedName)
-    -- rvalBox =<< go (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
+    let namesAndPaths = toList (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
+
+    go namesAndPaths
     rvalBox unit
     where
+      go [] = pure ()
+      go ((name, modulePath) : namesAndPaths) = do
+        span <- ask @Span
+        scopeAddress <- newScope mempty
+        declare (Declaration name) span (Just scopeAddress)
+        aliasSlot <- lookupDeclaration (Declaration name)
+        -- a.b.c
+        withScope scopeAddress $
+          mkScopeMap modulePath (\scopeMap -> do
+              objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
+              val <- object objFrame
+              assign aliasSlot val
+
+              withFrame objFrame $ do
+                let (namePaths, rest) = List.partition ((== name) . fst) namesAndPaths
+                for_ namePaths $ \(_, modulePath) -> do
+                  mkScopeMap modulePath $ \scopeMap -> do
+                    withFrame objFrame $ do
+                      insertFrameLink ScopeGraph.Import scopeMap
+                go rest)
+      mkScopeMap modulePath fun = do
+        (scopeGraph, (heap, _)) <- require modulePath
+        bindAll scopeGraph
+        bindFrames heap
+        case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+          (Just scope, Just frame) -> do
+            insertImportEdge scope
+            fun (Map.singleton scope frame)
+          _ -> pure ()
+
+        -- withScope scopeAddress $ do
+        --   let
+        --     go [] = pure ()
+        --     go (modulePath :| paths) =
+        --       mkScopeMap modulePath (\scopeMap -> do
+        --         objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
+        --         val <- object objFrame
+        --         assign aliasSlot val
+        --         for_ paths $ \modulePath ->
+        --           mkScopeMap modulePath (withFrame objFrame . insertFrameLink ScopeGraph.Import))
+        --     go paths
+
+    -- a/*.py
+    -- rvalBox =<< go (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
+    -- where
       -- -- Evaluate and import the last module, updating the environment
       -- go ((name, path) :| []) = evalQualifiedImport name path
       -- -- Evaluate each parent module, just creating a namespace
