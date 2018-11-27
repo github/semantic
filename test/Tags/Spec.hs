@@ -77,4 +77,7 @@ spec = parallel $ do
         [ Tag "Foo" "Module" (Span (Pos 2 1 ) (Pos 12 4)) ["Statements"] (Just "module Foo") (Just "# Public: Foo")
         , Tag "Bar" "Class"  (Span (Pos 5 3 ) (Pos 11 6)) ["Module", "Context", "Statements"] (Just "class Bar") (Just "# Public: Bar")
         , Tag "baz" "Method" (Span (Pos 8 5 ) (Pos 10 8)) ["Class", "Context", "Module", "Context", "Statements"] (Just "def baz(a)") (Just "# Public: baz")
+        , Tag "C" "Class" (Span (Pos 14 1) (Pos 20 4)) ["Statements"] (Just "class A::B::C") Nothing
+        , Tag "foo" "Method" (Span (Pos 15 3) (Pos 17 6)) ["Statements", "Class", "Statements"] (Just "def foo") Nothing
+        , Tag "foo" "Method" (Span (Pos 18 3) (Pos 19 6)) ["Statements", "Class", "Statements"] (Just "def self.foo") Nothing
         ]
