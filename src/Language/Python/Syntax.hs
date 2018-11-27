@@ -77,9 +77,9 @@ resolvePythonModules :: ( Member (Modules address value) sig
                      -> Evaluator term address value m (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
-  for (moduleNames q) $ \name -> do
-    x <- search relRootDir name
-    x <$ traceResolve name x
+  for (moduleNames q) $ \relPath -> do
+    x <- search relRootDir relPath
+    x <$ traceResolve relPath x
   where
     rootDir (QualifiedName _) ModuleInfo{..}           = mempty -- overall rootDir of the Package.
     rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
