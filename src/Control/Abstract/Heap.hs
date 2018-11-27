@@ -38,6 +38,7 @@ module Control.Abstract.Heap
 , throwHeapError
 , bindFrames
 , insertFrameLink
+, scopeLookup
 ) where
 
 import Control.Abstract.Context (withCurrentCallStack)
