@@ -11,7 +11,6 @@ import           Proto3.Suite
 import Control.Abstract hiding (Import)
 import           Data.Abstract.Evaluatable as Evaluatable
 import           qualified Data.Abstract.ScopeGraph as ScopeGraph
-import           qualified Data.Abstract.Heap as Heap
 import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
@@ -102,7 +101,7 @@ instance Evaluatable QualifiedExport where
   eval _ (QualifiedExport exportSymbols) = do
     -- Create a Lexical edge from the qualifed export's scope to the current scope.
     currentScopeAddress <- currentScope
-    let edges = maybe mempty (Map.singleton Lexical . pure) currentScopeAddress
+    let edges = Map.singleton Lexical [ currentScopeAddress ]
     exportScope <- newScope edges
     insertExportEdge exportScope -- Create an export edge from the current scope to the export scope
     withScope exportScope $
