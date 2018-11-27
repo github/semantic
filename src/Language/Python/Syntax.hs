@@ -133,13 +133,27 @@ toTuple Alias{..} = (aliasValue, aliasName)
 
 -- from a import b
 instance Evaluatable Import where
-  -- from . import moduleY
+  -- from . import moduleY            -- aliasValue = moduleY, aliasName = moduleY
+  -- from . import moduleY as moduleZ -- aliasValue = moduleY, aliasName = moduleZ
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
-    (scopeGraph, (heap, _)) <- require path
+    (moduleScope, (moduleFrame, _)) <- require path
+
     span <- ask @Span
-    declare (Declaration aliasValue) span (ScopeGraph.currentScope scopeGraph)
+    -- Construct a proxy scope containing an import edge to the imported module's last returned scope.
+    importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+
+    -- Construct an object frame.
+    let scopeMap = Map.singleton moduleScope moduleFrame
+    aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
+
+    -- Add declaration of the alias name to the current scope (within our current module).
+    declare (Declaration aliasName) span (Just importScope)
+    -- Retrieve the frame slot for the new declaration.
+    aliasSlot <- lookupDeclaration (Declaration aliasName)
+    assign aliasSlot =<< object aliasFrame
+
     rvalBox unit
 
   -- from a import b
