@@ -102,35 +102,22 @@ instance Evaluatable QualifiedImport where
     withScope scopeAddress $ do
       let
         go [] = pure ()
-        go (modulePath : paths) = do
-          (scopeGraph, (heap, _)) <- require modulePath
-          bindAll scopeGraph
-          bindFrames heap
-
-          case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-            (Just scope, Just frame) -> do
-              insertImportEdge scope
-              let scopeMap = (Map.singleton scope frame)
-
-              objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
-              val <- object objFrame
-              assign aliasSlot val
-              for_ paths $ \modulePath -> do
-                (scopeGraph, (heap, _)) <- require modulePath
-                bindAll scopeGraph
-                bindFrames heap
-
-                case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-                  (Just scope, Just frame) -> do
-                    insertImportEdge scope
-                    let scopeMap = (Map.singleton scope frame)
-
-                    maybeFrame <- scopedEnvironment val
-                    case maybeFrame of
-                      Just frame -> withFrame frame (insertFrameLink ScopeGraph.Import scopeMap)
-                      Nothing -> pure ()
-                  _ -> pure ()
-            _ -> pure ()
+        go (modulePath : paths) =
+          mkScopeMap modulePath (\scopeMap -> do
+            objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
+            val <- object objFrame
+            assign aliasSlot val
+            for_ paths $ \modulePath ->
+              mkScopeMap modulePath (withFrame objFrame . insertFrameLink ScopeGraph.Import))
+          where mkScopeMap modulePath fun = do
+                  (scopeGraph, (heap, _)) <- require modulePath
+                  bindAll scopeGraph
+                  bindFrames heap
+                  case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
+                    (Just scope, Just frame) -> do
+                      insertImportEdge scope
+                      fun (Map.singleton scope frame)
+                    _ -> pure ()
       go paths
     rvalBox unit
 
