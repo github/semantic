@@ -162,9 +162,9 @@ instance Evaluatable Import where
       let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
       scopeAddress <- newScope scopeEdges
       scope <- lookupScope scopeAddress
-      withScope scopeAddress $
+      withScope moduleScope $
         for_ xs $ \Alias{..} ->
-          insertImportReference (Reference aliasName) (Declaration aliasValue) moduleScope scopeAddress scope
+          insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
 
       let frameLinks = Map.singleton moduleScope moduleFrame
       frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
