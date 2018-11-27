@@ -133,7 +133,7 @@ modifyHeap :: (Member (State (Heap address address value)) sig, Carrier sig m) =
 modifyHeap = modify
 
 -- | Retrieve the heap.
-currentFrame :: forall address value sig term m. (
+currentFrame :: forall value address sig term m. (
                   Member (State (Heap address address value)) sig
                 , Carrier sig m
                 )
@@ -169,7 +169,7 @@ withFrame :: forall term address value sig m a. (
           -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
           -> Evaluator term address value m a
 withFrame address action = do
-    prevFrame <- currentFrame @address @value
+    prevFrame <- currentFrame @value
     modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
     value <- action
     case prevFrame of
