@@ -70,8 +70,6 @@ instance Evaluatable Import where
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
       (scopeGraph, (heap, _)) <- require path
-      bindAll scopeGraph
-      bindFrames heap
       case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
         (Just scopeAddress, Just frame) -> do
           insertImportEdge scopeAddress
@@ -111,8 +109,6 @@ instance Evaluatable QualifiedImport where
               mkScopeMap modulePath (withFrame objFrame . insertFrameLink ScopeGraph.Import))
           where mkScopeMap modulePath fun = do
                   (scopeGraph, (heap, _)) <- require modulePath
-                  bindAll scopeGraph
-                  bindFrames heap
                   case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
                     (Just scope, Just frame) -> do
                       insertImportEdge scope
@@ -135,7 +131,6 @@ instance Evaluatable SideEffectImport where
     traceResolve (unPath importPath) paths
     for_ paths $ \path -> do
       (scopeGraph, _) <- require path
-      bindAll scopeGraph
     rvalBox unit
 
 -- A composite literal in Go

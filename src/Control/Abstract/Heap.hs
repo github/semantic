@@ -21,7 +21,6 @@ module Control.Abstract.Heap
 , withChildFrame
 , define
 , withFrame
-, putCurrentFrame
 -- * Garbage collection
 , gc
 -- * Effects
@@ -36,7 +35,6 @@ module Control.Abstract.Heap
 , throwAddressError
 , runHeapErrorWith
 , throwHeapError
-, bindFrames
 , insertFrameLink
 , scopeLookup
 ) where
@@ -67,6 +65,7 @@ withScopeAndFrame :: forall term address value m a sig. (
                     , Member (Reader ModuleInfo) sig
                     , Member (Reader Span) sig
                     , Member (Resumable (BaseError (HeapError address))) sig
+                    , Member (Reader (address, address)) sig
                     , Member (State (Heap address address value)) sig
                     , Member (State (ScopeGraph address)) sig
                     , Carrier sig m
@@ -89,6 +88,7 @@ withLexicalScopeAndFrame :: forall term address value m a sig. (
                     , Member (Resumable (BaseError (ScopeError address))) sig
                     , Member (State (Heap address address value)) sig
                     , Member (State (ScopeGraph address)) sig
+                    , Member (Reader (address, address)) sig
                     , Member (Allocator address) sig
                     , Member Fresh sig
                     , Carrier sig m
@@ -100,10 +100,7 @@ withLexicalScopeAndFrame :: forall term address value m a sig. (
 withLexicalScopeAndFrame action = do
   currentScope' <- currentScope
   currentFrame' <- currentFrame
-  let (scopeEdges, frameEdges) = case (currentScope', currentFrame') of
-        (Just currentScope', Just currentFrame') ->
-          (Map.singleton Lexical [ currentScope' ], Map.singleton Lexical (Map.singleton currentScope' currentFrame'))
-        _ -> mempty
+  let (scopeEdges, frameEdges) = (Map.singleton Lexical [ currentScope' ], Map.singleton Lexical (Map.singleton currentScope' currentFrame'))
   scope <- newScope scopeEdges
   frame <- newFrame scope frameEdges
   withScopeAndFrame frame action
@@ -134,14 +131,11 @@ modifyHeap = modify
 
 -- | Retrieve the heap.
 currentFrame :: forall value address sig term m. (
-                  Member (State (Heap address address value)) sig
+                  Member (Reader (address, address)) sig
                 , Carrier sig m
                 )
-             => Evaluator term address value m (Maybe address)
-currentFrame = Heap.currentFrame <$> get @(Heap address address value)
-
-putCurrentFrame :: forall address value sig m term. ( Member (State (Heap address address value)) sig, Carrier sig m ) => address -> Evaluator term address value m ()
-putCurrentFrame address = modify @(Heap address address value) (\heap -> heap { Heap.currentFrame = Just address })
+             => Evaluator term address value m address
+currentFrame = asks @(address, address) snd
 
 -- | Inserts a new frame into the heap with the given scope and links.
 newFrame :: forall address value sig m term. (
@@ -162,20 +156,13 @@ newFrame scope links = do
 
 -- | Evaluates the action within the frame of the given frame address.
 withFrame :: forall term address value sig m a. (
-             Member (State (Heap address address value)) sig
+             Member (Reader (address, address)) sig
            , Carrier sig m
            )
           => address
           -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
           -> Evaluator term address value m a
-withFrame address action = do
-    prevFrame <- currentFrame @value
-    modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
-    value <- action
-    case prevFrame of
-      Nothing -> modify @(Heap address address value) (\h -> h { Heap.currentFrame = Just address })
-      _ -> modify @(Heap address address value) (\h -> h { Heap.currentFrame = prevFrame })
-    pure value
+withFrame address action = local @(address, address) (second (const address)) action
 
 -- box :: ( Member (Allocator address) effects
 --        , Member (Deref value) effects
@@ -196,6 +183,7 @@ define :: ( HasCallStack
           , Member (Deref value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader Span) sig
+          , Member (Reader (address, address)) sig
           , Member (State (Heap address address value)) sig
           , Member (State (ScopeGraph address)) sig
           , Member (Resumable (BaseError (ScopeError address))) sig
@@ -218,6 +206,7 @@ define declaration def = withCurrentCallStack callStack $ do
 withChildFrame :: ( Member (Allocator address) sig
                   , Member (State (Heap address address value)) sig
                   , Member (State (ScopeGraph address)) sig
+                  , Member (Reader (address, address)) sig
                   , Member Fresh sig
                   , Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
@@ -268,6 +257,7 @@ putSlotDeclarationScope Address{..} assocScope = do
 
 lookupDeclaration :: forall value address term sig m. ( Member (State (Heap address address value)) sig
                      , Member (State (ScopeGraph address)) sig
+                     , Member (Reader (address, address)) sig
                      , Member (Resumable (BaseError (ScopeError address))) sig
                      , Member (Resumable (BaseError (HeapError address))) sig
                      , Member (Reader ModuleInfo) sig
@@ -285,6 +275,7 @@ lookupDeclaration decl = do
 
 lookupDeclarationFrame :: ( Member (State (Heap address address value)) sig
                           , Member (State (ScopeGraph address)) sig
+                          , Member (Reader (address, address)) sig
                           , Member (Resumable (BaseError (ScopeError address))) sig
                           , Member (Resumable (BaseError (HeapError address))) sig
                           , Member (Reader ModuleInfo) sig
@@ -301,17 +292,16 @@ lookupDeclarationFrame decl = do
 
 -- | Follow a path through the heap and return the frame address associated with the declaration.
 lookupFrameAddress :: ( Member (State (Heap address address value)) sig
-                     , Member (Reader ModuleInfo) sig
-                     , Member (Reader Span) sig
-                     , Member (Resumable (BaseError (HeapError address))) sig
-                     , Ord address
-                     , Carrier sig m
-                     )
-                  => Path address
-                  -> Evaluator term address value m address
-lookupFrameAddress path = do
-  frameAddress <- maybeM (throwHeapError CurrentFrameError) =<< currentFrame
-  go path frameAddress
+                      , Member (Reader (address, address)) sig
+                      , Member (Reader ModuleInfo) sig
+                      , Member (Reader Span) sig
+                      , Member (Resumable (BaseError (HeapError address))) sig
+                      , Ord address
+                      , Carrier sig m
+                      )
+                   => Path address
+                   -> Evaluator term address value m address
+lookupFrameAddress path = go path =<< currentFrame
   where
     go path address = case path of
       Hole -> throwHeapError (LookupLinkError path)
@@ -336,19 +326,9 @@ frameLinks :: forall address value sig m term. (
 frameLinks address = maybeM (throwHeapError $ LookupLinksError address) . Heap.frameLinks address =<< get @(Heap address address value)
 
 
-bindFrames :: ( Ord address
-              , Member (State (Heap address address value)) sig
-              , Carrier sig m
-              )
-           => Heap address address value
-           -> Evaluator term address value m ()
-bindFrames oldHeap = do
-  currentHeap <- get
-  let newHeap = Heap.heap oldHeap <> Heap.heap currentHeap
-  put (currentHeap { Heap.heap = newHeap })
-
-
-insertFrameLink :: forall address value sig m term. ( Member (State (Heap address address value)) sig
+insertFrameLink :: forall address value sig m term. (
+                     Member (State (Heap address address value)) sig
+                   , Member (Reader (address, address)) sig
                    , Member (Resumable (BaseError (HeapError address))) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
@@ -357,7 +337,7 @@ insertFrameLink :: forall address value sig m term. ( Member (State (Heap addres
                    )
                 => EdgeLabel -> Map address address -> Evaluator term address value m ()
 insertFrameLink label linkMap = do
-  frameAddress <- maybeM (throwHeapError CurrentFrameError) =<< currentFrame
+  frameAddress <- currentFrame
   heap <- get @(Heap address address value)
   currentFrame <- maybeM (throwHeapError $ LookupFrameError frameAddress) (Heap.frameLookup frameAddress heap)
   let newCurrentFrame = currentFrame {

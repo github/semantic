@@ -32,12 +32,15 @@ spec config = parallel $ do
           const () <$> SpecHelpers.lookupDeclaration "e" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
-    it "imports using 'from' syntax" $ do
+    it "imports using from syntax" $ do
       (_, res) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main2.py" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+
+          -- TODO: Enable when we constrain edge paths with path predicates
+          -- () <$ SpecHelpers.lookupDeclaration "baz" heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
 
     it "imports with relative syntax" $ do

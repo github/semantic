@@ -28,22 +28,22 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (scopeGraph, (heap, _)) <- require modulePath
-    bindAll scopeGraph
-    bindFrames heap
-    if Prologue.null symbols then
-      maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
+    (moduleScope, (moduleFrame, _)) <- require modulePath
+    if Prologue.null symbols then do
+      insertImportEdge moduleScope
+      insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     else do
-      let scopeEdges = maybe mempty (Map.singleton ScopeGraph.Import . pure) (ScopeGraph.currentScope scopeGraph)
+      let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
       scopeAddress <- newScope scopeEdges
-      scope <- lookupScope scopeAddress
-      for_ symbols $ \Alias{..} ->
-        insertImportReference (Reference aliasName) (Declaration aliasValue) scopeGraph scopeAddress scope
-      let frameLinks = case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-            (Just importScope, Just importFrame) -> Map.singleton importScope importFrame
-            _ -> mempty
+      let frameLinks = Map.singleton ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+      frameAddress <- newFrame scopeAddress frameLinks
 
-      frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
+      -- Insert import references into the import scope starting from the perspective of the import scope.
+      withScopeAndFrame frameAddress $ do
+        for_ symbols $ \Alias{..} ->
+          insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
+
+      -- Create edges from the current scope/frame to the import scope/frame.
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
     rvalBox unit
@@ -60,22 +60,17 @@ instance Evaluatable QualifiedAliasedImport where
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     span <- ask @Span
-    (scopeGraph, (heap, _)) <- require modulePath
-    bindAll scopeGraph
-    bindFrames heap
-    declare (Declaration alias) span (ScopeGraph.currentScope scopeGraph)
+    (moduleScope, (moduleFrame, _)) <- require modulePath
+    declare (Declaration alias) span (Just moduleScope)
     aliasSlot <- lookupDeclaration (Declaration alias)
 
-    case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-      (Just scope, Just frame) -> do
-        insertImportEdge scope
-        let scopeMap = (Map.singleton scope frame)
-        insertFrameLink ScopeGraph.Import scopeMap
-        importScope <- newScope (Map.singleton ScopeGraph.Import [ scope ])
-        aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
-        assign aliasSlot =<< object aliasFrame
-        pure (LvalMember aliasSlot)
-      _ -> throwEvalError (QualifiedImportError importPath)
+    insertImportEdge moduleScope
+    let scopeMap = Map.singleton moduleScope moduleFrame
+    insertFrameLink ScopeGraph.Import scopeMap
+    importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+    aliasFrame <- newFrame importScope (Map.singleton ScopeGraph.Import scopeMap)
+    assign aliasSlot =<< object aliasFrame
+    pure (LvalMember aliasSlot)
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -88,7 +83,6 @@ instance Evaluatable SideEffectImport where
   eval _ (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     (scopeGraph, _) <- require modulePath
-    bindAll scopeGraph
     rvalBox unit
 
 
@@ -111,10 +105,9 @@ instance Evaluatable QualifiedExport where
     let edges = maybe mempty (Map.singleton Lexical . pure) currentScopeAddress
     exportScope <- newScope edges
     insertExportEdge exportScope -- Create an export edge from the current scope to the export scope
-    putCurrentScope exportScope -- Set the export scope as the new current scope
-
-    for_ exportSymbols $ \Alias{..} -> do
-      reference (Reference aliasName) (Declaration aliasValue)
+    withScope exportScope $
+      for_ exportSymbols $ \Alias{..} -> do
+        reference (Reference aliasName) (Declaration aliasValue)
 
     -- Create an export edge from a new scope to the qualifed export's scope.
     rvalBox unit

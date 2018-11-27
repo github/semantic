@@ -24,7 +24,6 @@ instance Evaluatable JavaScriptRequire where
   eval _ (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
     (scopeGraph, _) <- require modulePath
-    bindAll scopeGraph
     -- alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
     -- rvalBox =<< evalRequire modulePath alias
     case declaredName aliasTerm of
