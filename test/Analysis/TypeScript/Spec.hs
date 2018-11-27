@@ -116,7 +116,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "delete.ts" <$> res of
         Right (Just (Module _ (scopeGraph, (heap, value)) :| [])) -> do
           value `shouldBe` Rval Unit
-          SpecHelpers.lookupDeclaration "x" heap scopeGraph `shouldBe` Just []
+          SpecHelpers.lookupDeclaration "x" heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
 
     it "evaluates await" $ do
