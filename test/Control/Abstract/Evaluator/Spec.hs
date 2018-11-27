@@ -34,13 +34,7 @@ spec = parallel $ do
     (_, (_, expected)) <- evaluate $ do
       withLexicalScopeAndFrame $ do
         declare (ScopeGraph.Declaration "identity") emptySpan Nothing
-        valueRef <- function "identity" [ SpecEff (do
-            declare (ScopeGraph.Declaration "x") emptySpan Nothing
-            pure $ Rval (Value.Symbol $ pack "x"))
-            , SpecEff (do
-            declare (ScopeGraph.Declaration "y") emptySpan Nothing
-            pure $ Rval (Value.Symbol $ pack "y"))
-          ]
+        valueRef <- function "identity" [ SpecHelpers.name "x", SpecHelpers.name "y" ]
           (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "y"))))
         identity <- value valueRef
         val <- pure (integer 123)
