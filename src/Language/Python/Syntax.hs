@@ -238,34 +238,9 @@ instance Evaluatable QualifiedImport where
                       insertFrameLink ScopeGraph.Import scopeMap
                 go rest)
       mkScopeMap modulePath fun = do
-        (scopeGraph, (heap, _)) <- require modulePath
-        case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-          (Just scope, Just frame) -> do
-            insertImportEdge scope
-            fun (Map.singleton scope frame)
-          _ -> pure ()
-
-        -- withScope scopeAddress $ do
-        --   let
-        --     go [] = pure ()
-        --     go (modulePath :| paths) =
-        --       mkScopeMap modulePath (\scopeMap -> do
-        --         objFrame <- newFrame scopeAddress (Map.singleton ScopeGraph.Import scopeMap)
-        --         val <- object objFrame
-        --         assign aliasSlot val
-        --         for_ paths $ \modulePath ->
-        --           mkScopeMap modulePath (withFrame objFrame . insertFrameLink ScopeGraph.Import))
-        --     go paths
-
-    -- a/*.py
-    -- rvalBox =<< go (NonEmpty.zip (Data.Abstract.Evaluatable.name . T.pack <$> qualifiedName) modulePaths)
-    -- where
-      -- -- Evaluate and import the last module, updating the environment
-      -- go ((name, path) :| []) = evalQualifiedImport name path
-      -- -- Evaluate each parent module, just creating a namespace
-      -- go ((name, path) :| xs) = letrec' name $ \addr -> do
-      --   void $ require path
-      --   makeNamespace name addr Nothing (void (require path >> go (NonEmpty.fromList xs)))
+        (moduleScope, (moduleFrame, _)) <- require modulePath
+        insertImportEdge moduleScope
+        fun (Map.singleton moduleScope moduleFrame)
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
