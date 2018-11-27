@@ -154,46 +154,26 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    (scopeGraph, (heap, _)) <- require path
+    (moduleScope, (moduleFrame, _)) <- require path
     if Prologue.null xs then do
-      case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-        (Just scope, Just frame) -> do
-          insertImportEdge scope
-          insertFrameLink ScopeGraph.Import (Map.singleton scope frame)
-        _ -> pure ()
+      insertImportEdge moduleScope
+      insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     else do
-      let scopeEdges = maybe mempty (Map.singleton ScopeGraph.Import . pure) (ScopeGraph.currentScope scopeGraph)
+      let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
       scopeAddress <- newScope scopeEdges
       scope <- lookupScope scopeAddress
-      for_ xs $ \Alias{..} ->
-        insertImportReference (Reference aliasName) (Declaration aliasValue) scopeGraph scopeAddress scope
-      let frameLinks = case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-            (Just importScope, Just importFrame) -> Map.singleton importScope importFrame
-            _ -> mempty
+      withScope scopeAddress $
+        for_ xs $ \Alias{..} ->
+          insertImportReference (Reference aliasName) (Declaration aliasValue) moduleScope scopeAddress scope
 
+      let frameLinks = Map.singleton moduleScope moduleFrame
       frameAddress <- newFrame scopeAddress (Map.singleton ScopeGraph.Import frameLinks)
+
       insertImportEdge scopeAddress
       insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frameAddress)
 
     rvalBox unit
-    -- where
-    --   select importedBinds
-    --     | Prologue.null xs = importedBinds
-    --     | otherwise = Env.aliasBindings (toTuple <$> xs) importedBinds
 
-
--- -- Evaluate a qualified import
--- evalQualifiedImport :: ( AbstractValue term address value m
---                        , Carrier sig m
---                        , Member (Allocator address) sig
---                        , Member (Deref value) sig
---                        , Member (Modules address value) sig
---                        , Member (State (Heap address address value)) sig
---                        , Ord address
---                        )
---                     => Name -> ModulePath -> Evaluator term address value m value
--- evalQualifiedImport name path = letrec' name $ \addr -> do
---   unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
