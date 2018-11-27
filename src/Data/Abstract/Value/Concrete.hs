@@ -7,6 +7,7 @@ module Data.Abstract.Value.Concrete
   ) where
 
 import Control.Abstract.ScopeGraph (Allocator, ScopeError, lookupDeclarationScope)
+import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
 import Control.Effect.Carrier
@@ -132,7 +133,6 @@ instance ( FreeVariables term
               catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
         _ -> throwValueError (CallError op)
       Evaluator $ runFunctionC (k boxed) eval) op)
-
 
 instance ( Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
