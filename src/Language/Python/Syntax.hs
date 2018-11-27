@@ -181,7 +181,7 @@ instance Evaluatable Import where
 -- evalQualifiedImport name path = letrec' name $ \addr -> do
 --   unit <$ makeNamespace name addr Nothing (bindAll . fst . snd =<< require path)
 
-newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty FilePath }
+newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: NonEmpty String }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Message1 QualifiedImport where
