@@ -1,6 +1,5 @@
 module Analysis.Python.Spec (spec) where
 
-import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Value.Concrete
@@ -20,9 +19,8 @@ spec config = parallel $ do
           const () <$> SpecHelpers.lookupDeclaration "a" heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "b" heap scopeGraph `shouldBe` Just ()
 
-          -- (lookupDeclaration "a" heap >>= deNamespace heap) `shouldBe` Just ("a", ["foo"])
-          -- (lookupDeclaration "b" heap >>= deNamespace heap) `shouldBe` Just ("b", ["c"])
-          undefined
+          (SpecHelpers.lookupDeclaration "a" heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["foo"]
+          (SpecHelpers.lookupDeclaration "b" heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["c"]
           -- (derefQName heap ("b" :| ["c"]) env >>= deNamespace heap) `shouldBe` Just ("c", ["baz"])
         other -> expectationFailure (show other)
 
