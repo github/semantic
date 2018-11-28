@@ -91,8 +91,8 @@ instance Evaluatable Require where
     name <- eval x >>= value >>= asString
     path <- resolveRubyName name
     traceResolve name path
-    (scopeGraph, v) <- doRequire path
-    maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
+    (moduleScope, v) <- doRequire path
+    insertImportEdge moduleScope
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( Member (Boolean value) sig
@@ -100,12 +100,12 @@ doRequire :: ( Member (Boolean value) sig
              , Carrier sig m
              )
           => M.ModulePath
-          -> Evaluator term address value m (ScopeGraph.ScopeGraph address, value)
+          -> Evaluator term address value m (address, value)
 doRequire path = do
   result <- lookupModule path
   case result of
     Nothing       -> (,) . fst <$> load path <*> boolean True
-    Just (scopeGraph, _) -> (scopeGraph,) <$> boolean False
+    Just (moduleScope, _) -> (moduleScope,) <$> boolean False
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
@@ -129,7 +129,6 @@ doLoad :: ( Member (Boolean value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader Span) sig
           , Member (Resumable (BaseError ResolutionError)) sig
-          , Member (Resumable (BaseError (ScopeError address))) sig
           , Member (State (ScopeGraph.ScopeGraph address)) sig
           , Member Trace sig
           , Ord address
@@ -141,9 +140,8 @@ doLoad :: ( Member (Boolean value) sig
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  scopeGraph <- fst <$> load path'
-  unless shouldWrap $ do
-    maybe (pure ()) insertImportEdge (ScopeGraph.currentScope scopeGraph)
+  moduleScope <- fst <$> load path'
+  unless shouldWrap (insertImportEdge moduleScope)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
