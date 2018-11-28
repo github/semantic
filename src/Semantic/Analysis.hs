@@ -88,7 +88,10 @@ evaluate lang perModule runTerm modules = do
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModule parentScope parentFrame m = raiseHandler (runReader (moduleInfo m)) . runAllocator $ do
+        evalModule parentScope parentFrame m =
+          -- Run the allocator and Reader ModuleInfo effects (Some allocator instances depend on Reader ModuleInfo)
+          -- after setting up the scope and frame for a module.
+          raiseHandler (runReader (moduleInfo m)) . runAllocator $ do
           let (scopeEdges, frameLinks) = case (parentScope, parentFrame) of
                 (Just parentScope, Just parentFrame) -> (Map.singleton Lexical [ parentScope ], Map.singleton Lexical (Map.singleton parentScope parentFrame))
                 _ -> mempty
