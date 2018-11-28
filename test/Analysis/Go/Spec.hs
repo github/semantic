@@ -13,20 +13,20 @@ spec config = parallel $ do
     it "imports and wildcard imports" $ do
       (_, res) <- evaluate ["main.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main.go" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
-          () <$ SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
-          (SpecHelpers.lookupDeclaration "foo" heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["New"]
-          () <$ SpecHelpers.lookupDeclaration "main" heap scopeGraph `shouldBe` Just ()
-          () <$ SpecHelpers.lookupDeclaration "Bar" heap scopeGraph `shouldBe` Just ()
-          () <$ SpecHelpers.lookupDeclaration "Rab" heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeGraph, (heap, (addresses, valueRef))) :| [])) -> do
+          () <$ SpecHelpers.lookupDeclaration "foo" addresses heap scopeGraph `shouldBe` Just ()
+          (SpecHelpers.lookupDeclaration "foo" addresses heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["New"]
+          () <$ SpecHelpers.lookupDeclaration "main" addresses heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Bar" addresses heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Rab" addresses heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "imports with aliases (and side effects only)" $ do
       (_, res) <- evaluate ["main1.go", "foo/foo.go", "bar/bar.go", "bar/rab.go"]
       case ModuleTable.lookup "main1.go" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "f" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "main" heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeGraph, (heap, (addresses, valueRef))) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "f" addresses heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "main" addresses heap scopeGraph `shouldBe` Just ()
           -- (lookupDeclaration "f" heap >>= deNamespace heap) `shouldBe` Just ("f",  ["New"])
         other -> expectationFailure (show other)
 

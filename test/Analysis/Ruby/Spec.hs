@@ -21,15 +21,15 @@ spec config = parallel $ do
     it "evaluates require_relative" $ do
       (_, res) <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
-          const () <$> lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+          const () <$> lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates load" $ do
       (_, res) <- evaluate ["load.rb", "foo.rb"]
       case ModuleTable.lookup "load.rb" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, valueRef)) :| [])) -> do
+        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
           valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
           const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
