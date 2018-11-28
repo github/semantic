@@ -69,12 +69,9 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      (scopeGraph, (heap, _)) <- require path
-      case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-        (Just scopeAddress, Just frame) -> do
-          insertImportEdge scopeAddress
-          insertFrameLink ScopeGraph.Import (Map.singleton scopeAddress frame)
-        _ -> pure ()
+      (moduleScope, (moduleFrame, _)) <- require path
+      insertImportEdge moduleScope
+      insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     rvalBox unit
 
 
@@ -108,12 +105,9 @@ instance Evaluatable QualifiedImport where
             for_ paths $ \modulePath ->
               mkScopeMap modulePath (withFrame objFrame . insertFrameLink ScopeGraph.Import))
           where mkScopeMap modulePath fun = do
-                  (scopeGraph, (heap, _)) <- require modulePath
-                  case (ScopeGraph.currentScope scopeGraph, Heap.currentFrame heap) of
-                    (Just scope, Just frame) -> do
-                      insertImportEdge scope
-                      fun (Map.singleton scope frame)
-                    _ -> pure ()
+                  (moduleScope, (moduleFrame, _)) <- require modulePath
+                  insertImportEdge moduleScope
+                  fun (Map.singleton moduleScope moduleFrame)
       go paths
     rvalBox unit
 
@@ -125,12 +119,12 @@ instance Eq1 SideEffectImport where liftEq = genericLiftEq
 instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Revisit this and confirm if this is correct.
 instance Evaluatable SideEffectImport where
   eval _ (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
-    for_ paths $ \path -> do
-      (scopeGraph, _) <- require path
+    for_ paths $ \path -> require path -- Do we need to construct any scope / frames for these side-effect imports?
     rvalBox unit
 
 -- A composite literal in Go
@@ -296,11 +290,7 @@ instance Ord1 Package where liftCompare = genericLiftCompare
 instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
-  eval eval (Package _ xs) = do
-    currentScope' <- currentScope
-    let edges = maybe mempty (Map.singleton Lexical . pure) currentScope'
-    scope <- newScope edges
-    withScope scope $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+  eval eval (Package _ xs) = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).
