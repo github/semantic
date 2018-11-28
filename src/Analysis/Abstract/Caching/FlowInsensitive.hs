@@ -81,7 +81,6 @@ convergingModules :: ( AbstractValue term address value m
                      , Member NonDet sig
                      , Member (Reader (Cache term address value)) sig
                      , Member (Reader (Live address)) sig
-                     , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
                      , Member (State (Cache term address value)) sig
                      , Member (State (Heap address address value)) sig
