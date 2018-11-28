@@ -133,6 +133,7 @@ runCallGraph lang includePackages modules package
   . providingLiveSet
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
+  . runAllocator
   $ evaluate lang perModule perTerm modules
   where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
         perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
@@ -208,6 +209,8 @@ runImportGraph lang (package :: Package term) f
   . raiseHandler (runReader (packageInfo package))
   . raiseHandler (runState (lowerBound @Span))
   . raiseHandler (runReader (lowerBound @Span))
+  . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
+  . runAllocator
   $ evaluate lang graphingModuleInfo (evalTerm id) (ModuleTable.toPairs (packageModules package) >>= toList . snd)
 
 runHeap :: (Carrier sig m, Effect sig)
@@ -271,6 +274,8 @@ parsePythonPackage parser project = do
         . raiseHandler (runReader (PackageInfo (Data.Abstract.Evaluatable.name "setup") lowerBound))
         . raiseHandler (runState (lowerBound @Span))
         . raiseHandler (runReader (lowerBound @Span))
+        . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) Precise))))
+        . runAllocator
 
   strat <- case find ((== (projectRootDir project </> "setup.py")) . filePath) (projectFiles project) of
     Just setupFile -> do
