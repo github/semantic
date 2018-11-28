@@ -197,8 +197,8 @@ define :: forall value sig address m term. ( HasCallStack
        -> Evaluator term address value m (ValueRef address value)
 define declaration def = withCurrentCallStack callStack $ do
   -- TODO: This span is still wrong.
-  scopeGraph <- get @(ScopeGraph address)
-  traceShowM scopeGraph
+  declare declaration emptySpan Nothing
+  slot <- lookupDeclaration declaration
   value <- def
   LvalMember slot <$ assign slot value
 

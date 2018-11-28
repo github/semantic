@@ -50,13 +50,16 @@ lookup ref = ScopeGraph.scopeOfRef ref <$> get
 -- TODO: Don't return an address.
 declare :: ( Carrier sig m
            , Member (State (ScopeGraph address)) sig
+           , Member (Reader (address, address)) sig
            , Ord address
            )
         => Declaration
         -> Span
         -> Maybe address
         -> Evaluator term address value m ()
-declare decl span scope = modify (fst . ScopeGraph.declare decl span scope)
+declare decl span scope = do
+  currentAddress <- currentScope
+  modify (fst . ScopeGraph.declare decl span scope currentAddress)
 
 putDeclarationScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
 putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
@@ -64,32 +67,46 @@ putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
 putDeclarationSpan :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Span -> Evaluator term address value m ()
 putDeclarationSpan decl = modify @(ScopeGraph address) . (ScopeGraph.insertDeclarationSpan decl)
 
-reference :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Reference -> Declaration -> Evaluator term address value m ()
-reference ref = modify @(ScopeGraph address) . (ScopeGraph.reference ref)
+reference :: forall address sig m term value
+          . ( Ord address
+            , Member (State (ScopeGraph address)) sig
+            , Member (Reader (address, address)) sig
+            , Carrier sig m)
+          => Reference
+          -> Declaration
+          -> Evaluator term address value m ()
+reference ref decl = do
+  currentAddress <- currentScope
+  modify @(ScopeGraph address) (ScopeGraph.reference ref decl currentAddress)
 
 -- | Combinator to insert an export edge from the current scope to the provided scope address.
-insertExportEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
+insertExportEdge :: (Member (Reader (scopeAddress, scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                  => scopeAddress
                  -> Evaluator term scopeAddress value m ()
 insertExportEdge = insertEdge ScopeGraph.Export
 
 -- | Combinator to insert an import edge from the current scope to the provided scope address.
-insertImportEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
+insertImportEdge :: (Member (Reader (scopeAddress, scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                  => scopeAddress
                  -> Evaluator term scopeAddress value m ()
 insertImportEdge = insertEdge ScopeGraph.Import
 
 -- | Combinator to insert a lexical edge from the current scope to the provided scope address.
-insertLexicalEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
+insertLexicalEdge :: (Member (Reader (scopeAddress, scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                   => scopeAddress
                   -> Evaluator term scopeAddress value m ()
 insertLexicalEdge = insertEdge ScopeGraph.Lexical
 
-insertEdge :: (Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
+insertEdge :: ( Member (State (ScopeGraph address)) sig
+              , Member (Reader (address, address)) sig
+              , Carrier sig m
+              , Ord address)
            => EdgeLabel
-           -> scopeAddress
-           -> Evaluator term scopeAddress value m ()
-insertEdge label target = modify (ScopeGraph.insertEdge label target)
+           -> address
+           -> Evaluator term address value m ()
+insertEdge label target = do
+  currentAddress <- currentScope
+  modify (ScopeGraph.insertEdge label target currentAddress)
 
 -- | Inserts a new scope into the scope graph with the given edges.
 newScope :: ( Member (Allocator address) sig
@@ -139,7 +156,7 @@ insertImportReference ref decl scopeAddress = do
   scopeGraph <- get
   scope <- lookupScope scopeAddress
   currentAddress <- currentScope
-  newScope <- maybeM (throwScopeError LookupScopeError) (ScopeGraph.insertImportReference ref decl scopeGraph currentAddress scope)
+  newScope <- maybeM (throwScopeError LookupScopeError) (ScopeGraph.insertImportReference ref decl currentAddress scopeGraph scope)
   insertScope scopeAddress newScope
 
 insertScope :: ( Member (State (ScopeGraph address)) sig
@@ -155,13 +172,17 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader ModuleInfo) sig
                 , Member (Reader Span) sig
                 , Member (State (ScopeGraph address)) sig
+                , Member (Reader (address, address)) sig
                 , Carrier sig m
                 , Ord address
                 , Show address
                 )
              => Declaration
              -> Evaluator term address value m (ScopeGraph.Path address)
-lookupScopePath decl@Declaration{..} = maybeM (throwScopeError $ LookupPathError decl) . ScopeGraph.lookupScopePath unDeclaration =<< get
+lookupScopePath decl@Declaration{..} = do
+  currentAddress <- currentScope
+  scopeGraph <- get
+  maybeM (throwScopeError $ LookupPathError decl) (ScopeGraph.lookupScopePath unDeclaration currentAddress scopeGraph)
 
 lookupDeclarationScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader ModuleInfo) sig

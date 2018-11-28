@@ -35,11 +35,11 @@ data Frame scopeAddress frameAddress value = Frame {
   deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | A map of frame addresses onto Frames.
-data Heap scopeAddress frameAddress value = Heap { currentFrame :: Maybe frameAddress, heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
+newtype Heap scopeAddress frameAddress value = Heap { heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
   deriving (Eq, Ord, Generic, NFData, Show)
 
 instance Lower (Heap scopeAddress frameAddress value) where
-  lowerBound = Heap lowerBound lowerBound
+  lowerBound = Heap lowerBound
 
 
 -- | Look up the frame for an 'address' in a 'Heap', if any.
@@ -73,16 +73,15 @@ deleteSlot Address{..} h@Heap{} =
         h { heap = Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) (heap h) }
       Nothing -> h
 
-lookupDeclaration :: (Ord address, Show address) => Declaration -> address -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
-lookupDeclaration Declaration{..} currentAddress scopeGraph heap = do
-  path <- lookupScopePath unDeclaration currentAddress scopeGraph
-  frameAddress <- lookupFrameAddress path heap
+lookupDeclaration :: (Ord address, Show address) => Declaration -> (address, address) -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
+lookupDeclaration Declaration{..} (currentScope, currentFrame) scopeGraph heap = do
+  path <- lookupScopePath unDeclaration currentScope scopeGraph
+  frameAddress <- lookupFrameAddress path  currentFrame heap
   pure (Address frameAddress (pathPosition path))
 
-lookupFrameAddress :: (Ord address, Ord scope) => Path scope -> Heap scope address value -> Maybe address
-lookupFrameAddress path h@Heap{..} = do
-  frameAddress <- currentFrame
-  go path frameAddress
+lookupFrameAddress :: (Ord address, Ord scope) => Path scope -> address -> Heap scope address value -> Maybe address
+lookupFrameAddress path currentFrame h@Heap{..} = do
+  go path currentFrame
   where
     go path address = case path of
       DPath _ _ -> pure address
@@ -114,8 +113,7 @@ heapSize :: Heap scope address value -> Int
 heapSize = Map.size . heap
 
 isHeapEmpty :: (Eq address, Eq value) => Heap scope address value -> Bool
-isHeapEmpty h@Heap{..} = isJust currentFrame &&
-                         (heapSize h) == 1 &&
+isHeapEmpty h@Heap{..} = (heapSize h) == 1 &&
                          (toEmptyFrame <$> Map.elems heap) == [ Frame () mempty mempty ]
   where
     toEmptyFrame Frame{..} = Frame () (Map.mapKeysMonotonic (const ()) <$> links) slots
