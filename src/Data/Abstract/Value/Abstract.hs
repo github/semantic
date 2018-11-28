@@ -23,6 +23,7 @@ instance ( Member (Allocator address) sig
          , Member (Deref Abstract) sig
          , Member (Error (Return address Abstract)) sig
          , Member Fresh sig
+         , Member (Reader (address, address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
@@ -43,7 +44,7 @@ instance ( Member (Allocator address) sig
     Function name params body k -> runEvaluator $ do
       functionSpan <- ask @Span -- TODO: This might be wrong
       currentScope' <- currentScope
-      let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
       scope <- newScope lexicalEdges
       declare (Declaration name) functionSpan (Just scope)
 

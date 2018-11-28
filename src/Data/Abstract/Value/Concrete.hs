@@ -29,7 +29,8 @@ import Prologue
 import qualified Data.Map.Strict as Map
 
 data Value term address
-  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) address (Maybe address)
+                                                                         --  Scope   Frame
+  = Closure PackageInfo ModuleInfo (Maybe Name) [Name] (Either BuiltIn term) address address
   | Unit
   | Boolean Bool
   | Integer  (Number.Number Integer)
@@ -65,6 +66,7 @@ instance ( FreeVariables term
          , Member (Reader Span) sig
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
+         , Member (Reader (address, address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
          , Member (Resumable (BaseError (EvalError address (Value term address)))) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
@@ -88,7 +90,7 @@ instance ( FreeVariables term
       _ <- fresh
       -- TODO: Declare all params
       currentScope' <- currentScope
-      let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
       associatedScope <- newScope lexicalEdges
       -- TODO: Fix this if we find a solution to declaring names of functions without throwing a lookupPathError.
       -- declare (Declaration name) span (Just scope)
@@ -109,7 +111,7 @@ instance ( FreeVariables term
 
       currentScope' <- currentScope
       currentFrame' <- currentFrame @(Value term address)
-      let lexicalEdges = maybe mempty (Map.singleton Lexical . pure) currentScope'
+      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
       associatedScope <- newScope lexicalEdges
       let closure = Closure packageInfo moduleInfo Nothing [] (Left builtIn) associatedScope currentFrame'
       Evaluator $ runFunctionC (k closure) eval
@@ -121,10 +123,8 @@ instance ( FreeVariables term
           -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
           -- charge them to the closure's origin.
           withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
-            parentScope <- traverse scopeLookup parentFrame
-            let frameEdges = case (parentScope, parentFrame) of
-                  (Just scope, Just frame) -> Map.singleton Lexical (Map.singleton scope frame)
-                  _ -> mempty
+            parentScope <- scopeLookup parentFrame
+            let frameEdges = Map.singleton Lexical (Map.singleton parentScope parentFrame)
             frameAddress <- newFrame associatedScope frameEdges
             withScopeAndFrame frameAddress $ do
               for_ (zip names params) $ \(name, param) -> do
