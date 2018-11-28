@@ -41,6 +41,8 @@ justEvaluating
   = runM
   . runEvaluator
   . raiseHandler runTraceByPrinting
+  . runHeap
+  . runScopeGraph
   . raiseHandler runFresh
   . fmap reassociate
   . runLoadError
@@ -57,6 +59,7 @@ checking
   . runEvaluator
   . raiseHandler runTraceByPrinting
   . runHeap
+  . runScopeGraph
   . raiseHandler runFresh
   . caching
   . providingLiveSet
