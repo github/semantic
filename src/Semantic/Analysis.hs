@@ -63,6 +63,9 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member (Resumable (BaseError (UnspecializedError value))) innerSig
             , Member (State (Heap address address value)) innerSig
             , Member (State (ScopeGraph address)) innerSig
+            , Member (State (Heap address address value)) outerSig
+            , Member (State (ScopeGraph address)) outerSig
+            , Member (Reader (address, address)) innerSig
             , Member (Resumable (BaseError (HeapError address))) innerSig
             , Member (Resumable (BaseError (ScopeError address))) innerSig
             , Member Trace innerSig
@@ -78,23 +81,23 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
-  (preludeScopeAddress, (preludeFrameAddress, _)) <- evalModule lowerBound lowerBound prelude
-  foldr (run preludeScopeAddress heap . fmap Right) ask modules
+  (preludeScopeAddress, (preludeFrameAddress, _)) <- evalModule Nothing Nothing prelude
+  foldr (run preludeScopeAddress preludeFrameAddress . fmap Right) ask modules
   where run preludeScopeAddress preludeFrameAddress m rest = do
-          evaluated <- evalModule preludeScopeAddress preludeFrameAddress m
+          evaluated <- evalModule (Just preludeScopeAddress) (Just preludeFrameAddress) m
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
           local (ModuleTable.insert (modulePath (moduleInfo m)) ((evaluated <$ m) :| [])) rest
 
-        evalModule parentScopeAddress parentFrameAddress m = do
-          let (scopeEdges, frameLinks) = (Map.singleton Lexical [ parentScopeAddress ], Map.singleton Lexical (Map.singleton parentScopeAddress parentFrameAddress))
+        evalModule parentScope parentFrame m = raiseHandler (runReader (moduleInfo m)) . runAllocator $ do
+          let (scopeEdges, frameLinks) = case (parentScope, parentFrame) of
+                (Just parentScope, Just parentFrame) -> (Map.singleton Lexical [ parentScope ], Map.singleton Lexical (Map.singleton parentScope parentFrame))
+                _ -> mempty
           scopeAddress <- newScope scopeEdges
           frameAddress <- newFrame scopeAddress frameLinks
           val <- runInModule scopeAddress frameAddress (perModule (runValueEffects . moduleBody) m)
           pure (scopeAddress, (frameAddress, val))
           where runInModule scopeAddress frameAddress
-                  = raiseHandler (runReader (moduleInfo m))
-                  . runAllocator
-                  . runDeref
+                  = runDeref
                   . raiseHandler (runReader (scopeAddress, frameAddress))
                   . runReturn
                   . runLoopControl
@@ -128,6 +131,7 @@ evalTerm :: ( Carrier sig m
             , Member (Resumable (BaseError ResolutionError)) sig
             , Member (State (Heap address address value)) sig
             , Member (State (ScopeGraph address)) sig
+            , Member (Reader (address, address)) sig
             , Member (State Span) sig
             , Member (While address value) sig
             , Member Fresh sig

@@ -10,6 +10,7 @@ module Semantic.Graph
 , ControlFlowVertex
 , style
 , runHeap
+, runScopeGraph
 , runModuleTable
 , parsePackage
 , parsePythonPackage
@@ -115,9 +116,8 @@ runCallGraph lang includePackages modules package
   . runEvaluator
   . graphing @_ @_ @_ @(Hole (Maybe Name) (Located Monovariant)) @Abstract
   . runHeap
+  . runScopeGraph
   . caching
-  . raiseHandler (runState (lowerBound @(ScopeGraph (Hole (Maybe Name) (Located Monovariant)))))
-  . raiseHandler (runState (lowerBound @(Heap (Hole (Maybe Name) (Located Monovariant)) (Hole (Maybe Name) (Located Monovariant)) Abstract)))
   . raiseHandler runFresh
   . resumingLoadError
   . resumingUnspecialized
@@ -133,7 +133,6 @@ runCallGraph lang includePackages modules package
   . providingLiveSet
   . runModuleTable
   . runModules (ModuleTable.modulePaths (packageModules package))
-  . runAllocator
   $ evaluate lang perModule perTerm modules
   where perTerm = evalTerm (withTermSpans . graphingTerms . cachingTerms)
         perModule = (if includePackages then graphingPackages else id) . convergingModules . graphingModules
@@ -217,6 +216,11 @@ runHeap :: (Carrier sig m, Effect sig)
         => Evaluator term address value (StateC (Heap address address value) (Eff m)) a
         -> Evaluator term address value m (Heap address address value, a)
 runHeap = raiseHandler (runState lowerBound)
+
+runScopeGraph :: (Carrier sig m, Effect sig, Ord address)
+        => Evaluator term address value (StateC (ScopeGraph address) (Eff m)) a
+        -> Evaluator term address value m (ScopeGraph address, a)
+runScopeGraph = raiseHandler (runState lowerBound)
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: (Member Distribute sig, Member (Error SomeException) sig, Member Resolution sig, Member Task sig, Member Trace sig, Carrier sig m, Monad m)
