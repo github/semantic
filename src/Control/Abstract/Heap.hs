@@ -53,7 +53,7 @@ import Control.Abstract.ScopeGraph (ScopeError)
 import Data.Abstract.Live
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Name
-import Data.Span (Span)
+import Data.Span (Span, emptySpan)
 import qualified Data.Map.Strict as Map
 import Prologue
 import Data.Abstract.Ref
@@ -179,7 +179,7 @@ withFrame address action = local @(address, address) (second (const address)) ac
 --   pure addr
 
 -- | Define a declaration and assign the value of an action in the current frame.
-define :: ( HasCallStack
+define :: forall value sig address m term. ( HasCallStack
           , Member (Deref value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader Span) sig
@@ -196,9 +196,9 @@ define :: ( HasCallStack
        -> Evaluator term address value m value
        -> Evaluator term address value m (ValueRef address value)
 define declaration def = withCurrentCallStack callStack $ do
-  span <- ask @Span -- TODO: This Span is most definitely wrong
-  declare declaration span Nothing
-  slot <- lookupDeclaration declaration
+  -- TODO: This span is still wrong.
+  scopeGraph <- get @(ScopeGraph address)
+  traceShowM scopeGraph
   value <- def
   LvalMember slot <$ assign slot value
 
