@@ -113,8 +113,7 @@ instance HasPrelude 'PHP
 
 instance HasPrelude 'Python where
   definePrelude _ =
-    void . withLexicalScopeAndFrame $
-      define (Declaration $ X.name "print") (builtIn (X.name "print") Print)
+    void $ define (Declaration $ X.name "print") (builtIn (X.name "print") Print)
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do

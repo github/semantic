@@ -73,9 +73,9 @@ deleteSlot Address{..} h@Heap{} =
         h { heap = Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) (heap h) }
       Nothing -> h
 
-lookupDeclaration :: (Ord address, Show address) => Declaration -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
-lookupDeclaration Declaration{..} scopeGraph heap = do
-  path <- lookupScopePath unDeclaration scopeGraph
+lookupDeclaration :: (Ord address, Show address) => Declaration -> address -> ScopeGraph address -> Heap address address value -> Maybe (Address address)
+lookupDeclaration Declaration{..} currentAddress scopeGraph heap = do
+  path <- lookupScopePath unDeclaration currentAddress scopeGraph
   frameAddress <- lookupFrameAddress path heap
   pure (Address frameAddress (pathPosition path))
 

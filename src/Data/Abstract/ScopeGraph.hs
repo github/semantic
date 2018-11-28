@@ -58,10 +58,10 @@ instance AbstractHole address => AbstractHole (Address address) where
 newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)
 
-data ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope), currentScope :: Maybe scope }
+newtype ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope) }
 
 instance Ord scope => Lower (ScopeGraph scope) where
-  lowerBound = ScopeGraph mempty Nothing
+  lowerBound = ScopeGraph mempty
 
 deriving instance Eq address => Eq (ScopeGraph address)
 deriving instance Show address => Show (ScopeGraph address)
@@ -123,24 +123,22 @@ lookupScope scope = Map.lookup scope . graph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
-declare :: Ord scope => Declaration -> Span -> Maybe scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
-declare declaration ddata assocScope g@ScopeGraph{..} = fromMaybe (g, Nothing) $ do
-  scopeKey <- currentScope
-  scope <- lookupScope scopeKey g
+declare :: Ord scope => Declaration -> Span -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
+declare declaration ddata assocScope currentScope g@ScopeGraph{..} = fromMaybe (g, Nothing) $ do
+  scope <- lookupScope currentScope g
   let newScope = scope { declarations = (declarations scope) Seq.|> (declaration, (ddata, assocScope)) }
-  pure $ (g { graph = Map.insert scopeKey newScope graph }, Just . Position $ length (declarations newScope))
+  pure $ (g { graph = Map.insert currentScope newScope graph }, Just . Position $ length (declarations newScope))
 
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
-reference :: Ord scope => Reference -> Declaration -> ScopeGraph scope -> ScopeGraph scope
-reference ref decl@Declaration{..} g@ScopeGraph{..} = fromMaybe g $ do
+reference :: Ord scope => Reference -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
+reference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} = fromMaybe g $ do
   -- Start from the current address
-  currentAddress <- currentScope
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  go currentAddress currentScope' currentAddress id
+  go currentScope' currentAddress id
   where
-    go currentAddress currentScope address path =
+    go currentScope address path =
       case lookupDeclaration unDeclaration address g of
           Just (_, index) ->
             let newScope = currentScope { references = Map.insert ref (path (DPath decl index)) (references currentScope) }
@@ -150,12 +148,12 @@ reference ref decl@Declaration{..} g@ScopeGraph{..} = fromMaybe g $ do
               linkMap <- linksOfScope address g
               scopes <- Map.lookup edge linkMap
               -- Return the first path to the declaration through the scopes.
-              getFirst (foldMap (First . ap (go currentAddress currentScope) ((path .) . EPath edge)) scopes)
+              getFirst (foldMap (First . ap (go currentScope) ((path .) . EPath edge)) scopes)
             in traverseEdges Import <|> traverseEdges Lexical
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
-insertImportReference :: Ord address => Reference -> Declaration -> ScopeGraph address -> address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} currentAddress scope = do
+insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
+insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} scope = do
   go currentAddress (EPath Import currentAddress)
   where
     go address path =
@@ -170,9 +168,8 @@ insertImportReference ref decl@Declaration{..} g@ScopeGraph{..} currentAddress s
               -- Return the first path to the declaration through the scopes.
               getFirst (foldMap (First . (\scope -> go scope (path . EPath edge scope))) scopes)
 
-lookupScopePath :: Ord scopeAddress => Name -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupScopePath declaration g@ScopeGraph{..} = do
-  currentAddress <- currentScope
+lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
   go currentAddress id
   where
     go address path =
@@ -208,13 +205,12 @@ putDeclarationScopeAtPosition scope position assocScope g = fromMaybe g $ do
 lookupReference :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupReference  name scope g = Map.lookup (Reference name) =<< pathsOfScope scope g
 
-insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertEdge label target g@ScopeGraph{..} = fromMaybe g $ do
-  scopeAddress <- currentScope
-  currentScope' <- lookupScope scopeAddress g
+insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+insertEdge label target currentAddress g@ScopeGraph{..} = fromMaybe g $ do
+  currentScope' <- lookupScope currentAddress g
   scopes <- maybe (Just mempty) pure (Map.lookup label (edges currentScope'))
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
-  pure (g { graph = Map.insert scopeAddress newScope graph })
+  pure (g { graph = Map.insert currentAddress newScope graph })
 
 
 -- | Insert associate the given address to a declaration in the scope graph.
