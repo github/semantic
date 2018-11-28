@@ -59,6 +59,7 @@ import Semantic.Diff as X
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
+import Semantic.Graph (runHeap, runScopeGraph)
 import System.FilePath as X
 
 import Data.ByteString as X (ByteString)
@@ -117,9 +118,12 @@ type TestEvaluatingC term
   ( ResumableC (BaseError (ScopeError Precise)) (Eff
   ( ResumableC (BaseError (UnspecializedError (Val term))) (Eff
   ( ResumableC (BaseError (LoadError Precise (Val term))) (Eff
+
+  (StateC (Heap Precise Precise (Val term)) (Eff
+  (StateC (ScopeGraph Precise) (Eff
   ( FreshC (Eff
   ( TraceByReturningC (Eff
-  ( LiftC IO))))))))))))))))))))
+  ( LiftC IO))))))))))))))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (AddressError Precise (Val term))
      , BaseError (ValueError term Precise)
@@ -132,14 +136,16 @@ type TestEvaluatingErrors term
      ]
 testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) (Span, a)
                -> IO
-                 ( [String]
-                 , Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a
-                 )
+                  (ScopeGraph Precise,
+                    (Heap Precise Precise (Value term Precise),
+                     Either (SomeError (Data.Sum.Sum (TestEvaluatingErrors term))) a))
 testEvaluating
   = runM
-  . runTraceByReturning
+  . runTraceByIgnoring
   . runFresh
   . runEvaluator
+  . runScopeGraph
+  . runHeap
   . fmap reassociate
   . runLoadError
   . runUnspecialized
@@ -185,9 +191,9 @@ frameNames heap scopeGraph frame = do
 -- namespaceScope _ _ = Nothing
 
 lookupDeclaration :: Name -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Value term Precise ]
-lookupDeclaration name (currenScope, currentFrame) heap scopeGraph = do
-  path <- ScopeGraph.lookupScopePath name scopeGraph
-  frameAddress <- Heap.lookupFrameAddress path heap
+lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do
+  path <- ScopeGraph.lookupScopePath name currentScope scopeGraph
+  frameAddress <- Heap.lookupFrameAddress path currentFrame heap
   toList <$> Heap.getSlot (Address frameAddress (Heap.pathPosition path)) heap
 
 newtype Verbatim = Verbatim ByteString

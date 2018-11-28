@@ -27,11 +27,11 @@ import System.IO.Unsafe (unsafePerformIO)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    (_, (_, expected)) <- evaluate (rvalBox (integer 123))
+    (_, (_, (_, expected))) <- evaluate (rvalBox (integer 123))
     expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
 
   it "calls functions" $ do
-    (_, (_, expected)) <- evaluate $ do
+    (_, (_, (_, expected))) <- evaluate $ do
       withLexicalScopeAndFrame $ do
         declare (ScopeGraph.Declaration "identity") emptySpan Nothing
         valueRef <- function "identity" [ SpecHelpers.name "x", SpecHelpers.name "y" ]
@@ -56,18 +56,27 @@ evaluate
   . evalState (lowerBound @Span)
   . runReader (lowerBound @Span)
   . runEvaluator
-  . fmap reassociate
-  . runScopeError
-  . runHeapError
-  . runValueError
-  . runAddressError
-  . runEvalError
-  . runDeref @Val
   . runAllocator
-  . runReturn
-  . runLoopControl
-  . runBoolean
-  . runFunction runSpecEff
+  . evalModule
+  where
+    evalModule action = do
+      scopeAddress <- newScope mempty
+      frameAddress <- newFrame scopeAddress mempty
+      val <- raiseHandler (runReader (scopeAddress, frameAddress))
+        . fmap reassociate
+        . runScopeError
+        . runHeapError
+        . runValueError
+        . runAddressError
+        . runEvalError
+        . runDeref @Val
+        . runAllocator
+        . runReturn
+        . runLoopControl
+        . runBoolean
+        . runFunction runSpecEff
+        $ action
+      pure ((scopeAddress, frameAddress), val)
 
 reassociate :: Either (SomeError exc1) (Either (SomeError exc2) (Either (SomeError exc3) (Either (SomeError exc4) (Either (SomeError exc5) result)))) -> Either (SomeError (Sum '[exc5, exc4, exc3, exc2, exc1])) result
 reassociate = mergeErrors . mergeErrors . mergeErrors . mergeErrors . mergeErrors . Right
@@ -85,6 +94,8 @@ newtype SpecEff = SpecEff
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
                  (Eff (ResumableC (BaseError (HeapError Precise))
                  (Eff (ResumableC (BaseError (ScopeError Precise))
+                 (Eff (ReaderC (Precise, Precise)
+                 (Eff (AllocatorC Precise
                  (Eff (ReaderC Span
                  (Eff (StateC Span
                  (Eff (ReaderC ModuleInfo
@@ -93,7 +104,7 @@ newtype SpecEff = SpecEff
                  (Eff (StateC (Heap Precise Precise Val)
                  (Eff (StateC (ScopeGraph Precise)
                  (Eff (TraceByIgnoringC
-                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))
+                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))
                  (ValueRef Precise Val)
   }
 
@@ -104,5 +115,5 @@ instance FreeVariables SpecEff where freeVariables _ = lowerBound
 instance Declarations SpecEff where
   declaredName eff =
     case unsafePerformIO (evaluate $ runSpecEff eff) of
-      (_, (_, Right (Rval (Value.Symbol text)))) -> Just (SpecHelpers.name text)
+      (_, (_, (_, Right (Rval (Value.Symbol text))))) -> Just (SpecHelpers.name text)
       _ -> error "declaredName for SpecEff should return an RVal"
