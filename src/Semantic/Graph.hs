@@ -345,11 +345,12 @@ resumingLoadError :: ( Carrier sig m
                      , Member Trace sig
                      , Ord address
                      , AbstractHole value
+                     , AbstractHole address
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (LoadError address value)) (Eff m)) a
                   -> Evaluator term address value m a
 resumingLoadError = runLoadErrorWith (\ baseError -> traceError "LoadError" baseError *> case baseErrorException baseError of
-  ModuleNotFoundError _ -> pure (lowerBound, (lowerBound, hole)))
+  ModuleNotFoundError _ -> pure (hole, (hole, hole)))
 
 resumingEvalError :: ( Carrier sig m
                      , Member Fresh sig
