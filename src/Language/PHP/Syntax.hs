@@ -78,7 +78,7 @@ include eval pathTerm f = do
   name <- eval pathTerm >>= Abstract.value >>= asString
   path <- resolvePHPName name
   traceResolve name path
-  (moduleScope, (moduleFrame, v)) <- f path
+  ((moduleScope, moduleFrame), v) <- f path
   insertImportEdge moduleScope
   insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
   pure v

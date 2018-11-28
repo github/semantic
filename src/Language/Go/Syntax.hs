@@ -69,7 +69,7 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       traceResolve (unPath importPath) path
-      (moduleScope, (moduleFrame, _)) <- require path
+      ((moduleScope, moduleFrame), _) <- require path
       insertImportEdge moduleScope
       insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     rvalBox unit
@@ -105,7 +105,7 @@ instance Evaluatable QualifiedImport where
             for_ paths $ \modulePath ->
               mkScopeMap modulePath (withFrame objFrame . insertFrameLink ScopeGraph.Import))
           where mkScopeMap modulePath fun = do
-                  (moduleScope, (moduleFrame, _)) <- require modulePath
+                  ((moduleScope, moduleFrame), _) <- require modulePath
                   insertImportEdge moduleScope
                   fun (Map.singleton moduleScope moduleFrame)
       go paths

@@ -27,7 +27,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval _ (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (moduleScope, (moduleFrame, _)) <- require modulePath
+    ((moduleScope, moduleFrame), _) <- require modulePath
     if Prologue.null symbols then do
       insertImportEdge moduleScope
       insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
@@ -57,7 +57,7 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedAliasedImport where
   eval _ (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (moduleScope, (moduleFrame, _)) <- require modulePath
+    ((moduleScope, moduleFrame), _) <- require modulePath
     span <- ask @Span
 
     importScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])

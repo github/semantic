@@ -138,7 +138,7 @@ instance Evaluatable Import where
   -- This is a bit of a special case in the syntax as this actually behaves like a qualified relative import.
   eval _ (Import (RelativeQualifiedName n Nothing) [Alias{..}]) = do
     path <- NonEmpty.last <$> resolvePythonModules (RelativeQualifiedName n (Just (qualifiedName (formatName aliasValue :| []))))
-    (moduleScope, (moduleFrame, _)) <- require path
+    ((moduleScope, moduleFrame), _) <- require path
 
     span <- ask @Span
     -- Construct a proxy scope containing an import edge to the imported module's last returned scope.
@@ -168,7 +168,7 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    (moduleScope, (moduleFrame, _)) <- require path
+    ((moduleScope, moduleFrame), _) <- require path
     if Prologue.null xs then do
       insertImportEdge moduleScope
       insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
@@ -238,7 +238,7 @@ instance Evaluatable QualifiedImport where
                       insertFrameLink ScopeGraph.Import scopeMap
                 go rest)
       mkScopeMap modulePath fun = do
-        (moduleScope, (moduleFrame, _)) <- require modulePath
+        ((moduleScope, moduleFrame), _) <- require modulePath
         insertImportEdge moduleScope
         fun (Map.singleton moduleScope moduleFrame)
 

@@ -20,6 +20,8 @@ import           Proto3.Suite.Class
 import           Reprinting.Tokenize
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Control.Abstract.ScopeGraph (insertImportEdge)
+import Control.Abstract.Heap (insertFrameLink, HeapError, Heap)
+import qualified Data.Map.Strict as Map
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
@@ -104,8 +106,8 @@ doRequire :: ( Member (Boolean value) sig
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> (,) . fst <$> load path <*> boolean True
-    Just (moduleScope, _) -> (moduleScope,) <$> boolean False
+    Nothing       -> (,) . fst . fst <$> load path <*> boolean True
+    Just ((moduleScope, _), _) -> (moduleScope,) <$> boolean False
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
@@ -130,6 +132,8 @@ doLoad :: ( Member (Boolean value) sig
           , Member (Reader Span) sig
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (ScopeGraph.ScopeGraph address)) sig
+          , Member (State (Heap address address value)) sig
+          , Member (Resumable (BaseError (HeapError address))) sig
           , Member (Reader (address, address)) sig
           , Member Trace sig
           , Ord address
@@ -141,8 +145,10 @@ doLoad :: ( Member (Boolean value) sig
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  moduleScope <- fst <$> load path'
-  unless shouldWrap (insertImportEdge moduleScope)
+  (moduleScope, moduleFrame) <- fst <$> load path'
+  unless shouldWrap $ do
+    insertImportEdge moduleScope
+    insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
