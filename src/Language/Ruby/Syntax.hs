@@ -19,7 +19,7 @@ import           Diffing.Algorithm
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Control.Abstract.ScopeGraph (bindAll, insertImportEdge, ScopeError)
+import Control.Abstract.ScopeGraph (insertImportEdge)
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
