@@ -130,6 +130,7 @@ doLoad :: ( Member (Boolean value) sig
           , Member (Reader Span) sig
           , Member (Resumable (BaseError ResolutionError)) sig
           , Member (State (ScopeGraph.ScopeGraph address)) sig
+          , Member (Reader (address, address)) sig
           , Member Trace sig
           , Ord address
           , Carrier sig m
