@@ -19,7 +19,7 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      (_, res) <- evaluate ["main.rb", "foo.rb"]
+      (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
