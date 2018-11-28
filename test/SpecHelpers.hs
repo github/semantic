@@ -184,8 +184,8 @@ frameNames heap scopeGraph frame = do
 
 -- namespaceScope _ _ = Nothing
 
-lookupDeclaration :: Name -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Value term Precise ]
-lookupDeclaration name heap scopeGraph = do
+lookupDeclaration :: Name -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Value term Precise ]
+lookupDeclaration name (currenScope, currentFrame) heap scopeGraph = do
   path <- ScopeGraph.lookupScopePath name scopeGraph
   frameAddress <- Heap.lookupFrameAddress path heap
   toList <$> Heap.getSlot (Address frameAddress (Heap.pathPosition path)) heap

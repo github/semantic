@@ -81,7 +81,7 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
-  (preludeScopeAddress, (preludeFrameAddress, _)) <- evalModule Nothing Nothing prelude
+  ((preludeScopeAddress, preludeFrameAddress), _) <- evalModule Nothing Nothing prelude
   foldr (run preludeScopeAddress preludeFrameAddress . fmap Right) ask modules
   where run preludeScopeAddress preludeFrameAddress m rest = do
           evaluated <- evalModule (Just preludeScopeAddress) (Just preludeFrameAddress) m
@@ -98,7 +98,7 @@ evaluate lang perModule runTerm modules = do
           scopeAddress <- newScope scopeEdges
           frameAddress <- newFrame scopeAddress frameLinks
           val <- runInModule scopeAddress frameAddress (perModule (runValueEffects . moduleBody) m)
-          pure (scopeAddress, (frameAddress, val))
+          pure ((scopeAddress, frameAddress), val)
           where runInModule scopeAddress frameAddress
                   = runDeref
                   . raiseHandler (runReader (scopeAddress, frameAddress))

@@ -25,7 +25,7 @@ instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable JavaScriptRequire where
   eval _ (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
-    (moduleScope, (moduleFrame, _)) <- require modulePath
+    ((moduleScope, moduleFrame), _) <- require modulePath
 
     case declaredName aliasTerm of
       Just alias -> do
