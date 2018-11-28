@@ -20,8 +20,9 @@ type ModuleC address value m
   ( ErrorC (Return address value)               (Eff
   ( ReaderC (address, address)          (Eff
   ( DerefC address value                (Eff
+  ( AllocatorC address                  (Eff
   ( ReaderC ModuleInfo                  (Eff
-    m)))))))))
+    m)))))))))))
 
 type ValueC term address value m
   = FunctionC term address value                                  (Eff
@@ -34,10 +35,12 @@ type ValueC term address value m
 evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Carrier innerSig inner
             , Carrier outerSig outer
-            , derefSig ~ (Deref value :+: moduleInfoSig)
-            , derefC ~ (DerefC address value (Eff moduleInfoC))
+            , derefSig ~ (Deref value :+: allocatorSig)
+            , derefC ~ (DerefC address value (Eff allocatorC))
             , Carrier derefSig derefC
-            , moduleInfoSig ~ (Reader ModuleInfo :+: outerSig)
+            , allocatorSig ~ (Allocator address :+: Reader ModuleInfo :+: outerSig)
+            , allocatorC ~ (AllocatorC address (Eff (ReaderC ModuleInfo (Eff outer))))
+            , Carrier allocatorSig allocatorC
             , booleanC ~ BooleanC value (Eff (InterposeC (Resumable (BaseError (UnspecializedError value))) (Eff inner)))
             , booleanSig ~ (Boolean value :+: Interpose (Resumable (BaseError (UnspecializedError value))) :+: innerSig)
             , Carrier booleanSig booleanC
@@ -47,26 +50,22 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , functionC ~ FunctionC term address value (Eff whileC)
             , functionSig ~ (Function term address value :+: whileSig)
             , Carrier functionSig functionC
+            , Effect outerSig
             , HasPrelude lang
+            , Member Fresh outerSig
             , Member (Allocator address) innerSig
             , Member (Deref value) innerSig
             , Member Fresh innerSig
-            , Member (Reader (address, address)) innerSig
             , Member (Reader ModuleInfo) innerSig
+            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
             , Member (Reader Span) innerSig
             , Member (Resumable (BaseError (AddressError address value))) innerSig
             , Member (Resumable (BaseError (UnspecializedError value))) innerSig
+            , Member (State (Heap address address value)) innerSig
+            , Member (State (ScopeGraph address)) innerSig
             , Member (Resumable (BaseError (HeapError address))) innerSig
             , Member (Resumable (BaseError (ScopeError address))) innerSig
-            , Member (State (ScopeGraph address)) innerSig
-            , Member (State (Heap address address value)) innerSig
             , Member Trace innerSig
-            , Effect outerSig
-            , Member (Allocator address) outerSig
-            , Member Fresh outerSig
-            , Member (Reader (ModuleTable (NonEmpty (Module (ModuleResult address value))))) outerSig
-            , Member (State (ScopeGraph address)) outerSig
-            , Member (State (Heap address address value)) outerSig
             , Ord address
             , Show address
             , Show value
@@ -79,10 +78,8 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
          -> Evaluator term address value outer (ModuleTable (NonEmpty (Module (ModuleResult address value))))
 evaluate lang perModule runTerm modules = do
   let prelude = Module moduleInfoFromCallStack (Left lang)
-  initialPreludeScope <- newScope mempty
-  initialPreludeFrame <- newFrame initialPreludeScope mempty
-  (preludeScopeAddress, (preludeFrameAddress, _)) <- evalModule initialPreludeScope initialPreludeFrame prelude
-  foldr (run preludeScopeAddress preludeFrameAddress . fmap Right) ask modules
+  (preludeScopeAddress, (preludeFrameAddress, _)) <- evalModule lowerBound lowerBound prelude
+  foldr (run preludeScopeAddress heap . fmap Right) ask modules
   where run preludeScopeAddress preludeFrameAddress m rest = do
           evaluated <- evalModule preludeScopeAddress preludeFrameAddress m
           -- FIXME: this should be some sort of Monoidal insert à la the Heap to accommodate multiple Go files being part of the same module.
@@ -96,6 +93,7 @@ evaluate lang perModule runTerm modules = do
           pure (scopeAddress, (frameAddress, val))
           where runInModule scopeAddress frameAddress
                   = raiseHandler (runReader (moduleInfo m))
+                  . runAllocator
                   . runDeref
                   . raiseHandler (runReader (scopeAddress, frameAddress))
                   . runReturn
@@ -119,7 +117,6 @@ evalTerm :: ( Carrier sig m
             , Member (Error (Return address value)) sig
             , Member (Function term address value) sig
             , Member (Modules address value) sig
-            , Member (Reader (address, address)) sig
             , Member (Reader ModuleInfo) sig
             , Member (Reader PackageInfo) sig
             , Member (Reader Span) sig
