@@ -12,7 +12,7 @@ import SpecHelpers
 spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "PHP" $ do
-    pending "evaluates include and require" $ do
+    xit "evaluates include and require" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
@@ -21,7 +21,7 @@ spec config = parallel $ do
           const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
-    pending "evaluates include_once and require_once" $ do
+    xit "evaluates include_once and require_once" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main_once.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main_once.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
@@ -30,7 +30,7 @@ spec config = parallel $ do
           const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
-    pending "evaluates namespaces" $ do
+    xit "evaluates namespaces" $ do
       (scopeGraph, (heap, res)) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
