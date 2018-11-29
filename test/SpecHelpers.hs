@@ -122,7 +122,7 @@ type TestEvaluatingC term
   (StateC (Heap Precise Precise (Val term)) (Eff
   (StateC (ScopeGraph Precise) (Eff
   ( FreshC (Eff
-  ( TraceByReturningC (Eff
+  ( TraceByIgnoringC (Eff
   ( LiftC IO))))))))))))))))))))))))
 type TestEvaluatingErrors term
   = '[ BaseError (AddressError Precise (Val term))
