@@ -21,7 +21,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "main.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
-          const () <$> lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates load" $ do
