@@ -7,6 +7,7 @@ import Data.Abstract.Number as Number
 import Data.Abstract.Package (PackageInfo(..))
 import Data.Abstract.Module (ModuleInfo(..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
+import Control.Abstract.Value as Value
 import Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
@@ -18,6 +19,7 @@ import Data.Text (pack)
 import qualified Language.TypeScript.Assignment as TypeScript
 import Data.Quieterm
 import Data.Location
+import Data.Scientific (scientific)
 
 spec :: TaskConfig -> Spec
 spec config = parallel $ do
@@ -94,9 +96,8 @@ spec config = parallel $ do
     it "evaluates sequence expressions" $ do
       (scopeGraph, (heap, res)) <- evaluate ["sequence-expression.ts"]
       case ModuleTable.lookup "sequence-expression.ts" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "x" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          valueRef `shouldBe` Rval (Value.Float (Number.Decimal 3.0))
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) ->
+          SpecHelpers.lookupDeclaration "x" scopeAndFrame heap scopeGraph `shouldBe` Just [ Value.float (scientific 3 0) ]
         other -> expectationFailure (show other)
 
     it "evaluates void expressions" $ do
