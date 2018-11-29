@@ -38,7 +38,7 @@ instance Evaluatable Import where
       frameAddress <- newFrame scopeAddress frameLinks
 
       -- Insert import references into the import scope starting from the perspective of the import scope.
-      withScopeAndFrame frameAddress $ do
+      withScopeAndFrame moduleFrame $ do
         for_ symbols $ \Alias{..} ->
           insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress
 
