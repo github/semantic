@@ -262,9 +262,9 @@ instance Evaluatable QualifiedAliasedImport where
     val <- object objFrame
     aliasSlot <- lookupDeclaration (Declaration alias)
     assign aliasSlot val
-    -- Evaluate each parent module
+
     withScopeAndFrame objFrame $
-      for_ (NonEmpty.init modulePaths) $ \modulePath -> do
+      for_ modulePaths $ \modulePath -> do
         ((moduleScope, moduleFrame), val) <- require modulePath
         traceShowM moduleScope
         traceShowM moduleFrame
