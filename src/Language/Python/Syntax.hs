@@ -254,15 +254,25 @@ instance Evaluatable QualifiedAliasedImport where
   eval _ (QualifiedAliasedImport name aliasTerm) = do
     modulePaths <- resolvePythonModules name
 
-    -- Evaluate each parent module
-    for_ (NonEmpty.init modulePaths) require
-
-    -- Evaluate and import the last module, aliasing and updating the environment
+    span <- ask @Span
+    scopeAddress <- newScope mempty
     alias <- maybeM (throwEvalError NoNameError) (declaredName aliasTerm)
-    -- rvalBox =<< letrec' alias (\addr -> do
-    --   let path = NonEmpty.last modulePaths
-    --   unit <$ makeNamespace alias addr Nothing (void (bindAll . fst . snd =<< require path)))
-    undefined
+    declare (Declaration alias) span (Just scopeAddress)
+    objFrame <- newFrame scopeAddress mempty
+    val <- object objFrame
+    aliasSlot <- lookupDeclaration (Declaration alias)
+    assign aliasSlot val
+    -- Evaluate each parent module
+    withScopeAndFrame objFrame $
+      for_ (NonEmpty.init modulePaths) $ \modulePath -> do
+        ((moduleScope, moduleFrame), val) <- require modulePath
+        traceShowM moduleScope
+        traceShowM moduleFrame
+        traceShowM val
+        insertImportEdge moduleScope
+        insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+
+    rvalBox unit
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
