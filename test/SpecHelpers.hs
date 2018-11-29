@@ -61,6 +61,7 @@ import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
 import Semantic.Graph (runHeap, runScopeGraph)
 import System.FilePath as X
+import Debug.Trace as X (traceShowM, traceM)
 
 import Data.ByteString as X (ByteString)
 import Data.Functor.Both as X (Both, runBothWith, both)
