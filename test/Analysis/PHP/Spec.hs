@@ -17,8 +17,8 @@ spec config = parallel $ do
       case ModuleTable.lookup "main.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef))) :| [])) -> do
           valueRef `shouldBe` Rval unit
-          const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates include_once and require_once" $ do
@@ -26,16 +26,16 @@ spec config = parallel $ do
       case ModuleTable.lookup "main_once.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef))) :| [])) -> do
           valueRef `shouldBe` Rval unit
-          const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates namespaces" $ do
       (_, res) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef))) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "Foo" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "NS1" heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "NS1" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
           undefined
           -- (derefQName heap ("NS1" :| [])               env >>= deNamespace heap) `shouldBe` Just ("NS1",  ["Sub1", "b", "c"])
