@@ -13,56 +13,56 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "Python" $ do
     it "imports" $ do
-      (_, res) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
+      (scopeGraph, (heap, res)) <- evaluate ["main.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main.py" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), value))) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "a" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "b" heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "a" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
-          (SpecHelpers.lookupDeclaration "a" heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["foo"]
-          (SpecHelpers.lookupDeclaration "b" heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["c"]
+          (SpecHelpers.lookupDeclaration "a" scopeAndFrame heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["foo"]
+          (SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldBe` Just ["c"]
           -- (derefQName heap ("b" :| ["c"]) env >>= deNamespace heap) `shouldBe` Just ("c", ["baz"])
         other -> expectationFailure (show other)
 
     it "imports with aliases" $ do
-      (_, res) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
+      (scopeGraph, (heap, res)) <- evaluate ["main1.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main1.py" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "b" heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "e" heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "e" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "imports using from syntax" $ do
-      (_, res) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
+      (scopeGraph, (heap, res)) <- evaluate ["main2.py", "a.py", "b/__init__.py", "b/c.py"]
       case ModuleTable.lookup "main2.py" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
-          () <$ SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
-          () <$ SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
           -- TODO: Enable when we constrain edge paths with path predicates
           -- () <$ SpecHelpers.lookupDeclaration "baz" heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
 
     it "imports with relative syntax" $ do
-      (_, res) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
+      (scopeGraph, (heap, res)) <- evaluate ["main3.py", "c/__init__.py", "c/utils.py"]
       case ModuleTable.lookup "main3.py" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef)) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "utils" heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration "utils" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           -- (lookupDeclaration "utils" heap >>= deNamespace heap) `shouldBe` Just ("utils", ["to_s"])
         other -> expectationFailure (show other)
 
     it "subclasses" $ do
-      (_, res) <- evaluate ["subclass.py"]
+      (scopeGraph, (heap, res)) <- evaluate ["subclass.py"]
       case ModuleTable.lookup "subclass.py" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
-          SpecHelpers.lookupDeclaration undefined heap scopeGraph `shouldBe` Just [String "\"bar\""]
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration undefined scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "handles multiple inheritance left-to-right" $ do
-      (_, res) <- evaluate ["multiple_inheritance.py"]
+      (scopeGraph, (heap, res)) <- evaluate ["multiple_inheritance.py"]
       case ModuleTable.lookup "multiple_inheritance.py" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
-          SpecHelpers.lookupDeclaration undefined heap scopeGraph `shouldBe` Just [String "\"foo!\""]
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
+          const () <$> SpecHelpers.lookupDeclaration undefined scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
   where
