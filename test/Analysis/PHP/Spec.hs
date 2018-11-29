@@ -13,9 +13,9 @@ spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "PHP" $ do
     it "evaluates include and require" $ do
-      (_, res) <- evaluate ["main.php", "foo.php", "bar.php"]
+      ((scopeGraph, heap) res) <- evaluate ["main.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main.php" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, valueRef))) :| [])) -> do
           valueRef `shouldBe` Rval unit
           const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
@@ -24,7 +24,7 @@ spec config = parallel $ do
     it "evaluates include_once and require_once" $ do
       (_, res) <- evaluate ["main_once.php", "foo.php", "bar.php"]
       case ModuleTable.lookup "main_once.php" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, valueRef))) :| [])) -> do
           valueRef `shouldBe` Rval unit
           const () <$> SpecHelpers.lookupDeclaration "bar" heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "foo" heap scopeGraph `shouldBe` Just ()
@@ -33,7 +33,7 @@ spec config = parallel $ do
     it "evaluates namespaces" $ do
       (_, res) <- evaluate ["namespaces.php"]
       case ModuleTable.lookup "namespaces.php" <$> res of
-        Right (Just (Module _ (scopeGraph, (heap, ((currentScope, currentFrame), valueRef))) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, valueRef))) :| [])) -> do
           const () <$> SpecHelpers.lookupDeclaration "Foo" heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "NS1" heap scopeGraph `shouldBe` Just ()
 
