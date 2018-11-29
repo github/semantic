@@ -23,6 +23,7 @@ import qualified Data.Reprinting.Scope as Scope
 --   1. Each statement’s effects on the store are accumulated;
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
+--   TODO: Separate top-level statement nodes into non-lexical Statement and lexical StatementBlock nodes
 newtype Statements a = Statements { statements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
 
@@ -33,7 +34,7 @@ instance ToJSON1 Statements
 
 instance Evaluatable Statements where
   eval eval (Statements xs) =
-    withLexicalScopeAndFrame $ maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
+    maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty xs)
 
 instance Tokenize Statements where
   tokenize = imperative
