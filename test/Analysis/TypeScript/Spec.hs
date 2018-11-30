@@ -38,13 +38,14 @@ spec config = parallel $ do
       case ModuleTable.lookup "main1.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
           -- Env.names env `shouldBe` [ "b", "z" ]
-          const () <$> SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "z" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-
+          () <$ SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "z" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          lookupObjectMembers "b" scopeAndFrame heap scopeGraph `shouldBe` Just  [ "foo", "baz" ]
+          lookupObjectMembers "z" scopeAndFrame heap scopeGraph `shouldBe` Just  [ "foo", "baz" ]
           -- (Heap.lookupDeclaration "b" heap  >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
           -- (Heap.lookupDeclaration "z" heap >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
-          const () <$> SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
+          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Nothing
         other -> expectationFailure (show other)
 
     it "stores function declaration in scope graph" $ do
