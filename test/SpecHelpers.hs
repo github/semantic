@@ -15,7 +15,7 @@ module SpecHelpers
 , LogQueue
 , StatQueue
 , lookupDeclaration
-, objectMembers
+, lookupObjectMembers
 ) where
 
 import Control.Abstract hiding (lookupDeclaration)
@@ -177,19 +177,9 @@ frameNames heap scopeGraph frame = do
   scope <- ScopeGraph.lookupScope scopeAddress scopeGraph
   pure (unDeclaration <$> ScopeGraph.declarationNames scope scopeGraph)
 
---   = either (const Nothing) (snd . snd)
---   . run
---   . runFresh
---   . runEvaluator
---   . runAddressError
---   . raiseHandler (runState heap)
---   . raiseHandler (runState (lowerBound @Span))
---   . raiseHandler (runReader (lowerBound @Span))
---   . raiseHandler (runReader (ModuleInfo "SpecHelper.hs"))
---   . runDeref
---   $ undefined
-
--- namespaceScope _ _ = Nothing
+lookupObjectMembers :: Name -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Name ]
+lookupObjectMembers name scopeAndFrame heap scopeGraph =
+  (lookupDeclaration name scopeAndFrame heap scopeGraph >>= objectMembers heap scopeGraph . Prelude.head)
 
 lookupDeclaration :: Name -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Value term Precise ]
 lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do

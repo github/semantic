@@ -19,8 +19,8 @@ spec config = parallel $ do
           const () <$> SpecHelpers.lookupDeclaration "a" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
-          fromJust (SpecHelpers.lookupDeclaration "a" scopeAndFrame heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldContain` [ "foo" ]
-          fromJust (SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph >>= objectMembers heap scopeGraph . head) `shouldContain` ["c"]
+          fromJust (SpecHelpers.lookupObjectMembers "a" scopeAndFrame heap scopeGraph) `shouldContain` [ "foo" ]
+          fromJust (SpecHelpers.lookupObjectMembers "b" scopeAndFrame heap scopeGraph) `shouldContain` ["c"]
           -- (derefQName heap ("b" :| ["c"]) env >>= deNamespace heap) `shouldBe` Just ("c", ["baz"])
         other -> expectationFailure (show other)
 
