@@ -25,7 +25,7 @@ module Control.Abstract.ScopeGraph
   , AllocatorC(..)
   , runAllocator
   , alloc
-  , Address(..)
+  , Slot(..)
   , runScopeErrorWith
   , runScopeError
   , throwScopeError
@@ -38,7 +38,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.BaseError
 import           Control.Effect.Carrier
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Address(..), Scope(..))
+import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Slot(..), Scope(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
@@ -219,7 +219,7 @@ throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) sig
 throwScopeError = throwBaseError
 
 data ScopeError address return where
-  ScopeError :: Declaration -> Span -> ScopeError address (Address address)
+  ScopeError :: Declaration -> Span -> ScopeError address (Slot address)
   LookupScopeError :: ScopeError address (Scope address)
   LookupPathError :: Declaration -> ScopeError address (ScopeGraph.Path address)
   LookupDeclarationScopeError :: Declaration -> ScopeError address address

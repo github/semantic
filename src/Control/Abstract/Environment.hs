@@ -89,53 +89,8 @@ close fvs = send (Close fvs ret)
 self :: (Member (Env address) sig, Carrier sig m) => Evaluator term address value m (Maybe address)
 self = ctxSelf <$> getEvalContext
 
--- | Look up or allocate an address for a 'Name'.
--- lookupOrAlloc :: ( Member (Allocator address) sig
---                  , Member (Env address) sig
---                  , Carrier sig m
---                  )
---               => Name
---               -> Evaluator term address value m address
--- lookupOrAlloc name = lookupEnv name >>= maybeM (alloc name)
---
--- letrec :: ( Member (Allocator address) sig
---           , Member (Deref value) sig
---           , Member (Env address) sig
---           , Member (State (Heap address address value)) sig
---           , Ord address
---           , Carrier sig m
---           )
---        => Name
---        -> Evaluator term address value m value
---        -> Evaluator term address value m (value, address)
--- letrec name body = do
---   addr <- lookupOrAlloc name
---   v <- locally (bind name addr *> body)
---   assign addr v
---   pure (v, addr)
-
--- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
--- letrec' :: ( Member (Allocator address) sig
---            , Member (Env address) sig
---            , Carrier sig m
---            )
---         => Name
---         -> (address -> Evaluator term address value m a)
---         -> Evaluator term address value m a
--- letrec' name body = do
---   addr <- lookupOrAlloc name
---   v <- locally (body addr)
---   v <$ bind name addr
-
--- | Look up and dereference the given 'Name', throwing an exception for free variables.
--- variable :: ( Member (Reader ModuleInfo) sig
---             , Member (Reader Span) sig
---             , Carrier sig m
---             )
---          => Name
---          -> Evaluator term address value m (Address address)
 variable :: Name
-         -> Evaluator term address value m (Address address)
+         -> Evaluator term address value m (Slot address)
 variable _ = undefined -- lookupEnv name >>= maybeM (freeVariableError name)
 
 -- Effects

@@ -442,7 +442,7 @@ resumingHeapError = runHeapErrorWith (\ baseError -> traceError "ScopeError" bas
 
 resumingScopeError :: ( Carrier sig m
                      , Member Trace sig
-                     , AbstractHole (Address address)
+                     , AbstractHole (Slot address)
                      , AbstractHole (Scope address)
                      , AbstractHole (Path address)
                      , AbstractHole address
