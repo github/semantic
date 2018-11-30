@@ -73,12 +73,6 @@ spec config = parallel $ do
           Heap.heapSize heap `shouldBe` 3
         other -> expectationFailure (show other)
 
-    it "side effect only imports" $ do
-      (scopeGraph, (heap, res)) <- evaluate ["main2.ts", "a.ts", "foo.ts"]
-      case ModuleTable.lookup "main2.ts" <$> res of
-        Right (Just (Module _ (_, _) :| [])) -> heap `shouldSatisfy` Heap.isHeapEmpty
-        other -> expectationFailure (show other)
-
     it "fails exporting symbols not defined in the module" $ do
       (scopeGraph, (heap, res)) <- evaluate ["bad-export.ts", "pip.ts", "a.ts", "foo.ts"]
       case ModuleTable.lookup "bad-export.ts" <$> res of
