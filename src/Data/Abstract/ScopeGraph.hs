@@ -31,6 +31,7 @@ module Data.Abstract.ScopeGraph
 import Control.Abstract.Hole
 import           Data.Abstract.Name
 import qualified Data.Map.Strict as Map
+import qualified Data.Set as Set
 import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
@@ -191,7 +192,7 @@ lookupDeclaration declaration scope g = do
 
 declarationNames :: Ord address => Scope address -> ScopeGraph address -> [Declaration]
 declarationNames scope scopeGraph = localDeclarations <> edgeNames
-  where addresses = join (Map.elems (edges scope))
+  where addresses = join (Map.elems $ Map.withoutKeys (edges scope) (Set.singleton Export))
         edgeNames = addresses >>= toList . flip lookupScope scopeGraph >>= flip declarationNames scopeGraph
         localDeclarations = toList . fmap fst $ declarations scope
 
