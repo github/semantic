@@ -185,7 +185,7 @@ lookupDeclaration :: Name -> (Precise, Precise) -> Heap Precise Precise (Value t
 lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do
   path <- ScopeGraph.lookupScopePath name currentScope scopeGraph
   frameAddress <- Heap.lookupFrameAddress path currentFrame heap
-  toList <$> Heap.getSlot (Address frameAddress (Heap.pathPosition path)) heap
+  toList <$> Heap.getSlot (Slot frameAddress (Heap.pathPosition path)) heap
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)
