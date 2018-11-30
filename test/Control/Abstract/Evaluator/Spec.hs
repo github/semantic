@@ -42,7 +42,7 @@ spec = parallel $ do
         call identity [val, val]
     slotPosition expected `shouldBe` Just 1
     where
-      slotPosition (Right (LvalMember (Address _ Position{..}))) = Just unPosition
+      slotPosition (Right (LvalMember (Slot _ Position{..}))) = Just unPosition
       slotPosition _ = Nothing
 
 evaluate
