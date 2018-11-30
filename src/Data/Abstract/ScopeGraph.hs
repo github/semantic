@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 module Data.Abstract.ScopeGraph
-  ( Address(..)
+  ( Slot(..)
   , associatedScope
   , Declaration(..) -- TODO don't export these constructors
   , declare
@@ -37,7 +37,8 @@ import           Prelude hiding (lookup)
 import           Prologue
 import qualified Data.Sequence as Seq
 
-data Address address = Address { frameAddress :: address, position :: Position }
+-- A slot is a location in the heap where a value is stored.
+data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
 -- Offsets and frame addresses in the heap should be addresses?
@@ -53,8 +54,8 @@ instance Lower (Scope scopeAddress) where
 instance AbstractHole (Scope scopeAddress) where
   hole = lowerBound
 
-instance AbstractHole address => AbstractHole (Address address) where
-  hole = Address hole (Position 0)
+instance AbstractHole address => AbstractHole (Slot address) where
+  hole = Slot hole (Position 0)
 
 newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)

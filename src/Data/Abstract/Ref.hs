@@ -4,7 +4,7 @@ module Data.Abstract.Ref
   , Ref (..)
   ) where
 
-import Data.Abstract.ScopeGraph (Address(..))
+import Data.Abstract.ScopeGraph (Slot(..))
 import Data.Bifunctor
 import Control.Abstract.Hole
 
@@ -13,14 +13,14 @@ data ValueRef address value where
   -- | A value.
   Rval       :: value -> ValueRef address value
   -- | An object member.
-  LvalMember :: Address address -> ValueRef address value
+  LvalMember :: Slot address -> ValueRef address value
 
 instance AbstractHole value => AbstractHole (ValueRef address value) where
   hole = Rval hole
 
 instance Bifunctor ValueRef where
   bimap _ g (Rval v) = Rval (g v)
-  bimap f _ (LvalMember slot@Address{..}) = LvalMember (slot { frameAddress = f frameAddress })
+  bimap f _ (LvalMember slot@Slot{..}) = LvalMember (slot { frameAddress = f frameAddress })
 
 deriving instance (Eq value, Eq address) => Eq (ValueRef address value)
 deriving instance (Ord value, Ord address) => Ord (ValueRef address value)

@@ -2,7 +2,7 @@
 module Control.Abstract.Heap
 ( Heap
 , HeapError(..)
-, Address(..)
+, Slot(..)
 , Position(..)
 , Live
 , getHeap
@@ -235,9 +235,9 @@ deref :: ( Member (Deref value) sig
          , Ord address
          , Carrier sig m
          )
-      => Address address
+      => Slot address
       -> Evaluator term address value m value
-deref slot@Address{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError $ UninitializedAddress frameAddress)
+deref slot@Slot{..} = gets (Heap.getSlot slot) >>= maybeM (throwAddressError (UnallocatedAddress frameAddress)) >>= send . flip DerefCell ret >>= maybeM (throwAddressError $ UninitializedAddress frameAddress)
 
 putSlotDeclarationScope :: forall address value sig m term. ( Member (State (Heap address address value)) sig
                            , Member (State (ScopeGraph address)) sig
@@ -247,10 +247,10 @@ putSlotDeclarationScope :: forall address value sig m term. ( Member (State (Hea
                            , Ord address
                            , Carrier sig m
                            )
-                        => Address address
+                        => Slot address
                         -> Maybe address
                         -> Evaluator term address value m ()
-putSlotDeclarationScope Address{..} assocScope = do
+putSlotDeclarationScope Slot{..} assocScope = do
   scopeAddress <- scopeLookup frameAddress
   modify @(ScopeGraph address) (putDeclarationScopeAtPosition scopeAddress position assocScope)
 
@@ -267,11 +267,11 @@ lookupDeclaration :: forall value address term sig m. ( Member (State (Heap addr
                      , Carrier sig m
                      )
                   => Declaration
-                  -> Evaluator term address value m (Address address)
+                  -> Evaluator term address value m (Slot address)
 lookupDeclaration decl = do
   path <- lookupScopePath decl
   frameAddress <- lookupFrameAddress path
-  pure (Address frameAddress (Heap.pathPosition path))
+  pure (Slot frameAddress (Heap.pathPosition path))
 
 lookupDeclarationFrame :: ( Member (State (Heap address address value)) sig
                           , Member (State (ScopeGraph address)) sig
@@ -352,7 +352,7 @@ assign :: ( Member (Deref value) sig
           , Ord address
           , Carrier sig m
           )
-       => Address address
+       => Slot address
        -> value
        -> Evaluator term address value m ()
 assign addr value = do
@@ -365,7 +365,7 @@ dealloc :: forall address value sig m term. ( Member (Deref value) sig
           , Ord address
           , Carrier sig m
           )
-       => Address address
+       => Slot address
        -> Evaluator term address value m ()
 dealloc addr = modify @(Heap address address value) (Heap.deleteSlot addr)
 

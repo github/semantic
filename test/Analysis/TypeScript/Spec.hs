@@ -68,9 +68,9 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main3.ts", "a.ts"]
       case ModuleTable.lookup "main3.ts" <$> res of
         Right (Just (Module _ (scopeAndFrame@(currentScope, currentFrame), valueRef) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
+          () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing
           valueRef `shouldBe` Rval Unit
-          Heap.heapSize heap `shouldBe` 1
+          Heap.heapSize heap `shouldBe` 3
         other -> expectationFailure (show other)
 
     it "side effect only imports" $ do
