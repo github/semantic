@@ -1,11 +1,9 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module Diffing.Algorithm.RWS.Spec (spec) where
 
-import Analysis.Decorator
 import Data.Bifunctor
 import Data.Diff
 import Data.Functor.Listable (ListableSyntax)
-import Data.Location
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import Data.Term
