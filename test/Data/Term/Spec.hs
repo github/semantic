@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Data.Term.Spec where
+module Data.Term.Spec (spec) where
 
 import Data.Functor.Listable
 import Data.Term
