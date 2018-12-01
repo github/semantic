@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Diffing.Interpreter.Spec where
+module Diffing.Interpreter.Spec (spec, afterTerm, beforeTerm) where
 
 import Control.Applicative ((<|>))
 import Data.Diff

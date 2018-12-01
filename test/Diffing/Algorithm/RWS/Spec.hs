@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
-module Diffing.Algorithm.RWS.Spec where
+module Diffing.Algorithm.RWS.Spec (spec) where
 
 import Analysis.Decorator
 import Data.Bifunctor
