@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Data.Diff.Spec where
+module Data.Diff.Spec (spec) where
 
 import Data.Diff
 import Data.Functor.Listable (ListableSyntax)
