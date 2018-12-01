@@ -3,7 +3,6 @@ module Data.Source.Spec (spec) where
 import Data.Char (chr)
 import Data.Functor.Listable
 import Data.Range
-import Data.Semigroup
 import Data.Source
 import Data.Span
 import qualified Data.Text as Text
