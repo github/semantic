@@ -128,8 +128,13 @@ lookupScope scope = Map.lookup scope . graph
 declare :: Ord scope => Declaration -> Span -> Maybe scope -> scope -> ScopeGraph scope -> (ScopeGraph scope, Maybe Position)
 declare declaration ddata assocScope currentScope g@ScopeGraph{..} = fromMaybe (g, Nothing) $ do
   scope <- lookupScope currentScope g
-  let newScope = scope { declarations = (declarations scope) Seq.|> (declaration, (ddata, assocScope)) }
-  pure $ (g { graph = Map.insert currentScope newScope graph }, Just . Position $ length (declarations newScope))
+
+  dataSeq <- ddataOfScope currentScope g
+  case Seq.findIndexR (\(decl, (span, _)) -> decl == declaration && ddata == span) dataSeq of
+    Just index -> pure (g, Just $ Position index)
+    Nothing -> do
+      let newScope = scope { declarations = (declarations scope) Seq.|> (declaration, (ddata, assocScope)) }
+      pure $ (g { graph = Map.insert currentScope newScope graph }, Just . Position $ length (declarations newScope))
 
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
