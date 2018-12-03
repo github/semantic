@@ -1,6 +1,6 @@
 module Analysis.Python.Spec (spec) where
 
-import Data.Abstract.Evaluatable (EvalError(..))
+import Data.Abstract.Evaluatable (EvalError(..), ValueRef(..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Value.Concrete
 import qualified Language.Python.Assignment as Python
@@ -55,7 +55,10 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["subclass.py"]
       case ModuleTable.lookup "subclass.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          const () <$> SpecHelpers.lookupDeclaration undefined scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          SpecHelpers.lookupObjectMembers "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
+          valueRef `shouldBe` Rval (String "\"bar\"")
         other -> expectationFailure (show other)
 
     it "handles multiple inheritance left-to-right" $ do
