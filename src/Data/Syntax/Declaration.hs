@@ -2,11 +2,12 @@
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Data.Syntax.Declaration where
 
-import           Control.Abstract.ScopeGraph
+import           Control.Abstract hiding (Function)
 import           Data.Abstract.Evaluatable
 import           Data.JSON.Fields
 import qualified Data.Reprinting.Scope as Scope
 import qualified Data.Set as Set
+import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
@@ -207,31 +208,36 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval _ Class{..} = do
-    undefined
-     -- <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
-    -- span <- ask @Span
-    -- Run the action within the class's scope.
-    -- currentScope' <- currentScope
-    --
-    -- supers <- for classSuperclasses $ \superclass -> do
-    --   name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
-    --   scope <- associatedScope (Declaration name)
-      --   (scope,) <$> (eval superclass >>= address)
-      --
-      -- let imports = (Import,) <$> (fmap pure . catMaybes $ fst <$> supers)
-      --     current = maybe mempty (fmap (Lexical, ) . pure . pure) currentScope'
-      --     edges = Map.fromList (imports <> current)
-      -- childScope <- newScope edges
-      -- declare (Declaration name) span (Just childScope)
-      --
-      -- withScope childScope $ do
-      --   (_, addr) <- letrec name $ do
-      --     void $ eval classBody
-      --     classBinds <- Env.head <$> getEnv
-      --     klass name (snd <$> supers) classBinds
-      --   bind name addr
-      --   pure (Rval addr)
+  eval eval Class{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
+    span <- ask @Span
+    currentScope' <- currentScope
+
+    superScopes <- for classSuperclasses $ \superclass -> do
+      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+      scope <- associatedScope (Declaration name)
+      slot <- lookupDeclaration (Declaration name)
+      superclassFrame <- scopedEnvironment =<< deref slot
+      pure $ case (scope, superclassFrame) of
+        (Just scope, Just frame) -> Just (scope, frame)
+        _ -> Nothing
+
+    let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
+        current = fmap (Lexical, ) . pure . pure $ currentScope'
+        edges = Map.fromList (superclassEdges <> current)
+    childScope <- newScope edges
+    declare (Declaration name) span (Just childScope)
+
+    let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
+    childFrame <- newFrame childScope frameEdges
+
+    withScopeAndFrame childFrame $ do
+      void $ eval classBody
+
+    classSlot <- lookupDeclaration (Declaration name)
+    assign classSlot =<< klass (Declaration name) childFrame
+
+    rvalBox unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier

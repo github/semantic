@@ -285,7 +285,6 @@ class AbstractIntro value => AbstractValue term address value carrier where
 
   -- | Build a class value from a name and environment.
   klass :: Declaration      -- ^ The new class's identifier
-        -> [value]          -- ^ A list of superclasses
         -> address          -- ^ The environment to capture
         -> Evaluator term address value carrier value
 
