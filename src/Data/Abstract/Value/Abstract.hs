@@ -46,7 +46,7 @@ instance ( Member (Allocator address) sig
       currentScope' <- currentScope
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]
       scope <- newScope lexicalEdges
-      declare (Declaration name) functionSpan (Just scope)
+      putDeclarationScope (Declaration name) scope
 
       _ <- withScope scope $ do
         for_ params $ \param -> do
