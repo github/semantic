@@ -67,12 +67,19 @@ style = (defaultStyle (T.encodeUtf8Builder . vertexIdentifier))
 graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader Span) sig
                  , Member (State (Graph ControlFlowVertex)) sig
-                 , Member (State (Map (Hole context (Located address)) ControlFlowVertex)) sig
+                 , Member (State (Map (Slot (Hole context (Located address))) ControlFlowVertex)) sig
                  , AbstractValue term (Hole context (Located address)) value m
+                 , Member (State (Heap (Hole context (Located address)) (Hole context (Located address)) value)) sig
+                 , Member (State (ScopeGraph (Hole context (Located address)))) sig
+                 , Member (Resumable (BaseError (ScopeError (Hole context (Located address))))) sig
+                 , Member (Resumable (BaseError (HeapError (Hole context (Located address))))) sig
+                 , Member (Reader (Hole context (Located address), Hole context (Located address))) sig
                  , Member (Reader ControlFlowVertex) sig
                  , VertexDeclaration syntax
                  , Declarations1 syntax
                  , Ord address
+                 , Show address
+                 , Show context
                  , Ord context
                  , Foldable syntax
                  , term ~ Term syntax Location
@@ -84,25 +91,22 @@ graphingTerms recur0 recur term@(Term (In a syntax)) = do
   case toVertex a definedInModule syntax of
     Just (v@Function{}, _) -> recurWithContext v
     Just (v@Method{}, _) -> recurWithContext v
-    Just (v@Variable{..}, name) -> undefined -- do
-      -- variableDefinition v
-    --   maybeAddr <- lookupEnv name
-    --   case maybeAddr of
-    --     Just a -> do
-    --       defined <- gets (Map.lookup a)
-    --       maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
-    --     _ -> pure ()
-    --   recur0 recur term
-    -- _ -> recur0 recur term
+    Just (v@Variable{..}, name) -> do
+      variableDefinition v
+      addr <- lookupDeclaration (Declaration name)
+      defined <- gets (Map.lookup addr)
+      maybe (pure ()) (appendGraph . connect (vertex v) . vertex) defined
+      recur0 recur term
+    _ -> recur0 recur term
   where
     recurWithContext v = do
       variableDefinition v
       moduleInclusion v
-      local (const v) $ undefined -- do
-        -- valRef <- recur0 recur term
-        -- addr <- Control.Abstract.address valRef
-        -- modify (Map.insert addr v)
-        -- pure valRef
+      local (const v) $ do
+        valRef <- recur0 recur term
+        addr <- Control.Abstract.address valRef -- TODO: This is partial, we should remove ValRef
+        modify (Map.insert addr v)
+        pure valRef
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingPackages :: ( Member (Reader PackageInfo) sig
@@ -210,7 +214,7 @@ appendGraph = modify . (<>)
 
 
 graphing :: (Carrier sig m, Effect sig)
-         => Evaluator term address value (StateC (Map address ControlFlowVertex) (Eff
+         => Evaluator term address value (StateC (Map (Slot address) ControlFlowVertex) (Eff
                                          (StateC (Graph ControlFlowVertex) (Eff
                                          m)))) result
          -> Evaluator term address value m (Graph ControlFlowVertex, result)

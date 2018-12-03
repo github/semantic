@@ -26,6 +26,7 @@ module Control.Abstract.Value
 , WhileC(..)
 -- , makeNamespace
 , value
+, address
 , rvalBox
 ) where
 
