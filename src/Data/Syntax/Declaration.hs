@@ -31,8 +31,6 @@ instance Evaluatable Function where
   eval _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
     -- TODO: Should we declare the name of the function within `function`?
-    span <- ask @Span
-    declare (Declaration name) span Nothing
     params <- for functionParameters $ \param -> do
       maybeM (throwEvalError NoNameError) (declaredName param)
     function name params functionBody
