@@ -254,8 +254,8 @@ instance ( Member (Allocator address) sig
     | Array addresses <- val = pure addresses
     | otherwise = throwValueError $ ArrayError val
 
-  klass n supers binds = do
-    pure $ Class n supers binds
+  klass n binds = do
+    pure $ Class n mempty binds
 
   namespace _ _ _ = undefined -- do
   -- namespace name super binds = undefined -- do
@@ -273,6 +273,7 @@ instance ( Member (Allocator address) sig
 
   scopedEnvironment v
     | Object address <- v = pure (Just address)
+    | Class _ _ address <- v = pure (Just address)
     | otherwise = pure Nothing
 
   asString v

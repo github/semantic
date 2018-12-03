@@ -355,7 +355,7 @@ instance ( Member Fresh sig
 
   tuple fields = pure $ zeroOrMoreProduct fields
 
-  klass _ _ _     = pure Object
+  klass _ _       = pure Object
   namespace _ _ _ = pure Unit
 
   scopedEnvironment _ = pure Nothing

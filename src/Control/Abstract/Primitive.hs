@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE FunctionalDependencies, UndecidableInstances, ScopedTypeVariables, TupleSections #-}
 module Control.Abstract.Primitive
   ( defineClass
   , defineNamespace
@@ -7,9 +7,10 @@ module Control.Abstract.Primitive
 import           Control.Abstract.Context
 import           Control.Abstract.Evaluator
 import           Control.Abstract.Heap
-import           Control.Abstract.ScopeGraph (Declaration (..), ScopeError, ScopeGraph, Allocator)
+import           Control.Abstract.ScopeGraph
 import           Control.Abstract.Value
 import           Data.Abstract.BaseError
+import Data.Map.Strict as Map
 import           Prologue
 
 defineClass :: ( AbstractValue term address value m
@@ -29,13 +30,26 @@ defineClass :: ( AbstractValue term address value m
                , Show address
                )
             => Declaration
-            -> [value]
+            -> [Declaration]
             -> Evaluator term address value m a
             -> Evaluator term address value m ()
 defineClass declaration superclasses body = void . define declaration $ do
-  withChildFrame declaration $ \frame -> do
-    _ <- body
-    klass declaration superclasses frame
+    currentScope' <- currentScope
+
+    superScopes <- for superclasses $ \superclass -> do
+      scope <- associatedScope superclass
+      pure scope
+
+    let superclassEdges = (Superclass, ) <$> (fmap pure . catMaybes $ superScopes)
+        current = fmap (Lexical, ) . pure . pure $ currentScope'
+        edges = Map.fromList (superclassEdges <> current)
+    childScope <- newScope edges
+    putDeclarationScope declaration childScope
+
+    withScope childScope $ do
+      void $ body
+
+    pure unit
 
 defineNamespace :: ( AbstractValue term address value m
                    , Carrier sig m
