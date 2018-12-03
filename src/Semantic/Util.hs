@@ -93,6 +93,7 @@ callGraphProject parser proxy opts paths = runTaskWithOptions opts $ do
 evaluatePythonProject = justEvaluating <=< evaluatePythonProjects (Proxy @'Language.Python) pythonParser Language.Python
 
 callGraphRubyProject = callGraphProject rubyParser (Proxy @'Language.Ruby) debugOptions
+callGraphPythonProject = callGraphProject pythonParser (Proxy @'Language.Python) debugOptions
 
 -- Evaluate a project consisting of the listed paths.
 evaluateProject proxy parser paths = withOptions debugOptions $ \ config logger statter ->
