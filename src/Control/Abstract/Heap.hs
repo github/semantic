@@ -10,6 +10,7 @@ module Control.Abstract.Heap
 , putSlotDeclarationScope
 , alloc
 , dealloc
+, maybeLookupDeclaration
 , lookupDeclaration
 , lookupDeclarationFrame
 , deref
@@ -244,6 +245,26 @@ putSlotDeclarationScope Slot{..} assocScope = do
   scopeAddress <- scopeLookup frameAddress
   modify @(ScopeGraph address) (putDeclarationScopeAtPosition scopeAddress position assocScope)
 
+
+maybeLookupDeclaration :: forall value address term sig m. ( Member (State (Heap address address value)) sig
+                     , Member (State (ScopeGraph address)) sig
+                     , Member (Reader (address, address)) sig
+                     , Member (Resumable (BaseError (ScopeError address))) sig
+                     , Member (Resumable (BaseError (HeapError address))) sig
+                     , Member (Reader ModuleInfo) sig
+                     , Member (Reader Span) sig
+                     , Ord address
+                     , Carrier sig m
+                     )
+                  => Declaration
+                  -> Evaluator term address value m (Maybe (Slot address))
+maybeLookupDeclaration decl = do
+  path <- maybeLookupScopePath decl
+  case path of
+    Just path -> do
+      frameAddress <- lookupFrameAddress path
+      pure (Just $ Slot frameAddress (Heap.pathPosition path))
+    Nothing -> pure Nothing
 
 lookupDeclaration :: forall value address term sig m. ( Member (State (Heap address address value)) sig
                      , Member (State (ScopeGraph address)) sig
