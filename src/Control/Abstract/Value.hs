@@ -31,12 +31,10 @@ module Control.Abstract.Value
 ) where
 
 import Control.Abstract.ScopeGraph (Declaration, ScopeGraph, ScopeError)
-import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.ScopeGraph (Allocator)
 import Control.Effect.Carrier
-import Data.Abstract.Declarations
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Name

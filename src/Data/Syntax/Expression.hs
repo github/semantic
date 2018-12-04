@@ -9,7 +9,6 @@ import Data.Fixed
 import Proto3.Suite.Class
 
 import Control.Abstract hiding (Member, Void, Call)
-import           Control.Abstract.ScopeGraph as ScopeGraph
 import           Data.Abstract.Evaluatable as Abstract hiding (Member, Void)
 import           Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import           Data.JSON.Fields

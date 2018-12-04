@@ -7,7 +7,6 @@ module Analysis.Abstract.Caching.FlowSensitive
 
 import Control.Abstract
 import Data.Abstract.BaseError
-import Data.Abstract.Environment
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Data.Map.Monoidal as Monoidal

@@ -7,7 +7,6 @@ module Semantic.Analysis
 import Control.Abstract
 import Control.Abstract.ScopeGraph (runAllocator)
 import Control.Effect.Interpose
-import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
