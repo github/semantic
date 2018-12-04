@@ -85,8 +85,8 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
 graphingTerms recur0 recur term@(Term (In a syntax)) = do
   definedInModule <- currentModule
   case toVertex a definedInModule syntax of
-    Just (v@Function{}, _) -> recurWithContext v
-    Just (v@Method{}, _) -> recurWithContext v
+    Just (v@Function{}, name) -> recurWithContext v name
+    Just (v@Method{}, name) -> recurWithContext v name
     Just (v@Variable{..}, name) -> do
       variableDefinition v
       addr <- lookupDeclaration (Declaration name)
@@ -95,13 +95,13 @@ graphingTerms recur0 recur term@(Term (In a syntax)) = do
       recur0 recur term
     _ -> recur0 recur term
   where
-    recurWithContext v = do
+    recurWithContext v name = do
       variableDefinition v
       moduleInclusion v
       local (const v) $ do
         valRef <- recur0 recur term
-        addr <- Control.Abstract.address valRef -- TODO: This is partial, we should remove ValRef
-        modify (Map.insert addr v)
+        slot <- lookupDeclaration (Declaration name)
+        modify (Map.insert slot v)
         pure valRef
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
