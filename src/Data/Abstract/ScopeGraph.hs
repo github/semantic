@@ -196,10 +196,10 @@ lookupDeclaration declaration scope g = do
   index <- Seq.findIndexR (((Declaration declaration) ==) . fst) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
 
-declarationNames :: Ord address => Scope address -> ScopeGraph address -> [Declaration]
-declarationNames scope scopeGraph = localDeclarations <> edgeNames
-  where addresses = join (Map.elems $ Map.withoutKeys (edges scope) (Set.fromList [Lexical, Import, Export]))
-        edgeNames = addresses >>= toList . flip lookupScope scopeGraph >>= flip declarationNames scopeGraph
+declarationNames :: Ord address => [EdgeLabel] -> Scope address -> ScopeGraph address -> [Declaration]
+declarationNames edgeLabels scope scopeGraph = localDeclarations <> edgeNames
+  where addresses = join (Map.elems $ Map.restrictKeys (edges scope) (Set.fromList edgeLabels))
+        edgeNames = addresses >>= toList . flip lookupScope scopeGraph >>= flip (declarationNames edgeLabels) scopeGraph
         localDeclarations = toList . fmap fst $ declarations scope
 
 

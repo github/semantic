@@ -19,8 +19,8 @@ spec config = parallel $ do
           const () <$> SpecHelpers.lookupDeclaration "a" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           const () <$> SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
-          fromJust (SpecHelpers.lookupObjectMembers "a" scopeAndFrame heap scopeGraph) `shouldContain` [ "foo" ]
-          fromJust (SpecHelpers.lookupObjectMembers "b" scopeAndFrame heap scopeGraph) `shouldContain` ["c"]
+          fromJust (SpecHelpers.lookupMembers "a" Import scopeAndFrame heap scopeGraph) `shouldContain` [ "foo" ]
+          fromJust (SpecHelpers.lookupMembers "b" Import scopeAndFrame heap scopeGraph) `shouldContain` ["c"]
           -- (derefQName heap ("b" :| ["c"]) env >>= deNamespace heap) `shouldBe` Just ("c", ["baz"])
         other -> expectationFailure (show other)
 
@@ -57,7 +57,7 @@ spec config = parallel $ do
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           () <$ SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          SpecHelpers.lookupObjectMembers "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
+          SpecHelpers.lookupMembers "Bar" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
           valueRef `shouldBe` Rval (String "\"bar\"")
         other -> expectationFailure (show other)
 
@@ -65,7 +65,7 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["multiple_inheritance.py"]
       case ModuleTable.lookup "multiple_inheritance.py" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          SpecHelpers.lookupObjectMembers "Baz" scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
+          SpecHelpers.lookupMembers "Baz" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just [ "dang" ]
           valueRef `shouldBe` Rval (String "\"bar!\"")
         other -> expectationFailure (show other)
 

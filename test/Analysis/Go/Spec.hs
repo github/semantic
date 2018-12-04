@@ -15,7 +15,7 @@ spec config = parallel $ do
       case ModuleTable.lookup "main.go" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          SpecHelpers.lookupObjectMembers "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ["New"]
+          SpecHelpers.lookupMembers "foo" Import scopeAndFrame heap scopeGraph `shouldBe` Just ["New"]
           () <$ SpecHelpers.lookupDeclaration "main" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "Rab" scopeAndFrame heap scopeGraph `shouldBe` Just ()
