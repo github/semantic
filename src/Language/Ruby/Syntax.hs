@@ -7,6 +7,7 @@ import qualified Data.Text as T
 import           Prologue
 import           System.FilePath.Posix
 
+import Control.Abstract as Abstract hiding (Load)
 import           Control.Abstract.Value (Boolean)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
@@ -65,14 +66,27 @@ instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
-  eval _ Send{..} = undefined -- do
-    -- let sel = case sendSelector of
-    --       Just sel -> eval sel >>= address
-    --       Nothing  -> variable (name "call")
-    -- recv <- maybe (self >>= maybeM (box unit)) (eval >=> address) sendReceiver
-    -- func <- deref =<< evaluateInScopedEnv recv sel
-    -- args <- traverse (eval >=> address) sendArgs
-    -- Rval <$> call func recv args -- TODO pass through sendBlock
+  eval eval Send{..} = do
+    sel <- case sendSelector of
+             Just sel -> maybeM (throwEvalError NoNameError) (declaredName sel)
+             Nothing  ->
+               -- TODO: if there is no selector then it's a call on the receiver
+               -- Previously we returned a variable called `call`.
+               throwEvalError NoNameError
+    recv <- maybe (rvalBox unit) eval sendReceiver -- TODO: default to self here
+    lhsValue <- Abstract.value recv
+    lhsFrame <- Abstract.scopedEnvironment lhsValue
+
+    case lhsFrame of
+      Just lhsFrame ->
+        withScopeAndFrame lhsFrame $ do
+          reference (Reference sel) (Declaration sel)
+          func <- deref =<< lookupDeclaration (Declaration sel)
+          args <- traverse (eval >=> Abstract.value) sendArgs
+          call func args -- TODO pass through receiver and sendBlock
+      Nothing -> do
+        -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
+        throwEvalError (ReferenceError lhsValue sel)
 
 instance Tokenize Send where
   tokenize Send{..} = within Scope.Call $ do
