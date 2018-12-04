@@ -284,9 +284,8 @@ class AbstractIntro value => AbstractValue term address value carrier where
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
-  namespace :: Declaration          -- ^ The namespace's identifier
-            -> Maybe value          -- The ancestor of the namespace
-            -> address              -- ^ The environment to mappend
+  namespace :: Name                 -- ^ The namespace's identifier
+            -> address              -- ^ The frame of the namespace.
             -> Evaluator term address value carrier value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
