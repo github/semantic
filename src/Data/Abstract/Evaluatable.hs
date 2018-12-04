@@ -21,20 +21,21 @@ import Control.Abstract.Context as X
 import Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..), catchLoopControl, runLoopControl, catchReturn, runReturn)
 import Control.Abstract.Modules as X (Modules, ModuleResult, ResolutionError(..), load, lookupModule, listModulesInDir, require, resolve, throwResolutionError)
 import Control.Abstract.Value as X hiding (Boolean(..), Function(..), While(..))
-import Data.Abstract.Declarations as X
 import Data.Abstract.BaseError as X
+import Data.Abstract.Declarations as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.Name as X
 import Data.Abstract.Ref as X
+import Data.ImportPath (ImportPath)
 import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
+import Data.Span (emptySpan)
 import Data.Sum hiding (project)
 import Data.Term
 import Prologue
-import Data.ImportPath (ImportPath)
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class (Show1 constr, Foldable constr) => Evaluatable constr where
@@ -117,17 +118,30 @@ instance HasPrelude 'Python where
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
+    let self = Declaration $ X.name "__self"
+    declare self emptySpan Nothing
+    slot <- lookupDeclaration self
+    assign slot =<< object =<< currentFrame
+
     void $ defineBuiltIn (Declaration $ X.name "puts") Print
 
     defineClass (Declaration (X.name "Object")) [] $ do
       void $ defineBuiltIn (Declaration $ X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
-  definePrelude _ = pure ()
+  definePrelude _ = do
+    let self = Declaration $ X.name "__self"
+    declare self emptySpan Nothing
+    slot <- lookupDeclaration self
+    assign slot =<< object =<< currentFrame
     -- defineNamespace (Declaration (X.name "console")) (builtIn (X.name "log") Print)
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
+    let self = Declaration $ X.name "__self"
+    declare self emptySpan Nothing
+    slot <- lookupDeclaration self
+    assign slot =<< object =<< currentFrame
     defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
 
 
