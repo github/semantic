@@ -70,7 +70,6 @@ evaluate :: ( AbstractValue term address value (ValueC term address value inner)
             , Member Trace innerSig
             , Ord address
             , Show address
-            , Show value
             )
          => proxy lang
          -> (  (Module (Either (proxy lang) term) -> Evaluator term address value inner (ValueRef address value))
@@ -140,7 +139,6 @@ evalTerm :: ( Carrier sig m
             , Member Trace sig
             , Ord address
             , Show address
-            , Show value
             , Recursive term
             )
          => Open (Open (term -> Evaluator term address value m (ValueRef address value)))

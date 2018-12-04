@@ -67,7 +67,6 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (Reader Span) sig
                  , Member (State (Graph ControlFlowVertex)) sig
                  , Member (State (Map (Slot (Hole context (Located address))) ControlFlowVertex)) sig
-                 , AbstractValue term (Hole context (Located address)) value m
                  , Member (State (Heap (Hole context (Located address)) (Hole context (Located address)) value)) sig
                  , Member (State (ScopeGraph (Hole context (Located address)))) sig
                  , Member (Resumable (BaseError (ScopeError (Hole context (Located address))))) sig
@@ -77,8 +76,6 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , VertexDeclaration syntax
                  , Declarations1 syntax
                  , Ord address
-                 , Show address
-                 , Show context
                  , Ord context
                  , Foldable syntax
                  , term ~ Term syntax Location

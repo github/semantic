@@ -19,7 +19,6 @@ runPythonPackaging :: ( Carrier sig m
                       , Ord address
                       , Show address
                       , Show term
-                      , Declarations term
                       , Member Trace sig
                       , Member (Boolean (Value term address)) sig
                       , Member (State (Heap address address (Value term address))) sig
@@ -61,7 +60,6 @@ instance ( Carrier sig m
          , Member (State (Heap address address (Value term address))) sig
          , Member (State Strategy) sig
          , Member Trace sig
-         , Declarations term
          , Ord address
          , Show address
          , Show term
