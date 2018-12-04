@@ -87,7 +87,6 @@ instance ( FreeVariables term
     Abstract.Function name params body k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
-      _ <- fresh
       -- TODO: Declare all params
       currentScope' <- currentScope
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]
