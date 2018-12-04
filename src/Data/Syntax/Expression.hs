@@ -16,6 +16,7 @@ import qualified Data.Reprinting.Scope as Scope
 import           Diffing.Algorithm hiding (Delete)
 import           Reprinting.Tokenize
 import qualified Data.Reprinting.Token as Token
+import Data.Abstract.Name as Name
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -593,4 +594,5 @@ instance Eq1 This where liftEq = genericLiftEq
 instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable This where
-  eval _ This = undefined -- Rval <$> (maybeM (box unit) =<< self)
+  eval _ This =
+    rvalBox =<< deref =<< lookupDeclaration (Declaration $ Name.name "__self")
