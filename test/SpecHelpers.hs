@@ -15,10 +15,12 @@ module SpecHelpers
 , LogQueue
 , StatQueue
 , lookupDeclaration
-, lookupObjectMembers
+, lookupMembers
+, EdgeLabel(..)
 ) where
 
 import Control.Abstract hiding (lookupDeclaration)
+import Data.Abstract.ScopeGraph (EdgeLabel(..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import qualified Data.Abstract.Heap as Heap
 import Control.Arrow ((&&&))
@@ -161,26 +163,28 @@ testEvaluating
 type Val term = Value term Precise
 
 
-objectMembers :: Heap Precise Precise (Value term Precise)
-            -> ScopeGraph Precise
-            -> Value term Precise
-            -> Maybe [Name]
-objectMembers heap scopeGraph (Object frame) = frameNames heap scopeGraph frame
-objectMembers heap scopeGraph (Class _ _ frame) = frameNames heap scopeGraph frame
-objectMembers _ _ _                          = Nothing
+members :: EdgeLabel
+        -> Heap Precise Precise (Value term Precise)
+        -> ScopeGraph Precise
+        -> Value term Precise
+        -> Maybe [Name]
+members edgeLabel heap scopeGraph (Object frame)    = frameNames [ edgeLabel ] heap scopeGraph frame
+members edgeLabel heap scopeGraph (Class _ _ frame) = frameNames [ edgeLabel ] heap scopeGraph frame
+members _ _ _ _                                     = Nothing
 
-frameNames :: Heap Precise Precise (Value term Precise)
+frameNames :: [ EdgeLabel ]
+           -> Heap Precise Precise (Value term Precise)
            -> ScopeGraph Precise
            -> Precise
            -> Maybe [ Name ]
-frameNames heap scopeGraph frame = do
+frameNames edge heap scopeGraph frame = do
   scopeAddress <- Heap.scopeLookup frame heap
   scope <- ScopeGraph.lookupScope scopeAddress scopeGraph
-  pure (unDeclaration <$> ScopeGraph.declarationNames scope scopeGraph)
+  pure (unDeclaration <$> ScopeGraph.declarationNames edge scope scopeGraph)
 
-lookupObjectMembers :: Name -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Name ]
-lookupObjectMembers name scopeAndFrame heap scopeGraph =
-  (lookupDeclaration name scopeAndFrame heap scopeGraph >>= objectMembers heap scopeGraph . Prelude.head)
+lookupMembers :: Name -> EdgeLabel -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Name ]
+lookupMembers name edgeLabel scopeAndFrame heap scopeGraph =
+  (lookupDeclaration name scopeAndFrame heap scopeGraph >>= members edgeLabel heap scopeGraph . Prelude.head)
 
 lookupDeclaration :: Name -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Value term Precise ]
 lookupDeclaration name (currentScope, currentFrame) heap scopeGraph = do
