@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 module Analysis.Ruby.Spec (spec) where
 
 import qualified Data.Abstract.ModuleTable as ModuleTable
@@ -8,7 +9,7 @@ import Data.List.NonEmpty (NonEmpty(..))
 import Data.Sum
 import qualified Data.Language as Language
 import Data.Abstract.Evaluatable
-import Control.Abstract (ScopeError(..), Declaration(..))
+import Control.Abstract (ScopeError(..), Declaration(..), value)
 
 import SpecHelpers
 
@@ -19,30 +20,28 @@ spec config = parallel $ do
     it "evaluates require_relative" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
-          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates load" $ do
       (scopeGraph, (heap, res)) <- evaluate ["load.rb", "foo.rb"]
       case ModuleTable.lookup "load.rb" <$> res of
-        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
-          const () <$> SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+        Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
     it "evaluates load with wrapper" $ do
       (_, (_, res)) <- evaluate ["load-wrap.rb", "foo.rb"]
-      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "load-wrap.rb") emptySpan (ScopeError (Declaration "foo") emptySpan))))
+      res `shouldBe` Left (SomeError (inject @(BaseError (ScopeError Precise)) (BaseError (ModuleInfo "load-wrap.rb") emptySpan (LookupPathError (Declaration "foo")))))
 
     it "evaluates subclass" $ do
       (scopeGraph, (heap, res)) <- evaluate ["subclass.rb"]
       case ModuleTable.lookup "subclass.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           valueRef `shouldBe` Rval (String "\"<bar>\"")
-          const () <$> SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          const () <$> SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+          () <$ SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
 
           -- (lookupDeclaration "Bar" heap >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
         other -> expectationFailure (show other)
@@ -51,7 +50,6 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["modules.rb"]
       case ModuleTable.lookup "modules.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
-          valueRef `shouldBe` Rval (String "\"<hello>\"")
           const () <$> SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
