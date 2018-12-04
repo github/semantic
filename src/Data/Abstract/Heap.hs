@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Heap
   ( Heap(..)
   , Frame(..)
@@ -35,7 +35,8 @@ data Frame scopeAddress frameAddress value = Frame {
 
 -- | A map of frame addresses onto Frames.
 newtype Heap scopeAddress frameAddress value = Heap { heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
-  deriving (Eq, Ord, Generic, NFData, Show)
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving newtype (NFData)
 
 instance Lower (Heap scopeAddress frameAddress value) where
   lowerBound = Heap lowerBound
