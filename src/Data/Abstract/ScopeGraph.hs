@@ -220,10 +220,10 @@ insertEdge label target currentAddress g@ScopeGraph{..} = fromMaybe g $ do
   pure (g { graph = Map.insert currentAddress newScope graph })
 
 
--- | Insert associate the given address to a declaration in the scope graph.
-insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
-insertDeclarationScope decl@Declaration{..} address g@ScopeGraph{..} = fromMaybe g $ do
-  declScope <- scopeOfDeclaration decl g
+-- | Insert associate the given associated scope into the declaration in the scope graph.
+insertDeclarationScope :: Ord scopeAddress => Declaration -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
+insertDeclarationScope decl@Declaration{..} address currentAddress g@ScopeGraph{..} = fromMaybe g $ do
+  declScope <- pathDeclarationScope currentAddress =<< lookupScopePath unDeclaration currentAddress g
   (span, position) <- (fst . snd . fst &&& unPosition . snd) <$> lookupDeclaration unDeclaration declScope g
   scope <- lookupScope declScope g
   pure $ g { graph = Map.insert declScope (scope { declarations = Seq.adjust (const (decl, (span, Just address))) position (declarations scope) }) graph }

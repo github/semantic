@@ -61,8 +61,10 @@ declare decl span scope = do
   currentAddress <- currentScope
   modify (fst . ScopeGraph.declare decl span scope currentAddress)
 
-putDeclarationScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
-putDeclarationScope decl = modify . (ScopeGraph.insertDeclarationScope decl)
+putDeclarationScope :: (Ord address, Member (Reader (address, address)) sig, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
+putDeclarationScope decl assocScope = do
+  currentAddress <- currentScope
+  modify (ScopeGraph.insertDeclarationScope decl assocScope currentAddress)
 
 putDeclarationSpan :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Span -> Evaluator term address value m ()
 putDeclarationSpan decl = modify @(ScopeGraph address) . (ScopeGraph.insertDeclarationSpan decl)
