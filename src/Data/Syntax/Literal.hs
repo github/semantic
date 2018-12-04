@@ -13,6 +13,8 @@ import           Diffing.Algorithm
 import           Numeric.Exts
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize as Tok
+import qualified Data.Reprinting.Scope as Scope
+import           Data.Reprinting.Token
 import           Text.Read (readMaybe)
 
 -- Boolean
@@ -85,6 +87,9 @@ instance Evaluatable Data.Syntax.Literal.Rational where
       parsed = readMaybe @Prelude.Integer (T.unpack trimmed)
     in rvalBox =<< (rational <$> maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
 
+instance Tokenize Data.Syntax.Literal.Rational where
+  tokenize (Rational t) = yield . Run $ t
+
 -- Complex literals e.g. `3 + 2i`
 newtype Complex a = Complex { value :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
@@ -95,6 +100,9 @@ instance Show1 Data.Syntax.Literal.Complex where liftShowsPrec = genericLiftShow
 
 -- TODO: Implement Eval instance for Complex
 instance Evaluatable Complex
+
+instance Tokenize Complex where
+  tokenize (Complex v) = yield . Run $ v
 
 -- Strings, symbols
 
@@ -110,6 +118,9 @@ instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShows
 -- TODO: Implement Eval instance for String
 instance Evaluatable Data.Syntax.Literal.String
 
+instance Tokenize Data.Syntax.Literal.String where
+  tokenize = sequenceA_
+
 newtype Character a = Character { characterContent :: Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -118,6 +129,9 @@ instance Ord1 Data.Syntax.Literal.Character where liftCompare = genericLiftCompa
 instance Show1 Data.Syntax.Literal.Character where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Data.Syntax.Literal.Character
+
+instance Tokenize Character where
+  tokenize = yield . Glyph . characterContent
 
 -- | An interpolation element within a string literal.
 newtype InterpolationElement a = InterpolationElement { interpolationBody :: a }
@@ -129,6 +143,9 @@ instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for InterpolationElement
 instance Evaluatable InterpolationElement
+
+instance Tokenize InterpolationElement where
+  tokenize = sequenceA_
 
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: Text }
@@ -149,6 +166,9 @@ isTripleQuoted (TextElement t) =
   let trip = "\"\"\""
   in  T.take 3 t == trip && T.takeEnd 3 t == trip
 
+quoted :: Text -> TextElement a
+quoted t = TextElement ("\"" <> t <> "\"")
+
 -- | A sequence of textual contents within a string literal.
 newtype EscapeSequence a = EscapeSequence { value :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
@@ -159,6 +179,9 @@ instance Show1 EscapeSequence where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for EscapeSequence
 instance Evaluatable EscapeSequence
+
+instance Tokenize EscapeSequence where
+  tokenize (EscapeSequence e) = yield . Run $ e
 
 data Null a = Null
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, Diffable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
@@ -182,6 +205,9 @@ instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Symbol
 instance Evaluatable Symbol
 
+instance Tokenize Symbol where
+  tokenize s = within Scope.Atom (yield Sym *> sequenceA_ s)
+
 newtype SymbolElement a = SymbolElement { symbolContent :: Text }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
@@ -191,6 +217,9 @@ instance Show1 SymbolElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SymbolElement where
   eval _ (SymbolElement s) = rvalBox (symbol s)
+
+instance Tokenize SymbolElement where
+  tokenize = yield . Run . symbolContent
 
 newtype Regex a = Regex { regexContent :: Text }
   deriving (Diffable, Eq, Foldable, Functor, Generic1, Hashable1, Ord, Show, Traversable, FreeVariables1, Declarations1, ToJSONFields1, Named1, Message1, NFData1)
@@ -204,6 +233,9 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Regex
 instance Evaluatable Regex where
   eval _ (Regex x) = rvalBox (regex x)
+
+instance Tokenize Regex where
+  tokenize = yield . Run . regexContent
 
 -- Collections
 
