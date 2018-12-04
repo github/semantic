@@ -156,7 +156,7 @@ reference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} = fromMaybe g
               scopes <- Map.lookup edge linkMap
               -- Return the first path to the declaration through the scopes.
               getFirst (foldMap (First . ap (go currentScope) ((path .) . EPath edge)) scopes)
-            in traverseEdges Import <|> traverseEdges Lexical
+            in traverseEdges Superclass <|> traverseEdges Import <|> traverseEdges Lexical
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
@@ -167,7 +167,7 @@ insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} s
       case lookupDeclaration unDeclaration address g of
         Just (_, index) ->
           Just $ scope { references = Map.insert ref (path (DPath decl index)) (references scope) }
-        Nothing -> traverseEdges Import <|> traverseEdges Lexical
+        Nothing -> traverseEdges Superclass <|> traverseEdges Import <|> traverseEdges Lexical
           where
             traverseEdges edge = do
               linkMap <- linksOfScope address g
@@ -183,7 +183,7 @@ lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
       case lookupDeclaration declaration address g of
         Just (_, index) -> Just $ path (DPath (Declaration declaration) index)
         Nothing -> maybe Nothing (Just . path) (lookupReference declaration address g)
-          <|> traverseEdges Import <|> traverseEdges Lexical
+          <|> traverseEdges Superclass <|> traverseEdges Import <|> traverseEdges Lexical
           where
             traverseEdges edge = do
               linkMap <- linksOfScope address g
