@@ -18,6 +18,7 @@ import           Diffing.Algorithm hiding (Delete)
 import           Reprinting.Tokenize
 import           Data.Reprinting.Token (Element (..))
 import qualified Data.Reprinting.Token as Token
+import qualified Data.List.NonEmpty as NonEmpty
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -587,7 +588,7 @@ instance Evaluatable InstanceOf
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
 newtype ScopeResolution a = ScopeResolution { scopes :: NonEmpty a }
-  deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
 
 instance Hashable1 ScopeResolution where liftHashWithSalt = foldl
 instance Eq1 ScopeResolution where liftEq = genericLiftEq
@@ -599,9 +600,11 @@ instance Evaluatable ScopeResolution where
     where f ns id = ns >>= flip evaluateInScopedEnv id
 
 instance Tokenize ScopeResolution where
-  tokenize (ScopeResolution (a :| rest)) = do
-    a
-    for_ rest $ \item -> yield Token.Resolve *> item
+  tokenize (ScopeResolution (a :| rest)) = 
+    a *> for_ rest $ \item -> yield Token.Resolve *> item
+
+instance Declarations1 ScopeResolution where
+  liftDeclaredName declaredName = declaredName . NonEmpty.last . scopes
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
 newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }

@@ -65,7 +65,7 @@ instance HasDefault Pos where
 
 
 instance Show Span where
-  showsPrec _ Span{..} = shows spanStart . showString " - " . shows spanEnd
+  showsPrec _ Span{..} = shows spanStart . showString ".." . shows spanEnd
 
 instance Message Span where
   encodeMessage _ Span{..} = Encode.embedded 1 (encodeMessage 1 spanStart) <> Encode.embedded 2 (encodeMessage 1 spanEnd)
