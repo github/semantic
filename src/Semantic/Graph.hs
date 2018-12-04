@@ -346,7 +346,6 @@ resumingResolutionError = runResolutionErrorWith (\ baseError -> traceError "Res
 
 resumingLoadError :: ( Carrier sig m
                      , Member Trace sig
-                     , Ord address
                      , AbstractHole value
                      , AbstractHole address
                      )
@@ -426,10 +425,6 @@ resumingHeapError :: ( Carrier sig m
                      , AbstractHole address
                      , Member Trace sig
                      , Show address
-                     , Ord address
-                     , Member Fresh sig
-                     , Member (Resumable (BaseError (ScopeError address))) sig
-                     , Effect sig
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
                   -> Evaluator term address value m a
@@ -445,8 +440,6 @@ resumingScopeError :: ( Carrier sig m
                      , AbstractHole (Scope address)
                      , AbstractHole (Path address)
                      , AbstractHole address
-                     , Show address
-                     , Ord address
                      )
                     => Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a
                     -> Evaluator term address value m a

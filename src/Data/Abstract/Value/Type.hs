@@ -345,7 +345,6 @@ instance ( Member Fresh sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (State TypeMap) sig
-         , Ord address
          , Carrier sig m
          )
       => AbstractValue term address Type m where

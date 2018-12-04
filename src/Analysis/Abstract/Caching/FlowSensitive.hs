@@ -6,7 +6,6 @@ module Analysis.Abstract.Caching.FlowSensitive
 ) where
 
 import Control.Abstract
-import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Ref
 import Data.Map.Monoidal as Monoidal
@@ -74,19 +73,13 @@ cachingTerms recur0 recur term = do
       pairs <- consultOracle c
       cachingConfiguration c pairs (recur0 recur term)
 
-convergingModules :: ( AbstractValue term address value m
-                     , Cacheable term address value
+convergingModules :: ( Cacheable term address value
                      , Member Fresh sig
                      , Member NonDet sig
                      , Member (Reader (Cache term address value)) sig
                      , Member (Reader (Live address)) sig
-                     , Member (Reader ModuleInfo) sig
-                     , Member (Reader Span) sig
                      , Member (State (Cache term address value)) sig
                      , Member (State (Heap address address value)) sig
-                     , Member (State (ScopeGraph address)) sig
-                     , Member (Resumable (BaseError (HeapError address))) sig
-                     , Member (Resumable (BaseError (ScopeError address))) sig
                      , Carrier sig m
                      , Effect sig
                      )

@@ -30,7 +30,7 @@ module Control.Abstract.Value
 , rvalBox
 ) where
 
-import Control.Abstract.ScopeGraph (Declaration, ScopeGraph, ScopeError)
+import Control.Abstract.ScopeGraph (Declaration, ScopeGraph)
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.ScopeGraph (Allocator)
@@ -164,15 +164,12 @@ forLoop :: ( Carrier sig m
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
            , Member (Resumable (BaseError (HeapError address))) sig
-           , Member (Resumable (BaseError (ScopeError address))) sig
            , Member (State (Heap address address value)) sig
            , Member (State (ScopeGraph address)) sig
            , Member (Reader (address, address)) sig
            , Member (While address value) sig
            , Member Fresh sig
            , Ord address
-           , Show address
-           , Show value
            )
   => Evaluator term address value m value -- ^ Initial statement
   -> Evaluator term address value m value -- ^ Condition

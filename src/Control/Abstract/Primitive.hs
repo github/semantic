@@ -27,7 +27,6 @@ defineClass :: ( AbstractValue term address value m
                , Member (State (ScopeGraph address)) sig
                , Member (Reader (address, address)) sig
                , Ord address
-               , Show address
                )
             => Declaration
             -> [Declaration]
@@ -65,7 +64,6 @@ defineNamespace :: ( AbstractValue term address value m
                    , Member (State (ScopeGraph address)) sig
                    , Member (Reader (address, address)) sig
                    , Ord address
-                   , Show address
                    )
                 => Declaration
                 -> Evaluator term address value m a
