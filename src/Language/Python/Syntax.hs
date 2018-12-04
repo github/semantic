@@ -264,7 +264,7 @@ instance Evaluatable QualifiedAliasedImport where
 
     withScopeAndFrame objFrame $
       for_ modulePaths $ \modulePath -> do
-        ((moduleScope, moduleFrame), val) <- require modulePath
+        ((moduleScope, moduleFrame), _) <- require modulePath
         insertImportEdge moduleScope
         insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
 
