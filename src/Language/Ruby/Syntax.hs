@@ -7,22 +7,23 @@ import qualified Data.Text as T
 import           Prologue
 import           System.FilePath.Posix
 
-import Control.Abstract as Abstract hiding (Load)
 import           Control.Abstract.Value (Boolean)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
-import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path
-import qualified Data.Reprinting.Scope as Scope
 import           Data.JSON.Fields
-import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Control.Abstract.ScopeGraph (insertImportEdge)
+import Control.Abstract as Abstract hiding (Load)
 import Control.Abstract.Heap (insertFrameLink, HeapError, Heap)
+import Control.Abstract.ScopeGraph (insertImportEdge)
+import Data.Abstract.Name as Name
+import qualified Data.Abstract.Module as M
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
+import qualified Data.Reprinting.Scope as Scope
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
@@ -73,7 +74,9 @@ instance Evaluatable Send where
                -- TODO: if there is no selector then it's a call on the receiver
                -- Previously we returned a variable called `call`.
                throwEvalError NoNameError
-    recv <- maybe (rvalBox unit) eval sendReceiver -- TODO: default to self here
+
+    let self = LvalMember <$> lookupDeclaration (Declaration $ Name.name "__self")
+    recv <- maybe self eval sendReceiver
     lhsValue <- Abstract.value recv
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
@@ -83,7 +86,7 @@ instance Evaluatable Send where
           reference (Reference sel) (Declaration sel)
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse (eval >=> Abstract.value) sendArgs
-          call func args -- TODO pass through receiver and sendBlock
+          call func (lhsValue : args) -- TODO pass through sendBlock
       Nothing -> do
         -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
         throwEvalError (ReferenceError lhsValue sel)
