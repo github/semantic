@@ -178,11 +178,37 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
-  eval _ Class{..} = undefined -- do
-    -- super <- traverse (eval >=> address) classSuperClass
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
-    -- rvalBox =<< letrec' name (\addr ->
-    --   makeNamespace name addr super (void (eval classBody)))
+  eval eval Class{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName classIdentifier)
+    span <- ask @Span
+    currentScope' <- currentScope
+
+    let classSuperclasses = maybeToList classSuperClass
+    superScopes <- for classSuperclasses $ \superclass -> do
+      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+      scope <- associatedScope (Declaration name)
+      slot <- lookupDeclaration (Declaration name)
+      superclassFrame <- scopedEnvironment =<< deref slot
+      pure $ case (scope, superclassFrame) of
+        (Just scope, Just frame) -> Just (scope, frame)
+        _ -> Nothing
+
+    let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
+        current = fmap (Lexical, ) . pure . pure $ currentScope'
+        edges = Map.fromList (superclassEdges <> current)
+    childScope <- newScope edges
+    declare (Declaration name) span (Just childScope)
+
+    let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
+    childFrame <- newFrame childScope frameEdges
+
+    withScopeAndFrame childFrame $ do
+      void $ eval classBody
+
+    classSlot <- lookupDeclaration (Declaration name)
+    assign classSlot =<< klass (Declaration name) childFrame
+
+    rvalBox unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier
