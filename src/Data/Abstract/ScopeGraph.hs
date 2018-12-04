@@ -198,7 +198,7 @@ lookupDeclaration declaration scope g = do
 
 declarationNames :: Ord address => Scope address -> ScopeGraph address -> [Declaration]
 declarationNames scope scopeGraph = localDeclarations <> edgeNames
-  where addresses = join (Map.elems $ Map.withoutKeys (edges scope) (Set.singleton Export))
+  where addresses = join (Map.elems $ Map.withoutKeys (edges scope) (Set.fromList [Lexical, Import, Export]))
         edgeNames = addresses >>= toList . flip lookupScope scopeGraph >>= flip declarationNames scopeGraph
         localDeclarations = toList . fmap fst $ declarations scope
 
