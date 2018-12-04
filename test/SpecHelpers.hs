@@ -166,6 +166,7 @@ objectMembers :: Heap Precise Precise (Value term Precise)
             -> Value term Precise
             -> Maybe [Name]
 objectMembers heap scopeGraph (Object frame) = frameNames heap scopeGraph frame
+objectMembers heap scopeGraph (Class _ _ frame) = frameNames heap scopeGraph frame
 objectMembers _ _ _                          = Nothing
 
 frameNames :: Heap Precise Precise (Value term Precise)
