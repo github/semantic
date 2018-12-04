@@ -94,9 +94,9 @@ instance ( FreeVariables term
       associatedScope <- newScope lexicalEdges
       -- TODO: Fix this if we find a solution to declaring names of functions without throwing a lookupPathError.
       -- declare (Declaration name) span (Just scope)
-      functionSpan <- ask @Span
-      declare (Declaration name) functionSpan (Just associatedScope)
+      putDeclarationScope (Declaration name) associatedScope
 
+      functionSpan <- ask @Span
       names <- withScope associatedScope . for params $ \param ->
         param <$ declare (Declaration param) functionSpan Nothing
 
