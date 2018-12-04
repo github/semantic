@@ -108,6 +108,7 @@ instance ( FreeVariables term
       packageInfo <- currentPackage
       moduleInfo <- currentModule
 
+      -- FIXME: build the scope in 'define' instead
       currentScope' <- currentScope
       currentFrame' <- currentFrame @(Value term address)
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]
