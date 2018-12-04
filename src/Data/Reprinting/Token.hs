@@ -34,6 +34,7 @@ isControl _ = False
 data Element
   = Run Text         -- ^ A literal chunk of text.
   | Truth Bool       -- ^ A boolean value.
+  | Glyph Text       -- ^ A glyph like 'a' or #a.
   | Nullity          -- ^ @null@ or @nil@ or some other zero value.
   | Sep              -- ^ Some sort of delimiter, interpreted in some 'Context'.
   | Sym              -- ^ Some sort of symbol, interpreted in some 'Context'.

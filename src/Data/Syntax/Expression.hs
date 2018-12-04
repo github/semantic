@@ -601,7 +601,7 @@ instance Evaluatable ScopeResolution where
 
 instance Tokenize ScopeResolution where
   tokenize (ScopeResolution (a :| rest)) = 
-    a *> for_ rest $ \item -> yield Token.Resolve *> item
+    a *> (for_ rest (yield Token.Resolve *>))
 
 instance Declarations1 ScopeResolution where
   liftDeclaredName declaredName = declaredName . NonEmpty.last . scopes
