@@ -15,6 +15,7 @@ import Data.Abstract.Value.Concrete as Value
 import Data.Algebra
 import Data.Bifunctor (first)
 import Data.Functor.Const
+import qualified Data.Map.Strict as Map
 import Data.Sum
 import SpecHelpers hiding (reassociate)
 import Data.Abstract.Ref
@@ -33,9 +34,12 @@ spec = parallel $ do
   it "calls functions" $ do
     (_, (_, (_, expected))) <- evaluate $ do
       withLexicalScopeAndFrame $ do
-        declare (ScopeGraph.Declaration "identity") emptySpan Nothing
+        currentScope' <- currentScope
+        let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+        associatedScope <- newScope lexicalEdges
+        declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
         valueRef <- function "identity" [ SpecHelpers.name "x", SpecHelpers.name "y" ]
-          (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "y"))))
+          (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "y")))) associatedScope
         identity <- value valueRef
         val <- pure (integer 123)
         -- TODO Pass a unit slot to call at the self position
