@@ -31,8 +31,6 @@ import qualified Data.Set as Set
 import Data.Span
 import Prologue
 import System.FilePath.Posix (takeDirectory)
-import Data.Abstract.Heap
-import Data.Abstract.ScopeGraph
 import Data.Abstract.Ref
 
 -- A scope address, frame address, and value ref.

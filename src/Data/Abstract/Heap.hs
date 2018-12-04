@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Heap
   ( Heap(..)
   , Frame(..)
@@ -20,7 +20,6 @@ module Data.Abstract.Heap
   , isHeapEmpty
   ) where
 
-import Data.Abstract.Live
 import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Slot(..), ScopeGraph, pathPosition, pathDeclaration, lookupScopePath)
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap as IntMap
@@ -36,7 +35,8 @@ data Frame scopeAddress frameAddress value = Frame {
 
 -- | A map of frame addresses onto Frames.
 newtype Heap scopeAddress frameAddress value = Heap { heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
-  deriving (Eq, Ord, Generic, NFData, Show)
+  deriving stock (Eq, Generic, Ord, Show)
+  deriving newtype (NFData)
 
 instance Lower (Heap scopeAddress frameAddress value) where
   lowerBound = Heap lowerBound
@@ -73,7 +73,7 @@ deleteSlot Slot{..} h@Heap{} =
         h { heap = Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) (heap h) }
       Nothing -> h
 
-lookupDeclaration :: (Ord address, Show address) => Declaration -> (address, address) -> ScopeGraph address -> Heap address address value -> Maybe (Slot address)
+lookupDeclaration :: Ord address => Declaration -> (address, address) -> ScopeGraph address -> Heap address address value -> Maybe (Slot address)
 lookupDeclaration Declaration{..} (currentScope, currentFrame) scopeGraph heap = do
   path <- lookupScopePath unDeclaration currentScope scopeGraph
   frameAddress <- lookupFrameAddress path  currentFrame heap

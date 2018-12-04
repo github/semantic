@@ -32,7 +32,6 @@ import           Analysis.Abstract.Caching.FlowInsensitive
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Graph as Graph
 import           Control.Abstract
-import Control.Abstract.Heap as Heap
 import           Control.Abstract.PythonPackage as PythonPackage
 import           Data.Abstract.Address.Hole as Hole
 import           Data.Abstract.Address.Located as Located
@@ -347,7 +346,6 @@ resumingResolutionError = runResolutionErrorWith (\ baseError -> traceError "Res
 
 resumingLoadError :: ( Carrier sig m
                      , Member Trace sig
-                     , Ord address
                      , AbstractHole value
                      , AbstractHole address
                      )
@@ -427,10 +425,6 @@ resumingHeapError :: ( Carrier sig m
                      , AbstractHole address
                      , Member Trace sig
                      , Show address
-                     , Ord address
-                     , Member Fresh sig
-                     , Member (Resumable (BaseError (ScopeError address))) sig
-                     , Effect sig
                      )
                   => Evaluator term address value (ResumableWithC (BaseError (HeapError address)) (Eff m)) a
                   -> Evaluator term address value m a
@@ -446,15 +440,13 @@ resumingScopeError :: ( Carrier sig m
                      , AbstractHole (Scope address)
                      , AbstractHole (Path address)
                      , AbstractHole address
-                     , Show address
-                     , Ord address
                      )
                     => Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a
                     -> Evaluator term address value m a
 resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
-  ScopeError decl span -> pure hole
+  ScopeError _ _ -> pure hole
   LookupScopeError -> pure hole
-  LookupPathError decl -> pure hole
+  LookupPathError _ -> pure hole
   CurrentScopeError -> pure hole
   LookupDeclarationScopeError _ -> pure hole)
 

@@ -6,7 +6,7 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Control.Abstract.ScopeGraph (Allocator, ScopeError, lookupDeclarationScope)
+import Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
@@ -14,7 +14,7 @@ import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), declaredName, throwEvalError, EvalError(..), Declarations)
+import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), EvalError(..), Declarations)
 import Data.Abstract.Environment (Bindings)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Name
@@ -84,31 +84,18 @@ instance ( FreeVariables term
       => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Abstract.Function name params body k -> runEvaluator $ do
+    Abstract.Function name params body scope k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
-      _ <- fresh
-      -- TODO: Declare all params
-      currentScope' <- currentScope
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-      associatedScope <- newScope lexicalEdges
-      -- TODO: Fix this if we find a solution to declaring names of functions without throwing a lookupPathError.
-      -- declare (Declaration name) span (Just scope)
-      putDeclarationScope (Declaration name) associatedScope
 
-      functionSpan <- ask @Span
-      names <- withScope associatedScope . for params $ \param ->
-        param <$ declare (Declaration param) functionSpan Nothing
-
-      address <- lookupDeclaration @(Value term address) (Declaration name)
       currentFrame' <- currentFrame
-      let closure = Closure packageInfo moduleInfo (Just name) names (Right body) associatedScope currentFrame'
-      assign address closure
+      let closure = Closure packageInfo moduleInfo (Just name) params (Right body) scope currentFrame'
       Evaluator $ runFunctionC (k (Rval closure)) eval
-    Abstract.BuiltIn name builtIn k -> runEvaluator $ do
+    Abstract.BuiltIn _ builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
 
+      -- FIXME: build the scope in 'define' instead
       currentScope' <- currentScope
       currentFrame' <- currentFrame @(Value term address)
       let lexicalEdges = Map.singleton Lexical [ currentScope' ]

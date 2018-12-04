@@ -10,8 +10,6 @@ import Control.Abstract as Abstract
 import Control.Effect.Carrier
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Prologue
-import qualified Data.Map.Strict as Map
 import Data.Abstract.Ref
 import Data.Abstract.Evaluatable
 
@@ -41,25 +39,11 @@ instance ( Member (Allocator address) sig
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Function name params body k -> runEvaluator $ do
-      functionSpan <- ask @Span -- TODO: This might be wrong
-      currentScope' <- currentScope
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-      scope <- newScope lexicalEdges
-      putDeclarationScope (Declaration name) scope
-
-      _ <- withScope scope $ do
-        for_ params $ \param -> do
-          functionSpan <- ask @Span
-          declare (Declaration param) functionSpan Nothing
-        -- TODO: Ask @robrix if we should evaluate the body under Abstract semantics
+    Function _ _ body scope k -> runEvaluator $ do
+      -- FIXME: instantiate the scope and evaluate within a new frame
+      res <- withScope scope $ do
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
-
-
-      address <- lookupDeclaration @Abstract (Declaration name)
-      assign address Abstract
-      Evaluator $ runFunctionC (k (LvalMember address)) eval
-
+      Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
     Call _ _ k -> runEvaluator $ do
       rvalBox Abstract >>= Evaluator . flip runFunctionC eval . k) op)

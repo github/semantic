@@ -67,10 +67,7 @@ withScopeAndFrame :: forall term address value m a sig. (
                     , Member (Resumable (BaseError (HeapError address))) sig
                     , Member (Reader (address, address)) sig
                     , Member (State (Heap address address value)) sig
-                    , Member (State (ScopeGraph address)) sig
                     , Carrier sig m
-                    , Show address
-                    , Show value
                     )
                   => address
                   -> Evaluator term address value m a
@@ -85,15 +82,12 @@ withLexicalScopeAndFrame :: forall term address value m a sig. (
                     , Member (Reader ModuleInfo) sig
                     , Member (Reader Span) sig
                     , Member (Resumable (BaseError (HeapError address))) sig
-                    , Member (Resumable (BaseError (ScopeError address))) sig
                     , Member (State (Heap address address value)) sig
                     , Member (State (ScopeGraph address)) sig
                     , Member (Reader (address, address)) sig
                     , Member (Allocator address) sig
                     , Member Fresh sig
                     , Carrier sig m
-                    , Show address
-                    , Show value
                     )
                   => Evaluator term address value m a
                   -> Evaluator term address value m a
@@ -189,7 +183,6 @@ define :: forall value sig address m term. ( HasCallStack
           , Member (Resumable (BaseError (ScopeError address))) sig
           , Member (Resumable (BaseError (HeapError address))) sig
           , Ord address
-          , Show address
           , Carrier sig m
           )
        => Declaration
@@ -211,11 +204,8 @@ withChildFrame :: ( Member (Allocator address) sig
                   , Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
                   , Member (Resumable (BaseError (HeapError address))) sig
-                  , Member (Resumable (BaseError (ScopeError address))) sig
                   , Ord address
                   , Carrier sig m
-                  , Show address
-                  , Show value
                   )
                 => Declaration
                 -> (address -> Evaluator term address value m a)
@@ -263,7 +253,6 @@ lookupDeclaration :: forall value address term sig m. ( Member (State (Heap addr
                      , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
                      , Ord address
-                     , Show address
                      , Carrier sig m
                      )
                   => Declaration
@@ -281,7 +270,6 @@ lookupDeclarationFrame :: ( Member (State (Heap address address value)) sig
                           , Member (Reader ModuleInfo) sig
                           , Member (Reader Span) sig
                           , Ord address
-                          , Show address
                           , Carrier sig m
                           )
                        => Declaration
@@ -360,8 +348,8 @@ assign addr value = do
   cell <- send (AssignCell value (fromMaybe lowerBound (Heap.getSlot addr heap)) ret)
   putHeap (Heap.setSlot addr cell heap)
 
-dealloc :: forall address value sig m term. ( Member (Deref value) sig
-          , Member (State (Heap address address value)) sig
+dealloc :: forall address value sig m term.
+          ( Member (State (Heap address address value)) sig
           , Ord address
           , Carrier sig m
           )

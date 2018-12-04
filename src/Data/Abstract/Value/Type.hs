@@ -263,24 +263,18 @@ instance ( Member (Allocator address) sig
       => Carrier (Abstract.Function term address Type :+: sig) (FunctionC term address Type (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Abstract.Function name params body k -> runEvaluator $ do
-      functionSpan <- ask @Span -- TODO: This might be wrong
-      declare (Declaration name) functionSpan Nothing
-
-      -- TODO: Store the frame
-      let value = withLexicalScopeAndFrame $ do
-            (_, tvars) <- foldr (\ param rest -> do
-              tvar <- Var <$> fresh
-
-              functionSpan <- ask @Span
-              declare (Declaration param) functionSpan Nothing
-              address <- lookupDeclaration (Declaration param)
-              -- assign tvar values to names in the frame of the function?
-              assign address tvar
-              bimap id (tvar :) <$> rest) (pure (undefined, [])) params
-            -- TODO: We may still want to represent this as a closure and not a function type
-            bimap id (zeroOrMoreProduct tvars :->) <$> (catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body))))
-      value >>= Evaluator . flip runFunctionC eval . k
+    Abstract.Function _ params body scope k -> runEvaluator $ do
+      -- FIXME: instantiate the scope and evaluate within a new frame
+      res <- withScope scope $ do
+        (_, tvars) <- foldr (\ param rest -> do
+          tvar <- Var <$> fresh
+          address <- lookupDeclaration (Declaration param)
+          -- assign tvar values to names in the frame of the function?
+          assign address tvar
+          bimap id (tvar :) <$> rest) (pure (undefined, [])) params
+        -- TODO: We may still want to represent this as a closure and not a function type
+        bimap id (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
+      Evaluator (runFunctionC (k res) eval)
 
     Abstract.BuiltIn _ Print k -> runFunctionC (k (String :-> Unit)) eval
     Abstract.BuiltIn _ Show  k -> runFunctionC (k (Object :-> String)) eval
@@ -345,7 +339,6 @@ instance ( Member Fresh sig
          , Member (Reader Span) sig
          , Member (Resumable (BaseError TypeError)) sig
          , Member (State TypeMap) sig
-         , Ord address
          , Carrier sig m
          )
       => AbstractValue term address Type m where
