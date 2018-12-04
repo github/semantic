@@ -14,7 +14,6 @@ import           Numeric.Exts
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize as Tok
 import qualified Data.Reprinting.Scope as Scope
-import           Data.Reprinting.Token
 import           Text.Read (readMaybe)
 
 -- Boolean
