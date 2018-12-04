@@ -264,14 +264,17 @@ instance ( Member (Allocator address) sig
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
     Abstract.Function _ params body scope k -> runEvaluator $ do
-      -- FIXME: instantiate the scope and evaluate within a new frame
-      res <- withScope scope $ do
-        (_, tvars) <- foldr (\ param rest -> do
+      currentScope' <- currentScope
+      currentFrame' <- currentFrame
+      let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+      frame <- newFrame scope frameLinks
+      res <- withScopeAndFrame frame $ do
+        tvars <- foldr (\ param rest -> do
           tvar <- Var <$> fresh
           address <- lookupDeclaration (Declaration param)
           -- assign tvar values to names in the frame of the function?
           assign address tvar
-          bimap id (tvar :) <$> rest) (pure (undefined, [])) params
+          (tvar :) <$> rest) (pure []) params
         -- TODO: We may still want to represent this as a closure and not a function type
         bimap id (zeroOrMoreProduct tvars :->) <$> catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator (runFunctionC (k res) eval)

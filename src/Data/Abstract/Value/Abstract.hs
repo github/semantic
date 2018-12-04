@@ -12,6 +12,8 @@ import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Ref
 import Data.Abstract.Evaluatable
+import qualified Data.Map.Strict as Map
+import Prologue
 
 data Abstract = Abstract
   deriving (Eq, Ord, Show)
@@ -39,9 +41,15 @@ instance ( Member (Allocator address) sig
       => Carrier (Abstract.Function term address Abstract :+: sig) (FunctionC term address Abstract (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Function _ _ body scope k -> runEvaluator $ do
-      -- FIXME: instantiate the scope and evaluate within a new frame
-      res <- withScope scope $ do
+    Function _ params body scope k -> runEvaluator $ do
+      currentScope' <- currentScope
+      currentFrame' <- currentFrame
+      let frameLinks = Map.singleton Lexical (Map.singleton currentScope' currentFrame')
+      frame <- newFrame scope frameLinks
+      res <- withScopeAndFrame frame $ do
+        for_ params $ \param -> do
+          address <- lookupDeclaration (Declaration param)
+          assign address Abstract
         catchReturn (runFunction (Evaluator . eval) (Evaluator (eval body)))
       Evaluator $ runFunctionC (k res) eval
     BuiltIn _ _ k -> runFunctionC (k Abstract) eval
