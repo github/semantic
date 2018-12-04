@@ -80,16 +80,12 @@ instance Evaluatable Send where
     lhsValue <- Abstract.value recv
     lhsFrame <- Abstract.scopedEnvironment lhsValue
 
-    case lhsFrame of
-      Just lhsFrame ->
-        withScopeAndFrame lhsFrame $ do
+    let callFunction = do
           reference (Reference sel) (Declaration sel)
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse (eval >=> Abstract.value) sendArgs
           call func (lhsValue : args) -- TODO pass through sendBlock
-      Nothing -> do
-        -- Throw a ReferenceError since we're attempting to reference a name within a value that is not an Object.
-        throwEvalError (ReferenceError lhsValue sel)
+    maybe callFunction (flip withScopeAndFrame callFunction) lhsFrame
 
 instance Tokenize Send where
   tokenize Send{..} = within Scope.Call $ do
@@ -110,8 +106,9 @@ instance Evaluatable Require where
     name <- eval x >>= value >>= asString
     path <- resolveRubyName name
     traceResolve name path
-    (moduleScope, v) <- doRequire path
+    ((moduleScope, moduleFrame), v) <- doRequire path
     insertImportEdge moduleScope
+    insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
     rvalBox v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( Member (Boolean value) sig
@@ -119,12 +116,12 @@ doRequire :: ( Member (Boolean value) sig
              , Carrier sig m
              )
           => M.ModulePath
-          -> Evaluator term address value m (address, value)
+          -> Evaluator term address value m ((address, address), value)
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> (,) . fst . fst <$> load path <*> boolean True
-    Just ((moduleScope, _), _) -> (moduleScope,) <$> boolean False
+    Nothing       -> (,) . fst <$> load path <*> boolean True
+    Just (scopeAndFrame, _) -> (scopeAndFrame, ) <$> boolean False
 
 
 data Load a = Load { loadPath :: a, loadWrap :: Maybe a }
