@@ -87,6 +87,6 @@ instance ( Carrier sig m
             else pure ()
           _ -> pure ()
         call callName params
-      Function name params body k -> function name params body >>= Evaluator . k
+      Function name params body scope k -> function name params body scope >>= Evaluator . k
       BuiltIn n b k -> builtIn n b >>= Evaluator . k
     | otherwise        = PythonPackagingC (eff (handleCoercible op))

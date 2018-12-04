@@ -84,25 +84,12 @@ instance ( FreeVariables term
       => Carrier (Abstract.Function term address (Value term address) :+: sig) (Abstract.FunctionC term address (Value term address) (Eff m)) where
   ret = FunctionC . const . ret
   eff op = FunctionC (\ eval -> handleSum (eff . handleReader eval runFunctionC) (\case
-    Abstract.Function name params body k -> runEvaluator $ do
+    Abstract.Function name params body scope k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
-      -- TODO: Declare all params
-      currentScope' <- currentScope
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-      associatedScope <- newScope lexicalEdges
-      -- TODO: Fix this if we find a solution to declaring names of functions without throwing a lookupPathError.
-      -- declare (Declaration name) span (Just scope)
-      putDeclarationScope (Declaration name) associatedScope
 
-      functionSpan <- ask @Span
-      names <- withScope associatedScope . for params $ \param ->
-        param <$ declare (Declaration param) functionSpan Nothing
-
-      address <- lookupDeclaration @(Value term address) (Declaration name)
       currentFrame' <- currentFrame
-      let closure = Closure packageInfo moduleInfo (Just name) names (Right body) associatedScope currentFrame'
-      assign address closure
+      let closure = Closure packageInfo moduleInfo (Just name) params (Right body) scope currentFrame'
       Evaluator $ runFunctionC (k (Rval closure)) eval
     Abstract.BuiltIn _ builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
