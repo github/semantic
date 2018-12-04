@@ -105,7 +105,7 @@ defineNamespace :: ( AbstractValue term address value m
                 => Declaration
                 -> Evaluator term address value m a
                 -> Evaluator term address value m ()
-defineNamespace declaration body = void . define declaration $ do
+defineNamespace declaration@Declaration{..} body = void . define declaration $ do
   withChildFrame declaration $ \frame -> do
     _ <- body
-    namespace declaration Nothing frame
+    namespace unDeclaration frame

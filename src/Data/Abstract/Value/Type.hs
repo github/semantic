@@ -272,7 +272,6 @@ instance ( Member (Allocator address) sig
         tvars <- foldr (\ param rest -> do
           tvar <- Var <$> fresh
           address <- lookupDeclaration (Declaration param)
-          -- assign tvar values to names in the frame of the function?
           assign address tvar
           (tvar :) <$> rest) (pure []) params
         -- TODO: We may still want to represent this as a closure and not a function type
@@ -352,7 +351,7 @@ instance ( Member Fresh sig
   tuple fields = pure $ zeroOrMoreProduct fields
 
   klass _ _       = pure Object
-  namespace _ _ _ = pure Unit
+  namespace _ _   = pure Unit
 
   scopedEnvironment _ = pure Nothing
 

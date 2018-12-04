@@ -43,7 +43,7 @@ data Value term address
   | Array [(Value term address)]
   | Class Declaration [(Value term address)] address
   | Object address
-  | Namespace Name (Maybe address) (Bindings address)
+  | Namespace Name address
   | KVPair (Value term address) (Value term address)
   | Hash [Value term address]
   | Null
@@ -240,19 +240,7 @@ instance ( Member (Allocator address) sig
   klass n binds = do
     pure $ Class n mempty binds
 
-  namespace _ _ _ = undefined -- do
-  -- namespace name super binds = undefined -- do
-    -- maybeNs <- lookupEnv name >>= traverse deref
-    -- binds' <- maybe (pure lowerBound) asNamespaceBinds maybeNs
-    -- let super' = (maybeNs >>= asNamespaceSuper) <|> super
-    -- pure (Namespace name super' (binds <> binds'))
-    -- where
-    --   asNamespaceSuper = \case
-    --     Namespace _ super _ -> super
-    --     _ -> Nothing
-    --   asNamespaceBinds v
-    --     | Namespace _ _ binds' <- v = pure binds'
-    --     | otherwise                 = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
+  namespace name = pure . Namespace name
 
   scopedEnvironment v
     | Object address <- v = pure (Just address)
