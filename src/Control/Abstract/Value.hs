@@ -95,9 +95,7 @@ instance HFunctor (Function term address value) where
   hmap _ = coerce
 
 instance Effect (Function term address value) where
-  handle state handler (Function name params body k) = Function name params body (handler . (<$ state) . k)
-  handle state handler (BuiltIn name builtIn      k) = BuiltIn name builtIn      (handler . (<$ state) . k)
-  handle state handler (Call fn addrs        k) = Call fn addrs        (handler . (<$ state) . k)
+  handle state handler = coerce . fmap (handler . (<$ state))
 
 
 -- TODO: eval and runFunction should return a ValueRef instead of a value
