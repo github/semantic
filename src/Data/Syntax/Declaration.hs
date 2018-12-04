@@ -32,10 +32,18 @@ instance Evaluatable Function where
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
     -- TODO: Should we declare the name of the function within `function`?
     span <- ask @Span
-    declare (Declaration name) span Nothing
-    params <- for functionParameters $ \param -> do
-      maybeM (throwEvalError NoNameError) (declaredName param)
-    function name params functionBody
+    currentScope' <- currentScope
+    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+    associatedScope <- newScope lexicalEdges
+    declare (Declaration name) span (Just associatedScope)
+
+    params <- withScope associatedScope . for functionParameters $ \paramNode -> do
+      param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
+      param <$ declare (Declaration param) span Nothing
+
+    addr <- lookupDeclaration (Declaration name)
+    v <- function name params functionBody associatedScope
+    v <$ (value v >>= assign addr)
 
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
@@ -67,10 +75,18 @@ instance Evaluatable Method where
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
     -- TODO: Should we declare the name of the function within `function`?
     span <- ask @Span
-    declare (Declaration name) span Nothing
-    params <- for methodParameters $ \param -> do
-      maybeM (throwEvalError NoNameError) (declaredName param)
-    function name params methodBody
+    currentScope' <- currentScope
+    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+    associatedScope <- newScope lexicalEdges
+    declare (Declaration name) span (Just associatedScope)
+
+    params <- withScope associatedScope . for methodParameters $ \paramNode -> do
+      param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
+      param <$ declare (Declaration param) span Nothing
+
+    addr <- lookupDeclaration (Declaration name)
+    v <- function name params methodBody associatedScope
+    v <$ (value v >>= assign addr)
 
 instance Tokenize Data.Syntax.Declaration.Method where
   tokenize Method{..} = within' Scope.Method $ do

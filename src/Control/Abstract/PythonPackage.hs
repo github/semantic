@@ -19,7 +19,6 @@ runPythonPackaging :: ( Carrier sig m
                       , Ord address
                       , Show address
                       , Show term
-                      , Declarations term
                       , Member Trace sig
                       , Member (Boolean (Value term address)) sig
                       , Member (State (Heap address address (Value term address))) sig
@@ -61,7 +60,6 @@ instance ( Carrier sig m
          , Member (State (Heap address address (Value term address))) sig
          , Member (State Strategy) sig
          , Member Trace sig
-         , Declarations term
          , Ord address
          , Show address
          , Show term
@@ -72,7 +70,7 @@ instance ( Carrier sig m
     | Just e <- prj op = wrap $ case handleCoercible e of
       Call callName params k -> Evaluator . k =<< do
         case callName of
-          Closure _ _ name' paramNames _ scope parentFrame -> do
+          Closure _ _ name' paramNames _ _ _ -> do
             let bindings = foldr (uncurry Map.insert) lowerBound (zip paramNames params)
             let asStrings = asArray >=> traverse asString
 
@@ -89,6 +87,6 @@ instance ( Carrier sig m
             else pure ()
           _ -> pure ()
         call callName params
-      Function name params body k -> function name params body >>= Evaluator . k
+      Function name params body scope k -> function name params body scope >>= Evaluator . k
       BuiltIn n b k -> builtIn n b >>= Evaluator . k
     | otherwise        = PythonPackagingC (eff (handleCoercible op))

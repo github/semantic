@@ -30,13 +30,11 @@ module Control.Abstract.Value
 , rvalBox
 ) where
 
-import Control.Abstract.ScopeGraph (Declaration, ScopeGraph, ScopeError)
-import Control.Abstract.Environment
+import Control.Abstract.ScopeGraph (Declaration, ScopeGraph)
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.ScopeGraph (Allocator)
 import Control.Effect.Carrier
-import Data.Abstract.Declarations
 import Data.Abstract.BaseError
 import Data.Abstract.Module
 import Data.Abstract.Name
@@ -70,8 +68,8 @@ data Comparator
 --
 -- In the concrete domain, introductions & eliminations respectively construct & pattern match against values, while in abstract domains they respectively construct & project finite sets of discrete observations of abstract values. For example, an abstract domain modelling integers as a sign (-, 0, or +) would introduce abstract values by mapping integers to their sign and eliminate them by mapping signs back to some canonical integer, e.g. - -> -1, 0 -> 0, + -> 1.
 
-function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> Evaluator term address value m (ValueRef address value)
-function name params body = sendFunction (Function name params body ret)
+function :: (Member (Function term address value) sig, Carrier sig m) => Name -> [Name] -> term -> address -> Evaluator term address value m (ValueRef address value)
+function name params body scope = sendFunction (Function name params body scope ret)
 
 data BuiltIn
   = Print
@@ -88,7 +86,7 @@ sendFunction :: (Member (Function term address value) sig, Carrier sig m) => Fun
 sendFunction = send
 
 data Function term address value (m :: * -> *) k
-  = Function Name [Name] term (ValueRef address value -> k)
+  = Function Name [Name] term address (ValueRef address value -> k)
   | BuiltIn Name BuiltIn (value -> k)
   | Call value [value] (ValueRef address value -> k)
   deriving (Functor)
@@ -97,9 +95,7 @@ instance HFunctor (Function term address value) where
   hmap _ = coerce
 
 instance Effect (Function term address value) where
-  handle state handler (Function name params body k) = Function name params body (handler . (<$ state) . k)
-  handle state handler (BuiltIn name builtIn      k) = BuiltIn name builtIn      (handler . (<$ state) . k)
-  handle state handler (Call fn addrs        k) = Call fn addrs        (handler . (<$ state) . k)
+  handle state handler = coerce . fmap (handler . (<$ state))
 
 
 -- TODO: eval and runFunction should return a ValueRef instead of a value
@@ -166,15 +162,12 @@ forLoop :: ( Carrier sig m
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
            , Member (Resumable (BaseError (HeapError address))) sig
-           , Member (Resumable (BaseError (ScopeError address))) sig
            , Member (State (Heap address address value)) sig
            , Member (State (ScopeGraph address)) sig
            , Member (Reader (address, address)) sig
            , Member (While address value) sig
            , Member Fresh sig
            , Ord address
-           , Show address
-           , Show value
            )
   => Evaluator term address value m value -- ^ Initial statement
   -> Evaluator term address value m value -- ^ Condition

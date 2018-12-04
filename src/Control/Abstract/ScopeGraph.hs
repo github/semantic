@@ -177,7 +177,6 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader (address, address)) sig
                 , Carrier sig m
                 , Ord address
-                , Show address
                 )
              => Declaration
              -> Evaluator term address value m (ScopeGraph.Path address)
@@ -193,7 +192,6 @@ lookupDeclarationScope :: ( Member (Resumable (BaseError (ScopeError address))) 
                 , Member (Reader (address, address)) sig
                 , Carrier sig m
                 , Ord address
-                , Show address
                 ) => Declaration -> Evaluator term address value m address
 lookupDeclarationScope decl = do
   path <- lookupScopePath decl
