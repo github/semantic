@@ -13,6 +13,7 @@ import           Prologue
 import           Proto3.Suite.Class
 import           Reprinting.Tokenize
 import Data.Span (emptySpan)
+import Data.Abstract.Name as Name
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Ord, Show, Foldable, Traversable, Functor, Generic1, Hashable1, ToJSONFields1, Named1, Message1, NFData1)
@@ -80,9 +81,12 @@ instance Evaluatable Method where
     associatedScope <- newScope lexicalEdges
     declare (Declaration name) span (Just associatedScope)
 
-    params <- withScope associatedScope . for methodParameters $ \paramNode -> do
-      param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
-      param <$ declare (Declaration param) span Nothing
+    params <- withScope associatedScope $ do
+      let self = Name.name "__self"
+      declare (Declaration self)  emptySpan Nothing
+      fmap (self :) . for methodParameters $ \paramNode -> do
+        param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
+        param <$ declare (Declaration param) span Nothing
 
     addr <- lookupDeclaration (Declaration name)
     v <- function name params methodBody associatedScope
