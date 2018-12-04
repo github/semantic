@@ -444,9 +444,9 @@ resumingScopeError :: ( Carrier sig m
                     => Evaluator term address value (ResumableWithC (BaseError (ScopeError address)) (Eff m)) a
                     -> Evaluator term address value m a
 resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
-  ScopeError decl span -> pure hole
+  ScopeError _ _ -> pure hole
   LookupScopeError -> pure hole
-  LookupPathError decl -> pure hole
+  LookupPathError _ -> pure hole
   CurrentScopeError -> pure hole
   LookupDeclarationScopeError _ -> pure hole)
 
