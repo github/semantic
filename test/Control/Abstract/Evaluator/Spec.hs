@@ -32,22 +32,21 @@ spec = parallel $ do
     expected `shouldBe` Right (Rval (Value.Integer (Number.Integer 123)))
 
   it "calls functions" $ do
-    (_, (_, (_, expected))) <- evaluate $ do
-      withLexicalScopeAndFrame $ do
+    (_, (_, (_, expected))) <- evaluate $
+      rvalBox <=< value <=< withLexicalScopeAndFrame $ do
         currentScope' <- currentScope
         let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+            x =  SpecHelpers.name "x"
         associatedScope <- newScope lexicalEdges
         declare (ScopeGraph.Declaration "identity") emptySpan (Just associatedScope)
-        valueRef <- function "identity" [ SpecHelpers.name "x", SpecHelpers.name "y" ]
-          (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "y")))) associatedScope
+        withScope associatedScope $ do
+          declare (Declaration x) emptySpan Nothing
+        valueRef <- function "identity" [ x ]
+          (SpecEff (LvalMember <$> Heap.lookupDeclaration (ScopeGraph.Declaration (SpecHelpers.name "x")))) associatedScope
         identity <- value valueRef
         val <- pure (integer 123)
-        -- TODO Pass a unit slot to call at the self position
-        call identity [val, val]
-    slotPosition expected `shouldBe` Just 1
-    where
-      slotPosition (Right (LvalMember (Slot _ Position{..}))) = Just unPosition
-      slotPosition _ = Nothing
+        call identity [val]
+    expected `shouldBe` Right (Rval $ integer 123)
 
 evaluate
   = runM
