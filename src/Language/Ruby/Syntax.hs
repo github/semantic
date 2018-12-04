@@ -183,32 +183,43 @@ instance Evaluatable Class where
     span <- ask @Span
     currentScope' <- currentScope
 
-    let classSuperclasses = maybeToList classSuperClass
-    superScopes <- for classSuperclasses $ \superclass -> do
-      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
-      scope <- associatedScope (Declaration name)
-      slot <- lookupDeclaration (Declaration name)
-      superclassFrame <- scopedEnvironment =<< deref slot
-      pure $ case (scope, superclassFrame) of
-        (Just scope, Just frame) -> Just (scope, frame)
-        _ -> Nothing
+    let declaration = (Declaration name)
+    maybeSlot <- maybeLookupDeclaration declaration
 
-    let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
-        current = fmap (Lexical, ) . pure . pure $ currentScope'
-        edges = Map.fromList (superclassEdges <> current)
-    childScope <- newScope edges
-    declare (Declaration name) span (Just childScope)
+    case maybeSlot of
+      Just slot -> do
+        classVal <- deref slot
+        maybeFrame <- scopedEnvironment classVal
+        case maybeFrame of
+          Just classFrame -> withScopeAndFrame classFrame (eval classBody)
+          Nothing -> throwEvalError (DerefError classVal)
+      Nothing -> do
+        let classSuperclasses = maybeToList classSuperClass
+        superScopes <- for classSuperclasses $ \superclass -> do
+          name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+          scope <- associatedScope (Declaration name)
+          slot <- lookupDeclaration (Declaration name)
+          superclassFrame <- scopedEnvironment =<< deref slot
+          pure $ case (scope, superclassFrame) of
+            (Just scope, Just frame) -> Just (scope, frame)
+            _ -> Nothing
 
-    let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
-    childFrame <- newFrame childScope frameEdges
+        let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
+            current = fmap (Lexical, ) . pure . pure $ currentScope'
+            edges = Map.fromList (superclassEdges <> current)
+        childScope <- newScope edges
+        declare (Declaration name) span (Just childScope)
 
-    withScopeAndFrame childFrame $ do
-      void $ eval classBody
+        let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
+        childFrame <- newFrame childScope frameEdges
 
-    classSlot <- lookupDeclaration (Declaration name)
-    assign classSlot =<< klass (Declaration name) childFrame
+        withScopeAndFrame childFrame $ do
+          void $ eval classBody
 
-    rvalBox unit
+        classSlot <- lookupDeclaration (Declaration name)
+        assign classSlot =<< klass (Declaration name) childFrame
+
+        rvalBox unit
 
 instance Declarations1 Class where
   liftDeclaredName declaredName = declaredName . classIdentifier

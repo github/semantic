@@ -19,6 +19,7 @@ module Control.Abstract.ScopeGraph
   , putDeclarationSpan
   , insertImportReference
   , lookupScopePath
+  , maybeLookupScopePath
   , lookupDeclarationScope
   , lookupScope
   , Allocator(..)
@@ -169,6 +170,21 @@ insertScope :: ( Member (State (ScopeGraph address)) sig
             -> Scope address
             -> Evaluator term address value m ()
 insertScope scopeAddress scope = modify (ScopeGraph.insertScope scopeAddress scope)
+
+maybeLookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
+                , Member (Reader ModuleInfo) sig
+                , Member (Reader Span) sig
+                , Member (State (ScopeGraph address)) sig
+                , Member (Reader (address, address)) sig
+                , Carrier sig m
+                , Ord address
+                )
+             => Declaration
+             -> Evaluator term address value m (Maybe (ScopeGraph.Path address))
+maybeLookupScopePath decl@Declaration{..} = do
+  currentAddress <- currentScope
+  scopeGraph <- get
+  pure (ScopeGraph.lookupScopePath unDeclaration currentAddress scopeGraph)
 
 lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader ModuleInfo) sig
