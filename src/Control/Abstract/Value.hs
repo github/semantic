@@ -76,8 +76,8 @@ data BuiltIn
   | Show
   deriving (Eq, Ord, Show, Generic, NFData)
 
-builtIn :: (Member (Function term address value) sig, Carrier sig m) => Name -> BuiltIn -> Evaluator term address value m value
-builtIn name = sendFunction . flip (BuiltIn name) ret
+builtIn :: (Member (Function term address value) sig, Carrier sig m) => address -> BuiltIn -> Evaluator term address value m value
+builtIn address = sendFunction . flip (BuiltIn address) ret
 
 call :: (Member (Function term address value) sig, Carrier sig m) => value -> [value] -> Evaluator term address value m (ValueRef address value)
 call fn args = sendFunction (Call fn args ret)
@@ -87,7 +87,7 @@ sendFunction = send
 
 data Function term address value (m :: * -> *) k
   = Function Name [Name] term address (ValueRef address value -> k)
-  | BuiltIn Name BuiltIn (value -> k)
+  | BuiltIn address BuiltIn (value -> k)
   | Call value [value] (ValueRef address value -> k)
   deriving (Functor)
 
