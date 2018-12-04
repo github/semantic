@@ -91,15 +91,11 @@ instance ( FreeVariables term
       currentFrame' <- currentFrame
       let closure = Closure packageInfo moduleInfo (Just name) params (Right body) scope currentFrame'
       Evaluator $ runFunctionC (k (Rval closure)) eval
-    Abstract.BuiltIn _ builtIn k -> runEvaluator $ do
+    Abstract.BuiltIn associatedScope builtIn k -> runEvaluator $ do
       packageInfo <- currentPackage
       moduleInfo <- currentModule
 
-      -- FIXME: build the scope in 'define' instead
-      currentScope' <- currentScope
       currentFrame' <- currentFrame @(Value term address)
-      let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-      associatedScope <- newScope lexicalEdges
       let closure = Closure packageInfo moduleInfo Nothing [] (Left builtIn) associatedScope currentFrame'
       Evaluator $ runFunctionC (k closure) eval
     Abstract.Call op params k -> runEvaluator $ do
