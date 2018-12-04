@@ -20,7 +20,6 @@ module Data.Abstract.Heap
   , isHeapEmpty
   ) where
 
-import Data.Abstract.Live
 import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Slot(..), ScopeGraph, pathPosition, pathDeclaration, lookupScopePath)
 import qualified Data.Map.Strict as Map
 import qualified Data.IntMap as IntMap

@@ -23,7 +23,6 @@ import qualified Proto3.Wire.Decode as Decode
 import Control.Abstract.ScopeGraph hiding (Import)
 import Control.Abstract.Heap
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import qualified Data.Abstract.Heap as Heap
 import qualified Data.Map.Strict as Map
 import qualified Data.List as List
 

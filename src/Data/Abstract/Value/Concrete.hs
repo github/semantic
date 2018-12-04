@@ -6,7 +6,7 @@ module Data.Abstract.Value.Concrete
   , runValueErrorWith
   ) where
 
-import Control.Abstract.ScopeGraph (Allocator, ScopeError, lookupDeclarationScope)
+import Control.Abstract.ScopeGraph (Allocator, ScopeError)
 import Control.Abstract.Heap (scopeLookup)
 import qualified Control.Abstract as Abstract
 import Control.Abstract hiding (Boolean(..), Function(..), While(..))
@@ -14,7 +14,7 @@ import Control.Effect.Carrier
 import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
-import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), declaredName, throwEvalError, EvalError(..), Declarations)
+import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), EvalError(..), Declarations)
 import Data.Abstract.Environment (Bindings)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Name

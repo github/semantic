@@ -5,14 +5,11 @@ module Language.Go.Syntax where
 import Prologue
 
 import Control.Abstract
-import qualified Data.Abstract.Heap as Heap
-import           Control.Abstract.ScopeGraph hiding (Import)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
-import           Data.Aeson hiding (object)
 import           Data.JSON.Fields
 import qualified Data.Map as Map
 import           Data.Semigroup.App
@@ -20,9 +17,6 @@ import           Data.Semigroup.Foldable
 import qualified Data.Text as T
 import           Diffing.Algorithm
 import           Proto3.Suite.Class
-import           Proto3.Suite
-import qualified Proto3.Wire.Encode as Encode
-import qualified Proto3.Wire.Decode as Decode
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import Data.ImportPath
 import           System.FilePath.Posix
