@@ -367,20 +367,13 @@ dealloc addr = modify @(Heap address address value) (Heap.deleteSlot addr)
 -- Garbage collection
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
--- gc :: ( Member (State (Heap address address value)) sig
---       , Ord address
---       , ValueRoots address value
---       , Carrier sig m
---       )
---    => Live address                       -- ^ The set of addresses to consider rooted.
---    -> Evaluator term address value m ()
-gc :: Live address                       -- ^ The set of addresses to consider rooted.
+gc :: ( Member (State (Heap address address value)) sig
+      , Ord address
+      , Carrier sig m
+      )
+   => Live address                       -- ^ The set of addresses to consider rooted.
    -> Evaluator term address value m ()
--- gc roots =
-gc _ =
-  -- TODO: Implement frame garbage collection
-  undefined
-  -- modifyHeap (heapRestrict <*> reachable roots)
+gc roots = modifyHeap (Heap.heapRestrict <*> reachable roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
 reachable :: Ord address
