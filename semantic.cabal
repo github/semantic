@@ -61,7 +61,6 @@ library
                      , Data.Abstract.BaseError
                      , Data.Abstract.Declarations
                      , Data.Abstract.Evaluatable
-                     , Data.Abstract.Exports
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
