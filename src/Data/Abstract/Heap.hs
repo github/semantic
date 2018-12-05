@@ -12,6 +12,7 @@ module Data.Abstract.Heap
   , initFrame
   , newFrame
   , heapSize
+  , heapRestrict
   , Position(..)
   , pathPosition
   , pathDeclaration
@@ -20,6 +21,7 @@ module Data.Abstract.Heap
   , isHeapEmpty
   ) where
 
+import           Data.Abstract.Live
 import           Data.Abstract.ScopeGraph
     ( Declaration (..)
     , EdgeLabel (..)
@@ -121,6 +123,10 @@ fillFrame address slots heap =
 -- | The number of frames in the `Heap`.
 heapSize :: Heap scope address value -> Int
 heapSize = Map.size . heap
+
+-- | Restrict a 'Heap' to only those addresses in the given 'Live' set (in essence garbage collecting the rest).
+heapRestrict :: Ord address => Heap address address value -> Live address -> Heap address address value
+heapRestrict (Heap m) roots = Heap (Map.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
 isHeapEmpty :: (Eq address, Eq value) => Heap scope address value -> Bool
 isHeapEmpty h@Heap{..} = (heapSize h) == 1 &&
