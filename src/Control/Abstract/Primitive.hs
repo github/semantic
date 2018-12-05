@@ -81,7 +81,7 @@ defineClass declaration superclasses body = void . define declaration $ do
     putDeclarationScope declaration childScope
 
     withScope childScope $ do
-      void $ body
+      void body
 
     pure unit
 
