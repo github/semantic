@@ -243,7 +243,7 @@ instance Evaluatable Class where
         _ -> Nothing
 
     let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
-        current = fmap (Lexical, ) . pure . pure $ currentScope'
+        current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     childScope <- newScope edges
     declare (Declaration name) span (Just childScope)
