@@ -1,12 +1,11 @@
 module Analysis.PHP.Spec (spec) where
 
-import Control.Abstract
-import Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable (EvalError(..), ValueRef(..))
-import qualified Data.Language as Language
+import           Control.Abstract
+import           Data.Abstract.Evaluatable (EvalError (..), ValueRef (..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
+import qualified Data.Language as Language
 import qualified Language.PHP.Assignment as PHP
-import SpecHelpers
+import           SpecHelpers
 
 
 spec :: TaskConfig -> Spec
