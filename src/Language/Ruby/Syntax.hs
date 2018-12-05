@@ -206,8 +206,8 @@ instance Evaluatable Class where
             (Just scope, Just frame) -> Just (scope, frame)
             _                        -> Nothing
 
-        let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
-            current = fmap (Lexical, ) . pure . pure $ currentScope'
+        let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
+            current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
         childScope <- newScope edges
         declare (Declaration name) span (Just childScope)
