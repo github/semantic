@@ -20,7 +20,7 @@ spec config = parallel $ do
     it "evaluates require_relative" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
-        Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
           () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
@@ -28,7 +28,7 @@ spec config = parallel $ do
     it "evaluates load" $ do
       (scopeGraph, (heap, res)) <- evaluate ["load.rb", "foo.rb"]
       case ModuleTable.lookup "load.rb" <$> res of
-        Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+        Right (Just (Module _ (scopeAndFrame, valueRef) :| [])) -> do
           valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
           () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
@@ -44,8 +44,7 @@ spec config = parallel $ do
           valueRef `shouldBe` Rval (String "\"<bar>\"")
           () <$ SpecHelpers.lookupDeclaration "Bar" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "Foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-
-          -- (lookupDeclaration "Bar" heap >>= deNamespace heap) `shouldBe` Just ("Bar",  ["baz", "inspect", "foo"])
+          SpecHelpers.lookupMembers "Bar" Superclass scopeAndFrame heap scopeGraph `shouldBe` Just ["baz", "foo", "inspect"]
         other -> expectationFailure (show other)
 
     it "evaluates modules" $ do
