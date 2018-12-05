@@ -133,7 +133,7 @@ declare declaration ddata assocScope currentScope g@ScopeGraph{..} = fromMaybe (
   case Seq.findIndexR (\(decl, (span, _)) -> decl == declaration && ddata == span) dataSeq of
     Just index -> pure (g, Just $ Position index)
     Nothing -> do
-      let newScope = scope { declarations = (declarations scope) Seq.|> (declaration, (ddata, assocScope)) }
+      let newScope = scope { declarations = declarations scope Seq.|> (declaration, (ddata, assocScope)) }
       pure $ (g { graph = Map.insert currentScope newScope graph }, Just . Position $ length (declarations newScope))
 
 -- | Add a reference to a declaration in the scope graph.
@@ -193,7 +193,7 @@ lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe ((Declaration, (Span, Maybe scopeAddress)), Position)
 lookupDeclaration declaration scope g = do
   dataSeq <- ddataOfScope scope g
-  index <- Seq.findIndexR (((Declaration declaration) ==) . fst) dataSeq
+  index <- Seq.findIndexR ((Declaration declaration ==) . fst) dataSeq
   (, Position index) <$> Seq.lookup index dataSeq
 
 declarationNames :: Ord address => [EdgeLabel] -> Scope address -> ScopeGraph address -> Set Declaration
