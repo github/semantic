@@ -134,7 +134,7 @@ declare declaration ddata assocScope currentScope g@ScopeGraph{..} = fromMaybe (
     Just index -> pure (g, Just $ Position index)
     Nothing -> do
       let newScope = scope { declarations = declarations scope Seq.|> (declaration, (ddata, assocScope)) }
-      pure $ (g { graph = Map.insert currentScope newScope graph }, Just . Position $ length (declarations newScope))
+      pure (g { graph = Map.insert currentScope newScope graph }, Just (Position (length (declarations newScope))))
 
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
