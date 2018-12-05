@@ -182,7 +182,7 @@ lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
     go address path =
       case lookupDeclaration declaration address g of
         Just (_, index) -> Just $ path (DPath (Declaration declaration) index)
-        Nothing -> maybe Nothing (Just . path) (lookupReference declaration address g)
+        Nothing -> path <$> lookupReference declaration address g
           <|> traverseEdges Superclass <|> traverseEdges Import <|> traverseEdges Lexical
           where
             traverseEdges edge = do
