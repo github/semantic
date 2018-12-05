@@ -215,7 +215,7 @@ lookupReference  name scope g = Map.lookup (Reference name) =<< pathsOfScope sco
 insertEdge :: Ord scopeAddress => EdgeLabel -> scopeAddress -> scopeAddress -> ScopeGraph scopeAddress -> ScopeGraph scopeAddress
 insertEdge label target currentAddress g@ScopeGraph{..} = fromMaybe g $ do
   currentScope' <- lookupScope currentAddress g
-  scopes <- maybe (Just mempty) pure (Map.lookup label (edges currentScope'))
+  scopes <- maybeM (Just mempty) (Map.lookup label (edges currentScope'))
   let newScope = currentScope' { edges = Map.insert label (target : scopes) (edges currentScope') }
   pure (g { graph = Map.insert currentAddress newScope graph })
 
