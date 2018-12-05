@@ -1,25 +1,24 @@
 module Analysis.TypeScript.Spec (spec) where
 
-import Control.Arrow ((&&&))
-import Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
-import Data.Abstract.Number as Number
-import Data.Abstract.Package (PackageInfo(..))
-import Data.Abstract.Module (ModuleInfo(..))
+import           Control.Abstract.Value as Value
+import           Control.Arrow ((&&&))
+import           Data.Abstract.Evaluatable
+import qualified Data.Abstract.Heap as Heap
+import           Data.Abstract.Module (ModuleInfo (..))
 import qualified Data.Abstract.ModuleTable as ModuleTable
-import Control.Abstract.Value as Value
-import Data.Abstract.Value.Concrete as Value
+import           Data.Abstract.Number as Number
+import           Data.Abstract.Package (PackageInfo (..))
+import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.Abstract.Value.Concrete as Value
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Sum
-import SpecHelpers
-import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import qualified Data.Abstract.Heap       as Heap
-import Data.Text (pack)
+import           Data.Location
+import           Data.Quieterm
+import           Data.Scientific (scientific)
+import           Data.Sum
+import           Data.Text (pack)
 import qualified Language.TypeScript.Assignment as TypeScript
-import Data.Quieterm
-import Data.Location
-import Data.Scientific (scientific)
+import           SpecHelpers
 
 spec :: TaskConfig -> Spec
 spec config = parallel $ do
@@ -99,7 +98,7 @@ spec config = parallel $ do
       (_, (_, res)) <- evaluate ["void.ts"]
       case ModuleTable.lookup "void.ts" <$> res of
         Right (Just (Module _ (_, valueRef) :| [])) -> valueRef `shouldBe` Rval Null
-        other -> expectationFailure (show other)
+        other                                       -> expectationFailure (show other)
 
     it "evaluates delete" $ do
       (scopeGraph, (heap, res)) <- evaluate ["delete.ts"]
@@ -130,31 +129,31 @@ spec config = parallel $ do
       (_, (_, res)) <- evaluate ["band.ts"]
       case ModuleTable.lookup "band.ts" <$> res of
         Right (Just (Module _ (_, valueRef) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 0))
-        other -> expectationFailure (show other)
+        other                                       -> expectationFailure (show other)
 
     it "evaluates BXOr statements" $ do
       (_, (_, res)) <- evaluate ["bxor.ts"]
       case ModuleTable.lookup "bxor.ts" <$> res of
         Right (Just (Module _ (_, valueRef) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 3))
-        other -> expectationFailure (show other)
+        other                                       -> expectationFailure (show other)
 
     it "evaluates LShift statements" $ do
       (_, (_, res)) <- evaluate ["lshift.ts"]
       case ModuleTable.lookup "lshift.ts" <$> res of
         Right (Just (Module _ (_, valueRef) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 4))
-        other -> expectationFailure (show other)
+        other                                       -> expectationFailure (show other)
 
     it "evaluates RShift statements" $ do
       (_, (_, res)) <- evaluate ["rshift.ts"]
       case ModuleTable.lookup "rshift.ts" <$> res of
         Right (Just (Module _ (_, valueRef) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer 0))
-        other -> expectationFailure (show other)
+        other                                       -> expectationFailure (show other)
 
     it "evaluates Complement statements" $ do
       (_, (_, res)) <- evaluate ["complement.ts"]
       case ModuleTable.lookup "complement.ts" <$> res of
         Right (Just (Module _ (_, valueRef) :| [])) -> valueRef `shouldBe` Rval (Value.Integer (Number.Integer (-2)))
-        other -> expectationFailure (show other)
+        other                                       -> expectationFailure (show other)
 
 
   where

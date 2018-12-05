@@ -3,27 +3,26 @@ module Control.Abstract.Evaluator.Spec
 ( spec
 ) where
 
-import Control.Abstract
-import Data.Abstract.Address.Precise as Precise
-import Data.Abstract.BaseError
-import Data.Abstract.Environment
-import Data.Abstract.FreeVariables
-import Data.Abstract.Module
-import qualified Data.Abstract.Number as Number
-import Data.Abstract.Package
-import Data.Abstract.Value.Concrete as Value
-import Data.Algebra
-import Data.Bifunctor (first)
-import Data.Functor.Const
-import qualified Data.Map.Strict as Map
-import Data.Sum
-import SpecHelpers hiding (reassociate)
-import Data.Abstract.Ref
-import Data.Abstract.Evaluatable
+import           Control.Abstract
 import qualified Control.Abstract.Heap as Heap
+import           Data.Abstract.Address.Precise as Precise
+import           Data.Abstract.BaseError
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Module
+import qualified Data.Abstract.Number as Number
+import           Data.Abstract.Package
+import           Data.Abstract.Ref
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
-import Data.Text (pack)
-import System.IO.Unsafe (unsafePerformIO)
+import           Data.Abstract.Value.Concrete as Value
+import           Data.Algebra
+import           Data.Bifunctor (first)
+import           Data.Functor.Const
+import qualified Data.Map.Strict as Map
+import           Data.Sum
+import           Data.Text (pack)
+import           SpecHelpers hiding (reassociate)
+import           System.IO.Unsafe (unsafePerformIO)
 
 spec :: Spec
 spec = parallel $ do
@@ -119,4 +118,4 @@ instance Declarations SpecEff where
   declaredName eff =
     case unsafePerformIO (evaluate $ runSpecEff eff) of
       (_, (_, (_, Right (Rval (Value.Symbol text))))) -> Just (SpecHelpers.name text)
-      _ -> error "declaredName for SpecEff should return an RVal"
+      _                                               -> error "declaredName for SpecEff should return an RVal"
