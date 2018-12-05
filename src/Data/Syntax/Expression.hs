@@ -511,9 +511,7 @@ instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable ScopeResolution where
-  eval _ (ScopeResolution _) = undefined -- Rval <$> foldl1 f (fmap (eval >=> address) xs)
-    -- where f ns id = ns >>= flip evaluateInScopedEnv id
+instance Evaluatable ScopeResolution
 
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
