@@ -221,7 +221,7 @@ withScope :: forall sig m address term value a. ( Carrier sig m
           => address
           -> Evaluator term address value m a
           -> Evaluator term address value m a
-withScope scope action = local @(address, address) (first (const scope)) action
+withScope scope = local @(address, address) (first (const scope))
 
 throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) sig
                    , Member (Reader ModuleInfo) sig
