@@ -153,7 +153,7 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable VariableDeclaration where
   eval _ (VariableDeclaration [])   = rvalBox unit
   eval eval (VariableDeclaration decs) = do
-    _ <- for decs $ \declaration -> do
+    for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
       declare (Declaration name) emptySpan Nothing
       (span, _) <- do
@@ -242,8 +242,8 @@ instance Evaluatable Class where
         (Just scope, Just frame) -> Just (scope, frame)
         _ -> Nothing
 
-    let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
-        current = fmap (Lexical, ) . pure . pure $ currentScope'
+    let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
+        current = (Lexical, ) <$> pure (pure currentScope')
         edges = Map.fromList (superclassEdges <> current)
     childScope <- newScope edges
     declare (Declaration name) span (Just childScope)

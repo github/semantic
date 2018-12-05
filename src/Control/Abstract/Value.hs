@@ -28,10 +28,9 @@ module Control.Abstract.Value
 , rvalBox
 ) where
 
-import Control.Abstract.ScopeGraph (Declaration, ScopeGraph)
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Abstract.ScopeGraph (Allocator)
+import Control.Abstract.ScopeGraph (Allocator, Declaration, ScopeGraph)
 import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import Data.Abstract.Module
@@ -172,7 +171,7 @@ forLoop :: ( Carrier sig m
   -> Evaluator term address value m value -- ^ Increment/stepper
   -> Evaluator term address value m value -- ^ Body
   -> Evaluator term address value m (ValueRef address value)
-forLoop initial cond step body = initial *> while cond ((withLexicalScopeAndFrame body) *> step)
+forLoop initial cond step body = initial *> while cond (withLexicalScopeAndFrame body *> step)
 
 data While address value m k
   = While (m value) (m value) (ValueRef address value -> k)
@@ -303,7 +302,7 @@ value :: ( Member (Deref value) sig
          )
       => ValueRef address value
       -> Evaluator term address value m value
-value (Rval val) = pure val
+value (Rval val)        = pure val
 value (LvalMember slot) = deref slot
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval

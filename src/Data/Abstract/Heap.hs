@@ -114,7 +114,7 @@ initFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope addre
 initFrame scope address links slots = fillFrame address slots . newFrame scope address links
 
 insertFrame :: Ord address => address -> Frame scope address value -> Heap scope address value -> Heap scope address value
-insertFrame address frame h@Heap{..} = h { heap = (Map.insert address frame heap) }
+insertFrame address frame h@Heap{..} = h { heap = Map.insert address frame heap }
 
 fillFrame :: Ord address => address -> IntMap (Set value) -> Heap scope address value -> Heap scope address value
 fillFrame address slots heap =
@@ -139,7 +139,7 @@ heapRestrict :: Ord address => Heap address address value -> Live address -> Hea
 heapRestrict (Heap m) roots = Heap (Map.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
 isHeapEmpty :: (Eq address, Eq value) => Heap scope address value -> Bool
-isHeapEmpty h@Heap{..} = (heapSize h) == 1 &&
+isHeapEmpty h@Heap{..} = heapSize h == 1 &&
                          (toEmptyFrame <$> Map.elems heap) == [ Frame () mempty mempty ]
   where
     toEmptyFrame Frame{..} = Frame () (Map.mapKeysMonotonic (const ()) <$> links) slots
