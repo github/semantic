@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, UndecidableInstances, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE TupleSections #-}
 module Control.Abstract.Primitive
   ( defineClass
   , defineNamespace
@@ -17,7 +17,7 @@ import Data.Abstract.Name
 import Data.Span
 import           Prologue
 
-defineBuiltIn :: forall value sig address m term. ( HasCallStack
+defineBuiltIn :: ( HasCallStack
           , Member (Deref value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader Span) sig
