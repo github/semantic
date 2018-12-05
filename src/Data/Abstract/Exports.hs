@@ -7,7 +7,6 @@ module Data.Abstract.Exports
     , toBindings
     ) where
 
-import Data.Abstract.Environment (Bindings, unpairs)
 import Data.Abstract.Name
 import qualified Data.Map as Map
 import Prelude hiding (null)
