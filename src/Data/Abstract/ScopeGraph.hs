@@ -264,8 +264,7 @@ pathOfRef ref graph = do
 scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 scopeOfDeclaration Declaration{..} g@ScopeGraph{..} = go (Map.keys graph)
   where
-    go (scope : scopes') = scope <$ lookupDeclaration unDeclaration scope g <|> go scopes'
-    go []                = Nothing
+    go = foldr (\ scope -> (scope <$ lookupDeclaration unDeclaration scope g <|>)) Nothing
 
 -- | Returns the scope associated with a declaration (the child scope if any exists).
 associatedScope :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
