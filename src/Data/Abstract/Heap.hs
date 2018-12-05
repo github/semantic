@@ -12,6 +12,7 @@ module Data.Abstract.Heap
   , initFrame
   , newFrame
   , heapLookup
+  , heapLookupAll
   , heapSize
   , heapRestrict
   , Position(..)
@@ -124,6 +125,10 @@ fillFrame address slots heap =
 -- | Look up the cell of values for an address in a 'Heap', if any.
 heapLookup :: (Ord address, Ord value) => address -> Heap address address value -> Maybe (Set value)
 heapLookup address = fmap (fold . IntMap.elems . slots) . Map.lookup address . heap
+
+-- | Look up the list of values stored for a given address, if any.
+heapLookupAll :: (Ord address, Ord value) => address -> Heap address address value -> Maybe [value]
+heapLookupAll address = fmap toList . heapLookup address
 
 -- | The number of frames in the `Heap`.
 heapSize :: Heap scope address value -> Int
