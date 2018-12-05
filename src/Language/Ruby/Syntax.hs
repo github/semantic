@@ -7,25 +7,25 @@ import qualified Data.Text as T
 import           Prologue
 import           System.FilePath.Posix
 
+import           Control.Abstract as Abstract hiding (Load)
+import           Control.Abstract.Heap (Heap, HeapError, insertFrameLink)
+import           Control.Abstract.ScopeGraph (insertImportEdge)
 import           Control.Abstract.Value (Boolean)
 import           Data.Abstract.BaseError
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Path
-import           Data.JSON.Fields
-import           Diffing.Algorithm
-import           Proto3.Suite.Class
-import           Reprinting.Tokenize
-import Control.Abstract as Abstract hiding (Load)
-import Control.Abstract.Heap (insertFrameLink, HeapError, Heap)
-import Control.Abstract.ScopeGraph (insertImportEdge)
-import Data.Abstract.Name as Name
 import qualified Data.Abstract.Module as M
+import           Data.Abstract.Name as Name
+import           Data.Abstract.Path
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
+import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.Map.Strict as Map
 import qualified Data.Reprinting.Scope as Scope
-import Data.Semigroup.App
-import Data.Semigroup.Foldable
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
+import           Diffing.Algorithm
+import           Proto3.Suite.Class
+import           Reprinting.Tokenize
 
 -- TODO: Fully sort out ruby require/load mechanics
 --
@@ -122,7 +122,7 @@ doRequire :: ( Member (Boolean value) sig
 doRequire path = do
   result <- lookupModule path
   case result of
-    Nothing       -> (,) . fst <$> load path <*> boolean True
+    Nothing                 -> (,) . fst <$> load path <*> boolean True
     Just (scopeAndFrame, _) -> (scopeAndFrame, ) <$> boolean False
 
 
@@ -194,7 +194,7 @@ instance Evaluatable Class where
         maybeFrame <- scopedEnvironment classVal
         case maybeFrame of
           Just classFrame -> withScopeAndFrame classFrame (eval classBody)
-          Nothing -> throwEvalError (DerefError classVal)
+          Nothing         -> throwEvalError (DerefError classVal)
       Nothing -> do
         let classSuperclasses = maybeToList classSuperClass
         superScopes <- for classSuperclasses $ \superclass -> do
@@ -204,7 +204,7 @@ instance Evaluatable Class where
           superclassFrame <- scopedEnvironment =<< deref slot
           pure $ case (scope, superclassFrame) of
             (Just scope, Just frame) -> Just (scope, frame)
-            _ -> Nothing
+            _                        -> Nothing
 
         let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
             current = fmap (Lexical, ) . pure . pure $ currentScope'
