@@ -72,9 +72,7 @@ defineClass :: ( AbstractValue term address value m
 defineClass declaration superclasses body = void . define declaration $ do
     currentScope' <- currentScope
 
-    superScopes <- for superclasses $ \superclass -> do
-      scope <- associatedScope superclass
-      pure scope
+    superScopes <- for superclasses associatedScope
 
     let superclassEdges = (Superclass, ) <$> (fmap pure . catMaybes $ superScopes)
         current = fmap (Lexical, ) . pure . pure $ currentScope'
