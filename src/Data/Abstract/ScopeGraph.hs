@@ -139,7 +139,7 @@ declare declaration ddata assocScope currentScope g = fromMaybe (g, Nothing) $ d
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
 reference :: Ord scope => Reference -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
-reference ref decl@Declaration{..} currentAddress g= fromMaybe g $ do
+reference ref decl@Declaration{..} currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
