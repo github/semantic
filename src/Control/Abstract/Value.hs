@@ -24,9 +24,7 @@ module Control.Abstract.Value
 , While(..)
 , runWhile
 , WhileC(..)
--- , makeNamespace
 , value
-, address
 , rvalBox
 ) where
 
@@ -307,12 +305,6 @@ value :: ( Member (Deref value) sig
       -> Evaluator term address value m value
 value (Rval val) = pure val
 value (LvalMember slot) = deref slot
-
--- | Returns the slot of a value referenced by a 'ValueRef'
-address :: ValueRef address value
-        -> Evaluator term address value m (Slot address)
-address (LvalMember slot) = pure slot
-address (Rval _)      = undefined
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
 rvalBox :: value -> Evaluator term address value m (ValueRef address value)
