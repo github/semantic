@@ -21,6 +21,7 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.rb", "foo.rb"]
       case ModuleTable.lookup "main.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+          valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
           () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
@@ -28,6 +29,7 @@ spec config = parallel $ do
       (scopeGraph, (heap, res)) <- evaluate ["load.rb", "foo.rb"]
       case ModuleTable.lookup "load.rb" <$> res of
         Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+          valueRef `shouldBe` Rval (Value.Integer (Number.Integer 1))
           () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
         other -> expectationFailure (show other)
 
