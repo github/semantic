@@ -414,7 +414,6 @@ resumingValueError = runValueErrorWith (\ baseError -> traceError "ValueError" b
   NumericError{}    -> pure hole
   Numeric2Error{}   -> pure hole
   ComparisonError{} -> pure hole
-  NamespaceError{}  -> pure lowerBound
   BitwiseError{}    -> pure hole
   Bitwise2Error{}   -> pure hole
   KeyValueError{}   -> pure (hole, hole)

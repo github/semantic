@@ -15,7 +15,6 @@ import Control.Effect.Interpose
 import Control.Effect.Sum
 import Data.Abstract.BaseError
 import Data.Abstract.Evaluatable (UnspecializedError(..), ValueRef(..), EvalError(..), Declarations)
-import Data.Abstract.Environment (Bindings)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Name
 import qualified Data.Abstract.Number as Number
@@ -344,7 +343,6 @@ data ValueError term address resume where
   StringError            :: Value term address                       -> ValueError term address Text
   BoolError              :: Value term address                       -> ValueError term address Bool
   IndexError             :: Value term address -> Value term address -> ValueError term address (Value term address)
-  NamespaceError         :: Prelude.String                           -> ValueError term address (Bindings address)
   CallError              :: Value term address                       -> ValueError term address (ValueRef address (Value term address))
   NumericError           :: Value term address                       -> ValueError term address (Value term address)
   Numeric2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
@@ -363,7 +361,6 @@ instance (NFData term, NFData address) => NFData1 (ValueError term address) wher
     StringError i       -> rnf i
     BoolError   i       -> rnf i
     IndexError  i j     -> rnf i `seq` rnf j
-    NamespaceError i    -> rnf i
     CallError i         -> rnf i
     NumericError i      -> rnf i
     Numeric2Error i j   -> rnf i `seq` rnf j
@@ -380,7 +377,6 @@ instance (NFData term, NFData address, NFData resume) => NFData (ValueError term
 
 instance (Eq address, Eq term) => Eq1 (ValueError term address) where
   liftEq _ (StringError a) (StringError b)                       = a == b
-  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ (BoolError a) (BoolError c)                           = a == c
   liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)
