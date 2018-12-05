@@ -447,6 +447,7 @@ resumingScopeError :: ( Carrier sig m
                     -> Evaluator term address value m a
 resumingScopeError = runScopeErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
   ScopeError _ _ -> pure hole
+  ImportReferenceError -> pure hole
   LookupScopeError -> pure hole
   LookupPathError _ -> pure hole
   CurrentScopeError -> pure hole
