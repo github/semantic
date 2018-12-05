@@ -182,7 +182,7 @@ maybeLookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) si
                 )
              => Declaration
              -> Evaluator term address value m (Maybe (ScopeGraph.Path address))
-maybeLookupScopePath decl@Declaration{..} = do
+maybeLookupScopePath Declaration{..} = do
   currentAddress <- currentScope
   scopeGraph <- get
   pure (ScopeGraph.lookupScopePath unDeclaration currentAddress scopeGraph)
