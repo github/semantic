@@ -69,7 +69,7 @@ putDeclarationScope decl assocScope = do
   modify (ScopeGraph.insertDeclarationScope decl assocScope currentAddress)
 
 putDeclarationSpan :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Span -> Evaluator term address value m ()
-putDeclarationSpan decl = modify @(ScopeGraph address) . (ScopeGraph.insertDeclarationSpan decl)
+putDeclarationSpan decl = modify @(ScopeGraph address) . ScopeGraph.insertDeclarationSpan decl
 
 reference :: forall address sig m term value
           . ( Ord address
