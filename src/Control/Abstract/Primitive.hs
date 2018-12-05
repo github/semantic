@@ -1,40 +1,40 @@
-{-# LANGUAGE FunctionalDependencies, UndecidableInstances, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE TupleSections #-}
 module Control.Abstract.Primitive
   ( defineClass
   , defineNamespace
   , defineBuiltIn
   ) where
 
-import           Control.Abstract.Context
-import           Control.Abstract.Evaluator
-import           Control.Abstract.Heap
-import           Control.Abstract.ScopeGraph
-import           Control.Abstract.Value
-import           Data.Abstract.BaseError
-import Data.Map.Strict as Map
-import Data.Abstract.Ref
+import Control.Abstract.Context
+import Control.Abstract.Evaluator
+import Control.Abstract.Heap
+import Control.Abstract.ScopeGraph
+import Control.Abstract.Value
+import Data.Abstract.BaseError
 import Data.Abstract.Name
+import Data.Abstract.Ref
+import Data.Map.Strict as Map
 import Data.Span
-import           Prologue
+import Prologue
 
-defineBuiltIn :: forall value sig address m term. ( HasCallStack
-          , Member (Deref value) sig
-          , Member (Reader ModuleInfo) sig
-          , Member (Reader Span) sig
-          , Member (Reader (address, address)) sig
-          , Member (State (Heap address address value)) sig
-          , Member (State (ScopeGraph address)) sig
-          , Member (Resumable (BaseError (ScopeError address))) sig
-          , Member (Resumable (BaseError (HeapError address))) sig
-          , Member (Function term address value) sig
-          , Member (Allocator address) sig
-          , Member Fresh sig
-          , Ord address
-          , Carrier sig m
-          )
-       => Declaration
-       -> BuiltIn
-       -> Evaluator term address value m (ValueRef address value)
+defineBuiltIn :: ( HasCallStack
+                 , Member (Deref value) sig
+                 , Member (Reader ModuleInfo) sig
+                 , Member (Reader Span) sig
+                 , Member (Reader (address, address)) sig
+                 , Member (State (Heap address address value)) sig
+                 , Member (State (ScopeGraph address)) sig
+                 , Member (Resumable (BaseError (ScopeError address))) sig
+                 , Member (Resumable (BaseError (HeapError address))) sig
+                 , Member (Function term address value) sig
+                 , Member (Allocator address) sig
+                 , Member Fresh sig
+                 , Ord address
+                 , Carrier sig m
+                 )
+              => Declaration
+              -> BuiltIn
+              -> Evaluator term address value m (ValueRef address value)
 defineBuiltIn declaration value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
@@ -72,9 +72,7 @@ defineClass :: ( AbstractValue term address value m
 defineClass declaration superclasses body = void . define declaration $ do
     currentScope' <- currentScope
 
-    superScopes <- for superclasses $ \superclass -> do
-      scope <- associatedScope superclass
-      pure scope
+    superScopes <- for superclasses associatedScope
 
     let superclassEdges = (Superclass, ) <$> (fmap pure . catMaybes $ superScopes)
         current = fmap (Lexical, ) . pure . pure $ currentScope'
@@ -83,7 +81,7 @@ defineClass declaration superclasses body = void . define declaration $ do
     putDeclarationScope declaration childScope
 
     withScope childScope $ do
-      void $ body
+      void body
 
     pure unit
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# OPTIONS_GHC -Wno-missing-export-lists #-}
 module Language.Go.Syntax where
 

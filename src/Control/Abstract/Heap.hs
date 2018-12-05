@@ -157,7 +157,7 @@ withFrame :: forall term address value sig m a. (
           => address
           -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
           -> Evaluator term address value m a
-withFrame address action = local @(address, address) (second (const address)) action
+withFrame address = local @(address, address) (second (const address))
 
 -- | Define a declaration and assign the value of an action in the current frame.
 define :: forall value sig address m term. ( HasCallStack

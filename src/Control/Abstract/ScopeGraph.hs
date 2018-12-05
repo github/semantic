@@ -69,7 +69,7 @@ putDeclarationScope decl assocScope = do
   modify (ScopeGraph.insertDeclarationScope decl assocScope currentAddress)
 
 putDeclarationSpan :: forall address sig m term value. (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Span -> Evaluator term address value m ()
-putDeclarationSpan decl = modify @(ScopeGraph address) . (ScopeGraph.insertDeclarationSpan decl)
+putDeclarationSpan decl = modify @(ScopeGraph address) . ScopeGraph.insertDeclarationSpan decl
 
 reference :: forall address sig m term value
           . ( Ord address
@@ -182,8 +182,7 @@ maybeLookupScopePath ::
              -> Evaluator term address value m (Maybe (ScopeGraph.Path address))
 maybeLookupScopePath Declaration{..} = do
   currentAddress <- currentScope
-  scopeGraph <- get
-  pure (ScopeGraph.lookupScopePath unDeclaration currentAddress scopeGraph)
+  gets (ScopeGraph.lookupScopePath unDeclaration currentAddress)
 
 lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader ModuleInfo) sig
@@ -222,7 +221,7 @@ withScope :: forall sig m address term value a. ( Carrier sig m
           => address
           -> Evaluator term address value m a
           -> Evaluator term address value m a
-withScope scope action = local @(address, address) (first (const scope)) action
+withScope scope = local @(address, address) (first (const scope))
 
 throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) sig
                    , Member (Reader ModuleInfo) sig
