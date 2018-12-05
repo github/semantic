@@ -39,8 +39,8 @@ spec config = parallel $ do
           -- Env.names env `shouldBe` [ "b", "z" ]
           () <$ SpecHelpers.lookupDeclaration "b" scopeAndFrame heap scopeGraph `shouldBe` Just ()
           () <$ SpecHelpers.lookupDeclaration "z" scopeAndFrame heap scopeGraph `shouldBe` Just ()
-          lookupMembers "b" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "foo", "baz" ]
-          lookupMembers "z" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "foo", "baz" ]
+          lookupMembers "b" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "baz", "foo" ]
+          lookupMembers "z" Import scopeAndFrame heap scopeGraph `shouldBe` Just  [ "baz", "foo" ]
           -- (Heap.lookupDeclaration "b" heap  >>= deNamespace heap) `shouldBe` Just ("b", [ "baz", "foo" ])
           -- (Heap.lookupDeclaration "z" heap >>= deNamespace heap) `shouldBe` Just ("z", [ "baz", "foo" ])
           () <$ SpecHelpers.lookupDeclaration "baz" scopeAndFrame heap scopeGraph `shouldBe` Nothing

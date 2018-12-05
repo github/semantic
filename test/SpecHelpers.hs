@@ -179,7 +179,7 @@ frameNames :: [ EdgeLabel ]
 frameNames edge heap scopeGraph frame = do
   scopeAddress <- Heap.scopeLookup frame heap
   scope <- ScopeGraph.lookupScope scopeAddress scopeGraph
-  pure (unDeclaration <$> ScopeGraph.declarationNames edge scope scopeGraph)
+  pure (unDeclaration <$> toList (ScopeGraph.declarationNames edge scope scopeGraph))
 
 lookupMembers :: Name -> EdgeLabel -> (Precise, Precise) -> Heap Precise Precise (Value term Precise) -> ScopeGraph Precise -> Maybe [ Name ]
 lookupMembers name edgeLabel scopeAndFrame heap scopeGraph =
