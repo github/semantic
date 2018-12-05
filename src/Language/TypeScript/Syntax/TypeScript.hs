@@ -125,14 +125,18 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval _ (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    -- scopeGraph <- fst <$> require modulePath
-    -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
-    for_ exportSymbols $ \Alias{..} -> do
-      -- TODO: Add an Alias Edge to resolve qualified export froms
-      -- Scope 1 -> alias (bar, foo) -> Export 3 -> Export -> Scope 4
-      pure ()
-      -- let address = Env.lookup aliasValue importedBinds
-      -- maybe (throwEvalError $ ExportError modulePath aliasValue) (export aliasValue aliasName . Just) address
+
+    ((moduleScope, moduleFrame), _) <- require modulePath
+    exportScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+    exportFrame <- newFrame exportScope (Map.singleton ScopeGraph.Import (Map.singleton moduleScope moduleFrame))
+
+    withScopeAndFrame moduleFrame .
+      for_ exportSymbols $ \Alias{..} -> do
+        insertImportReference (Reference aliasName) (Declaration aliasValue) exportScope
+
+    insertExportEdge exportScope
+    insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
+
     rvalBox unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
