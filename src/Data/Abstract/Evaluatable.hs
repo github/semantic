@@ -118,10 +118,7 @@ instance HasPrelude 'Python where
 
 instance HasPrelude 'Ruby where
   definePrelude _ = do
-    let self = Declaration $ X.name "__self"
-    declare self emptySpan Nothing
-    slot <- lookupDeclaration self
-    assign slot =<< object =<< currentFrame
+    defineSelf
 
     void $ defineBuiltIn (Declaration $ X.name "puts") Print
 
@@ -129,20 +126,32 @@ instance HasPrelude 'Ruby where
       void $ defineBuiltIn (Declaration $ X.name "inspect") Show
 
 instance HasPrelude 'TypeScript where
-  definePrelude _ = do
-    let self = Declaration $ X.name "__self"
-    declare self emptySpan Nothing
-    slot <- lookupDeclaration self
-    assign slot =<< object =<< currentFrame
-    -- defineNamespace (Declaration (X.name "console")) (builtIn (X.name "log") Print)
+  definePrelude _ = defineSelf
+    -- defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
 
 instance HasPrelude 'JavaScript where
   definePrelude _ = do
-    let self = Declaration $ X.name "__self"
-    declare self emptySpan Nothing
-    slot <- lookupDeclaration self
-    assign slot =<< object =<< currentFrame
+    defineSelf
     defineNamespace (Declaration (X.name "console")) $ defineBuiltIn (Declaration $ X.name "log") Print
+
+defineSelf :: ( AbstractValue term address value m
+              , Carrier sig m
+              , Member (State (ScopeGraph address)) sig
+              , Member (Resumable (BaseError (ScopeError address))) sig
+              , Member (Resumable (BaseError (HeapError address))) sig
+              , Member (Deref value) sig
+              , Member (Reader ModuleInfo) sig
+              , Member (Reader Span) sig
+              , Member (State (Heap address address value)) sig
+              , Member (Reader (address, address)) sig
+              , Ord address
+              )
+           => Evaluator term address value m ()
+defineSelf = do
+  let self = Declaration $ X.name "__self"
+  declare self emptySpan Nothing
+  slot <- lookupDeclaration self
+  assign slot =<< object =<< currentFrame
 
 
 -- Effects
