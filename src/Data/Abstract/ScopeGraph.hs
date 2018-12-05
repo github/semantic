@@ -42,8 +42,8 @@ data Slot address = Slot { frameAddress :: address, position :: Position }
     deriving (Eq, Show, Ord, Generic, NFData)
 
 -- Offsets and frame addresses in the heap should be addresses?
-data Scope scopeAddress = Scope {
-    edges        :: Map EdgeLabel [scopeAddress] -- Maybe Map EdgeLabel [Path scope]?
+data Scope scopeAddress = Scope
+  { edges        :: Map EdgeLabel [scopeAddress] -- Maybe Map EdgeLabel [Path scope]?
   , references   :: Map Reference (Path scopeAddress)
   , declarations :: Seq (Declaration, (Span, Maybe scopeAddress))
   } deriving (Eq, Show, Ord, Generic, NFData)
