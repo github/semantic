@@ -38,7 +38,6 @@ library
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract
                      , Control.Abstract.Context
-                     , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Heap
                      , Control.Abstract.Hole
@@ -61,7 +60,6 @@ library
                      , Data.Abstract.Address.Precise
                      , Data.Abstract.BaseError
                      , Data.Abstract.Declarations
-                     , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
                      , Data.Abstract.Exports
                      , Data.Abstract.FreeVariables
@@ -336,7 +334,6 @@ test-suite test
                      , Assigning.Assignment.Spec
                      , Control.Abstract.Evaluator.Spec
                      , Control.Rewriting.Spec
-                     , Data.Abstract.Environment.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Abstract.Name.Spec
                      , Data.Diff.Spec
