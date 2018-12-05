@@ -369,6 +369,8 @@ dealloc addr = modify @(Heap address address value) (Heap.deleteSlot addr)
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
 gc :: ( Member (State (Heap address address value)) sig
       , Ord address
+      , Ord value
+      , ValueRoots address value
       , Carrier sig m
       )
    => Live address                       -- ^ The set of addresses to consider rooted.
@@ -376,16 +378,19 @@ gc :: ( Member (State (Heap address address value)) sig
 gc roots = modifyHeap (Heap.heapRestrict <*> reachable roots)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
-reachable :: Ord address
+reachable :: ( Ord address
+             , Ord value
+             , ValueRoots address value
+             )
           => Live address       -- ^ The set of root addresses.
           -> Heap address address value -- ^ The heap to trace addresses through.
           -> Live address       -- ^ The set of addresses reachable from the root set.
-reachable roots _ = go mempty roots
+reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
-          Just (_, _) -> undefined -- go (liveInsert a seen) $ case heapLookupAll a heap of
-            -- Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
-            -- _           -> seen
+          Just (a, as) -> go (liveInsert a seen) $ case Heap.heapLookupAll a heap of
+            Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
+            _           -> seen
 
 
 -- Effects
