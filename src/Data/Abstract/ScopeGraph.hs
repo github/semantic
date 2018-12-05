@@ -152,8 +152,7 @@ reference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} = fromMaybe g
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} scope = do
-  go currentAddress (EPath Import currentAddress)
+insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} scope = go currentAddress (EPath Import currentAddress)
   where
     go address path
       =   modifyReferences scope . Map.insert ref . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
@@ -161,8 +160,7 @@ insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} s
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
-  go currentAddress id
+lookupScopePath declaration currentAddress g@ScopeGraph{..} = go currentAddress id
   where
     go address path
       =   path . DPath (Declaration declaration) . snd <$> lookupDeclaration declaration address g
