@@ -270,7 +270,7 @@ scopeOfDeclaration Declaration{..} g@ScopeGraph{..} = go (Map.keys graph)
 associatedScope :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 associatedScope Declaration{..} g@ScopeGraph{..} = go (Map.keys graph)
   where
-    go (scope : scopes') = maybe (go scopes') (snd . snd . fst) (lookupDeclaration unDeclaration scope g)
+    go (scope : scopes') = snd . snd . fst <$> lookupDeclaration unDeclaration scope g <|> go scopes'
     go []                = Nothing
 
 newtype Reference = Reference { unReference :: Name }
