@@ -17,18 +17,18 @@ module Control.Abstract.Evaluator
   , module X
   ) where
 
-import Control.Effect           as X
+import Control.Effect as X
 import Control.Effect.Carrier
-import Control.Effect.Error     as X
-import Control.Effect.Fresh     as X
-import Control.Effect.NonDet    as X
-import Control.Effect.Reader    as X
+import Control.Effect.Error as X
+import Control.Effect.Fresh as X
+import Control.Effect.NonDet as X
+import Control.Effect.Reader as X
 import Control.Effect.Resumable as X
-import Control.Effect.State     as X
-import Control.Effect.Trace     as X
+import Control.Effect.State as X
+import Control.Effect.Trace as X
 import Control.Monad.IO.Class
-import Data.Coerce
 import Data.Abstract.Ref
+import Data.Coerce
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the address, term, and value types.
 --
@@ -94,16 +94,13 @@ throwContinue :: (Member (Error (LoopControl address value)) sig, Carrier sig m)
               -> Evaluator term address value m (ValueRef address value)
 throwContinue = throwError . Continue
 
-throwAbort :: forall term address sig m value a .
-           ( Member (Error (LoopControl address value)) sig
-           , Carrier sig m)
+throwAbort :: forall term address sig m value a . (Member (Error (LoopControl address value)) sig , Carrier sig m)
            => Evaluator term address value m a
 throwAbort = throwError (Abort @address @value)
 
-catchLoopControl :: (
-                    Member (Error (LoopControl address value)) sig
-                  , Carrier sig m
-                  )
+catchLoopControl :: ( Member (Error (LoopControl address value)) sig
+                    , Carrier sig m
+                    )
                  => Evaluator term address value m a
                  -> (LoopControl address value -> Evaluator term address value m a)
                  -> Evaluator term address value m a

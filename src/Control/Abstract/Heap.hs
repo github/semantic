@@ -159,20 +159,6 @@ withFrame :: forall term address value sig m a. (
           -> Evaluator term address value m a
 withFrame address action = local @(address, address) (second (const address)) action
 
--- box :: ( Member (Allocator address) effects
---        , Member (Deref value) effects
---        , Member Fresh effects
---        , Member (State (Heap address address value)) effects
---        , Ord address
---        )
---     => value
---     -> Evaluator term address value m address
--- box val = do
---   name <- gensym
---   addr <- alloc name
---   assign addr (Declaration name) val -- TODO This is probably wrong
---   pure addr
-
 -- | Define a declaration and assign the value of an action in the current frame.
 define :: forall value sig address m term. ( HasCallStack
           , Member (Deref value) sig
