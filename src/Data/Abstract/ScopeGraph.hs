@@ -148,13 +148,13 @@ reference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} = fromMaybe g
     go currentScope address path =
       case lookupDeclaration unDeclaration address g of
           Just (_, index) ->
-            let newScope = modifyReferences (Map.insert ref (path (DPath decl index))) currentScope
+            let newScope = modifyReferences currentScope (Map.insert ref (path (DPath decl index)))
             in Just (g { graph = Map.insert currentAddress newScope graph })
           Nothing -> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
             where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
 
-modifyReferences :: (Map Reference (Path scopeAddress) -> Map Reference (Path scopeAddress)) -> Scope scopeAddress -> Scope scopeAddress
-modifyReferences f scope = scope { references = f (references scope) }
+modifyReferences :: Scope scopeAddress -> (Map Reference (Path scopeAddress) -> Map Reference (Path scopeAddress)) -> Scope scopeAddress
+modifyReferences scope f = scope { references = f (references scope) }
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
@@ -164,7 +164,7 @@ insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} s
     go address path =
       case lookupDeclaration unDeclaration address g of
         Just (_, index) ->
-          Just $ modifyReferences (Map.insert ref (path (DPath decl index))) scope
+          Just $ modifyReferences scope (Map.insert ref (path (DPath decl index)))
         Nothing -> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
           where
             traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
