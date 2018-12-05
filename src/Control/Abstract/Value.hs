@@ -302,7 +302,7 @@ value :: ( Member (Deref value) sig
          )
       => ValueRef address value
       -> Evaluator term address value m value
-value (Rval val) = pure val
+value (Rval val)        = pure val
 value (LvalMember slot) = deref slot
 
 -- | Convenience function for boxing a raw value and wrapping it in an Rval
