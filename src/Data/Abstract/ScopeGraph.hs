@@ -153,9 +153,6 @@ reference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} = fromMaybe g
           Nothing -> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
             where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
 
-modifyReferences :: Scope scopeAddress -> (Map Reference (Path scopeAddress) -> Map Reference (Path scopeAddress)) -> Scope scopeAddress
-modifyReferences scope f = scope { references = f (references scope) }
-
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
 insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} scope = do
@@ -178,6 +175,9 @@ lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
       <|> path <$> lookupReference declaration address g
       <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
+
+modifyReferences :: Scope scopeAddress -> (Map Reference (Path scopeAddress) -> Map Reference (Path scopeAddress)) -> Scope scopeAddress
+modifyReferences scope f = scope { references = f (references scope) }
 
 traverseEdges :: Foldable t => (Path scopeAddress -> Path scopeAddress) -> (scopeAddress -> (Path scopeAddress -> Path scopeAddress) -> Maybe a) -> EdgeLabel -> t scopeAddress -> Maybe a
 -- Return the first path to the declaration through the scopes.
