@@ -5,17 +5,17 @@ module Control.Abstract.Primitive
   , defineBuiltIn
   ) where
 
-import           Control.Abstract.Context
-import           Control.Abstract.Evaluator
-import           Control.Abstract.Heap
-import           Control.Abstract.ScopeGraph
-import           Control.Abstract.Value
-import           Data.Abstract.BaseError
-import Data.Map.Strict as Map
-import Data.Abstract.Ref
+import Control.Abstract.Context
+import Control.Abstract.Evaluator
+import Control.Abstract.Heap
+import Control.Abstract.ScopeGraph
+import Control.Abstract.Value
+import Data.Abstract.BaseError
 import Data.Abstract.Name
+import Data.Abstract.Ref
+import Data.Map.Strict as Map
 import Data.Span
-import           Prologue
+import Prologue
 
 defineBuiltIn :: ( HasCallStack
           , Member (Deref value) sig
