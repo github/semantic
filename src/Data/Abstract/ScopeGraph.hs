@@ -158,13 +158,10 @@ insertImportReference :: Ord address => Reference -> Declaration -> address -> S
 insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} scope = do
   go currentAddress (EPath Import currentAddress)
   where
-    go address path =
-      case lookupDeclaration unDeclaration address g of
-        Just (_, index) ->
-          Just $ modifyReferences scope (Map.insert ref (path (DPath decl index)))
-        Nothing -> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
-          where
-            traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
+    go address path
+      =   modifyReferences scope . Map.insert ref . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
+      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
+      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
