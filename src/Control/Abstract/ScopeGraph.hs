@@ -172,10 +172,8 @@ insertScope :: ( Member (State (ScopeGraph address)) sig
             -> Evaluator term address value m ()
 insertScope scopeAddress scope = modify (ScopeGraph.insertScope scopeAddress scope)
 
-maybeLookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
-                , Member (Reader ModuleInfo) sig
-                , Member (Reader Span) sig
-                , Member (State (ScopeGraph address)) sig
+maybeLookupScopePath ::
+                ( Member (State (ScopeGraph address)) sig
                 , Member (Reader (address, address)) sig
                 , Carrier sig m
                 , Ord address
