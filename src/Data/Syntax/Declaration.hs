@@ -153,7 +153,7 @@ instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable VariableDeclaration where
   eval _ (VariableDeclaration [])   = rvalBox unit
   eval eval (VariableDeclaration decs) = do
-    _ <- for decs $ \declaration -> do
+    for_ decs $ \declaration -> do
       name <- maybeM (throwEvalError NoNameError) (declaredName declaration)
       declare (Declaration name) emptySpan Nothing
       (span, _) <- do
