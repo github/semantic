@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables, InstanceSigs, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators, UndecidableInstances, ScopedTypeVariables, InstanceSigs #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
