@@ -109,7 +109,7 @@ evaluateProject' (TaskConfig config logger statter) proxy parser paths = either 
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
@@ -122,7 +122,7 @@ evaluatePythonProjects proxy parser lang path = runTaskWithOptions debugOptions 
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))
        (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (evaluate proxy id (evalTerm withTermSpans) modules)))))))
 
@@ -133,7 +133,7 @@ evaluateProjectWithCaching proxy parser path = runTaskWithOptions debugOptions $
   modules <- topologicalSort <$> runImportGraphToModules proxy package
   pure (id @(Evaluator _ Monovariant _ _ _)
        (raiseHandler (runReader (packageInfo package))
-       (raiseHandler (runState (lowerBound @Span))
+       (raiseHandler (evalState (lowerBound @Span))
        (raiseHandler (runReader (lowerBound @Span))
        (runModuleTable
        (runModules (ModuleTable.modulePaths (packageModules package))

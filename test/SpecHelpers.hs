@@ -26,6 +26,7 @@ import qualified Data.Abstract.Heap as Heap
 import Control.Arrow ((&&&))
 import Control.Effect.Trace as X (runTraceByIgnoring, runTraceByReturning)
 import Control.Monad ((>=>))
+import Data.Traversable as X (for)
 import Data.Abstract.Address.Precise as X
 import Data.Abstract.Evaluatable hiding (lookupDeclaration)
 import Data.Abstract.FreeVariables as X
@@ -136,7 +137,7 @@ type TestEvaluatingErrors term
      , BaseError (UnspecializedError (Val term))
      , BaseError (LoadError Precise (Val term))
      ]
-testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) (Span, a)
+testEvaluating :: Evaluator term Precise (Val term) (TestEvaluatingC term) a
                -> IO
                   (ScopeGraph Precise,
                     (Heap Precise Precise (Value term Precise),
@@ -157,7 +158,6 @@ testEvaluating
   . runResolutionError
   . runValueError
   . runAddressError
-  . fmap snd
 
 type Val term = Value term Precise
 
