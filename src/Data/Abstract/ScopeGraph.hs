@@ -131,7 +131,7 @@ declare declaration ddata assocScope currentScope g@ScopeGraph{..} = fromMaybe (
 
   dataSeq <- ddataOfScope currentScope g
   case Seq.findIndexR (\(decl, (span, _)) -> decl == declaration && ddata == span) dataSeq of
-    Just index -> pure (g, Just $ Position index)
+    Just index -> pure (g, Just (Position index))
     Nothing -> do
       let newScope = scope { declarations = declarations scope Seq.|> (declaration, (ddata, assocScope)) }
       pure (g { graph = Map.insert currentScope newScope graph }, Just (Position (length (declarations newScope))))
