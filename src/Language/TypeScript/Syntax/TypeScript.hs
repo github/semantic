@@ -15,6 +15,7 @@ import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Language.TypeScript.Resolution
 import qualified Data.Map.Strict as Map
+import qualified Data.Abstract.Name as Name
 
 data Import a = Import { importSymbols :: ![Alias], importFrom :: ImportPath }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
@@ -147,12 +148,21 @@ instance Ord1 DefaultExport where liftCompare = genericLiftCompare
 instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultExport where
-  eval _ (DefaultExport term) = do
+  eval eval (DefaultExport term) = do
     case declaredName term of
-      Just _ -> undefined -- do
-        -- addr <- eval term >>= address
-        -- export name name Nothing
-        -- bind name addr
+      Just _ -> do
+        exportScope <- newScope mempty
+        exportFrame <- newFrame exportScope mempty
+        exportSpan <- ask @Span
+        withScopeAndFrame exportFrame $ do
+          valueRef <- value =<< eval term
+          let declaration = Declaration $ Name.name "__default"
+          declare declaration exportSpan Nothing
+          defaultSlot <- lookupDeclaration declaration
+          assign defaultSlot valueRef
+
+        insertExportEdge exportScope
+        insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
       Nothing -> throwEvalError DefaultExportError
     rvalBox unit
 
