@@ -145,13 +145,10 @@ reference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} = fromMaybe g
   -- Build a path up to the declaration
   go currentScope' currentAddress id
   where
-    go currentScope address path =
-      case lookupDeclaration unDeclaration address g of
-          Just (_, index) ->
-            let newScope = modifyReferences currentScope (Map.insert ref (path (DPath decl index)))
-            in Just (g { graph = Map.insert currentAddress newScope graph })
-          Nothing -> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
-            where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
+    go currentScope address path
+      =   ScopeGraph . flip (Map.insert currentAddress) graph . modifyReferences currentScope . Map.insert ref . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
+      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
+      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
