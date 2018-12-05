@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, GADTs, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , associatedScope
@@ -28,14 +28,14 @@ module Data.Abstract.ScopeGraph
   , declarationNames
   ) where
 
-import Control.Abstract.Hole
+import           Control.Abstract.Hole
 import           Data.Abstract.Name
 import qualified Data.Map.Strict as Map
+import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import           Data.Span
 import           Prelude hiding (lookup)
 import           Prologue
-import qualified Data.Sequence as Seq
 
 -- A slot is a location in the heap where a value is stored.
 data Slot address = Slot { frameAddress :: address, position :: Position }
@@ -97,13 +97,13 @@ pathDeclaration Hole          = undefined
 -- TODO: Store the current scope closer _in_ the DPath?
 pathDeclarationScope :: scope -> Path scope -> Maybe scope
 pathDeclarationScope _ (EPath _ scope (DPath _ _)) = Just scope
-pathDeclarationScope currentScope (EPath _ _ p) = pathDeclarationScope currentScope p
-pathDeclarationScope currentScope (DPath _ _) = Just currentScope
-pathDeclarationScope _ Hole = Nothing
+pathDeclarationScope currentScope (EPath _ _ p)    = pathDeclarationScope currentScope p
+pathDeclarationScope currentScope (DPath _ _)      = Just currentScope
+pathDeclarationScope _ Hole                        = Nothing
 
 -- TODO: Possibly return in Maybe since we can have Hole paths
 pathPosition :: Path scope -> Position
-pathPosition Hole    = Position 0
+pathPosition Hole          = Position 0
 pathPosition (DPath _ p)   = p
 pathPosition (EPath _ _ p) = pathPosition p
 
@@ -265,14 +265,14 @@ scopeOfDeclaration :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scop
 scopeOfDeclaration Declaration{..} g@ScopeGraph{..} = go (Map.keys graph)
   where
     go (scope : scopes') = fromMaybe (go scopes') $ lookupDeclaration unDeclaration scope g >> pure (Just scope)
-    go [] = Nothing
+    go []                = Nothing
 
 -- | Returns the scope associated with a declaration (the child scope if any exists).
 associatedScope :: Ord scope => Declaration -> ScopeGraph scope -> Maybe scope
 associatedScope Declaration{..} g@ScopeGraph{..} = go (Map.keys graph)
   where
     go (scope : scopes') = fromMaybe (go scopes') $ snd . snd . fst <$> lookupDeclaration unDeclaration scope g
-    go [] = Nothing
+    go []                = Nothing
 
 newtype Reference = Reference { unReference :: Name }
   deriving (Eq, Ord, Show, Generic, NFData)

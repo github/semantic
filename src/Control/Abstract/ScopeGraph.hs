@@ -1,4 +1,5 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, GADTs, LambdaCase, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables, TypeOperators,
+             UndecidableInstances #-}
 module Control.Abstract.ScopeGraph
   ( lookup
   , declare
@@ -35,11 +36,11 @@ module Control.Abstract.ScopeGraph
   ) where
 
 import           Control.Abstract.Evaluator hiding (Local)
-import           Data.Abstract.Module
-import           Data.Abstract.BaseError
 import           Control.Effect.Carrier
+import           Data.Abstract.BaseError
+import           Data.Abstract.Module
 import           Data.Abstract.Name hiding (name)
-import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, ScopeGraph, Slot(..), Scope(..))
+import           Data.Abstract.ScopeGraph (Declaration (..), EdgeLabel, Reference, Scope (..), ScopeGraph, Slot (..))
 import qualified Data.Abstract.ScopeGraph as ScopeGraph
 import           Data.Span
 import           Prelude hiding (lookup)
@@ -245,11 +246,11 @@ deriving instance Eq (ScopeError address return)
 deriving instance Show (ScopeError address return)
 instance Show address => Show1 (ScopeError address) where liftShowsPrec _ _ = showsPrec
 instance Eq1 (ScopeError address) where
-  liftEq _ (ScopeError m1 n1) (ScopeError m2 n2) = m1 == m2 && n1 == n2
-  liftEq _ CurrentScopeError CurrentScopeError = True
-  liftEq _ LookupScopeError LookupScopeError = True
+  liftEq _ (ScopeError m1 n1) (ScopeError m2 n2)           = m1 == m2 && n1 == n2
+  liftEq _ CurrentScopeError CurrentScopeError             = True
+  liftEq _ LookupScopeError LookupScopeError               = True
   liftEq _ (LookupPathError decl1) (LookupPathError decl2) = decl1 == decl2
-  liftEq _ _ _ = False
+  liftEq _ _ _                                             = False
 
 alloc :: (Member (Allocator address) sig, Carrier sig m) => Name -> Evaluator term address value m address
 alloc = send . flip Alloc ret

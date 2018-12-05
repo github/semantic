@@ -20,11 +20,21 @@ module Data.Abstract.Heap
   , isHeapEmpty
   ) where
 
-import Data.Abstract.ScopeGraph (EdgeLabel(..), Declaration(..), Path(..), Position(..), Slot(..), ScopeGraph, pathPosition, pathDeclaration, lookupScopePath)
-import qualified Data.Map.Strict as Map
+import           Data.Abstract.ScopeGraph
+    ( Declaration (..)
+    , EdgeLabel (..)
+    , Path (..)
+    , Position (..)
+    , ScopeGraph
+    , Slot (..)
+    , lookupScopePath
+    , pathDeclaration
+    , pathPosition
+    )
 import qualified Data.IntMap as IntMap
-import Prologue
-import Prelude hiding (lookup)
+import qualified Data.Map.Strict as Map
+import           Prelude hiding (lookup)
+import           Prologue
 
 data Frame scopeAddress frameAddress value = Frame {
     scopeAddress :: scopeAddress
