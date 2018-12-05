@@ -39,6 +39,7 @@ import           Data.Abstract.Address.Monovariant as Monovariant
 import           Data.Abstract.Address.Precise as Precise
 import           Data.Abstract.BaseError (BaseError (..))
 import           Data.Abstract.Evaluatable
+import           Data.Abstract.Heap
 import           Data.Abstract.Module
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Package as Package
@@ -430,6 +431,8 @@ resumingHeapError :: ( Carrier sig m
 resumingHeapError = runHeapErrorWith (\ baseError -> traceError "ScopeError" baseError *> case baseErrorException baseError of
     CurrentFrameError -> pure hole
     LookupAddressError _ -> pure hole
+    -- FIXME: this is clearly bogus
+    LookupFrameError addr -> pure (Frame addr lowerBound lowerBound)
     LookupLinksError _ -> pure mempty
     LookupLinkError _ -> pure hole)
 
