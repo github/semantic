@@ -95,17 +95,13 @@ instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
 instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
-  -- eval _ (QualifiedExport exportSymbols) = do
-  --   -- Insert the aliases with no addresses.
-  --   for_ exportSymbols $ \Alias{..} ->
-  --     export aliasValue aliasName Nothing
   eval _ (QualifiedExport exportSymbols) = do
     -- Create a Lexical edge from the qualifed export's scope to the current scope.
     currentScopeAddress <- currentScope
     let edges = Map.singleton Lexical [ currentScopeAddress ]
     exportScope <- newScope edges
     insertExportEdge exportScope -- Create an export edge from the current scope to the export scope
-    withScope exportScope $
+    withScope exportScope .
       for_ exportSymbols $ \Alias{..} -> do
         reference (Reference aliasName) (Declaration aliasValue)
 
