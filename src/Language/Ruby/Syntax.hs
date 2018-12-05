@@ -297,3 +297,40 @@ instance Evaluatable LowPrecedenceOr where
 instance Eq1 LowPrecedenceOr where liftEq = genericLiftEq
 instance Ord1 LowPrecedenceOr where liftCompare = genericLiftCompare
 instance Show1 LowPrecedenceOr where liftShowsPrec = genericLiftShowsPrec
+
+data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
+
+instance Declarations1 Assignment where
+  liftDeclaredName declaredName Assignment{..} = declaredName assignmentTarget
+
+instance Eq1 Assignment where liftEq = genericLiftEq
+instance Ord1 Assignment where liftCompare = genericLiftCompare
+instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Assignment where
+  eval eval Assignment{..} = do
+    lhsName <- maybeM (throwEvalError NoNameError) (declaredName assignmentTarget)
+    maybeSlot <- maybeLookupDeclaration (Declaration lhsName)
+    assignmentSpan <- ask @Span
+    maybe (declare (Declaration lhsName) assignmentSpan Nothing) (const (pure ())) maybeSlot
+
+    lhs <- eval assignmentTarget
+    rhs <- eval assignmentValue
+
+    case lhs of
+      Rval val -> throwEvalError (DerefError val)
+      LvalMember lhsSlot -> do
+        case declaredName assignmentValue of
+          Just rhsName -> do
+            assocScope <- associatedScope (Declaration rhsName)
+            case assocScope of
+              Just assocScope' -> do
+                objectScope <- newScope (Map.singleton Import [ assocScope' ])
+                putSlotDeclarationScope lhsSlot (Just objectScope) -- TODO: not sure if this is right
+              Nothing ->
+                pure ()
+          Nothing ->
+            pure ()
+        assign lhsSlot =<< Abstract.value rhs
+        pure (LvalMember lhsSlot)
