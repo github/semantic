@@ -167,7 +167,7 @@ insertImportReference ref decl@Declaration{..} currentAddress g@ScopeGraph{..} s
       case lookupDeclaration unDeclaration address g of
         Just (_, index) ->
           Just $ scope { references = Map.insert ref (path (DPath decl index)) (references scope) }
-        Nothing -> traverseEdges Superclass <|> traverseEdges Import <|> traverseEdges Lexical
+        Nothing -> traverseEdges Superclass <|> traverseEdges Export <|> traverseEdges Import <|> traverseEdges Lexical
           where
             traverseEdges edge = do
               linkMap <- linksOfScope address g
@@ -183,7 +183,7 @@ lookupScopePath declaration currentAddress g@ScopeGraph{..} = do
       case lookupDeclaration declaration address g of
         Just (_, index) -> Just $ path (DPath (Declaration declaration) index)
         Nothing -> maybe Nothing (Just . path) (lookupReference declaration address g)
-          <|> traverseEdges Superclass <|> traverseEdges Import <|> traverseEdges Lexical
+          <|> traverseEdges Superclass <|> traverseEdges Export <|> traverseEdges Import <|> traverseEdges Lexical
           where
             traverseEdges edge = do
               linkMap <- linksOfScope address g

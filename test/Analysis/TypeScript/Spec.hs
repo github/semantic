@@ -23,6 +23,13 @@ import           SpecHelpers
 spec :: TaskConfig -> Spec
 spec config = parallel $ do
   describe "TypeScript" $ do
+    it "qualified export from" $ do
+      (scopeGraph, (heap, res)) <- evaluate ["main6.ts", "baz.ts", "foo.ts"]
+      case ModuleTable.lookup "main6.ts" <$> res of
+        Right (Just (Module _ (scopeAndFrame, _) :| [])) -> do
+          () <$ SpecHelpers.lookupDeclaration "foo" scopeAndFrame heap scopeGraph `shouldBe` Just ()
+        other -> expectationFailure (show other)
+
     it "imports with aliased symbols" $ do
       (scopeGraph, (heap, res)) <- evaluate ["main.ts", "foo.ts", "a.ts", "foo/b.ts"]
       case ModuleTable.lookup "main.ts" <$> res of

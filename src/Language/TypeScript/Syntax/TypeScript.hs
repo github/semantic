@@ -125,16 +125,17 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval _ (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    exportScope <- newScope mempty
-    exportFrame <- newFrame exportScope mempty
 
-    withScopeAndFrame exportFrame $ do
-      ((moduleScope, moduleFrame), _) <- require modulePath
-      insertImportEdge moduleScope
-      insertFrameLink ScopeGraph.Import (Map.singleton moduleScope moduleFrame)
+    ((moduleScope, moduleFrame), _) <- require modulePath
+    exportScope <- newScope (Map.singleton ScopeGraph.Import [ moduleScope ])
+    exportFrame <- newFrame exportScope (Map.singleton ScopeGraph.Import (Map.singleton moduleScope moduleFrame))
 
+    withScopeAndFrame moduleFrame .
       for_ exportSymbols $ \Alias{..} -> do
-        reference (Reference aliasName) (Declaration aliasValue)
+        insertImportReference (Reference aliasName) (Declaration aliasValue) exportScope
+
+    insertExportEdge exportScope
+    insertFrameLink ScopeGraph.Export (Map.singleton exportScope exportFrame)
 
     rvalBox unit
 

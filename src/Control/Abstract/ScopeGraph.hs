@@ -160,7 +160,7 @@ insertImportReference ref decl scopeAddress = do
   scopeGraph <- get
   scope <- lookupScope scopeAddress
   currentAddress <- currentScope
-  newScope <- maybeM (throwScopeError LookupScopeError) (ScopeGraph.insertImportReference ref decl currentAddress scopeGraph scope)
+  newScope <- maybeM (throwScopeError ImportReferenceError) (ScopeGraph.insertImportReference ref decl currentAddress scopeGraph scope)
   insertScope scopeAddress newScope
 
 insertScope :: ( Member (State (ScopeGraph address)) sig
@@ -236,6 +236,7 @@ throwScopeError = throwBaseError
 data ScopeError address return where
   ScopeError :: Declaration -> Span -> ScopeError address (Slot address)
   LookupScopeError :: ScopeError address (Scope address)
+  ImportReferenceError :: ScopeError address (Scope address)
   LookupPathError :: Declaration -> ScopeError address (ScopeGraph.Path address)
   LookupDeclarationScopeError :: Declaration -> ScopeError address address
   CurrentScopeError :: ScopeError address address
