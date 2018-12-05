@@ -171,7 +171,7 @@ forLoop :: ( Carrier sig m
   -> Evaluator term address value m value -- ^ Increment/stepper
   -> Evaluator term address value m value -- ^ Body
   -> Evaluator term address value m (ValueRef address value)
-forLoop initial cond step body = initial *> while cond ((withLexicalScopeAndFrame body) *> step)
+forLoop initial cond step body = initial *> while cond (withLexicalScopeAndFrame body *> step)
 
 data While address value m k
   = While (m value) (m value) (ValueRef address value -> k)
