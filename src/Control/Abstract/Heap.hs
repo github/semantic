@@ -120,10 +120,6 @@ getHeap = get
 putHeap :: (Member (State (Heap address address value)) sig, Carrier sig m) => Heap address address value -> Evaluator term address value m ()
 putHeap = put
 
--- | Update the heap.
-modifyHeap :: (Member (State (Heap address address value)) sig, Carrier sig m) => (Heap address address value -> Heap address address value) -> Evaluator term address value m ()
-modifyHeap = modify
-
 -- | Retrieve the heap.
 currentFrame :: forall value address sig term m. (
                   Member (Reader (address, address)) sig
