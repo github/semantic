@@ -18,23 +18,23 @@ import Data.Span
 import Prologue
 
 defineBuiltIn :: ( HasCallStack
-          , Member (Deref value) sig
-          , Member (Reader ModuleInfo) sig
-          , Member (Reader Span) sig
-          , Member (Reader (address, address)) sig
-          , Member (State (Heap address address value)) sig
-          , Member (State (ScopeGraph address)) sig
-          , Member (Resumable (BaseError (ScopeError address))) sig
-          , Member (Resumable (BaseError (HeapError address))) sig
-          , Member (Function term address value) sig
-          , Member (Allocator address) sig
-          , Member Fresh sig
-          , Ord address
-          , Carrier sig m
-          )
-       => Declaration
-       -> BuiltIn
-       -> Evaluator term address value m (ValueRef address value)
+                 , Member (Deref value) sig
+                 , Member (Reader ModuleInfo) sig
+                 , Member (Reader Span) sig
+                 , Member (Reader (address, address)) sig
+                 , Member (State (Heap address address value)) sig
+                 , Member (State (ScopeGraph address)) sig
+                 , Member (Resumable (BaseError (ScopeError address))) sig
+                 , Member (Resumable (BaseError (HeapError address))) sig
+                 , Member (Function term address value) sig
+                 , Member (Allocator address) sig
+                 , Member Fresh sig
+                 , Ord address
+                 , Carrier sig m
+                 )
+              => Declaration
+              -> BuiltIn
+              -> Evaluator term address value m (ValueRef address value)
 defineBuiltIn declaration value = withCurrentCallStack callStack $ do
   currentScope' <- currentScope
   let lexicalEdges = Map.singleton Lexical [ currentScope' ]
