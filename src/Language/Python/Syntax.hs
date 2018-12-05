@@ -174,7 +174,6 @@ instance Evaluatable Import where
     else do
       let scopeEdges = Map.singleton ScopeGraph.Import [ moduleScope ]
       scopeAddress <- newScope scopeEdges
-      scope <- lookupScope scopeAddress
       withScope moduleScope $
         for_ xs $ \Alias{..} ->
           insertImportReference (Reference aliasName) (Declaration aliasValue) scopeAddress

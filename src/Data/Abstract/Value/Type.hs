@@ -355,6 +355,8 @@ instance ( Member Fresh sig
 
   scopedEnvironment _ = pure Nothing
 
+  object _ = pure Object
+
   asString t = unify t String $> ""
   asPair t   = do
     t1 <- fresh
