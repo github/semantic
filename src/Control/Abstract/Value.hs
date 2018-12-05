@@ -28,10 +28,9 @@ module Control.Abstract.Value
 , rvalBox
 ) where
 
-import Control.Abstract.ScopeGraph (Declaration, ScopeGraph)
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Abstract.ScopeGraph (Allocator)
+import Control.Abstract.ScopeGraph (Allocator, Declaration, ScopeGraph)
 import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import Data.Abstract.Module
