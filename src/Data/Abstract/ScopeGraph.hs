@@ -60,7 +60,7 @@ instance AbstractHole address => AbstractHole (Slot address) where
 newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)
 
-newtype ScopeGraph scope = ScopeGraph { graph :: Map scope (Scope scope) }
+newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) }
 
 instance Ord scope => Lower (ScopeGraph scope) where
   lowerBound = ScopeGraph mempty
@@ -109,19 +109,19 @@ pathPosition (EPath _ _ p) = pathPosition p
 
 -- Returns the reference paths of a scope in a scope graph.
 pathsOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map Reference (Path scope))
-pathsOfScope scope = fmap references . Map.lookup scope . graph
+pathsOfScope scope = fmap references . Map.lookup scope . unScopeGraph
 
 -- Returns the declaration data of a scope in a scope graph.
 ddataOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Seq (Declaration, (Span, Maybe scope)))
-ddataOfScope scope = fmap declarations . Map.lookup scope . graph
+ddataOfScope scope = fmap declarations . Map.lookup scope . unScopeGraph
 
 -- Returns the edges of a scope in a scope graph.
 linksOfScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Map EdgeLabel [scope])
-linksOfScope scope = fmap edges . Map.lookup scope . graph
+linksOfScope scope = fmap edges . Map.lookup scope . unScopeGraph
 
 -- Lookup a scope in the scope graph.
 lookupScope :: Ord scope => scope -> ScopeGraph scope -> Maybe (Scope scope)
-lookupScope scope = Map.lookup scope . graph
+lookupScope scope = Map.lookup scope . unScopeGraph
 
 -- Declare a declaration with a span and an associated scope in the scope graph.
 -- TODO: Return the whole value in Maybe or Either.
@@ -226,7 +226,7 @@ newScope :: Ord address => address -> Map EdgeLabel [address] -> ScopeGraph addr
 newScope address edges = insertScope address (Scope edges mempty mempty)
 
 insertScope :: Ord address => address -> Scope address -> ScopeGraph address -> ScopeGraph address
-insertScope address scope = ScopeGraph . Map.insert address scope . graph
+insertScope address scope = ScopeGraph . Map.insert address scope . unScopeGraph
 
 -- | Returns the scope of a reference in the scope graph.
 scopeOfRef :: Ord scope => Reference -> ScopeGraph scope -> Maybe scope
