@@ -256,7 +256,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval _ (Break _) = undefined -- Rval <$> (eval x >>= address >>= throwBreak)
+  eval eval (Break x) = eval x >>= throwBreak
 
 newtype Continue a = Continue { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
@@ -266,7 +266,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval _ (Continue _) = undefined -- Rval <$> (eval x >>= address >>= throwContinue)
+  eval eval (Continue x) = eval x >>= throwContinue
 
 newtype Retry a = Retry { value :: a }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
