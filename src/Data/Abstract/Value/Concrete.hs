@@ -38,9 +38,9 @@ data Value term address
   | String Text
   | Symbol Text
   | Regex Text
-  | Tuple [(Value term address)]
-  | Array [(Value term address)]
-  | Class Declaration [(Value term address)] address
+  | Tuple [Value term address]
+  | Array [Value term address]
+  | Class Declaration [Value term address] address
   | Object address
   | Namespace Name address
   | KVPair (Value term address) (Value term address)
@@ -350,7 +350,7 @@ data ValueError term address resume where
   BitwiseError           :: Value term address                       -> ValueError term address (Value term address)
   Bitwise2Error          :: Value term address -> Value term address -> ValueError term address (Value term address)
   KeyValueError          :: Value term address                       -> ValueError term address (Value term address, Value term address)
-  ArrayError             :: Value term address                       -> ValueError term address [(Value term address)]
+  ArrayError             :: Value term address                       -> ValueError term address [Value term address]
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
   ArithmeticError        :: ArithException                           -> ValueError term address (Value term address)
   -- Out-of-bounds error
