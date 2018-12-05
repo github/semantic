@@ -185,7 +185,7 @@ instance Evaluatable Class where
     span <- ask @Span
     currentScope' <- currentScope
 
-    let declaration = (Declaration name)
+    let declaration = Declaration name
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -239,7 +239,7 @@ instance Evaluatable Module where
     span <- ask @Span
     currentScope' <- currentScope
 
-    let declaration = (Declaration name)
+    let declaration = Declaration name
         moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
     maybeSlot <- maybeLookupDeclaration declaration
 
