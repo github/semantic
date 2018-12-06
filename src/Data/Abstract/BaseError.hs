@@ -24,7 +24,7 @@ instance (Show (exc resume)) => Show (BaseError exc resume) where
           endErrorCol    = show $ S.posColumn (S.spanEnd baseErrorSpan)
 
 instance (Eq1 exc) => Eq1 (BaseError exc) where
-  liftEq f (BaseError _ _ exc1) (BaseError _ _ exc2) = liftEq f exc1 exc2
+  liftEq f (BaseError info1 span1 exc1) (BaseError info2 span2 exc2) = info1 == info2 && span1 == span2 && liftEq f exc1 exc2
 
 instance Show1 exc => Show1 (BaseError exc) where
   liftShowsPrec sl sp d (BaseError info span exc) = showParen (d > 10) $ showString "BaseError" . showChar ' ' . showsPrec 11 info . showChar ' ' . showsPrec 11 span . showChar ' ' . liftShowsPrec sl sp 11 exc
