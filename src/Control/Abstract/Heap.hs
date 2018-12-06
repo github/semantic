@@ -337,7 +337,7 @@ insertFrameLink label linkMap = do
   let newCurrentFrame = currentFrame {
         Heap.links = Map.alter (\val -> val <> Just linkMap) label (Heap.links currentFrame)
       }
-  modify (\h -> h { Heap.heap = Map.insert frameAddress newCurrentFrame (Heap.heap h)})
+  modify (Heap.Heap . Map.insert frameAddress newCurrentFrame . Heap.unHeap)
 
 
 -- | Write a value to the given frame address in the 'Heap'.

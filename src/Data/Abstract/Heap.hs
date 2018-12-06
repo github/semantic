@@ -48,7 +48,7 @@ data Frame scopeAddress frameAddress value = Frame
   deriving (Eq, Ord, Show, Generic, NFData)
 
 -- | A map of frame addresses onto Frames.
-newtype Heap scopeAddress frameAddress value = Heap { heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
+newtype Heap scopeAddress frameAddress value = Heap { unHeap :: Map frameAddress (Frame scopeAddress frameAddress value) }
   deriving stock (Eq, Generic, Ord)
   deriving newtype (NFData)
 
@@ -58,7 +58,7 @@ instance Lower (Heap scopeAddress frameAddress value) where
 
 -- | Look up the frame for an 'address' in a 'Heap', if any.
 frameLookup :: Ord address => address -> Heap scope address value -> Maybe (Frame scope address value)
-frameLookup address = Map.lookup address . heap
+frameLookup address = Map.lookup address . unHeap
 
 -- | Look up the scope address for a given frame address.
 scopeLookup :: Ord address => address -> Heap scope address value -> Maybe scope
@@ -74,15 +74,15 @@ getSlot :: Ord address => Slot address -> Heap address address value -> Maybe (S
 getSlot Slot{..} = (IntMap.lookup (unPosition position) =<<) . frameSlots frameAddress
 
 setSlot :: Ord address => Slot address -> Set value -> Heap scope address value -> Heap scope address value
-setSlot Slot{..} value h@Heap{} = case frameLookup frameAddress h of
+setSlot Slot{..} value h@(Heap heap) = case frameLookup frameAddress h of
   Just frame -> let slotMap = slots frame in
-    h { heap = Map.insert frameAddress (frame { slots = IntMap.insert (unPosition position) value slotMap }) (heap h) }
+    Heap (Map.insert frameAddress (frame { slots = IntMap.insert (unPosition position) value slotMap }) heap)
   Nothing -> h
 
 deleteSlot :: Ord address => Slot address -> Heap scope address value -> Heap scope address value
-deleteSlot Slot{..} h@Heap{} = case frameLookup frameAddress h of
+deleteSlot Slot{..} h@(Heap heap) = case frameLookup frameAddress h of
   Just frame -> let slotMap = slots frame in
-    h { heap = Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) (heap h) }
+    Heap (Map.insert frameAddress (frame { slots = IntMap.delete (unPosition position) slotMap }) heap)
   Nothing -> h
 
 lookupDeclaration :: Ord address => Declaration -> (address, address) -> ScopeGraph address -> Heap address address value -> Maybe (Slot address)
@@ -92,7 +92,7 @@ lookupDeclaration Declaration{..} (currentScope, currentFrame) scopeGraph heap =
   pure (Slot frameAddress (pathPosition path))
 
 lookupFrameAddress :: (Ord address, Ord scope) => Path scope -> address -> Heap scope address value -> Maybe address
-lookupFrameAddress path currentFrame h@Heap{..} = go path currentFrame
+lookupFrameAddress path currentFrame h = go path currentFrame
   where
     go path address = case path of
       DPath _ _ -> pure address
@@ -111,7 +111,7 @@ initFrame :: (Ord address) => scope -> address -> Map EdgeLabel (Map scope addre
 initFrame scope address links slots = fillFrame address slots . newFrame scope address links
 
 insertFrame :: Ord address => address -> Frame scope address value -> Heap scope address value -> Heap scope address value
-insertFrame address frame h@Heap{..} = h { heap = Map.insert address frame heap }
+insertFrame address frame = Heap . Map.insert address frame . unHeap
 
 fillFrame :: Ord address => address -> IntMap (Set value) -> Heap scope address value -> Heap scope address value
 fillFrame address slots heap = case frameLookup address heap of
@@ -120,7 +120,7 @@ fillFrame address slots heap = case frameLookup address heap of
 
 -- | Look up the cell of values for an address in a 'Heap', if any.
 heapLookup :: (Ord address, Ord value) => address -> Heap address address value -> Maybe (Set value)
-heapLookup address = fmap (fold . IntMap.elems . slots) . Map.lookup address . heap
+heapLookup address = fmap (fold . IntMap.elems . slots) . Map.lookup address . unHeap
 
 -- | Look up the list of values stored for a given address, if any.
 heapLookupAll :: (Ord address, Ord value) => address -> Heap address address value -> Maybe [value]
@@ -128,18 +128,19 @@ heapLookupAll address = fmap toList . heapLookup address
 
 -- | The number of frames in the `Heap`.
 heapSize :: Heap scope address value -> Int
-heapSize = Map.size . heap
+heapSize = Map.size . unHeap
 
 -- | Restrict a 'Heap' to only those addresses in the given 'Live' set (in essence garbage collecting the rest).
 heapRestrict :: Ord address => Heap address address value -> Live address -> Heap address address value
 heapRestrict (Heap m) roots = Heap (Map.filterWithKey (\ address _ -> address `liveMember` roots) m)
 
 isHeapEmpty :: (Eq address, Eq value) => Heap scope address value -> Bool
-isHeapEmpty h@Heap{..} = heapSize h == 1 &&
-                         (toEmptyFrame <$> Map.elems heap) == [ Frame () mempty mempty ]
+isHeapEmpty h@(Heap heap)
+  =  heapSize h == 1
+  && (toEmptyFrame <$> Map.elems heap) == [ Frame () mempty mempty ]
   where
     toEmptyFrame Frame{..} = Frame () (Map.mapKeysMonotonic (const ()) <$> links) slots
 
 
 instance (Show address, Show value) => Show (Heap address address value) where
-  showsPrec d = showsUnaryWith showsPrec "Heap" d . Map.toList . heap
+  showsPrec d = showsUnaryWith showsPrec "Heap" d . Map.toList . unHeap
