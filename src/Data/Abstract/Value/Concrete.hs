@@ -50,10 +50,8 @@ data Value term address
   deriving (Eq, Ord, Show, Generic, NFData)
 
 
-instance Ord address => ValueRoots address (Value term address) where
-  valueRoots v
-    | Closure _ _ _ _ _ _ _ <- v = undefined -- Env.addresses env
-    | otherwise                = mempty
+instance ValueRoots address (Value term address) where
+  valueRoots _ = lowerBound
 
 
 instance ( FreeVariables term
