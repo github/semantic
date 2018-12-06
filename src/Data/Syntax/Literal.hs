@@ -255,7 +255,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Tuple where
-  eval _ (Tuple _) = undefined -- rvalBox =<< tuple =<< traverse (eval >=> address) cs
+  eval _ (Tuple _) = rvalBox =<< tuple =<< traverse (eval >=> Eval.value) cs
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
