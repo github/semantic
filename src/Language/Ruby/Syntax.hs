@@ -87,7 +87,7 @@ instance Evaluatable Send where
           func <- deref =<< lookupDeclaration (Declaration sel)
           args <- traverse (eval >=> Abstract.value) sendArgs
           call func (lhsValue : args) -- TODO pass through sendBlock
-    maybe callFunction (flip withScopeAndFrame callFunction) lhsFrame
+    maybe callFunction (`withScopeAndFrame` callFunction) lhsFrame
 
 instance Tokenize Send where
   tokenize Send{..} = within Scope.Call $ do
@@ -185,7 +185,7 @@ instance Evaluatable Class where
     span <- ask @Span
     currentScope' <- currentScope
 
-    let declaration = (Declaration name)
+    let declaration = Declaration name
     maybeSlot <- maybeLookupDeclaration declaration
 
     case maybeSlot of
@@ -206,8 +206,8 @@ instance Evaluatable Class where
             (Just scope, Just frame) -> Just (scope, frame)
             _                        -> Nothing
 
-        let superclassEdges = fmap (Superclass, ) . fmap (pure . fst) . catMaybes $ superScopes
-            current = fmap (Lexical, ) . pure . pure $ currentScope'
+        let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
+            current = (Lexical, ) <$> pure (pure currentScope')
             edges = Map.fromList (superclassEdges <> current)
         childScope <- newScope edges
         declare (Declaration name) span (Just childScope)
@@ -239,7 +239,7 @@ instance Evaluatable Module where
     span <- ask @Span
     currentScope' <- currentScope
 
-    let declaration = (Declaration name)
+    let declaration = Declaration name
         moduleBody = maybe (rvalBox unit) (runApp . foldMap1 (App . eval)) (nonEmpty moduleStatements)
     maybeSlot <- maybeLookupDeclaration declaration
 
