@@ -31,7 +31,6 @@ module Data.Abstract.ScopeGraph
 import           Control.Abstract.Hole
 import           Data.Abstract.Name
 import qualified Data.Map.Strict as Map
-import           Data.Monoid (Alt(..))
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import           Data.Span
@@ -143,14 +142,14 @@ lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeA
 lookupScopePath declaration currentAddress g = findPath (flip (lookupReference declaration) g) (Declaration declaration) currentAddress g
 
 findPath :: Ord scopeAddress => (scopeAddress -> Maybe (Path scopeAddress)) -> Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-findPath extra decl currentAddress g = snd <$> getAlt (foldGraph combine currentAddress g)
+findPath extra decl currentAddress g = snd <$> getFirst (foldGraph combine currentAddress g)
   where combine address path = fmap (address, )
-          $   Alt (pathToDeclaration decl address g)
-          <|> Alt (extra address)
-          <|> uncurry (EPath Superclass) <$> path Superclass
-          <|> uncurry (EPath Import)     <$> path Import
-          <|> uncurry (EPath Export)     <$> path Export
-          <|> uncurry (EPath Lexical)    <$> path Lexical
+          $  First (pathToDeclaration decl address g)
+          <> First (extra address)
+          <> (uncurry (EPath Superclass) <$> path Superclass)
+          <> (uncurry (EPath Import)     <$> path Import)
+          <> (uncurry (EPath Export)     <$> path Export)
+          <> (uncurry (EPath Lexical)    <$> path Lexical)
 
 foldGraph :: (Ord scopeAddress, Monoid a) => (scopeAddress -> (EdgeLabel -> a) -> a) -> scopeAddress -> ScopeGraph scopeAddress -> a
 foldGraph combine address graph = go lowerBound address
