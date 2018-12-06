@@ -31,7 +31,6 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
-    -- TODO: Should we declare the name of the function within `function`?
     span <- ask @Span
     currentScope' <- currentScope
     let lexicalEdges = Map.singleton Lexical [ currentScope' ]
@@ -91,7 +90,6 @@ instance Diffable Method where
 instance Evaluatable Method where
   eval _ Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
-    -- TODO: Should we declare the name of the function within `function`?
     span <- ask @Span
     currentScope' <- currentScope
     let lexicalEdges = Map.singleton Lexical [ currentScope' ]
