@@ -132,36 +132,33 @@ reference ref decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  go lowerBound currentScope' currentAddress id
-  where
-    go visited currentScope address path
-      | address `Set.member` visited = Nothing
-      | otherwise
-        =   flip (insertScope currentAddress) g . flip (insertReference ref) currentScope . path <$> pathToDeclaration decl address g
-        <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go (Set.insert address visited) currentScope) edge
+  flip (insertScope currentAddress) g . flip (insertReference ref) currentScope' . snd <$> foldrGraph combine currentAddress g
+  where combine address path = fmap (address, )
+          $   pathToDeclaration decl address g
+          <|> uncurry (EPath Superclass) <$> path Superclass
+          <|> uncurry (EPath Import)     <$> path Import
+          <|> uncurry (EPath Export)     <$> path Export
+          <|> uncurry (EPath Lexical)    <$> path Lexical
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl currentAddress g scope = go lowerBound currentAddress (EPath Import currentAddress)
-  where
-    go visited address path
-      | address `Set.member` visited = Nothing
-      | otherwise
-        =   flip (insertReference ref) scope . path <$> pathToDeclaration decl address g
-        <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go (Set.insert address visited)) edge
+insertImportReference ref decl currentAddress g scope = flip (insertReference ref) scope . EPath Import currentAddress . snd <$> foldrGraph combine currentAddress g
+  where combine address path = fmap (address, )
+          $   pathToDeclaration decl address g
+          <|> uncurry (EPath Superclass) <$> path Superclass
+          <|> uncurry (EPath Import)     <$> path Import
+          <|> uncurry (EPath Export)     <$> path Export
+          <|> uncurry (EPath Lexical)    <$> path Lexical
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupScopePath declaration currentAddress g = go lowerBound currentAddress id
-  where
-    go visited address path
-      | address `Set.member` visited = Nothing
-      | otherwise
-        =   path <$> pathToDeclaration (Declaration declaration) address g
-        <|> path <$> lookupReference declaration address g
-        <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Export <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go (Set.insert address visited)) edge
+lookupScopePath declaration currentAddress g = snd <$> foldrGraph combine currentAddress g
+  where combine address path = fmap (address, )
+          $   pathToDeclaration (Declaration declaration) address g
+          <|> lookupReference declaration address g
+          <|> uncurry (EPath Superclass) <$> path Superclass
+          <|> uncurry (EPath Import)     <$> path Import
+          <|> uncurry (EPath Export)     <$> path Export
+          <|> uncurry (EPath Lexical)    <$> path Lexical
 
 foldrGraph :: Ord scopeAddress => (scopeAddress -> (EdgeLabel -> Maybe a) -> Maybe a) -> scopeAddress -> ScopeGraph scopeAddress -> Maybe a
 foldrGraph combine address graph = go lowerBound address
@@ -177,10 +174,6 @@ pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDec
 
 insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
 insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
-
-traverseEdges :: Foldable t => (Path scopeAddress -> Path scopeAddress) -> (scopeAddress -> (Path scopeAddress -> Path scopeAddress) -> Maybe a) -> EdgeLabel -> t scopeAddress -> Maybe a
--- Return the first path to the declaration through the scopes.
-traverseEdges path go edge = getFirst . foldMap (First . (go <*> fmap path . EPath edge))
 
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe ((Declaration, (Span, Maybe scopeAddress)), Position)
 lookupDeclaration declaration scope g = do
