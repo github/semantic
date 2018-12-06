@@ -31,6 +31,7 @@ module Data.Abstract.ScopeGraph
 import           Control.Abstract.Hole
 import           Data.Abstract.Name
 import qualified Data.Map.Strict as Map
+import           Data.Monoid (Alt(..))
 import qualified Data.Sequence as Seq
 import qualified Data.Set as Set
 import           Data.Span
@@ -142,23 +143,23 @@ lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeA
 lookupScopePath declaration currentAddress g = findPath (flip (lookupReference declaration) g) (Declaration declaration) currentAddress g
 
 findPath :: Ord scopeAddress => (scopeAddress -> Maybe (Path scopeAddress)) -> Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-findPath extra decl currentAddress g = snd <$> foldrGraph combine currentAddress g
+findPath extra decl currentAddress g = snd <$> getAlt (foldGraph combine currentAddress g)
   where combine address path = fmap (address, )
-          $   pathToDeclaration decl address g
-          <|> extra address
+          $   Alt (pathToDeclaration decl address g)
+          <|> Alt (extra address)
           <|> uncurry (EPath Superclass) <$> path Superclass
           <|> uncurry (EPath Import)     <$> path Import
           <|> uncurry (EPath Export)     <$> path Export
           <|> uncurry (EPath Lexical)    <$> path Lexical
 
-foldrGraph :: Ord scopeAddress => (scopeAddress -> (EdgeLabel -> Maybe a) -> Maybe a) -> scopeAddress -> ScopeGraph scopeAddress -> Maybe a
-foldrGraph combine address graph = go lowerBound address
+foldGraph :: (Ord scopeAddress, Monoid a) => (scopeAddress -> (EdgeLabel -> a) -> a) -> scopeAddress -> ScopeGraph scopeAddress -> a
+foldGraph combine address graph = go lowerBound address
   where go visited address
-          | address `Set.member` visited = Nothing
-          | otherwise                    = do
-            edges <- linksOfScope address graph
-            let visited' = Set.insert address visited
-            combine address (flip Map.lookup edges >=> foldMapA (go visited'))
+          | address `Set.notMember` visited
+          , Just edges <- linksOfScope address graph = combine address (recur edges)
+          | otherwise                                = mempty
+          where visited' = Set.insert address visited
+                recur edges edge = maybe mempty (foldMap (go visited')) (Map.lookup edge edges)
 
 pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
