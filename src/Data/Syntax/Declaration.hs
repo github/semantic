@@ -32,10 +32,7 @@ instance Evaluatable Function where
   eval _ Function{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName functionName)
     span <- ask @Span
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    associatedScope <- newScope lexicalEdges
-    declare (Declaration name) span (Just associatedScope)
+    associatedScope <- declareFunction name span
 
     params <- withScope associatedScope . for functionParameters $ \paramNode -> do
       param <- maybeM (throwEvalError NoNameError) (declaredName paramNode)
@@ -91,10 +88,7 @@ instance Evaluatable Method where
   eval _ Method{..} = do
     name <- maybeM (throwEvalError NoNameError) (declaredName methodName)
     span <- ask @Span
-    currentScope' <- currentScope
-    let lexicalEdges = Map.singleton Lexical [ currentScope' ]
-    associatedScope <- newScope lexicalEdges
-    declare (Declaration name) span (Just associatedScope)
+    associatedScope <- declareFunction name span
 
     params <- withScope associatedScope $ do
       let self = Name.name "__self"
