@@ -11,7 +11,7 @@ import qualified Data.Map.Strict as Map
 import           Diffing.Algorithm
 import           Prologue
 import           Proto3.Suite.Class
-import           Reprinting.Tokenize
+import           Reprinting.Tokenize hiding (Superclass)
 import Data.Span (emptySpan)
 import Data.Abstract.Name as Name
 

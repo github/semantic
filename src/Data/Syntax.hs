@@ -11,6 +11,7 @@ import Data.Location
 import qualified Data.Set as Set
 import Data.Sum
 import Data.Term
+import qualified Data.Reprinting.Token as Token
 import GHC.Types (Constraint)
 import GHC.TypeLits
 import Diffing.Algorithm
@@ -169,7 +170,7 @@ instance Evaluatable Identifier where
     LvalMember <$> lookupDeclaration (Declaration name)
 
 instance Tokenize Identifier where
-  tokenize = yield . Run . formatName . Data.Syntax.name
+  tokenize = yield . Token.Run . formatName . Data.Syntax.name
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
@@ -293,7 +294,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Declarations1, Eq, Foldable, FreeVariables1, Functor, Generic1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
+  deriving (Eq, Foldable, FreeVariables1, Functor, Generic1, Message1, Named1, Ord, Show, ToJSONFields1, Traversable, NFData1)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
@@ -311,3 +312,6 @@ instance Evaluatable Context where
 
 instance Tokenize Context where
   tokenize Context{..} = sequenceA_ (sepTrailing contextTerms) *> contextSubject
+
+instance Declarations1 Context where
+  liftDeclaredName declaredName = declaredName . contextSubject
