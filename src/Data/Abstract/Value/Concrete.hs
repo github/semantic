@@ -92,7 +92,7 @@ instance ( FreeVariables term
       packageInfo <- currentPackage
       moduleInfo <- currentModule
 
-      currentFrame' <- currentFrame @(Value term address)
+      currentFrame' <- currentFrame
       let closure = Closure packageInfo moduleInfo Nothing [] (Left builtIn) associatedScope currentFrame'
       Evaluator $ runFunctionC (k closure) eval
     Abstract.Call op params k -> runEvaluator $ do
