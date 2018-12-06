@@ -10,6 +10,7 @@ module Control.Abstract.ScopeGraph
   , ScopeError(..)
   , Reference(..)
   , EdgeLabel(..)
+  , CurrentScope(..)
   , currentScope
   , insertExportEdge
   , insertImportEdge
@@ -125,6 +126,8 @@ newScope edges = do
   name <- gensym
   address <- alloc name
   address <$ modify (ScopeGraph.newScope address edges)
+
+newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
 
 currentScope :: forall address sig term value m. ( Member (Reader (address, address)) sig
                 , Carrier sig m
