@@ -66,12 +66,12 @@ newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) 
 instance Ord scope => Lower (ScopeGraph scope) where
   lowerBound = ScopeGraph mempty
 
-data Path scope where
+data Path scope
+  = Hole
   -- | Construct a direct path to a declaration.
-  Hole :: Path scope
-  DPath :: Declaration -> Position -> Path scope
+  | DPath Declaration Position
   -- | Construct an edge from a scope to another declaration path.
-  EPath :: EdgeLabel -> scope -> Path scope -> Path scope
+  | EPath EdgeLabel scope (Path scope)
 
 instance AbstractHole (Path scope) where
   hole = Hole
