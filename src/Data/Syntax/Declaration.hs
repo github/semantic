@@ -46,6 +46,23 @@ instance Evaluatable Function where
     v <- function name params functionBody associatedScope
     v <$ (value v >>= assign addr)
 
+declareFunction :: ( Carrier sig m
+                   , Member (State (ScopeGraph address)) sig
+                   , Member (Allocator address) sig
+                   , Member (Reader (address, address)) sig
+                   , Member Fresh sig
+                   , Ord address
+                   )
+                => Name
+                -> Span
+                -> Evaluator term address value m address
+declareFunction name span = do
+  currentScope' <- currentScope
+  let lexicalEdges = Map.singleton Lexical [ currentScope' ]
+  associatedScope <- newScope lexicalEdges
+  declare (Declaration name) span (Just associatedScope)
+  pure associatedScope
+
 instance Tokenize Function where
   tokenize Function{..} = within' Scope.Function $ do
     functionName
