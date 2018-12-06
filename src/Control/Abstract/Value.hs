@@ -30,7 +30,7 @@ module Control.Abstract.Value
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Abstract.ScopeGraph (Allocator, Declaration, ScopeGraph)
+import Control.Abstract.ScopeGraph (Allocator, CurrentScope, Declaration, ScopeGraph)
 import Control.Effect.Carrier
 import Data.Abstract.BaseError
 import Data.Abstract.Module
@@ -161,7 +161,8 @@ forLoop :: ( Carrier sig m
            , Member (Resumable (BaseError (HeapError address))) sig
            , Member (State (Heap address address value)) sig
            , Member (State (ScopeGraph address)) sig
-           , Member (Reader (address, address)) sig
+           , Member (Reader (CurrentFrame address)) sig
+           , Member (Reader (CurrentScope address)) sig
            , Member (While address value) sig
            , Member Fresh sig
            , Ord address

@@ -59,7 +59,8 @@ include :: ( AbstractValue term address value m
            , Carrier sig m
            , Member (Deref value) sig
            , Member (Modules address value) sig
-           , Member (Reader (address, address)) sig
+           , Member (Reader (CurrentFrame address)) sig
+           , Member (Reader (CurrentScope address)) sig
            , Member (Reader ModuleInfo) sig
            , Member (Reader Span) sig
            , Member (Resumable (BaseError (AddressError address value))) sig

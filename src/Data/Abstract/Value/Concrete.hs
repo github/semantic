@@ -58,12 +58,13 @@ instance ( FreeVariables term
          , Member (Allocator address) sig
          , Member (Deref (Value term address)) sig
          , Member Fresh sig
+         , Member (Reader (CurrentFrame address)) sig
+         , Member (Reader (CurrentScope address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
-         , Member (Reader (address, address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
          , Member (Resumable (BaseError (EvalError address (Value term address)))) sig
          , Member (Resumable (BaseError (ValueError term address))) sig
@@ -92,7 +93,7 @@ instance ( FreeVariables term
       packageInfo <- currentPackage
       moduleInfo <- currentModule
 
-      currentFrame' <- currentFrame @(Value term address)
+      currentFrame' <- currentFrame
       let closure = Closure packageInfo moduleInfo Nothing [] (Left builtIn) associatedScope currentFrame'
       Evaluator $ runFunctionC (k closure) eval
     Abstract.Call op params k -> runEvaluator $ do
