@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, GADTs, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, TupleSections #-}
 module Data.Abstract.ScopeGraph
   ( Slot(..)
   , associatedScope
@@ -61,32 +61,21 @@ newtype Position = Position { unPosition :: Int }
   deriving (Eq, Show, Ord, Generic, NFData)
 
 newtype ScopeGraph scope = ScopeGraph { unScopeGraph :: Map scope (Scope scope) }
+  deriving (Eq, Generic, NFData, Ord, Show)
 
 instance Ord scope => Lower (ScopeGraph scope) where
   lowerBound = ScopeGraph mempty
 
-deriving instance Eq address => Eq (ScopeGraph address)
-deriving instance Show address => Show (ScopeGraph address)
-deriving instance Ord address => Ord (ScopeGraph address)
-deriving instance Generic (ScopeGraph address)
-deriving instance NFData scope => NFData (ScopeGraph scope)
-
-data Path scope where
+data Path scope
+  = Hole
   -- | Construct a direct path to a declaration.
-  Hole :: Path scope
-  DPath :: Declaration -> Position -> Path scope
+  | DPath Declaration Position
   -- | Construct an edge from a scope to another declaration path.
-  EPath :: EdgeLabel -> scope -> Path scope -> Path scope
+  | EPath EdgeLabel scope (Path scope)
+  deriving (Eq, Functor, Generic, NFData, Ord, Show)
 
 instance AbstractHole (Path scope) where
   hole = Hole
-
-deriving instance Eq scope => Eq (Path scope)
-deriving instance Show scope => Show (Path scope)
-deriving instance Ord scope => Ord (Path scope)
-deriving instance Generic (Path scope)
-deriving instance NFData scope => NFData (Path scope)
-deriving instance Functor Path
 
 -- Returns the declaration of a path.
 pathDeclaration :: Path scope -> Declaration
@@ -143,40 +132,39 @@ reference ref decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  go currentScope' currentAddress id
-  where
-    go currentScope address path
-      =   flip (insertScope currentAddress) g . flip (insertReference ref) currentScope . path <$> pathToDeclaration decl address g
-      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
+  flip (insertScope currentAddress) g . flip (insertReference ref) currentScope' <$> findPath (const Nothing) decl currentAddress g
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl currentAddress g scope = go currentAddress (EPath Import currentAddress)
-  where
-    go address path
-      =   flip (insertReference ref) scope . path <$> pathToDeclaration decl address g
-      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
+insertImportReference ref decl currentAddress g scope = flip (insertReference ref) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupScopePath declaration currentAddress g = go currentAddress id
-  where
-    go address path
-      =   path <$> pathToDeclaration (Declaration declaration) address g
-      <|> path <$> lookupReference declaration address g
-      <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
-      where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
+lookupScopePath declaration currentAddress g = findPath (flip (lookupReference declaration) g) (Declaration declaration) currentAddress g
+
+findPath :: Ord scopeAddress => (scopeAddress -> Maybe (Path scopeAddress)) -> Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+findPath extra decl currentAddress g = snd <$> getFirst (foldGraph combine currentAddress g)
+  where combine address path = fmap (address, )
+          $  First (pathToDeclaration decl address g)
+          <> First (extra address)
+          <> (uncurry (EPath Superclass) <$> path Superclass)
+          <> (uncurry (EPath Import)     <$> path Import)
+          <> (uncurry (EPath Export)     <$> path Export)
+          <> (uncurry (EPath Lexical)    <$> path Lexical)
+
+foldGraph :: (Ord scopeAddress, Monoid a) => (scopeAddress -> (EdgeLabel -> a) -> a) -> scopeAddress -> ScopeGraph scopeAddress -> a
+foldGraph combine address graph = go lowerBound address
+  where go visited address
+          | address `Set.notMember` visited
+          , Just edges <- linksOfScope address graph = combine address (recur edges)
+          | otherwise                                = mempty
+          where visited' = Set.insert address visited
+                recur edges edge = maybe mempty (foldMap (go visited')) (Map.lookup edge edges)
 
 pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
 
 insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
 insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
-
-traverseEdges :: Foldable t => (Path scopeAddress -> Path scopeAddress) -> (scopeAddress -> (Path scopeAddress -> Path scopeAddress) -> Maybe a) -> EdgeLabel -> t scopeAddress -> Maybe a
--- Return the first path to the declaration through the scopes.
-traverseEdges path go edge = getFirst . foldMap (First . (go <*> fmap path . EPath edge))
 
 lookupDeclaration :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe ((Declaration, (Span, Maybe scopeAddress)), Position)
 lookupDeclaration declaration scope g = do
