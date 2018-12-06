@@ -19,9 +19,10 @@ import Prologue
 
 defineBuiltIn :: ( HasCallStack
                  , Member (Deref value) sig
+                 , Member (Reader (CurrentFrame address)) sig
+                 , Member (Reader (CurrentScope address)) sig
                  , Member (Reader ModuleInfo) sig
                  , Member (Reader Span) sig
-                 , Member (Reader (address, address)) sig
                  , Member (State (Heap address address value)) sig
                  , Member (State (ScopeGraph address)) sig
                  , Member (Resumable (BaseError (ScopeError address))) sig
@@ -58,11 +59,12 @@ defineClass :: ( AbstractValue term address value m
                , Member (Reader ModuleInfo) sig
                , Member (Reader Span) sig
                , Member Fresh sig
+               , Member (Reader (CurrentFrame address)) sig
+               , Member (Reader (CurrentScope address)) sig
                , Member (Resumable (BaseError (HeapError address))) sig
                , Member (Resumable (BaseError (ScopeError address))) sig
                , Member (State (Heap address address value)) sig
                , Member (State (ScopeGraph address)) sig
-               , Member (Reader (address, address)) sig
                , Ord address
                )
             => Declaration
@@ -90,6 +92,8 @@ defineNamespace :: ( AbstractValue term address value m
                    , HasCallStack
                    , Member (Allocator address) sig
                    , Member (Deref value) sig
+                   , Member (Reader (CurrentFrame address)) sig
+                   , Member (Reader (CurrentScope address)) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
                    , Member (Resumable (BaseError (HeapError address))) sig
@@ -97,7 +101,6 @@ defineNamespace :: ( AbstractValue term address value m
                    , Member (Resumable (BaseError (ScopeError address))) sig
                    , Member (State (Heap address address value)) sig
                    , Member (State (ScopeGraph address)) sig
-                   , Member (Reader (address, address)) sig
                    , Ord address
                    )
                 => Declaration

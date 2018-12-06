@@ -52,7 +52,7 @@ lookup ref = ScopeGraph.scopeOfRef ref <$> get
 
 declare :: ( Carrier sig m
            , Member (State (ScopeGraph address)) sig
-           , Member (Reader (address, address)) sig
+           , Member (Reader (CurrentScope address)) sig
            , Ord address
            )
         => Declaration
@@ -63,7 +63,7 @@ declare decl span scope = do
   currentAddress <- currentScope
   modify (fst . ScopeGraph.declare decl span scope currentAddress)
 
-putDeclarationScope :: (Ord address, Member (Reader (address, address)) sig, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
+putDeclarationScope :: (Ord address, Member (Reader (CurrentScope address)) sig, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> address -> Evaluator term address value m ()
 putDeclarationScope decl assocScope = do
   currentAddress <- currentScope
   modify (ScopeGraph.insertDeclarationScope decl assocScope currentAddress)
@@ -74,8 +74,9 @@ putDeclarationSpan decl = modify @(ScopeGraph address) . ScopeGraph.insertDeclar
 reference :: forall address sig m term value
           . ( Ord address
             , Member (State (ScopeGraph address)) sig
-            , Member (Reader (address, address)) sig
-            , Carrier sig m)
+            , Member (Reader (CurrentScope address)) sig
+            , Carrier sig m
+            )
           => Reference
           -> Declaration
           -> Evaluator term address value m ()
@@ -84,25 +85,25 @@ reference ref decl = do
   modify @(ScopeGraph address) (ScopeGraph.reference ref decl currentAddress)
 
 -- | Combinator to insert an export edge from the current scope to the provided scope address.
-insertExportEdge :: (Member (Reader (scopeAddress, scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
+insertExportEdge :: (Member (Reader (CurrentScope scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                  => scopeAddress
                  -> Evaluator term scopeAddress value m ()
 insertExportEdge = insertEdge ScopeGraph.Export
 
 -- | Combinator to insert an import edge from the current scope to the provided scope address.
-insertImportEdge :: (Member (Reader (scopeAddress, scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
+insertImportEdge :: (Member (Reader (CurrentScope scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                  => scopeAddress
                  -> Evaluator term scopeAddress value m ()
 insertImportEdge = insertEdge ScopeGraph.Import
 
 -- | Combinator to insert a lexical edge from the current scope to the provided scope address.
-insertLexicalEdge :: (Member (Reader (scopeAddress, scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
+insertLexicalEdge :: (Member (Reader (CurrentScope scopeAddress)) sig, Member (State (ScopeGraph scopeAddress)) sig, Carrier sig m, Ord scopeAddress)
                   => scopeAddress
                   -> Evaluator term scopeAddress value m ()
 insertLexicalEdge = insertEdge ScopeGraph.Lexical
 
 insertEdge :: ( Member (State (ScopeGraph address)) sig
-              , Member (Reader (address, address)) sig
+              , Member (Reader (CurrentScope address)) sig
               , Carrier sig m
               , Ord address)
            => EdgeLabel
@@ -129,11 +130,11 @@ newScope edges = do
 
 newtype CurrentScope address = CurrentScope { unCurrentScope :: address }
 
-currentScope :: forall address sig term value m. ( Member (Reader (address, address)) sig
-                , Carrier sig m
+currentScope :: ( Carrier sig m
+                , Member (Reader (CurrentScope address)) sig
                 )
              => Evaluator term address value m address
-currentScope = asks @(address, address) fst
+currentScope = asks unCurrentScope
 
 lookupScope :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader ModuleInfo) sig
@@ -150,7 +151,7 @@ insertImportReference :: ( Member (Resumable (BaseError (ScopeError address))) s
                         , Member (Reader ModuleInfo) sig
                         , Member (Reader Span) sig
                         , Member (State (ScopeGraph address)) sig
-                        , Member (Reader (address, address)) sig
+                        , Member (Reader (CurrentScope address)) sig
                         , Carrier sig m
                         , Ord address
                         )
@@ -176,7 +177,7 @@ insertScope scopeAddress scope = modify (ScopeGraph.insertScope scopeAddress sco
 
 maybeLookupScopePath ::
                 ( Member (State (ScopeGraph address)) sig
-                , Member (Reader (address, address)) sig
+                , Member (Reader (CurrentScope address)) sig
                 , Carrier sig m
                 , Ord address
                 )
@@ -190,7 +191,7 @@ lookupScopePath :: ( Member (Resumable (BaseError (ScopeError address))) sig
                 , Member (Reader ModuleInfo) sig
                 , Member (Reader Span) sig
                 , Member (State (ScopeGraph address)) sig
-                , Member (Reader (address, address)) sig
+                , Member (Reader (CurrentScope address)) sig
                 , Carrier sig m
                 , Ord address
                 )
@@ -205,7 +206,7 @@ lookupDeclarationScope :: ( Member (Resumable (BaseError (ScopeError address))) 
                 , Member (Reader ModuleInfo) sig
                 , Member (Reader Span) sig
                 , Member (State (ScopeGraph address)) sig
-                , Member (Reader (address, address)) sig
+                , Member (Reader (CurrentScope address)) sig
                 , Carrier sig m
                 , Ord address
                 ) => Declaration -> Evaluator term address value m address
@@ -217,13 +218,13 @@ lookupDeclarationScope decl = do
 associatedScope :: (Ord address, Member (State (ScopeGraph address)) sig, Carrier sig m) => Declaration -> Evaluator term address value m (Maybe address)
 associatedScope decl = ScopeGraph.associatedScope decl <$> get
 
-withScope :: forall sig m address term value a. ( Carrier sig m
-             , Member (Reader (address, address)) sig
+withScope :: ( Carrier sig m
+             , Member (Reader (CurrentScope address)) sig
              )
           => address
           -> Evaluator term address value m a
           -> Evaluator term address value m a
-withScope scope = local @(address, address) (first (const scope))
+withScope scope = local (const (CurrentScope scope))
 
 throwScopeError :: ( Member (Resumable (BaseError (ScopeError address))) sig
                    , Member (Reader ModuleInfo) sig

@@ -58,12 +58,13 @@ instance ( FreeVariables term
          , Member (Allocator address) sig
          , Member (Deref (Value term address)) sig
          , Member Fresh sig
+         , Member (Reader (CurrentFrame address)) sig
+         , Member (Reader (CurrentScope address)) sig
          , Member (Reader ModuleInfo) sig
          , Member (Reader PackageInfo) sig
          , Member (Reader Span) sig
          , Member (State Span) sig
          , Member (State (ScopeGraph address)) sig
-         , Member (Reader (address, address)) sig
          , Member (Resumable (BaseError (AddressError address (Value term address)))) sig
          , Member (Resumable (BaseError (EvalError address (Value term address)))) sig
          , Member (Resumable (BaseError (ValueError term address))) sig

@@ -67,7 +67,8 @@ withScopeAndFrame :: ( Ord address
                      , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
                      , Member (Resumable (BaseError (HeapError address))) sig
-                     , Member (Reader (address, address)) sig
+                     , Member (Reader (CurrentFrame address)) sig
+                     , Member (Reader (CurrentScope address)) sig
                      , Member (State (Heap address address value)) sig
                      , Carrier sig m
                      )
@@ -85,7 +86,8 @@ withLexicalScopeAndFrame :: ( Ord address
                             , Member (Resumable (BaseError (HeapError address))) sig
                             , Member (State (Heap address address value)) sig
                             , Member (State (ScopeGraph address)) sig
-                            , Member (Reader (address, address)) sig
+                            , Member (Reader (CurrentFrame address)) sig
+                            , Member (Reader (CurrentScope address)) sig
                             , Member (Allocator address) sig
                             , Member Fresh sig
                             , Carrier sig m
@@ -127,16 +129,11 @@ newtype CurrentFrame address = CurrentFrame { unCurrentFrame :: address }
 
 -- | Retrieve the heap.
 currentFrame :: ( Carrier sig m
-                , Member (Reader (address, address)) sig
+                , Member (Reader (CurrentFrame address)) sig
                 )
              => Evaluator term address value m address
-currentFrame = snd <$> currentScopeAndFrame
+currentFrame = asks unCurrentFrame
 
-currentScopeAndFrame :: ( Carrier sig m
-                        , Member (Reader (address, address)) sig
-                        )
-                     => Evaluator term address value m (address, address)
-currentScopeAndFrame = ask
 
 -- | Inserts a new frame into the heap with the given scope and links.
 newFrame :: ( Carrier sig m
@@ -155,21 +152,21 @@ newFrame scope links = do
   pure address
 
 -- | Evaluates the action within the frame of the given frame address.
-withFrame :: forall term address value sig m a. (
-             Member (Reader (address, address)) sig
-           , Carrier sig m
-           )
+withFrame :: ( Carrier sig m
+             , Member (Reader (CurrentFrame address)) sig
+             )
           => address
           -> Evaluator term address value m a -- Not sure about this `sig` here (substituting `sig` for `effects`)
           -> Evaluator term address value m a
-withFrame address = local @(address, address) (second (const address))
+withFrame address = local (const (CurrentFrame address))
 
 -- | Define a declaration and assign the value of an action in the current frame.
 define :: ( HasCallStack
           , Member (Deref value) sig
           , Member (Reader ModuleInfo) sig
           , Member (Reader Span) sig
-          , Member (Reader (address, address)) sig
+          , Member (Reader (CurrentFrame address)) sig
+          , Member (Reader (CurrentScope address)) sig
           , Member (State (Heap address address value)) sig
           , Member (State (ScopeGraph address)) sig
           , Member (Resumable (BaseError (ScopeError address))) sig
@@ -191,7 +188,8 @@ define declaration def = withCurrentCallStack callStack $ do
 withChildFrame :: ( Member (Allocator address) sig
                   , Member (State (Heap address address value)) sig
                   , Member (State (ScopeGraph address)) sig
-                  , Member (Reader (address, address)) sig
+                  , Member (Reader (CurrentFrame address)) sig
+                  , Member (Reader (CurrentScope address)) sig
                   , Member Fresh sig
                   , Member (Reader ModuleInfo) sig
                   , Member (Reader Span) sig
@@ -238,7 +236,8 @@ putSlotDeclarationScope Slot{..} assocScope = do
 
 
 maybeLookupDeclaration :: ( Carrier sig m
-                          , Member (Reader (address, address)) sig
+                          , Member (Reader (CurrentFrame address)) sig
+                          , Member (Reader (CurrentScope address)) sig
                           , Member (Reader ModuleInfo) sig
                           , Member (Reader Span) sig
                           , Member (Resumable (BaseError (HeapError address))) sig
@@ -257,7 +256,8 @@ maybeLookupDeclaration decl = do
     Nothing -> pure Nothing
 
 lookupDeclaration :: ( Carrier sig m
-                     , Member (Reader (address, address)) sig
+                     , Member (Reader (CurrentFrame address)) sig
+                     , Member (Reader (CurrentScope address)) sig
                      , Member (Reader ModuleInfo) sig
                      , Member (Reader Span) sig
                      , Member (Resumable (BaseError (HeapError address))) sig
@@ -275,11 +275,12 @@ lookupDeclaration decl = do
 
 lookupDeclarationFrame :: ( Member (State (Heap address address value)) sig
                           , Member (State (ScopeGraph address)) sig
-                          , Member (Reader (address, address)) sig
-                          , Member (Resumable (BaseError (ScopeError address))) sig
-                          , Member (Resumable (BaseError (HeapError address))) sig
+                          , Member (Reader (CurrentFrame address)) sig
+                          , Member (Reader (CurrentScope address)) sig
                           , Member (Reader ModuleInfo) sig
                           , Member (Reader Span) sig
+                          , Member (Resumable (BaseError (ScopeError address))) sig
+                          , Member (Resumable (BaseError (HeapError address))) sig
                           , Ord address
                           , Carrier sig m
                           )
@@ -291,7 +292,7 @@ lookupDeclarationFrame decl = do
 
 -- | Follow a path through the heap and return the frame address associated with the declaration.
 lookupFrameAddress :: ( Member (State (Heap address address value)) sig
-                      , Member (Reader (address, address)) sig
+                      , Member (Reader (CurrentFrame address)) sig
                       , Member (Reader ModuleInfo) sig
                       , Member (Reader Span) sig
                       , Member (Resumable (BaseError (HeapError address))) sig
@@ -325,7 +326,7 @@ frameLinks address = maybeM (throwHeapError (LookupLinksError address)) . Heap.f
 
 
 insertFrameLink :: ( Carrier sig m
-                   , Member (Reader (address, address)) sig
+                   , Member (Reader (CurrentFrame address)) sig
                    , Member (Reader ModuleInfo) sig
                    , Member (Reader Span) sig
                    , Member (Resumable (BaseError (HeapError address))) sig
