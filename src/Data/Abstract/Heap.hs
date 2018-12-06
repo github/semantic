@@ -94,8 +94,7 @@ lookupDeclaration Declaration{..} (currentScope, currentFrame) scopeGraph heap =
   pure (Slot frameAddress (pathPosition path))
 
 lookupFrameAddress :: (Ord address, Ord scope) => Path scope -> address -> Heap scope address value -> Maybe address
-lookupFrameAddress path currentFrame h@Heap{..} = do
-  go path currentFrame
+lookupFrameAddress path currentFrame h@Heap{..} = go path currentFrame
   where
     go path address = case path of
       DPath _ _ -> pure address
