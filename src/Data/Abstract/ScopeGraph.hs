@@ -132,33 +132,14 @@ reference ref decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
-  flip (insertScope currentAddress) g . flip (insertReference ref) currentScope' . snd <$> foldrGraph combine currentAddress g
-  where combine address path = fmap (address, )
-          $   pathToDeclaration decl address g
-          <|> uncurry (EPath Superclass) <$> path Superclass
-          <|> uncurry (EPath Import)     <$> path Import
-          <|> uncurry (EPath Export)     <$> path Export
-          <|> uncurry (EPath Lexical)    <$> path Lexical
+  flip (insertScope currentAddress) g . flip (insertReference ref) currentScope' <$> findPath (const Nothing) decl currentAddress g
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl currentAddress g scope = flip (insertReference ref) scope . EPath Import currentAddress . snd <$> foldrGraph combine currentAddress g
-  where combine address path = fmap (address, )
-          $   pathToDeclaration decl address g
-          <|> uncurry (EPath Superclass) <$> path Superclass
-          <|> uncurry (EPath Import)     <$> path Import
-          <|> uncurry (EPath Export)     <$> path Export
-          <|> uncurry (EPath Lexical)    <$> path Lexical
+insertImportReference ref decl currentAddress g scope = flip (insertReference ref) scope . EPath Import currentAddress <$> findPath (const Nothing) decl currentAddress g
 
 lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
-lookupScopePath declaration currentAddress g = snd <$> foldrGraph combine currentAddress g
-  where combine address path = fmap (address, )
-          $   pathToDeclaration (Declaration declaration) address g
-          <|> lookupReference declaration address g
-          <|> uncurry (EPath Superclass) <$> path Superclass
-          <|> uncurry (EPath Import)     <$> path Import
-          <|> uncurry (EPath Export)     <$> path Export
-          <|> uncurry (EPath Lexical)    <$> path Lexical
+lookupScopePath declaration currentAddress g = findPath (flip (lookupReference declaration) g) (Declaration declaration) currentAddress g
 
 findPath :: Ord scopeAddress => (scopeAddress -> Maybe (Path scopeAddress)) -> Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
 findPath extra decl currentAddress g = snd <$> foldrGraph combine currentAddress g
