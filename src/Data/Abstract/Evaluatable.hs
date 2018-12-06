@@ -57,7 +57,8 @@ class (Show1 constr, Foldable constr) => Evaluatable constr where
           , Member (Reader PackageInfo) sig
           , Member (Reader Span) sig
           , Member (State Span) sig
-          , Member (Reader (address, address)) sig
+          , Member (Reader (CurrentFrame address)) sig
+          , Member (Reader (CurrentScope address)) sig
           , Member (Resumable (BaseError (ScopeError address))) sig
           , Member (Resumable (BaseError (HeapError address))) sig
           , Member (Resumable (BaseError (AddressError address value))) sig
@@ -98,7 +99,8 @@ class HasPrelude (language :: Language) where
                    , Member (Reader Span) sig
                    , Member (Resumable (BaseError (AddressError address value))) sig
                    , Member (State (Heap address address value)) sig
-                   , Member (Reader (address, address)) sig
+                   , Member (Reader (CurrentFrame address)) sig
+                   , Member (Reader (CurrentScope address)) sig
                    , Member Trace sig
                    , Ord address
                    , Show address
@@ -143,7 +145,8 @@ defineSelf :: ( AbstractValue term address value m
               , Member (Reader ModuleInfo) sig
               , Member (Reader Span) sig
               , Member (State (Heap address address value)) sig
-              , Member (Reader (address, address)) sig
+              , Member (Reader (CurrentFrame address)) sig
+              , Member (Reader (CurrentScope address)) sig
               , Ord address
               )
            => Evaluator term address value m ()

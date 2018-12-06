@@ -71,7 +71,8 @@ graphingTerms :: ( Member (Reader ModuleInfo) sig
                  , Member (State (ScopeGraph (Hole context (Located address)))) sig
                  , Member (Resumable (BaseError (ScopeError (Hole context (Located address))))) sig
                  , Member (Resumable (BaseError (HeapError (Hole context (Located address))))) sig
-                 , Member (Reader (Hole context (Located address), Hole context (Located address))) sig
+                 , Member (Reader (CurrentFrame (Hole context (Located address)))) sig
+                 , Member (Reader (CurrentScope (Hole context (Located address)))) sig
                  , Member (Reader ControlFlowVertex) sig
                  , VertexDeclaration syntax
                  , Declarations1 syntax

@@ -64,7 +64,8 @@ evaluate
     evalModule action = do
       scopeAddress <- newScope mempty
       frameAddress <- newFrame scopeAddress mempty
-      val <- raiseHandler (runReader (scopeAddress, frameAddress))
+      val <- raiseHandler (runReader (CurrentScope scopeAddress))
+        . raiseHandler (runReader (CurrentFrame frameAddress))
         . fmap reassociate
         . runScopeError
         . runHeapError
@@ -96,7 +97,8 @@ newtype SpecEff = SpecEff
                  (Eff (ResumableC (BaseError (ValueError SpecEff Precise))
                  (Eff (ResumableC (BaseError (HeapError Precise))
                  (Eff (ResumableC (BaseError (ScopeError Precise))
-                 (Eff (ReaderC (Precise, Precise)
+                 (Eff (ReaderC (CurrentFrame Precise)
+                 (Eff (ReaderC (CurrentScope Precise)
                  (Eff (AllocatorC Precise
                  (Eff (ReaderC Span
                  (Eff (StateC Span
@@ -106,7 +108,7 @@ newtype SpecEff = SpecEff
                  (Eff (StateC (Heap Precise Precise Val)
                  (Eff (StateC (ScopeGraph Precise)
                  (Eff (TraceByIgnoringC
-                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))
+                 (Eff (LiftC IO)))))))))))))))))))))))))))))))))))))))))))))
                  (ValueRef Precise Val)
   }
 
