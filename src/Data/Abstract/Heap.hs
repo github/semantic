@@ -40,8 +40,8 @@ import qualified Data.Map.Strict as Map
 import           Prelude hiding (lookup)
 import           Prologue
 
-data Frame scopeAddress frameAddress value = Frame {
-    scopeAddress :: scopeAddress
+data Frame scopeAddress frameAddress value = Frame
+  { scopeAddress :: scopeAddress
   , links        :: Map EdgeLabel (Map scopeAddress frameAddress)
   , slots        :: IntMap (Set value)
   }
