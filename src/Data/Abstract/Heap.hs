@@ -49,7 +49,7 @@ data Frame scopeAddress frameAddress value = Frame
 
 -- | A map of frame addresses onto Frames.
 newtype Heap scopeAddress frameAddress value = Heap { heap :: Map frameAddress (Frame scopeAddress frameAddress value) }
-  deriving stock (Eq, Generic, Ord, Show)
+  deriving stock (Eq, Generic, Ord)
   deriving newtype (NFData)
 
 instance Lower (Heap scopeAddress frameAddress value) where
@@ -180,5 +180,5 @@ isHeapEmpty h@Heap{..} = heapSize h == 1 &&
 --   cons (addr, a) (Heap heap) = Heap (cons (addr, a) heap)
 --   snoc (Heap heap) (addr, a) = Heap (snoc heap (addr, a))
 
--- instance (Show address, Show value) => Show (Heap address address value) where
---   showsPrec d = showsUnaryWith showsPrec "Heap" d . map (second toList) . Monoidal.pairs . unHeap
+instance (Show address, Show value) => Show (Heap address address value) where
+  showsPrec d = showsUnaryWith showsPrec "Heap" d . Map.toList . heap
