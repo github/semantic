@@ -139,14 +139,14 @@ declare declaration ddata assocScope currentScope g@(ScopeGraph graph) = fromMay
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
 reference :: Ord scope => Reference -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
-reference ref decl@Declaration{..} currentAddress g@(ScopeGraph graph) = fromMaybe g $ do
+reference ref decl@Declaration{..} currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
   go currentScope' currentAddress id
   where
     go currentScope address path
-      =   ScopeGraph . flip (Map.insert currentAddress) graph . modifyReferences currentScope . Map.insert ref . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
+      =   flip (insertScope currentAddress) g . modifyReferences currentScope . Map.insert ref . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
       <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
 
