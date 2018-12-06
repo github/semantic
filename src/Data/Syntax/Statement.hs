@@ -139,7 +139,7 @@ instance Evaluatable Let where
     valueName <- maybeM (throwEvalError NoNameError) (declaredName letValue)
     assocScope <- associatedScope (Declaration valueName)
 
-    withLexicalScopeAndFrame $ do
+    _ <- withLexicalScopeAndFrame $ do
       declare (Declaration name) letSpan assocScope
       letVal <- (eval letValue >>= Abstract.value)
       slot <- lookupDeclaration (Declaration name)
