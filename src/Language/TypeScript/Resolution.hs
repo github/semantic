@@ -127,18 +127,3 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
-
--- evalRequire :: ( AbstractValue term address value m
---                , Member (Allocator address) sig
---                , Member (Deref value) sig
---                , Member (Env address) sig
---                , Member (Modules address value) sig
---                , Member (State (Heap address address value)) sig
---                , Ord address
---                , Carrier sig m
---                )
---             => M.ModulePath
---             -> Name
---             -> Evaluator term address value m value
--- evalRequire modulePath alias = letrec' alias $ \addr ->
---   unit <$ makeNamespace alias addr Nothing (bindAll . fst . snd =<< require modulePath)
