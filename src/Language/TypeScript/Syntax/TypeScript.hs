@@ -665,36 +665,33 @@ instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 instance Evaluatable AbstractClass where
-  eval _ AbstractClass{..} = undefined -- do
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
-    -- supers <- traverse (eval >=> address) classHeritage
-    -- (v, addr) <- letrec name $ do
-    --   void $ eval classBody
-    --   classBinds <- Env.head <$> getEnv
-    --   klass name supers classBinds
-    -- rvalBox =<< (v <$ bind name addr)
+  eval eval AbstractClass{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName abstractClassIdentifier)
+    span <- ask @Span
+    currentScope' <- currentScope
 
-  -- Previous ScopeGraph approach:
-  -- eval AbstractClass{..} = do
-  --   name <- maybeM (throwEvalError NoNameError) (declaredName (subterm abstractClassIdentifier))
-  --   span <- ask @Span
-  --   -- Run the action within the class's scope.
-  --   currentScopeAddress <- currentScope
-  --
-  --   supers <- for classHeritage $ \superclass -> do
-  --     name <- maybeM (throwEvalError NoNameError) (declaredName (subterm superclass))
-  --     scope <- associatedScope (Declaration name)
-  --     (scope,) <$> subtermValue superclass
-  --
-  --   let imports = (ScopeGraph.Import, ) <$> (pure . catMaybes $ fst <$> supers)
-  --       current = pure (Lexical, [ currentScopeAddress ])
-  --       edges = Map.fromList (imports <> current)
-  --   childScope <- newScope edges
-  --   declare (Declaration name) span (Just childScope)
-  --
-  --   frame <- newFrame childScope mempty -- TODO: Instantiate frames for superclasses
-  --   withScopeAndFrame frame $ do
-  --     void $ subtermValue classBody
-  --     klass (Declaration name) (snd <$> supers) frame
-  --
-  --   rvalBox unit
+    superScopes <- for classHeritage $ \superclass -> do
+      name <- maybeM (throwEvalError NoNameError) (declaredName superclass)
+      scope <- associatedScope (Declaration name)
+      slot <- lookupDeclaration (Declaration name)
+      superclassFrame <- scopedEnvironment =<< deref slot
+      pure $ case (scope, superclassFrame) of
+        (Just scope, Just frame) -> Just (scope, frame)
+        _ -> Nothing
+
+    let superclassEdges = (Superclass, ) . pure . fst <$> catMaybes superScopes
+        current = (Lexical, ) <$> pure (pure currentScope')
+        edges = Map.fromList (superclassEdges <> current)
+    childScope <- newScope edges
+    declare (Declaration name) span (Just childScope)
+
+    let frameEdges = Map.singleton Superclass (Map.fromList (catMaybes superScopes))
+    childFrame <- newFrame childScope frameEdges
+
+    withScopeAndFrame childFrame $ do
+      void $ eval classBody
+
+    classSlot <- lookupDeclaration (Declaration name)
+    assign classSlot =<< klass (Declaration name) childFrame
+
+    rvalBox unit
