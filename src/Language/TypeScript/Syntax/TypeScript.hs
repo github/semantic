@@ -547,6 +547,22 @@ instance Ord1 Update where liftCompare = genericLiftCompare
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Update
 
+data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
+  deriving (Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
+
+instance Eq1 Module where liftEq = genericLiftEq
+instance Ord1 Module where liftCompare = genericLiftCompare
+instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Module where
+  eval _ (Module _ _) = undefined -- do
+    -- name <- maybeM (throwEvalError NoNameError) (declaredName iden)
+    -- rvalBox =<< letrec' name (\addr ->
+    --   makeNamespace name addr Nothing (traverse_ eval xs))
+
+instance Declarations1 Module where
+  liftDeclaredName declaredName = declaredName . moduleIdentifier
+
 data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Message1, NFData1, Named1, Ord, Show, ToJSONFields1, Traversable)
 
