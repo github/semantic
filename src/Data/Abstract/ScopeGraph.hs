@@ -139,23 +139,23 @@ declare declaration ddata assocScope currentScope g = fromMaybe (g, Nothing) $ d
 -- | Add a reference to a declaration in the scope graph.
 -- Returns the original scope graph if the declaration could not be found.
 reference :: Ord scope => Reference -> Declaration -> scope -> ScopeGraph scope -> ScopeGraph scope
-reference ref decl@Declaration{..} currentAddress g = fromMaybe g $ do
+reference ref decl currentAddress g = fromMaybe g $ do
   -- Start from the current address
   currentScope' <- lookupScope currentAddress g
   -- Build a path up to the declaration
   go currentScope' currentAddress id
   where
     go currentScope address path
-      =   flip (insertScope currentAddress) g . flip (insertReference ref) currentScope . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
+      =   flip (insertScope currentAddress) g . flip (insertReference ref) currentScope . path <$> pathToDeclaration decl address g
       <|> traverseEdges' Superclass <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path (go currentScope) edge
 
 -- | Insert a reference into the given scope by constructing a resolution path to the declaration within the given scope graph.
 insertImportReference :: Ord address => Reference -> Declaration -> address -> ScopeGraph address -> Scope address -> Maybe (Scope address)
-insertImportReference ref decl@Declaration{..} currentAddress g scope = go currentAddress (EPath Import currentAddress)
+insertImportReference ref decl currentAddress g scope = go currentAddress (EPath Import currentAddress)
   where
     go address path
-      =   flip (insertReference ref) scope . path . DPath decl . snd <$> lookupDeclaration unDeclaration address g
+      =   flip (insertReference ref) scope . path <$> pathToDeclaration decl address g
       <|> traverseEdges' Superclass <|> traverseEdges' Export <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
 
@@ -163,10 +163,13 @@ lookupScopePath :: Ord scopeAddress => Name -> scopeAddress -> ScopeGraph scopeA
 lookupScopePath declaration currentAddress g = go currentAddress id
   where
     go address path
-      =   path . DPath (Declaration declaration) . snd <$> lookupDeclaration declaration address g
+      =   path <$> pathToDeclaration (Declaration declaration) address g
       <|> path <$> lookupReference declaration address g
       <|> traverseEdges' Superclass <|> traverseEdges' Export <|> traverseEdges' Import <|> traverseEdges' Lexical
       where traverseEdges' edge = linksOfScope address g >>= Map.lookup edge >>= traverseEdges path go edge
+
+pathToDeclaration :: Ord scopeAddress => Declaration -> scopeAddress -> ScopeGraph scopeAddress -> Maybe (Path scopeAddress)
+pathToDeclaration decl address g = DPath decl . snd <$> lookupDeclaration (unDeclaration decl) address g
 
 insertReference :: Reference -> Path scopeAddress -> Scope scopeAddress -> Scope scopeAddress
 insertReference ref path scope = scope { references = Map.insert ref path (references scope) }
