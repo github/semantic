@@ -11,6 +11,7 @@ module Data.Abstract.Heap
   , deleteSlot
   , initFrame
   , newFrame
+  , insertFrame
   , heapLookup
   , heapLookupAll
   , heapSize
