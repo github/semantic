@@ -133,11 +133,19 @@ instance Ord1 Let where liftCompare = genericLiftCompare
 instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Let where
-  eval _ Let{..} = do
-    undefined
-    -- name <- maybeM (throwEvalError NoNameError) (declaredName letVariable)
-    -- addr <- snd <$> letrec name (eval letValue >>= Abstract.value)
-    -- Rval <$> locally (bind name addr *> (eval letBody >>= address))
+  eval eval Let{..} = do
+    name <- maybeM (throwEvalError NoNameError) (declaredName letVariable)
+    letSpan <- ask @Span
+    valueName <- maybeM (throwEvalError NoNameError) (declaredName letValue)
+    assocScope <- associatedScope (Declaration valueName)
+
+    withLexicalScopeAndFrame $ do
+      declare (Declaration name) letSpan assocScope
+      letVal <- (eval letValue >>= Abstract.value)
+      slot <- lookupDeclaration (Declaration name)
+      assign slot letVal
+      eval letBody
+    rvalBox unit
 
 
 -- Assignment
