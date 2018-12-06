@@ -246,9 +246,7 @@ instance Eq1 NamespaceName where liftEq = genericLiftEq
 instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable NamespaceName where
-  eval _ (NamespaceName _) = undefined -- Rval <$> foldl1 f (fmap (eval >=> address) xs)
-    -- where f ns id = ns >>= flip evaluateInScopedEnv id
+instance Evaluatable NamespaceName
 
 newtype ConstDeclaration a = ConstDeclaration { values :: [a] }
   deriving (Declarations1, Diffable, Eq, Foldable, FreeVariables1, Functor, Generic1, Hashable1, Ord, Show, ToJSONFields1, Traversable, Named1, Message1, NFData1)
